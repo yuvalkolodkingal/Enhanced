@@ -186,6 +186,44 @@ public final class EnhancedRenderTypes {
         return WEB_DECAL.apply(texture);
     }
 
+    private static final Function<ResourceLocation, RenderType> ONE_SIDED_GLOW = Util.memoize(texture ->
+            RenderType.create("enhanced_one_sided_glow",
+                    DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 16384, false, true,
+                    RenderType.CompositeState.builder()
+                            .setShaderState(POSITION_TEX_COLOR)
+                            .setTextureState(new RenderStateShard.TextureStateShard(texture, true, false))
+                            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+                            .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                            .setCullState(RenderStateShard.CULL)
+                            .createCompositeState(false)));
+
+    /**
+     * Textured (smoothly filtered), additive, fullbright and seen from its front only (3.7.1): the Hex Runes, which are
+     * drawn facing in or facing out (to the side the camera is on) so they read the right way round from either side.
+     */
+    public static RenderType oneSidedGlow(ResourceLocation texture) {
+        return ONE_SIDED_GLOW.apply(texture);
+    }
+
+    private static final Function<ResourceLocation, RenderType> ONE_SIDED_SHADE = Util.memoize(texture ->
+            RenderType.create("enhanced_one_sided_shade",
+                    DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 4096, false, true,
+                    RenderType.CompositeState.builder()
+                            .setShaderState(POSITION_TEX_COLOR)
+                            .setTextureState(new RenderStateShard.TextureStateShard(texture, true, false))
+                            .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                            .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                            .setCullState(RenderStateShard.CULL)
+                            .createCompositeState(false)));
+
+    /**
+     * {@link #oneSidedGlow} with normal alpha blending instead of adding light (3.7.1): the dark red mist behind each Hex
+     * Rune, which darkens a bright sky so the runes stay scarlet by day.
+     */
+    public static RenderType oneSidedShade(ResourceLocation texture) {
+        return ONE_SIDED_SHADE.apply(texture);
+    }
+
     private EnhancedRenderTypes() {
     }
 }

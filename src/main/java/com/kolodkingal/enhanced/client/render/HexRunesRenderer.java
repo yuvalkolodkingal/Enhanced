@@ -4,10 +4,9 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.hex.Hex;
-import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.hex.HexRuneLayout;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -19,63 +18,132 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
+import java.util.Collection;
+
 /**
- * The Hex Runes (3.3) on the four walls of a Hex, as on the walls of Westview: on each side of the dome (north, east, south,
- * west) a panel of glowing red runes on the wall, from just above the middle of the Hex upward, drawn just inside and just
- * outside the wall so they are seen from both sides (the dome's own veil lies between, so they never fight it). Each rune
- * breathes slowly on its own beat; they fade in when Wanda inscribes them and out when she wipes them, all from synced game
- * time and the partial tick, so nothing pops or flickers. Reduced motion: they glow steady.
+ * The Hex Runes on the four walls of a Hex (3.3; 3.7.1 as in the WandaVision finale): huge scarlet runes of glowing lines
+ * hanging on the wall, each in a soft red mist with faint scanlines, spread over every wall ({@link HexRuneLayout}: rows of
+ * them from the ground to where the wall turns into the roof) and growing with the Hex: they are laid out each frame at the
+ * radius the wall is drawn at ({@link WorldEffectsRenderer.ShownHex}), so they rise with a rising wall, swell or shrink with
+ * it while it eases to a new size, and a wall that gained or lost runes fades the old ones into the new.
+ *
+ * <p>A rune is its strokes ({@link HexRuneGlyphs}), each a wide soft halo under a neon tube (bright edges, dimmer inside),
+ * fullbright and additive, over a dark red mist that darkens a bright sky (so they stay scarlet by day) and a red glow. The runes lie on the sphere just inside the wall when the camera is inside the Hex and just
+ * outside it when it is outside, facing the camera's side only (so they read the right way round from both sides and the
+ * far wall's runes do not show back to front through the dome); nothing writes depth, so they never fight the wall. When
+ * Wanda inscribes them they are drawn stroke by stroke; when she wipes them they fade. Each breathes on its own beat with a
+ * rare flicker; under Reduced motion they glow steady.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class HexRunesRenderer {
-    static final ResourceLocation RUNES = Enhanced.id("textures/entity/hex_runes.png");
-    /** How long (ticks) the runes take to fade in or out. */
+    static final ResourceLocation GLOW_TEXTURE = Enhanced.id("textures/entity/hex_rune_glow.png");
+    /** Ticks the strokes take to be drawn when Wanda inscribes the runes, and the runes to fade when she wipes them. */
+    private static final float INSCRIBE_TICKS = 40.0F;
     private static final float FADE_TICKS = 30.0F;
-    /** How far (blocks) inside and outside the wall the two layers lie. */
-    private static final double LAYER = 0.15;
-    private static final int GLOW = 0xFF3A55;
-    private static final int CORE = 0xFFB0BC;
+    /** Ticks the runes of a wall that gained or lost some take to fade from the old count into the new. */
+    private static final float RECOUNT_TICKS = 20.0F;
+    /** How far (blocks) inside or outside the wall the runes lie. */
+    private static final double LAYER = 0.12;
+    /** A stroke's halo and tube widths, and the mist's half-size, in rune heights. */
+    private static final double HALO_WIDTH = 0.28;
+    private static final double TUBE_WIDTH = 0.085;
+    private static final double MIST = 0.85;
+    private static final int HALO = 0xFF1020;
+    private static final int TUBE = 0xFF5A4E;
+    private static final int MIST_COLOR = 0xB0102A;
+    /** The dark red of the mist that darkens the sky behind a rune (so a rune is scarlet by day too). */
+    private static final int SHADE = 0x3A0610;
+    /** The strips of the glow texture: the halo, the tube (across a stroke) and the mist. */
+    private static final float HALO_U0 = 1F / 64F;
+    private static final float HALO_U1 = 15F / 64F;
+    private static final float TUBE_U0 = 17F / 64F;
+    private static final float TUBE_U1 = 31F / 64F;
+    private static final float MIST_U0 = 32F / 64F;
+    private static final float MIST_U1 = 1F;
+    /** The pose the runes are drawn with (the camera's own is the level's model-view). */
+    private static final Matrix4f POSE = new Matrix4f();
+    /** One wall's runes, filled by {@link HexRuneLayout#place} (reused every frame). */
+    private static final float[] PLACES = new float[HexRuneLayout.MAX_PER_WALL * HexRuneLayout.FIELDS];
 
+    /** The frame's state of the rune being drawn (the render thread only), so nothing is allocated per stroke. */
+    private static double cx;
+    private static double cy;
+    private static double cz;
+    private static double r;
+    private static double dx;
+    private static double dy;
+    private static double dz;
+    private static double rightX;
+    private static double rightZ;
+    private static double upX;
+    private static double upY;
+    private static double upZ;
+    private static double tiltCos;
+    private static double tiltSin;
+
+    /**
+     * Draws the runes of every Hex that has them, after the walls ({@link WorldEffectsRenderer}, after the particles) and
+     * after the clouds and the weather, which would otherwise be drawn over them (nothing here writes depth): first the
+     * dark mist behind them, then their light.
+     */
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER || Minecraft.getInstance().level == null) {
             return;
         }
-        Minecraft mc = Minecraft.getInstance();
-        ClientLevel level = mc.level;
-        if (level == null) {
-            return;
-        }
-        var hexes = level.getData(ModAttachments.HEXES).hexes();
+        Collection<WorldEffectsRenderer.ShownHex> hexes = WorldEffectsRenderer.shownHexes();
         if (hexes.isEmpty()) {
             return;
         }
-        Vec3 camera = event.getCamera().getPosition();
-        float time = level.getGameTime() + event.getPartialTick().getGameTimeDeltaPartialTick(false);
-        double reach = mc.options.getEffectiveRenderDistance() * 16.0 + 32.0;
+        Minecraft mc = Minecraft.getInstance();
+        float time = mc.level.getGameTime() + event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        render(POSE, mc.renderBuffers().bufferSource(), hexes, event.getCamera().getPosition(), time,
+                mc.options.getEffectiveRenderDistance() * 16.0);
+    }
+
+    static void render(Matrix4f pose, MultiBufferSource.BufferSource buffers, Collection<WorldEffectsRenderer.ShownHex> hexes,
+                       Vec3 camera, float time, double renderDistance) {
+        pass(pose, buffers, EnhancedRenderTypes.oneSidedShade(GLOW_TEXTURE), true, hexes, camera, time, renderDistance);
+        pass(pose, buffers, EnhancedRenderTypes.oneSidedGlow(GLOW_TEXTURE), false, hexes, camera, time, renderDistance);
+    }
+
+    private static void pass(Matrix4f pose, MultiBufferSource.BufferSource buffers, RenderType type, boolean shade,
+                             Collection<WorldEffectsRenderer.ShownHex> hexes, Vec3 camera, float time, double renderDistance) {
         boolean still = EnhancedClientConfig.reducedMotion();
-        Matrix4f pose = new Matrix4f();
-        MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        RenderType type = EnhancedRenderTypes.energyField(RUNES);
         VertexConsumer vc = null;
-        for (Hex hex : hexes) {
-            float shown = shown(hex, time);
-            if (shown <= 0.0F) {
+        for (WorldEffectsRenderer.ShownHex shown : hexes) {
+            Hex hex = shown.hex;
+            float alpha = shown(hex, time) * AnimMath.ss(0.0F, 1.0F, shown.fade);
+            if (alpha <= 0.0F) {
                 continue;
             }
-            float grow = Mth.clamp((time - hex.createdAt()) / 50F, 0F, 1F);
-            grow = grow * grow * (3 - 2 * grow);
-            double radius = hex.radius() * grow;
-            Vec3 center = hex.center().subtract(camera);
-            double distance = center.length();
-            if (radius < 2.0 || Math.abs(distance - radius) > reach) {
+            double radius = shown.drawnRadius(time);
+            cx = hex.center().x - camera.x;
+            cy = hex.center().y - camera.y;
+            cz = hex.center().z - camera.z;
+            double distance = Math.sqrt(cx * cx + cy * cy + cz * cz);
+            if (radius < 2.0 || Math.abs(distance - radius) > renderDistance + 32.0) {
                 continue;
             }
             if (vc == null) {
                 vc = buffers.getBuffer(type);
             }
+            boolean inside = distance < radius;
+            r = inside ? radius - LAYER : radius + LAYER;
+            float progress = hex.runes() ? Mth.clamp((time - hex.runesAt()) / INSCRIBE_TICKS, 0.0F, 1.0F) : 1.0F;
+            // (3.5: the runes of a Hex raised in a chosen colour glow in it.)
+            int halo = hex.color() < 0 ? HALO : AbilityColors.recolor(HALO, hex.color());
+            int tube = hex.color() < 0 ? TUBE : AbilityColors.recolor(TUBE, hex.color());
+            int mist = hex.color() < 0 ? MIST_COLOR : AbilityColors.recolor(MIST_COLOR, hex.color());
+            float recount = AnimMath.ss(0.0F, 1.0F, (time - shown.runeRadiusAt) / RECOUNT_TICKS);
+            boolean blend = recount < 1.0F && !HexRuneLayout.sameLayout(shown.runeRadius, shown.runeRadiusBefore);
             for (int side = 0; side < 4; side++) {
-                panel(pose, vc, center, radius, side, shown, time, still, hex.id().hashCode(), hex.color());
+                wall(pose, vc, shade, radius, shown.runeRadius, side, blend ? alpha * recount : alpha, progress, inside,
+                        still, time, halo, tube, mist);
+                if (blend) {
+                    wall(pose, vc, shade, radius, shown.runeRadiusBefore, side, alpha * (1.0F - recount), progress, inside,
+                            still, time, halo, tube, mist);
+                }
             }
         }
         if (vc != null) {
@@ -83,61 +151,131 @@ public final class HexRunesRenderer {
         }
     }
 
-    /** How much the runes of this Hex show now: fading in after they were inscribed, fading out after they were wiped. */
+    /**
+     * How much the runes of this Hex show now: fully while inscribed (they are drawn in stroke by stroke), fading out after
+     * they were wiped.
+     */
     static float shown(Hex hex, float time) {
-        float since = Mth.clamp((time - hex.runesAt()) / FADE_TICKS, 0.0F, 1.0F);
-        since = since * since * (3.0F - 2.0F * since);
-        return hex.runes() ? since : 1.0F - since;
+        if (hex.runes()) {
+            return 1.0F;
+        }
+        return 1.0F - AnimMath.ss(0.0F, 1.0F, (time - hex.runesAt()) / FADE_TICKS);
     }
 
-    /** One wall's panel of runes: a grid of cells on the sphere, each a rune of the sheet, inside and outside. */
-    private static void panel(Matrix4f pose, VertexConsumer vc, Vec3 center, double radius, int side, float shown, float time, boolean still,
-                              int seed, int hexColor) {
-        // (3.5: the runes of a Hex raised in a chosen colour glow in it.)
-        int glowRgb = hexColor < 0 ? GLOW : AbilityColors.recolor(GLOW, hexColor);
-        int coreRgb = hexColor < 0 ? CORE : AbilityColors.recolor(CORE, hexColor);
-        double cell = Mth.clamp(radius / 12.0, 1.2, 3.0);
-        double width = Math.min(radius * 0.9, 18.0);
-        double height = Math.min(radius * 0.55, 9.0);
-        int cols = Math.max(2, (int) Math.round(width / cell));
-        int rows = Math.max(1, (int) Math.round(height / cell));
-        double base = 0.5;
-        double azimuth = Math.PI * 0.5 * side;
-        double span = cols * cell / radius; // the angle the panel spans
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                int glyph = Math.floorMod(seed * 31 + side * 977 + row * 131 + col * 17 + (col * row) * 7, 16);
-                float beat = still ? 1.0F : 0.72F + 0.28F * Mth.sin(time * 0.07F + side * 1.3F + row * 0.9F + col * 1.7F);
-                float alpha = shown * beat;
-                double a0 = azimuth - span * 0.5 + (col + 0.08) * cell / radius;
-                double a1 = azimuth - span * 0.5 + (col + 0.92) * cell / radius;
-                double y0 = base + (row + 0.08) * cell;
-                double y1 = base + (row + 0.92) * cell;
-                if (y1 >= radius - 0.5) {
-                    continue; // (a small Hex: no room up there)
+    /** One wall's runes, as many as a Hex of radius {@code countRadius} has, laid out at {@code radius}. */
+    private static void wall(Matrix4f pose, VertexConsumer vc, boolean shade, double radius, int countRadius, int side,
+                             float alpha, float progress, boolean inside, boolean still, float time, int halo, int tube,
+                             int mist) {
+        int n = HexRuneLayout.place(radius, countRadius, side, PLACES, 0);
+        for (int k = 0; k < n; k++) {
+            int at = k * HexRuneLayout.FIELDS;
+            float phase = PLACES[at + HexRuneLayout.PHASE];
+            float glow = alpha;
+            if (!still) {
+                glow *= 0.84F + 0.16F * Mth.sin(time * 0.08F + phase);
+                // Now and then a rune flickers, as the film's do.
+                if (Mth.sin(time * 0.9F + phase * 3.1F) * Mth.sin(time * 0.23F + phase) > 0.92F) {
+                    glow *= 0.65F;
                 }
-                float u0 = (glyph % 8) / 8.0F;
-                float v0 = (glyph / 8) / 2.0F;
-                float u1 = u0 + 1.0F / 8.0F;
-                float v1 = v0 + 0.5F;
-                for (double r : new double[]{radius - LAYER, radius + LAYER}) {
-                    int glow = EnergyGeometry.argb(glowRgb, 0.85F * alpha);
-                    int core = EnergyGeometry.argb(coreRgb, 0.85F * alpha);
-                    vertex(pose, vc, center, r, a0, y0, u0, v1, glow);
-                    vertex(pose, vc, center, r, a1, y0, u1, v1, glow);
-                    vertex(pose, vc, center, r, a1, y1, u1, v0, core);
-                    vertex(pose, vc, center, r, a0, y1, u0, v0, core);
+            }
+            rune(pose, vc, shade, side, PLACES[at + HexRuneLayout.AZIMUTH], PLACES[at + HexRuneLayout.ELEVATION],
+                    PLACES[at + HexRuneLayout.SIZE], (int) PLACES[at + HexRuneLayout.GLYPH], PLACES[at + HexRuneLayout.TILT],
+                    glow, progress, inside, halo, tube, mist);
+        }
+    }
+
+    /** One rune: its dark mist (the shade pass), or its glowing mist and its strokes (as many as are drawn in yet). */
+    private static void rune(Matrix4f pose, VertexConsumer vc, boolean shade, int side, float azimuth, float elevation, float size, int glyph,
+                             float tilt, float alpha, float progress, boolean inside, int halo, int tube, int mist) {
+        double a = side * HexRuneLayout.QUARTER + azimuth;
+        double sinA = Math.sin(a);
+        double cosA = Math.cos(a);
+        double sinE = Math.sin(elevation);
+        double cosE = Math.cos(elevation);
+        dx = sinA * cosE;
+        dy = sinE;
+        dz = cosA * cosE;
+        // Right and up on the wall as seen from the camera's side of it (from inside, right is the other way round).
+        rightX = inside ? -cosA : cosA;
+        rightZ = inside ? sinA : -sinA;
+        upX = -sinE * sinA;
+        upY = cosE;
+        upZ = -sinE * cosA;
+        tiltCos = 1.0;
+        tiltSin = 0.0;
+        // The mist first, level (its scanlines run straight across), coming up as the strokes are drawn in.
+        double m = size * MIST;
+        float misty = alpha * Math.min(1.0F, progress * 3.0F);
+        int mistArgb = shade ? EnergyGeometry.argb(SHADE, 0.6F * misty) : EnergyGeometry.argb(mist, 0.45F * misty);
+        vertex(pose, vc, -m, -m, MIST_U0, 1.0F, mistArgb);
+        vertex(pose, vc, m, -m, MIST_U1, 1.0F, mistArgb);
+        vertex(pose, vc, m, m, MIST_U1, 0.0F, mistArgb);
+        vertex(pose, vc, -m, m, MIST_U0, 0.0F, mistArgb);
+        if (shade) {
+            return;
+        }
+        tiltCos = Math.cos(tilt);
+        tiltSin = Math.sin(tilt);
+        double haloHalf = size * HALO_WIDTH * 0.5;
+        double tubeHalf = size * TUBE_WIDTH * 0.5;
+        float drawn = progress * HexRuneGlyphs.SEGMENTS[glyph];
+        int segment = 0;
+        for (float[] stroke : HexRuneGlyphs.STROKES[glyph]) {
+            for (int p = 0; p + 3 < stroke.length; p += 2, segment++) {
+                if (segment >= drawn) {
+                    return;
                 }
+                float part = Math.min(1.0F, drawn - segment);
+                // A short segment (of a ring) is dimmer, so a small ring whose glow overlaps itself is no white blot.
+                float ax = stroke[p + 2] - stroke[p];
+                float ay = stroke[p + 3] - stroke[p + 1];
+                double full = Math.sqrt(ax * ax + ay * ay) * size;
+                int haloArgb = EnergyGeometry.argb(halo, 0.7F * alpha * (float) Math.min(1.0, full / (2.0 * haloHalf)));
+                int tubeArgb = EnergyGeometry.argb(tube, alpha);
+                double x0 = stroke[p] * size;
+                double y0 = stroke[p + 1] * size;
+                double x1 = Mth.lerp(part, stroke[p], stroke[p + 2]) * size;
+                double y1 = Mth.lerp(part, stroke[p + 1], stroke[p + 3]) * size;
+                ribbon(pose, vc, x0, y0, x1, y1, haloHalf, HALO_U0, HALO_U1, haloArgb);
+                ribbon(pose, vc, x0, y0, x1, y1, tubeHalf, TUBE_U0, TUBE_U1, tubeArgb);
             }
         }
     }
 
-    /** The point of the sphere of radius {@code r} round {@code center} at {@code azimuth}, {@code y} blocks above its middle. */
-    private static void vertex(Matrix4f pose, VertexConsumer vc, Vec3 center, double r, double azimuth, double y, float u, float v, int argb) {
-        double flat = Math.sqrt(Math.max(0.0, r * r - y * y));
-        float x = (float) (center.x + Math.sin(azimuth) * flat);
-        float z = (float) (center.z + Math.cos(azimuth) * flat);
-        vc.addVertex(pose, x, (float) (center.y + y), z).setUv(u, v).setColor(argb);
+    /** A stroke from (x0, y0) to (x1, y1) (blocks, on the rune), {@code half} wide each way, its ends a little past its points. */
+    private static void ribbon(Matrix4f pose, VertexConsumer vc, double x0, double y0, double x1, double y1, double half,
+                               float u0, float u1, int argb) {
+        double lx = x1 - x0;
+        double ly = y1 - y0;
+        double length = Math.sqrt(lx * lx + ly * ly);
+        if (length < 1.0E-4) {
+            return;
+        }
+        lx /= length;
+        ly /= length;
+        // Its ends reach a little past its points to close the joints (less for the short segments of a ring).
+        double reach = Math.min(half * 0.6, length * 0.3);
+        double ex = lx * reach;
+        double ey = ly * reach;
+        double px = -ly * half;
+        double py = lx * half;
+        // Counter-clockwise as seen from the camera's side, so the culling keeps it.
+        vertex(pose, vc, x0 - ex - px, y0 - ey - py, u0, 0.25F, argb);
+        vertex(pose, vc, x1 + ex - px, y1 + ey - py, u0, 0.75F, argb);
+        vertex(pose, vc, x1 + ex + px, y1 + ey + py, u1, 0.75F, argb);
+        vertex(pose, vc, x0 - ex + px, y0 - ey + py, u1, 0.25F, argb);
+    }
+
+    /** The point (x, y) blocks from the middle of the rune (turned by its tilt), laid on the sphere the runes lie on. */
+    private static void vertex(Matrix4f pose, VertexConsumer vc, double x, double y, float u, float v, int argb) {
+        double tx = (x * tiltCos - y * tiltSin) / r;
+        double ty = (x * tiltSin + y * tiltCos) / r;
+        double px = dx + tx * rightX + ty * upX;
+        double py = dy + ty * upY;
+        double pz = dz + tx * rightZ + ty * upZ;
+        double scale = r / Math.sqrt(px * px + py * py + pz * pz);
+        vc.addVertex(pose, (float) (cx + px * scale), (float) (cy + py * scale), (float) (cz + pz * scale)).setUv(u, v)
+                .setColor(argb);
     }
 
     private HexRunesRenderer() {

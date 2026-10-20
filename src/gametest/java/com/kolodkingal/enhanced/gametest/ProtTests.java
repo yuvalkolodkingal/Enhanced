@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.config.HexRunesConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.hex.HexRuneLayout;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -495,6 +496,90 @@ public final class ProtTests {
         check(com.kolodkingal.enhanced.darkhold.DarkholdBook.mayUse(loki), "before the runes, he reads it");
         HexManager.handleAction(wanda, HexAction.SET_RUNES, Optional.empty(), 1);
         check(!com.kolodkingal.enhanced.darkhold.DarkholdBook.mayUse(loki), "with the runes up, the book is shut");
+        helper.succeed();
+    }
+
+    /**
+     * 3.7.1: the runes are spread over all four walls and grow with the Hex. Every wall has several, the film's two among
+     * them, each on its own quarter of the dome between the ground and the roof, none crowding another (on its wall or the
+     * next); a bigger Hex has bigger runes, up to a cap, and past it more of them. While the wall eases to a new size the runes
+     * are already the new Hex's, at the size of the wall drawn now.
+     */
+    @GameTest(template = ARENA, batch = "prot_runes_layout")
+    public static void theRunesCoverTheWallsAndGrowWithTheHex(GameTestHelper helper) {
+        float[] out = new float[HexRuneLayout.MAX_PER_WALL * HexRuneLayout.FIELDS];
+        Vec3[] spots = new Vec3[4 * HexRuneLayout.MAX_PER_WALL];
+        int lastCount = 0;
+        double lastSize = 0.0;
+        check(HexRuneLayout.count(4) >= 1, "the smallest Hex has a rune on each wall");
+        for (int radius : new int[]{8, 16, 24, 32, 48, 64, 96, 128, 192, 256}) {
+            int count = HexRuneLayout.count(radius);
+            double size = HexRuneLayout.size(radius);
+            check(count >= 2 && count <= HexRuneLayout.MAX_PER_WALL, "radius " + radius + ": runes on a wall " + count);
+            check(count >= lastCount, "radius " + radius + ": a bigger Hex never has fewer runes (" + count + " < " + lastCount + ")");
+            check(size >= lastSize, "radius " + radius + ": a bigger Hex never has smaller runes");
+            lastCount = count;
+            lastSize = size;
+            int spotCount = 0;
+            for (int side = 0; side < 4; side++) {
+                int n = HexRuneLayout.place(radius, radius, side, out, 0);
+                check(n == count, "radius " + radius + " wall " + side + ": " + n + " runes, not " + count);
+                boolean branch = false;
+                boolean gate = false;
+                for (int k = 0; k < n; k++) {
+                    int at = k * HexRuneLayout.FIELDS;
+                    double azimuth = out[at + HexRuneLayout.AZIMUTH];
+                    double elevation = out[at + HexRuneLayout.ELEVATION];
+                    int glyph = (int) out[at + HexRuneLayout.GLYPH];
+                    check(out[at + HexRuneLayout.SIZE] == (float) size, "every rune of the wall is the Hex's size");
+                    check(Math.abs(azimuth) < HexRuneLayout.QUARTER * 0.5, "radius " + radius + ": a rune off its wall");
+                    check(radius * Math.sin(elevation) - size * 0.5 >= HexRuneLayout.GROUND - 1.0E-3,
+                            "radius " + radius + ": a rune's foot in the ground");
+                    check(elevation <= HexRuneLayout.TOP, "radius " + radius + ": a rune up in the roof");
+                    check(glyph >= 0 && glyph < HexRuneLayout.GLYPHS, "a rune that does not exist: " + glyph);
+                    branch |= glyph == 0;
+                    gate |= glyph == 1;
+                    spots[spotCount++] = HexRuneLayout.direction(side, azimuth, elevation).scale(radius);
+                }
+                check(branch && gate, "radius " + radius + " wall " + side + ": the film's two runes are on it");
+            }
+            for (int a = 0; a < spotCount; a++) {
+                for (int b = a + 1; b < spotCount; b++) {
+                    check(spots[a].distanceTo(spots[b]) >= size * 1.2,
+                            "radius " + radius + ": two runes crowd each other (" + spots[a].distanceTo(spots[b]) + ")");
+                }
+            }
+        }
+        check(HexRuneLayout.size(8) < HexRuneLayout.size(16) && HexRuneLayout.size(16) < HexRuneLayout.size(32)
+                && HexRuneLayout.size(32) < HexRuneLayout.size(48), "the runes grow with the Hex");
+        check(HexRuneLayout.size(96) == HexRuneLayout.MAX_SIZE && HexRuneLayout.size(256) == HexRuneLayout.MAX_SIZE,
+                "but never into giants");
+        check(HexRuneLayout.count(256) > HexRuneLayout.count(64) && HexRuneLayout.count(96) > HexRuneLayout.count(32),
+                "a huge Hex has more runes instead");
+        // Easing from 32 to 64: the 64's runes, at the size and height of the wall drawn now.
+        int n = HexRuneLayout.place(48, 64, 2, out, 0);
+        check(n == HexRuneLayout.count(64), "the runes of the Hex it is set to");
+        assertNear(out[HexRuneLayout.SIZE], HexRuneLayout.size(48), 1.0E-4, "at the size of the wall drawn now");
+        double low = 48 * Math.sin(out[HexRuneLayout.ELEVATION]);
+        HexRuneLayout.place(64, 64, 2, out, 0);
+        check(64 * Math.sin(out[HexRuneLayout.ELEVATION]) > low, "and they rise as the wall grows");
+        helper.succeed();
+    }
+
+    /** Resizing the Hex keeps its runes: grown over a sorcerer standing outside, they hold him; shrunk off him, he is free. */
+    @GameTest(template = ARENA, batch = "prot_runes_grow", timeoutTicks = 40)
+    public static void theRunesGrowWithTheHex(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = HexTests.raiseHex(f);
+        wanda.getFoodData().setFoodLevel(20);
+        ServerPlayer loki = f.player(10.5, FLOOR, 1.0, Power.LOKI);
+        HexManager.handleAction(wanda, HexAction.SET_RUNES, Optional.empty(), 1);
+        check(hexOf(f, wanda).runes() && !HexRunes.silences(loki), "runes up; Loki outside is free");
+        HexManager.handleAction(wanda, HexAction.SET_RADIUS, Optional.empty(), 12);
+        check(hexOf(f, wanda).radius() == 12 && hexOf(f, wanda).runes(), "she grows the Hex: the runes stay inscribed");
+        check(HexRunes.silences(loki), "and they hold Loki, inside the bigger Hex now");
+        HexManager.handleAction(wanda, HexAction.SET_RADIUS, Optional.empty(), 8);
+        check(hexOf(f, wanda).runes() && !HexRunes.silences(loki), "shrunk again: he is outside and free");
         helper.succeed();
     }
 

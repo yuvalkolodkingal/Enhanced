@@ -44,6 +44,14 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine and Deadpool) are on [Looks](Looks).
 
+## What's new in 3.7.1
+
+Eilon's request, with pictures from the show:
+
+* **Wanda's [Hex Runes](Scarlet-Witch#hex-runes) look like the *WandaVision* finale:** huge glowing scarlet runes, drawn stroke by stroke, several on each of the Hex's four walls, readable from inside and from outside. **They grow with the Hex**: make it bigger or smaller and the runes follow the wall.
+* **Avengers Tower** no longer writes 13 errors to the log about its item frames when it is built.
+* Works with 3.7 servers and players (network protocol **11**, unchanged); the new runes show for players who have 3.7.1.
+
 ## What's new in 3.7
 
 Eilon asked for Wolverine, Deadpool, Cerebro in the Mutant School and a Stone Locator; his mom asked for a happy home for Agatha, Nicky and Rio; and Eilon added a meeting with Death.

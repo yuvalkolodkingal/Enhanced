@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -236,12 +237,24 @@ public final class WorldEffectsRenderer {
      * What the client shows of each Hex (3.3): the radius it is drawn at, easing to the real one when the Scarlet Witch
      * resizes it (it jumped), and a Hex that was just dissolved, sinking and fading away for {@link #HEX_FADE_TICKS}
      * (it vanished at once). Only the picture lingers: the wall is gone on the server the moment it is dissolved.
+     * 3.7.1: its runes follow it ({@link HexRunesRenderer}): the radius it is set to (how many runes each wall has), the
+     * one it was set to before and when it changed (the runes of the old count fade into those of the new).
      */
-    private static final class ShownHex {
+    static final class ShownHex {
         Hex hex;
         float radius;
         float fade = 1.0F;
         boolean gone;
+        int runeRadius;
+        int runeRadiusBefore;
+        float runeRadiusAt = Float.NEGATIVE_INFINITY;
+
+        /** The radius its wall is drawn at now: rising when it was just raised, sinking when it was just dissolved. */
+        float drawnRadius(float time) {
+            float grow = Mth.clamp((time - hex.createdAt()) / 50F, 0F, 1F);
+            grow = grow * grow * (3 - 2 * grow);
+            return radius * grow * (0.85F + 0.15F * AnimMath.ss(0.0F, 1.0F, fade));
+        }
     }
 
     private static final Map<UUID, ShownHex> SHOWN_HEXES = new HashMap<>();
@@ -249,6 +262,11 @@ public final class WorldEffectsRenderer {
     private static float hexClock = Float.NaN;
     @Nullable
     private static ClientLevel hexLevel;
+
+    /** The Hexes as shown this frame (3.7.1: {@link HexRunesRenderer} draws their runes on them). */
+    static Collection<ShownHex> shownHexes() {
+        return SHOWN_HEXES.values();
+    }
 
     public static void clearHexes() {
         SHOWN_HEXES.clear();
@@ -272,6 +290,12 @@ public final class WorldEffectsRenderer {
             ShownHex shown = SHOWN_HEXES.computeIfAbsent(hex.id(), id -> new ShownHex());
             if (shown.hex == null) {
                 shown.radius = hex.radius();
+                shown.runeRadius = hex.radius();
+                shown.runeRadiusBefore = hex.radius();
+            } else if (hex.radius() != shown.runeRadius) {
+                shown.runeRadiusBefore = shown.runeRadius;
+                shown.runeRadius = hex.radius();
+                shown.runeRadiusAt = time;
             }
             shown.hex = hex;
             shown.gone = false;
@@ -289,7 +313,7 @@ public final class WorldEffectsRenderer {
             grow = grow * grow * (3 - 2 * grow);
             // A dissolved Hex sinks a little as it fades.
             float fade = AnimMath.ss(0.0F, 1.0F, shown.fade);
-            float radius = shown.radius * grow * (0.85F + 0.15F * fade);
+            float radius = shown.drawnRadius(time);
             if (radius < 0.5F || fade <= 0.0F) {
                 continue;
             }
