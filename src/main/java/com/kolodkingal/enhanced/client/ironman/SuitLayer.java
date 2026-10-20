@@ -77,6 +77,10 @@ public class SuitLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Abs
             return chest != null && chest.classic() ? chest : null;
         }
         SuitKind kind = state.phaseKind();
+        if (kind == SuitKind.HULKBUSTER || kind == null && SuitKind.of(state.suit()) == SuitKind.HULKBUSTER) {
+            // (Lane L4: the Hulkbuster is the renderer swap's, HulkbusterRenderer, and its frame's in a phase.)
+            return null;
+        }
         if (kind == null) {
             kind = SuitKind.of(state.suit());
         }

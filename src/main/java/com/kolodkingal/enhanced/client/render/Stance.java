@@ -149,6 +149,16 @@ public enum Stance {
     /** The Mark 1's Brace: arms crossed before the chest, knees bent. */
     IRON_BRACING(1.5F, 3.0F, true)
     // ===== nanotech (3.8) =====
+    // (Lane L4, after lane L3's; NanoActing.)
+    ,
+    /** A nanotech shield is up: the left arm before him behind it. */
+    NANO_SHIELD(1.5F, 3.0F, true),
+    /** The nano blade or the energy blades are out: a low guard, the fists out. */
+    NANO_BLADES(2.0F, 3.0F, false),
+    /** The Mark 50's nano cannon charges: both forearms forward, merged. */
+    NANO_CANNON(1.5F, 3.0F, true),
+    /** The Hulkbuster holds what he grabbed up in his right fist. */
+    HULKBUSTER_GRAB(1.5F, 3.0F, true)
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
     // ===== love (3.8) =====
