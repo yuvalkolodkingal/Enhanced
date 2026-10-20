@@ -1,7 +1,9 @@
 package com.kolodkingal.enhanced.asgard.npc;
 
+import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.asgard.AsgardState;
 import com.kolodkingal.enhanced.asgard.CityPlan;
+import com.kolodkingal.enhanced.asgard.FeastHall;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,6 +25,8 @@ import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -92,6 +96,43 @@ final class AsgardianGoals {
         BlockState state = level.getBlockState(seat);
         double top = state.getCollisionShape(level, seat).isEmpty() ? 0.0 : state.getCollisionShape(level, seat).max(Direction.Axis.Y);
         return new Vec3(seat.getX() + 0.5, seat.getY() + top, seat.getZ() + 0.5);
+    }
+
+    /** The persistent tags of the way a seated Asgardian faces (his seat's front) and where he sits (3.7.2). */
+    static final String SEAT_YAW = "enhanced:asgard_seat_yaw";
+    static final String SEAT_AT = "enhanced:asgard_seat_at";
+
+    /**
+     * Where a sitter sits on a seat that faces {@code facing}: on top of it, a little back from its front (so a diner's
+     * knees stay out of his table).
+     */
+    static Vec3 sitAt(ServerLevel level, BlockPos seat, Direction facing) {
+        return seatTop(level, seat).subtract(facing.getStepX() * 0.12, 0.0, facing.getStepZ() * 0.12);
+    }
+
+    /**
+     * Sits him down at {@code at}, facing {@code facing} (kept by {@link Seated}), in {@code state} for {@code ticks}.
+     */
+    static void sitDown(AsgardianEntity npc, Vec3 at, Direction facing, NpcState state, int ticks) {
+        float yaw = facing.toYRot();
+        npc.getNavigation().stop();
+        npc.moveTo(at.x, at.y, at.z, yaw, 0.0F);
+        npc.setYHeadRot(yaw);
+        npc.setYBodyRot(yaw);
+        npc.getPersistentData().putFloat(SEAT_YAW, yaw);
+        net.minecraft.nbt.ListTag where = new net.minecraft.nbt.ListTag();
+        where.add(net.minecraft.nbt.DoubleTag.valueOf(at.x));
+        where.add(net.minecraft.nbt.DoubleTag.valueOf(at.y));
+        where.add(net.minecraft.nbt.DoubleTag.valueOf(at.z));
+        npc.getPersistentData().put(SEAT_AT, where);
+        npc.setState(state, ticks);
+    }
+
+    /** Whether someone (a living thing, or a player on a seat) is on the seat block {@code seat}. */
+    static boolean taken(AsgardianEntity npc, BlockPos seat) {
+        AABB around = new AABB(seat).inflate(0.05, 0.6, 0.05);
+        return !npc.level().getEntities(npc, around, e -> e instanceof LivingEntity && e.isAlive()
+                || e instanceof com.kolodkingal.enhanced.asgard.SeatEntity && e.isVehicle()).isEmpty();
     }
 
     // ------------------------------------------------------------------------------------------------------------------
@@ -296,7 +337,8 @@ final class AsgardianGoals {
         public boolean canUse() {
             BlockPos home = npc.activeHome();
             if (home == null || npc.leader() != null || patroller(npc) || npc.getTarget() != null || npc.state().still()
-                    || npc.state() == NpcState.TALKING || (npc.tickCount + npc.getId()) % 20 != 0) {
+                    || npc.state() == NpcState.TALKING || npc.state() == NpcState.DINING
+                    || (npc.tickCount + npc.getId()) % 20 != 0) {
                 return false;
             }
             double far = npc.homeRadius() + 8.0;
@@ -333,7 +375,8 @@ final class AsgardianGoals {
             stuck++;
             boolean far = npc.distanceToSqr(Vec3.atBottomCenterOf(home)) > 64.0 * 64.0;
             if ((far || stuck > 600) && stuck % 20 == 0 && unseen(npc)) {
-                npc.moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, npc.getYRot(), 0.0F);
+                BlockPos to = FeastHall.arrival(home);
+                npc.moveTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5, npc.getYRot(), 0.0F);
                 npc.getNavigation().stop();
                 stuck = 0;
                 return;
@@ -529,8 +572,9 @@ final class AsgardianGoals {
                 return true; // led by the other
             }
             long now = npc.level().getGameTime();
-            if (!npc.free() || now < nextTry || npc.getRandom().nextInt(40) != 0) {
-                return false;
+            boolean feast = FeastHall.feastNow(npc.level());
+            if (!npc.free() || now < nextTry || npc.getRandom().nextInt(40) != 0 || feast) {
+                return false; // (at the feast they dine, not spar)
             }
             nextTry = now + 200 + npc.getRandom().nextInt(200);
             for (AsgardianEntity other : npc.level().getEntitiesOfClass(AsgardianEntity.class, npc.getBoundingBox().inflate(14.0),
@@ -598,64 +642,216 @@ final class AsgardianGoals {
         }
     }
 
-    /** Volstagg feasts in the Hall of Feasts: a chicken leg in hand, bite after bite. */
-    static final class Feast extends Goal {
+    /**
+     * Dining at a table (3.7.2): Volstagg at his place at the high table of the Hall of Feasts now and then, and at
+     * dusk (the feast, {@link FeastHall}) the Warriors Three and Sif with him until the night. He walks to his seat
+     * (someone sits there: the first free seat of the hall), sits on the bench facing the table and eats, bite after
+     * bite. One whose home is not the hall (made by a command, the tests) dines at a table near his home if it has one.
+     * A diner who cannot get through for a long while, and whom nobody sees, sits down at once.
+     */
+    static final class Dine extends Goal {
         private final AsgardianEntity npc;
+        @Nullable
+        private CityPlan.Bench seat;
         private long nextTry;
+        private int repath;
+        private int walk;
         private int bite;
+        /** He sat down for the feast: he gets up when it is over (the night came, or a bed skipped it). */
+        private boolean forFeast;
 
-        Feast(AsgardianEntity npc) {
+        Dine(AsgardianEntity npc) {
             this.npc = npc;
             setFlags(EnumSet.of(Flag.MOVE));
         }
 
+        /** Whether the feast is on for him (a guest of the high table, at dusk). */
+        private boolean feast() {
+            return FeastHall.guest(npc.role()) && FeastHall.feastNow(npc.level());
+        }
+
         @Override
         public boolean canUse() {
-            long now = npc.level().getGameTime();
-            if (!npc.free() || now < nextTry || npc.getRandom().nextInt(30) != 0 || npc.home() == null
-                    || npc.distanceToSqr(Vec3.atBottomCenterOf(npc.home())) > npc.homeRadius() * npc.homeRadius()) {
+            if (!npc.free() || npc.home() == null) {
                 return false;
             }
-            nextTry = now + 400 + npc.getRandom().nextInt(400);
-            npc.setState(NpcState.FEASTING, 300 + npc.getRandom().nextInt(300));
-            return true;
+            long now = npc.level().getGameTime();
+            boolean feast = feast();
+            boolean invited = npc.getPersistentData().getBoolean(FeastHall.INVITED);
+            if (!invited && (now < nextTry || !feast && (npc.role() != Role.VOLSTAGG
+                    || npc.getRandom().nextInt(30) != 0))) {
+                return false;
+            }
+            npc.getPersistentData().remove(FeastHall.INVITED);
+            nextTry = now + (feast ? 100 : 400 + npc.getRandom().nextInt(400));
+            seat = choose();
+            return seat != null && npc.distanceToSqr(Vec3.atBottomCenterOf(seat.pos())) < 40.0 * 40.0;
+        }
+
+        /** His own place at the high table, or the hall's first free seat; away from the hall, a seat near his home. */
+        @Nullable
+        private CityPlan.Bench choose() {
+            Level level = npc.level();
+            if (AsgardDimension.is(level) && FeastHall.guest(npc.role())) {
+                CityPlan.Bench own = FeastHall.seatOf(npc.role());
+                if (own != null && free(own.pos())) {
+                    return own;
+                }
+                for (CityPlan.Bench s : FeastHall.seats()) {
+                    if (free(s.pos())) {
+                        return s;
+                    }
+                }
+                return null;
+            }
+            BlockPos home = npc.home();
+            int r = Math.min(12, npc.homeRadius());
+            for (BlockPos p : BlockPos.betweenClosed(home.offset(-r, -2, -r), home.offset(r, 2, r))) {
+                if (free(p)) {
+                    return new CityPlan.Bench(p.immutable(),
+                            level.getBlockState(p).getValue(HorizontalDirectionalBlock.FACING));
+                }
+            }
+            return null;
+        }
+
+        private boolean free(BlockPos pos) {
+            return FeastHall.diningSeat(npc.level(), pos) && !taken(npc, pos);
         }
 
         @Override
         public boolean canContinueToUse() {
-            return npc.state() == NpcState.FEASTING;
+            if (npc.state() == NpcState.DINING) {
+                return seat != null && !(forFeast && !feast());
+            }
+            return seat != null && npc.free() && walk < 600;
         }
 
         @Override
         public void start() {
-            npc.getNavigation().stop();
+            repath = 0;
+            walk = 0;
             bite = 0;
+            forFeast = false;
         }
 
         @Override
         public void stop() {
-            if (npc.state() == NpcState.FEASTING) {
+            if (npc.state() == NpcState.DINING) {
                 npc.setState(NpcState.IDLE, 0);
             }
+            npc.getNavigation().stop();
+            seat = null;
         }
 
         @Override
         public void tick() {
-            if (++bite % 30 == 0 && npc.level() instanceof ServerLevel level) {
-                Vec3 mouth = npc.getEyePosition().add(npc.getLookAngle().scale(0.35)).subtract(0, 0.2, 0);
-                level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.COOKED_CHICKEN)), mouth.x, mouth.y,
-                        mouth.z, 5, 0.08, 0.05, 0.08, 0.04);
-                level.playSound(null, npc.getX(), npc.getY(), npc.getZ(), SoundEvents.GENERIC_EAT, npc.getSoundSource(), 0.6F,
-                        0.8F + npc.getRandom().nextFloat() * 0.3F);
+            if (seat == null || !(npc.level() instanceof ServerLevel level)) {
+                return;
+            }
+            if (npc.state() == NpcState.DINING) {
+                if (++bite % 30 == 0) {
+                    ItemStack food = npc.getMainHandItem().isEmpty() ? new ItemStack(Items.COOKED_CHICKEN)
+                            : npc.getMainHandItem();
+                    Vec3 mouth = npc.getEyePosition().add(npc.getLookAngle().scale(0.35)).subtract(0, 0.2, 0);
+                    level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, food), mouth.x, mouth.y, mouth.z, 5,
+                            0.08, 0.05,
+                            0.08, 0.04);
+                    level.playSound(null, npc.getX(), npc.getY(), npc.getZ(), SoundEvents.GENERIC_EAT,
+                            npc.getSoundSource(), 0.6F,
+                            0.8F + npc.getRandom().nextFloat() * 0.3F);
+                }
+                return;
+            }
+            walk++;
+            if (walk % REPATH == 0 && taken(npc, seat.pos())) {
+                // someone sat down there first: another seat
+                seat = choose();
+                repath = 0;
+                return;
+            }
+            Vec3 at = sitAt(level, seat.pos(), seat.facing());
+            // beside his seat (his path ends a step from it) he sits down; one stuck for long, unseen, at once
+            if (npc.distanceToSqr(at) < 2.6 && Math.abs(npc.getY() - at.y) < 1.0 || walk > 400 && walk % 20 == 0
+                    && ReturnHome.unseen(npc)) {
+                long day = level.getDayTime();
+                forFeast = feast();
+                int ticks = forFeast ? FeastHall.feastLeft(day) + npc.getRandom().nextInt(80)
+                        : 300 + npc.getRandom().nextInt(300);
+                sitDown(npc, at, seat.facing(), NpcState.DINING, Math.max(40, ticks));
+            } else if (--repath <= 0) {
+                repath = REPATH;
+                npc.getNavigation().moveTo(seat.pos().getX() + 0.5, seat.pos().getY() + 0.5, seat.pos().getZ() + 0.5,
+                        0.7);
             }
         }
     }
 
-    /** Frigga and the citizens sit a while on a bench near their home. */
+    /**
+     * A sitter (on a bench, at a table) keeps facing the way his seat faces (3.7.2; before, he sat facing wherever he
+     * had walked from): he looks ahead, or at a player near him and before him.
+     */
+    static final class Seated extends Goal {
+        private final AsgardianEntity npc;
+
+        Seated(AsgardianEntity npc) {
+            this.npc = npc;
+            // (LOOK only: the goal that sat him down, Sit or Dine, keeps him there)
+            setFlags(EnumSet.of(Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            return (npc.state() == NpcState.SITTING || npc.state() == NpcState.DINING)
+                    && npc.getPersistentData().contains(SEAT_YAW);
+        }
+
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void tick() {
+            float yaw = npc.getPersistentData().getFloat(SEAT_YAW);
+            npc.setYRot(yaw);
+            npc.setYBodyRot(yaw);
+            // He stays on his seat: one walking past (along the benches behind the high table) slips by, not shoves him.
+            net.minecraft.nbt.ListTag where = npc.getPersistentData().getList(SEAT_AT, net.minecraft.nbt.Tag.TAG_DOUBLE);
+            if (where.size() == 3) {
+                Vec3 at = new Vec3(where.getDouble(0), where.getDouble(1), where.getDouble(2));
+                if (npc.position().distanceToSqr(at) > 0.0025) {
+                    npc.setPos(at.x, at.y, at.z);
+                    npc.setDeltaMovement(Vec3.ZERO);
+                }
+            }
+            Player near = npc.level().getNearestPlayer(npc.getX(), npc.getY(), npc.getZ(), 6.0, p -> !p.isSpectator());
+            float toNear = near == null ? 0.0F
+                    : (float) (Mth.atan2(near.getZ() - npc.getZ(), near.getX() - npc.getX()) * Mth.RAD_TO_DEG) - 90.0F;
+            if (near != null && Math.abs(Mth.wrapDegrees(toNear - yaw)) < 70.0F) {
+                npc.getLookControl().setLookAt(near, 30.0F, 30.0F);
+            } else {
+                Vec3 ahead = npc.getEyePosition().add(Vec3.directionFromRotation(npc.state() == NpcState.DINING
+                        ? 25.0F : 0.0F, yaw)
+                        .scale(2.0));
+                npc.getLookControl().setLookAt(ahead.x, ahead.y, ahead.z);
+            }
+        }
+
+        @Override
+        public void stop() {
+            if (npc.state() != NpcState.SITTING && npc.state() != NpcState.DINING) {
+                npc.getPersistentData().remove(SEAT_YAW);
+                npc.getPersistentData().remove(SEAT_AT);
+            }
+        }
+    }
+
+    /** Frigga and the citizens sit a while on a bench near their home, facing the way it faces (3.7.2). */
     static final class Sit extends Goal {
         private final AsgardianEntity npc;
         @Nullable
-        private BlockPos seat;
+        private CityPlan.Bench seat;
         private long nextTry;
         private int repath;
         private int walk;
@@ -677,14 +873,14 @@ final class AsgardianGoals {
         }
 
         @Nullable
-        private BlockPos freeSeat() {
+        private CityPlan.Bench freeSeat() {
             BlockPos home = npc.home();
             double reach = npc.homeRadius() + 8.0;
-            for (BlockPos s : CityPlan.seats()) {
-                if (s.equals(CityPlan.THRONE) || home == null || s.distSqr(home) > reach * reach) {
+            for (CityPlan.Bench s : CityPlan.benches()) {
+                if (home == null || s.pos().distSqr(home) > reach * reach) {
                     continue;
                 }
-                AABB around = new AABB(s).inflate(0.4, 1.0, 0.4);
+                AABB around = new AABB(s.pos()).inflate(0.4, 1.0, 0.4);
                 if (npc.level().getEntitiesOfClass(AsgardianEntity.class, around, e -> e != npc).isEmpty()) {
                     return s;
                 }
@@ -717,11 +913,9 @@ final class AsgardianGoals {
                 return;
             }
             walk++;
-            Vec3 top = seatTop(level, seat);
+            Vec3 top = seatTop(level, seat.pos());
             if (npc.distanceToSqr(top) < 1.8) {
-                npc.getNavigation().stop();
-                npc.moveTo(top.x, top.y, top.z, npc.getYRot(), 0.0F);
-                npc.setState(NpcState.SITTING, 300 + npc.getRandom().nextInt(400));
+                sitDown(npc, top, seat.facing(), NpcState.SITTING, 300 + npc.getRandom().nextInt(400));
             } else if (--repath <= 0) {
                 repath = REPATH;
                 npc.getNavigation().moveTo(top.x, top.y, top.z, 0.6);

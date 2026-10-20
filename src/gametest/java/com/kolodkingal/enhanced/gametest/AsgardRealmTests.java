@@ -11,6 +11,10 @@ import com.kolodkingal.enhanced.asgard.AsgardSky;
 import com.kolodkingal.enhanced.asgard.AsgardTerrain;
 import com.kolodkingal.enhanced.asgard.CityBuild;
 import com.kolodkingal.enhanced.asgard.CityPlan;
+import com.kolodkingal.enhanced.asgard.FeastHall;
+import com.kolodkingal.enhanced.asgard.AsgardState;
+import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
+import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.asgard.RuneStones;
 import com.kolodkingal.enhanced.asgard.SeatEntity;
 import com.kolodkingal.enhanced.block.asgard.AsgardMuralBlock;
@@ -362,6 +366,180 @@ public final class AsgardRealmTests {
         player.stopRiding();
         check(!player.isPassenger() && !helper.getLevel().getBlockState(BlockPos.containing(player.position())).is(ModBlocks.ODIN_THRONE.get()),
                 "and gets up beside it, not inside it");
+        helper.succeed();
+    }
+
+    // ---- the Hall of Feasts (3.7.2: "fix Asgard's dining hall") ----
+
+    /** Asgard with every chunk of the Hall of Feasts generated and loaded. */
+    private static ServerLevel hall(MinecraftServer server) {
+        ServerLevel asgard = AsgardTestSupport.ensureAsgard(server);
+        BoundingBox b = FeastHall.box();
+        for (int cx = (b.minX() >> 4) - 1; cx <= (b.maxX() >> 4) + 1; cx++) {
+            for (int cz = (b.minZ() >> 4) - 1; cz <= (b.maxZ() >> 4) + 1; cz++) {
+                asgard.getChunk(cx, cz);
+            }
+        }
+        return asgard;
+    }
+
+    private static double top(ServerLevel level, BlockPos pos) {
+        var shape = level.getBlockState(pos).getCollisionShape(level, pos);
+        return shape.isEmpty() ? 0.0 : shape.max(Direction.Axis.Y);
+    }
+
+    /**
+     * Every seat of the hall is a bench facing its table, with the table a block high right before it and room to sit;
+     * the high table has its six; nothing floats (the dishes stand on the boards, the lanterns hang from the ceiling),
+     * no fence arms reach into the air, the doors (three at the front, two to the kitchen at the back) are open.
+     */
+    @GameTest(template = ARENA, batch = REALM, timeoutTicks = 400)
+    public static void theHallOfFeastsHasItsTablesSeatsAndLightsInPlace(GameTestHelper helper) {
+        ServerLevel asgard = hall(helper.getLevel().getServer());
+        List<CityPlan.Bench> seats = FeastHall.seats();
+        check(seats.size() == 6 + 112
+                && new HashSet<>(seats.stream().map(CityPlan.Bench::pos).toList()).size() == seats.size(),
+                "118 seats, each its own: " + seats.size());
+        for (CityPlan.Bench seat : seats) {
+            BlockState bench = asgard.getBlockState(seat.pos());
+            check(bench.is(ModBlocks.ASGARD_BENCH.get())
+                    && bench.getValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING)
+                    == seat.facing(), "a bench facing its table at " + seat + ": " + bench);
+            BlockPos front = seat.pos().relative(seat.facing());
+            check(FeastHall.isTable(asgard.getBlockState(front)) && top(asgard, front) == 1.0
+                    && FeastHall.diningSeat(asgard, seat.pos()),
+                    "a table a block high right before " + seat + ": " + asgard.getBlockState(front));
+            check(top(asgard, seat.pos().below()) == 1.0 && top(asgard, seat.pos()) == 0.5,
+                    "the bench stands on the floor: " + seat);
+            check(asgard.getBlockState(seat.pos().above()).getCollisionShape(asgard, seat.pos().above()).isEmpty()
+                    && asgard.getBlockState(seat.pos().above(2)).getCollisionShape(asgard,
+                            seat.pos().above(2)).isEmpty(),
+                    "room to sit at " + seat);
+        }
+        BoundingBox box = FeastHall.box();
+        int lanterns = 0;
+        int dishes = 0;
+        for (BlockPos pos : BlockPos.betweenClosed(box.minX(), box.minY() + 1, box.minZ(), box.maxX(), box.minY() + 13,
+                box.maxZ())) {
+            BlockState state = asgard.getBlockState(pos);
+            check(!(state.getBlock() instanceof net.minecraft.world.level.block.FenceBlock),
+                    "no fence posts with arms into the air: " + pos);
+            if (state.is(Blocks.CAKE) || state.is(Blocks.CANDLE) || state.is(Blocks.FLOWER_POT)) {
+                dishes++;
+                check(FeastHall.isTable(asgard.getBlockState(pos.below())) && top(asgard, pos.below()) == 1.0
+                        && state.canSurvive(asgard, pos),
+                        "the dish stands on a table's board, not over it: " + pos + " " + state);
+            }
+            if (state.is(Blocks.LANTERN)) {
+                lanterns++;
+                check(state.getValue(net.minecraft.world.level.block.LanternBlock.HANGING) && state.canSurvive(asgard,
+                        pos)
+                        && net.minecraft.world.level.block.Block.canSupportCenter(asgard, pos.above(), Direction.DOWN),
+                        "the lantern hangs from the ceiling: " + pos);
+            }
+        }
+        check(lanterns == 12 && dishes >= 30, "12 lanterns, the tables laid: " + lanterns + " " + dishes);
+        // the doors: the front's three arches (west, the template's south) and the back's two to the kitchen (east)
+        CityPlan.Piece p = FeastHall.piece();
+        for (int[] door : new int[][]{{10, 30}, {20, 30}, {30, 30}, {10, 0}, {30, 0}}) {
+            for (int y = 1; y <= 2; y++) {
+                BlockPos at = p.toWorld(new BlockPos(door[0], y, door[1]));
+                check(asgard.getBlockState(at).isAir(), "the door is open at " + at);
+            }
+        }
+        helper.succeed();
+    }
+
+    /**
+     * An Asgardian finds his way from the hall's front door to every one of its seats, and from the kitchen to the high
+     * table, and never over a table or a dish on one.
+     */
+    @GameTest(template = ARENA, batch = REALM, timeoutTicks = 400)
+    public static void everySeatOfTheHallIsReachedAndNeverOverATable(GameTestHelper helper) {
+        ServerLevel asgard = hall(helper.getLevel().getServer());
+        AsgardianEntity walker = com.kolodkingal.enhanced.registry.ModEntities.ASGARDIAN.get().create(asgard);
+        walker.setRole(Role.SIF, 0);
+        List<String> lost = new java.util.ArrayList<>();
+        for (BlockPos from : List.of(FeastHall.DOOR, FeastHall.piece().toWorld(new BlockPos(10, 1, -3)))) {
+            List<CityPlan.Bench> to = from.equals(FeastHall.DOOR) ? FeastHall.seats() : FeastHall.highTable();
+            for (CityPlan.Bench seat : to) {
+                // as a walker does: a path as far as his search reaches, then on from where it ended (at most three
+                // legs)
+                BlockPos at = from;
+                boolean reached = false;
+                for (int leg = 0; leg < 3 && !reached; leg++) {
+                    walker.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0.0F, 0.0F);
+                    walker.setOnGround(true);
+                    net.minecraft.world.level.pathfinder.Path path = walker.getNavigation().createPath(seat.pos(), 1);
+                    if (path == null || path.getNodeCount() == 0) {
+                        break;
+                    }
+                    for (int i = 0; i < path.getNodeCount(); i++) {
+                        net.minecraft.world.level.pathfinder.Node n = path.getNode(i);
+                        check(!FeastHall.overTable(asgard, n.x, n.y, n.z), "the way to " + seat
+                                + " goes over a table at " + n.asBlockPos());
+                    }
+                    reached = path.canReach();
+                    at = path.getEndNode().asBlockPos();
+                }
+                if (!reached) {
+                    lost.add(from.toShortString() + "->" + seat.pos().toShortString());
+                }
+            }
+        }
+        check(lost.isEmpty(), lost.size() + " seats out of reach, the first: " + (lost.isEmpty() ? "" : lost.get(0)));
+        walker.discard();
+        helper.succeed();
+    }
+
+    /**
+     * A city built before 3.7.2 has the hall of 3.5: the first time all of it is loaded it is mended once, block by
+     * block, to the new hall, leaving alone a block a player changed (and the banners come with their colours).
+     */
+    @GameTest(template = ARENA, batch = "asgard_feast_mend", timeoutTicks = 400)
+    public static void aHallOfFeastsBuiltBeforeIsMendedOnce(GameTestHelper helper) {
+        ServerLevel asgard = hall(helper.getLevel().getServer());
+        var templates = asgard.getStructureManager();
+        FeastHall.Diff diff = FeastHall.diff(templates.get(FeastHall.LEGACY).orElseThrow(),
+                templates.get(FeastHall.piece().id()).orElseThrow());
+        int n = diff.positions().size();
+        check(n > 300, "the two halls differ in many blocks: " + n);
+        int flags = net.minecraft.world.level.block.Block.UPDATE_CLIENTS
+                | net.minecraft.world.level.block.Block.UPDATE_KNOWN_SHAPE;
+        for (BlockPos pos : diff.positions()) {
+            asgard.setBlock(pos, diff.was(pos), flags);
+        }
+        // the hall of 3.5: a cake over Volstagg's table floats half a block over the board
+        CityPlan.Bench volstagg = FeastHall.seatOf(Role.VOLSTAGG);
+        BlockPos changed = volstagg.pos().relative(volstagg.facing());
+        check(asgard.getBlockState(changed).is(ModBlocks.POLISHED_REALM_STONE.get()), "the old high table: "
+                + asgard.getBlockState(changed));
+        asgard.setBlock(changed, Blocks.GOLD_BLOCK.defaultBlockState(), flags);
+        AsgardState state = AsgardState.get(helper.getLevel().getServer());
+        state.setFeastHallMended(false);
+        FeastHall.Mend done = FeastHall.mendOnce(asgard);
+        check(done != null && done.repaired() == n - 1 && done.skipped() == 1 && done.alreadyRight() == 0, "mended: "
+                + done);
+        check(state.feastHallMended() && FeastHall.mendOnce(asgard) == null, "once");
+        for (BlockPos pos : diff.positions()) {
+            if (!pos.equals(changed)) {
+                check(FeastHall.same(asgard.getBlockState(pos), diff.now(pos)), "the new hall at " + pos + ": "
+                        + asgard.getBlockState(pos));
+            }
+        }
+        check(asgard.getBlockState(changed).is(Blocks.GOLD_BLOCK), "the player's block is left alone");
+        int banners = 0;
+        for (BlockPos pos : diff.positions()) {
+            if (asgard.getBlockEntity(pos) instanceof net.minecraft.world.level.block.entity.BannerBlockEntity banner) {
+                banners++;
+                check(banner.getPatterns().layers().size() == 3, "a banner of Asgard with its pattern: " + pos);
+            }
+        }
+        check(banners >= 4, "the banners moved onto the pillars: " + banners);
+        FeastHall.Mend again = FeastHall.mend(asgard);
+        check(again.repaired() == 0 && again.alreadyRight() == n - 1 && again.skipped() == 1,
+                "a second mending changes nothing: " + again);
+        asgard.setBlock(changed, diff.now(changed), flags);
         helper.succeed();
     }
 }

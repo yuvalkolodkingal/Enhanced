@@ -44,6 +44,15 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine and Deadpool) are on [Looks](Looks).
 
+## What's new in 3.7.2
+
+Eilon's requests:
+
+* **Asgard's dining hall is fixed.** In the [Hall of Feasts](Asgard#the-city) the tables were chest high on fence posts with their arms sticking out, the cakes, candles and pots floated over them, the high table had no seats, the lanterns hung from the air and the kitchen's door looked at a blank wall; and nobody sat down to eat. Now the tables are the right height with the dishes on them, each long table has a cross aisle through the middle from the door to the high table, the high table has six benches facing the hall, the lanterns hang from the ceiling and two doors lead to the kitchen. **Volstagg sits at his place at the high table to eat**, and **at dusk the Warriors Three and Sif come to the feast** and dine with him until the night, facing the hall; nobody walks on the tables. A hall built before 3.7.2 is mended by itself the first time you come near it (a block you changed there is left as you made it); `/enhanced asgard mendhall` does it again.
+* **Death's line:** Rio now says "All roads lead to me." ([Meeting Death](Meeting-Death)).
+* **Rio wears her Death look on Death's screen:** the dark green-black gown, the long hood and the crown of branches of *Agatha All Along*. At home in the cottage she stays the gardener.
+* Works with 3.7 servers and players (network protocol **11**, unchanged).
+
 ## What's new in 3.7.1
 
 Eilon's request, with pictures from the show:

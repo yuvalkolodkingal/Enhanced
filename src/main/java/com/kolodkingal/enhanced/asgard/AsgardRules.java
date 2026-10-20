@@ -246,6 +246,9 @@ public final class AsgardRules {
 
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
+        if (event.getLevel() instanceof ServerLevel asgard && AsgardDimension.is(asgard)) {
+            FeastHall.tick(asgard); // 3.7.2: mends once a Hall of Feasts built before
+        }
         if (event.getLevel() instanceof ServerLevel level && !FIRES.isEmpty()) {
             Set<BlockPos> fires = FIRES.remove(level);
             if (fires != null) {

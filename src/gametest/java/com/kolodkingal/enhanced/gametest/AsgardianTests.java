@@ -6,6 +6,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.AsgardProgress;
 import com.kolodkingal.enhanced.asgard.AsgardState;
 import com.kolodkingal.enhanced.asgard.CityPlan;
+import com.kolodkingal.enhanced.asgard.FeastHall;
+import com.kolodkingal.enhanced.block.asgard.AsgardBenchBlock;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue;
 import com.kolodkingal.enhanced.asgard.npc.AsgardPopulation;
 import com.kolodkingal.enhanced.asgard.npc.AsgardTalk;
@@ -19,8 +21,10 @@ import com.kolodkingal.enhanced.config.AsgardConfig;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -29,6 +33,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.WitherSkeleton;
 import net.minecraft.world.entity.monster.Zombie;
@@ -38,6 +43,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -561,5 +569,148 @@ public final class AsgardianTests {
                 Vec3.ZERO, 0.0F, 0.0F, net.minecraft.world.level.portal.DimensionTransition.DO_NOTHING));
         check(moved == null && frigga.level() == fx.level() && !frigga.isRemoved(), "Frigga stays");
         helper.succeed();
+    }
+
+    // ---- dining (3.7.2: Asgard's dining hall) ----
+
+    /**
+     * A table in the arena as the Hall of Feasts has them: a board of top spruce slabs along x (6 to 14) at z 10, legs
+     * of stripped spruce at its ends, three benches on each side facing it (x 8, 10, 12; z 9 facing south, z 11 north).
+     */
+    private static void table(GameTestHelper helper) {
+        for (int x = 6; x <= 14; x++) {
+            helper.setBlock(new BlockPos(x, 2, 10), x == 6 || x == 14 ? Blocks.STRIPPED_SPRUCE_WOOD.defaultBlockState()
+                    : Blocks.SPRUCE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP));
+        }
+        helper.setBlock(new BlockPos(8, 3, 10), Blocks.CAKE.defaultBlockState());
+        for (int x = 8; x <= 12; x += 2) {
+            helper.setBlock(new BlockPos(x, 2, 9),
+                    ModBlocks.ASGARD_BENCH.get().defaultBlockState().setValue(AsgardBenchBlock.FACING,
+                            Direction.SOUTH));
+            helper.setBlock(new BlockPos(x, 2, 11),
+                    ModBlocks.ASGARD_BENCH.get().defaultBlockState().setValue(AsgardBenchBlock.FACING,
+                            Direction.NORTH));
+        }
+    }
+
+    /** Someone sitting on the bench at (x, z) of the arena (an armour stand: the seat is taken). */
+    private static void taken(TestKit.Fixture fx, int x, int z) {
+        ArmorStand stand = mob(fx, EntityType.ARMOR_STAND, x + 0.5, z + 0.5);
+        Vec3 at = fx.helper().absoluteVec(new Vec3(x + 0.5, FLOOR + 0.5, z + 0.5));
+        stand.moveTo(at.x, at.y, at.z, 0.0F, 0.0F);
+        stand.setNoGravity(true);
+    }
+
+    /**
+     * Volstagg goes to a free seat at the table (the others are taken), never over the table on his way; he sits on the
+     * bench facing the table, a chicken leg in hand, eats, and keeps facing the table while a player walks round him.
+     */
+    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    public static void volstaggSitsAtTheTableFacingItAndEats(GameTestHelper helper) {
+        TestKit.Fixture fx = TestKit.fixture(helper);
+        table(helper);
+        for (int[] t : new int[][]{{8, 9}, {10, 9}, {12, 9}, {8, 11}, {10, 11}}) {
+            taken(fx, t[0], t[1]);
+        }
+        BlockPos free = helper.absolutePos(new BlockPos(12, 2, 11));
+        AsgardianEntity volstagg = npc(fx, Role.VOLSTAGG, 3.5, 3.5);
+        volstagg.setHome("", helper.absolutePos(new BlockPos(10, 2, 10)), 10);
+        FeastHall.invite(volstagg);
+        ServerPlayer player = fx.player(17.5, FLOOR, 17.5);
+        long[] seated = {-1};
+        helper.onEachTick(() -> {
+            if (seated[0] >= 0 && helper.getTick() == seated[0] + 10) {
+                volstagg.push(0.6, 0.0, 0.6); // a shove: he stays in his seat
+            }
+            BlockPos at = volstagg.blockPosition();
+            check(!FeastHall.overTable(helper.getLevel(), at.getX(), at.getY(), at.getZ()), "never over the table: "
+                    + volstagg.position());
+            if (seated[0] >= 0) {
+                // a player walks round him: he still faces the table
+                double a = (helper.getTick() - seated[0]) * 0.15;
+                Vec3 round = Vec3.atBottomCenterOf(free).add(Math.cos(a) * 2.5, 0.0, Math.sin(a) * 2.5);
+                player.teleportTo(round.x, round.y, round.z);
+            }
+        });
+        helper.succeedWhen(() -> {
+            check(volstagg.state() == NpcState.DINING, "he sits down to eat: " + volstagg.state() + " at "
+                    + volstagg.position());
+            if (seated[0] < 0) {
+                seated[0] = helper.getTick();
+            }
+            check(volstagg.blockPosition().equals(free) && Math.abs(volstagg.getY() - (free.getY() + 0.5)) < 0.01,
+                    "on the free bench, on its seat: " + volstagg.position());
+            float north = Direction.NORTH.toYRot();
+            check(Math.abs(net.minecraft.util.Mth.wrapDegrees(volstagg.getYRot() - north)) < 1.0F
+                    && Math.abs(net.minecraft.util.Mth.wrapDegrees(volstagg.yBodyRot - north)) < 1.0F,
+                    "facing the table (north): " + volstagg.getYRot() + " " + volstagg.yBodyRot);
+            check(volstagg.getMainHandItem().is(Items.COOKED_CHICKEN), "a chicken leg in hand");
+            check(helper.getTick() - seated[0] >= 40, "and he stays");
+        });
+    }
+
+    /**
+     * The feast at dusk: who comes, when, to which seat; where one from far off arrives; the guests' seats face the
+     * hall.
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void theWarriorsThreeAndSifComeToTheHighTableAtDusk(GameTestHelper helper) {
+        check(!FeastHall.feastAt(10999) && FeastHall.feastAt(11000) && FeastHall.feastAt(13499)
+                && !FeastHall.feastAt(13500)
+                && FeastHall.feastAt(24000L * 3 + 12000), "the feast is at dusk, every day");
+        check(FeastHall.feastLeft(12000) == 1500 && FeastHall.feastLeft(6000) == 0, "and ends at the first stars");
+        BlockPos ring = CityPlan.TRAINING_RING;
+        List<BlockPos> seats = new ArrayList<>();
+        for (Role role : List.of(Role.VOLSTAGG, Role.SIF, Role.FANDRAL, Role.HOGUN)) {
+            check(FeastHall.guest(role) && FeastHall.homeAt(role, ring, 12000).equals(CityPlan.FEAST_HALL)
+                    && FeastHall.homeAt(role, ring, 6000).equals(ring), role + " goes to the hall at dusk, home after");
+            CityPlan.Bench seat = FeastHall.seatOf(role);
+            check(seat != null && FeastHall.highTable().contains(seat) && !seats.contains(seat.pos()), role
+                    + " has his own place at the high table");
+            seats.add(seat.pos());
+            check(seat.facing() == Direction.WEST, "facing the hall (west, its doors): " + seat);
+        }
+        for (Role role : List.of(Role.FRIGGA, Role.CITIZEN, Role.EINHERJAR, Role.ODIN, Role.HEIMDALL)) {
+            check(!FeastHall.guest(role) && FeastHall.homeAt(role, ring, 12000).equals(ring), role + " keeps his home");
+        }
+        check(FeastHall.arrival(CityPlan.FEAST_HALL).equals(FeastHall.DOOR) && FeastHall.arrival(ring).equals(ring),
+                "one from far off arrives at the hall's front door");
+        helper.succeed();
+    }
+
+    /**
+     * At dusk Sif and Fandral sit at the table with bread and an apple (no sparring at the feast), and get up when the
+     * night comes.
+     */
+    @GameTest(template = ARENA, batch = "asgard_npc_feast", timeoutTicks = 400)
+    public static void atDuskSifDinesUntilTheNight(GameTestHelper helper) {
+        TestKit.Fixture fx = TestKit.fixture(helper);
+        ServerLevel level = fx.level();
+        long before = level.getDayTime();
+        long day = 24000L * (before / 24000L);
+        level.setDayTime(day + 11500L);
+        fx.onClose(() -> level.setDayTime(before));
+        table(helper);
+        AsgardianEntity sif = npc(fx, Role.SIF, 4.5, 15.5);
+        sif.setHome("", helper.absolutePos(new BlockPos(10, 2, 10)), 10);
+        AsgardianEntity fandral = npc(fx, Role.FANDRAL, 16.5, 4.5);
+        fandral.setHome("", helper.absolutePos(new BlockPos(10, 2, 10)), 10);
+        long[] night = {-1};
+        helper.onEachTick(() -> {
+            if (night[0] < 0 && sif.state() == NpcState.DINING && fandral.state() == NpcState.DINING) {
+                check(FeastHall.diningSeat(level, sif.blockPosition()) && FeastHall.diningSeat(level, fandral.blockPosition()),
+                        "both on seats at the table");
+                check(sif.getMainHandItem().is(Items.BREAD) && fandral.getMainHandItem().is(Items.APPLE),
+                        "bread and an apple, swords put by");
+                level.setDayTime(day + 13600L); // the night comes
+                night[0] = helper.getTick();
+            }
+        });
+        helper.succeedWhen(() -> {
+            check(night[0] >= 0, "both dine at dusk: " + sif.state() + " " + fandral.state());
+            check(helper.getTick() - night[0] >= 10 && sif.state() != NpcState.DINING && fandral.state() != NpcState.DINING,
+                    "and get up when the night comes: " + sif.state() + " " + fandral.state());
+            check(!sif.getMainHandItem().is(Items.BREAD), "the bread put away");
+        });
     }
 }

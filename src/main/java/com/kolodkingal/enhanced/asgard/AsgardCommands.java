@@ -27,7 +27,9 @@ import java.util.Locale;
  * <li>{@code tp [players]}: to the Observatory ({@link CityPlan#ARRIVAL}; an operator's teleport passes the gate);</li>
  * <li>{@code state}: the realm's saved state and the generation times so far;</li>
  * <li>{@code genbench}: generates a 9 x 9 block of chunks of the city round the palace, and one of the wild sea, in
- * fresh chunks that are thrown away (the world is not touched), and prints the milliseconds per chunk.</li>
+ * fresh chunks that are thrown away (the world is not touched), and prints the milliseconds per chunk;</li>
+ * <li>{@code mendhall} (3.7.2): mends the Hall of Feasts now ({@link FeastHall#mend}: a hall of 3.5 to 3.7.1 becomes
+ * the new one, a block a player changed is left alone; it is done once by itself when the hall is first loaded).</li>
  * </ul>
  */
 public final class AsgardCommands {
@@ -39,7 +41,8 @@ public final class AsgardCommands {
                         .then(Commands.argument("players", EntityArgument.players())
                                 .executes(ctx -> tp(ctx, EntityArgument.getPlayers(ctx, "players")))))
                 .then(Commands.literal("state").executes(AsgardCommands::state))
-                .then(Commands.literal("genbench").executes(AsgardCommands::genbench));
+                .then(Commands.literal("genbench").executes(AsgardCommands::genbench))
+                .then(Commands.literal("mendhall").executes(AsgardCommands::mendHall));
     }
 
     private static int tp(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) {
@@ -68,6 +71,20 @@ public final class AsgardCommands {
                 chunks == 0 ? 0.0 : AsgardChunkGenerator.CITY_NANOS.get() / 1e6 / chunks, AsgardChunkGenerator.WORST_NANOS.get() / 1e6);
         ctx.getSource().sendSuccess(() -> Component.literal(text), false);
         return 1;
+    }
+
+    private static int mendHall(CommandContext<CommandSourceStack> ctx) {
+        ServerLevel asgard = AsgardDimension.level(ctx.getSource().getServer());
+        if (asgard == null || !FeastHall.loaded(asgard)) {
+            ctx.getSource().sendFailure(Component.literal("Asgard: the Hall of Feasts is not loaded: go near it"));
+            return 0;
+        }
+        FeastHall.Mend done = FeastHall.mend(asgard);
+        AsgardState.get(ctx.getSource().getServer()).setFeastHallMended(true);
+        String text = "Asgard: the Hall of Feasts: " + done.repaired() + " blocks set, " + done.alreadyRight()
+                + " already right, " + done.skipped() + " left as a player made them";
+        ctx.getSource().sendSuccess(() -> Component.literal(text), true);
+        return done.repaired();
     }
 
     /** The measured times of a block of chunks: average and worst, in milliseconds. */

@@ -34,6 +34,8 @@ public final class AsgardState extends SavedData {
     /** 3.6.1: the one player who took Gungnir from its stand ({@code [gungnir] onePerWorld}), or null. */
     @Nullable
     private UUID gungnirOwner;
+    /** Whether the Hall of Feasts of a city built before 3.7.2 has been mended ({@code FeastHall#mend}). */
+    private boolean feastHallMended;
 
     public static SavedData.Factory<AsgardState> factory() {
         return new SavedData.Factory<>(AsgardState::new, AsgardState::load, null);
@@ -64,6 +66,7 @@ public final class AsgardState extends SavedData {
         if (tag.hasUUID("gungnir_owner")) {
             state.gungnirOwner = tag.getUUID("gungnir_owner");
         }
+        state.feastHallMended = tag.getBoolean("feast_hall_mended");
         return state;
     }
 
@@ -80,6 +83,7 @@ public final class AsgardState extends SavedData {
         if (gungnirOwner != null) {
             tag.putUUID("gungnir_owner", gungnirOwner);
         }
+        tag.putBoolean("feast_hall_mended", feastHallMended);
         return tag;
     }
 
@@ -163,6 +167,16 @@ public final class AsgardState extends SavedData {
     /** Records (or, with null, forgets) the world's Gungnir owner. */
     public void setGungnirOwner(@Nullable UUID owner) {
         gungnirOwner = owner;
+        setDirty();
+    }
+
+    /** Whether the Hall of Feasts has been looked over and mended (3.7.2; a city built before had a broken hall). */
+    public boolean feastHallMended() {
+        return feastHallMended;
+    }
+
+    public void setFeastHallMended(boolean mended) {
+        feastHallMended = mended;
         setDirty();
     }
 }

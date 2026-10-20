@@ -18,7 +18,7 @@ Hebrew: [עברית](Asgardians-HE)
 | **The Einherjar** (12) | Two at the gate of the bridge, two at the throne room doors, the others on patrol | The city's guards, in gold armour and red capes, with spear and shield. They give directions and news. |
 | **The citizens** (14) | The houses, the plaza, the benches | Stroll, sit, chat in pairs, greet you and tell rumours. |
 
-Each named Asgardian is there **exactly once**: the city brings back anyone who is missing, at his home, when nobody is looking. They live their days: Heimdall and the guards keep their posts, the Einherjar walk their rounds, Sif, Fandral, Hogun and Volstagg spar in the ring (with sparks and the clash of blades), Volstagg feasts, Frigga and the citizens sit on the benches, two Asgardians who meet stop and talk a while. Look at one to see his name.
+Each named Asgardian is there **exactly once**: the city brings back anyone who is missing, at his home, when nobody is looking. They live their days: Heimdall and the guards keep their posts, the Einherjar walk their rounds, Sif, Fandral, Hogun and Volstagg spar in the ring (with sparks and the clash of blades), Volstagg feasts at his place at the high table of the Hall of Feasts, and at dusk Sif, Fandral and Hogun join him there for the feast until the night (3.7.2), Frigga and the citizens sit on the benches (facing the way the bench faces), two Asgardians who meet stop and talk a while. Look at one to see his name.
 
 ## One of each character
 
