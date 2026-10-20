@@ -199,14 +199,14 @@ public final class StoneSiteTests {
     /** The ladder's column in the tower's base frame, and its first layer (over the lobby's floor). */
     static final BlockPos TOWER_LADDER = new BlockPos(3, 0, 12);
     static final int TOWER_LADDER_FROM = 3;
-    /** A place to stand in each of the tower's rooms, in its whole frame (3.6.1). */
+    /** A place to stand in each of the tower's rooms, in its whole frame (3.6.1; 3.8: by Cap's case). */
     static final Map<String, BlockPos> TOWER_ROOMS = Map.ofEntries(Map.entry("lobby", new BlockPos(12, 3, 20)),
             Map.entry("Hawkeye", new BlockPos(12, 14, 20)), Map.entry("Black Widow", new BlockPos(12, 20, 17)),
             Map.entry("Hulk", new BlockPos(12, 26, 19)), Map.entry("Thor", new BlockPos(12, 38, 15)),
             Map.entry("Spider-Man", new BlockPos(12, 44, 16)), Map.entry("Scarlet Witch", new BlockPos(12, 50, 17)),
             Map.entry("lab", new BlockPos(12, 56, 17)), Map.entry("Iron Man", new BlockPos(12, 62, 10)),
             Map.entry("meeting room", new BlockPos(12, 74, 22)), Map.entry("penthouse", new BlockPos(16, 83, 15)),
-            Map.entry("Captain America", new BlockPos(7, 83, 9)), Map.entry("observation", new BlockPos(14, 90, 19)));
+            Map.entry("Captain America", new BlockPos(7, 83, 10)), Map.entry("observation", new BlockPos(14, 90, 19)));
 
     /** A point of the tower's base frame in the whole tower's frame ({@link #tower}). */
     static BlockPos inTower(BlockPos base) {
@@ -932,9 +932,9 @@ public final class StoneSiteTests {
     }
 
     /**
-     * 3.7.1: the tower's 13 item frames are read where they are put (no "Block-attached entity at invalid position" in
-     * the log): every part is placed with {@link HangingEntityProcessor}, which writes each frame's block into it, turned
-     * as the part is turned.
+     * 3.7.1: the tower's 13 item frames (12 since 3.8: Cap's shield is in a case) are read where they are put (no
+     * "Block-attached entity at invalid position" in the log): every part is placed with {@link
+     * HangingEntityProcessor}, which writes each frame's block into it, turned as the part is turned.
      */
     @GameTest(template = ARENA, batch = "stone_sites_frames")
     public static void theTowersItemFramesHangWhereTheyArePut(GameTestHelper helper) {
@@ -979,7 +979,7 @@ public final class StoneSiteTests {
                         "the frame is read where it is put, " + at + ": " + entity);
             }
         }
-        check(frames == 13, "the tower's 13 frames: " + frames);
+        check(frames == 12, "the tower's 12 frames: " + frames);
         helper.succeed();
     }
 

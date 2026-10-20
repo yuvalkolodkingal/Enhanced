@@ -157,6 +157,7 @@ public final class ClientSetup {
             com.kolodkingal.enhanced.client.ironman.suits.SuitArt.register();
             // ===== falcon (3.8) =====
             // ===== tower (3.8) =====
+            com.kolodkingal.enhanced.client.tower.TowerClient.setup();
             // ===== eternity (3.8) =====
             // ===== love (3.8) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
@@ -305,6 +306,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.REDWING.get(),
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xD8323C));
         // ===== tower (3.8) =====
+        // (the suit display's stand-in: client/tower/TowerClient, registered first so lane L7's renderer replaces it)
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TECH_CASE.get(),
+                com.kolodkingal.enhanced.client.tower.TechCaseRenderer::new);
         // ===== eternity (3.8) =====
         event.registerEntityRenderer(ModEntities.ETERNITY.get(),
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0x2A1F4A));
