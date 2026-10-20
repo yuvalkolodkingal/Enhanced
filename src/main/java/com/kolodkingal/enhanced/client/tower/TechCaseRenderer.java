@@ -77,7 +77,8 @@ public class TechCaseRenderer implements BlockEntityRenderer<TechCaseBlockEntity
         pose.pushPose();
         pose.translate(2.0 / 16.0, (15.0 + up) / 16.0, 2.0 / 16.0);
         pose.scale(12.0F / 16.0F, 1.0F / 16.0F, 12.0F / 16.0F);
-        blocks.renderSingleBlock(Blocks.GLASS.defaultBlockState(), pose, buffers, light, OverlayTexture.NO_OVERLAY);
+        blocks.renderSingleBlock(Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState(), pose, buffers, light,
+                OverlayTexture.NO_OVERLAY);
         pose.popPose();
         pose.popPose();
     }

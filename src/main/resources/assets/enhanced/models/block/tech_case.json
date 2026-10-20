@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:block/block",
-  "render_type": "minecraft:cutout",
+  "render_type": "minecraft:translucent",
   "textures": {
     "particle": "minecraft:block/iron_block",
     "base": "minecraft:block/polished_deepslate",
     "trim": "minecraft:block/iron_block",
-    "glass": "minecraft:block/glass",
+    "glass": "minecraft:block/light_blue_stained_glass",
     "light": "minecraft:block/light_blue_concrete"
   },
   "elements": [
