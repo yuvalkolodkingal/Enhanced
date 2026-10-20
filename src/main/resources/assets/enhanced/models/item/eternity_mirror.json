@@ -1,3 +1,6 @@
 {
-  "parent": "enhanced:block/eternity_mirror"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "enhanced:item/eternity_mirror"
+  }
 }

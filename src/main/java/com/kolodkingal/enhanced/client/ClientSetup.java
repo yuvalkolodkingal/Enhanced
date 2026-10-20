@@ -151,6 +151,7 @@ public final class ClientSetup {
             // ===== iron_man (3.8) =====
             // ===== nanotech (3.8) =====
             // ===== suit_art (3.8) =====
+            com.kolodkingal.enhanced.client.ironman.suits.SuitArt.register();
             // ===== falcon (3.8) =====
             // ===== tower (3.8) =====
             // ===== eternity (3.8) =====
@@ -290,6 +291,10 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.HULKBUSTER_FRAME.get(),
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
         // ===== suit_art (3.8) =====
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.SUIT_DISPLAY.get(),
+                com.kolodkingal.enhanced.client.ironman.suits.SuitDisplayRenderer::new);
+        event.registerEntityRenderer(ModEntities.HULKBUSTER_FRAME.get(),
+                com.kolodkingal.enhanced.client.ironman.suits.HulkbusterFrameRenderer::new);
         // ===== falcon (3.8) =====
         event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.FALCON_DART.get(), NoopRenderer::new);
@@ -391,6 +396,7 @@ public final class ClientSetup {
         // ===== iron_man (3.8) =====
         // ===== nanotech (3.8) =====
         // ===== suit_art (3.8) =====
+        com.kolodkingal.enhanced.client.ironman.suits.SuitArt.registerLayers(event);
         // ===== falcon (3.8) =====
         // ===== eternity (3.8) =====
         // ===== love (3.8) =====
@@ -463,6 +469,8 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.SuitLayer(renderer));
                 // ===== nanotech (3.8) =====
                 // ===== suit_art (3.8) =====
+                com.kolodkingal.enhanced.client.ironman.suits.SuitArt.bake(event.getEntityModels());
+                renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.suits.SuitExtrasLayer(renderer));
                 // ===== falcon (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.falcon.FalconWingsLayer(renderer));
                 // ===== love (3.8) =====

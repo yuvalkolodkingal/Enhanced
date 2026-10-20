@@ -670,10 +670,12 @@ public final class AvengersSkeletonTests {
         dummy.setDeltaMovement(0.1, 0.2, 0.3);
         check(MissileGuidance.steer(dummy).equals(new Vec3(0.1, 0.2, 0.3)), "missiles fly straight");
         dummy.discard();
+        // (The skeleton's linear timelines are lane L7's choreographies now, SuitArtTests: here only their ends.)
         for (SuitParts part : SuitParts.VALUES) {
-            TestKit.assertNear(SuitTimelines.reveal(SuitKind.MARK_85, part, 0.25F, true), 0.25, 1.0E-6, part + " up");
-            TestKit.assertNear(SuitTimelines.reveal(SuitKind.MARK_85, part, 0.25F, false), 0.75, 1.0E-6,
-                    part + " down");
+            check(SuitTimelines.reveal(SuitKind.MARK_85, part, 0.0F, true) == 0.0F
+                    && SuitTimelines.reveal(SuitKind.MARK_85, part, 1.0F, true) == 1.0F, part + " up");
+            check(SuitTimelines.reveal(SuitKind.MARK_85, part, 0.0F, false) == 1.0F
+                    && SuitTimelines.reveal(SuitKind.MARK_85, part, 1.0F, false) == 0.0F, part + " down");
         }
         TestKit.assertNear(SuitTimelines.progress(110L, 100L, 20, 0.5F), 0.525, 1.0E-6, "the progress");
         check(SuitTimelines.progress(200L, 100L, 20, 0.0F) == 1.0F, "and it ends at 1");
