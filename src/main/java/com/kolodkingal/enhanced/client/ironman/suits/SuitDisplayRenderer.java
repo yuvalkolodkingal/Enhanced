@@ -31,8 +31,8 @@ import java.util.function.Function;
  * A suit display of Iron Man's workshop (3.8, PLAN 7.1, 9.3): the suit it shows standing on its plinth (a steel post
  * holds it up), its eyes and reactor slowly breathing light, a light ring round the plinth; behind it the workshop's
  * gantry, whose robot arms bolt a Mark 3 onto Iron Man when he suits up within reach ({@link GantryArms}). The
- * Hulkbuster stands at 1.75x in its bay, without a gantry. The block's own model (the tower lane's) is the plinth and
- * the post.
+ * Hulkbuster stands at 1.5x in its 3-block bay, without a gantry. The block's own model (the tower lane's) is the
+ * plinth and the post.
  */
 public class SuitDisplayRenderer implements BlockEntityRenderer<SuitDisplayBlockEntity> {
     private static final ResourceLocation WHITE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
@@ -43,7 +43,7 @@ public class SuitDisplayRenderer implements BlockEntityRenderer<SuitDisplayBlock
     private static final float PLINTH = 2.5F / 16.0F;
     private static final float SUIT_SCALE = 0.92F;
     private static final float FORWARD = 2.0F / 16.0F;
-    private static final float HULKBUSTER_SCALE = 1.75F;
+    private static final float HULKBUSTER_SCALE = 1.5F;
     /**
      * Which suit a display shows: the block entity's (lane L6's {@code SuitDisplayBlockEntity}, a public method
      * returning a {@code SuitKind}, found once); until it says, the display's column picks one of the six (so a row of
