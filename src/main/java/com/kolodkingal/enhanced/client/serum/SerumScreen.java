@@ -232,14 +232,25 @@ public class SerumScreen extends Screen {
         g.drawCenteredString(font, String.valueOf(card + 1), x + 8, y + 4, open ? 0xFFFFFFFF : 0xFF808080);
         // The name and the line.
         int ty = y + portraitH + 6;
-        g.drawCenteredString(font, hero.displayName().copy().withStyle(s -> s.withBold(true)
-                .withColor(open ? hero.titleColor() : 0x9A9A9A)), x + cardW / 2, ty, 0xFFFFFF);
+        Component name = hero.displayName().copy().withStyle(s -> s.withBold(true)
+                .withColor(open ? hero.titleColor() : 0x9A9A9A));
+        scaledCentered(g, name, x + cardW / 2, ty, Math.min(1.0F, (cardW - 6) / (float) font.width(name)),
+                0xFFFFFFFF);
         Component line = open ? Component.translatable("screen.enhanced.serum." + hero.getSerializedName())
                 : Component.translatable("screen.enhanced.serum.falcon_locked");
+        // The line in the room left above the button; smaller when it would not fit whole.
+        int room = Math.max(1, (cardH - portraitH - 42) / 9);
+        float scale = 1.0F;
         List<FormattedCharSequence> lines = font.split(line, cardW - 8);
+        while (lines.size() > (int) (room / scale) && scale > 0.55F) {
+            scale -= 0.15F;
+            lines = font.split(line, (int) ((cardW - 8) / scale));
+        }
         int ly = ty + 12;
-        for (int k = 0; k < Math.min(lines.size(), Math.max(1, (cardH - portraitH - 42) / 9)); k++) {
-            g.drawCenteredString(font, lines.get(k), x + cardW / 2, ly + k * 9, open ? 0xFFD8E0EE : 0xFFE0A050);
+        int shown = Math.min(lines.size(), (int) (room / scale));
+        for (int k = 0; k < shown; k++) {
+            scaledCentered(g, lines.get(k), x + cardW / 2, ly + Math.round(k * 9 * scale), scale,
+                    open ? 0xFFD8E0EE : 0xFFE0A050);
         }
         if (!open) {
             // Locked: greyed, a padlock over the portrait (in front of the puppet, which is drawn deep).
@@ -249,6 +260,19 @@ public class SerumScreen extends Screen {
             padlock(g, x + cardW / 2, y + 2 + portraitH / 2);
             g.pose().popPose();
         }
+    }
+
+    /** Text centred on {@code cx} at {@code y}, drawn at {@code scale}. */
+    private void scaledCentered(GuiGraphics g, Component text, int cx, int y, float scale, int color) {
+        scaledCentered(g, text.getVisualOrderText(), cx, y, scale, color);
+    }
+
+    private void scaledCentered(GuiGraphics g, FormattedCharSequence text, int cx, int y, float scale, int color) {
+        g.pose().pushPose();
+        g.pose().translate(cx, y, 0.0F);
+        g.pose().scale(scale, scale, 1.0F);
+        g.drawString(font, text, -font.width(text) / 2, 0, color, true);
+        g.pose().popPose();
     }
 
     /** A padlock, drawn in pixels: the shackle and the body with its keyhole. */

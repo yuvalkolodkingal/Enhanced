@@ -51,10 +51,9 @@ public final class CaptainEffects {
         RandomSource r = level.random;
         switch (p.kind()) {
             case CaptainFxPayload.THROW -> {
-                for (int i = 0; i < 8; i++) {
-                    level.addParticle(ParticleTypes.CLOUD, at.x + r.nextGaussian() * 0.15, at.y
-                            + r.nextGaussian() * 0.1, at.z + r.nextGaussian() * 0.15, 0, 0.01, 0);
-                }
+                // A rush of air where it left his hand.
+                level.addParticle(ParticleTypes.SWEEP_ATTACK, at.x, at.y, at.z, 0, 0, 0);
+                burst(level, at, SILVER, 5, 0.08, r);
             }
             case CaptainFxPayload.CATCH -> burst(level, at, SILVER, 6, 0.12, r);
             case CaptainFxPayload.RICOCHET -> {
@@ -205,7 +204,7 @@ public final class CaptainEffects {
                 level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, ground), at.x + cos * 0.5, at.y + 0.1,
                         at.z + sin * 0.5, cos * radius * 0.12, 0.12, sin * radius * 0.12);
             }
-            if (i % 3 == 0) {
+            if (i % 5 == 0) {
                 level.addParticle(ParticleTypes.POOF, at.x + cos * radius * 0.6, at.y + 0.2, at.z + sin * radius
                         * 0.6, cos * 0.05, 0.02, sin * 0.05);
             }
