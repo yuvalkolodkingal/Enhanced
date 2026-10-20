@@ -580,9 +580,6 @@ public final class ClientSetup {
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("iron_man"),
                 new com.kolodkingal.enhanced.client.ironman.IronHud());
         // ===== nanotech (3.8) =====
-        // The drones' seconds and the Refocuser's charge, over the suit's panel.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("nanotech"),
-                new com.kolodkingal.enhanced.client.ironman.nano.NanoHud());
         // ===== falcon (3.8) =====
         // ===== tower (3.8) =====
         // ===== eternity (3.8) =====

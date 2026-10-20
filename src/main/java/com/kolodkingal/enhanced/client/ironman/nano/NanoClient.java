@@ -3,10 +3,12 @@ package com.kolodkingal.enhanced.client.ironman.nano;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.beam.AvengersBeams;
 import com.kolodkingal.enhanced.client.ironman.IronFx;
+import com.kolodkingal.enhanced.client.ironman.IronHud;
 import com.kolodkingal.enhanced.client.render.ArenaFx;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
+import com.kolodkingal.enhanced.ironman.IronManState;
 import com.kolodkingal.enhanced.ironman.IronMissileEntity;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -14,8 +16,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -25,6 +29,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -68,8 +73,33 @@ public final class NanoClient {
         for (int kind : kinds) {
             IronFx.register(kind, NanoClient::draw);
         }
+        // Under the suit's panel: the drones' seconds, the Refocuser's charge.
+        IronHud.addLine(NanoClient::dronesLine);
+        IronHud.addLine(NanoClient::chargedLine);
         BeamRenderer.registerDrawer(AvengersBeams.CHEST_LASER, NanoBeamDrawers.CHEST_LASER);
         BeamRenderer.registerDrawer(AvengersBeams.HULKBUSTER_UNIBEAM, NanoBeamDrawers.HEAVY_UNIBEAM);
+    }
+
+    /** The drones' seconds while they fly with him, or null. */
+    @Nullable
+    static Component dronesLine(LocalPlayer player, IronManState state) {
+        long now = player.level().getGameTime();
+        if (!state.has(IronManState.DRONES) || state.dronesUntil() <= now) {
+            return null;
+        }
+        return Component.translatable("hud.enhanced.nanotech.drones", (state.dronesUntil() - now + 19) / 20)
+                .withStyle(s -> s.withColor(0xFF8A5A));
+    }
+
+    /** "Refocuser charged!" (flickering) while lightning's charge is in the suit, or null. */
+    @Nullable
+    static Component chargedLine(LocalPlayer player, IronManState state) {
+        if (!state.has(IronManState.CHARGED)) {
+            return null;
+        }
+        boolean bright = (player.level().getGameTime() / 4) % 2 == 0;
+        return Component.translatable("hud.enhanced.nanotech.charged")
+                .withStyle(s -> s.withColor(bright ? 0xCFF6FF : 0x7FD8FF));
     }
 
     /** One effect arrived. */

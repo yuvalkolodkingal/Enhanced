@@ -45,8 +45,10 @@ public final class NanoBeamDrawers {
             @Override
             public void draw(Minecraft mc, AbstractClientPlayer player, BeamStyle style, Matrix4f pose,
                              VertexConsumer vc, Vec3 a, Vec3 b, float partialTick, float time) {
+                // (In the camera's own first-person view thinner, as lane L3's Unibeam.)
+                float own = mc.getCameraEntity() == player && mc.options.getCameraType().isFirstPerson() ? 0.6F : 1.0F;
                 IronManBeamFx.chestBeam(pose, vc, a, b, style, time, WIDTHS, ALPHAS,
-                        scale * Math.max(1.0F, player.getScale() * 0.5F));
+                        scale * own * Math.max(1.0F, player.getScale() * 0.5F));
             }
         };
     }
