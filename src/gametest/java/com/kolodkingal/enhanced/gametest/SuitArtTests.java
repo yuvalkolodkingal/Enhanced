@@ -74,7 +74,7 @@ public final class SuitArtTests {
                 check(wh[0] == 128 && wh[1] == 128, name + " is 128 x 128");
             }
         }
-        for (String prop : new String[] {"suitcase", "nano_drone", "nano_drone_glow", "suit_gantry"}) {
+        for (String prop : new String[] {"suitcase", "suit_gantry"}) {
             size("textures/entity/iron_man/" + prop + ".png");
         }
         helper.succeed();

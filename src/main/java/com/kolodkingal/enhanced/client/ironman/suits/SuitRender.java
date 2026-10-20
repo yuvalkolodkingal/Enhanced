@@ -80,7 +80,7 @@ public final class SuitRender {
         if (kind == SuitKind.MARK_5 && look.inPhase) {
             Suitcase.drawAtFeet(poseStack, buffers, light, overlay, look);
         }
-        if (kind == SuitKind.MARK_85 && look.shield > 0.01F && SuitArt.NANO_GEAR) {
+        if (kind == SuitKind.MARK_85 && look.shield > 0.01F && SuitArt.ENERGY_GEAR) {
             EnergyShapes.hexShield(poseStack, buffers, body, look);
         }
     }

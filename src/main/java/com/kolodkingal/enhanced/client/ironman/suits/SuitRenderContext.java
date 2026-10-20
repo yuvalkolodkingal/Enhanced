@@ -25,6 +25,7 @@ public final class SuitRenderContext {
     @Nullable
     private static AbstractClientPlayer player;
     private static float partialTick;
+    private static boolean firstPerson;
     private static long frame;
     private static long setAt = -1L;
     @Nullable
@@ -46,7 +47,13 @@ public final class SuitRenderContext {
         return look.kind == kind ? look : null;
     }
 
-    private static void begin(AbstractClientPlayer who, float pt) {
+    /** Whether the draw now is a first-person arm. */
+    static boolean firstPerson() {
+        return firstPerson && player != null && setAt == frame;
+    }
+
+    private static void begin(AbstractClientPlayer who, float pt, boolean arm) {
+        firstPerson = arm;
         player = who;
         partialTick = pt;
         look = null;
@@ -67,7 +74,7 @@ public final class SuitRenderContext {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void onPlayerPre(RenderPlayerEvent.Pre event) {
         if (event.getEntity() instanceof AbstractClientPlayer p) {
-            begin(p, event.getPartialTick());
+            begin(p, event.getPartialTick(), false);
         }
     }
 
@@ -78,7 +85,7 @@ public final class SuitRenderContext {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onArm(RenderArmEvent event) {
-        begin(event.getPlayer(), Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false));
+        begin(event.getPlayer(), Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false), true);
     }
 
     private SuitRenderContext() {

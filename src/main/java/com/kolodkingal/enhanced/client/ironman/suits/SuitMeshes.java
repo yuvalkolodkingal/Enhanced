@@ -14,7 +14,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
  * s0}, {@code s1}... (the nanite wave reveals them one by one; the Hulkbuster's hinged front shells are segments too)
  * placed at their pivots, and its extras {@code x_<name>} (the Mark 3's pods, the Mark 50's blade, shield and cannon,
  * the Mark 85's back flaps and energy blades). Pixels in the space of the player model's part each rides on. Then the
- * props: the Mark 5's suitcase and the Mark 85's drone.
+ * props: the Mark 5's suitcase and the display's gantry.
  */
 final class SuitMeshes {
     /**
@@ -685,19 +685,6 @@ final class SuitMeshes {
                 .texOffs(0, 11).addBox(-6F, -1F, -9F, 12, 1, 9, new CubeDeformation(0F))
                 , PartPose.offset(0F, -2F, 4.5F));
         return LayerDefinition.create(mesh, 64, 32);
-    }
-
-    /** The nano drone prop. */
-    static LayerDefinition nanoDrone() {
-        MeshDefinition mesh = new MeshDefinition();
-        PartDefinition root = mesh.getRoot();
-        root.addOrReplaceChild("body", CubeListBuilder.create()
-                .texOffs(0, 0).addBox(-2F, -1.5F, -2.5F, 4, 3, 5, new CubeDeformation(0F))
-                .texOffs(18, 0).addBox(-1.5F, -2.5F, -2F, 3, 1, 4, new CubeDeformation(0F))
-                .texOffs(0, 8).addBox(-4F, -1F, -1F, 2, 1, 3, new CubeDeformation(0F))
-                .texOffs(10, 8).addBox(2F, -1F, -1F, 2, 1, 3, new CubeDeformation(0F))
-                , PartPose.offset(0F, 0F, 0F));
-        return LayerDefinition.create(mesh, 32, 32);
     }
 
     /** The suit gantry prop. */

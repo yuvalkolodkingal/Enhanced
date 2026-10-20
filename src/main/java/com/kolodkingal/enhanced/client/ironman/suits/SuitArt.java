@@ -28,10 +28,16 @@ public final class SuitArt {
     static final List<String> EXTRAS = List.of("pod", "blade", "shield", "cannon", "eblade", "flap0r", "flap0l",
             "flap1r", "flap1l");
     /**
-     * Whether the suits draw their nanotech gear (the Mark 50's blade, round shield and cannon, the Mark 85's energy
-     * blades and hexagonal shield). The nanotech lane's own gear layer draws them as light too: keep one of the two.
+     * Whether the suits draw the solid part of the Mark 50's gear: the nanite blade on the right forearm and the cannon
+     * barrels on both (the nanotech lane's {@code NanoGearLayer} draws their glow over them).
      */
     public static boolean NANO_GEAR = true;
+    /**
+     * Whether the suits draw their own energy gear: the Mark 50's round shield on the forearm, the Mark 85's energy
+     * blades and hexagonal shield. Off: the nanotech lane's {@code NanoGearLayer} draws these (as light, wired to its
+     * moves and first person); on, they would be drawn twice.
+     */
+    public static boolean ENERGY_GEAR = false;
     private static final Map<SuitKind, ModelLayerLocation> LAYERS = new EnumMap<>(SuitKind.class);
     public static final ModelLayerLocation SUITCASE = new ModelLayerLocation(Enhanced.id("suitcase"), "main");
     public static final ModelLayerLocation GANTRY = new ModelLayerLocation(Enhanced.id("suit_gantry"), "main");
@@ -57,7 +63,6 @@ public final class SuitArt {
         event.registerLayerDefinition(SUITCASE, SuitMeshes::suitcase);
         event.registerLayerDefinition(GANTRY, SuitMeshes::suitGantry);
         event.registerLayerDefinition(HulkbusterModel.LAYER, HulkbusterModel::createLayer);
-        event.registerLayerDefinition(NanoDroneModel.LAYER, SuitMeshes::nanoDrone);
     }
 
     /** The models, baked from the loaded model set (the {@code AddLayers} event: after every resource reload). */

@@ -77,7 +77,7 @@ public final class SuitArtModel implements SuitModel {
      */
     @Override
     public void renderPart(SuitParts part, PoseStack pose, VertexConsumer buffer, int light, int overlay, int color) {
-        boolean moved = kind == SuitKind.HULKBUSTER;
+        boolean moved = kind == SuitKind.HULKBUSTER && !SuitRenderContext.firstPerson();
         if (moved) {
             pose.pushPose();
             float[] d = HulkbusterModel.fromPlayer(part);
@@ -157,8 +157,10 @@ public final class SuitArtModel implements SuitModel {
         float side = right ? -1.0F : 1.0F;
         for (Map.Entry<String, ModelPart> e : x.entrySet()) {
             ModelPart m = e.getValue();
-            boolean gear = !e.getKey().startsWith("flap") && !e.getKey().equals("pod");
-            if (gear && !SuitArt.NANO_GEAR) {
+            String name = e.getKey();
+            boolean energy = name.equals("shield") || name.equals("eblade");
+            boolean solid = name.equals("blade") || name.equals("cannon");
+            if (energy && !SuitArt.ENERGY_GEAR || solid && !SuitArt.NANO_GEAR) {
                 continue;
             }
             float amount;
