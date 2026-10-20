@@ -66,18 +66,18 @@ public class FalconWingsModel extends Model {
         PartDefinition root = mesh.getRoot();
         // The pack: a flat plate on his back, its two nozzles under it, and the knuckles of the wings.
         root.addOrReplaceChild("pack", CubeListBuilder.create()
-                .texOffs(0, 32).addBox(-3.5F, 0.5F, 2.0F, 7.0F, 9.0F, 2.0F)
-                .texOffs(20, 32).addBox(-3.0F, 8.5F, 2.4F, 2.0F, 3.0F, 2.0F)
-                .texOffs(20, 32).addBox(1.0F, 8.5F, 2.4F, 2.0F, 3.0F, 2.0F)
-                .texOffs(0, 44).addBox(-2.5F, 2.0F, 4.0F, 5.0F, 5.0F, 1.0F), PartPose.ZERO);
+                .texOffs(0, 40).addBox(-3.5F, 0.5F, 2.0F, 7.0F, 9.0F, 2.0F)
+                .texOffs(20, 40).addBox(-3.0F, 8.5F, 2.4F, 2.0F, 3.0F, 2.0F)
+                .texOffs(20, 40).addBox(1.0F, 8.5F, 2.4F, 2.0F, 3.0F, 2.0F)
+                .texOffs(0, 52).addBox(-2.5F, 2.0F, 4.0F, 5.0F, 5.0F, 1.0F), PartPose.ZERO);
         // The nozzles' flames (drawn bright, stretched by the flicker).
         root.addOrReplaceChild("flames", CubeListBuilder.create()
-                .texOffs(32, 32).addBox(-2.75F, 0.0F, 2.65F, 1.5F, 4.0F, 1.5F)
-                .texOffs(32, 32).addBox(1.25F, 0.0F, 2.65F, 1.5F, 4.0F, 1.5F), PartPose.offset(0.0F, 11.5F, 0.0F));
+                .texOffs(32, 40).addBox(-2.75F, 0.0F, 2.65F, 1.5F, 4.0F, 1.5F)
+                .texOffs(32, 40).addBox(1.25F, 0.0F, 2.65F, 1.5F, 4.0F, 1.5F), PartPose.offset(0.0F, 11.5F, 0.0F));
         for (int side = 0; side < 2; side++) {
             float sign = side == 0 ? -1.0F : 1.0F;
             PartDefinition wing = root.addOrReplaceChild(side == 0 ? "right_wing" : "left_wing",
-                    CubeListBuilder.create().texOffs(44, 32).addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F),
+                    CubeListBuilder.create().texOffs(44, 40).addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F),
                     PartPose.offset(sign * 3.0F, 2.0F, 3.9F));
             for (int i = 0; i < FEATHERS; i++) {
                 PartDefinition feather = wing.addOrReplaceChild("feather" + i, CubeListBuilder.create(),
@@ -86,11 +86,11 @@ public class FalconWingsModel extends Model {
                 for (int k = 0; k < 3; k++) {
                     // Each segment a little thinner than the one it slides out of, so the nested ones never fight.
                     CubeDeformation thin = new CubeDeformation(-0.06F * k);
-                    CubeListBuilder cubes = CubeListBuilder.create().texOffs(0, i * 6)
-                            .addBox(sign < 0 ? -len : 0.0F, -2.0F, -0.5F, len, 4.0F, 1.0F, thin);
+                    CubeListBuilder cubes = CubeListBuilder.create().texOffs(0, i * 8)
+                            .addBox(sign < 0 ? -len : 0.0F, -3.0F, -0.5F, len, 6.0F, 1.0F, thin);
                     if (k == 2) {
                         // The feather's point.
-                        cubes.texOffs(28, i * 6).addBox(sign < 0 ? -len - 3.0F : len, -1.5F, -0.5F, 3.0F, 2.0F,
+                        cubes.texOffs(28, i * 8).addBox(sign < 0 ? -len - 3.0F : len, -2.5F, -0.5F, 3.0F, 4.0F,
                                 1.0F, thin);
                     }
                     feather.addOrReplaceChild("segment" + k, cubes, PartPose.ZERO);

@@ -526,6 +526,50 @@ public final class FalconTests {
     }
 
     // ------------------------------------------------------------------------------------------------------------
+    // A custom hero and the preset
+
+    /** A custom hero with his Wing Shield on R and the blasters on G needs no item (the rows bring the wings). */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void aCustomHeroHasHisWingsWithoutTheItem(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        com.kolodkingal.enhanced.custom.CustomHero def = CustomKitSupport.def()
+                .pick("falcon.wing_shield", 3).key(1, "falcon.wing_shield")
+                .pick("falcon.blasters", 3).key(2, "falcon.blasters").pick("falcon.body", 3).build();
+        ServerPlayer hero = CustomKitSupport.hero(f, 5.5, 10.5, def);
+        f.onClose(() -> HeroLifecycle.onLogout(hero));
+        CustomKitSupport.tickN(hero, 1);
+        check(FalconWings.hasWings(hero, data(hero)) && !FalconWings.worn(hero), "wings without the item");
+        Husk husk = husk(helper, 12.5, FLOOR, 10.5);
+        lookAt(hero, husk);
+        CustomKitSupport.press(hero, 1, false, true);
+        check(data(hero).is(Live.FALCON_WING_SHIELD), "R held: the Wing Shield");
+        CustomKitSupport.press(hero, 1, false, false);
+        check(!data(hero).is(Live.FALCON_WING_SHIELD), "let go: down");
+        CustomKitSupport.tap(hero, 2, false);
+        check(inArena(helper, FalconDartEntity.class).size() == 1, "G: a dart");
+        check(hero.getMaxHealth() > 20.0F, "his body");
+        helper.succeed();
+    }
+
+    /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
+        java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
+                .findResource("assets", Enhanced.MODID, "hero_presets", "falcon.json");
+        String json = java.nio.file.Files.readString(file, java.nio.charset.StandardCharsets.UTF_8);
+        com.kolodkingal.enhanced.custom.HeroPresets.Preset preset =
+                com.kolodkingal.enhanced.custom.HeroPresets.read("falcon", json);
+        check(preset != null && preset.like() == Power.FALCON, "the preset reads, like Falcon");
+        com.kolodkingal.enhanced.custom.CustomHeroRules.Result r = com.kolodkingal.enhanced.custom.CustomHeroRules
+                .sanitize(preset.hero(), com.kolodkingal.enhanced.custom.CustomHeroRules.Limits.DEFAULT.withBudget(
+                        com.kolodkingal.enhanced.custom.HeroPresets.MAX_POINTS));
+        check(r.notes().isEmpty(), "no note: " + r.notes());
+        check(com.kolodkingal.enhanced.custom.CustomHeroRules.cost(r.hero())
+                <= com.kolodkingal.enhanced.custom.HeroPresets.MAX_POINTS, "60 points at most");
+        helper.succeed();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
     // His animation (pure tables)
 
     /** His gestures have keys, his moves' effects start them, the stances hand over, his rows act his moves. */

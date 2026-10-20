@@ -74,7 +74,6 @@ public class FalconRocketRenderer extends EntityRenderer<IronMissileEntity> {
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
         poseStack.mulPose(Axis.XP.rotationDegrees(-pitch));
         poseStack.mulPose(Axis.ZP.rotationDegrees((entity.tickCount + partialTick) * 24.0F));
-        poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         rocket.render(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)), packedLight,
                 OverlayTexture.NO_OVERLAY);
         poseStack.popPose();

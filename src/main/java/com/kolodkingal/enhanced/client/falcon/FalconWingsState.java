@@ -38,19 +38,19 @@ public final class FalconWingsState {
     public static final int SIZE = 8;
 
     /** Folded on the pack: the blades nested and stacked, pointing down. */
-    public static final float[] FOLDED = {2.0F, 1.5F, 3.9F, 0.0F, -70.0F, 5.0F, 0.0F, 0.0F};
+    public static final float[] FOLDED = {1.6F, 1.5F, 3.9F, 0.0F, -82.0F, 3.0F, 0.0F, 0.0F};
     /** Spread for flight: wide, fanned from a little up to well down. */
-    public static final float[] SPREAD = {3.0F, 2.0F, 3.9F, 12.0F, 28.0F, 15.0F, 1.0F, 0.0F};
+    public static final float[] SPREAD = {3.0F, 2.0F, 3.9F, 12.0F, 24.0F, 10.0F, 1.0F, 0.0F};
     /** The glide: flat and wide. */
-    public static final float[] GLIDE = {3.0F, 2.0F, 3.9F, 4.0F, 7.0F, 5.0F, 1.0F, 0.0F};
+    public static final float[] GLIDE = {3.0F, 2.0F, 3.9F, 4.0F, 7.0F, 4.0F, 1.0F, 0.0F};
     /** The Dive: swept back and half drawn in. */
     public static final float[] DIVE = {2.5F, 2.0F, 3.9F, 62.0F, -18.0F, 7.0F, 0.65F, 0.0F};
     /** The Boost Climb: swept back and down, the nozzles roaring. */
     public static final float[] CLIMB = {2.5F, 2.0F, 3.9F, 48.0F, -30.0F, 6.0F, 0.5F, 0.0F};
     /** The Wing Shield: the hinges at his shoulders, the wings wrapped round the front, fanned top to knee. */
-    public static final float[] SHIELD = {5.5F, 1.0F, 0.5F, -118.0F, 48.0F, 26.0F, 0.6F, 0.0F};
+    public static final float[] SHIELD = {5.5F, 1.0F, 0.5F, -118.0F, 20.0F, 14.0F, 0.6F, 0.0F};
     /** The Wing Slash: flung out wide and a little forward. */
-    public static final float[] SLASH = {3.0F, 2.0F, 3.9F, -5.0F, 14.0F, 9.0F, 1.0F, 0.0F};
+    public static final float[] SLASH = {3.0F, 2.0F, 3.9F, -5.0F, 16.0F, 8.0F, 1.0F, 0.0F};
 
     /** How much of the gap to the asked pose is closed each tick. */
     static final float EASE = 0.35F;
@@ -157,12 +157,17 @@ public final class FalconWingsState {
         Vec3 facing = new Vec3(-Mth.sin(yaw), 0, Mth.cos(yaw));
         Vec3 side = new Vec3(-facing.z, 0, facing.x);
         if (player.isFallFlying()) {
+            // Lying along his look: the pack on his back (up), the nozzles toward his feet (behind).
             Vec3 look = player.getLookAngle();
-            return player.position().add(0, 0.3, 0).subtract(look.scale(0.1)).add(side.scale(right ? 0.13 : -0.13))
-                    .add(0, 0.25, 0);
+            return player.position().add(0, 0.45, 0).subtract(look.scale(0.15)).add(side.scale(right ? 0.13 : -0.13));
         }
-        return player.position().add(0, player.getBbHeight() * 0.47, 0).subtract(facing.scale(0.24))
+        return player.position().add(0, player.getBbHeight() * 0.45, 0).subtract(facing.scale(0.26))
                 .add(side.scale(right ? 0.13 : -0.13));
+    }
+
+    /** The way the nozzles' flames blow: down, or behind him while he glides. */
+    public static Vec3 exhaust(Player player) {
+        return player.isFallFlying() ? player.getLookAngle().scale(-1.0) : new Vec3(0, -1, 0);
     }
 
     /** Every client tick: each player's wings ease; the gone are forgotten. */

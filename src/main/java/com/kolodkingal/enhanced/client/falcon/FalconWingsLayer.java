@@ -23,6 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
@@ -36,6 +37,8 @@ import net.neoforged.neoforge.client.event.RenderHandEvent;
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
+    /** The sweep (degrees, forward negative) of the wings as his own eyes see them. */
+    static final float FIRST_PERSON_SWEEP = -28.0F;
     /** The model the first-person view draws with (any player renderer's: they are all the same). */
     private static FalconWingsModel firstPersonModel;
 
@@ -88,9 +91,9 @@ public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
 
     /**
      * In first person, the tips of his spread wings at the edges of his view while he flies or glides (drawn once a
-     * frame, with the main hand).
+     * frame, with the main hand; before {@code FirstPersonArms}, which takes the hands over and cancels the event).
      */
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
     public static void onRenderHand(RenderHandEvent event) {
         FalconWingsModel model = firstPersonModel;
         Minecraft mc = Minecraft.getInstance();
@@ -107,13 +110,18 @@ public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
             return; // (folded, swept back or wrapped: nothing at the edges of his view)
         }
         float age = player.tickCount + partialTick;
+        // (Seen from his eyes the wings are swept a little forward, so their outer feathers come into the edges of his
+        // view instead of lying beside the camera.)
+        p[FalconWingsState.SWEEP] = FIRST_PERSON_SWEEP;
+        p[FalconWingsState.HZ] = 0.0F;
         model.pose(p, flap, age, 0.0F);
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
         // From the camera to his back, then into the body's model space (x to his left, y down, z behind him).
-        poseStack.translate(0.0F, -0.42F, -0.30F);
+        poseStack.translate(0.0F, -0.30F, -0.55F);
         poseStack.mulPose(Axis.XP.rotationDegrees(player.isFallFlying() ? -12.0F : 4.0F));
-        poseStack.scale(-1.0F / 16.0F, -1.0F / 16.0F, 1.0F / 16.0F);
+        // (A model part's own numbers are pixels: it divides them by 16 itself; only the axes turn here.)
+        poseStack.scale(-1.0F, -1.0F, 1.0F);
         var buffer = event.getMultiBufferSource().getBuffer(RenderType.entityCutoutNoCull(texture(player)));
         int light = event.getPackedLight();
         model.renderTips(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, 0, 3);

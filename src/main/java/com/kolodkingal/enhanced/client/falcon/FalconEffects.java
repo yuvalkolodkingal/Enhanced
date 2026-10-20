@@ -221,12 +221,18 @@ public final class FalconEffects {
             if (!thrusting || player.onGround() || reduced && (now & 1) == 0) {
                 continue;
             }
+            // (A small flame and a wisp of smoke from each nozzle, blown back the way the flames point.)
+            Vec3 back = FalconWingsState.exhaust(player);
             for (boolean right : new boolean[]{true, false}) {
+                if ((now + (right ? 1 : 0)) % 2 != 0) {
+                    continue;
+                }
                 Vec3 nozzle = FalconWingsState.nozzle(player, right);
-                level.addParticle(ParticleTypes.FLAME, nozzle.x, nozzle.y, nozzle.z,
-                        level.random.nextGaussian() * 0.01, -0.06, level.random.nextGaussian() * 0.01);
-                if ((now + (right ? 1 : 0)) % 3 == 0) {
-                    level.addParticle(ParticleTypes.SMOKE, nozzle.x, nozzle.y - 0.1, nozzle.z, 0, -0.02, 0);
+                level.addParticle(ParticleTypes.SMALL_FLAME, nozzle.x, nozzle.y, nozzle.z, back.x * 0.08,
+                        back.y * 0.08, back.z * 0.08);
+                if (!player.isFallFlying() && (now + (right ? 1 : 0)) % 6 == 0) {
+                    level.addParticle(ParticleTypes.SMOKE, nozzle.x + back.x * 0.2, nozzle.y + back.y * 0.2,
+                            nozzle.z + back.z * 0.2, back.x * 0.03, back.y * 0.03, back.z * 0.03);
                 }
             }
         }
