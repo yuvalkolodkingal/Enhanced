@@ -6,7 +6,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 
 | Rule | Detail |
 |---|---|
-| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
+| One power per player | A player is exactly one of: no powers, Magneto, Scarlet Witch, Quicksilver, Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Red Hulk, Iron Man, Falcon, Love or a custom hero of the [Hero Creator](Hero-Creator). Powers never stack. |
 | Permanent | Once unlocked, a power survives death, logging out and changing dimension. Only an operator command removes it: `/enhanced power set <player> none` (see [Commands](Commands)). |
 | Creative and Spectator | Creative and Spectator players are never killed by the Mind Stone or the Hex wall. |
 
@@ -36,6 +36,11 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Hulk](Hulk) (3.6) | Craft a **Gamma Emitter** (iron blocks, lime stained glass, an emerald block and a redstone block), place it and right-click it; with no power, **stand in its green beam for 3 seconds**. |
 | [Wolverine](Wolverine) (3.7) | In the [X-Men lower lab](Mutant-School-Lab) under a Mutant School, take an **Adamantium Injection** from the **Weapon X rack** (one per player per rack) and, with no power, **hold right-click on it for 3 seconds**. A hero is refused: take the **Mutant Cure** first (the lab's **Cure Station** fills one for a glass bottle). |
 | [Deadpool](Deadpool) (3.7) | In the same lab, with no power, **step into the Weapon X Pod** and right-click it: 5 seconds of "treatment". |
+| [Captain America](Captain-America) (3.8) | In the lab of an [Avengers Tower](Structures#the-armoury-38), take a **Super Soldier Serum** from its case, use it and choose **Captain America**. Any hero is replaced; you get a Vibranium Shield. |
+| [Red Hulk](Red-Hulk) (3.8) | The same serum: choose **Red Hulk**. |
+| [Falcon](Falcon) (3.8) | Take the **Falcon Exo-Wings** from the tower's observation deck (its highest room), then use the serum with the wings in your bag and choose **Falcon** (locked without them). Wear the wings on your chest. |
+| [Iron Man](Iron-Man) (3.8) | On Tony's desk in the tower's Iron Man workshop, take an **Arc Reactor** and **hold right-click for 2 seconds** (or wear the **Nano Arc Reactor**). Any hero is replaced. Then take the suits from the workshop's displays and put them on with **H**. |
+| [Love](Love) (3.8) | In the End, find the **Shrine of the Cosmic Entities**, right-click **Eternity's altar** holding a key of the Bifrost (Stormbreaker, your Mjolnir, Hofund or your Gungnir), and in [Eternity's](Eternity) realm wish to **become Love**. Any hero is replaced; you get a Stormbreaker. |
 | [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once (since 3.4 with that hero's items), or make your own. |
 
 ## Step by step
@@ -196,6 +201,28 @@ Already a hero? "The adamantium needs a body that can heal. Take the Mutant Cure
 2. With **no power**, **step into the Weapon X Pod** (the steel pod with a glass front and a green light, at the end of the room) and **right-click it**.
 3. Stand still for **5 seconds** of treatment (Sneak stops it). A red flash, and you are Deadpool. See [Deadpool](Deadpool).
 
+### Captain America, Red Hulk and Falcon: the Super Soldier Serum (3.8)
+
+1. Find an **Avengers Tower** (`/locate structure enhanced:avengers_tower`) and climb the ladder in its core to the floor whose door says **THE LAB**.
+2. On the workbench between the two brewing stands, right-click the glass case ("Project Rebirth"): a **Super Soldier Serum** (one for each player from each case).
+3. **For Falcon** first climb on to the **observation deck**, the highest room, and take the **Falcon Exo-Wings** from their case (one pair for each player). Keep them with you.
+4. **Use the serum**: a screen of three cards opens. Choose **Captain America**, **Red Hulk** or **Falcon** (open only while you carry the wings). Your old hero is replaced, whoever he was; Escape keeps the serum. See [Super Soldier Serum](Super-Soldier-Serum).
+5. Falcon: put the wings on your chest, and fly.
+
+### Iron Man (3.8)
+
+1. In an Avengers Tower, climb to the floor whose door says **IRON MAN workshop**.
+2. On **Tony's desk**, right-click the case under the sign "Arc Reactors": an **Arc Reactor** (and the other case: the **Nano Arc Reactor**).
+3. **Hold right-click with the Arc Reactor for 2 seconds** (or put the Nano Arc Reactor on your chest): it goes into your chest, and you are Iron Man. Your old hero is replaced.
+4. Right-click the **Suit Displays** along the wall for the suits (one of each for each player), and press **H** to suit up. See [Iron Man](Iron-Man).
+
+### Love (3.8)
+
+1. Get a key of the Bifrost: **Stormbreaker** (anyone can forge it and hold it: see [Thor](Thor#stormbreaker)), your own Mjolnir, a Hofund or your own Gungnir.
+2. In **the End**, fly out to the outer islands and find the **Shrine of the Cosmic Entities** (`/locate structure enhanced:eternity_shrine`).
+3. Right-click **Eternity's altar** in the middle with the key in your hand, and stay by it for 3 seconds.
+4. In Eternity's realm, choose **Become Love**. It is your one wish. See [Eternity](Eternity) and [Love](Love).
+
 ### A hero of your own
 
-In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty and, since 3.4, any of the abilities of the mod's heroes (123 since 3.7) and the six Infinity Stones (each with a strength from 1 to 10, within a budget of points), on your keys plain or with Sneak, with the heroes' moves, your colours, your own skin and extras like a cape, which everyone on the server sees. Since 3.4, **Choose a Hero** also gives you that hero's items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).
+In **Creative** mode, or as an operator, take the **Hero Creator** from the Enhanced creative tab and use it: **Choose a Hero** turns you into any hero of the mod, in any look, at once; **Create My Hero** makes your own, with a name, powers from a catalogue of thirty and, since 3.4, any of the abilities of the mod's heroes (150 since 3.8) and the six Infinity Stones (each with a strength from 1 to 10, within a budget of points), on your keys plain or with Sneak, with the heroes' moves, your colours, your own skin and extras like a cape, which everyone on the server sees. Since 3.4, **Choose a Hero** also gives you that hero's items (Thor's Mjolnir, claimed; Agatha's Darkhold...), never twice. Your hero can be saved to a file and loaded on another server. See [Hero Creator](Hero-Creator).

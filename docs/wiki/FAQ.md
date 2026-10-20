@@ -4,7 +4,7 @@
 
 ### How do I become a hero?
 
-Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open (and the three trials behind it), a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, a book to read (Agatha), glasses to put on (Cyclops), a wheelchair to hold (Professor X), an injection or a pod in the X-Men's lab (Wolverine, Deadpool), or, for Thanos, Ultron and Apocalypse, a boss to beat. In Creative mode the Hero Creator makes any hero at once. See [Becoming a Hero](Becoming-a-Hero).
+Each hero has one way in: a helmet, goggles or crown to wear, a stone to touch, a door to open (and the three trials behind it), a Tesseract to use, a hammer to lift, an Ember to hold, a spider's bite, a book to read (Agatha), glasses to put on (Cyclops), a wheelchair to hold (Professor X), an injection or a pod in the X-Men's lab (Wolverine, Deadpool), the Super Soldier Serum (Captain America, Red Hulk, Falcon) or an Arc Reactor (Iron Man) in the Avengers Tower, a wish to Eternity (Love), or, for Thanos, Ultron and Apocalypse, a boss to beat. In Creative mode the Hero Creator makes any hero at once. See [Becoming a Hero](Becoming-a-Hero).
 
 ### I touched Loki's Scepter and died. Why?
 
@@ -28,7 +28,7 @@ The Tesseract makes you Loki only if you have **no power**, and no **Scarlet Wit
 
 There are two reasons:
 
-1. **You are not worthy.** Only Thor, Vision, anyone with the *Hero of the Village* advancement (save a village from a raid) and Creative or Spectator players are worthy, unless the server turned on `thor.anyoneWorthy`, which makes everybody worthy.
+1. **You are not worthy.** Only Thor, Vision, (3.8) Captain America and Love, anyone with the *Hero of the Village* advancement (save a village from a raid) and Creative or Spectator players are worthy, unless the server turned on `thor.anyoneWorthy`, which makes everybody worthy.
 2. **It is bound to someone else.** The first worthy player who lifts a Mjolnir claims it, and from then on only that player can lift it. Its tooltip says "Bound to" followed by the owner's name. Anyone else finds it far too heavy, and it slips out of their hands.
 
 A Mjolnir nobody has claimed yet (its tooltip says "Unclaimed") belongs to the first worthy player who lifts it. If you are worthy and forge one yourself, it is yours the moment you take it from the table. If you are not worthy, it stays unclaimed and slips out of your hands: leave it on the ground for a worthy player to claim.
@@ -406,6 +406,92 @@ He ran off (some mornings he does). Ask Agatha, say "I'll find him!", and look f
 ### My friend cannot join my server (3.7).
 
 3.7 speaks network protocol **11**: the server and every player need 3.7. Worlds of 3.6 open in 3.7: every school gets its lab when a player comes near, and cottages appear in land not explored yet.
+
+## The Avengers, Iron Man's suits and Eternity (3.8)
+
+### How do I become Iron Man?
+
+With an **Arc Reactor**, not the serum. In an [Avengers Tower](Structures#the-armoury-38), climb to the floor whose door says **IRON MAN workshop**, and on **Tony's desk** right-click the case under the sign "Arc Reactors". **Hold right-click with the reactor for 2 seconds**: it goes into your chest and you are Iron Man (your old hero is replaced). Keep the reactor in your bag: it powers the suits. Then right-click the **Suit Displays** in the same room for the suits, and press **H** to suit up. See [Iron Man](Iron-Man).
+
+### Where is the Arc Reactor?
+
+On **Tony's desk** in Iron Man's workshop in the Avengers Tower, in a glass case (where 3.6.1 had a beacon), and the **Nano Arc Reactor** in the case next to it. One of each for each player. `/locate structure enhanced:avengers_tower` finds a tower. A server without towers can switch on their recipes (`iron_man.reactorsCraftable`).
+
+### Why can't I wear the Mark 3?
+
+**Only Iron Man can wear a suit**: "Only Iron Man can wear this suit. Use an Arc Reactor first." Become Iron Man with the reactor, then put it on (right-click with it, or **H**). The nanotech suits (Mark 50, Mark 85) are not worn at all: you carry them, wear the **Nano Arc Reactor** on your chest, and press **H**.
+
+### My suit is on, but nothing works!
+
+A suit works only with its reactor: **an Arc Reactor anywhere in your bag** for the Mark 1, 3, 5 and the Hulkbuster ("No reactor!"), the **Nano Arc Reactor on your chest** for the Mark 50 and 85. A suit worn down to its last point is **offline** ("Suit offline! Repair it."): repair it on an anvil (iron ingots; diamonds for the Mark 50, netherite scrap for the Mark 85, iron blocks for the Hulkbuster). And with **no suit energy** left, every move waits until the bar fills again ("Suit energy empty!").
+
+### Why won't my suit fly?
+
+* The **Mark 1** can't fly: its **G** is a single **Rocket Boost** that ends in a crash landing.
+* The suit doesn't work (above): no reactor, offline, or a nanotech suit without the Nano Arc Reactor on your chest.
+* Your **suit energy is empty**: flight stops (with a soft Slow Falling landing) until it recharges. Land and wait: it fills fastest on the ground.
+* The suit is still **going on** (wait for the suit-up, or press **H** to skip it).
+* You are **bracing** (Mark 1), **holding a creature** (Hulkbuster) or **charging the Nano Cannon** (Mark 50).
+
+Press **G** (or double-tap Space) to fly. See [Iron Man](Iron-Man#flight).
+
+### Why won't the Hulkbuster come indoors?
+
+Veronica drops the Hulkbuster **from the sky**: you need **open sky** above you and above the spot in front of you ("Veronica can't reach you in here."). Indoors, **put the Hulkbuster on your chest slot by hand** instead: the frame folds round you in 2 seconds. Either way you need **room** to grow to 3.5 times your size ("No room for the Hulkbuster here."). Veronica's new arm (**N**) needs open sky too.
+
+### My brother took the Mark 85. Is there one for me?
+
+Yes. Every display and case gives **one to each player**: you get your own Mark 85 from the same display. (A server can change it: `avengers_tower.displaysPerPlayer`.)
+
+### My Avengers Tower has the old armour stands, not the suits.
+
+A tower built before 3.8 is **refitted by itself** the first time a player comes within 96 blocks of it: the stands make way for the displays and cases in about half a second. A block you changed there is left alone. An operator can do it at once: `/enhanced structure refit_tower` (`force` to put the blocks even over yours, `status` to see what happened). A tower of the very first design (3.6.0) can't be refitted. See [Structures](Structures#towers-built-before-38-the-refit).
+
+### Can I become Iron Man with the serum?
+
+No: the serum has three cards, **Captain America**, **Red Hulk** and **Falcon**. Iron Man is the Arc Reactor's.
+
+### Why is Falcon locked in the serum?
+
+Falcon's power is his **wings**, so his card needs them: carry the **Falcon Exo-Wings** anywhere (your bag, your off hand or your chest) and use the serum again. The wings are on the **observation deck**, the highest room of the [Avengers Tower](Structures#the-armoury-38), in a case between two end rods: one pair for each player. See [Super Soldier Serum](Super-Soldier-Serum#why-is-falcon-locked).
+
+### I am Falcon, but I can't fly.
+
+**Wear the Exo-Wings on your chest**: every wing move says "Put on your Exo-Wings!" without them (only the wrist blasters work). Broken wings don't fly either: mend them with iron ingots on an anvil.
+
+### Why can't my friend take Cap's shield?
+
+The case in Cap's closet gives the Vibranium Shield **only to Captain America** ("This is Cap's shield."). Anyone can block with a Vibranium Shield, but only Captain America throws it and blocks everything with it.
+
+### Red Hulk never bursts.
+
+His Anger fills when he **is hurt** (3 for each health) and when he **hurts** someone (1 for each health), and it cools after 5 seconds out of a fight. Fight, and at 100 he bursts by himself. From 50 you can burst early with **B**; below 50: "Not angry enough… yet." The Roar (**Sneak + G**) adds 10, and soaking up fire or beams with the Energy Absorb (**Sneak + B**) adds more. See [Red Hulk](Red-Hulk#anger).
+
+### Does Red Hulk's burst burn my house down?
+
+The burst sets blocks on fire **only if the game rule `mobGriefing` is on** (and the server's `red_hulk.burstSetsFire`), and never in a protected area or a boss arena. With `mobGriefing` off, only creatures burn.
+
+### How do I reach Eternity?
+
+You need a **key of the Bifrost**: **Stormbreaker** (anyone can forge it and hold it), your own **Mjolnir**, a **Hofund** or your own **Gungnir**. Then:
+
+1. In **the End**, fly out to the outer islands and find the **Shrine of the Cosmic Entities** (`/locate structure enhanced:eternity_shrine`). Shrines appear only in islands nobody has explored yet.
+2. Right-click **Eternity's altar** in the middle of the plaza with the key in your hand, and **stay by it for 3 seconds** (don't sneak or walk away).
+3. You are in Eternity's realm. His screen opens by itself.
+
+See [Eternity](Eternity).
+
+### Can I wish for all six Infinity Stones?
+
+One wish is one item, so one stone (or the empty Gauntlet). And a stone obeys the same rules as anywhere else: you must be one who **may hold it bare** (a god, the Scarlet Witch or the Phoenix), and the Reality, Time, Power and Soul Stones follow the server's **stone ledger** (if someone else already holds that stone, it is locked). See [Eternity](Eternity#ask-for-anything).
+
+### I wished for the wrong thing! Can I wish again?
+
+Each player has **one wish**, for good. An operator can give it back: `/enhanced eternity reset <player>`. Choosing **Leave** instead of wishing keeps the wish for another visit.
+
+### Why can't Love throw her axe or fly?
+
+Love needs **Stormbreaker in her hand** for the Axe Throw, for flight and for the Bifrost ("Love needs her axe."), as Thor needs his weapon. Her lightning (**V**) and her eye laser (**B**) work without it.
 
 ## The fixes of 3.6
 

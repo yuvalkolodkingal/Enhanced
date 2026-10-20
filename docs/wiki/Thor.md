@@ -35,6 +35,7 @@ Only the worthy can lift a Mjolnir nobody owns yet:
 
 * **Thor** himself,
 * **Vision**, who lifted it in *Age of Ultron*,
+* (3.8) **[Captain America](Captain-America)**, who lifted it in *Endgame*, and **[Love](Love)**, Thor's daughter (a server can take it from them: `captain_america.worthy`, `love.worthy`; a custom hero with their bodies is worthy too),
 * anyone who has proven themselves a hero by **saving a village from a raid** (the *Hero of the Village* advancement),
 * players in **Creative or Spectator** mode,
 * or **everyone**, if the server option `thor.anyoneWorthy` is turned on.
@@ -103,6 +104,8 @@ L = any log (Groot's arm)
 
 Stormbreaker carries no enchantment of worthiness: **anyone can wield it**, and nobody owns it. It is an axe (it chops wood, strips logs and knocks shields aside) that hits harder than any other (12 attack damage), never breaks and can't burn. It doesn't make anyone Thor, but whoever holds it can call **the Bifrost** (below). In Thor's hands it does most of what Mjolnir does: he throws it, calls it back, flies with it and fires his lightning beam through it. (It doesn't shatter, and it can't pin anyone.) Unlike Mjolnir, a speedster can snatch it out of a hand. It is metal: Magneto can lift it, tear it from a hand, and pull it.
 
+**Stormbreaker in 3.8.** It is **[Love](Love)'s axe**: she throws it and calls it back exactly as Thor does (with Thor's own throw), flies while she holds it and opens the Bifrost with it; wishing to become Love gives you one if you carry none. And it is the best-known **key of the Bifrost** for [Eternity's altar](Eternity#the-way-in-the-altar) in the End (Mjolnir, Hofund and your own Gungnir open it too): hold it, right-click the altar, and it floats over it for 3 seconds before you are taken to Eternity's realm. Since anyone can forge and hold Stormbreaker, anyone can reach Eternity.
+
 ## Mjolnir or Stormbreaker?
 
 In the films the axe hit a bit harder than the hammer, and so it does here: **Stormbreaker is a fifth stronger than Mjolnir in everything they share**. What only Mjolnir can do stays Mjolnir's.
@@ -159,6 +162,12 @@ All of Thor's lightning is the MCU's: a white-hot core, electric blue and a deep
 ## Looks
 
 *Thor* (2011 and *The Avengers*: black and silver armour with the six chest discs, red cape), *Ragnarok* (the God of Thunder at the end of the film: short hair, eyepatch), *Love and Thunder* (navy, gold and black armour, bare arms, long ash-blond hair swept back, a full beard, red cape), *Love and Thunder, helmet* (the same suit with the winged helmet of the New Asgard fight), *Mighty Thor* (Jane Foster), and *Your own skin*. Press **H** to switch. See [Looks](Looks).
+
+## Thor and the heroes of 3.8
+
+* **[Love](Love)**, his daughter, has his throw, his flight with the axe, his lightning beam (in lilac and gold) and his Bifrost, with Stormbreaker.
+* Thor's lightning on an Iron Man in a **Mark 85** charges its **Lightning Refocuser** (free and stronger for 10 seconds). [Red Hulk](Red-Hulk)'s Energy Absorb soaks up his lightning beam into anger.
+* [Captain America](Captain-America) and Love are worthy: they can lift a Mjolnir nobody owns, and claim it.
 
 ## The Infinity Stones (3.6)
 

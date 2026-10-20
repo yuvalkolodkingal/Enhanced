@@ -1,6 +1,6 @@
 # Items and Crafting
 
-Every item you can use is in the **Enhanced** creative tab. Thirteen are crafted, five more are found in chests (or dropped), three more are the rewards of the bosses, and one, the [Hero Creator](#hero-creator), is for Creative mode only. The Radioactive Spider and Professor X's Wheelchair are both: you can craft them and find them. Since 3.6 there are also [the Infinity Stones and their vessels](#the-infinity-stones-and-their-vessels-36), Doctor Strange's [Eye of Agamotto](#eye-of-agamotto-36) and [Sling Ring](#sling-ring-36), the Hulk's [Gamma Emitter](#gamma-emitter-36) and [Hydra's gear](#hydras-gear-36). Since 3.7: the [Mutant Cure](#mutant-cure-331) (it is older, from 3.3.1, but now has a home), Deadpool's [chimichanga](#chimichanga-37), the [Stone Locator](#stone-locator-37), and the [Adamantium Injection](#adamantium-injection-37), found in the X-Men's lab. In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
+Every item you can use is in the **Enhanced** creative tab. Thirteen are crafted, five more are found in chests (or dropped), three more are the rewards of the bosses, and one, the [Hero Creator](#hero-creator), is for Creative mode only. The Radioactive Spider and Professor X's Wheelchair are both: you can craft them and find them. Since 3.6 there are also [the Infinity Stones and their vessels](#the-infinity-stones-and-their-vessels-36), Doctor Strange's [Eye of Agamotto](#eye-of-agamotto-36) and [Sling Ring](#sling-ring-36), the Hulk's [Gamma Emitter](#gamma-emitter-36) and [Hydra's gear](#hydras-gear-36). Since 3.7: the [Mutant Cure](#mutant-cure-331) (it is older, from 3.3.1, but now has a home), Deadpool's [chimichanga](#chimichanga-37), the [Stone Locator](#stone-locator-37), and the [Adamantium Injection](#adamantium-injection-37), found in the X-Men's lab. Since 3.8: [the Avengers' gear](#the-avengers-gear-38), found in the Avengers Tower (the Super Soldier Serum, the Vibranium Shield, the Falcon Exo-Wings, the two Arc Reactors and Iron Man's six suits). In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
 
 ## Crafted items
 
@@ -459,9 +459,39 @@ The spear of the Allfather: 9 attack damage, a block more reach, never breaks, f
 
 Asgardian Gold Plating, Gold Trim, Gold Pillar and Gold Lattice; Realm Stone, Realm Stone Bricks (with stairs, slab and wall), Polished Realm Stone and Realm Stone Pillar; the Rainbow Bridge; the Cosmic Falls; the Mural of Asgard; the Asgardian Brazier; Golden Leaves of Asgard; the Asgardian Bench. They are in the Creative tab, with no recipe. In Asgard's wild land the stone and the leaves can be mined like any block; the city itself can't be broken ([Asgard](Asgard#the-rules-of-asgard)). The Throne of Asgard, Hela's Seal, Gungnir's Stand, Hofund's Socket, the Bifrost Mechanism and the Bifrost Rune Stone are the city's own: they can't be broken and have no item.
 
+## The Avengers' gear (3.8)
+
+None of these is found in a chest, and none can be crafted unless a server switches a recipe on: they wait in the [Avengers Tower's armoury](Structures#the-armoury-38), on its **Suit Displays** and in its **Tech Cases**, **one of each for each player** from each display or case (`avengers_tower.displaysPerPlayer`; the serum's case `super_soldier_serum.casePerPlayer`). The new advancement tab **Avengers** starts with finding them.
+
+| Item | Where | What it does |
+|---|---|---|
+| **Super Soldier Serum** | the tower's lab ("Project Rebirth") | Use it: choose [Captain America, Red Hulk or Falcon](Super-Soldier-Serum). Replaces your hero; used up only when you choose. Epic, doesn't stack. |
+| **Vibranium Shield** | Cap's closet in the penthouse (for Captain America only); the serum's Captain card; Choose a Hero | A shield for anyone; for [Captain America](Captain-America#the-vibranium-shield) it blocks everything from the front, bounces shots back, and he throws it. Unbreakable, fireproof. |
+| **Falcon Exo-Wings** | the observation deck, the highest room | Worn on the chest: 6 armour; for [Falcon](Falcon#the-exo-wings) they fly and glide (an elytra). Unlock Falcon's card on the serum. Mend with iron ingots. |
+| **Arc Reactor** | Tony's desk in Iron Man's workshop | Hold right-click 2 seconds: you become [Iron Man](Iron-Man). Carried, it powers the classic suits. |
+| **Nano Arc Reactor** | Tony's desk | Hold it, or wear it on your chest: you become Iron Man. On the chest, it holds the nanotech suits. |
+| **Iron Man Mark 1** | a Suit Display in the workshop | The cave suit, worn on the chest (Iron Man only). Mend with iron ingots. |
+| **Iron Man Mark 3** | a Suit Display | The red-and-gold suit, worn on the chest. Mend with iron ingots. |
+| **Iron Man Mark 5** | a Suit Display | A **suitcase**: use it anywhere and it unfolds onto you. Mend with iron ingots. |
+| **Iron Man Mark 50** | a Suit Display | A nanotech housing, carried: the Nano Arc Reactor on your chest and **H** put it on. Mend with diamonds (it also rebuilds by itself). |
+| **Iron Man Mark 85** | a Suit Display | The strongest nanotech housing. Mend with netherite scrap (it also rebuilds by itself). |
+| **Hulkbuster** | a Suit Display in its own bay | Use it under the open sky and Veronica drops it for you. Mend with iron blocks. |
+
+The suits work only for Iron Man, with a reactor: see [Iron Man](Iron-Man#the-six-suits).
+
+**The recipes a server can switch on** (for worlds with no towers):
+
+* **Super Soldier Serum** (`super_soldier_serum.craftable`): `B G B / D W D / B N B`: B Blue Stained Glass Pane, G Golden Apple, D Diamond, W Water Bottle, N Nether Star.
+* **Arc Reactor** (`iron_man.reactorsCraftable`): `I R I / R N R / I R I`: I Block of Iron, R Block of Redstone, N Nether Star.
+* **Nano Arc Reactor** (the same option): `. N . / N A N / . N E`: N Netherite Ingot, A Arc Reactor, E Echo Shard.
+
+**The new blocks:** the **Suit Display** (two high: a steel mannequin on a plinth), the **Tech Case** (a glass case on a steel plinth), **Eternity's Altar** and **Eternity's Still Water** (the mirror floor of [Eternity's realm](Eternity#eternitys-realm)). They are in the creative tab for builders; the ones in a tower or a shrine can't be broken in Survival.
+
+**Stormbreaker, Mjolnir, Hofund and Gungnir** are the keys of [Eternity's altar](Eternity#the-way-in-the-altar), and **Eternity** may give you almost any item as your wish.
+
 ## Hero Creator
 
-"Become any hero, or make your own." A gold medallion, only in the **creative tab**: it has no recipe and is never found. It works for a player in Creative mode or an operator. Use it to open the Hero Creator: become any hero of the mod in any look, or make a hero of your own with powers from a catalogue of thirty and (since 3.4) the abilities of the heroes (123 since 3.7) and the six Infinity Stones, your keys, your moves, your colours, your skin and its extras, and save it to a file. Since 3.4, choosing a hero also gives you his items: Magneto's Helmet, Quicksilver's Goggles, the Ruby-Quartz Glasses, Mjolnir (claimed by you) or Stormbreaker, Loki's Scepter, Thanos's Gauntlet, Ultron's Core, the wheelchair, the Darkhold, or (3.6) Doctor Strange's Eye of Agamotto and Sling Ring, or (3.7) Deadpool's three chimichangas, never a second one (`custom_hero.chooseGivesItems`). See [Hero Creator](Hero-Creator).
+"Become any hero, or make your own." A gold medallion, only in the **creative tab**: it has no recipe and is never found. It works for a player in Creative mode or an operator. Use it to open the Hero Creator: become any hero of the mod in any look, or make a hero of your own with powers from a catalogue of thirty and (since 3.4) the abilities of the heroes (150 since 3.8) and the six Infinity Stones, your keys, your moves, your colours, your skin and its extras, and save it to a file. Since 3.4, choosing a hero also gives you his items: Magneto's Helmet, Quicksilver's Goggles, the Ruby-Quartz Glasses, Mjolnir (claimed by you) or Stormbreaker, Loki's Scepter, Thanos's Gauntlet, Ultron's Core, the wheelchair, the Darkhold, or (3.6) Doctor Strange's Eye of Agamotto and Sling Ring, or (3.7) Deadpool's three chimichangas, or (3.8) Captain America's Vibranium Shield, Iron Man's Arc Reactor and Mark 3, Falcon's Exo-Wings (on his chest if it is free) or Love's Stormbreaker, never a second one (`custom_hero.chooseGivesItems`). See [Hero Creator](Hero-Creator).
 
 ## Spider Web (a block, not an item)
 

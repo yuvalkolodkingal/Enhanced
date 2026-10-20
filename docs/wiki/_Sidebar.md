@@ -35,6 +35,19 @@
 * [Hero Creator](Hero-Creator)
 * [Heroes' Abilities](Hero-Abilities)
 
+**The Avengers**
+
+* [Super Soldier Serum](Super-Soldier-Serum)
+* [Captain America](Captain-America)
+* [Red Hulk](Red-Hulk)
+* [Iron Man](Iron-Man)
+* [Falcon](Falcon)
+
+**Eternity**
+
+* [Eternity](Eternity)
+* [Love](Love)
+
 **Asgard**
 
 * [Asgard](Asgard)
@@ -104,6 +117,19 @@
 * [גורם הריפוי](Healing-Factor-HE)
 * [יוצר הגיבורים](Hero-Creator-HE)
 * [יכולות הגיבורים](Hero-Abilities-HE)
+
+**הנוקמים**
+
+* [סרום חייל העל](Super-Soldier-Serum-HE)
+* [קפטן אמריקה](Captain-America-HE)
+* [האלק האדום](Red-Hulk-HE)
+* [איירון מן](Iron-Man-HE)
+* [פלקון](Falcon-HE)
+
+**הנצח**
+
+* [הנצח](Eternity-HE)
+* [לאב](Love-HE)
 
 **אסגרד**
 

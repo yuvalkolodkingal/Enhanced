@@ -1,6 +1,6 @@
 # Heroes' Abilities
 
-Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes, since 3.5 **99** of nineteen (Heimdall, Odin and Hela added), since 3.6 **111** of twenty-one (Doctor Strange and the Hulk added), and since 3.7 **123** of twenty-three (Wolverine and Deadpool added), with every Sneak variant also [a card of its own](#the-sneak-variants-cards-of-their-own-35): **176 cards** in all. Since 3.6 there are also six [stone rows](#the-infinity-stones-36), one for each Infinity Stone. This page lists them all, hero by hero.
+Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero-Creator) can pick in the Hero Creator: **81 abilities** of sixteen heroes, since 3.5 **99** of nineteen (Heimdall, Odin and Hela added), since 3.6 **111** of twenty-one (Doctor Strange and the Hulk added), since 3.7 **123** of twenty-three (Wolverine and Deadpool added), and since 3.8 **150** of twenty-eight (Captain America, Red Hulk, Iron Man, Falcon and Love added), with every Sneak variant also [a card of its own](#the-sneak-variants-cards-of-their-own-35): **221 cards** in all. Since 3.6 there are also six [stone rows](#the-infinity-stones-36), one for each Infinity Stone. This page lists them all, hero by hero.
 
 Hebrew: [עברית](Hero-Abilities-HE)
 
@@ -14,7 +14,7 @@ Hebrew: [עברית](Hero-Abilities-HE)
 * A **world power** may be switched off by a server (`custom_hero.worldPowers`).
 * Two abilities of **different heroes** that drive the same thing (one grip, one shield, one beam...) cannot be on the same hero; see [Powers that cannot go together](Hero-Creator#5-powers-that-cannot-go-together).
 
-The flying keys of the fliers (Magneto's, the Scarlet Witch's, Vision's, Billy's, Thor's, the Phoenix's, Ultron's, Apocalypse's and Agatha's) are not abilities here: your hero flies with the **Flight** power, and flies **like** one of them with the [flight style](Hero-Creator#7-animations-how-your-hero-moves). Billy's Build Magic is here as his (his rules); since 3.5 the Scarlet Witch's, with her rules, is [a card of its own](#the-sneak-variants-cards-of-their-own-35). Doctor Strange's Cloak of Levitation is not an ability either: a custom hero flies with **Flight**, in the flight style *Doctor Strange (the Cloak)*.
+The flying keys of the fliers (Magneto's, the Scarlet Witch's, Vision's, Billy's, Thor's, the Phoenix's, Ultron's, Apocalypse's and Agatha's) are not abilities here: your hero flies with the **Flight** power, and flies **like** one of them with the [flight style](Hero-Creator#7-animations-how-your-hero-moves). Billy's Build Magic is here as his (his rules); since 3.5 the Scarlet Witch's, with her rules, is [a card of its own](#the-sneak-variants-cards-of-their-own-35). Doctor Strange's Cloak of Levitation is not an ability either: a custom hero flies with **Flight**, in the flight style *Doctor Strange (the Cloak)*. The same for the fliers of 3.8: Iron Man (*Iron Man (the thrusters)*), Falcon (*Falcon (the wings)*) and Love fly with **Flight**.
 
 ## The abilities
 
@@ -302,6 +302,68 @@ New in 3.7. See [Deadpool](Deadpool) for the full story of each ability.
 | **Dogpool** `deadpool.dogpool` | **N** (press) | Smoke Vanish (press) | 3 a point | Whistle for Dogpool, who fights beside you for two minutes. Sneak: vanish in a puff of smoke. |
 | **Deadpool's body** `deadpool.body` | no key (always on) | — | 3 a point | More health, faster and stronger. The [healing factor](Healing-Factor). |
 
+### Captain America (6)
+
+New in 3.8. See [Captain America](Captain-America) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Shield Throw** `captain.shield_throw` | **R** (press) | Ricochet Throw (press) | 2 a point | Throw your shield: it hits and flies back to your hand. Needs a shield in hand: any shield flies and comes back, only the Vibranium Shield ricochets. Sneak: it bounces from foe to foe. |
+| **Shield Slam** `captain.shield_slam` | **G** (press) | Super-Soldier Leap (press) | 2 a point | Leap and drive the shield down: a shockwave round you. Sneak: a long running leap. |
+| **Shield Charge** `captain.shield_charge` | **V** (press) | Shield Bash (press) | 2 a point | Charge behind your raised shield and knock foes away. Sneak: a bash that stuns. |
+| **Assemble** `captain.assemble` | **B** (press) | Inspire (press) | 2 a point | Call your allies: they get stronger and faster. Sneak: heal your allies. |
+| **Combat Combo** `captain.combo` | **N** (press) | Flip Kick (press) | 1 a point | Two punches and a spinning kick. Sneak: a backflip kick. |
+| **Super-Soldier** `captain.body` | no key (always on) | — | 2 a point | Speed II, Strength II and Resistance I, more health; **worthy of Mjolnir**. |
+
+### Red Hulk (6)
+
+New in 3.8. See [Red Hulk](Red-Hulk) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Ground Smash** `red_hulk.smash` | **R** (press) | Grab & Slam (press) | 2 a point | Smash the ground and throw everyone round you up. Sneak: grab a creature and slam it. |
+| **Heat Wave** `red_hulk.heat_wave` | **G** (press) | Roar (press) | 2 a point | A cone of heat that sets foes alight. Sneak: a roar that frightens monsters. |
+| **Super Jump** `red_hulk.super_jump` | **V** (hold, let go) | Bound (press) | 2 a point | Hold to charge a huge jump straight up (no fall damage). Sneak: a long low leap. |
+| **Anger Burst** `red_hulk.burst` | **B** (press) | Energy Absorb (hold) | 3 a point | Let your anger out in a ring of fire. Sneak, held: soak up fire, lightning and beams. The Absorb shares the one shield. |
+| **Transform** `red_hulk.transform` | **N** (press) | — | 5 (no slider) | For a custom hero, a human form: **N** turns every power off and shows your own skin until **N** again. (Red Hulk himself turns into Ross.) Shares the one shape. |
+| **Red Hulk's Body** `red_hulk.body` | no key (always on) | — | 3 a point | Huge, strong and fire-proof, a little slow; anger builds up as you fight and bursts at 100. Shares the size. |
+
+### Iron Man (5)
+
+New in 3.8. A custom hero wears no suit: these cards are the **Mark 85**'s moves, and the body card is his suit. See [Iron Man](Iron-Man) for the full story.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Repulsor** `iron_man.repulsor` | **R** (press) | Energy Blades (on/off) | 2 a point | Blasts of energy from your palms. Sneak: energy blades come out of your hands. |
+| **Unibeam** `iron_man.unibeam` | **V** (hold) | — | 2 a point | Hold: a big laser beam from your chest (the Mark 85's giant chest laser). |
+| **Energy Shield** `iron_man.shield` | **B** (hold) | Lightning Refocuser (press) | 2 a point | Hold up a giant energy shield. Sneak: chain lightning that jumps between foes. Shares the one shield. |
+| **Homing Missiles** `iron_man.missiles` | **N** (press) | Nanotech Drones (press) | 2 a point | Tiny missiles that chase foes and pop. Sneak: drones that fire lasers for you. |
+| **Suit** `iron_man.suit` | no key (always on) | — | 3 a point | Armour all over (+8 armour, +4 toughness) and a **suit energy** meter that powers the moves. |
+
+### Falcon (5)
+
+New in 3.8. A custom hero with his cards needs no wings item: Falcon's wings are drawn on him. See [Falcon](Falcon) for the full story.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Wrist Blasters** `falcon.blasters` | **R** (press) | Wrist Rocket (press) | 2 a point | Bright energy darts from both wrists. Sneak: a small rocket. |
+| **Dive** `falcon.dive` | **V** (press) | Boost Climb (press) | 2 a point | Fold your wings and dive onto a foe, from the air. Sneak: shoot straight up. |
+| **Wing Shield** `falcon.wing_shield` | **B** (hold) | Wing Slash (press) | 2 a point | Hold to wrap your wings in front of you. Sneak: spin with your wings out. Shares the one shield. |
+| **Redwing** `falcon.redwing` | **N** (press) | Redwing Strike (press) | 2 a point | Your drone marks monsters and zaps them. Sneak: it rams a foe. |
+| **Falcon's Body** `falcon.body` | no key (always on) | — | 2 a point | A little more health and speed, and Falcon's wings (with the Exo-Wings on your chest, you glide). |
+
+### Love (5)
+
+New in 3.8. See [Love](Love) for the full story of each ability.
+
+| Ability (id) | Hero's key | Sneak variant | Points | What it does |
+|---|---|---|---|---|
+| **Axe Throw** `love.axe` | **R** (press) | Thunder Strike (press) | 2 a point | Throw Stormbreaker (or Mjolnir) and it flies back to you. Needs the weapon in your hand. Sneak: lightning strikes where you look. |
+| **Lightning** `love.lightning` | **V** (hold) | — | 3 a point | Hold: a beam of lightning from your hand. |
+| **Eye Laser** `love.eye_laser` | **B** (hold) | — | 2 a point | Hold: a purple beam from your eyes that burns. |
+| **Bifrost** `love.bifrost` | **N** (press) | Bifrost to where you look (press) | 2 a point | Open the Bifrost with your axe in hand. Sneak: straight to where you look. A world power. |
+| **Daughter of Thor** `love.body` | no key (always on) | — | 2 a point | 16 hearts; **worthy of Mjolnir**. |
+
 ## The Infinity Stones (3.6)
 
 Each Infinity Stone is a **stone row**: put it on any key, and Sneak + that key is its second power. A stone row works **only while your hero carries that stone and may use it**: the stone itself (only a god's ability lets a hero hold the Reality, Power and Soul Stones: see [Infinity Stones](Infinity-Stones#who-may-hold-a-stone)), a Gauntlet with it that he may wield, or its vessel (Loki's Scepter, the Tesseract, the Eye of Agamotto). Without it the key says "You do not carry the Mind Stone." The Time Stone answers only a sorcerer. The card shows **Needs the stone**. The numbers follow the stone's own (`[mind_stone]`...), its strength and `custom_hero.cooldownScale`. A server can switch them off (`custom_hero.stoneRows`).
@@ -373,10 +435,28 @@ Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you
 | **Drop-In (Deadpool)** `deadpool.drop_in` | `deadpool.belt` | — | 2 a point | Teleport above a foe and drop onto it sword first. (3.7) |
 | **Chimichanga Break (Deadpool)** `deadpool.chimichanga` | `deadpool.taunt` | — | 1 a point | A healing break; with a chimichanga in your bag, a bigger one. Works without the healing factor too. (3.7) |
 | **Smoke Vanish (Deadpool)** `deadpool.smoke` | `deadpool.dogpool` | — | 3 a point | A smoke bomb: you turn invisible and monsters lose you. (3.7) |
+| **Ricochet Throw (Captain America)** `captain.ricochet` | `captain.shield_throw` | — | 2 a point | The shield bounces from foe to foe before it flies home. (3.8) |
+| **Super-Soldier Leap (Captain America)** `captain.super_leap` | `captain.shield_slam` | — | 2 a point | A long running leap, with a safe landing. (3.8) |
+| **Shield Bash (Captain America)** `captain.shield_bash` | `captain.shield_charge` | — | 2 a point | A close bash with the shield that stuns. (3.8) |
+| **Inspire (Captain America)** `captain.inspire` | `captain.assemble` | — | 2 a point | Heal your allies around you. (3.8) |
+| **Flip Kick (Captain America)** `captain.flip_kick` | `captain.combo` | — | 1 a point | A backflip kick that throws a foe up. (3.8) |
+| **Grab & Slam (Red Hulk)** `red_hulk.grab_slam` | `red_hulk.smash` | — | 2 a point | Grab a creature and slam it down. (3.8) |
+| **Roar (Red Hulk)** `red_hulk.roar` | `red_hulk.heat_wave` | — | 2 a point | A roar that frightens monsters away. (3.8) |
+| **Bound (Red Hulk)** `red_hulk.bound` | `red_hulk.super_jump` | — | 2 a point | A long, low leap forward. (3.8) |
+| **Energy Absorb (Red Hulk)** `red_hulk.absorb` | `red_hulk.burst` | — | 3 a point | Hold to soak up fire, lightning and beams into your anger. Shares the one shield. (3.8) |
+| **Energy Blades (Iron Man)** `iron_man.energy_blades` | `iron_man.repulsor` | — | 2 a point | Energy blades come out of your hands. (3.8) |
+| **Lightning Refocuser (Iron Man)** `iron_man.lightning_refocuser` | `iron_man.shield` | — | 2 a point | Chain lightning that jumps between foes. (3.8) |
+| **Nanotech Drones (Iron Man)** `iron_man.drones` | `iron_man.missiles` | — | 2 a point | Drones form behind you and fire lasers. (3.8) |
+| **Wrist Rocket (Falcon)** `falcon.wrist_rocket` | `falcon.blasters` | — | 2 a point | A small rocket with a small boom. (3.8) |
+| **Boost Climb (Falcon)** `falcon.boost_climb` | `falcon.dive` | — | 2 a point | Shoot straight up into the sky. (3.8) |
+| **Wing Slash (Falcon)** `falcon.wing_slash` | `falcon.wing_shield` | — | 2 a point | Spin with your wings out. (3.8) |
+| **Redwing Strike (Falcon)** `falcon.redwing_strike` | `falcon.redwing` | — | 2 a point | Redwing rams the foe you look at. (3.8) |
+| **Thunder Strike (Love)** `love.thunder_strike` | `love.axe` | — | 2 a point | Lightning strikes where you look. (3.8) |
+| **Bifrost to where you look (Love)** `love.bifrost_look` | `love.bifrost` | — | 2 a point | The Bifrost takes you straight to where you look. A world power. (3.8) |
 
 **The Scarlet Witch's Build Magic** is a card of its own too (3.5): **Build Magic (Scarlet Witch)** `wanda.build_magic`, on **Y**, 10 points (no slider): build, copy and change the world with magic by the Scarlet Witch's rules (no meter, and her **Instant** switch). A hero may have hers or Billy's (`billy.build_magic`), not both.
 
-Heimdall's, Odin's and Hela's Sneak variants are not cards of their own: they come with their abilities (the tables above). Doctor Strange's and the Hulk's are (3.6), except the Hulk's **Switch Hulk**, which is only the real Hulk's; and so are all of Wolverine's and Deadpool's (3.7).
+Heimdall's, Odin's and Hela's Sneak variants are not cards of their own: they come with their abilities (the tables above). Doctor Strange's and the Hulk's are (3.6), except the Hulk's **Switch Hulk**, which is only the real Hulk's; and so are all of Wolverine's and Deadpool's (3.7), and all of the 3.8 heroes' (Captain America's five, Red Hulk's four, Iron Man's three, Falcon's four and Love's two). The suits' other moves (the Mark 1's flamethrower, the Mark 3's flares, the Mark 5's dash punch, the Mark 50's nano cannon, the Hulkbuster's punches and Veronica...) are not cards: a custom hero wears no suit.
 
 ## Related
 

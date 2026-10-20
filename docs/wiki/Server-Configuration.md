@@ -2,7 +2,7 @@
 
 Every balance number of the mod lives in one file, **`world/serverconfig/enhanced-server.toml`** in the world (or server) folder. The mod creates it when the world is first loaded, with every option at its default, and syncs it to the clients. It is a plain text file: open it in any editor, change a value and restart the world or the server.
 
-The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes), the [Hero Creator](#the-hero-creator), since 3.5 [Asgard](#asgard), [the Bifrost](#the-bifrost) and the [world's music](#music), and since 3.6 [the Infinity Stones](#the-infinity-stones-36), [the Soul Stone](#the-soul-stone-and-vormir), [the stone sites](#the-stone-sites), [Doctor Strange](#doctor-strange-the-eye-of-agamotto-and-the-sling-ring), [the Hulk](#the-hulk-and-the-gamma-emitter) and [the Hydra soldiers](#hydra-soldiers), and since 3.7 [the healing factor](#the-healing-factor), [Wolverine](#wolverine-and-the-adamantium-injection), [Deadpool](#deadpool-and-dogpool), [the X-Men lower lab](#the-x-men-lower-lab), [the Stone Locator](#the-stone-locator), [Agatha's Cottage](#agathas-cottage) and [meeting Death](#meeting-death) have their own; the [Mutant Cure](#the-mutant-cure) has had one since 3.3.1), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
+The file has one section per hero (a boss has a section for his fight and one for his hero, and `[boss]` holds the rules every boss shares; [Build Magic](#build-magic) has three; the [Witches' Road](#the-witches-road), the [Book of the Vishanti](#the-book-of-the-vishanti), the [Darkhold](#the-darkhold), the [Hex Runes](#hex-runes), the [Hero Creator](#the-hero-creator), since 3.5 [Asgard](#asgard), [the Bifrost](#the-bifrost) and the [world's music](#music), and since 3.6 [the Infinity Stones](#the-infinity-stones-36), [the Soul Stone](#the-soul-stone-and-vormir), [the stone sites](#the-stone-sites), [Doctor Strange](#doctor-strange-the-eye-of-agamotto-and-the-sling-ring), [the Hulk](#the-hulk-and-the-gamma-emitter) and [the Hydra soldiers](#hydra-soldiers), and since 3.7 [the healing factor](#the-healing-factor), [Wolverine](#wolverine-and-the-adamantium-injection), [Deadpool](#deadpool-and-dogpool), [the X-Men lower lab](#the-x-men-lower-lab), [the Stone Locator](#the-stone-locator), [Agatha's Cottage](#agathas-cottage) and [meeting Death](#meeting-death), and since 3.8 [the Super Soldier Serum](#the-super-soldier-serum), [Captain America and his shield](#captain-america-and-the-vibranium-shield), [Red Hulk](#red-hulk), [Iron Man and each of his suits](#iron-man-and-his-suits), [Falcon](#falcon), [the Avengers Tower's armoury](#the-avengers-towers-armoury) and [Eternity and Love](#eternity-and-love) have their own; the [Mutant Cure](#the-mutant-cure) has had one since 3.3.1), and an option is written as `section.key`. For example, Wanda's Hex death chance is the `hexDeathChance` key in the `[scarlet_witch]` section:
 
 ```toml
 [scarlet_witch]
@@ -1680,6 +1680,467 @@ Section `[death_meeting]` (3.7). The page is [Meeting Death](Meeting-Death): Rio
 | `death_meeting.allowNether` | `true` | `true` or `false` | Whether Death offers "Start again in the Nether" (a safe spot near the player's spawn point divided by 8, or a small platform built for him). |
 | `death_meeting.fireResistanceSeconds` | `10` | 0 to 600 | Seconds of Fire Resistance a player who starts again in the Nether gets (0: none). |
 
+## The Super Soldier Serum
+
+Section `[super_soldier_serum]` (3.8). The page is [Super Soldier Serum](Super-Soldier-Serum).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `super_soldier_serum.enabled` | `true` | `true` or `false` | Whether the serum works (off: using it does nothing). |
+| `super_soldier_serum.pendingTicks` | `600` | 20 to 12000 | Ticks the serum's open screen stays valid for a choice (600 = 30 seconds). |
+| `super_soldier_serum.craftable` | `false` | `true` or `false` | Whether the serum can be crafted (for servers without Avengers Towers). |
+| `super_soldier_serum.casePerPlayer` | `1` | 0 to 64 | Serums each player may take from the tower lab's case (0: unlimited). |
+
+## Captain America and the Vibranium Shield
+
+Sections `[captain_america]` and `[vibranium_shield]` (3.8). The page is [Captain America](Captain-America). His body's numbers are scaled by a custom hero's strength.
+
+### `[captain_america]`: the hero
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `captain_america.healthBonus` | `6.0` | 0.0 to 100.0 | Max health added to his 20. |
+| `captain_america.speedBonus` | `0.4` | 0.0 to 2.0 | Movement speed added, as a fraction (0.4 = 40 %: Speed II). |
+| `captain_america.attackBonus` | `6.0` | 0.0 to 40.0 | Attack damage added to every blow (Strength II). |
+| `captain_america.resistance` | `0.2` | 0.0 to 0.9 | Fraction of incoming damage he shrugs off (Resistance I), unless it bypasses effects. |
+| `captain_america.jumpBonus` | `0.15` | 0.0 to 2.0 | Jump strength added. |
+| `captain_america.safeFall` | `4.0` | 0.0 to 64.0 | Safe fall distance added (blocks). |
+| `captain_america.attackSpeedBonus` | `0.5` | 0.0 to 4.0 | Attack speed added. |
+| `captain_america.attackKnockback` | `0.5` | 0.0 to 4.0 | Attack knockback added. |
+| `captain_america.worthy` | `true` | `true` or `false` | Whether Captain America is worthy of Mjolnir (Endgame). |
+| `captain_america.throwDamage` | `8.0` | 0.0 to 200.0 | Damage of the Shield Throw. |
+| `captain_america.throwSpeed` | `1.8` | 0.2 to 6.0 | Speed (blocks per tick) of the thrown shield. |
+| `captain_america.throwRange` | `24` | 4 to 96 | Range (blocks) of the throw before the shield turns home. |
+| `captain_america.throwCooldown` | `20` | 0 to 72000 | Cooldown (ticks) of the Shield Throw, after the catch (20 = 1 second). |
+| `captain_america.ricochets` | `3` | 0 to 16 | Bounces of the Ricochet Throw. |
+| `captain_america.ricochetRadius` | `8.0` | 1.0 to 32.0 | Radius (blocks) in which the Ricochet Throw finds its next target. |
+| `captain_america.ricochetFalloff` | `1.0` | 0.0 to 10.0 | Damage lost on each bounce of the ricochet. |
+| `captain_america.ricochetCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Ricochet Throw, after the catch (60 = 3 seconds). |
+| `captain_america.slamDamage` | `6.0` | 0.0 to 200.0 | Damage of the Shield Slam. |
+| `captain_america.slamRadius` | `4.0` | 1.0 to 16.0 | Radius (blocks) of the Shield Slam. |
+| `captain_america.slamCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Shield Slam (100 = 5 seconds). |
+| `captain_america.leapCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of the Super-Soldier Leap (40 = 2 seconds). |
+| `captain_america.chargeDistance` | `8.0` | 1.0 to 32.0 | Distance (blocks) of the Shield Charge. |
+| `captain_america.chargeDamage` | `6.0` | 0.0 to 200.0 | Damage of the Shield Charge. |
+| `captain_america.chargeCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Shield Charge (100 = 5 seconds). |
+| `captain_america.bashDamage` | `5.0` | 0.0 to 200.0 | Damage of the Shield Bash. |
+| `captain_america.bashStunTicks` | `30` | 0 to 400 | Ticks the Shield Bash stuns (30 = 1.5 seconds). |
+| `captain_america.bashCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Shield Bash (60 = 3 seconds). |
+| `captain_america.rallyRadius` | `16.0` | 1.0 to 64.0 | Radius (blocks) of Assemble and Inspire. |
+| `captain_america.rallyTicks` | `400` | 20 to 12000 | Ticks of Strength I and Speed I that Assemble gives (400 = 20 seconds). |
+| `captain_america.rallyCooldown` | `1200` | 0 to 72000 | Cooldown (ticks) of Assemble (1200 = 1 minute). |
+| `captain_america.inspireHeal` | `6.0` | 0.0 to 40.0 | Health Inspire heals. |
+| `captain_america.inspireCooldown` | `600` | 0 to 72000 | Cooldown (ticks) of Inspire (600 = 30 seconds). |
+| `captain_america.comboDamage1` | `4.0` | 0.0 to 200.0 | Damage of the first blow of the Combat Combo. |
+| `captain_america.comboDamage2` | `4.0` | 0.0 to 200.0 | Damage of the second blow. |
+| `captain_america.comboDamage3` | `7.0` | 0.0 to 200.0 | Damage of the third blow (the spinning kick). |
+| `captain_america.comboGap` | `8` | 1 to 100 | Ticks between two blows of the combo (8 = 0.4 seconds). |
+| `captain_america.comboReset` | `30` | 5 to 200 | Ticks after which the combo starts again from the first blow (30 = 1.5 seconds). |
+| `captain_america.flipDamage` | `5.0` | 0.0 to 200.0 | Damage of the Flip Kick. |
+| `captain_america.flipCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of the Flip Kick (40 = 2 seconds). |
+
+### `[vibranium_shield]`: the shield, for Captain America
+
+Anyone may block with the shield as with a vanilla shield; these options are what it does for Captain America.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `vibranium_shield.capBlocksEverything` | `true` | `true` or `false` | Whether the shield blocks all damage from the front for Captain America (explosions and beams too). |
+| `vibranium_shield.capBlockAngle` | `180.0` | 10.0 to 360.0 | The angle (degrees) in front of him that the shield covers for Captain America. |
+| `vibranium_shield.reflectProjectiles` | `true` | `true` or `false` | Whether projectiles from the front bounce back toward their shooter for Captain America. |
+| `vibranium_shield.reflectSpeed` | `0.8` | 0.0 to 2.0 | Fraction of its speed a reflected projectile keeps. |
+| `vibranium_shield.axeDisables` | `false` | `true` or `false` | Whether an axe can disable the shield of Captain America (vanilla's 5 seconds). |
+| `vibranium_shield.meleePush` | `0.6` | 0.0 to 4.0 | How far a melee attacker in front is pushed back by a block. |
+
+## Red Hulk
+
+Section `[red_hulk]` (3.8). The page is [Red Hulk](Red-Hulk). Anger goes from 0 to 100.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `red_hulk.scaleBonus` | `0.5` | 0.0 to 2.0 | Scale added to his size (0.5: one and a half times). |
+| `red_hulk.healthBonus` | `24.0` | 0.0 to 200.0 | Max health added to his 20. |
+| `red_hulk.attackBonus` | `12.0` | 0.0 to 60.0 | Attack damage added to every blow (Strength IV). |
+| `red_hulk.speedPenalty` | `0.15` | 0.0 to 0.9 | Movement speed taken away, as a fraction (Slowness I). |
+| `red_hulk.armorBonus` | `6.0` | 0.0 to 30.0 | Armour of his red hide. |
+| `red_hulk.toughnessBonus` | `3.0` | 0.0 to 20.0 | Armour toughness of his red hide. |
+| `red_hulk.knockbackResistance` | `0.8` | 0.0 to 1.0 | Knockback resistance. |
+| `red_hulk.reachBonus` | `1.5` | 0.0 to 8.0 | Reach (blocks) added. |
+| `red_hulk.stepBonus` | `0.6` | 0.0 to 4.0 | Step height added. |
+| `red_hulk.jumpBonus` | `0.4` | 0.0 to 4.0 | Jump strength added. |
+| `red_hulk.safeFall` | `20.0` | 0.0 to 256.0 | Safe fall distance added (blocks). |
+| `red_hulk.fireImmune` | `true` | `true` or `false` | Whether fire, lava and hot floors never hurt him. |
+| `red_hulk.transformTicks` | `30` | 1 to 200 | Ticks the change between Ross and Red Hulk takes (30 = 1.5 seconds). |
+| `red_hulk.angerPerDamageTaken` | `3.0` | 0.0 to 100.0 | Anger for each health he loses. |
+| `red_hulk.angerPerDamageDealt` | `1.0` | 0.0 to 100.0 | Anger for each health he deals. |
+| `red_hulk.angerOnRoar` | `10.0` | 0.0 to 100.0 | Anger the Roar adds. |
+| `red_hulk.coolDelayTicks` | `100` | 0 to 12000 | Ticks without fighting before his anger cools (100 = 5 seconds). |
+| `red_hulk.coolPerSecond` | `4.0` | 0.0 to 100.0 | Anger lost per second while he cools. |
+| `red_hulk.rossAngerFactor` | `0.5` | 0.0 to 1.0 | How fast Ross (his human form) gets angry, as a fraction of Red Hulk's. |
+| `red_hulk.burstRadius` | `6.0` | 1.0 to 24.0 | Radius (blocks) of the Anger Burst. |
+| `red_hulk.burstDamage` | `10.0` | 0.0 to 200.0 | Damage of the Anger Burst (at its centre). |
+| `red_hulk.burstFireSeconds` | `5` | 0 to 60 | Seconds the Anger Burst sets creatures burning. |
+| `red_hulk.burstPush` | `1.2` | 0.0 to 4.0 | How far the Anger Burst pushes creatures. |
+| `red_hulk.burstSetsFire` | `true` | `true` or `false` | Whether the Anger Burst sets blocks on fire (only with the mobGriefing game rule too). |
+| `red_hulk.earlyBurstMin` | `50.0` | 0.0 to 100.0 | The least anger for an Anger Burst on B. |
+| `red_hulk.earlyBurstCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of the Anger Burst on B (200 = 10 seconds). |
+| `red_hulk.smashDamage` | `8.0` | 0.0 to 200.0 | Damage of the Ground Smash. |
+| `red_hulk.smashRadius` | `6.0` | 1.0 to 24.0 | Radius (blocks) of the Ground Smash. |
+| `red_hulk.smashLaunch` | `0.9` | 0.0 to 4.0 | How high the Ground Smash throws creatures. |
+| `red_hulk.smashCooldown` | `80` | 0 to 72000 | Cooldown (ticks) of the Ground Smash (80 = 4 seconds). |
+| `red_hulk.smashBreaksBlocks` | `false` | `true` or `false` | Whether the Ground Smash breaks soft blocks (the Hulk's rules; only with mobGriefing too). |
+| `red_hulk.grabDamage1` | `5.0` | 0.0 to 200.0 | Damage of the first slam of Grab & Slam. |
+| `red_hulk.grabDamage2` | `5.0` | 0.0 to 200.0 | Damage of the second slam. |
+| `red_hulk.grabDamage3` | `7.0` | 0.0 to 200.0 | Damage of the last slam and throw. |
+| `red_hulk.grabCooldown` | `160` | 0 to 72000 | Cooldown (ticks) of Grab & Slam (160 = 8 seconds). |
+| `red_hulk.heatLength` | `10.0` | 1.0 to 32.0 | Length (blocks) of the Heat Wave. |
+| `red_hulk.heatAngle` | `50.0` | 5.0 to 180.0 | Angle (degrees) of the Heat Wave's cone. |
+| `red_hulk.heatDamage` | `5.0` | 0.0 to 200.0 | Damage of the Heat Wave. |
+| `red_hulk.heatFireSeconds` | `4` | 0 to 60 | Seconds the Heat Wave sets creatures burning. |
+| `red_hulk.heatMeltsSnow` | `true` | `true` or `false` | Whether the Heat Wave melts snow and ice (only with mobGriefing too). |
+| `red_hulk.heatCooldown` | `120` | 0 to 72000 | Cooldown (ticks) of the Heat Wave (120 = 6 seconds). |
+| `red_hulk.roarRadius` | `12.0` | 1.0 to 64.0 | Radius (blocks) of the Roar. |
+| `red_hulk.roarFrightTicks` | `80` | 0 to 1200 | Ticks the Roar frightens monsters (80 = 4 seconds). |
+| `red_hulk.roarWeaknessTicks` | `160` | 0 to 1200 | Ticks of Weakness I the Roar gives (160 = 8 seconds). |
+| `red_hulk.roarCooldown` | `300` | 0 to 72000 | Cooldown (ticks) of the Roar (300 = 15 seconds). |
+| `red_hulk.jumpChargeTicks` | `30` | 1 to 200 | Ticks of holding V for a fully charged Super Jump (30 = 1.5 seconds). |
+| `red_hulk.jumpMinHeight` | `8.0` | 1.0 to 64.0 | Height (blocks) of an uncharged Super Jump. |
+| `red_hulk.jumpMaxHeight` | `30.0` | 1.0 to 128.0 | Height (blocks) of a fully charged Super Jump. |
+| `red_hulk.jumpLandDamage` | `4.0` | 0.0 to 200.0 | Damage of the Super Jump's landing. |
+| `red_hulk.jumpLandRadius` | `3.0` | 0.0 to 16.0 | Radius (blocks) of the Super Jump's landing. |
+| `red_hulk.jumpCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Super Jump, after the landing (60 = 3 seconds). |
+| `red_hulk.boundDistance` | `20.0` | 4.0 to 64.0 | Distance (blocks) of the Bound. |
+| `red_hulk.boundCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of the Bound (40 = 2 seconds). |
+| `red_hulk.absorbMaxTicks` | `80` | 1 to 1200 | The longest (ticks) Energy Absorb can be held (80 = 4 seconds). |
+| `red_hulk.absorbAngerPerHealth` | `2.0` | 0.0 to 100.0 | Anger for each health of energy he absorbs. |
+| `red_hulk.absorbCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of Energy Absorb (200 = 10 seconds). |
+
+## Iron Man and his suits
+
+Sections `[iron_man]` (the power, the reactors, the suit energy, the suit-ups) and one for each suit: `[mark_1]`, `[mark_3]`, `[mark_5]`, `[mark_50]`, `[mark_85]` and `[hulkbuster]` (3.8). The page is [Iron Man](Iron-Man). Energy goes from 0 to `energyMax`. A suit's armour is the whole set's, on its one item, and a suit never breaks (it stops at its last point: "offline").
+
+### `[iron_man]`
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `iron_man.reactorHoldTicks` | `40` | 1 to 400 | Ticks an Arc Reactor is held to the chest to become Iron Man (40 = 2 seconds). |
+| `iron_man.reactorReplacesHero` | `true` | `true` or `false` | Whether an Arc Reactor replaces a hero's power with Iron Man's (false: a hero is refused). |
+| `iron_man.reactorsCraftable` | `false` | `true` or `false` | Whether the Arc Reactors can be crafted (for servers without Avengers Towers). |
+| `iron_man.onlyIronManWears` | `true` | `true` or `false` | Whether only Iron Man may wear a suit (Creative players always may). |
+| `iron_man.energyMax` | `100.0` | 1.0 to 10000.0 | Suit energy when full. |
+| `iron_man.rechargeGround` | `3.0` | 0.0 to 100.0 | Suit energy recharged per second on the ground. |
+| `iron_man.rechargeAir` | `1.0` | 0.0 to 100.0 | Suit energy recharged per second in the air, not flying. |
+| `iron_man.rechargeDelayTicks` | `20` | 0 to 1200 | Ticks after a move before the suit recharges (20 = 1 second). |
+| `iron_man.emptySlowFallTicks` | `100` | 0 to 1200 | Ticks of Slow Falling when the suit's energy runs out in flight (100 = 5 seconds). |
+| `iron_man.suitUpDamageFactor` | `0.5` | 0.0 to 1.0 | Incoming damage is multiplied by this while a suit goes on (a brief protection, never immunity). |
+| `iron_man.suitPhaseCooldown` | `40` | 0 to 1200 | Ticks after a suit-up or take-off before the next one may start (40 = 2 seconds). |
+| `iron_man.suitUpTicksMark1` | `60` | 1 to 400 | Ticks the Mark 1 takes to go on (60 = 3 seconds). |
+| `iron_man.suitUpTicksMark3` | `50` | 1 to 400 | Ticks the Mark 3 takes to go on (50 = 2.5 seconds). |
+| `iron_man.suitUpTicksMark5` | `40` | 1 to 400 | Ticks the Mark 5 takes to unfold (40 = 2 seconds). |
+| `iron_man.suitUpTicksMark50` | `30` | 1 to 400 | Ticks the Mark 50's nanites take to cover him (30 = 1.5 seconds). |
+| `iron_man.suitUpTicksMark85` | `24` | 1 to 400 | Ticks the Mark 85's nanites take to cover him (24 = 1.2 seconds). |
+| `iron_man.suitUpTicksHulkbuster` | `80` | 1 to 400 | Ticks of the Hulkbuster's drop, opening, step-in, closing and growth (80 = 4 seconds). |
+| `iron_man.suitDownFactor` | `0.5` | 0.05 to 1.0 | A take-off lasts this fraction of the suit-up. |
+| `iron_man.gantryRange` | `4.0` | 0.0 to 32.0 | Distance (blocks) from a suit display within which the Mark 3 is bolted on by the gantry's arms. |
+| `iron_man.nanoRebuildTicks` | `40` | 1 to 12000 | Ticks for a stowed nanotech housing to rebuild one point of durability (40 = 2 seconds). |
+| `iron_man.hardLandingDurability` | `5` | 0 to 1000 | Durability a hard landing in flight costs the suit (he is unhurt). |
+| `iron_man.magneticClassicSuits` | `true` | `true` or `false` | Whether Magneto can lift Iron Man in a powered classic suit (not the nanotech ones). |
+| `iron_man.boomsBreakBlocks` | `false` | `true` or `false` | Whether the suits' booms break blocks (only with mobGriefing too). |
+
+### `[mark_1]`: the cave suit
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `mark_1.armor` | `18.0` | 0.0 to 30.0 | Armour of the suit (one item: a whole set). |
+| `mark_1.toughness` | `3.0` | 0.0 to 20.0 | Armour toughness of the suit. |
+| `mark_1.knockbackResistance` | `0.5` | 0.0 to 1.0 | Knockback resistance of the suit. |
+| `mark_1.durability` | `825` | 1 to 100000 | Durability of the suit. |
+| `mark_1.speedPenalty` | `0.2` | 0.0 to 0.9 | Walking speed taken away by the heavy suit, as a fraction. |
+| `mark_1.flameDamage` | `2.0` | 0.0 to 200.0 | Damage of the flamethrower (every 10 ticks). |
+| `mark_1.flameLength` | `5.0` | 1.0 to 16.0 | Length (blocks) of the flamethrower's cone. |
+| `mark_1.flameAngle` | `30.0` | 5.0 to 120.0 | Angle (degrees) of the flamethrower's cone. |
+| `mark_1.flameFireSeconds` | `4` | 0 to 60 | Seconds the flamethrower sets creatures burning. |
+| `mark_1.flameEnergyPerSecond` | `4.0` | 0.0 to 100.0 | Suit energy per second of the flamethrower. |
+| `mark_1.flameMaxTicks` | `60` | 1 to 1200 | The longest (ticks) the flamethrower can be held (60 = 3 seconds). |
+| `mark_1.flameCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of the flamethrower (40 = 2 seconds). |
+| `mark_1.mark1FlameSetsBlocks` | `false` | `true` or `false` | Whether the flamethrower sets blocks on fire (only with mobGriefing too). |
+| `mark_1.boostUpTicks` | `10` | 0 to 100 | Ticks the Rocket Boost goes straight up (10 = 0.5 seconds). |
+| `mark_1.boostForwardTicks` | `20` | 0 to 100 | Ticks the Rocket Boost goes forward (20 = 1 second). |
+| `mark_1.boostEnergy` | `30.0` | 0.0 to 100.0 | Suit energy the Rocket Boost costs. |
+| `mark_1.boostCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of the Rocket Boost (200 = 10 seconds). |
+| `mark_1.crashDurability` | `30` | 0 to 1000 | Durability the crash landing costs the suit. |
+| `mark_1.crashDamage` | `3.0` | 0.0 to 200.0 | Damage of the crash landing to creatures near. |
+| `mark_1.rocketDamage` | `8.0` | 0.0 to 200.0 | Damage of the Arm Rocket. |
+| `mark_1.rocketPower` | `1.2` | 0.0 to 8.0 | Power of the small boom of the Arm Rocket (it never breaks blocks unless [iron_man] boomsBreakBlocks and mobGriefing). |
+| `mark_1.rocketEnergy` | `15.0` | 0.0 to 100.0 | Suit energy the Arm Rocket costs. |
+| `mark_1.rocketCooldown` | `80` | 0 to 72000 | Cooldown (ticks) of the Arm Rocket (80 = 4 seconds). |
+| `mark_1.braceReduction` | `0.6` | 0.0 to 1.0 | Fraction of incoming damage the Brace takes away. |
+| `mark_1.braceEnergyPerSecond` | `2.0` | 0.0 to 100.0 | Suit energy per second of the Brace. |
+| `mark_1.punchDamage` | `10.0` | 0.0 to 200.0 | Damage of the Heavy Punch. |
+| `mark_1.punchCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of the Heavy Punch (40 = 2 seconds). |
+
+### `[mark_3]`: the classic suit
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `mark_3.armor` | `16.0` | 0.0 to 30.0 | Armour of the suit (one item: a whole set). |
+| `mark_3.toughness` | `2.0` | 0.0 to 20.0 | Armour toughness of the suit. |
+| `mark_3.knockbackResistance` | `0.2` | 0.0 to 1.0 | Knockback resistance of the suit. |
+| `mark_3.durability` | `1100` | 1 to 100000 | Durability of the suit. |
+| `mark_3.flightSpeed` | `0.1` | 0.01 to 0.5 | Flight speed in the suit. |
+| `mark_3.flightEnergyPerSecond` | `0.6` | 0.0 to 100.0 | Suit energy per second of flight. |
+| `mark_3.repulsorDamage` | `6.0` | 0.0 to 200.0 | Damage of the Repulsor. |
+| `mark_3.repulsorRange` | `32` | 4 to 128 | Range (blocks) of the Repulsor. |
+| `mark_3.repulsorPower` | `0.8` | 0.0 to 8.0 | Power of the small boom of the Repulsor (it never breaks blocks unless [iron_man] boomsBreakBlocks and mobGriefing). |
+| `mark_3.repulsorEnergy` | `4.0` | 0.0 to 100.0 | Suit energy the Repulsor costs. |
+| `mark_3.repulsorGap` | `10` | 1 to 200 | Ticks between two Repulsor blasts (10 = 0.5 seconds). |
+| `mark_3.doubleBlastDamage` | `10.0` | 0.0 to 200.0 | Damage of the Double-Hand Blast. |
+| `mark_3.doubleBlastPower` | `1.2` | 0.0 to 8.0 | Power of the small boom of the Double-Hand Blast (it never breaks blocks unless [iron_man] boomsBreakBlocks and mobGriefing). |
+| `mark_3.doubleBlastEnergy` | `8.0` | 0.0 to 100.0 | Suit energy the Double-Hand Blast costs. |
+| `mark_3.doubleBlastCooldown` | `40` | 0 to 72000 | Cooldown (ticks) of the Double-Hand Blast (40 = 2 seconds). |
+| `mark_3.unibeamDamage` | `4.0` | 0.0 to 200.0 | Damage of the Unibeam (every 10 ticks). |
+| `mark_3.unibeamRange` | `24` | 4 to 128 | Range (blocks) of the Unibeam. |
+| `mark_3.unibeamEnergyPerSecond` | `6.0` | 0.0 to 100.0 | Suit energy per second of the Unibeam. |
+| `mark_3.unibeamMaxTicks` | `60` | 1 to 1200 | The longest (ticks) the Unibeam can be held (60 = 3 seconds). |
+| `mark_3.flareRadius` | `16.0` | 1.0 to 64.0 | Radius (blocks) of the Flares. |
+| `mark_3.flareTicks` | `100` | 1 to 1200 | Ticks monsters cannot target him after the Flares (100 = 5 seconds). |
+| `mark_3.flareEnergy` | `10.0` | 0.0 to 100.0 | Suit energy the Flares cost. |
+| `mark_3.flareCooldown` | `300` | 0 to 72000 | Cooldown (ticks) of the Flares (300 = 15 seconds). |
+| `mark_3.missileCount` | `4` | 1 to 16 | Shoulder missiles in a volley. |
+| `mark_3.missileDamage` | `3.0` | 0.0 to 200.0 | Damage of each shoulder missile. |
+| `mark_3.missilePower` | `0.6` | 0.0 to 8.0 | Power of the small boom of each shoulder missile (it never breaks blocks unless [iron_man] boomsBreakBlocks and mobGriefing). |
+| `mark_3.missileEnergy` | `12.0` | 0.0 to 100.0 | Suit energy a volley costs. |
+| `mark_3.missileCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the shoulder missiles (100 = 5 seconds). |
+
+### `[mark_5]`: the suitcase suit
+
+The Mark 5's Unibeam lasts at most as long as the Mark 3's (`mark_3.unibeamMaxTicks`); its repulsor's boom is fixed (0.6).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `mark_5.armor` | `12.0` | 0.0 to 30.0 | Armour of the suit (one item: a whole set). |
+| `mark_5.toughness` | `1.0` | 0.0 to 20.0 | Armour toughness of the suit. |
+| `mark_5.knockbackResistance` | `0.1` | 0.0 to 1.0 | Knockback resistance of the suit. |
+| `mark_5.durability` | `600` | 1 to 100000 | Durability of the suit. |
+| `mark_5.speedBonus` | `0.05` | 0.0 to 1.0 | Walking speed added by the light suit, as a fraction. |
+| `mark_5.flightSpeed` | `0.08` | 0.01 to 0.5 | Flight speed in the suit. |
+| `mark_5.flightEnergyPerSecond` | `0.5` | 0.0 to 100.0 | Suit energy per second of flight. |
+| `mark_5.repulsorDamage` | `5.0` | 0.0 to 200.0 | Damage of the Repulsor. |
+| `mark_5.repulsorEnergy` | `3.0` | 0.0 to 100.0 | Suit energy the Repulsor costs. |
+| `mark_5.unibeamDamage` | `3.0` | 0.0 to 200.0 | Damage of the Unibeam (every 10 ticks). |
+| `mark_5.unibeamEnergyPerSecond` | `5.0` | 0.0 to 100.0 | Suit energy per second of the Unibeam. |
+| `mark_5.dashDistance` | `6.0` | 1.0 to 32.0 | Distance (blocks) of the Dash Punch. |
+| `mark_5.dashDamage` | `8.0` | 0.0 to 200.0 | Damage of the Dash Punch. |
+| `mark_5.dashEnergy` | `10.0` | 0.0 to 100.0 | Suit energy the Dash Punch costs. |
+| `mark_5.dashCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Dash Punch (60 = 3 seconds). |
+| `mark_5.laserBurstRadius` | `6.0` | 1.0 to 24.0 | Radius (blocks) of the Laser Burst. |
+| `mark_5.laserBurstDamage` | `6.0` | 0.0 to 200.0 | Damage of the Laser Burst. |
+| `mark_5.laserBurstEnergy` | `20.0` | 0.0 to 100.0 | Suit energy the Laser Burst costs. |
+| `mark_5.laserBurstCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of the Laser Burst (200 = 10 seconds). |
+
+### `[mark_50]`: the first nanotech suit
+
+Its repulsor's boom (0.8), energy (4) and gap (10 ticks) are fixed, and so is its Unibeam's energy (6 a second); its Unibeam's range and longest hold are the Mark 3's options; its shield covers the same 120° in front as the Mark 85's.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `mark_50.armor` | `20.0` | 0.0 to 30.0 | Armour of the suit (one item: a whole set). |
+| `mark_50.toughness` | `8.0` | 0.0 to 20.0 | Armour toughness of the suit. |
+| `mark_50.knockbackResistance` | `0.2` | 0.0 to 1.0 | Knockback resistance of the suit. |
+| `mark_50.durability` | `1815` | 1 to 100000 | Durability of the suit. |
+| `mark_50.speedBonus` | `0.05` | 0.0 to 1.0 | Walking speed added, as a fraction. |
+| `mark_50.flightSpeed` | `0.11` | 0.01 to 0.5 | Flight speed in the suit. |
+| `mark_50.flightEnergyPerSecond` | `0.4` | 0.0 to 100.0 | Suit energy per second of flight. |
+| `mark_50.repulsorDamage` | `7.0` | 0.0 to 200.0 | Damage of the Nano Repulsor. |
+| `mark_50.bladeDamage` | `9.0` | 0.0 to 200.0 | Damage of the Nano Blade. |
+| `mark_50.bladeTicks` | `100` | 1 to 1200 | Ticks the Nano Blade lasts (100 = 5 seconds). |
+| `mark_50.bladeEnergy` | `8.0` | 0.0 to 100.0 | Suit energy the Nano Blade costs. |
+| `mark_50.bladeCooldown` | `160` | 0 to 72000 | Cooldown (ticks) of the Nano Blade (160 = 8 seconds). |
+| `mark_50.unibeamDamage` | `5.0` | 0.0 to 200.0 | Damage of the Unibeam (every 10 ticks). |
+| `mark_50.shieldReduction` | `0.8` | 0.0 to 1.0 | Fraction of damage from the front the Nano Shield takes away. |
+| `mark_50.shieldEnergyPerSecond` | `3.0` | 0.0 to 100.0 | Suit energy per second of the Nano Shield. |
+| `mark_50.shieldMaxTicks` | `160` | 1 to 1200 | The longest (ticks) the Nano Shield can be held (160 = 8 seconds). |
+| `mark_50.cannonChargeTicks` | `20` | 1 to 200 | Ticks the Nano Cannon charges (20 = 1 second). |
+| `mark_50.cannonDamage` | `14.0` | 0.0 to 200.0 | Damage of the Nano Cannon. |
+| `mark_50.cannonPower` | `1.5` | 0.0 to 8.0 | Power of the small boom of the Nano Cannon (it never breaks blocks unless [iron_man] boomsBreakBlocks and mobGriefing). |
+| `mark_50.cannonEnergy` | `25.0` | 0.0 to 100.0 | Suit energy the Nano Cannon costs. |
+| `mark_50.cannonCooldown` | `160` | 0 to 72000 | Cooldown (ticks) of the Nano Cannon (160 = 8 seconds). |
+
+### `[mark_85]`: the strongest suit
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `mark_85.armor` | `20.0` | 0.0 to 30.0 | Armour of the suit (one item: a whole set). |
+| `mark_85.toughness` | `12.0` | 0.0 to 20.0 | Armour toughness of the suit. |
+| `mark_85.knockbackResistance` | `0.4` | 0.0 to 1.0 | Knockback resistance of the suit. |
+| `mark_85.durability` | `2035` | 1 to 100000 | Durability of the suit. |
+| `mark_85.speedBonus` | `0.1` | 0.0 to 1.0 | Walking speed added, as a fraction. |
+| `mark_85.flightSpeed` | `0.12` | 0.01 to 0.5 | Flight speed in the suit. |
+| `mark_85.flightEnergyPerSecond` | `0.35` | 0.0 to 100.0 | Suit energy per second of flight. |
+| `mark_85.repulsorDamage` | `9.0` | 0.0 to 200.0 | Damage of each Boosted Repulsor blast. |
+| `mark_85.repulsorPower` | `1.0` | 0.0 to 8.0 | Power of the small boom of each Boosted Repulsor blast (it never breaks blocks unless [iron_man] boomsBreakBlocks and mobGriefing). |
+| `mark_85.repulsorEnergy` | `6.0` | 0.0 to 100.0 | Suit energy the Boosted Repulsors cost. |
+| `mark_85.repulsorGap` | `12` | 1 to 200 | Ticks between two pairs of Boosted Repulsor blasts (12 = 0.6 seconds). |
+| `mark_85.bladeDamage1` | `10.0` | 0.0 to 200.0 | Damage of the first slash of the Energy Blades. |
+| `mark_85.bladeDamage2` | `10.0` | 0.0 to 200.0 | Damage of the second slash. |
+| `mark_85.bladeDamage3` | `14.0` | 0.0 to 200.0 | Damage of the third slash (the sweep). |
+| `mark_85.bladeHandDamage` | `12.0` | 0.0 to 200.0 | Damage of his empty hand's blow while the blades are out. |
+| `mark_85.bladeEnergyPerSecond` | `1.0` | 0.0 to 100.0 | Suit energy per second while the Energy Blades are out. |
+| `mark_85.laserDamage` | `7.0` | 0.0 to 200.0 | Damage of the Giant Chest Laser (every 10 ticks). |
+| `mark_85.laserRange` | `32` | 4 to 128 | Range (blocks) of the Giant Chest Laser. |
+| `mark_85.laserEnergyPerSecond` | `8.0` | 0.0 to 100.0 | Suit energy per second of the Giant Chest Laser. |
+| `mark_85.laserMaxTicks` | `80` | 1 to 1200 | The longest (ticks) the Giant Chest Laser can be held (80 = 4 seconds). |
+| `mark_85.shieldAngle` | `120.0` | 10.0 to 360.0 | The angle (degrees) in front of him the Giant Energy Shield covers. |
+| `mark_85.shieldEnergyPerSecond` | `4.0` | 0.0 to 100.0 | Suit energy per second of the Giant Energy Shield. |
+| `mark_85.shieldMaxTicks` | `200` | 1 to 1200 | The longest (ticks) the Giant Energy Shield can be held (200 = 10 seconds). |
+| `mark_85.refocuserDamage` | `10.0` | 0.0 to 200.0 | Damage of the Lightning Refocuser's first strike. |
+| `mark_85.refocuserJumps` | `4` | 0 to 16 | Creatures the Lightning Refocuser jumps on to after the first. |
+| `mark_85.refocuserJumpRadius` | `6.0` | 1.0 to 32.0 | Radius (blocks) of each jump of the Lightning Refocuser. |
+| `mark_85.refocuserEnergy` | `25.0` | 0.0 to 100.0 | Suit energy the Lightning Refocuser costs. |
+| `mark_85.refocuserCooldown` | `240` | 0 to 72000 | Cooldown (ticks) of the Lightning Refocuser (240 = 12 seconds). |
+| `mark_85.refocuserChargedTicks` | `200` | 0 to 12000 | Ticks after a lightning strike in which the Refocuser is charged (free and stronger) (200 = 10 seconds). |
+| `mark_85.refocuserChargedFactor` | `1.5` | 1.0 to 10.0 | How much stronger the charged Refocuser is. |
+| `mark_85.missileCount` | `6` | 1 to 16 | Homing mini-missiles in a volley. |
+| `mark_85.missileDamage` | `4.0` | 0.0 to 200.0 | Damage of each homing mini-missile. |
+| `mark_85.missilePower` | `0.6` | 0.0 to 8.0 | Power of the small boom of each homing mini-missile (it never breaks blocks unless [iron_man] boomsBreakBlocks and mobGriefing). |
+| `mark_85.missileLockRange` | `24.0` | 4.0 to 128.0 | Range (blocks) in which the missiles lock on. |
+| `mark_85.missileHomingTicks` | `200` | 1 to 2400 | Ticks a missile follows its target before it pops (200 = 10 seconds). |
+| `mark_85.missileTurnDegrees` | `12.0` | 1.0 to 180.0 | Degrees a missile may turn per tick. |
+| `mark_85.missileEnergy` | `15.0` | 0.0 to 100.0 | Suit energy a volley costs. |
+| `mark_85.missileCooldown` | `120` | 0 to 72000 | Cooldown (ticks) of the homing mini-missiles (120 = 6 seconds). |
+| `mark_85.droneCount` | `2` | 1 to 8 | Nanotech drones that form behind him. |
+| `mark_85.droneTicks` | `400` | 1 to 12000 | Ticks the drones stay (400 = 20 seconds). |
+| `mark_85.droneDamage` | `6.0` | 0.0 to 200.0 | Damage of each drone's laser. |
+| `mark_85.droneShotGap` | `15` | 1 to 400 | Ticks between two shots of a drone (15 = 0.75 seconds). |
+| `mark_85.droneRange` | `20.0` | 2.0 to 64.0 | Range (blocks) of the drones' lasers. |
+| `mark_85.droneEnergy` | `30.0` | 0.0 to 100.0 | Suit energy the drones cost. |
+| `mark_85.droneCooldown` | `900` | 0 to 72000 | Cooldown (ticks) of the nanotech drones (900 = 45 seconds). |
+
+### `[hulkbuster]`
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `hulkbuster.armor` | `20.0` | 0.0 to 30.0 | Armour of the suit (one item: a whole set). |
+| `hulkbuster.toughness` | `12.0` | 0.0 to 20.0 | Armour toughness of the suit. |
+| `hulkbuster.knockbackResistance` | `1.0` | 0.0 to 1.0 | Knockback resistance of the suit. |
+| `hulkbuster.durability` | `3000` | 1 to 100000 | Durability of the suit. |
+| `hulkbuster.scaleBonus` | `2.5` | 0.0 to 6.0 | Scale added in the Hulkbuster (2.5: three and a half times). |
+| `hulkbuster.speedPenalty` | `0.1` | 0.0 to 0.9 | Walking speed taken away, as a fraction. |
+| `hulkbuster.flightSpeed` | `0.06` | 0.01 to 0.5 | Flight speed in the suit. |
+| `hulkbuster.flightEnergyPerSecond` | `1.0` | 0.0 to 100.0 | Suit energy per second of flight. |
+| `hulkbuster.explosionImmune` | `true` | `true` or `false` | Whether explosions never hurt the Hulkbuster's wearer. |
+| `hulkbuster.dropHeight` | `40` | 4 to 200 | Height (blocks) Veronica drops the frame from. |
+| `hulkbuster.punchDamage` | `6.0` | 0.0 to 200.0 | Damage of each punch of the Rapid Punch Combo. |
+| `hulkbuster.punchFinalDamage` | `10.0` | 0.0 to 200.0 | Damage of the combo's last punch. |
+| `hulkbuster.punchFinalKnockback` | `2.5` | 0.0 to 8.0 | Knockback of the combo's last punch. |
+| `hulkbuster.punchCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Rapid Punch Combo (60 = 3 seconds). |
+| `hulkbuster.unibeamDamage` | `8.0` | 0.0 to 200.0 | Damage of the Heavy Unibeam (every 10 ticks). |
+| `hulkbuster.unibeamEnergyPerSecond` | `10.0` | 0.0 to 100.0 | Suit energy per second of the Heavy Unibeam. |
+| `hulkbuster.grabRange` | `5.0` | 1.0 to 16.0 | Reach (blocks) of Grab & Throw. |
+| `hulkbuster.grabMaxTicks` | `60` | 1 to 1200 | The longest (ticks) a creature is held (60 = 3 seconds). |
+| `hulkbuster.throwDistance` | `12.0` | 1.0 to 64.0 | Distance (blocks) of the throw. |
+| `hulkbuster.throwDamage` | `10.0` | 0.0 to 200.0 | Damage of the throw's landing. |
+| `hulkbuster.grabCooldown` | `160` | 0 to 72000 | Cooldown (ticks) of Grab & Throw (160 = 8 seconds). |
+| `hulkbuster.veronicaRepair` | `0.5` | 0.0 to 1.0 | Fraction of the suit's durability a new arm from Veronica repairs. |
+| `hulkbuster.veronicaCooldown` | `1200` | 0 to 72000 | Cooldown (ticks) of Veronica's new arm (1200 = 1 minute). |
+| `hulkbuster.needsSky` | `true` | `true` or `false` | Whether Veronica needs open sky to drop the frame or an arm. |
+
+## Falcon
+
+Section `[falcon]` (3.8). The page is [Falcon](Falcon).
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `falcon.healthBonus` | `4.0` | 0.0 to 100.0 | Max health added to his 20. |
+| `falcon.speedBonus` | `0.1` | 0.0 to 2.0 | Movement speed added, as a fraction. |
+| `falcon.flightSpeed` | `0.1` | 0.01 to 0.5 | Flight speed with the wings. |
+| `falcon.glideBoost` | `0.6` | 0.0 to 4.0 | Speed the nozzles add while gliding upward. |
+| `falcon.glideBoostTicks` | `40` | 1 to 1200 | Ticks between two glide boosts (40 = 2 seconds). |
+| `falcon.dartDamage` | `4.0` | 0.0 to 200.0 | Damage of each energy dart. |
+| `falcon.dartSpeed` | `3.0` | 0.2 to 8.0 | Speed of the energy darts. |
+| `falcon.dartRange` | `40` | 4 to 128 | Range (blocks) of the energy darts. |
+| `falcon.dartGap` | `6` | 1 to 200 | Ticks between two pairs of darts (6 = 0.3 seconds). |
+| `falcon.rocketDamage` | `8.0` | 0.0 to 200.0 | Damage of the Wrist Rocket. |
+| `falcon.rocketPower` | `1.0` | 0.0 to 8.0 | Power of the Wrist Rocket's small boom (it never breaks blocks). |
+| `falcon.rocketCooldown` | `80` | 0 to 72000 | Cooldown (ticks) of the Wrist Rocket (80 = 4 seconds). |
+| `falcon.diveRange` | `32` | 4 to 128 | Range (blocks) of the Dive. |
+| `falcon.diveSpeed` | `1.8` | 0.2 to 6.0 | Speed (blocks per tick) of the Dive. |
+| `falcon.diveDamage` | `10.0` | 0.0 to 200.0 | Damage of the Dive. |
+| `falcon.diveSplash` | `3.0` | 0.0 to 200.0 | Damage of the Dive to creatures near the one it hits. |
+| `falcon.diveMinHeight` | `4.0` | 0.0 to 64.0 | The least height (blocks) above the ground for a Dive. |
+| `falcon.diveCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Dive (100 = 5 seconds). |
+| `falcon.climbHeight` | `24.0` | 1.0 to 128.0 | Height (blocks) of the Boost Climb. |
+| `falcon.climbCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Boost Climb (60 = 3 seconds). |
+| `falcon.shieldMaxTicks` | `100` | 1 to 1200 | The longest (ticks) the Wing Shield can be held (100 = 5 seconds). |
+| `falcon.shieldMeleeReduction` | `0.7` | 0.0 to 1.0 | Fraction of a blow from the front the Wing Shield takes away. |
+| `falcon.shieldExplosionReduction` | `0.5` | 0.0 to 1.0 | Fraction of an explosion from the front the Wing Shield takes away. |
+| `falcon.shieldCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Wing Shield (60 = 3 seconds). |
+| `falcon.slashDamage` | `7.0` | 0.0 to 200.0 | Damage of the Wing Slash. |
+| `falcon.slashRadius` | `3.0` | 1.0 to 16.0 | Radius (blocks) of the Wing Slash. |
+| `falcon.slashCooldown` | `80` | 0 to 72000 | Cooldown (ticks) of the Wing Slash (80 = 4 seconds). |
+| `falcon.redwingHealth` | `12.0` | 1.0 to 200.0 | Redwing's health. |
+| `falcon.redwingTicks` | `1200` | 20 to 72000 | Ticks Redwing stays out (1200 = 1 minute). |
+| `falcon.redwingMarkRadius` | `32.0` | 4.0 to 128.0 | Radius (blocks) in which Redwing marks monsters. |
+| `falcon.redwingZapDamage` | `2.0` | 0.0 to 200.0 | Damage of Redwing's zap. |
+| `falcon.redwingZapRange` | `16.0` | 1.0 to 64.0 | Range (blocks) of Redwing's zap. |
+| `falcon.redwingZapGap` | `20` | 1 to 400 | Ticks between two zaps of Redwing (20 = 1 second). |
+| `falcon.redwingRepairTicks` | `600` | 0 to 72000 | Ticks before a shot-down Redwing can fly again (600 = 30 seconds). |
+| `falcon.strikeDamage` | `8.0` | 0.0 to 200.0 | Damage of Redwing Strike. |
+| `falcon.strikeRange` | `32` | 4 to 128 | Range (blocks) of Redwing Strike. |
+| `falcon.strikeCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of Redwing Strike (200 = 10 seconds). |
+| `falcon.wingsDurability` | `900` | 1 to 100000 | Durability of the Exo-Wings. |
+
+## The Avengers Tower's armoury
+
+Section `[avengers_tower]` (3.8): the Suit Displays and Tech Cases of the tower, and the refit of towers built before 3.8. See [Structures](Structures#the-armoury-38). The serum's case counts `super_soldier_serum.casePerPlayer` instead.
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `avengers_tower.displaysPerPlayer` | `1` | 0 to 64 | Items each player may take from one display or case (0: unlimited, for creative servers). |
+| `avengers_tower.refit` | `true` | `true` or `false` | Whether towers generated before 3.8 get the new armoury at run time. |
+| `avengers_tower.refitRadius` | `96` | 16 to 512 | Radius (blocks) round a player in which old towers are refitted. |
+| `avengers_tower.refitIntervalTicks` | `100` | 20 to 12000 | Ticks between two looks for old towers near a player (100 = 5 seconds). |
+
+## Eternity and Love
+
+Sections `[eternity]` and `[love]` (3.8). The pages are [Eternity](Eternity) and [Love](Love). The shrines' spacing is data (the structure set `enhanced:eternity_shrines`, 40 / 14 chunks).
+
+### `[eternity]`: the shrine, the altar and the wish
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `eternity.enabled` | `true` | `true` or `false` | Whether the Shrine of the Cosmic Entities generates in new End chunks (existing shrines stay). |
+| `eternity.altarChargeTicks` | `60` | 1 to 1200 | Ticks the Bifrost key floats over the altar before the journey (60 = 3 seconds). |
+| `eternity.wishesPerPlayer` | `1` | 0 to 64 | Wishes each player may make (0: unlimited). |
+| `eternity.wishFullStack` | `true` | `true` or `false` | Whether a wished item comes as a full stack (false: one). |
+| `eternity.loveWish` | `true` | `true` or `false` | Whether one may wish to become Love. |
+| `eternity.returnDelayTicks` | `60` | 0 to 1200 | Ticks after a wish before the traveller is sent home (60 = 3 seconds). |
+| `eternity.screenDelayTicks` | `40` | 0 to 1200 | Ticks after arriving before Eternity speaks (the screen opens) (40 = 2 seconds). |
+
+### `[love]`: the hero
+
+| Option | Default | Allowed values | Meaning |
+|---|---|---|---|
+| `love.healthBonus` | `12.0` | 0.0 to 100.0 | Max health added to her 20 (32: sixteen hearts). |
+| `love.armorBonus` | `4.0` | 0.0 to 30.0 | Armour added. |
+| `love.attackBonus` | `3.0` | 0.0 to 40.0 | Attack damage added. |
+| `love.knockbackResistance` | `0.3` | 0.0 to 1.0 | Knockback resistance. |
+| `love.safeFall` | `6.0` | 0.0 to 64.0 | Safe fall distance added (blocks). |
+| `love.flightSpeed` | `0.1` | 0.01 to 0.5 | Flight speed. |
+| `love.flightNeedsAxe` | `true` | `true` or `false` | Whether Love flies only while she holds Stormbreaker (as Thor). |
+| `love.worthy` | `true` | `true` or `false` | Whether Love is worthy of Mjolnir. |
+| `love.strikeDamage` | `8.0` | 0.0 to 200.0 | Damage of the Thunder Strike. |
+| `love.strikeRadius` | `2.0` | 0.0 to 16.0 | Radius (blocks) of the Thunder Strike. |
+| `love.strikeRange` | `48` | 4 to 128 | Range (blocks) of the Thunder Strike. |
+| `love.strikeCooldown` | `100` | 0 to 72000 | Cooldown (ticks) of the Thunder Strike (100 = 5 seconds). |
+| `love.strikeSetsFire` | `false` | `true` or `false` | Whether the Thunder Strike sets blocks on fire (only with mobGriefing too). |
+| `love.eyeLaserDamage` | `6.0` | 0.0 to 200.0 | Damage of the Eye Laser to each creature it touches. |
+| `love.eyeLaserRange` | `24` | 4 to 128 | Range (blocks) of the Eye Laser. |
+| `love.eyeLaserHitGap` | `20` | 1 to 400 | Ticks before the Eye Laser hurts the same creature again (20 = 1 second). |
+| `love.eyeLaserFireSeconds` | `4` | 0 to 60 | Seconds the Eye Laser sets creatures burning. |
+| `love.eyeLaserMaxTicks` | `100` | 1 to 1200 | The longest (ticks) the Eye Laser can be held (100 = 5 seconds). |
+| `love.eyeLaserCooldown` | `60` | 0 to 72000 | Cooldown (ticks) of the Eye Laser (60 = 3 seconds). |
+
 ## Music
 
 Section `[music]` (3.5): [a world's own music](Music#a-worlds-own-music-servers), the songs a server owner puts in `<world>/serverconfig/enhanced/music/` to replace the Walkman songs and the Witches' Road for every player.
@@ -1824,7 +2285,7 @@ Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-dar
 
 ## Structures
 
-The four stone sites of 3.6 can each be switched off: see [The stone sites](#the-stone-sites). Since 3.7 the schools' lower labs are [`[school_lab]`](#the-x-men-lower-lab) and Agatha's Cottages [`[agatha_cottage]`](#agathas-cottage). The garrison of the Hydra outposts is the section [`[hydra]`](#hydra-soldiers). The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.
+The four stone sites of 3.6 can each be switched off: see [The stone sites](#the-stone-sites). Since 3.7 the schools' lower labs are [`[school_lab]`](#the-x-men-lower-lab) and Agatha's Cottages [`[agatha_cottage]`](#agathas-cottage). Since 3.8 the Shrines of the Cosmic Entities in the End are switched by `eternity.enabled` ([Eternity and Love](#eternity-and-love); their spacing is the data file `worldgen/structure_set/eternity_shrines.json`, 40 / 14 chunks, 4 chunks from an End tunnel, and the biome tag `has_structure/eternity_shrine.json`), and the Avengers Tower's armoury and the refit of old towers are [`[avengers_tower]`](#the-avengers-towers-armoury). The garrison of the Hydra outposts is the section [`[hydra]`](#hydra-soldiers). The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.
 
 ## Datapack tags
 
@@ -1857,7 +2318,7 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:reality_proof` | entity type | Projectiles the Reality Veil (the Mad Titan's and a Thanos player's) and, since 3.6, the [Reality Stone](Infinity-Stones#the-reality-stone-red)'s bubbles do not turn into bubbles: a thrown Mjolnir or Stormbreaker, Mjolnir's fragments, a thrown Gungnir, and the Mad Titan's own sword, meteors and orbs. (A Hydra bolt is not in it: the stone bubbles it.) |
 | `enhanced:infinity_stones` | item | 3.6: the six Infinity Stones. |
 | `enhanced:hydra` | entity type | 3.6: the Hydra soldier and the Hydra officer: they never hit each other, and an area attack of theirs spares their side. |
-| `enhanced:grab_immune` | entity type | 3.6: what the Hulk's Grab Smash can't pick up (it gets one heavy punch instead): the bosses, the Stonekeeper and the Asgardians. |
+| `enhanced:grab_immune` | entity type | 3.6: what the Hulk's Grab Smash can't pick up (it gets one heavy punch instead): the bosses, the Stonekeeper and the Asgardians; since 3.7 the cottage's family, and since 3.8 Eternity, the nanotech drones and the Hulkbuster's frame. Red Hulk's Grab & Slam and the Hulkbuster's grab ask it too. |
 | `enhanced:hulk_soft` | block | 3.6: what the Hulk breaks with `hulk.blockBreaking` = `SOFT`: glass and panes, leaves, snow, ice, small flowers, grass and ferns, vines, cobwebs, dead bushes. |
 | `enhanced:hulk_smashable` | block | 3.6: what he also breaks with `ALL`: dirt, sand, gravel, stone and cobblestone, planks and logs, bricks, clay, netherrack, end stone... |
 | `enhanced:hulk_unbreakable` | block | 3.6: what he never breaks: everything Build Magic never touches, obsidian, end portal frames, spawners, reinforced deepslate, the stone pedestals, the Tesseract's cradle, Hela's Seal and the Gamma Emitter. |
@@ -1874,6 +2335,12 @@ Item, block, entity type and damage type tags under `data/enhanced/tags/` decide
 | `enhanced:chimichanga_fillings` | item | 3.7: what goes in a chimichanga: cooked beef, porkchop or chicken. |
 | `enhanced:stone_site/mind`, `time`, `space`, `power`, `soul` | structure | 3.7: the sites the Stone Locator looks for: the Hydra outpost, the Sanctum, Avengers Tower, the End tunnel, the Vormir Cliff. |
 | `enhanced:bifrost_sites` | structure | 3.7: where the Stone Locator points for the Reality Stone in the Overworld (the Bifrost sites). |
+| `enhanced:arc_reactors` | item | 3.8: the Arc Reactor and the Nano Arc Reactor: carried anywhere, one of them powers Iron Man's classic suits. |
+| `enhanced:iron_suits`, `enhanced:nano_suits` | item | 3.8: Iron Man's six suits, and the two nanotech housings (Mark 50, Mark 85): lists for data packs and other mods (the mod knows its suits by their items). |
+| `enhanced:bifrost_keys` | item | 3.8: the keys of [Eternity's altar](Eternity#the-way-in-the-altar): Mjolnir, Stormbreaker, Hofund and Gungnir (a Gungnir only if it is the holder's own). |
+| `enhanced:wish_forbidden` | item | 3.8: what [Eternity](Eternity#ask-for-anything) never grants, and the picker hides: the command blocks and their minecart, structure blocks and voids, the jigsaw, barriers, light blocks, the debug stick, the knowledge book, spawners, trial spawners, vaults, bedrock, end portal frames, reinforced deepslate and the petrified oak slab. (Any operator-only block item is refused too.) |
+| `enhanced:energy_damage` | damage type | 3.8: beams, repulsors and lasers (Iron Man's repulsor, Unibeam and drones' lasers, Redwing's zap, Love's eye laser, the Chaos Beam, the Mind Stone beam, Thor's lightning beam, the Hex Beam and Bolt, the Darkhold's beam, Ultron's beam and bolts, the Optic Blast, the Power Stone's beam, a custom hero's beam, Hydra bolts): what Red Hulk's **Energy Absorb** soaks up (with fire, lightning and explosions). |
+| `enhanced:has_structure/eternity_shrine` | biome | 3.8: where the Shrine of the Cosmic Entities may stand: the End's highlands and midlands. |
 | `enhanced:telekinesis_immovable` | block | Blocks no telekinesis can tear out of the ground. |
 | `enhanced:magnetic_blocks` | block | Metal blocks: what Magneto's R tears out and his Magnetic Pull takes whole (it holds `magnetic_ores`, the storage blocks, anvils, rails, chains, bars, doors, lanterns, hoppers, pistons, copper blocks and more; other mods' metals are optional entries). |
 | `enhanced:magnetic_ores` | block | Ores whose metal the Magnetic Pull takes out (the ore turns into its stone). Iron, gold, copper, nether gold, ancient debris and gilded blackstone, and other mods' tin, lead, silver and so on. |
@@ -1898,7 +2365,7 @@ The recipes (`data/enhanced/recipe/`) and the loot chances (`data/enhanced/loot_
 
 ## Client options: animations, effects and looks
 
-Sixteen options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]`, `[spider_man]`, (3.5) `[music]`, (3.6) `[hulk]` and (3.7) `[deadpool]` and `[death_meeting]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
+Twenty options are about your own game only. They are not synced, and a server can't change them. They live in a second file, **`config/enhanced-client.toml`** in your Minecraft folder (the mod creates it the first time the game starts), in the `[animation]`, `[appearance]`, `[build_magic]`, `[spider_man]`, (3.5) `[music]`, (3.6) `[hulk]`, (3.7) `[deadpool]` and `[death_meeting]`, and (3.8) `[iron_man]` and `[eternity]` sections (`[build_magic]` is for [Build Magic](Build-Magic); reduced motion calms its animations and the Magnetic Pull's streams too). The easiest way to change them is in the game: **Mods → Enhanced → Config**. You can also change a value in any text editor while the game is closed:
 
 ```toml
 [animation]
@@ -1932,6 +2399,14 @@ Sixteen options are about your own game only. They are not synced, and a server 
 
 [death_meeting]
     showDeathMeeting = true
+
+[iron_man]
+    suitUpOverlay = true
+    ironHelmetHud = true
+
+[eternity]
+    eternityReflections = true
+    eternityFog = true
 ```
 
 | Option | Setting in the file | Default | What it does |
@@ -1951,6 +2426,10 @@ Sixteen options are about your own game only. They are not synced, and a server 
 | The Hulk's body | `hulkModel` | `true` | 3.6: the Hulk is drawn with his own giant body. Off: the normal player model wearing his skin, made bigger (if another mod's player model clashes with his). See [Hulk](Hulk#looks-and-how-he-moves). |
 | Deadpool's jokes | `deadpoolLines` | `true` | 3.7: [Deadpool](Deadpool#his-jokes)'s joke lines in speech bubbles over his head (and, when you are Deadpool, in the action bar). Off: you see none. |
 | Meet Death when you die | `showDeathMeeting` | `true` | 3.7: when you die, [meet Death](Meeting-Death) (Rio, the Green Witch) and choose where to start again. Off: the plain death screen. |
+| Suit-up faceplate | `suitUpOverlay` | `true` | 3.8: when your [Iron Man](Iron-Man#the-suit-up) suit goes on, the faceplate closes over the edges of your screen and the helmet boots ("SYSTEMS ONLINE"); with *Reduced motion*, a short fade. Off: nothing over the screen. |
+| Iron Man's helmet frame | `ironHelmetHud` | `true` | 3.8: a suited Iron Man sees the helmet's frame in first person: blue arcs at the edges, with altitude and speed while he flies. |
+| Eternity's reflections | `eternityReflections` | `true` | 3.8: Eternity and the players are mirrored in the still water of [Eternity's realm](Eternity#eternitys-realm). Off for slow computers. |
+| Eternity's mist | `eternityFog` | `true` | 3.8: the white mist on the horizon of Eternity's realm. |
 | Ignore the world's music | `ignoreServerMusic` | `false` | 3.5: don't download or play the songs a server or world puts in its music folder; hear the built-in music, or your own. |
 
 Two more client options, for the music and the air of the Thanos fight, are in a `[thanos]` section of the same file: see [above](#your-own-game-the-music-and-the-atmosphere-of-the-fight).

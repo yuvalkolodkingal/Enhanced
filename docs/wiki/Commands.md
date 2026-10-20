@@ -66,9 +66,22 @@ Asgard has no portal: an operator can also use `/tp` or `/execute in enhanced:as
 | `/enhanced structure school_lab [radius]` | (3.7) Builds the [X-Men lower lab](Mutant-School-Lab) of the Mutant School nearest to you (within 128 blocks, or `radius`, 16 to 256) now, or finishes one being built: "The lower lab is built. Its lift starts in the study at …", or "This school's lab is already built." The lab is otherwise built by itself when a player comes near (`school_lab.autoBuild`). |
 | `/enhanced structure school_lab force` | (3.7) The same, and puts the secret entrance in the study even over a player's blocks (without `force`, a block a player put there keeps the entrance out: "a player's block stands where the entrance goes"). |
 | `/enhanced structure school_lab status` | (3.7) The nearest school's lab: not begun, being built, built or blocked (and why), where the study's and the lab's pads are, how it is turned, and for a built lab its holes, stray water or lava inside, and doors without a frame (0, 0 and 0 in a whole lab). |
+| `/enhanced structure refit_tower [radius]` | (3.8) Refits the [Avengers Tower](Structures#towers-built-before-38-the-refit) nearest to you (within 96 blocks, or `radius`, 16 to 512) now: a tower built before 3.8 gets its armoury (the suit displays, the reactor, serum, shield and wings cases, the signs), only where the 3.6.1 tower's own blocks still stand; the old armour stands and the shield's frame go only if they are still the tower's. It tells you how many blocks it set, how many stands it took away, and what of the players' it left. A tower is otherwise refitted by itself when a player comes near (`avengers_tower.refit`). A tower of the old 3.6.0 design is left as it is. The chunks round the armoury must be loaded ("come closer and try again"). |
+| `/enhanced structure refit_tower [radius] force` | (3.8) The same, and puts the blocks even where a player changed them (what stood there drops as if broken). A player's armour stand or item frame is never touched, and nobody's takes are forgotten. |
+| `/enhanced structure refit_tower status` | (3.8) The nearest tower: refitted or not yet, its armoury's version, how many blocks the refit set, stands it took away, and players' blocks it left. |
 | `/enhanced structure repair_school [radius]` | (3.5) Mends a [Mutant School](Structures#the-mutant-school) built before 3.3.1, the hole round its front door: only the 76 blocks of the door and the tower that 3.3.1 changed, in the school's own stone. It looks for the school nearest to you within 128 blocks (or `radius`, 16 to 256). A block a player has changed there is left alone and counted ("kept"); run it again any time, and it says when the school is whole. |
 
-To **find** a structure, use the game's own `/locate structure <id>`: `enhanced:hydra_outpost`, `enhanced:mjolnir_crater`, `enhanced:mutant_school`, `enhanced:bifrost_site`, and since 3.6 `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (run it in the End) and `enhanced:vormir_cliff` (run it in the Nether), and since 3.7 `enhanced:agatha_cottage`. See [Structures](Structures#the-stone-sites-36). The schools' lower labs are not structures of their own: they are under the schools.
+To **find** a structure, use the game's own `/locate structure <id>`: `enhanced:hydra_outpost`, `enhanced:mjolnir_crater`, `enhanced:mutant_school`, `enhanced:bifrost_site`, and since 3.6 `enhanced:sanctum`, `enhanced:avengers_tower`, `enhanced:end_tunnel` (run it in the End) and `enhanced:vormir_cliff` (run it in the Nether), and since 3.7 `enhanced:agatha_cottage`, and since 3.8 `enhanced:eternity_shrine` (in the End). See [Structures](Structures#the-stone-sites-36). The schools' lower labs are not structures of their own: they are under the schools.
+
+## The Avengers (3.8)
+
+| Command | Effect |
+|---|---|
+| `/enhanced serum open <player>` | Opens the [Super Soldier Serum](Super-Soldier-Serum)'s choice for a player who holds no serum: Captain America, Red Hulk or Falcon (Falcon still only with the Exo-Wings). Nothing is used up. "Opened the serum's choice for Eilon." |
+| `/enhanced eternity reset <player>` | The player may make a wish to [Eternity](Eternity) again ("Eilon may make a wish to Eternity again."). His visits and his way home are kept. |
+| `/enhanced eternity send <player>` | Takes the player to Eternity's realm, as the altar would (his way home is where he stands now), or, if he is in the realm, sends him home. |
+
+`/enhanced structure refit_tower` (above) refits an old Avengers Tower. Iron Man's suits, the reactors, the serum, the shield and the wings can also be given with `/give` (`enhanced:iron_man_mark_85`, `enhanced:arc_reactor`, `enhanced:special_soldier_serum`, `enhanced:vibranium_shield`, `enhanced:falcon_exo_wings`...).
 
 ## Build Magic: /enhanced build
 
@@ -118,6 +131,11 @@ The `<power>` argument is one of:
 | `hulk` | [Hulk](Hulk) (3.6) |
 | `wolverine` | [Wolverine](Wolverine) (3.7) |
 | `deadpool` | [Deadpool](Deadpool) (3.7) |
+| `captain_america` | [Captain America](Captain-America) (3.8) |
+| `red_hulk` | [Red Hulk](Red-Hulk) (3.8) |
+| `iron_man` | [Iron Man](Iron-Man) (3.8) |
+| `falcon` | [Falcon](Falcon) (3.8) |
+| `love` | [Love](Love) (3.8) |
 | `custom` | The player's own hero from the [Hero Creator](Hero-Creator): the one they last made (an empty hero, with no powers, if they never made one) |
 
 The command suggests the names as you type. A player who is given a power awakens as that hero, with the title, the sound and the announcement to everyone, exactly as if they had earned it. If a player already has that power and you give a look, only the look changes.
@@ -148,6 +166,11 @@ The `[look]` or `<look>` argument is the id of a look (see [Looks](Looks)):
 | Hulk | `ragnarok`, `brand_new_day`, `banner`, `own` (`banner` and `own` are Bruce Banner, with no powers) |
 | Wolverine | `classic`, `x_men_2000`, `own` |
 | Deadpool | `classic`, `trainee`, `kidpool`, `own` |
+| Captain America | `classic`, `stealth`, `own` |
+| Red Hulk | `red_hulk`, `own` |
+| Iron Man | `tony`, `own` (his suits are items, not looks) |
+| Falcon | `endgame`, `winter_soldier`, `own` |
+| Love | `love`, `own` |
 
 Magneto, the Scarlet Witch and Quicksilver have no looks to choose, and a custom hero's look is chosen in the Hero Creator. Professor X given without a look is the young Charles (the screen that asks which Charles he is opens only after the wheelchair; **H** changes it). `/enhanced look` skips players whose hero does not have the look, and it fails with "Unknown look" if no given player has it.
 
@@ -172,6 +195,11 @@ Magneto, the Scarlet Witch and Quicksilver have no looks to choose, and a custom
 | `/enhanced power set Steve wolverine x_men_2000` | Makes Steve Wolverine, in the *X-Men* (2000) leather (he skips the injection). |
 | `/enhanced power set Steve deadpool kidpool` | Makes Steve Deadpool, as Kidpool. |
 | `/enhanced structure school_lab status` | Tells you about the lab of the nearest school. |
+| `/enhanced power set Steve captain_america stealth` | Makes Steve Captain America, in the stealth suit (give him a shield, or use Choose a Hero). |
+| `/enhanced power set Steve iron_man` | Makes Steve Iron Man (give him an Arc Reactor and a suit, or use Choose a Hero). |
+| `/enhanced serum open Steve` | Opens the serum's choice for Steve. |
+| `/enhanced eternity reset Steve` | Gives Steve his wish back. |
+| `/enhanced structure refit_tower status` | Tells you about the armoury of the nearest Avengers Tower. |
 | `/enhanced look Steve white_vision` | Puts Steve, a Vision, in the White Vision look. |
 | `/enhanced hex list` | Lists the Hexes in your dimension. |
 | `/enhanced hex clear` | Dissolves them all. |

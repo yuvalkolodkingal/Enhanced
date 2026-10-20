@@ -2,7 +2,7 @@
 
 A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The exceptions are Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs; and since 3.6 the Hulk, whose Bruce Banner has no powers and whose Brand New Day Hulk is bigger and hits harder.)
 
-Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, since 3.6 Doctor Strange and the Hulk, and since 3.7 Wolverine and Deadpool have several looks. A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
+Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, since 3.6 Doctor Strange and the Hulk, since 3.7 Wolverine and Deadpool, and since 3.8 Captain America, Red Hulk, Falcon and Love have several looks (Iron Man's look is his suit: for him **H** is the suit key, see [Iron Man](Iron-Man#h-suiting-up)). A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
 ## Switching looks
 
@@ -219,6 +219,49 @@ His adamantium claws slide out of his fists in every look, in first and third pe
 | **Your own skin** | `own` | His powers in your own skin. |
 
 His two katanas are crossed on his back and his pistols at his hips in every look.
+
+### Captain America ([page](Captain-America))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Avengers suit** (default) | `classic` | The suit of *Avengers: Endgame*: dark blue with the white star on the chest, red-and-white stripes at the waist, brown leather straps, gloves and boots, the helmet with the white "A". |
+| **Stealth suit** | `stealth` | The navy stealth suit of *The Winter Soldier*, with a silver star and silver straps. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+His Vibranium Shield hangs on his back when it is not in his hand, in every look.
+
+### Red Hulk ([page](Red-Hulk))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Red Hulk** (default) | `red_hulk` | Deep red skin with glowing cracks that burn brighter with his anger, grey-white swept-back hair and a grey moustache, black torn trousers; drawn with the Hulk's big body at 1.5 times your size. |
+| **Your own skin** | `own` | His powers in your own skin, at his size. |
+
+As **Ross** (**N**) he is you, in a dark navy suit with a red tie.
+
+### Iron Man ([page](Iron-Man))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Tony** (default) | `tony` | Plain dark clothes, under the suits. |
+| **Your own skin** | `own` | Your own skin, under the suits. |
+
+His real looks are his six **suits**, put on with **H**. A look is chosen with `/enhanced power set` or in Choose a Hero.
+
+### Falcon ([page](Falcon))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Endgame suit** (default) | `endgame` | A dark grey tactical suit with red chest and shoulder panels and red goggles; steel wings with a red stripe. |
+| **Winter Soldier suit** | `winter_soldier` | The dark brown-black flight suit and grey goggles of *The Winter Soldier*; darker gunmetal wings. |
+| **Your own skin** | `own` | His powers in your own skin. |
+
+### Love ([page](Love))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Love** (default) | `love` | A girl of about ten with dark curly hair and a gold circlet, a golden-amber Asgardian tunic with lilac trim and a short lilac cape. |
+| **Your own skin** | `own` | Her powers in your own skin. |
 
 ### Magneto, the Scarlet Witch and Quicksilver
 
