@@ -499,8 +499,12 @@ public final class GestureRoutes {
             // ===== red_hulk (3.8) =====
             case RED_HULK -> "none: Red Hulk's keys are acted by his plug-in (lane L2 of 3.8)";
             // ===== iron_man (3.8) =====
-            case IRON_MAN -> ability == 2 ? "flight" : "none: Iron Man's keys are acted by his plug-in (lanes L3 and L4"
-                    + " of 3.8)";
+            // (Lane L3: every suit move is told by the payload of its effect, which names him; G is flight, or the
+            // Mark 1's Rocket Boost, whose effect BOOST plays IRON_BOOST. The nanotech suits' and the Hulkbuster's
+            // moves are lane L4's, told the same way.)
+            case IRON_MAN -> ability == 2 ? "flight" : "none: Iron Man's suit moves are acted by the effects of the"
+                    + " moves, which name him (IronManGestures.gestureOf; the nanotech suits' and the Hulkbuster's:"
+                    + " lane L4)";
             // ===== falcon (3.8) =====
             case FALCON -> ability == 2 ? "flight" : "none: Falcon's keys are acted by his plug-in (lane L5 of 3.8)";
             // ===== love (3.8) =====
@@ -602,8 +606,11 @@ public final class GestureRoutes {
             case RED_HULK_TRANSFORMING, RED_HULK_JUMP_CHARGING, RED_HULK_LEAPING, RED_HULK_HEATED, RED_HULK_ABSORBING,
                     RED_HULK_GRABBING -> "pending: Red Hulk's lane (L2 of 3.8) acts it";
             // ===== iron_man (3.8) =====
-            case IRON_SUITING, IRON_SHIELD, IRON_BLADES, IRON_GRABBING, IRON_DASHING, IRON_CHARGING ->
-                    "pending: Iron Man's lanes (L3, L4 of 3.8) act it";
+            case IRON_SUITING -> "a stance (IRON_SUITING) while a suit goes on or comes off; the effects SUIT_UP and"
+                    + " SUIT_DOWN play IRON_SUIT_UP, IRON_STEP_IN and IRON_SUIT_DOWN (IronManActing)";
+            case IRON_DASHING -> "the effects BOOST and DASH play IRON_BOOST and IRON_DASH_PUNCH (IronManActing)";
+            case IRON_SHIELD, IRON_BLADES, IRON_GRABBING, IRON_CHARGING ->
+                    "pending: Iron Man's nanotech lane (L4 of 3.8) acts it";
             // ===== falcon (3.8) =====
             case FALCON_DIVING, FALCON_WING_SHIELD, FALCON_GLIDING -> "pending: Falcon's lane (L5 of 3.8) acts it";
         };

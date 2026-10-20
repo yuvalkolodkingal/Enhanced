@@ -12,8 +12,8 @@ import java.util.Map;
  * A suit's choreography (3.8, PLAN 5.8, 7.2): how each part is posed at a moment of a suit-up ({@code up}) or a
  * take-off, from the phase's progress (0-1, interpolated with the partial tick). {@code SuitLayer} (lane L3) resets the
  * poses, asks the suit's assembly, and draws each part with its pose; the first-person arms use the same. Lane L3
- * writes the generic one ("plates slide in"), lane L7 the six suits' ({@link #of}); the 3.8 skeleton's is {@link
- * #PLAIN}.
+ * writes the generic one ("plates slide in", {@link #GENERIC}), lane L7 the six suits' ({@link #of}); the 3.8
+ * skeleton's was {@link #PLAIN}.
  */
 @FunctionalInterface
 public interface SuitAssembly {
@@ -27,9 +27,16 @@ public interface SuitAssembly {
         }
     };
 
-    /** The assembly of a suit (lane L7 registers its own with {@link Registry#register}; else {@link #PLAIN}). */
+    /**
+     * Lane L3's generic choreography, for any suit until lane L7's arrives: the plates slide in from a ring round him
+     * and lock, one group after another (the boots first, the helmet last; {@link GenericAssembly}); a take-off plays
+     * it backwards (the helmet first).
+     */
+    SuitAssembly GENERIC = GenericAssembly::pose;
+
+    /** The assembly of a suit (lane L7 registers its own with {@link Registry#register}; else {@link #GENERIC}). */
     static SuitAssembly of(SuitKind kind) {
-        return Registry.ASSEMBLIES.getOrDefault(kind, PLAIN);
+        return Registry.ASSEMBLIES.getOrDefault(kind, GENERIC);
     }
 
     /** The registered assemblies. */

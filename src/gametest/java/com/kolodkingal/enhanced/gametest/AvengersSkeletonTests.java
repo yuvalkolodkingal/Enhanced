@@ -614,17 +614,18 @@ public final class AvengersSkeletonTests {
     @GameTest(template = ARENA, batch = BATCH)
     public static void theSeamsAreNeutralUntilTheLanes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        // Iron Man's suits never power, fly or turn metal yet; only Iron Man (or a Creative player) may wear one.
+        // Only Iron Man (or a Creative player) may wear a suit. (3.8, lane L3: the suits work now: a Mark 3 with a
+        // reactor in his pocket is powered, flies at its 0.10 and is iron for Magneto; IronCoreTests has the rest.)
         ServerPlayer tony = f.player(3.5, FLOOR, 3.5, Power.IRON_MAN);
         tony.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ModItems.IRON_MAN_MARK_3.get()));
         tony.getInventory().add(new ItemStack(ModItems.ARC_REACTOR.get()));
         check(IronSuits.worn(tony) == SuitKind.MARK_3 && IronSuits.hasReactor(tony) && IronSuits.mayWear(tony),
                 "he wears a Mark 3, a reactor in his pocket");
-        check(!IronSuits.powered(tony) && !IronSuits.isMetal(tony) && IronSuits.flightSpeed(tony) == 0.05F,
-                "and nothing works yet");
+        check(IronSuits.powered(tony) && IronSuits.isMetal(tony) && Math.abs(IronSuits.flightSpeed(tony) - 0.10F)
+                < 1.0E-6F, "and it works (lane L3)");
         PowerTicker.applyPassives(tony, Powers.get(tony));
-        check(!tony.mayFly(), "so he does not fly");
-        check(!Metal.isMagnetic(tony), "nor is Magneto's: the suit is in no metal tag");
+        check(tony.mayFly(), "so he flies");
+        check(Metal.isMagnetic(tony), "and is Magneto's: a powered classic suit is iron");
         ServerPlayer plain = f.player(6.5, FLOOR, 3.5);
         check(!IronSuits.mayWear(plain) && !Metal.isMagnetic(plain), "a powerless player may not wear a suit");
         plain.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));

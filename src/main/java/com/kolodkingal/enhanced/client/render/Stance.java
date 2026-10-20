@@ -138,6 +138,16 @@ public enum Stance {
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
+    // (Lane L3. Each starts with a comma, so the regions of 3.8 join in any order.)
+    ,
+    /** A suit goes on or comes off: the arms held a little out, still (the suit assembles round him). */
+    IRON_SUITING(2.0F, 3.0F, true),
+    /** The Unibeam burns: the chest out, the arms back. */
+    IRON_UNIBEAM(2.0F, 3.0F, true),
+    /** The Mark 1's Flamethrower burns: both forearms forward. */
+    IRON_FLAME(1.5F, 3.0F, true),
+    /** The Mark 1's Brace: arms crossed before the chest, knees bent. */
+    IRON_BRACING(1.5F, 3.0F, true)
     // ===== nanotech (3.8) =====
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
