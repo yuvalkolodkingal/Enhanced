@@ -38,6 +38,11 @@ public final class NanoState {
     long lastSlash = Long.MIN_VALUE / 2;
     long nextSlash;
 
+    // ---- the long moves' own cooldowns (NanoTech.ownReady) ----
+    /** When the drones and the Mark 50's nano blade may come again (game time). */
+    long dronesReadyAt;
+    long bladeReadyAt;
+
     // ---- the Mark 50's cannon ----
     /** When the charge began (0: none). */
     long cannonSince;

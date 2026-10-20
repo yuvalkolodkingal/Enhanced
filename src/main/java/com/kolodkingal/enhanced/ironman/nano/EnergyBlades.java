@@ -143,12 +143,14 @@ public final class EnergyBlades {
     /** Sneak + R on the Mark 50: the nano blade forms on the right forearm for {@code bladeTicks}. */
     public static boolean nanoBlade(ServerPlayer player, PowerData data) {
         long now = player.level().getGameTime();
-        if (data.is(Live.IRON_BLADES) || !data.isReady(HeroAbility.IRON_MAN_ENERGY_BLADES, now)
+        NanoState own = NanoState.of(player.getUUID());
+        if (data.is(Live.IRON_BLADES) || !NanoTech.ownReady(player, data, HeroAbility.IRON_MAN_ENERGY_BLADES,
+                own.bladeReadyAt, "message.enhanced.nanotech.blade_wait")
                 || !SuitEnergy.spend(player, NanoTech.cfg(IronManConfig.MARK50_BLADE_ENERGY, 8.0))) {
             return false;
         }
-        data.startCooldown(HeroAbility.IRON_MAN_ENERGY_BLADES, now, NanoTech.cfg(IronManConfig.MARK50_BLADE_COOLDOWN,
-                160));
+        own.bladeReadyAt = NanoTech.startOwn(player, data, HeroAbility.IRON_MAN_ENERGY_BLADES,
+                NanoTech.cfg(IronManConfig.MARK50_BLADE_COOLDOWN, 160));
         NanoState.of(player.getUUID()).nanoBladeUntil = now + NanoTech.cfg(IronManConfig.MARK50_BLADE_TICKS, 100);
         data.set(Live.IRON_BLADES, true);
         ServerLevel level = player.serverLevel();

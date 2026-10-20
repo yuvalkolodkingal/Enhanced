@@ -5,14 +5,19 @@ import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.IronManConfig;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.thanos.StonePowers;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -143,6 +148,36 @@ public final class NanoTech {
     /** Throws the creature away from {@code from} (credited to him for the Soul Stone's sacrifice). */
     public static void push(LivingEntity victim, Vec3 from, double strength, double lift, LivingEntity by) {
         StonePowers.shove(victim, from, strength, lift, by);
+    }
+
+    // ---- cooldowns of their own ----
+
+    /**
+     * Whether a long move that shares its key with a quick one is ready (3.8, lane L4): the drones (Sneak + N, 900
+     * ticks) and the Mark 50's nano blade (Sneak + R, 160). For Iron Man himself their cooldowns are their own, so that
+     * the drones never hold up the missiles for 45 seconds, nor the blade the repulsor (the HUD's key line shows the
+     * key's quick move); not ready, he is told how long is left. A custom hero's rows wait on their keys as every row.
+     */
+    public static boolean ownReady(ServerPlayer player, PowerData data, HeroAbility row, long readyAt, String waitKey) {
+        long now = player.level().getGameTime();
+        if (data.power() != Power.IRON_MAN) {
+            return data.isReady(row, now);
+        }
+        if (readyAt <= now || readyAt - now > 20L * 3600) {
+            return true;
+        }
+        player.displayClientMessage(Component.translatable(waitKey, (readyAt - now + 19) / 20)
+                .withStyle(ChatFormatting.GRAY), true);
+        return false;
+    }
+
+    /** Starts a long move's own cooldown (Iron Man) or its row's (a custom hero); the game time it ends for him. */
+    public static long startOwn(ServerPlayer player, PowerData data, HeroAbility row, int ticks) {
+        long now = player.level().getGameTime();
+        if (data.power() != Power.IRON_MAN) {
+            data.startCooldown(row, now, ticks);
+        }
+        return now + ticks;
     }
 
     // ---- the repulsor's ray and the small booms ----

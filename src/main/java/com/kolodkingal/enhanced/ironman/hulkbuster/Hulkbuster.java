@@ -157,6 +157,9 @@ public final class Hulkbuster implements SuitPhases.Listener {
     public static void applyBody(ServerPlayer player) {
         IronManState state = IronSuits.state(player);
         boolean hulkbusterPhase = state.inPhase() && state.phaseKind() == SuitKind.HULKBUSTER;
+        if (!hulkbusterPhase && !onChest(player) && current(player) == 0.0) {
+            return; // (nobody's Hulkbuster: nothing to put on or take off)
+        }
         double full = scaleBonus();
         if (!hulkbusterPhase && onChest(player) && mayHaveBody(player) && player.isAlive()
                 && current(player) < full - 1.0E-3) {

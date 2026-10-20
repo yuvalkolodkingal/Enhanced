@@ -140,13 +140,16 @@ public class HulkbusterFrameEntity extends Entity {
         super.tick();
         if (level().isClientSide) {
             Vec3 at = position();
-            if (stage() == FALLING || stage() == LIFTING) {
-                // The thrusters of Veronica's delivery.
+            boolean lifting = stage() == LIFTING && stageAge(0.0F) > 4.0F;
+            if (stage() == FALLING || lifting) {
+                // The thrusters of Veronica's delivery (under it: a lifting frame first clears his head).
                 for (int i = 0; i < 2; i++) {
                     level().addParticle(ParticleTypes.FLAME, at.x + (random.nextDouble() - 0.5) * 1.6, at.y,
                             at.z + (random.nextDouble() - 0.5) * 1.6, 0.0, -0.15, 0.0);
                 }
-                level().addParticle(ParticleTypes.LARGE_SMOKE, at.x, at.y, at.z, 0.0, 0.02, 0.0);
+                if (tickCount % 3 == 0) {
+                    level().addParticle(ParticleTypes.SMOKE, at.x, at.y, at.z, 0.0, 0.02, 0.0);
+                }
             }
             return;
         }

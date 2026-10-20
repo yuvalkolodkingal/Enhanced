@@ -21,7 +21,8 @@ import java.util.List;
 
 /**
  * Sneak + N on the Mark 85: the <b>Nanotech Drones</b> (3.8, lane L4, PLAN 6.2): {@code droneCount} 2 {@link
- * NanoDroneEntity}s form behind his shoulders for {@code droneTicks} 400 (20 seconds). 30 energy, cooldown 900.
+ * NanoDroneEntity}s form behind his shoulders for {@code droneTicks} 400 (20 seconds). 30 energy, cooldown 900 (its
+ * own: {@link NanoTech#ownReady}).
  * {@link IronManState#DRONES} and {@code dronesUntil} say so to the clients (the HUD's drones' time).
  */
 public final class NanoDrones {
@@ -32,11 +33,14 @@ public final class NanoDrones {
      */
     public static List<NanoDroneEntity> deploy(ServerPlayer player, PowerData data) {
         long now = player.level().getGameTime();
-        if (!data.has(HeroAbility.IRON_MAN_DRONES) || !data.isReady(HeroAbility.IRON_MAN_DRONES, now)
+        NanoState own = NanoState.of(player.getUUID());
+        if (!data.has(HeroAbility.IRON_MAN_DRONES) || !NanoTech.ownReady(player, data, HeroAbility.IRON_MAN_DRONES,
+                own.dronesReadyAt, "message.enhanced.nanotech.drones_wait")
                 || !SuitEnergy.spend(player, NanoTech.cfg(IronManConfig.MARK85_DRONE_ENERGY, 30.0))) {
             return List.of();
         }
-        data.startCooldown(HeroAbility.IRON_MAN_DRONES, now, NanoTech.cfg(IronManConfig.MARK85_DRONE_COOLDOWN, 900));
+        own.dronesReadyAt = NanoTech.startOwn(player, data, HeroAbility.IRON_MAN_DRONES,
+                NanoTech.cfg(IronManConfig.MARK85_DRONE_COOLDOWN, 900));
         recall(player);
         long until = now + NanoTech.cfg(IronManConfig.MARK85_DRONE_TICKS, 400);
         int count = NanoTech.cfg(IronManConfig.MARK85_DRONE_COUNT, 2);
