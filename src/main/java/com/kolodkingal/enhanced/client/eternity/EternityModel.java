@@ -19,9 +19,10 @@ import java.util.List;
 /**
  * Eternity's shape (3.8, PLAN 10.4): a giant seated cross-legged, meditating, his hands on his knees, a faceted helmet
  * with a pointed crown, and four tall antenna-horns, two on each side, bent like an insect's legs in three segments
- * (the upper pair rise, then bend up, then hook outward; the lower pair reach out, then down, then out). Our own shapes
- * after the reference ({@code SCRATCH/v38/ref/eternity_ref.jpg}), drawn by {@link EternityRenderer}: the body is a
- * window onto space (its texture mapped by world position, not by these boxes' UVs), the helmet and horns dark metal.
+ * (the upper pair lean out, rise tall, then turn a little outward; the lower pair reach straight out, then hook
+ * down). Our own shapes after the reference ({@code SCRATCH/v38/ref/eternity_ref.jpg}), drawn by
+ * {@link EternityRenderer}: the body is a window onto space (its texture mapped by world position, not by these boxes'
+ * UVs), the helmet and horns dark metal.
  *
  * <p>Units: pixels of the model, drawn at {@link #SCALE} times a pixel's size, so 4 pixels are a block; y up, the face
  * toward +z, the origin on the ground under the middle of his lap. About 44 blocks from the ground to the crown.
@@ -32,6 +33,8 @@ public class EternityModel {
     public static final float SCALE = 4.0F;
     /** The breath's rise of the chest, shoulders, arms and head (pixels) at the top of a breath. */
     static final float BREATH = 1.6F;
+    /** The starfield's tint: a little deeper than the texture, as space is in the reference. */
+    static final int BODY_TINT = 0xFFB4B2D0;
 
     private final ModelPart lap;
     private final ModelPart torso;
@@ -102,8 +105,8 @@ public class EternityModel {
         for (int side = -1; side <= 1; side += 2) {
             String s = side < 0 ? "_l" : "_r";
             // (A segment runs along +y from its joint; a rotation of -a about z leans it toward +x.)
-            horn(horns, "upper" + s, side, 18, 25, -2, new float[]{-0.95F, 0.80F, -1.20F}, new float[]{26, 30, 18});
-            horn(horns, "lower" + s, side, 18, 12, -2, new float[]{-1.62F, -0.62F, 0.70F}, new float[]{22, 24, 16});
+            horn(horns, "upper" + s, side, 18, 25, -2, new float[]{-1.15F, 0.95F, -0.35F}, new float[]{24, 40, 16});
+            horn(horns, "lower" + s, side, 18, 12, -2, new float[]{-1.57F, -0.85F, -0.45F}, new float[]{28, 16, 12});
         }
         return LayerDefinition.create(mesh, 64, 64);
     }
@@ -117,7 +120,7 @@ public class EternityModel {
         PartDefinition joint = parent;
         float at = 0;
         for (int i = 0; i < 3; i++) {
-            float width = 7 - i * 1.5F;
+            float width = 9 - i * 2.0F;
             float jx = i == 0 ? side * x : 0;
             float jy = i == 0 ? y : at;
             float jz = i == 0 ? z : 0;
@@ -138,11 +141,11 @@ public class EternityModel {
 
     /** The body (the starfield): the lap, the torso, the chest, shoulders and arms, the neck. */
     public void renderBody(PoseStack pose, VertexConsumer buffer, int light, int overlay) {
-        lap.render(pose, buffer, light, overlay);
-        torso.render(pose, buffer, light, overlay);
+        lap.render(pose, buffer, light, overlay, BODY_TINT);
+        torso.render(pose, buffer, light, overlay, BODY_TINT);
         helmet.visible = false;
         horns.visible = false;
-        upper.render(pose, buffer, light, overlay);
+        upper.render(pose, buffer, light, overlay, BODY_TINT);
         helmet.visible = true;
         horns.visible = true;
     }

@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#B57BFF",
+  "glow": "#FFE59A",
+  "look": {
+    "base": "love/love",
+    "slim": true
+  },
+  "powers": [
+    {
+      "id": "love.axe",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 4,
+      "option": "jet"
+    },
+    {
+      "id": "love.lightning",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "love.eye_laser",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "love.bifrost",
+      "strength": 3,
+      "option": "both"
+    },
+    {
+      "id": "love.body",
+      "strength": 5,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "love.axe",
+    "flight",
+    "love.lightning",
+    "love.eye_laser",
+    "love.bifrost"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "thor",
+    "run": "auto",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "enhanced:stormbreaker",
+    "hero": "love"
+  }
+}

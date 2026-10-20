@@ -195,7 +195,7 @@ public final class EternityRealm {
 
     // ---- the screen ----
 
-    /** Eternity speaks (a line on the screen and his voice) and the wish screen opens on the player's screen. */
+    /** Eternity speaks (his voice; his line is on the screen) and the wish screen opens on the player's screen. */
     public static void openScreen(ServerPlayer player) {
         if (!in(player)) {
             return;
@@ -206,7 +206,8 @@ public final class EternityRealm {
             return; // (a wish was granted: he is about to go home)
         }
         boolean may = Wishes.mayWish(player);
-        say(player, may ? "eternity.enhanced.line.welcome" : "message.enhanced.eternity.had_wish");
+        // (His line is the screen's own: only his voice is heard.)
+        voice(player);
         PacketDistributor.sendToPlayer(player, new EternityScreenPayload(may, may && Wishes.loveOffered(),
                 Wishes.locks(player)));
     }
@@ -217,9 +218,13 @@ public final class EternityRealm {
         player.connection.send(new ClientboundSetTitleTextPacket(Component.empty()));
         player.connection.send(new ClientboundSetSubtitleTextPacket(Component.translatable(key)
                 .withStyle(s -> s.withColor(0xE8E0FF).withItalic(true))));
-        ServerLevel level = player.serverLevel();
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ETERNITY_VOICE.get(),
-                SoundSource.NEUTRAL, 1.0F, 1.0F);
+        voice(player);
+    }
+
+    /** Eternity's deep, wordless voice. */
+    static void voice(ServerPlayer player) {
+        player.serverLevel().playSound(null, player.getX(), player.getY(), player.getZ(),
+                ModSounds.ETERNITY_VOICE.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
     }
 
     // ---- the wish ----

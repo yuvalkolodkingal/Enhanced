@@ -42,12 +42,12 @@ import java.util.function.BooleanSupplier;
  * The client of Eternity and Love (3.8): {@link #setup} registers the drawers of {@link EternityFxPayload} (the altar's
  * charge, the journey's white flash, the arrival, the wish's golden-white stars, the way home, Love's awakening, her
  * Thunder Strike's gesture), the wish screen's opener and Love's eye beams. In the realm: the white mist on the horizon
- * (fog from 48 to 200 blocks, never beyond what is drawn; client option {@code eternityFog}), and the realm's ambient
+ * (fog from 48 to 200 blocks; client option {@code eternityFog}), and the realm's ambient
  * pad and soft rings of light round the walkers' feet on the still water; by an altar, the shrine's hum.
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class EternityClient {
-    /** The mist: its colour and where it begins and ends. */
+    /** The mist: its colour, where it begins at the most (blocks) and where it ends at the most. */
     static final float MIST_R = 0.95F;
     static final float MIST_G = 0.96F;
     static final float MIST_B = 0.97F;
@@ -157,13 +157,14 @@ public final class EternityClient {
         if (!inRealm() || event.getType() != FogType.NONE || !EnhancedClientConfig.eternityFog()) {
             return;
         }
-        boolean sky = event.getMode() == FogRenderer.FogMode.FOG_SKY;
-        float drawn = event.getFarPlaneDistance();
-        float far = Math.min(MIST_FAR, Math.max(24.0F, drawn - 8.0F));
-        float near = Math.min(MIST_NEAR, far * 0.35F);
-        if (sky) {
+        if (event.getMode() == FogRenderer.FogMode.FOG_SKY) {
             return; // (the sky dome is drawn without fog: its horizon is the mist's colour already)
         }
+        // The far edge of the still water is lost in the mist just before the drawn distance ends (no line where the
+        // water stops); the mist begins late enough at short distances that Eternity, 72 blocks from the arrival,
+        // stands clear of it (it begins 20 blocks before its end up to a drawn distance of 100, then earlier, to 48).
+        float far = Mth.clamp(event.getFarPlaneDistance() - 4.0F, 64.0F, MIST_FAR);
+        float near = far <= 100.0F ? far - 20.0F : Math.max(MIST_NEAR, 80.0F - (far - 100.0F) * 0.32F);
         event.setNearPlaneDistance(near);
         event.setFarPlaneDistance(far);
         event.setCanceled(true);

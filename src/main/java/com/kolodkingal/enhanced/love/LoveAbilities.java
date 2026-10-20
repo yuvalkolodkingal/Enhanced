@@ -54,8 +54,8 @@ public final class LoveAbilities {
     private static final ResourceLocation BODY_KNOCKBACK = Enhanced.id("love_knockback");
     private static final ResourceLocation BODY_SAFE_FALL = Enhanced.id("love_safe_fall");
 
-    /** Her lightning's colours: Asgard's gold round a lilac core. */
-    public static final int LIGHTNING = 0xB57BFF;
+    /** Her lightning's colours: a deep lilac (the tint of Thor's beam; light enough that it stays lilac), and gold. */
+    public static final int LIGHTNING = 0x8A3FD8;
     public static final int LIGHTNING_GLOW = 0xFFE59A;
     /** Ticks between two throws (Thor's). */
     public static final int THROW_COOLDOWN = ThorAbilities.THROW_COOLDOWN;

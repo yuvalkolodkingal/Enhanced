@@ -24,7 +24,7 @@ public final class LoveEyeBeamFx {
     private static final Vec3 UP = new Vec3(0, 1, 0);
     /** The widths (blocks) of its fringe, body, light and core, and their alphas. */
     private static final float[] WIDTHS = {0.16F, 0.09F, 0.045F, 0.018F};
-    private static final float[] ALPHAS = {0.25F, 0.55F, 0.75F, 0.85F};
+    private static final float[] ALPHAS = {0.35F, 0.65F, 0.8F, 0.6F};
     /** Half the distance between her eyes (blocks), and how far in front of her face the beams start. */
     private static final double EYE_HALF = 0.07;
     private static final double AHEAD = 0.26;
@@ -59,7 +59,7 @@ public final class LoveEyeBeamFx {
                 beam(pose, vc, from, b, style, time, player.getId() * 31 + side, firstPerson ? 0.6F : 1.0F);
             }
             float flicker = 0.9F + 0.1F * Mth.sin(time * 2.7F + player.getId());
-            flare(pose, vc, b, 0.32F * flicker, style, b.subtract(a));
+            flare(pose, vc, b, 0.22F * flicker, style, b.subtract(a));
         }
     };
 

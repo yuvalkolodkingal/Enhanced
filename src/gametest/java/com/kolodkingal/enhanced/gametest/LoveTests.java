@@ -5,7 +5,9 @@ import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
+import com.kolodkingal.enhanced.custom.CustomHeroRules;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.custom.HeroPresets;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.love.EyeLaser;
 import com.kolodkingal.enhanced.love.LoveAbilities;
@@ -26,9 +28,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -198,6 +204,22 @@ public final class LoveTests {
         }
         check(HeroAbility.LOVE_THUNDER_STRIKE.isVariant() && HeroAbility.LOVE_BIFROST_LOOK.isVariant(),
                 "her two Sneak variants");
+        helper.succeed();
+    }
+
+    /** Her preset (for the integrator's {@code HeroPresets.HEROES}) passes the rules at 60 points, with no note. */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void herPresetFitsSixtyPoints(GameTestHelper helper) throws IOException {
+        Path file = ModList.get().getModFileById(Enhanced.MODID).getFile()
+                .findResource("assets", Enhanced.MODID, "hero_presets", "love.json");
+        String json = Files.readString(file);
+        HeroPresets.Preset preset = HeroPresets.read("love", json);
+        check(preset != null && preset.like() == Power.LOVE, "her preset reads as Love's");
+        CustomHeroRules.Result r = CustomHeroRules.sanitize(preset.hero(),
+                CustomHeroRules.Limits.DEFAULT.withBudget(HeroPresets.MAX_POINTS));
+        check(r.notes().isEmpty(), "no note: " + r.notes());
+        int cost = CustomHeroRules.cost(r.hero());
+        check(cost <= HeroPresets.MAX_POINTS, "at most 60 points: " + cost);
         helper.succeed();
     }
 

@@ -64,6 +64,8 @@ public class WishScreen extends Screen {
     private int scroll;
     private ItemStack selected = ItemStack.EMPTY;
     private EditBox box;
+    /** The search box takes the keys on the next tick (the click that opened the picker keeps the focus till then). */
+    private boolean focusBox;
     private Button wishButton;
     // The grid's layout.
     private int gridX;
@@ -156,6 +158,7 @@ public class WishScreen extends Screen {
         });
         addRenderableWidget(box);
         setInitialFocus(box);
+        focusBox = true;
         int bottom = height - 26;
         int cx = width / 2;
         addRenderableWidget(Button.builder(Component.translatable("screen.enhanced.wish.back"), b -> show(Mode.CHOOSE))
@@ -416,6 +419,11 @@ public class WishScreen extends Screen {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null || !player.isAlive()) {
             onClose();
+            return;
+        }
+        if (focusBox && mode == Mode.PICKER && box != null) {
+            focusBox = false;
+            setFocused(box);
         }
     }
 

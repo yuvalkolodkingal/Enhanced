@@ -15,8 +15,9 @@ public final class AvengersBeams {
             "beam.enhanced.hulkbuster_unibeam", 0xFFFFFF, 0xE8FBFF, 0xA8E8FF, 0x58B8E8, 0x2468A0, false));
     public static final BeamStyle DRONE_LASER = BeamStyles.register(new BeamStyle("drone_laser",
             "beam.enhanced.drone_laser", 0xFFFFFF, 0xFFE8B0, 0xFFB040, 0xD8323C, 0x8C1418, false));
+    // (Lane L8: a violet beam with a lilac core, not white: it must read as purple against a bright sky.)
     public static final BeamStyle LOVE_EYES = BeamStyles.register(new BeamStyle("love_eyes", "beam.enhanced.love_eyes",
-            0xFFFFFF, 0xF0D8FF, 0xC08CFF, 0x9A5CE8, 0x5A2A9C, false));
+            0xF2E2FF, 0xD7A6FF, 0xB062F2, 0x8A3FD8, 0x4C1C8E, false));
     public static final BeamStyle FLAMETHROWER = BeamStyles.register(new BeamStyle("flamethrower",
             "beam.enhanced.flamethrower", 0xFFF8D0, 0xFFE070, 0xFFA030, 0xE85A10, 0x8C2A08, false));
 
