@@ -141,14 +141,17 @@ public final class FlightProfile {
             pose(22, 0, 8, 22, 0, -8, 4, 1, 4, -1),
             pose(18, 0, 4, 18, 0, -4, 2, 1, 2, -1)});
     // ===== falcon (3.8) =====
-    /** Falcon (3.8): Thor's numbers until lane L5 tunes them (arms slightly out with the wings, body forward). */
+    /**
+     * Falcon (3.8): the wings carry him, so the body leans well into the flight and banks wide like a bird; the arms
+     * hang a little out from his sides hovering and lie back along the wings flying; a light bob in the hover.
+     */
     private static final FlightProfile FALCON = new FlightProfile(
-            new float[]{72, 88, -6}, 0.35F, 40, 25, 5.0F, 8, 3.5F, true, new float[]{0.42F, 0.56F}, new float[]{0.04F,
-                    60}, 2.3F, 6.0F, 1.5F, 0.0F,
-            false, 0.11F, true, new float[][]{
-            pose(158, 0, 0, -8, 0, -30, 0, 2, 0, -2),
-            pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),
-            pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
+            new float[]{48, 74, -8}, 0.40F, 22, 24, 4.0F, 10, 4, false, new float[]{5.0F, 5.0F}, new float[]{0.05F,
+                    70}, 2.5F, 2.0F, 2.0F, 0.0F,
+            false, 0.10F, false, new float[][]{
+            pose(-8, 0, 22, -8, 0, -22, 4, 2, 4, -2),
+            pose(14, 0, 28, 14, 0, -28, 8, 2, 8, -2),
+            pose(20, 0, 24, 20, 0, -24, 10, 2, 10, -2)});
     // ===== love (3.8) =====
     /** Love (3.8): Thor's, as she flies by her axe (lane L8 tunes them for her height). */
     private static final FlightProfile LOVE = new FlightProfile(

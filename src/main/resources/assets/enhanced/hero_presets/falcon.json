@@ -1,0 +1,68 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#8A8F98",
+  "glow": "#E0313A",
+  "look": {
+    "base": "falcon/endgame",
+    "slim": false
+  },
+  "powers": [
+    {
+      "id": "falcon.blasters",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 5,
+      "option": "wings"
+    },
+    {
+      "id": "falcon.dive",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "falcon.wing_shield",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "falcon.redwing",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "falcon.body",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "falcon.blasters",
+    "flight",
+    "falcon.dive",
+    "falcon.wing_shield",
+    "falcon.redwing"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "auto",
+    "run": "falcon",
+    "speedRun": "auto",
+    "idle": "ready"
+  },
+  "preset": {
+    "icon": "minecraft:elytra",
+    "hero": "falcon"
+  }
+}

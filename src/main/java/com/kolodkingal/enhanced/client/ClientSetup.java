@@ -163,6 +163,8 @@ public final class ClientSetup {
             // ===== suit_art (3.8) =====
             com.kolodkingal.enhanced.client.ironman.suits.SuitArt.register();
             // ===== falcon (3.8) =====
+            // (Falcon's effects, his gestures' payloads, and Redwing's marks glowing for him.)
+            com.kolodkingal.enhanced.client.falcon.FalconEffects.setup();
             // ===== tower (3.8) =====
             com.kolodkingal.enhanced.client.tower.TowerClient.setup();
             // ===== eternity (3.8) =====
@@ -309,10 +311,13 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.HULKBUSTER_FRAME.get(),
                 com.kolodkingal.enhanced.client.ironman.suits.HulkbusterFrameRenderer::new);
         // ===== falcon (3.8) =====
-        event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(), NoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.FALCON_DART.get(), NoopRenderer::new);
+        // (The Wrist Rocket is one of Iron Man's missiles, of the kind FALCON: lane L3's renderer draws it.)
+        event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(),
+                com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
+        event.registerEntityRenderer(ModEntities.FALCON_DART.get(),
+                com.kolodkingal.enhanced.client.falcon.FalconDartRenderer::new);
         event.registerEntityRenderer(ModEntities.REDWING.get(),
-                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xD8323C));
+                com.kolodkingal.enhanced.client.falcon.RedwingRenderer::new);
         // ===== tower (3.8) =====
         // (the suit display's stand-in: client/tower/TowerClient, registered first so lane L7's renderer replaces it)
         event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TECH_CASE.get(),
@@ -418,6 +423,10 @@ public final class ClientSetup {
         // ===== suit_art (3.8) =====
         com.kolodkingal.enhanced.client.ironman.suits.SuitArt.registerLayers(event);
         // ===== falcon (3.8) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER,
+                com.kolodkingal.enhanced.client.falcon.FalconWingsModel::createLayer);
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.RedwingModel.LAYER,
+                com.kolodkingal.enhanced.client.falcon.RedwingModel::createLayer);
         // ===== eternity (3.8) =====
         // ===== love (3.8) =====
     }
@@ -498,7 +507,8 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.ironman.suits.SuitArt.bake(event.getEntityModels());
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.suits.SuitExtrasLayer(renderer));
                 // ===== falcon (3.8) =====
-                renderer.addLayer(new com.kolodkingal.enhanced.client.falcon.FalconWingsLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.falcon.FalconWingsLayer(renderer,
+                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER)));
                 // ===== love (3.8) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,

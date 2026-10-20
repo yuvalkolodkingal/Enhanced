@@ -202,7 +202,8 @@ public final class GestureRoutes {
             // ===== red_hulk (3.8) =====
             case ROSS_FORM -> power == Power.RED_HULK ? PENDING_GESTURE : null;
             // ===== falcon (3.8) =====
-            case REDWING_OUT -> power == Power.FALCON ? PENDING_GESTURE : null;
+            // (Redwing out of the pack: the flick of the hand that launches it; home again, nothing.)
+            case REDWING_OUT -> power == Power.FALCON && on ? GestureId.FALCON_REDWING_LAUNCH : null;
         };
     }
 
@@ -510,7 +511,19 @@ public final class GestureRoutes {
                     + " moves, which name him (IronManGestures.gestureOf; the nanotech suits' and the Hulkbuster's:"
                     + " lane L4)";
             // ===== falcon (3.8) =====
-            case FALCON -> ability == 2 ? "flight" : "none: Falcon's keys are acted by his plug-in (lane L5 of 3.8)";
+            // (R's darts and rocket, V's Dive and Boost Climb, Sneak + B's Wing Slash and Sneak + N's Redwing Strike
+            // are told by the payloads of their effects, which name him (or his Redwing); B held is the Wing Shield's
+            // stance (its effect plays the crossing); N is toggle:REDWING_OUT.)
+            case FALCON -> switch (ability) {
+                case 1 -> "none: the darts and the Wrist Rocket are told by the payloads of their shots, which name him"
+                        + " (FalconGestures.gestureOf)";
+                case 2 -> "flight";
+                case 3 -> "none: the Dive and the Boost Climb are told by the payloads of their starts, which name him;"
+                        + " in the Dive the stance FALCON_DIVING holds him";
+                case 4 -> "none: the Wing Shield is a stance (FALCON_SHIELDING) whose effect plays FALCON_SHIELD; the"
+                        + " Wing Slash is told by its payload";
+                default -> "toggle:REDWING_OUT";
+            };
             // ===== love (3.8) =====
             case LOVE -> ability == 2 ? "flight" : "none: Love's keys are acted by her plug-in (lane L8 of 3.8)";
             default -> "none: no abilities";
@@ -619,7 +632,12 @@ public final class GestureRoutes {
                     + " HULKBUSTER_GRAB, NANO_CANNON) while it lasts; the slashes, punches and throws swing the arms by"
                     + " the game's own swing (NanoActing)";
             // ===== falcon (3.8) =====
-            case FALCON_DIVING, FALCON_WING_SHIELD, FALCON_GLIDING -> "pending: Falcon's lane (L5 of 3.8) acts it";
+            case FALCON_DIVING -> "a stance (FALCON_DIVING): tipped head first, the arms tight along him; the effect"
+                    + " DIVE_START plays FALCON_DIVE and the hit FALCON_DIVE_HIT";
+            case FALCON_WING_SHIELD -> "a stance (FALCON_SHIELDING): the forearms crossed behind the wings; the effect"
+                    + " SHIELD_ON plays FALCON_SHIELD";
+            case FALCON_GLIDING -> "vanilla's fall-flying turns the body; the stance FALCON_GLIDE holds the arms out"
+                    + " along the wings, which the wings' layer lays flat";
         };
     }
 

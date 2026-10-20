@@ -546,6 +546,29 @@ public enum GestureId {
     // ===== nanotech (3.8) =====
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
+    // (Falcon's, lane L5: started by the payloads of his moves, which name him: FalconClient.startedElsewhere.)
+    // (Lane L5. Each starts with a comma, so the regions of 3.8 join in any order.)
+    ,
+    /** A dart from the left wrist (R): the off arm up along the look, a small kick. */
+    FALCON_BLAST_L(Group.CAST, 8, 1, 3, false),
+    /** A dart from the right wrist, 3 ticks later. */
+    FALCON_BLAST_R(Group.CAST, 8, 1, 3, false),
+    /** The Wrist Rocket (Sneak + R): the right arm out along the look, braced by the left hand, a heavier kick. */
+    FALCON_ROCKET(Group.CAST, 14, 2, 4, true),
+    /** The Dive (V): the arms tight along his sides, the head first, the legs together. */
+    FALCON_DIVE(Group.CAST, 12, 3, 4, true),
+    /** The Dive's hit: both fists forward into the blow, then out of it. */
+    FALCON_DIVE_HIT(Group.CAST, 12, 1, 5, true),
+    /** The Boost Climb (Sneak + V): the arms down and back along him, the head up, the knees together. */
+    FALCON_CLIMB(Group.CAST, 20, 2, 5, true),
+    /** The Wing Shield goes up (B held): the arms crossed before the chest as the wings wrap round. */
+    FALCON_SHIELD(Group.CAST, 6, 2, 2, true),
+    /** The Wing Slash (Sneak + B): one whole spin with the arms out wide. */
+    FALCON_SLASH(Group.CAST, 12, 1, 3, true),
+    /** Redwing launches (N): a flick of the right hand up over the shoulder. */
+    FALCON_REDWING_LAUNCH(Group.CAST, 10, 1, 4, true),
+    /** Redwing Strike (Sneak + N): the right arm points at the foe. */
+    FALCON_REDWING_POINT(Group.CAST, 16, 2, 5, true)
     // ===== love (3.8) =====
     // (3.8: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
     // AnimationMathTests wants keys for every gesture.)

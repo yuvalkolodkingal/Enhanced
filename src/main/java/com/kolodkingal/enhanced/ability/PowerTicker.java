@@ -66,9 +66,10 @@ public final class PowerTicker {
 
         Abilities abilities = player.getAbilities();
         boolean survivalLike = !player.isCreative() && !player.isSpectator();
-        // (3.8: Iron Man's speed is his suit's.)
+        // (3.8: Iron Man's speed is his suit's; Falcon's is 0 behind his Wing Shield: he hovers still.)
         float speed = !survivalLike || !canFly ? 0.05F : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
+                : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
                 : power.flightSpeed();
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
