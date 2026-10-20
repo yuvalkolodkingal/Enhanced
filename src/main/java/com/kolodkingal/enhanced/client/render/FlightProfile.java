@@ -128,15 +128,18 @@ public final class FlightProfile {
      */
     // ===== iron_man (3.8) =====
     /**
-     * Iron Man (3.8): Thor's numbers until lane L3 tunes them (palms down and back hovering, arms along him flying).
+     * Iron Man (3.8, lane L3): a thruster flier. Hovering he stands upright on his boots' jets, the arms down and a
+     * little out, the palms down and back steadying him (a slow, small bob); flying he tips nearly flat like a missile,
+     * the arms along his body and the palms back; a sprint flattens him all the way. Stops are firm (a suit's mass:
+     * the spring of Thor's, a little stiffer), turns banked.
      */
     private static final FlightProfile IRON_MAN = new FlightProfile(
-            new float[]{72, 88, -6}, 0.35F, 40, 25, 5.0F, 8, 3.5F, true, new float[]{0.42F, 0.56F}, new float[]{0.04F,
-                    60}, 2.3F, 6.0F, 1.5F, 0.0F,
-            false, 0.11F, true, new float[][]{
-            pose(158, 0, 0, -8, 0, -30, 0, 2, 0, -2),
-            pose(100, 0, 0, 12, 0, -8, 8, 2, 8, -2),
-            pose(96, 0, 0, 20, 0, -4, 10, 2, 10, -2)});
+            new float[]{70, 86, -8}, 0.35F, 30, 22, 4.5F, 8, 3.5F, true, new float[]{0.48F, 0.62F}, new float[]{0.03F,
+                    70}, 1.5F, 2.0F, 1.0F, 0.0F,
+            false, 0.10F, false, new float[][]{
+            pose(14, 0, 16, 14, 0, -16, 0, 3, 0, -3),
+            pose(22, 0, 8, 22, 0, -8, 4, 1, 4, -1),
+            pose(18, 0, 4, 18, 0, -4, 2, 1, 2, -1)});
     // ===== falcon (3.8) =====
     /** Falcon (3.8): Thor's numbers until lane L5 tunes them (arms slightly out with the wings, body forward). */
     private static final FlightProfile FALCON = new FlightProfile(

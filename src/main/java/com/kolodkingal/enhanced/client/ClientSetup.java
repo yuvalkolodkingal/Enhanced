@@ -149,6 +149,8 @@ public final class ClientSetup {
             // ===== captain (3.8) =====
             // ===== red_hulk (3.8) =====
             // ===== iron_man (3.8) =====
+            // The classic suits' and the suit-up's effects, the Unibeam's beam from the chest.
+            com.kolodkingal.enhanced.client.ironman.IronClientFx.setup();
             // ===== nanotech (3.8) =====
             // ===== suit_art (3.8) =====
             // ===== falcon (3.8) =====
@@ -283,7 +285,8 @@ public final class ClientSetup {
         // ===== captain (3.8) =====
         event.registerEntityRenderer(ModEntities.THROWN_SHIELD.get(), NoopRenderer::new);
         // ===== iron_man (3.8) =====
-        event.registerEntityRenderer(ModEntities.IRON_MISSILE.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.IRON_MISSILE.get(),
+                com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
         // ===== nanotech (3.8) =====
         event.registerEntityRenderer(ModEntities.NANO_DRONE.get(),
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
@@ -564,6 +567,9 @@ public final class ClientSetup {
         // ===== captain (3.8) =====
         // ===== red_hulk (3.8) =====
         // ===== iron_man (3.8) =====
+        // 3.8, lane L3: the suit's panel (name, energy, durability), the helmet frame and the faceplate.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("iron_man"),
+                new com.kolodkingal.enhanced.client.ironman.IronHud());
         // ===== nanotech (3.8) =====
         // ===== falcon (3.8) =====
         // ===== tower (3.8) =====

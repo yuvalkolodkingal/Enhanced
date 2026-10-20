@@ -476,6 +476,42 @@ public enum GestureId {
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
+    // (Lane L3. Each starts with a comma, so the regions of 3.8 join in any order.)
+    ,
+    /** A suit goes on: the arms a little out from the body, the chin up (the suit assembles round him). */
+    IRON_SUIT_UP(Group.CAST, 20, 3, 6, true),
+    /** A suit comes off: the arms out, then down; the head bows as the helmet opens. */
+    IRON_SUIT_DOWN(Group.CAST, 16, 2, 6, true),
+    /** The Hulkbuster's frame: a step forward into it, the arms reaching into its sleeves. */
+    IRON_STEP_IN(Group.CAST, 24, 3, 8, true),
+    /** A repulsor from the right palm: the arm thrown up along the look, the palm out, the kick of the blast. */
+    IRON_REPULSOR_R(Group.CAST, 10, 1, 4, true),
+    /** A repulsor from the left palm. */
+    IRON_REPULSOR_L(Group.CAST, 10, 1, 4, true),
+    /** The Double-Hand Blast: both palms out along the look together. */
+    IRON_DOUBLE_BLAST(Group.CAST, 14, 2, 5, true),
+    /** The Unibeam: the chest thrust out, the arms swept back. */
+    IRON_UNIBEAM(Group.CAST, 16, 3, 6, true),
+    /** The Flares: the arms a little out and down, the hips' pods firing behind. */
+    IRON_FLARES(Group.CAST, 14, 2, 5, true),
+    /** The shoulder Mini-Missiles: the shoulders up as the pods open. */
+    IRON_MISSILES(Group.CAST, 14, 2, 5, true),
+    /** The Mark 1's Flamethrower: both forearms thrust forward. */
+    IRON_FLAME(Group.CAST, 12, 2, 4, true),
+    /** The Mark 1's Rocket Boost: the arms straight down at the sides, the body stiff as a rocket. */
+    IRON_BOOST(Group.CAST, 20, 2, 6, true),
+    /** The Mark 1's crash landing: down hard on one knee, a hand to the ground. */
+    IRON_CRASH_LAND(Group.LAND, 26, 2, 9, true),
+    /** The Mark 1's Arm Rocket: the left forearm up along the look. */
+    IRON_ARM_ROCKET(Group.CAST, 12, 1, 4, true),
+    /** The Mark 1's Brace: the arms crossed before the chest, the feet planted. */
+    IRON_BRACE(Group.CAST, 10, 2, 4, true),
+    /** The Mark 1's Heavy Punch: a slow, crushing right hook. */
+    IRON_HEAVY_PUNCH(Group.CAST, 14, 1, 5, true),
+    /** The Mark 5's Dash Punch: the fist thrown forward, the body leaning into the thrust. */
+    IRON_DASH_PUNCH(Group.CAST, 12, 1, 5, true),
+    /** The Mark 5's Laser Burst: the arms flung out to the sides, a full turn. */
+    IRON_LASER_BURST(Group.CAST, 20, 2, 6, true)
     // ===== nanotech (3.8) =====
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
