@@ -569,7 +569,13 @@ public final class DeadpoolTests {
         }, wade);
     }
 
-    /** Dogpool follows Deadpool across the arena. */
+    /**
+     * Dogpool follows Deadpool across the arena: from 20 blocks off he is back by his side, where the wolf's own follow
+     * goal puts him. That goal jumps a pet 12 or more blocks off to a free spot 2-3 blocks from its owner's block on
+     * either axis (and 1 up or down at most), so a corner of that ring is 3 * sqrt(2) = 4.24 blocks away; from there,
+     * nearer than 10 blocks, a tame wolf does not come closer by himself. (A plain "within 4 blocks" failed about one
+     * run in twenty: the corners.)
+     */
     @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void dogpoolFollows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
@@ -579,7 +585,10 @@ public final class DeadpoolTests {
         check(dog != null, "out");
         Vec3 to = helper.absoluteVec(new Vec3(17.5, FLOOR, 17.5));
         wade.teleportTo(to.x, to.y, to.z);
-        until(helper, 160, () -> dog.distanceTo(wade) < 4.0F, helper::succeed, wade);
+        check(dog.distanceTo(wade) > 12.0F, "far from him first: " + dog.distanceTo(wade));
+        until(helper, 160, () -> Math.abs(dog.getBlockX() - wade.getBlockX()) <= 3
+                && Math.abs(dog.getBlockZ() - wade.getBlockZ()) <= 3
+                && Math.abs(dog.getBlockY() - wade.getBlockY()) <= 1, helper::succeed, wade);
     }
 
     /** Dogpool never bites a player while PvP is off. */
