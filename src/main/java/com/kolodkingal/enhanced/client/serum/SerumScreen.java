@@ -30,11 +30,11 @@ import java.util.List;
 /**
  * The Super Soldier Serum's choice (3.8, PLAN 2.1): a dark-blue panel, "Super Soldier Serum", and three tall cards side
  * by side, Captain America, Red Hulk and Falcon, each with the hero standing in his look (the Hero Creator's {@link
- * PreviewPuppet}, turning a little) on a backdrop of his colours, his name, one line, and a Choose button. Falcon's card
- * is grey with a padlock while he does not carry the Exo-Wings ("Needs the Falcon Exo-Wings..."). Keys 1, 2, 3 pick a
- * card and Enter takes it; Escape or Cancel closes and sends nothing (the serum is kept). The server checks the answer
- * again. The layout shrinks to fit any GUI scale (1-4); in Hebrew the text reads right to left and the cards keep their
- * order.
+ * PreviewPuppet}, turning a little) on a backdrop of his colours, his name, one line, and a Choose button. Falcon's
+ * card is grey with a padlock while he does not carry the Exo-Wings ("Needs the Falcon Exo-Wings..."). Keys 1, 2, 3
+ * pick a card and Enter takes it; Escape or Cancel closes and sends nothing (the serum is kept). The server checks the
+ * answer again. The layout shrinks to fit any GUI scale (1-4); in Hebrew the text reads right to left and the cards
+ * keep their order.
  */
 public class SerumScreen extends Screen {
     /** The serum's heroes, in the order of their cards. */

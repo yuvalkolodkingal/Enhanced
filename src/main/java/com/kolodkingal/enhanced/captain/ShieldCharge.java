@@ -33,9 +33,9 @@ import java.util.UUID;
 /**
  * V: the Shield Charge, and with Sneak the Shield Bash (3.8, PLAN 3.4). The charge carries him {@code chargeDistance}
  * blocks in {@link #CHARGE_TICKS} ticks behind his raised shield (it blocks from the front all the way, {@link
- * ShieldRules#guarding}); the first creatures in his path are struck and thrown; a wall stops him, unhurt. The bash is a
- * point-blank blow of the shield that stuns ({@code bashStunTicks}: Slowness IV, and no jump); a boss takes the damage
- * only.
+ * ShieldRules#guarding}); the first creatures in his path are struck and thrown; a wall stops him, unhurt. The bash is
+ * a point-blank blow of the shield that stuns ({@code bashStunTicks}: Slowness IV, and no jump); a boss takes the
+ * damage only.
  */
 public final class ShieldCharge {
     /** The charge's length in ticks (its distance is the config's). */

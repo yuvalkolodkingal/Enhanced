@@ -15,9 +15,9 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.Items;
 
 /**
- * The Vibranium Shield on Captain America's back (3.8, PLAN 3.3) when he carries it but does not hold it (and none is in
- * flight): the synced {@link CaptainState#BACK} flag says so for everyone who sees him (the client knows only its own
- * player's inventory). Its face out, between his shoulder blades; an elytra or a cape hides it.
+ * The Vibranium Shield on Captain America's back (3.8, PLAN 3.3) when he carries it but does not hold it (and none is
+ * in flight): the synced {@link CaptainState#BACK} flag says so for everyone who sees him (the client knows only its
+ * own player's inventory). Its face out, between his shoulder blades; an elytra or a cape hides it.
  */
 public class CapShieldLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     /** Its size on the back, and how high on it its centre sits (pixels below the neck). */

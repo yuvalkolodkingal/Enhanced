@@ -59,8 +59,8 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /**
- * Captain America and the Vibranium Shield (3.8, lane L1, PLAN 3): his body (Speed II, Strength II, health, jump,
- * fall; worthy of Mjolnir), Resistance I (a zombie's blow cut by 20 %), the shield (a creeper's explosion from the front
+ * Captain America and the Vibranium Shield (3.8, lane L1, PLAN 3): his body (Speed II, Strength II, health, jump, fall;
+ * worthy of Mjolnir), Resistance I (a zombie's blow cut by 20 %), the shield (a creeper's explosion from the front
  * blocked whole for him, not for a powerless holder who has just raised it, never from behind; an axe never disables
  * it; an arrow from the front bounces back), the throw (8 to a husk, back to the off hand; a full hand: the inventory;
  * the thrower gone: it drops), the ricochet (three husks, 8, 7, 6), the slam (6 within 4), the charge (8 blocks; a wall

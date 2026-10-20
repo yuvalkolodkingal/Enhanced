@@ -42,8 +42,8 @@ import java.util.Optional;
  * Captain America's thrown shield (3.8, PLAN 3.4): it flies along his look, strikes the first creature in its path (or
  * a wall, or the end of its range) and turns home, flying straight back through walls to the hand it left (Mjolnir's
  * rule: the flight home mirrors {@code ThrownWeaponEntity}'s). Thrown to ricochet, each hit sends it on to the nearest
- * other foe within {@code ricochetRadius} the hit can see, up to {@code ricochets} times, a little weaker each time; off
- * a wall it bounces once more toward a foe near the wall. If he is gone (dead, logged out, in another dimension, no
+ * other foe within {@code ricochetRadius} the hit can see, up to {@code ricochets} times, a little weaker each time;
+ * off a wall it bounces once more toward a foe near the wall. If he is gone (dead, logged out, in another dimension, no
  * longer one who throws it) it drops where it is, like any shield nobody holds.
  */
 public class ThrownShieldEntity extends Projectile {

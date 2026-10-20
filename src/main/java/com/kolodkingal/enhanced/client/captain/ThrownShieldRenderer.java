@@ -13,9 +13,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * The thrown shield in flight (3.8, PLAN 3.4): the disc lying almost flat, its face up and leaning into its way, spinning
- * fast round its own axis (a turn every {@link #TURN_TICKS} ticks, interpolated with the frame's partial tick), as the
- * MCU's shield flies. A plain shield a custom hero threw is drawn as the item it is.
+ * The thrown shield in flight (3.8, PLAN 3.4): the disc lying almost flat, its face up and leaning into its way,
+ * spinning fast round its own axis (a turn every {@link #TURN_TICKS} ticks, interpolated with the frame's partial
+ * tick), as the MCU's shield flies. A plain shield a custom hero threw is drawn as the item it is.
  */
 public class ThrownShieldRenderer extends EntityRenderer<ThrownShieldEntity> {
     /** Ticks for a whole turn of the spin. */

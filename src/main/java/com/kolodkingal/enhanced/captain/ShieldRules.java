@@ -17,11 +17,12 @@ import net.neoforged.neoforge.common.ItemAbilities;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The rules of the Vibranium Shield (3.8, PLAN 3.3): who it serves as Captain America's, when it is up, and what lies in
- * front of it. Anyone may block with it as with any shield; for Captain America ({@link #isCap}: the hero, or a custom
- * hero with his Shield Throw) it is up the moment he raises it (no 5-tick delay), covers everything from the front
- * {@code capBlockAngle} degrees (explosions and beams too, never the void or a {@code /kill}), bounces projectiles
- * back and is never disabled by an axe ({@link CaptainEvents}). Both sides (the client's guard stance asks it too).
+ * The rules of the Vibranium Shield (3.8, PLAN 3.3): who it serves as Captain America's, when it is up, and what lies
+ * in front of it. Anyone may block with it as with any shield; for Captain America ({@link #isCap}: the hero, or a
+ * custom hero with his Shield Throw) it is up the moment he raises it (no 5-tick delay), covers everything from the
+ * front {@code capBlockAngle} degrees (explosions and beams too, never the void or a {@code /kill}), bounces
+ * projectiles back and is never disabled by an axe ({@link CaptainEvents}). Both sides (the client's guard stance asks
+ * it too).
  */
 public final class ShieldRules {
     /** Whether the stack is the Vibranium Shield. */

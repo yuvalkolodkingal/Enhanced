@@ -17,9 +17,9 @@ import net.minecraft.util.Mth;
 /**
  * The Vibranium Shield's model (3.8, PLAN 3.3): a round, slightly convex disc 14 pixels across, its front painted with
  * the red, silver and red rings round the blue centre and its white star, its back brushed vibranium, a red rim; behind
- * it a leather pad and the grip the hand holds. The disc is our own mesh (a dome of quads, drawn by {@link #renderDisc}:
- * boxes cannot make a circle); the pad and the grip are the parts of a layer definition ({@link #LAYER}). Our own
- * drawing ({@code textures/entity/captain/shield.png}, by {@code SCRATCH/v38/art/l1/gen_captain.py}).
+ * it a leather pad and the grip the hand holds. The disc is our own mesh (a dome of quads, drawn by {@link
+ * #renderDisc}: boxes cannot make a circle); the pad and the grip are the parts of a layer definition ({@link #LAYER}).
+ * Our own drawing ({@code textures/entity/captain/shield.png}, by {@code SCRATCH/v38/art/l1/gen_captain.py}).
  *
  * <p>Its frame is vanilla's shield's (so the item's display transforms are vanilla's): the centre of the disc at the
  * origin, its face toward -z (+z once the item renderer has flipped it), the grip along +z, pixels as units.

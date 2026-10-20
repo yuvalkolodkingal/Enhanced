@@ -207,7 +207,9 @@ public final class CaptainAbilities {
 
     // ---- the body ----
 
-    /** Whether the player has Captain America's body right now (the hero, or a custom hero with {@code captain.body}). */
+    /**
+     * Whether the player has Captain America's body right now (the hero, or a custom hero with {@code captain.body}).
+     */
     public static boolean hasBody(PowerData data) {
         return data.has(HeroAbility.CAPTAIN_BODY);
     }

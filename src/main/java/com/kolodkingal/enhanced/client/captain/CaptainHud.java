@@ -26,14 +26,17 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Captain America's HUD (3.8, PLAN 3.6): his lines on the powers' panel ({@link #status}, for {@code
  * CaptainClient.hudStatus}): R the shield (in hand, flying with its ricochets left, on his back, or none) and the
- * throw's cooldown; G the slam in the air; V the charge; B Assemble's seconds while the rally lasts; N the combo's step.
- * And under the panel (this layer) the super-soldier's line with a little shield: "Super-soldier: Speed II · Strength
- * II · Resistance I".
+ * throw's cooldown; G the slam in the air; V the charge; B Assemble's seconds while the rally lasts; N the combo's
+ * step. And under the panel (this layer) the super-soldier's line with a little shield: "Super-soldier: Speed II ·
+ * Strength II · Resistance I".
  */
 public final class CaptainHud implements LayeredDraw.Layer {
     /** How long after a blow of the combo its step stays on the HUD (the combo's reset). */
     static final int COMBO_SHOWN = 30;
-    /** The little shield of the line, 7 x 7: red ({@code r}), silver ({@code s}), blue ({@code b}), the star ({@code w}). */
+    /**
+     * The little shield of the line, 7 x 7: red ({@code r}), silver ({@code s}), blue ({@code b}), the star ({@code
+     * w}).
+     */
     private static final String[] ICON = {
             "..rrr..",
             ".rsssr.",
