@@ -1,3 +1,6 @@
 {
-  "parent": "enhanced:block/tech_case"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "enhanced:item/tech_case"
+  }
 }

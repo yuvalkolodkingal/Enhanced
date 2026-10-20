@@ -1,3 +1,6 @@
 {
-  "parent": "enhanced:block/suit_display"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "enhanced:item/suit_display"
+  }
 }
