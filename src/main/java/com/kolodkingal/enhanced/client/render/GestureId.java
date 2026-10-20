@@ -480,6 +480,20 @@ public enum GestureId {
     // ===== suit_art (3.8) =====
     // ===== falcon (3.8) =====
     // ===== love (3.8) =====
+    // (Lane L8. The leading comma: the constant before the 3.8 regions ends without one. Her throw is the cooldown of
+    // R, her lightning and her eyes her states (LoveClient); the catch and the strike are started by her client when
+    // the axe comes home and by the strike's payload.)
+    ,
+    /** The Axe Throw (R): Stormbreaker hauled back over the shoulder, then whipped forward along the look. */
+    LOVE_THROW(Group.CAST, 12, 1, 6, true),
+    /** The axe slaps back into her hand: the arm reaches and absorbs it. */
+    LOVE_CATCH(Group.CAST, 12, 1, 5, true),
+    /** The Thunder Strike (Sneak + R): the axe raised high to the sky, then brought down. */
+    LOVE_STRIKE(Group.CAST, 16, 2, 6, true),
+    /** Her lightning leaves the hand: the arm kicks up, then points down the look (the hold is LoveClient's). */
+    LOVE_LIGHTNING(Group.CAST, 8, 1, 5, true),
+    /** The Eye Laser lights: the chin thrust forward, the fists pulled down to her sides. */
+    LOVE_EYE_LASER(Group.CAST, 10, 1, 5, false)
     // (3.8: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
     // AnimationMathTests wants keys for every gesture.)
     ;
