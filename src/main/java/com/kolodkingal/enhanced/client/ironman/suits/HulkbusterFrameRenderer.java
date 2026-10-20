@@ -12,16 +12,13 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Method;
 
 /**
  * The Hulkbuster's frame that Veronica drops (3.8, PLAN 6.4, 7.2; Age of Ultron): the empty suit at human height,
  * falling with its thrusters burning under the boots and the back, then opening its front shells (the chest's two
  * doors, the forearms' and shins' guards, the faceplate), the arms out, for Iron Man to step in, and closing round him.
- * How open it is comes from {@link #OPENNESS} (by default {@link SuitTimelines#frameOpen} of its age; the Hulkbuster
- * lane may drive it from the entity's synced state). Its eyes stay dark until he is in.
+ * How open it is comes from {@link #OPENNESS} (the entity's synced stages). Its eyes stay dark until he is in.
  */
 public class HulkbusterFrameRenderer extends EntityRenderer<HulkbusterFrameEntity> {
     private static final ResourceLocation TEXTURE = Enhanced.id("textures/entity/iron_man/hulkbuster.png");
@@ -33,17 +30,14 @@ public class HulkbusterFrameRenderer extends EntityRenderer<HulkbusterFrameEntit
     }
 
     /**
-     * How open a frame is: the entity's own {@code openness(partialTick)} (the Hulkbuster lane's synced stages: falls,
-     * opening, closing, assembling, lifting) when it has one, else from its age ({@link SuitTimelines#frameOpen}).
+     * How open a frame is: the entity's own {@link HulkbusterFrameEntity#openness} (the Hulkbuster lane's synced stages:
+     * falls, opening, closing, assembling, lifting).
      */
     public static Openness OPENNESS = HulkbusterFrameRenderer::openness;
     /** Whether its thrusters burn (while it moves: falling from the sky or lifting away). */
     public static Openness THRUST = (frame, partialTick) -> Math.abs(frame.getY() - frame.yo) > 0.01
             || frame.tickCount < SuitTimelines.FRAME_FALL && !frame.onGround() ? 1.0F : 0.0F;
 
-    @Nullable
-    private static Method opennessMethod;
-    private static boolean looked;
     private final HulkbusterModel<LivingEntity> model;
 
     public HulkbusterFrameRenderer(EntityRendererProvider.Context context) {
@@ -87,23 +81,7 @@ public class HulkbusterFrameRenderer extends EntityRenderer<HulkbusterFrameEntit
     }
 
     private static float openness(HulkbusterFrameEntity frame, float partialTick) {
-        if (!looked) {
-            looked = true;
-            try {
-                Method m = frame.getClass().getMethod("openness", float.class);
-                opennessMethod = m.getReturnType() == float.class ? m : null;
-            } catch (NoSuchMethodException ignored) {
-                opennessMethod = null;
-            }
-        }
-        if (opennessMethod != null) {
-            try {
-                return (float) opennessMethod.invoke(frame, partialTick);
-            } catch (ReflectiveOperationException e) {
-                opennessMethod = null;
-            }
-        }
-        return SuitTimelines.frameOpen(frame.tickCount + partialTick);
+        return frame.openness(partialTick);
     }
 
     @Override

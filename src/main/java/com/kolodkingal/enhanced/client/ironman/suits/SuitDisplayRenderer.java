@@ -21,10 +21,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
-import java.lang.reflect.Method;
 import java.util.function.Function;
 
 /**
@@ -44,15 +42,8 @@ public class SuitDisplayRenderer implements BlockEntityRenderer<SuitDisplayBlock
     private static final float SUIT_SCALE = 0.92F;
     private static final float FORWARD = 2.0F / 16.0F;
     private static final float HULKBUSTER_SCALE = 1.5F;
-    /**
-     * Which suit a display shows: the block entity's (lane L6's {@code SuitDisplayBlockEntity}, a public method
-     * returning a {@code SuitKind}, found once); until it says, the display's column picks one of the six (so a row of
-     * displays shows them all).
-     */
-    public static Function<SuitDisplayBlockEntity, SuitKind> KIND_OF = SuitDisplayRenderer::kindOf;
-    @Nullable
-    private static Method kindMethod;
-    private static boolean kindLooked;
+    /** Which suit a display shows: the block entity's ({@link SuitDisplayBlockEntity#kind()}; null: an empty display). */
+    public static Function<SuitDisplayBlockEntity, SuitKind> KIND_OF = SuitDisplayBlockEntity::kind;
 
     private final HumanoidModel<LivingEntity> mannequin;
     private final HulkbusterModel<LivingEntity> hulkbuster;
@@ -170,32 +161,5 @@ public class SuitDisplayRenderer implements BlockEntityRenderer<SuitDisplayBlock
     @Override
     public int getViewDistance() {
         return 96;
-    }
-
-    /** The block entity's suit (lane L6's accessor, found once), else the column's. */
-    private static SuitKind kindOf(SuitDisplayBlockEntity display) {
-        if (!kindLooked) {
-            kindLooked = true;
-            for (String name : new String[] {"kind", "suitKind", "shown", "suit", "getKind", "getSuit"}) {
-                try {
-                    Method m = display.getClass().getMethod(name);
-                    if (m.getReturnType() == SuitKind.class) {
-                        kindMethod = m;
-                        break;
-                    }
-                } catch (NoSuchMethodException ignored) {
-                    // not this name
-                }
-            }
-        }
-        if (kindMethod != null) {
-            try {
-                return (SuitKind) kindMethod.invoke(display);
-            } catch (ReflectiveOperationException e) {
-                kindMethod = null;
-            }
-        }
-        BlockPos pos = display.getBlockPos();
-        return SuitKind.VALUES[Math.floorMod(pos.getX() + pos.getZ(), SuitKind.VALUES.length)];
     }
 }
