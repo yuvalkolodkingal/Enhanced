@@ -45,6 +45,7 @@ public final class IronManClient implements HeroClient {
     @Override
     public void stanceTargets(HeroAnimState s, AbstractClientPlayer p, PowerData data, boolean[] on, long now) {
         IronManActing.stanceTargets(s, p, data, on);
+        NanoActing.stanceTargets(s, p, data, on); // (lane L4: the nanotech suits and the Hulkbuster)
     }
 
     @Override
@@ -55,6 +56,7 @@ public final class IronManClient implements HeroClient {
     @Override
     public void aimed(PoseContext c) {
         IronManActing.aimed(c);
+        NanoActing.aimed(c);
     }
 
     // ---- which gesture stands for what ----
@@ -77,6 +79,7 @@ public final class IronManClient implements HeroClient {
     public void firstPerson(HeroAnimState s, LocalPlayer player, FirstPersonArms.Offset main,
                             FirstPersonArms.Offset off) {
         IronManActing.firstPerson(s, main, off);
+        NanoActing.firstPerson(s, main, off);
     }
 
     // ---- the client's life ----

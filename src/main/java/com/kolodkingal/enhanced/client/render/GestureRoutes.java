@@ -609,8 +609,9 @@ public final class GestureRoutes {
             case IRON_SUITING -> "a stance (IRON_SUITING) while a suit goes on or comes off; the effects SUIT_UP and"
                     + " SUIT_DOWN play IRON_SUIT_UP, IRON_STEP_IN and IRON_SUIT_DOWN (IronManActing)";
             case IRON_DASHING -> "the effects BOOST and DASH play IRON_BOOST and IRON_DASH_PUNCH (IronManActing)";
-            case IRON_SHIELD, IRON_BLADES, IRON_GRABBING, IRON_CHARGING ->
-                    "pending: Iron Man's nanotech lane (L4 of 3.8) acts it";
+            case IRON_SHIELD, IRON_BLADES, IRON_GRABBING, IRON_CHARGING -> "a stance (NANO_SHIELD, NANO_BLADES,"
+                    + " HULKBUSTER_GRAB, NANO_CANNON) while it lasts; the slashes, punches and throws swing the arms by"
+                    + " the game's own swing (NanoActing)";
             // ===== falcon (3.8) =====
             case FALCON_DIVING, FALCON_WING_SHIELD, FALCON_GLIDING -> "pending: Falcon's lane (L5 of 3.8) acts it";
         };
