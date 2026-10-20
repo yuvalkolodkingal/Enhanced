@@ -632,8 +632,7 @@ public final class AvengersSkeletonTests {
         check(!IronSuits.mayWear(plain) && !Metal.isMagnetic(plain), "a powerless player may not wear a suit");
         plain.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
         check(Metal.isMagnetic(plain), "but iron armour is metal, as before");
-        // Love does not fly yet; the serum and the realm answer "not yet". (Falcon flies with his wings on since lane
-        // L5 filled FalconWings.canFly.)
+        // Falcon flies with his wings on (lane L5 filled FalconWings.canFly).
         ServerPlayer sam = f.player(9.5, FLOOR, 3.5, Power.FALCON);
         HeroItems.give(sam, Power.FALCON, "endgame");
         check(FalconWings.carries(sam) && FalconWings.worn(sam), "Choose a hero puts the wings on his back");
@@ -652,10 +651,10 @@ public final class AvengersSkeletonTests {
         cap.setItemInHand(InteractionHand.MAIN_HAND, serum);
         answer(SerumChoicePayload.class, new SerumChoicePayload(Power.CAPTAIN_AMERICA), cap);
         check(Powers.power(cap) == Power.NONE && cap.getMainHandItem().is(ModItems.SPECIAL_SOLDIER_SERUM.get()),
-                "a choice changes nobody yet, and keeps the serum");
+                "a choice with no serum screen open changes nobody and keeps the serum (lane L1: SerumTests)");
         // (3.8, lane L8: the realm opens through the altar's charge: EternityTests.)
         check(!EternityRealm.in(cap), "nobody is taken to the realm by a choice");
-        // H: Wolverine's looks still cycle; Iron Man's H is the suit key (nothing yet).
+        // H: Wolverine's looks still cycle; Iron Man's H is the suit key (lane L3), never his looks.
         ServerPlayer logan = f.player(3.5, FLOOR, 8.5, Power.WOLVERINE);
         String before = Powers.variant(logan).id();
         answer(ChangeLookPayload.class, new ChangeLookPayload(1), logan);

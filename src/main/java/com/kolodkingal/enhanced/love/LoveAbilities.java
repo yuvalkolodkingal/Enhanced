@@ -97,6 +97,11 @@ public final class LoveAbilities {
         return holdsStormbreaker(player) || Powers.get(player).hammerEntityId() != -1;
     }
 
+    /** Whether Love is worthy of Mjolnir ({@code [love] worthy}; {@code Traits.of} asks). */
+    public static boolean worthy() {
+        return cfg(EternityConfig.LOVE_WORTHY, true);
+    }
+
     // ---- input ----
 
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down) {

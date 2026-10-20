@@ -73,6 +73,10 @@ public final class Traits {
         if (power == Power.CAPTAIN_AMERICA && !com.kolodkingal.enhanced.captain.CaptainAbilities.worthy()) {
             traits.remove(Trait.WORTHY);
         }
+        // 3.8 (lane L8, wired at the integration): [love] worthy false takes Mjolnir from her.
+        if (power == Power.LOVE && !com.kolodkingal.enhanced.love.LoveAbilities.worthy()) {
+            traits.remove(Trait.WORTHY);
+        }
         return traits;
     }
 

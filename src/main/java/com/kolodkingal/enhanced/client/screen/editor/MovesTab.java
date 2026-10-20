@@ -148,6 +148,7 @@ public final class MovesTab extends EditorTab {
             case "wanda" -> Power.SCARLET_WITCH;
             case "spider" -> Power.SPIDER_MAN;
             case "xavier" -> Power.PROFESSOR_X;
+            case "captain" -> Power.CAPTAIN_AMERICA;
             default -> Power.byName(style);
         };
         return p == null ? null : StartTab.face(p);

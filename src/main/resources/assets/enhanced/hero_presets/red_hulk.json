@@ -57,7 +57,7 @@
   "moves": {},
   "anim": {
     "flight": "auto",
-    "run": "hulk",
+    "run": "red_hulk",
     "speedRun": "auto",
     "idle": "heavy"
   },

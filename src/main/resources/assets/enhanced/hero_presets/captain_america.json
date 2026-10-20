@@ -57,7 +57,7 @@
   "moves": {},
   "anim": {
     "flight": "auto",
-    "run": "cyclops",
+    "run": "captain",
     "speedRun": "auto",
     "idle": "ready"
   },
