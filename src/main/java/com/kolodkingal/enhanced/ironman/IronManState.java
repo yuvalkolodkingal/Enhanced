@@ -35,6 +35,12 @@ public record IronManState(byte suit, float energy, byte phase, byte phaseSuit, 
     public static final int CHARGED = 2;
     /** The Mark 85's drones are out. */
     public static final int DRONES = 4;
+    /**
+     * (L3) The suit works: its eyes, reactor and thrusters are lit (clients read it; see {@code IronSuits.powered}).
+     */
+    public static final int POWERED = 8;
+    /** (L3) The Mark 1 braces (B held): feet planted, arms crossed. */
+    public static final int BRACING = 16;
     /** No suit, full energy, the Mark 85 selected. */
     public static final IronManState EMPTY = new IronManState(SuitKind.NONE, 100.0F, NONE, SuitKind.NONE, 0L, 0,
             SuitKind.MARK_85.asByte(), SuitKind.NONE, 0, 0L);
@@ -89,6 +95,12 @@ public record IronManState(byte suit, float energy, byte phase, byte phaseSuit, 
         byte b = kind == null ? SuitKind.NONE : kind.asByte();
         return new IronManState(b, energy, phase, phaseSuit, phaseStart, phaseTicks, nanoSuit,
                 kind == null ? lastSuit : b, flags, dronesUntil);
+    }
+
+    /** (L3) The suit H puts on next (the last worn, or the one Sneak + H picked). */
+    public IronManState withLast(@Nullable SuitKind kind) {
+        return new IronManState(suit, energy, phase, phaseSuit, phaseStart, phaseTicks, nanoSuit,
+                kind == null ? SuitKind.NONE : kind.asByte(), flags, dronesUntil);
     }
 
     public IronManState withEnergy(float value) {

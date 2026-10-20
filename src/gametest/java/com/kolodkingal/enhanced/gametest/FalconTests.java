@@ -12,11 +12,11 @@ import com.kolodkingal.enhanced.client.render.RunCharacter;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.falcon.Dive;
 import com.kolodkingal.enhanced.falcon.FalconDartEntity;
-import com.kolodkingal.enhanced.falcon.FalconRocketEntity;
 import com.kolodkingal.enhanced.falcon.FalconState;
 import com.kolodkingal.enhanced.falcon.FalconWings;
 import com.kolodkingal.enhanced.falcon.Redwing;
 import com.kolodkingal.enhanced.falcon.RedwingEntity;
+import com.kolodkingal.enhanced.ironman.IronMissileEntity;
 import com.kolodkingal.enhanced.network.FalconFxPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -296,7 +296,7 @@ public final class FalconTests {
         press(sam, 1, true);
         long now = helper.getLevel().getGameTime();
         check(!data(sam).isReady(1, now + 79) && data(sam).isReady(1, now + 80), "R waits 80");
-        until(helper, 30, () -> lost(husk) > 0.0F && inArena(helper, FalconRocketEntity.class).isEmpty(), () -> {
+        until(helper, 30, () -> lost(husk) > 0.0F && inArena(helper, IronMissileEntity.class).isEmpty(), () -> {
             check(lost(husk) >= 8.0F, "8 and the boom: " + lost(husk));
             helper.assertBlockPresent(Blocks.OAK_PLANKS, new BlockPos(11, 2, 10));
             helper.assertBlockPresent(Blocks.GLASS, new BlockPos(10, 2, 11));
@@ -521,7 +521,7 @@ public final class FalconTests {
         press(sam, 1, false);
         press(sam, 1, true);
         check(inArena(helper, FalconDartEntity.class).size() == 1, "a dart flies");
-        check(inArena(helper, FalconRocketEntity.class).size() == 1, "and a rocket");
+        check(inArena(helper, IronMissileEntity.class).size() == 1, "and a rocket");
         helper.succeed();
     }
 

@@ -57,13 +57,19 @@ public enum RunCharacter {
     WOLVERINE(1.0F, 0.75F, 1.30F, 16, 5, 0.025F),
     // ===== deadpool (3.7) =====
     /** Deadpool (3.7): a jaunty jog, the arms swinging loose, a bounce in the step and a swagger of the shoulders. */
-    DEADPOOL(1.10F, 1.30F, 1.15F, 7, 7, 0.030F),
+    DEADPOOL(1.10F, 1.30F, 1.15F, 7, 7, 0.030F)
     // ===== captain (3.8) =====
     // ===== red_hulk (3.8) =====
     // ===== iron_man (3.8) =====
+    // (Lane L3. Each starts with a comma, so the regions of 3.8 join in any order.)
+    ,
+    /** Iron Man (3.8): heavy, metallic steps in a suit; a short arm swing, a firm bob (lighter in the Mark 5). */
+    IRON_MAN(0.80F, 1.05F, 1.05F, 9, 3, 0.032F)
     // ===== falcon (3.8) =====
+    // (Lane L5. Each starts with a comma, so the regions of 3.8 join in any order.)
+    ,
     /** Falcon (3.8): a light, quick run, a soldier's, the arms swinging easily, a little lean, a light bob. */
-    FALCON(0.95F, 1.20F, 1.20F, 8, 4, 0.018F),
+    FALCON(0.95F, 1.20F, 1.20F, 8, 4, 0.018F)
     // ===== love (3.8) =====
     // (3.8: each lane appends its hero's run here and routes it in of(); until then they run as anyone.)
     ;
@@ -108,6 +114,7 @@ public enum RunCharacter {
             case HULK -> HULK; // (3.6; Bruce Banner walks as anyone: RunPoses)
             case WOLVERINE -> WOLVERINE; // (3.7)
             case DEADPOOL -> DEADPOOL; // (3.7)
+            case IRON_MAN -> IRON_MAN; // (3.8)
             case FALCON -> FALCON; // (3.8)
             default -> DEFAULT;
         };

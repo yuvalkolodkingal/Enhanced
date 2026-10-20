@@ -2,8 +2,10 @@ package com.kolodkingal.enhanced.falcon;
 
 import com.kolodkingal.enhanced.config.FalconConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.ironman.IronMissileEntity;
 import com.kolodkingal.enhanced.network.FalconFxPayload;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,8 +22,8 @@ import java.util.List;
  * darts ({@link FalconDartEntity}: {@code dartDamage} 4 each, {@code dartSpeed} 3.0, no gravity, {@code dartRange}
  * 40), the left wrist's at once and the right's {@link #PAIR_GAP} ticks later, both aimed at what his crosshair is on;
  * a new pair waits {@code dartGap} 6 ticks (they are energy, not bullets: no magazine). The Wrist Rocket is one small
- * rocket ({@link FalconRocketEntity}, the class of Iron Man's missiles: {@code rocketDamage} 8 and a small boom that
- * never breaks a block), on R's slot ({@code rocketCooldown} 80). Neither needs the wings.
+ * rocket (Iron Man's missile, {@link IronMissileEntity} of the kind {@code FALCON}: {@code rocketDamage} 8 and a
+ * small boom of {@code rocketPower} 1.0, as the suits' rockets boom), on R's slot ({@code rocketCooldown} 80). Neither needs the wings.
  */
 public final class WristWeapons {
     /** The right wrist fires this many ticks after the left. */
@@ -29,8 +31,9 @@ public final class WristWeapons {
     /** The wrists, sideways from the middle of his chest, and below his eyes (blocks). */
     static final double WRIST_SIDE = 0.38;
     static final double WRIST_DROP = 0.45;
-    /** The rocket's speed (blocks a tick). */
+    /** The rocket's speed (blocks a tick), and how far it flies before it pops in the air. */
     public static final double ROCKET_SPEED = 1.6;
+    public static final double ROCKET_RANGE = 96.0;
 
     /** R: a pair of darts (the left now, the right {@link #PAIR_GAP} ticks later). */
     static boolean fire(ServerPlayer player, PowerData data) {
@@ -65,9 +68,10 @@ public final class WristWeapons {
         ServerLevel level = player.serverLevel();
         Vec3 from = wrist(player, true);
         Vec3 dir = aim(player, from, 64.0);
-        FalconRocketEntity rocket = FalconRocketEntity.create(level, player, from, dir, ROCKET_SPEED,
-                (float) FalconAbilities.cfg(FalconConfig.ROCKET_DAMAGE, 8.0),
-                (float) FalconAbilities.cfg(FalconConfig.ROCKET_POWER, 1.0));
+        IronMissileEntity rocket = IronMissileEntity.create(level, player, IronMissileEntity.FALCON, from, dir,
+                ROCKET_SPEED, (float) FalconAbilities.cfg(FalconConfig.ROCKET_DAMAGE, 8.0),
+                (float) FalconAbilities.cfg(FalconConfig.ROCKET_POWER, 1.0), ROCKET_RANGE);
+        rocket.setDamageType(ModDamageTypes.FALCON_DART);
         level.addFreshEntity(rocket);
         FalconAbilities.sound(level, from, ModSounds.FALCON_ROCKET.get(), 1.0F, 1.0F);
         FalconAbilities.send(level, player, FalconFxPayload.ROCKET, List.of(from, from.add(dir)), 0);

@@ -8,10 +8,9 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * The server side of Falcon (3.8), as a {@link HeroServer} plug-in: his keys, his body and his tick are {@link
- * FalconAbilities} (with the moves {@link WristWeapons} and its {@link FalconDartEntity} and {@link
- * FalconRocketEntity}, the {@link Dive} and the Boost Climb, the {@link WingShield} and the Wing Slash, {@link Redwing}
- * and its {@link RedwingEntity}); the wings' flight and glide {@link FalconWings}; his event hooks {@link
- * FalconEvents}.
+ * FalconAbilities} (with the moves {@link WristWeapons} and its {@link FalconDartEntity} and Iron Man's missile for
+ * the rocket, the {@link Dive} and the Boost Climb, the {@link WingShield} and the Wing Slash, {@link Redwing} and its
+ * {@link RedwingEntity}); the wings' flight and glide {@link FalconWings}; his event hooks {@link FalconEvents}.
  */
 public final class FalconServer implements HeroServer {
     @Override

@@ -149,6 +149,8 @@ public final class ClientSetup {
             // ===== captain (3.8) =====
             // ===== red_hulk (3.8) =====
             // ===== iron_man (3.8) =====
+            // The classic suits' and the suit-up's effects, the Unibeam's beam from the chest.
+            com.kolodkingal.enhanced.client.ironman.IronClientFx.setup();
             // ===== nanotech (3.8) =====
             // ===== suit_art (3.8) =====
             // ===== falcon (3.8) =====
@@ -285,7 +287,8 @@ public final class ClientSetup {
         // ===== captain (3.8) =====
         event.registerEntityRenderer(ModEntities.THROWN_SHIELD.get(), NoopRenderer::new);
         // ===== iron_man (3.8) =====
-        event.registerEntityRenderer(ModEntities.IRON_MISSILE.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.IRON_MISSILE.get(),
+                com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
         // ===== nanotech (3.8) =====
         event.registerEntityRenderer(ModEntities.NANO_DRONE.get(),
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
@@ -293,8 +296,9 @@ public final class ClientSetup {
                 ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
         // ===== suit_art (3.8) =====
         // ===== falcon (3.8) =====
+        // (The Wrist Rocket is one of Iron Man's missiles, of the kind FALCON: lane L3's renderer draws it.)
         event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(),
-                com.kolodkingal.enhanced.client.falcon.FalconRocketRenderer::new);
+                com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
         event.registerEntityRenderer(ModEntities.FALCON_DART.get(),
                 com.kolodkingal.enhanced.client.falcon.FalconDartRenderer::new);
         event.registerEntityRenderer(ModEntities.REDWING.get(),
@@ -400,8 +404,6 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.falcon.FalconWingsModel::createLayer);
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.RedwingModel.LAYER,
                 com.kolodkingal.enhanced.client.falcon.RedwingModel::createLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.FalconRocketRenderer.LAYER,
-                com.kolodkingal.enhanced.client.falcon.FalconRocketRenderer::createLayer);
         // ===== eternity (3.8) =====
         // ===== love (3.8) =====
     }
@@ -575,6 +577,9 @@ public final class ClientSetup {
         // ===== captain (3.8) =====
         // ===== red_hulk (3.8) =====
         // ===== iron_man (3.8) =====
+        // 3.8, lane L3: the suit's panel (name, energy, durability), the helmet frame and the faceplate.
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("iron_man"),
+                new com.kolodkingal.enhanced.client.ironman.IronHud());
         // ===== nanotech (3.8) =====
         // ===== falcon (3.8) =====
         // ===== tower (3.8) =====

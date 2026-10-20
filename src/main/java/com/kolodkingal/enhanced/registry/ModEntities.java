@@ -497,15 +497,12 @@ public final class ModEntities {
                     .noSummon()
                     .build("hulkbuster_frame"));
     // ===== falcon (3.8) =====
-    /**
-     * Falcon's Wrist Rocket (lane L5): the class of Iron Man's missiles, a type of its own; its straight flight and
-     * small boom are {@code falcon/FalconRocketEntity}'s (a subclass, so the field's type stays the missiles').
-     */
+    /** Falcon's Wrist Rocket (lane L5): the class of Iron Man's missiles, a type of its own. */
     public static final DeferredHolder<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.ironman.IronMissileEntity>> FALCON_ROCKET =
             ENTITIES.register("falcon_rocket",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.IronMissileEntity>of(
-                            com.kolodkingal.enhanced.falcon.FalconRocketEntity::new, MobCategory.MISC)
+                            com.kolodkingal.enhanced.ironman.IronMissileEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .clientTrackingRange(8)
                     .updateInterval(1)
