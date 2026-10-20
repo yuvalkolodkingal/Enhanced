@@ -13,7 +13,7 @@ the order of Eilon's list.
 
 Each hero has its wiki pages (`docs/wiki/<Hero>.md` and `<Hero>-HE.md`) and a section of `docs/DESIGN.md` and
 `docs/DESIGN.he.md`: **13 Phoenix, 14 Spider-Man, 15 Thanos, 16 Ultron, 17 Apocalypse** (12 is 2.3's voices of the
-Infinity Stones), since 3.1 **18 Build Magic**, since 3.2 **19 the Witches' Road trials, 20 the sorcerers' books, 21 the beam system, 22 the rest of 3.2** (with Billy's Hex Beam and Barrier in 6.4 and 6.5), and since 3.3 **23 the walls (Billy's barrier, the ward, the Hex and its runes), 24 Agatha, 25 Cyclops, 26 Professor X, 27 the Hero Creator, 28 the structures and the Road's music, 29 the animations, 30 how 3.3 was put together, 31 the speedsters, 32 Web Assist**, since 3.4 **33 the Hero Creator as good as the heroes, 34 how 3.4 was put together**, since 3.5 **35 Asgard and its heroes, 36 how 3.5 was put together**, since 3.6 **37 the Infinity Stones, Doctor Strange, the Hulk and Hydra, 38 how 3.6 was put together**, and since 3.7 **39 the healing factor, 40 Wolverine and Deadpool, 41 the lower lab and Cerebro, 42 the Stone Locator, 43 Agatha's Cottage, 44 meeting Death, 45 how 3.7 was put together**. The wiki pages of 3.3 are `Agatha`, `Cyclops`, `Professor-X`, `Hero-Creator` and `Structures` (each with its `-HE` twin); 3.4 added `Hero-Abilities` (the 81 rows, generated from `HeroAbility` and the lang files); 3.5 added `Asgard`, `Asgardians`, `Heimdall`, `Odin`, `Hela` and `Music`; 3.6 added `Infinity-Stones`, `Vormir`, `Doctor-Strange`, `Hulk` and `Hydra-Soldiers`; 3.7 added `Healing-Factor`, `Wolverine`, `Deadpool`, `Mutant-School-Lab`, `Stone-Locator`, `Agathas-Cottage` and `Meeting-Death`. Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
+Infinity Stones), since 3.1 **18 Build Magic**, since 3.2 **19 the Witches' Road trials, 20 the sorcerers' books, 21 the beam system, 22 the rest of 3.2** (with Billy's Hex Beam and Barrier in 6.4 and 6.5), and since 3.3 **23 the walls (Billy's barrier, the ward, the Hex and its runes), 24 Agatha, 25 Cyclops, 26 Professor X, 27 the Hero Creator, 28 the structures and the Road's music, 29 the animations, 30 how 3.3 was put together, 31 the speedsters, 32 Web Assist**, since 3.4 **33 the Hero Creator as good as the heroes, 34 how 3.4 was put together**, since 3.5 **35 Asgard and its heroes, 36 how 3.5 was put together**, since 3.6 **37 the Infinity Stones, Doctor Strange, the Hulk and Hydra, 38 how 3.6 was put together**, and since 3.7 **39 the healing factor, 40 Wolverine and Deadpool, 41 the lower lab and Cerebro, 42 the Stone Locator, 43 Agatha's Cottage, 44 meeting Death, 45 how 3.7 was put together**, and since 3.8 **46 the Super Soldier Serum, 47 Captain America and the Vibranium Shield, 48 Red Hulk, 49 Iron Man (the reactors, the six suits and the suit-up framework), 50 Falcon and the Exo-Wings, 51 the Avengers Tower's armoury, 52 Eternity and Love, 53 how 3.8 was put together**. The wiki pages of 3.3 are `Agatha`, `Cyclops`, `Professor-X`, `Hero-Creator` and `Structures` (each with its `-HE` twin); 3.4 added `Hero-Abilities` (the 81 rows, generated from `HeroAbility` and the lang files); 3.5 added `Asgard`, `Asgardians`, `Heimdall`, `Odin`, `Hela` and `Music`; 3.6 added `Infinity-Stones`, `Vormir`, `Doctor-Strange`, `Hulk` and `Hydra-Soldiers`; 3.7 added `Healing-Factor`, `Wolverine`, `Deadpool`, `Mutant-School-Lab`, `Stone-Locator`, `Agathas-Cottage` and `Meeting-Death`; 3.8 added `Super-Soldier-Serum`, `Captain-America`, `Red-Hulk`, `Iron-Man`, `Falcon`, `Eternity` and `Love`. Their rows are in the shared pages (Home, Controls, Looks, Items and Crafting, Commands, Server
 Configuration, FAQ, Becoming a Hero, Credits, the sidebar) and in the README, in both languages. While 3.0 was built
 each lane wrote these as fragments that were stitched in at the end; a change now goes straight into the pages, English
 and Hebrew together.
@@ -70,11 +70,11 @@ half is `client/build/`; design in `DESIGN.md` section 18).
 
 | Event | HIGHEST | HIGH | NORMAL | LOW | LOWEST |
 |---|---|---|---|---|---|
-| `LivingIncomingDamageEvent` | Ultron: a carried player is immune except `BYPASSES_INVULNERABILITY`; Apocalypse: the hero's shield `guard` (before Wanda's branch); 3.7 the healing factor: a DOWN healer's blows cancelled unless they defeat him (after the Road trial's own rule, which it steps aside for) | Phoenix: fire damage cancelled; Ultron: lightning factor, Vision bonus; boss damage runs inside the boss's own `hurt`; 3.7 the fall guards of Wolverine's leaps and climb and of Deadpool's Drop-In, and Dogpool's bite refused where `AreaTargets.mayHurt` spares | the existing chain of `CommonEvents`; 3.7 Deadpool's Parry cuts a blow from the front | Thor's melee arcs (so a stopped blow lands nothing); Thanos stone effects (petrify factor); 3.4 `HeroDamage`: a custom hero's damage by a hero's ability × the row's strength factor × `custom_hero.damageScale`; 3.7 Wolverine's claws: an empty-hand blow with the claws out + `clawBonus` | |
-| `LivingDeathEvent` | 3.7 the healing factor's net: a death without damage cancelled to health 1 and DOWN unless a defeat | Ultron: Second Life (after vanilla's totem, which runs inside `hurt`) | `CommonEvents.onDeath` releases (and `HeroLifecycle.onDeath`) | | 3.6 the Vormir sacrifice; 3.7 the healing factor's defeat line (`receiveCanceled`), then `DeathMeeting`'s offer (only an uncancelled death) |
-| `ProjectileImpactEvent` | `SlowMotion.unslow` (existing) | Apocalypse boss: neutralise before impact | Wanda, Magneto, Vision (existing); 3.7 Deadpool's Parry bounces it | | |
+| `LivingIncomingDamageEvent` | Ultron: a carried player is immune except `BYPASSES_INVULNERABILITY`; Apocalypse: the hero's shield `guard` (before Wanda's branch); 3.7 the healing factor: a DOWN healer's blows cancelled unless they defeat him (after the Road trial's own rule, which it steps aside for); 3.8 nothing hurts in Eternity's realm but what bypasses invulnerability; the Hulkbuster's explosion immunity | Phoenix: fire damage cancelled; Ultron: lightning factor, Vision bonus; boss damage runs inside the boss's own `hurt`; 3.7 the fall guards of Wolverine's leaps and climb and of Deadpool's Drop-In, and Dogpool's bite refused where `AreaTargets.mayHurt` spares; 3.8 Captain America's Vibranium Shield cancels a blow from the front (and his leap's fall), Red Hulk's next fall after a Super Jump and his Energy Absorb, the Mark 1's crash fall, Falcon's fall and wall with working wings (and the Dive's landing), a nanotech shield's share of a blow from the front (and lightning charges the Mark 85's Refocuser) | the existing chain of `CommonEvents`; 3.7 Deadpool's Parry cuts a blow from the front; 3.8 Captain America's Resistance cut, Red Hulk's fire immunity, the suit-up's protection and the Mark 1's Brace (`IronEvents`), the Wing Shield's cuts from the front | Thor's melee arcs (so a stopped blow lands nothing); Thanos stone effects (petrify factor); 3.4 `HeroDamage`: a custom hero's damage by a hero's ability × the row's strength factor × `custom_hero.damageScale`; 3.7 Wolverine's claws: an empty-hand blow with the claws out + `clawBonus`; 3.8 the nano energy blades: an empty-hand blow with the blades out is the blade's | |
+| `LivingDeathEvent` | 3.7 the healing factor's net: a death without damage cancelled to health 1 and DOWN unless a defeat | Ultron: Second Life (after vanilla's totem, which runs inside `hurt`) | `CommonEvents.onDeath` releases (and `HeroLifecycle.onDeath`); 3.8 the serum forgets a pending choice, a death in Eternity's realm ends the visit (the way home forgotten), an uncancelled death recalls the nano drones and forgets the nano state | 3.8 the Hulkbuster: an uncancelled death is his own size at once | 3.6 the Vormir sacrifice; 3.7 the healing factor's defeat line (`receiveCanceled`), then `DeathMeeting`'s offer (only an uncancelled death) |
+| `ProjectileImpactEvent` | `SlowMotion.unslow` (existing) | Apocalypse boss: neutralise before impact | Wanda, Magneto, Vision (existing); 3.7 Deadpool's Parry bounces it; 3.8 the Vibranium Shield, the Wing Shield and a nanotech shield turn back a projectile from the front | | |
 | `MobEffectEvent.Applicable` | | boss tags refuse effects | existing | | |
-| `LivingChangeTargetEvent` | | Phoenix: possessed creatures never target Jean's side; 3.7 monsters may not target a DOWN healer | existing; 3.7 Deadpool's Taunt keeps the taunted at him | | |
+| `LivingChangeTargetEvent` | | Phoenix: possessed creatures never target Jean's side; 3.7 monsters may not target a DOWN healer | existing; 3.7 Deadpool's Taunt keeps the taunted at him; 3.8 a mob decoyed by the Mark 3's flares may not target him | | |
 | `EntityJoinLevelEvent` | one orphan sweep in `BossFights` for all marked entities | | | | |
 | `PlayerLoggedIn / Respawn / ChangedDimension` | | | `BossGifts.deliver`, existing calls, `HeroLifecycle` | | |
 | `ServerStoppingEvent` / `ServerStartingEvent` | `BossFights.stopAll` (restores any island) / Sokovia recovery | | | | |
@@ -82,6 +82,8 @@ half is `client/build/`; design in `DESIGN.md` section 18).
 | `LivingDamageEvent.Pre` | | | | | 3.7 the healing factor's cut: a blow that would kill a healer (after armour and absorption) is cut to health − 1 and he goes DOWN, unless it defeats him |
 | `MobEffectEvent.Added` | | | 3.7 the healing factor's shrug: a vanilla harmful effect (not `#enhanced:stops_healing`) on an active healer × `shrugFactor` | | |
 | `PlayerRespawnPositionEvent` / `PlayerRespawnEvent` | | 3.7 `DeathMeeting`'s Nether welcome (Fire Resistance, Rio's line) | | 3.7 `DeathMeeting` redirects a chosen Nether respawn, unless another handler changed it | |
+| `LivingDamageEvent.Post` | | | 3.8 Red Hulk's anger (taken and dealt); a deployed nano suit's housing takes the wear | | |
+| `LivingShieldBlockEvent` | | | 3.8 with `capBlocksEverything` off, Captain America's raised Vibranium Shield blocks at once | | |
 
 ## 4. Lang, sounds, art
 
@@ -446,3 +448,60 @@ L8, L7, L6). The design is `DESIGN.md` **39 to 45**.
   `SoundAssetTests` for the 63 sounds. `TestKit.Fixture.loadChunksAround` holds an area loaded with a ticket of its own
   for the keepers' tests. Delete `run/world` and `run/config/enhanced-server.toml` before a full run.
 
+
+## 16. How 3.8 was put together: the Avengers, Iron Man's suits and Eternity
+
+3.8 (Eilon's Avengers: the Super Soldier Serum with Captain America, Red Hulk and Falcon, Iron Man and his six suits, the
+tower's armoury; and Eternity, who grants one wish, with Love) began with a skeleton step, **S0** (from 3.7.1 with 3.7.2
+merged in), then eight lanes: L1 the serum and Captain America, L2 Red Hulk and all 109 sounds, L3 Iron Man's core, L4 the
+nanotech suits and the Hulkbuster, L5 Falcon, L6 the tower, L7 the suit art, L8 Eternity and Love; the integrator merged
+them into `v38` (S0, L3, L4, L7, L6, L1, L5, L8, L2). The design is `DESIGN.md` **46 to 53**.
+
+* **`Live` is two words.** 3.8's states (58 → 75) no longer fit in one `long`, so S0 widened it: `PowerData.live` and
+  `liveHigh`, 64 states to a word, each state's `Live.word()` and `mask()`, at most 127
+  (`theBitsFitAndTheProtocolIsTwelve`; `aStatePastTheSixtyFourthRoundTrips` checks that a state of the second word sets,
+  clears and survives the sync). Ask a state through `PowerData`, never by shifting a bit yourself. `Live` 75, `Toggle` 24, **221** rows (27 new and 18 Sneak
+  variants; `theRowsAre221`).
+* **One hero, many suits: a framework and moves per suit.** Iron Man's keys go to `SuitMoves` (`onKey`, `tick`, `end`,
+  `ownsG`), registered per `SuitKind` with `SuitMoves.register`; putting a suit on or off is only ever
+  `SuitPhases.begin(player, kind, up, ...)`, and a suit with its own rules (the Hulkbuster's sky and room, its frame) is a
+  `SuitPhases.Listener` (`SuitPhases.listen`). One energy meter for all suits (`SuitEnergy`), one HUD with lines any suit
+  may add (`IronHud.addLine`). L3 published this API before L4 and L7 started; L4's suits register at
+  `FMLCommonSetupEvent` (`NanoEvents.Setup`). A new suit is a `SuitKind`, a `SuitMoves` and (for art) a model and a
+  choreography, never a change to `IronManAbilities`.
+* **A rule several heroes share is still one place.** Who blocks with a shield and from where is `captain/ShieldRules`;
+  a powered classic suit is metal through `Metal.isMetalHero` (so Magneto's rule stays one rule); Love throws Thor's own
+  `ThrownWeaponEntity` (`thor()` accepts her row), draws Thor's beam (`ThorAbilities.lightningBeamFor`) and opens Thor's
+  Bifrost screen (`BifrostKeys`); Red Hulk's Grab & Slam and Bound are the Hulk's `GrabSmash` and `SuperLeap` with his
+  numbers. Each of these was an S0 seam with a neutral stub, filled by its lane (`theSeamsAreNeutralUntilTheLanes`
+  pinned the stubs while the lanes were apart).
+* **A choice screen whose decision stays on the server** (the serum, Eternity's wish): the server opens it with a payload
+  that carries what is locked and why, the client only sends the choice back, and the server checks it again (a pending
+  choice, how old it is, the same hand and slot, the hero's own rule) before anything is used up; the pending choice is
+  forgotten at logout, death, a dimension change and server stop.
+* **A structure that changes in a new version gets a refit** (the tower's armoury): find the structures by their starts
+  (cached), keep a SavedData record per start, step a job only when the chunks **and their entities** are loaded, with a
+  wall-time budget per tick; check first that it is the old design (else record it and leave it); set a cell only where
+  the old block still stands, and never touch a player's block. `/enhanced structure refit_tower` does it now or reports.
+  Takers of a display or case are recorded **before** the item is handed over.
+* **A realm visited for one moment** (Eternity): the return point is saved on the player's attachment, the realm's one
+  creature is never saved (made when a traveller arrives, let go when the realm is empty), a login inside the realm sends
+  the player home on the first tick, and nothing hurts there but what bypasses invulnerability.
+* **No library, no new key.** Every model is the mod's own `LayerDefinition` or generated mesh, every animation the mod's
+  gestures and timelines (`build.gradle` and `neoforge.mods.toml` unchanged); Iron Man's H is the Change Look key.
+* **Lanes and shared files**: S0 made a region per lane in every shared file
+  (`// ===== serum|captain|red_hulk|iron_man|nanotech|suit_art|falcon|tower|eternity|love (3.8) =====`, and
+  `captain_america|red_hulk|iron_man|falcon|love|variants (3.8)` in `HeroAbility`), one FX payload per family
+  (`CaptainFxPayload`, `RedHulkFxPayload`, `IronFxPayload`, `FalconFxPayload`, `TowerFxPayload`, `EternityFxPayload`) and
+  the screens' payloads, 109 placeholder sounds and 470 lang keys; lang blocks were added 30 keys before the end of the
+  files (`add_lang38.py`) and merged by union. The integrator settled one comma rule for the 3.8 enum regions (every
+  constant ends in a comma). L7 drew against S0's `SuitModels`/`SuitAssembly` interfaces and reached L4's and L6's
+  accessors by reflection until they merged; the integrator replaced that with direct calls. Every visual was checked in
+  a real client (a dedicated server, English and Hebrew clients, a second client watching).
+* **Protocol "12"** (`AvengersSkeletonTests.theBitsFitAndTheProtocolIsTwelve`): a 3.7 client cannot join a 3.8 server.
+* **Tests**: `SerumTests`, `CaptainTests`, `RedHulkTests`, `IronCoreTests`, `IronMarkTests`, `NanoTechTests`,
+  `HulkbusterTests`, `SuitArtTests`, `FalconTests`, `TowerDisplayTests`, `EternityTests`, `LoveTests`,
+  `AvengersSkeletonTests` and `SoundAssetTests` for every 3.8 sound. A test that lets a missile or a hammer fly keeps it
+  away from its neighbours (a homing-missile test starts by its husks; a Thor recall test has a batch of its own), and
+  the refit test waits until the armoury is loaded. Delete `run/world` and `run/config/enhanced-server.toml` before a
+  full run. Full run at the integration: `All 2574 required tests passed`.
