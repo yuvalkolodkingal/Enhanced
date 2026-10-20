@@ -177,6 +177,12 @@ public final class ThorEffects {
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.9F);
                 rainbowBeam(pose, vc, feet, 1.3F * pulse, time, 1.0F);
             }
+            // 3.8 (lane L8): Love's lightning is Thor's beam in her lilac.
+            if (loveBeam(data) && !OwnBeams.behind(mc, player)) {
+                tint = com.kolodkingal.enhanced.love.LoveAbilities.LIGHTNING;
+                beam(mc, player, ThorAbilities.holdsWeapon(player), false, pose, vc, camera, partialTick, time);
+                tint = -1;
+            }
             if (!data.acts(Power.THOR)) {
                 continue;
             }
@@ -201,9 +207,12 @@ public final class ThorEffects {
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
         if (mc.getCameraEntity() instanceof AbstractClientPlayer self && OwnBeams.behind(mc, self)) {
             PowerData data = Powers.get(self);
-            if (data.acts(Power.THOR) && data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)) {
+            boolean love = loveBeam(data);
+            if (love || data.acts(Power.THOR) && data.has(HeroAbility.THOR_LIGHTNING)
+                    && data.is(Live.CALLING_LIGHTNING)) {
                 VertexConsumer over = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM_OVER);
-                tint = AbilityColors.chosen(self, HeroAbility.THOR_LIGHTNING);
+                tint = love ? com.kolodkingal.enhanced.love.LoveAbilities.LIGHTNING
+                        : AbilityColors.chosen(self, HeroAbility.THOR_LIGHTNING);
                 beam(mc, self, ThorAbilities.holdsWeapon(self), data.toggle(Toggle.GOD_OF_THUNDER), pose, over, camera,
                         partialTick, time);
                 tint = -1;
@@ -213,6 +222,12 @@ public final class ThorEffects {
     }
 
     // ---- the lightning beam ----
+
+    /** 3.8: Love's lightning (or a custom hero's with her row and not Thor's): Thor's beam in her colour. */
+    private static boolean loveBeam(PowerData data) {
+        return data.has(HeroAbility.LOVE_LIGHTNING) && !data.has(HeroAbility.THOR_LIGHTNING)
+                && data.is(Live.CALLING_LIGHTNING);
+    }
 
     /**
      * Thor's lightning beam, from his hand (or the head of the weapon in it) to what he looks at: a jagged bolt with a

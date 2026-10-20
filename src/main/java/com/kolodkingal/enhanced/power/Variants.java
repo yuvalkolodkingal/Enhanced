@@ -192,7 +192,8 @@ public final class Variants {
         // ===== love (3.8) =====
         // Love's golden tunic and lilac cape (our own design by lane L8, SCRATCH/v38/art/l8).
         add(Power.LOVE,
-                new Variant("love", Power.LOVE, Variant.suit("love"), null, false, 0xB57BFF, 0xFFE59A),
+                new Variant("love", Power.LOVE, Variant.suit("love"), Variant.suit("love_cape"), true, 0xB57BFF,
+                        0xFFE59A),
                 own(Power.LOVE));
     }
 

@@ -168,6 +168,8 @@ public final class ClientSetup {
             // ===== tower (3.8) =====
             com.kolodkingal.enhanced.client.tower.TowerClient.setup();
             // ===== eternity (3.8) =====
+            // The wish screen, the altar's and the realm's moments, Love's eye beams and her strike (lane L8).
+            com.kolodkingal.enhanced.client.eternity.EternityClient.setup();
             // ===== love (3.8) =====
             // 3.3: a custom hero's Super Senses ("xray") and Telepathy ("sense").
             EntityGlow.register(com.kolodkingal.enhanced.client.custom.CustomSenses::reveals, com.kolodkingal.enhanced.client.custom.CustomSenses::color);
@@ -324,7 +326,9 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.tower.TechCaseRenderer::new);
         // ===== eternity (3.8) =====
         event.registerEntityRenderer(ModEntities.ETERNITY.get(),
-                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0x2A1F4A));
+                com.kolodkingal.enhanced.client.eternity.EternityRenderer::new);
+        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.ETERNITY_ALTAR.get(),
+                com.kolodkingal.enhanced.client.eternity.AltarRenderer::new);
         // ===== love (3.8) =====
     }
 
@@ -428,6 +432,8 @@ public final class ClientSetup {
         event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.RedwingModel.LAYER,
                 com.kolodkingal.enhanced.client.falcon.RedwingModel::createLayer);
         // ===== eternity (3.8) =====
+        event.registerLayerDefinition(com.kolodkingal.enhanced.client.eternity.EternityModel.LAYER,
+                com.kolodkingal.enhanced.client.eternity.EternityModel::createLayer);
         // ===== love (3.8) =====
     }
 
@@ -618,6 +624,9 @@ public final class ClientSetup {
         // ===== falcon (3.8) =====
         // ===== tower (3.8) =====
         // ===== eternity (3.8) =====
+        // The white flash of the journey to Eternity and home.
+        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("eternity_flash"),
+                new com.kolodkingal.enhanced.client.eternity.EternityClient.FlashLayer());
         // ===== love (3.8) =====
     }
 

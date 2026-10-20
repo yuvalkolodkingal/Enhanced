@@ -23,8 +23,11 @@ public final class ShrinePlan {
     public static final int FLOOR = 2;
     /** The plaza's middle. */
     public static final BlockPos CENTER = new BlockPos(23, 3, 23);
-    /** Eternity's altar. */
-    public static final BlockPos ALTAR = new BlockPos(23, 3, 23);
+    /**
+     * Eternity's altar, on the dais three steps up from the plaza (3.8, lane L8: moved up from the skeleton's (23, 3,
+     * 23) with its template; {@code EternityTests} and the skeleton's test check it).
+     */
+    public static final BlockPos ALTAR = new BlockPos(23, 6, 23);
     /** The foot of Eternity's seated statue, behind the altar (north). */
     public static final BlockPos ETERNITY_STATUE = new BlockPos(23, 3, 14);
     /** The lectern with "The Cosmic Entities", by the stair. */

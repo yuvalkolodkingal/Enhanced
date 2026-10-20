@@ -301,9 +301,11 @@ public final class HeroAbilityAnims {
         live(Live.FALCON_WING_SHIELD, HeroAbility.FALCON_WING_SHIELD);
         live(Live.FALCON_GLIDING, HeroAbility.FALCON_BODY);
         // ===== love (3.8) =====
-        row(HeroAbility.LOVE_AXE);
-        row(HeroAbility.LOVE_LIGHTNING);
-        row(HeroAbility.LOVE_EYE_LASER);
+        // (Her throw is the cooldown of R; her lightning and her eyes her states; the catch and the strike her
+        // client's.)
+        row(HeroAbility.LOVE_AXE).mainCd(GestureId.LOVE_THROW).alt(GestureId.LOVE_STRIKE).also(GestureId.LOVE_CATCH);
+        row(HeroAbility.LOVE_LIGHTNING).main(GestureId.LOVE_LIGHTNING);
+        row(HeroAbility.LOVE_EYE_LASER).main(GestureId.LOVE_EYE_LASER);
         row(HeroAbility.LOVE_BIFROST);
         row(HeroAbility.LOVE_BODY);
         // ===== variants (3.5, the creator lane) =====

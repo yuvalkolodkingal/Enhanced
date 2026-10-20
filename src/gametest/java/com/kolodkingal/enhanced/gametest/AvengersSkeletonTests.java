@@ -638,7 +638,8 @@ public final class AvengersSkeletonTests {
         check(FalconWings.canFly(sam), "with them on his back he flies (lane L5)");
         ServerPlayer love = f.player(12.5, FLOOR, 3.5, Power.LOVE);
         love.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
-        check(LoveAbilities.holdsStormbreaker(love) && !LoveAbilities.canFly(love), "Love holds the axe; no flight");
+        // (3.8, lane L8: Love flies while she holds the axe: LoveTests.)
+        check(LoveAbilities.holdsStormbreaker(love) && LoveAbilities.canFly(love), "Love holds the axe and may fly");
         check(Powers.get(love).has(HeroAbility.LOVE_AXE) && !Powers.get(love).has(HeroAbility.THOR_HAMMER),
                 "the thrown axe flies home to her by her own row");
         check(com.kolodkingal.enhanced.bifrost.BifrostKeys.opensScreen(love, 5, false)
@@ -650,7 +651,8 @@ public final class AvengersSkeletonTests {
         answer(SerumChoicePayload.class, new SerumChoicePayload(Power.CAPTAIN_AMERICA), cap);
         check(Powers.power(cap) == Power.NONE && cap.getMainHandItem().is(ModItems.SPECIAL_SOLDIER_SERUM.get()),
                 "a choice changes nobody yet, and keeps the serum");
-        check(!EternityRealm.enter(cap, BlockPos.ZERO) && !EternityRealm.in(cap), "the realm is shut");
+        // (3.8, lane L8: the realm opens through the altar's charge: EternityTests.)
+        check(!EternityRealm.in(cap), "nobody is taken to the realm by a choice");
         // H: Wolverine's looks still cycle; Iron Man's H is the suit key (nothing yet).
         ServerPlayer logan = f.player(3.5, FLOOR, 8.5, Power.WOLVERINE);
         String before = Powers.variant(logan).id();
