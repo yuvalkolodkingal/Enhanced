@@ -20,7 +20,7 @@ public final class ModNetwork {
      * (the serum, Captain America, Red Hulk, Iron Man, Falcon, the tower's armoury, Eternity and Love; the momentary
      * states in two words).
      */
-    public static final String PROTOCOL_VERSION = "12";
+    public static final String PROTOCOL_VERSION = "13";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
