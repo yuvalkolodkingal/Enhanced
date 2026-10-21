@@ -25,7 +25,7 @@ Or **Choose a Hero** in the [Hero Creator](Hero-Creator) (it gives a pair, on yo
 
 A back pack with two jet nozzles and two wings of **segmented metal feathers**, five panels a wing. They are worn on the **chest slot** and give **6 armour** (an iron chestplate's, and a little toughness). They can't be crafted. They wear like an elytra while he glides and when he is hit; mend them with **iron ingots on an anvil** ("Your Exo-Wings are broken. Mend them with iron on an anvil."). Broken wings don't fly.
 
-The wings move: **folded** on his back on the ground, **spread** and beating gently while he hovers, **wide and flat** when he glides, **swept back** for the dive, **wrapped round the front** for the shield and **flung out** for the slash. The nozzles flame while he flies. In first person you see the tips of the wings at the edges of your screen while you fly.
+The wings move: **folded** on his back on the ground, **spread** and beating gently while he hovers, **wide and flat** when he glides, **swept back** for the dive, **wrapped round the front** for the shield and **flung out** for the slash. The nozzles flame while he flies. In first person, while you fly, the two top feathers of each wing rise from low by your hands out to the edges of your screen: two long diagonals that leave the middle of your view clear (since 3.8.1; before, only short tips showed in the corners).
 
 On a player who is **not Falcon**, they are just a chest plate with folded wings: no flight.
 

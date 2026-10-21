@@ -33,15 +33,25 @@ import net.neoforged.neoforge.client.event.RenderHandEvent;
  * {@link FalconWingsState} (folded, spread and beating while he hovers, flat for the glide, swept back for the Dive and
  * the Boost Climb, wrapped round the front for the Wing Shield, flung out for the Wing Slash), the nozzles' flames
  * bright while he flies. Drawn for anyone wearing them (folded for anyone but Falcon) and for a custom hero with
- * Falcon's rows. In first person, the tips of the spread wings show at the edges of his view ({@link #onRenderHand}).
+ * Falcon's rows. In first person, the spread wings' top feathers rise from low in his view out to its edges ({@link
+ * #onRenderHand}).
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     /** The sweep (degrees, forward negative) of the wings as his own eyes see them. */
-    static final float FIRST_PERSON_SWEEP = -28.0F;
+    static final float FIRST_PERSON_SWEEP = -30.0F;
     /** How big the wings look from his eyes (smaller than they are, so they stay at the edges of his view). */
     static final float FIRST_PERSON_SCALE = 0.55F;
-    /** The model the first-person view draws with (any player renderer's: they are all the same). */
+    /**
+     * (3.8.1) The top feather's elevation and the step to the next one down, at most, as his eyes see them: the two top
+     * feathers rise from low by his hands out to the edges of his view, two long diagonals that read as wings.
+     */
+    static final float FIRST_PERSON_TOP = 35.0F;
+    static final float FIRST_PERSON_STEP = 10.0F;
+    /** How many top feathers are seen, and from which of their three segments out. */
+    static final int FIRST_PERSON_FEATHERS = 2;
+    static final int FIRST_PERSON_FROM_SEGMENT = 1;
+    /** The model used for the first-person view (any player renderer's: they are all the same). */
     private static FalconWingsModel firstPersonModel;
 
     private final FalconWingsModel model;
@@ -92,8 +102,9 @@ public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
     }
 
     /**
-     * In first person, the tips of his spread wings at the edges of his view while he flies or glides (drawn once a
-     * frame, with the main hand; before {@code FirstPersonArms}, which takes the hands over and cancels the event).
+     * In first person, the outer two thirds of his spread wings' top two feathers, long diagonals from low in his view
+     * out to its edges, while he flies or glides (drawn once a frame, with the main hand, so not with the hands hidden;
+     * before {@code FirstPersonArms}, which takes the hands over and cancels the event).
      */
     @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
     public static void onRenderHand(RenderHandEvent event) {
@@ -116,21 +127,23 @@ public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
         // view instead of lying beside the camera.)
         p[FalconWingsState.SWEEP] = FIRST_PERSON_SWEEP;
         p[FalconWingsState.HZ] = 0.0F;
-        // (Low in his view: the feathers only peek in at the lower edges, whatever the beat.)
-        p[FalconWingsState.TOP] = Math.min(p[FalconWingsState.TOP], 4.0F);
-        p[FalconWingsState.STEP] = Math.min(p[FalconWingsState.STEP], 6.0F);
+        // (Rising from low in his view to its edges, whatever the beat: the middle stays clear.)
+        p[FalconWingsState.TOP] = Math.min(p[FalconWingsState.TOP], FIRST_PERSON_TOP);
+        p[FalconWingsState.STEP] = Math.min(p[FalconWingsState.STEP], FIRST_PERSON_STEP);
         model.pose(p, flap, age, 0.0F);
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
         // From the camera to his back, then into the body's model space (x to his left, y down, z behind him).
-        poseStack.translate(0.0F, -0.36F, -0.62F);
+        poseStack.translate(0.0F, -0.50F, -0.55F);
         poseStack.mulPose(Axis.XP.rotationDegrees(player.isFallFlying() ? -12.0F : 4.0F));
         // (A model part's own numbers are pixels: it divides them by 16 itself; only the axes turn here.)
         poseStack.scale(-FIRST_PERSON_SCALE, -FIRST_PERSON_SCALE, FIRST_PERSON_SCALE);
         var buffer = event.getMultiBufferSource().getBuffer(RenderType.entityCutoutNoCull(texture(player)));
         int light = event.getPackedLight();
-        model.renderTips(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, 0, 3);
-        model.renderTips(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, 1, 3);
+        model.renderTips(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, 0, FIRST_PERSON_FEATHERS,
+                FIRST_PERSON_FROM_SEGMENT);
+        model.renderTips(poseStack, buffer, light, OverlayTexture.NO_OVERLAY, 1, FIRST_PERSON_FEATHERS,
+                FIRST_PERSON_FROM_SEGMENT);
         poseStack.popPose();
     }
 }

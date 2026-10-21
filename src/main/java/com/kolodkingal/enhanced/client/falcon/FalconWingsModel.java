@@ -149,14 +149,20 @@ public class FalconWingsModel extends Model {
         }
     }
 
-    /** The outer segments (with their points) of one wing's top feathers, for the first-person view (side 0 right). */
-    public void renderTips(PoseStack poseStack, VertexConsumer buffer, int light, int overlay, int side, int count) {
+    /**
+     * The outer segments (from segment {@code from}, 0-2, to the point) of one wing's top {@code count} feathers, for
+     * the first-person view (side 0 right).
+     */
+    public void renderTips(PoseStack poseStack, VertexConsumer buffer, int light, int overlay, int side, int count,
+                           int from) {
         poseStack.pushPose();
         wings[side].translateAndRotate(poseStack);
         for (int i = 0; i < Math.min(count, FEATHERS); i++) {
             poseStack.pushPose();
             feathers[side][i].translateAndRotate(poseStack);
-            segments[side][i][2].render(poseStack, buffer, light, overlay);
+            for (int k = Math.max(0, from); k < 3; k++) {
+                segments[side][i][k].render(poseStack, buffer, light, overlay);
+            }
             poseStack.popPose();
         }
         poseStack.popPose();
