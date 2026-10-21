@@ -622,10 +622,13 @@ public final class LabTests {
             check(entrance[0] / 1e6 <= ENTRANCE_MS, "the entrance within " + ENTRANCE_MS + " ms: " + entrance[0] / 1e6);
             checkBuilt(level, site, "under a real school");
             int i = 0;
+            // (3.8.1, the flake of a full run: the school's cellar has a daylight detector, whose power the world
+            // changes by itself with the time of day, so a whole-state comparison failed when the run reached this
+            // test by day. "Untouched" is about the builder: the same block stands there, whatever its power.)
             for (BlockPos p : BlockPos.betweenClosed(1, -3, 1, 45, 5, 42)) {
                 BlockState now = level.getBlockState(site.school(p));
-                check(now == before.get(i++) || isEntrance(p), "the cellar and the ground above the lab are "
-                        + "untouched at " + p.immutable() + ": " + now);
+                check(now.getBlock() == before.get(i++).getBlock() || isEntrance(p), "the cellar and the ground "
+                        + "above the lab are untouched at " + p.immutable() + ": " + now);
             }
             for (BlockPos p : SchoolLabPlan.STUDY_SHELVES) {
                 check(level.getBlockState(site.school(p)).is(ModBlocks.SECRET_BOOKSHELF.get()), "a secret shelf");
