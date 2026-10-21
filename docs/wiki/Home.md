@@ -49,6 +49,18 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.8.1
+
+Eilon asked: "draw Tony a skin".
+
+* **[Tony Stark](Iron-Man#looks) has a real skin**, in three looks: **Tony** (dark swept-back hair, his moustache and pointed beard, a dark T-shirt with the **Arc Reactor** shining through it, dark jeans), **Tony in sunglasses** (tinted glasses and a dark blazer) and **Workshop Tony** (a grey tank top with oil smudges). The **reactor glows in the dark**, and the suits still close over him when he suits up.
+* **Sounds:** the Arc Reactor **hums** softly while you press it to your chest, when Iron Man holds his up, and when a suit powers up; the repulsors **whine** under the Mark 3's Double-Hand Blast.
+* **[Captain America](Captain-America):** his Combat Combo and Flip Kick have a damage of their own now, so a custom hero's card strength makes them stronger, as with every other hero's moves.
+* **[Falcon](Falcon):** in first person, the spread wings show as long diagonals at the sides of your view, not just short stubs in the corners.
+* **The server's announcements** tell the story ("…put an Arc Reactor in their chest…", "…took the Super Soldier Serum…", "…made a wish to Eternity…") only when that really happened: a hero given by a command or by Choose a Hero is announced plainly ("Eilon has become Iron Man!").
+* **Avengers Tower** no longer writes six warnings to the server log when it is built.
+* Keep the server and the players on the same version (network protocol **12**, unchanged).
+
 ## What's new in 3.8
 
 Eilon asked for the Super Soldier Serum, Captain America, Red Hulk, Iron Man and every one of his suits, Falcon, and, from *Thor: Love and Thunder*, Eternity and Love.
