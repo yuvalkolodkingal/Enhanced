@@ -140,7 +140,11 @@ public final class SuitControl {
         }
         IronSuits.setState(player, IronSuits.state(player).withSuit(kind));
         if (!IronSuits.state(player).inPhase() && Powers.power(player) == Power.IRON_MAN) {
-            SuitPhases.begin(player, kind, true, SuitPhases.length(kind, true), true);
+            // (3.8.1: the Hulkbuster's by-hand version is its short one from the start, as its listener wants it.)
+            int ticks = kind == SuitKind.HULKBUSTER
+                    ? com.kolodkingal.enhanced.ironman.hulkbuster.Hulkbuster.BY_HAND_TICKS
+                    : SuitPhases.length(kind, true);
+            SuitPhases.begin(player, kind, true, ticks, true);
         }
     }
 

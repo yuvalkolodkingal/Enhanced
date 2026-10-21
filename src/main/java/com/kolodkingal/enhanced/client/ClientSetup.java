@@ -306,8 +306,7 @@ public final class ClientSetup {
         // ===== nanotech (3.8) =====
         event.registerEntityRenderer(ModEntities.NANO_DRONE.get(),
                 com.kolodkingal.enhanced.client.ironman.nano.NanoDroneRenderer::new);
-        event.registerEntityRenderer(ModEntities.HULKBUSTER_FRAME.get(),
-                ctx -> new com.kolodkingal.enhanced.client.render.PlaceholderBoxRenderer<>(ctx, 0xC0301E));
+        // (The Hulkbuster's frame: lane L7's renderer, in the suit_art region.)
         // ===== suit_art (3.8) =====
         event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.SUIT_DISPLAY.get(),
                 com.kolodkingal.enhanced.client.ironman.suits.SuitDisplayRenderer::new);
@@ -322,7 +321,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.REDWING.get(),
                 com.kolodkingal.enhanced.client.falcon.RedwingRenderer::new);
         // ===== tower (3.8) =====
-        // (the suit display's stand-in: client/tower/TowerClient, registered first so lane L7's renderer replaces it)
+        // (the suit display: lane L7's SuitDisplayRenderer, in the suit_art region)
         event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TECH_CASE.get(),
                 com.kolodkingal.enhanced.client.tower.TechCaseRenderer::new);
         // ===== eternity (3.8) =====

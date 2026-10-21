@@ -147,6 +147,8 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> CAP_SHIELD = key("cap_shield");
     /** The Shield Slam's shockwave and the Shield Charge (lane L1). */
     public static final ResourceKey<DamageType> CAP_SLAM = key("cap_slam");
+    /** His fists and kicks: the Combat Combo and the Flip Kick (melee_blows; 3.8.1, scaled for a custom hero). */
+    public static final ResourceKey<DamageType> CAP_COMBO = key("cap_combo");
     // ===== red_hulk (3.8) =====
     /** Red Hulk's Ground Smash (melee_blows; lane L2). */
     public static final ResourceKey<DamageType> RED_HULK_SMASH = key("red_hulk_smash");

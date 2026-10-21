@@ -5,11 +5,11 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.CaptainFxPayload;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -19,7 +19,9 @@ import java.util.List;
  * N: the Combat Combo, and with Sneak the Flip Kick (3.8, PLAN 3.4). The combo is two punches and a spinning kick
  * ({@code comboDamage1/2/3}) on the first creature in a 60° cone before him, at least {@code comboGap} ticks apart; a
  * pause of {@code comboReset} starts it again from the first punch; the kick knocks back. The flip kick is a backflip:
- * the creature in front is kicked up and away and he lands three blocks back.
+ * the creature in front is kicked up and away and he lands three blocks back. Both deal {@code enhanced:cap_combo}
+ * (3.8.1; a blow of the hand, {@code #enhanced:melee_blows}), which a custom hero's strength scales ({@code
+ * HeroDamage}).
  */
 public final class CaptainCombo {
     static final double REACH = 3.5;
@@ -51,7 +53,7 @@ public final class CaptainCombo {
         ServerLevel level = player.serverLevel();
         player.swing(step == 1 ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND, true);
         LivingEntity target = CaptainAbilities.inFront(player, REACH, CONE);
-        if (target != null && CaptainAbilities.hurt(player, target, DamageTypes.PLAYER_ATTACK, damage, null)) {
+        if (target != null && CaptainAbilities.hurt(player, target, ModDamageTypes.CAP_COMBO, damage, null)) {
             if (step == 2) {
                 CaptainAbilities.push(target, player.position(), KICK_KNOCK, 0.2, player);
             }
@@ -73,7 +75,7 @@ public final class CaptainCombo {
         ServerLevel level = player.serverLevel();
         LivingEntity target = CaptainAbilities.inFront(player, REACH, CONE);
         boolean struck = false;
-        if (target != null && CaptainAbilities.hurt(player, target, DamageTypes.PLAYER_ATTACK,
+        if (target != null && CaptainAbilities.hurt(player, target, ModDamageTypes.CAP_COMBO,
                 (float) CaptainAbilities.cfg(CaptainConfig.FLIP_DAMAGE, 5.0), null)) {
             CaptainAbilities.push(target, player.position(), FLIP_BACK, FLIP_UP, player);
             struck = true;

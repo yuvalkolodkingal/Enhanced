@@ -49,6 +49,9 @@ public class NanoArcReactorItem extends ArmorItem {
             return InteractionResultHolder.consume(stack);
         }
         player.startUsingItem(hand);
+        if (player instanceof ServerPlayer server) {
+            ArcReactorItem.hum(server, 0.45F);
+        }
         return InteractionResultHolder.consume(stack);
     }
 

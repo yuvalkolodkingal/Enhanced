@@ -22,7 +22,10 @@ import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * The Arc Reactor (3.8, PLAN 5.2): a round palm-sized reactor, a white-blue core in a steel ring. Hold right-click for
@@ -52,9 +55,10 @@ public class ArcReactorItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (Powers.power(player) == Power.IRON_MAN) {
-            if (!level.isClientSide) {
+            if (player instanceof ServerPlayer server) {
                 player.displayClientMessage(Component.translatable("message.enhanced.iron_man.full_power")
                         .withStyle(ChatFormatting.AQUA), true);
+                hum(server, 0.35F);
             }
             return InteractionResultHolder.consume(stack);
         }
@@ -66,8 +70,35 @@ public class ArcReactorItem extends Item {
             return InteractionResultHolder.consume(stack);
         }
         player.startUsingItem(hand);
+        if (player instanceof ServerPlayer server) {
+            hum(server, 0.45F);
+        }
         return InteractionResultHolder.consume(stack);
     }
+
+    /**
+     * When each player last started the hum (game time), so that clicking again and again does not stack it (one small
+     * entry per player; a time from another world's clock is simply replaced).
+     */
+    private static final Map<UUID, Long> LAST_HUM = new HashMap<>();
+
+    /**
+     * The reactor's soft hum (3.8.1; its two seconds are the hold's): while a reactor is pressed to the chest, when
+     * Iron Man holds his up, when a suit powers up. At most once in {@link #HUM_GAP} ticks for a player.
+     */
+    public static void hum(ServerPlayer player, float volume) {
+        long now = player.level().getGameTime();
+        Long last = LAST_HUM.get(player.getUUID());
+        if (last != null && now - last < HUM_GAP && now >= last) {
+            return;
+        }
+        LAST_HUM.put(player.getUUID(), now);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ARC_REACTOR_HUM.get(),
+                SoundSource.PLAYERS, volume, 1.0F);
+    }
+
+    /** The hum's length in ticks: the shortest time between two. */
+    public static final int HUM_GAP = 40;
 
     @Override
     public UseAnim getUseAnimation(ItemStack stack) {

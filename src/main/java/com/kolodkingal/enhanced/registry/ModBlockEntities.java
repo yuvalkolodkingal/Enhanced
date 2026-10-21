@@ -85,6 +85,16 @@ public final class ModBlockEntities {
             BLOCK_ENTITIES.register("suit_display",
                     () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.SuitDisplayBlockEntity::new,
                     ModBlocks.SUIT_DISPLAY.get()).build(null));
+    /**
+     * The display's upper half (3.8.1): an empty block entity, so that world generation, which gives every block of an
+     * entity block a placeholder, finds one there instead of warning in the log.
+     */
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>,
+            BlockEntityType<com.kolodkingal.enhanced.block.SuitDisplayBlock.Top>> SUIT_DISPLAY_TOP =
+            BLOCK_ENTITIES.register("suit_display_top",
+                    () -> BlockEntityType.Builder.of(com.kolodkingal.enhanced.block.SuitDisplayBlock.Top::new,
+                    ModBlocks.SUIT_DISPLAY.get()).build(null));
     @SuppressWarnings("DataFlowIssue")
     public static final DeferredHolder<BlockEntityType<?>,
             BlockEntityType<com.kolodkingal.enhanced.block.TechCaseBlockEntity>> TECH_CASE =

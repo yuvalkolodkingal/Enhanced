@@ -77,7 +77,7 @@ Next to the usual panel: the shield ("Shield: in hand", "on your back", "flying 
 
 ## Captain America in the Hero Creator
 
-His abilities are in the [Hero Creator](Hero-Creator) (`captain.shield_throw`, `captain.shield_slam`, `captain.shield_charge`, `captain.assemble`, `captain.combo`, `captain.body`), and his five Sneak variants are cards of their own (`captain.ricochet`, `captain.super_leap`, `captain.shield_bash`, `captain.inspire`, `captain.flip_kick`). **The Super-Soldier** body makes a custom hero worthy of Mjolnir. A custom hero's Shield Throw needs a shield in hand: any shield flies and comes back, only the Vibranium Shield ricochets. See [Heroes' Abilities](Hero-Abilities#captain-america-6). The ready-made hero is *Captain America-like*, and *Captain America* is a run style.
+His abilities are in the [Hero Creator](Hero-Creator) (`captain.shield_throw`, `captain.shield_slam`, `captain.shield_charge`, `captain.assemble`, `captain.combo`, `captain.body`), and his five Sneak variants are cards of their own (`captain.ricochet`, `captain.super_leap`, `captain.shield_bash`, `captain.inspire`, `captain.flip_kick`). **The Super-Soldier** body makes a custom hero worthy of Mjolnir. Since 3.8.1 his Combat Combo and Flip Kick deal a damage of their own (`cap_combo`), so a custom hero's card strength scales them. A custom hero's Shield Throw needs a shield in hand: any shield flies and comes back, only the Vibranium Shield ricochets. See [Heroes' Abilities](Hero-Abilities#captain-america-6). The ready-made hero is *Captain America-like*, and *Captain America* is a run style.
 
 ## Numbers you can change
 

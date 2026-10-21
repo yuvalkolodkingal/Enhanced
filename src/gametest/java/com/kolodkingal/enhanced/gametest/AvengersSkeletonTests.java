@@ -396,7 +396,8 @@ public final class AvengersSkeletonTests {
         Map<ResourceKey<DamageType>, HeroAbility> dealt = Map.of(ModDamageTypes.CAP_SHIELD,
                 HeroAbility.CAPTAIN_SHIELD_THROW, ModDamageTypes.RED_HULK_SMASH, HeroAbility.RED_HULK_SMASH,
                 ModDamageTypes.REPULSOR, HeroAbility.IRON_MAN_REPULSOR, ModDamageTypes.FALCON_DART,
-                HeroAbility.FALCON_BLASTERS, ModDamageTypes.LOVE_EYE_LASER, HeroAbility.LOVE_EYE_LASER);
+                HeroAbility.FALCON_BLASTERS, ModDamageTypes.LOVE_EYE_LASER, HeroAbility.LOVE_EYE_LASER,
+                ModDamageTypes.CAP_COMBO, HeroAbility.CAPTAIN_COMBO); // (3.8.1: Cap's fists, scaled like his shield)
         for (Map.Entry<ResourceKey<DamageType>, HeroAbility> e : dealt.entrySet()) {
             CustomHero hero = CustomKitSupport.def().pick(e.getValue().id(), 5).key(e.getValue().home,
                     e.getValue().id()).build();
@@ -442,16 +443,18 @@ public final class AvengersSkeletonTests {
                 && BuiltInRegistries.ITEM.getTag(ModTags.NANO_SUITS).map(HolderSet::size).orElse(0) == 2
                 && new ItemStack(ModItems.NANO_ARC_REACTOR.get()).is(ModTags.ARC_REACTORS), "the suits and reactors");
         Registry<DamageType> types = server.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        for (String name : List.of("cap_shield", "cap_slam", "red_hulk_smash", "red_hulk_burst", "repulsor", "unibeam",
-                "iron_missile", "iron_flame", "iron_blade", "refocuser_lightning", "drone_laser", "hulkbuster_punch",
-                "falcon_dart", "falcon_dive", "redwing_laser", "love_eye_laser", "love_lightning")) {
+        for (String name : List.of("cap_shield", "cap_slam", "cap_combo", "red_hulk_smash", "red_hulk_burst",
+                "repulsor", "unibeam", "iron_missile", "iron_flame", "iron_blade", "refocuser_lightning",
+                "drone_laser", "hulkbuster_punch", "falcon_dart", "falcon_dive", "redwing_laser", "love_eye_laser",
+                "love_lightning")) {
             check(types.containsKey(Enhanced.id(name)), "the damage " + name);
         }
         check(types.getHolderOrThrow(ModDamageTypes.RED_HULK_BURST).is(DamageTypeTags.IS_FIRE)
                 && types.getHolderOrThrow(ModDamageTypes.CAP_SHIELD).is(DamageTypeTags.IS_PROJECTILE)
                 && types.getHolderOrThrow(ModDamageTypes.IRON_MISSILE).is(DamageTypeTags.IS_EXPLOSION)
                 && types.getHolderOrThrow(ModDamageTypes.LOVE_LIGHTNING).is(DamageTypeTags.IS_LIGHTNING)
-                && types.getHolderOrThrow(ModDamageTypes.HULKBUSTER_PUNCH).is(ModTags.MELEE_BLOWS),
+                && types.getHolderOrThrow(ModDamageTypes.HULKBUSTER_PUNCH).is(ModTags.MELEE_BLOWS)
+                && types.getHolderOrThrow(ModDamageTypes.CAP_COMBO).is(ModTags.MELEE_BLOWS),
                 "the damages' tags");
         for (ResourceKey<DamageType> energy : List.of(ModDamageTypes.REPULSOR, ModDamageTypes.LOVE_EYE_LASER,
                 ModDamageTypes.CHAOS_BEAM, ModDamageTypes.LIGHTNING_BEAM, ModDamageTypes.OPTIC_BLAST)) {

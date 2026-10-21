@@ -113,6 +113,8 @@ public final class HeroDamage {
         // flame and the Hulkbuster's punches, are no rows: PLAN 11.1).
         first(ModDamageTypes.CAP_SHIELD, HeroAbility.CAPTAIN_SHIELD_THROW, HeroAbility.CAPTAIN_RICOCHET);
         first(ModDamageTypes.CAP_SLAM, HeroAbility.CAPTAIN_SHIELD_SLAM, HeroAbility.CAPTAIN_SHIELD_CHARGE);
+        // (3.8.1: his fists and kicks have their own type now, so that a custom hero's strength scales them.)
+        first(ModDamageTypes.CAP_COMBO, HeroAbility.CAPTAIN_COMBO, HeroAbility.CAPTAIN_FLIP_KICK);
         first(ModDamageTypes.RED_HULK_SMASH, HeroAbility.RED_HULK_SMASH);
         first(ModDamageTypes.RED_HULK_BURST, HeroAbility.RED_HULK_BURST, HeroAbility.RED_HULK_HEAT_WAVE);
         first(ModDamageTypes.REPULSOR, HeroAbility.IRON_MAN_REPULSOR);

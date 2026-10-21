@@ -138,7 +138,7 @@ The `<power>` argument is one of:
 | `love` | [Love](Love) (3.8) |
 | `custom` | The player's own hero from the [Hero Creator](Hero-Creator): the one they last made (an empty hero, with no powers, if they never made one) |
 
-The command suggests the names as you type. A player who is given a power awakens as that hero, with the title, the sound and the announcement to everyone, exactly as if they had earned it. If a player already has that power and you give a look, only the look changes.
+The command suggests the names as you type. A player who is given a power awakens as that hero, with the title, the sound and an announcement to everyone, as if they had earned it; since 3.8.1 the announcement says plainly that they became the hero ("Steve has become Thor!"), not the story of the hero's item. If a player already has that power and you give a look, only the look changes.
 
 ## Looks
 

@@ -79,7 +79,7 @@ English: [Captain America](Captain-America)
 
 ## קפטן אמריקה ביוצר הגיבורים
 
-היכולות שלו נמצאות ב[יוצר הגיבורים](Hero-Creator-HE) (`captain.shield_throw`, `captain.shield_slam`, `captain.shield_charge`, `captain.assemble`, `captain.combo`, `captain.body`), וחמש גרסאות ההתכופפות שלו הן קלפים בפני עצמם (`captain.ricochet`, `captain.super_leap`, `captain.shield_bash`, `captain.inspire`, `captain.flip_kick`). **חייל-על** (הגוף) עושה גיבור שיצרתם לראוי למיולניר. זריקת המגן של גיבור שיצרתם צריכה מגן ביד: כל מגן עף וחוזר, ורק מגן הוויברניום קופץ. ראו [יכולות הגיבורים](Hero-Abilities-HE#קפטן-אמריקה-6). הגיבור המוכן הוא *דמוי קפטן אמריקה*, ו*קפטן אמריקה* הוא סגנון ריצה.
+היכולות שלו נמצאות ב[יוצר הגיבורים](Hero-Creator-HE) (`captain.shield_throw`, `captain.shield_slam`, `captain.shield_charge`, `captain.assemble`, `captain.combo`, `captain.body`), וחמש גרסאות ההתכופפות שלו הן קלפים בפני עצמם (`captain.ricochet`, `captain.super_leap`, `captain.shield_bash`, `captain.inspire`, `captain.flip_kick`). **חייל-על** (הגוף) עושה גיבור שיצרתם לראוי למיולניר. מאז 3.8.1 לקומבו ולבעיטת הסלטה שלו יש נזק משלהם (`cap_combo`), אז החוזק של הקלף מחזק אותם אצל גיבור שיצרתם. זריקת המגן של גיבור שיצרתם צריכה מגן ביד: כל מגן עף וחוזר, ורק מגן הוויברניום קופץ. ראו [יכולות הגיבורים](Hero-Abilities-HE#קפטן-אמריקה-6). הגיבור המוכן הוא *דמוי קפטן אמריקה*, ו*קפטן אמריקה* הוא סגנון ריצה.
 
 ## מספרים שאפשר לשנות
 

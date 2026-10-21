@@ -151,7 +151,7 @@ public final class EnhancedCommand {
             } else if (Powers.power(player) == power && !look.isEmpty()) {
                 Powers.setVariant(player, Variants.get(power, look));
             } else {
-                Powers.awaken(player, power, look);
+                Powers.awaken(player, power, look, false);
             }
         }
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.power.set", players.size(), power.displayName()), true);

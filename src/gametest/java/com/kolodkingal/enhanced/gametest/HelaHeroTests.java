@@ -151,8 +151,17 @@ public final class HelaHeroTests {
         tap(p, 1, true);
         List<NecroswordEntity> blades = near(f, NecroswordEntity.class);
         check(blades.size() == HelaAbilities.RAIN_BLADES && blades.stream().allMatch(b -> b.falling() && b.hang() > 0), "twelve blades hang");
+        // (3.8.1, the flake of a full run: the zombie stood under "the first blade" of an entity search, whose order
+        // follows the chunk sections the arena happens to straddle, so in some places that was an outer blade over the
+        // arena's edge; and with its AI on it walked off towards her before the blades fell. Now: the middle blade,
+        // the one nearest the blades' centre (seen from above), and a zombie that stays where it is put.)
+        Vec3 centre = blades.stream().map(NecroswordEntity::position).reduce(Vec3.ZERO, Vec3::add)
+                .scale(1.0 / blades.size());
+        NecroswordEntity middle = blades.stream().min(java.util.Comparator.comparingDouble(
+                b -> Math.hypot(b.getX() - centre.x, b.getZ() - centre.z))).orElseThrow();
         Zombie zombie = EntityType.ZOMBIE.create(f.level());
-        Vec3 under = blades.get(0).position().subtract(0.0, 3.0, 0.0);
+        zombie.setNoAi(true);
+        Vec3 under = middle.position().subtract(0.0, 3.0, 0.0);
         zombie.moveTo(under.x, HelaRules.groundAt(f.level(), under.x, under.y + 3, under.z), under.z);
         f.level().addFreshEntity(zombie);
         f.everyTick(60, t -> {

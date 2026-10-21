@@ -87,6 +87,15 @@ public final class Powers {
 
     /** {@link #awaken(ServerPlayer, Power)} straight into one of the hero's looks (an unknown id means the default). */
     public static void awaken(ServerPlayer player, Power power, String variant) {
+        awaken(player, power, variant, true);
+    }
+
+    /**
+     * {@link #awaken(ServerPlayer, Power, String)}; {@code ownWay} false (3.8.1) when the hero was not reached his own
+     * way but given by a command or the Hero Creator's "Choose a hero": the server is then told plainly that he became
+     * the hero ("… has become Iron Man!"), not the story of his item ("… put an Arc Reactor in their chest …").
+     */
+    public static void awaken(ServerPlayer player, Power power, String variant, boolean ownWay) {
         setPower(player, power);
         setVariant(player, Variants.get(power, variant));
         ServerLevel level = player.serverLevel();
@@ -110,9 +119,12 @@ public final class Powers {
         burst(level, player.getX(), player.getY() + 1.0, player.getZ(), look.color(), 120, 1.6);
         burst(level, player.getX(), player.getY() + 1.0, player.getZ(), look.glow(), 60, 0.8);
 
+        String key = ownWay ? "power.enhanced." + power.getSerializedName() + ".broadcast"
+                : "power.enhanced.chosen.broadcast";
+        Component told = ownWay ? Component.translatable(key, player.getDisplayName())
+                : Component.translatable(key, player.getDisplayName(), power.displayName());
         player.server.getPlayerList().broadcastSystemMessage(
-                Component.translatable("power.enhanced." + power.getSerializedName() + ".broadcast", player.getDisplayName())
-                        .withStyle(s -> s.withColor(power.titleColor())), false);
+                told.copy().withStyle(s -> s.withColor(power.titleColor())), false);
     }
 
     /** The longest awakening line (in the server's English) that is shown as the title's subtitle. */

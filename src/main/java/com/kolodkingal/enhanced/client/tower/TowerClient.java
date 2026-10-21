@@ -1,30 +1,20 @@
 package com.kolodkingal.enhanced.client.tower;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.block.TechCaseBlockEntity;
 import com.kolodkingal.enhanced.network.TowerFxPayload;
-import com.kolodkingal.enhanced.registry.ModBlockEntities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 /**
  * The client's side of the Avengers Tower's armoury (3.8, lane L6): the drawers of {@link TowerFxPayload} (a suit
- * taken: sparks round the display; refused: a puff; a case's lid opening and closing, which its renderer slides) and
- * the suit display's stand-in renderer ({@link SuitDisplayStandIn}). The stand-in is registered before the client
- * setup's own renderers ({@link EventPriority#HIGHEST}), so lane L7's display renderer, registered there, takes its
- * place when the lanes are merged; until then the displays show the suits of {@code SuitModels} (the 3.8 skeleton's
- * boxes, or lane L7's models).
+ * taken: sparks round the display; refused: a puff; a case's lid opening and closing, which its renderer slides). The
+ * displays are drawn by lane L7's {@code client/ironman/suits/SuitDisplayRenderer} (3.8.1: L6's stand-in renderer,
+ * which it replaced at every start, is gone).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class TowerClient {
 
     /** The drawers (from the client setup's {@code tower (3.8)} region). */
@@ -33,12 +23,6 @@ public final class TowerClient {
         TowerFx.register(TowerFxPayload.DISPLAY_REFUSE, TowerClient::refused);
         TowerFx.register(TowerFxPayload.CASE_OPEN, TowerClient::opened);
         TowerFx.register(TowerFxPayload.CASE_CLOSE, TowerClient::closed);
-    }
-
-    /** The display's stand-in, first of all the renderers: lane L7's display renderer replaces it. */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ModBlockEntities.SUIT_DISPLAY.get(), SuitDisplayStandIn::new);
     }
 
     private static void taken(TowerFxPayload payload) {

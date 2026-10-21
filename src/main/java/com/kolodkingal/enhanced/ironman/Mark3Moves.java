@@ -116,6 +116,8 @@ public final class Mark3Moves implements SuitMoves {
         blast(player, IronManAbilities.cfg(IronManConfig.MARK3_DOUBLE_BLAST_DAMAGE, 10.0),
                 IronManAbilities.cfg(IronManConfig.MARK3_DOUBLE_BLAST_POWER, 1.2), true);
         IronManAbilities.sound(player.serverLevel(), player.position(), ModSounds.DOUBLE_BLAST.get(), 1.0F, 1.0F);
+        // (3.8.1) Both palms whine up under the blast: the repulsors' charge, quieter (once a blast: 2-s cooldown).
+        IronManAbilities.sound(player.serverLevel(), player.position(), ModSounds.REPULSOR_CHARGE.get(), 0.55F, 1.1F);
     }
 
     /** The ray itself: what it hits, the damage, the boom, the effect (from one palm or both). */

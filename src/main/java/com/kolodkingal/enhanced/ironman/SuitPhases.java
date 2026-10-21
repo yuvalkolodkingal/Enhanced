@@ -231,6 +231,8 @@ public final class SuitPhases {
                 if (!silent) {
                     player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                             ModSounds.IRON_HUD_BOOT.get(), SoundSource.PLAYERS, 0.7F, 1.0F);
+                    // (3.8.1) and the reactor hums softly as the suit draws its power
+                    com.kolodkingal.enhanced.item.ArcReactorItem.hum(player, 0.3F);
                 }
             }
             for (Listener l : listeners(kind)) {

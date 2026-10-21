@@ -181,9 +181,18 @@ public class SuitDisplayBlock extends BaseEntityBlock {
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new SuitDisplayBlockEntity(pos, state) : null;
+        // (3.8.1) The upper half has an empty one: every state of an entity block "has" a block entity, and world
+        // generation logged a warning for each upper half that made none.
+        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new SuitDisplayBlockEntity(pos, state)
+                : new Top(pos, state);
+    }
+
+    /** The upper half's block entity: nothing in it, never saved with data, never drawn. */
+    public static final class Top extends BlockEntity {
+        public Top(BlockPos pos, BlockState state) {
+            super(com.kolodkingal.enhanced.registry.ModBlockEntities.SUIT_DISPLAY_TOP.get(), pos, state);
+        }
     }
 }
