@@ -177,9 +177,16 @@ public final class Variants {
                 new Variant("red_hulk", Power.RED_HULK, Variant.suit("red_hulk"), null, false, 0xC4231B, 0xFF7A3A),
                 own(Power.RED_HULK));
         // ===== iron_man (3.8) =====
-        // Tony under the suit (his look is his suit, drawn by SuitLayer over this skin; lane L3).
+        // Tony under the suit (the suits are drawn by SuitLayer over this skin; lane L3). 3.8.1: our own drawings
+        // (SCRATCH/v381/art/gen_tony.py): Tony in his dark T-shirt with the Arc Reactor shining through it, the same
+        // with his tinted sunglasses and a blazer, and Workshop Tony in a grey tank top; the reactor glows in the dark
+        // (IronManClient.eyes, the looks' _glow masks).
         add(Power.IRON_MAN,
                 new Variant("tony", Power.IRON_MAN, Variant.suit("iron_man_tony"), null, false, 0xB3121B, 0x9FE8FF),
+                new Variant("shades", Power.IRON_MAN, Variant.suit("iron_man_tony_shades"), null, false, 0xB3121B,
+                        0x9FE8FF),
+                new Variant("workshop", Power.IRON_MAN, Variant.suit("iron_man_tony_workshop"), null, false, 0xB3121B,
+                        0x9FE8FF),
                 own(Power.IRON_MAN));
         // ===== falcon (3.8) =====
         // Endgame's suit and the Winter Soldier's flight suit; our own drawings by lane L5 (SCRATCH/v38/art/l5).

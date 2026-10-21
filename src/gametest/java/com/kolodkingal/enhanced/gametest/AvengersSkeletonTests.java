@@ -186,8 +186,8 @@ public final class AvengersSkeletonTests {
                 .equals(List.of("classic", "stealth", "own")), "Cap's three looks");
         check(Variants.of(Power.RED_HULK).stream().map(Variant::id).toList().equals(List.of("red_hulk", "own")),
                 "Red Hulk's two");
-        check(Variants.of(Power.IRON_MAN).stream().map(Variant::id).toList().equals(List.of("tony", "own")),
-                "Iron Man's two (his look is his suit)");
+        check(Variants.of(Power.IRON_MAN).stream().map(Variant::id).toList()
+                .equals(List.of("tony", "shades", "workshop", "own")), "Tony's three looks under the suit (3.8.1)");
         check(Variants.of(Power.FALCON).stream().map(Variant::id).toList()
                 .equals(List.of("endgame", "winter_soldier", "own")), "Falcon's three");
         check(Variants.of(Power.LOVE).stream().map(Variant::id).toList().equals(List.of("love", "own")), "Love's two");

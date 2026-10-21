@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.power.PowerData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +34,14 @@ public final class IronManClient implements HeroClient {
     public Component hudStatus(LocalPlayer player, PowerData data, int ability, long now) {
         // (In a class of the client's own: the game tests load this plug-in on a server.)
         return com.kolodkingal.enhanced.client.ironman.IronHud.status(player, data, ability, now);
+    }
+
+    // ---- the reactor in his chest (3.8.1) ----
+
+    @Override
+    @Nullable
+    public RenderType eyes(AbstractClientPlayer player, PowerData data) {
+        return com.kolodkingal.enhanced.client.ironman.TonyGlow.eyes(player, data);
     }
 
     // ---- the animation ----

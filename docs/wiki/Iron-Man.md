@@ -22,7 +22,7 @@ There are two reactors. Both are on **Tony's desk** in Iron Man's workshop, each
 
 Becoming Iron Man **replaces your hero**, exactly as `/enhanced power set` does (a server can make the reactors refuse heroes instead: `iron_man.reactorReplacesHero`; then a hero hears "The Arc Reactor won't go in: you are already a hero.").
 
-You also become Iron Man with **Choose a Hero** in the [Hero Creator](Hero-Creator) (with an **Arc Reactor and a Mark 3**), or with `/enhanced power set <player> iron_man` (and a look: `tony` or `own`). The [Super Soldier Serum](Super-Soldier-Serum) has no Iron Man card.
+You also become Iron Man with **Choose a Hero** in the [Hero Creator](Hero-Creator) (with an **Arc Reactor and a Mark 3**), or with `/enhanced power set <player> iron_man` (and a look: `tony`, `shades`, `workshop` or `own`). The [Super Soldier Serum](Super-Soldier-Serum) has no Iron Man card.
 
 The reactors have **no recipe** unless a server switches them on (`iron_man.reactorsCraftable`, for worlds with no towers):
 
@@ -199,7 +199,18 @@ In first person a thin **helmet frame** (blue arcs at the edges of the screen, w
 
 ## Looks
 
-Iron Man's look is his **suit**. Under it, Tony wears plain dark clothes (`tony`), or your own skin (`own`); choose with `/enhanced power set <player> iron_man own` or in Choose a Hero. **H** is his suit key, not a look key.
+Iron Man's look is his **suit**. Under it is **Tony** (since 3.8.1 drawn for real), in one of three looks, or your own skin:
+
+| Look | Id | What it is |
+|---|---|---|
+| **Tony** (default) | `tony` | Dark swept-back hair, his moustache and pointed beard, brown eyes; a fitted charcoal T-shirt with the **Arc Reactor** shining through the middle of the chest (a round blue-white light), a dark belt, dark jeans and dark shoes, a watch on the left wrist. |
+| **Tony in sunglasses** | `shades` | The same Tony with his tinted (rose) sunglasses and a dark grey blazer open over the T-shirt, so the reactor still shines between the lapels. |
+| **Workshop Tony** | `workshop` | A plain grey tank top with oil smudges, bare arms with grease on the forearms, worn jeans and dark work boots: Tony building suits in his workshop. |
+| **Your own skin** | `own` | Your own skin, under the suits. |
+
+The **Arc Reactor glows in the dark**: it is drawn full-bright, so at night the blue-white circle in his chest is the brightest thing about him. It shines while he wears no suit and while a suit goes on or comes off; the suit's plates cover it as they close, and the suit's own reactor lights up instead.
+
+Choose a look in **Choose a Hero** in the [Hero Creator](Hero-Creator), or with `/enhanced look <player> shades` (or `/enhanced power set <player> iron_man workshop`). **H** is his suit key, not a look key.
 
 ## Against the others
 

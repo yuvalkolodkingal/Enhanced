@@ -243,10 +243,12 @@ As **Ross** (**N**) he is you, in a dark navy suit with a red tie.
 
 | Look | Id | What it is |
 |---|---|---|
-| **Tony** (default) | `tony` | Plain dark clothes, under the suits. |
+| **Tony** (default) | `tony` | Dark swept-back hair, moustache and pointed beard; a charcoal T-shirt with the Arc Reactor glowing through it, dark jeans and shoes. |
+| **Tony in sunglasses** | `shades` | Tinted sunglasses and a dark grey blazer over the T-shirt (since 3.8.1). |
+| **Workshop Tony** | `workshop` | A grey tank top with oil smudges, greasy forearms, work boots (since 3.8.1). |
 | **Your own skin** | `own` | Your own skin, under the suits. |
 
-His real looks are his six **suits**, put on with **H**. A look is chosen with `/enhanced power set` or in Choose a Hero.
+His real looks are his six **suits**, put on with **H**. The Arc Reactor in Tony's chest glows in the dark. A look is chosen with `/enhanced look`, `/enhanced power set` or in Choose a Hero.
 
 ### Falcon ([page](Falcon))
 
