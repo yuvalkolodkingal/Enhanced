@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ironman.nano;
 
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.ironman.IronManState;
@@ -38,11 +39,14 @@ public final class LightningRefocuser {
     static final double[] FALLOFF = {1.0, 0.8, 0.6, 0.5, 0.4};
     /** How far it reaches for its first creature. */
     public static final double RANGE = 24.0;
+    /** The bolt's pale blue (the flash where it meets a shield). */
+    static final int BOLT_BLUE = 0xBFF4FF;
 
     /**
      * Fires the chain.
      *
-     * @return the creatures struck, in the order of the chain (empty: nothing in reach; then nothing is spent)
+     * @return the creatures struck, in the order of the chain (empty: nothing in reach, and then nothing is spent;
+     *         or, 3.8.2, the bolt struck a Chaos Shield)
      */
     public static List<LivingEntity> fire(ServerPlayer player, PowerData data) {
         long now = player.level().getGameTime();
@@ -50,8 +54,10 @@ public final class LightningRefocuser {
                 || !data.isReady(HeroAbility.IRON_MAN_LIGHTNING_REFOCUSER, now)) {
             return List.of();
         }
-        LivingEntity first = firstTarget(player);
-        if (first == null) {
+        // (3.8.2) Aimed at a Chaos Shield (or another wall), the bolt strikes it: the chain ends there.
+        NanoTech.Ray aim = NanoTech.ray(player, RANGE);
+        LivingEntity first = aim.blocked() ? null : firstTarget(player, aim);
+        if (first == null && !aim.blocked()) {
             return List.of();
         }
         NanoState state = NanoState.of(player.getUUID());
@@ -69,36 +75,50 @@ public final class LightningRefocuser {
         int jumps = NanoTech.cfg(IronManConfig.MARK85_REFOCUSER_JUMPS, 4);
         double radius = NanoTech.cfg(IronManConfig.MARK85_REFOCUSER_JUMP_RADIUS, 6.0);
         List<LivingEntity> chain = new ArrayList<>();
-        chain.add(first);
-        LivingEntity last = first;
-        for (int i = 0; i < jumps; i++) {
-            LivingEntity next = nextTarget(player, last, chain, radius);
-            if (next == null) {
-                break;
+        if (first != null) {
+            chain.add(first);
+            LivingEntity last = first;
+            for (int i = 0; i < jumps; i++) {
+                LivingEntity next = nextTarget(player, last, chain, radius);
+                if (next == null) {
+                    break;
+                }
+                chain.add(next);
+                last = next;
             }
-            chain.add(next);
-            last = next;
         }
         ServerLevel level = player.serverLevel();
         List<Vec3> points = new ArrayList<>();
         points.add(NanoTech.palm(player, false).add(0.0, 0.3 * player.getScale(), 0.0));
+        if (aim.blocked()) {
+            NanoTech.stopped(player, aim.wall(), (float) (base * factor), BOLT_BLUE);
+            points.add(aim.wall().point());
+        }
+        List<LivingEntity> struck = new ArrayList<>();
         for (int i = 0; i < chain.size(); i++) {
             LivingEntity e = chain.get(i);
             float amount = (float) (base * FALLOFF[Math.min(i, FALLOFF.length - 1)] * factor);
-            NanoTech.hurt(player, e, ModDamageTypes.REFOCUSER_LIGHTNING, amount);
             Vec3 at = e.position().add(0.0, e.getBbHeight() * 0.6, 0.0);
+            // (3.8.2) A link that runs into a Chaos Shield (or another wall) ends at it, and the chain with it.
+            WandaAbilities.ShieldStop wall = NanoTech.wallAcross(player, points.get(points.size() - 1), at);
+            if (wall != null) {
+                NanoTech.stopped(player, wall, amount, BOLT_BLUE);
+                points.add(wall.point());
+                break;
+            }
+            NanoTech.hurt(player, e, ModDamageTypes.REFOCUSER_LIGHTNING, amount);
+            struck.add(e);
             points.add(at);
             level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 8, 0.25, 0.3, 0.25, 0.3);
         }
         NanoTech.send(level, player, IronFxPayload.REFOCUSER, points, charged ? 1 : 0);
         NanoTech.sound(level, player.position(), ModSounds.LIGHTNING_REFOCUSER.get(), 1.2F, charged ? 0.8F : 1.0F);
-        return chain;
+        return struck;
     }
 
     /** The creature at his crosshair within reach, or else the nearest he can see in front of him (60° either side). */
     @Nullable
-    static LivingEntity firstTarget(ServerPlayer player) {
-        NanoTech.Ray ray = NanoTech.ray(player, RANGE);
+    static LivingEntity firstTarget(ServerPlayer player, NanoTech.Ray ray) {
         if (ray.target() instanceof LivingEntity living && NanoTech.mayHurt(player, living)) {
             return living;
         }

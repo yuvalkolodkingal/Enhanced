@@ -288,6 +288,14 @@ public final class CommonEvents {
                 event.setCanceled(true);
                 return;
             }
+            if (source.is(ModTags.CHAOS_SHIELD_STOPS) && source.getEntity() != player) {
+                // 3.8.2: nor do Iron Man's repulsors, beams, lasers and bolts (and the other lasers of 3.8), even
+                // from inside the sphere, nor the small boom of a repulsor that lands next to her.
+                WandaAbilities.wear(wanda, event.getAmount(), source.getEntity() != null ? source.getEntity()
+                        : source.getDirectEntity());
+                event.setCanceled(true);
+                return;
+            }
         }
         if (MagnetoAbilities.wearsHelmet(player) && isWandasAttack(source)) {
             // The helmet only blocks Nausea: Magneto takes Wanda's attacks at full strength.

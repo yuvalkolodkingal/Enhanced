@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "enhanced:repulsor",
+    "enhanced:unibeam",
+    "enhanced:drone_laser",
+    "enhanced:refocuser_lightning",
+    "enhanced:redwing_laser",
+    "enhanced:love_eye_laser"
+  ]
+}

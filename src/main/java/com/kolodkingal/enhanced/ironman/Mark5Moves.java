@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.ironman;
 
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.config.IronManConfig;
+import com.kolodkingal.enhanced.ironman.nano.NanoTech;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -32,6 +34,8 @@ public final class Mark5Moves implements SuitMoves {
 
     /** The boom of its repulsor (PLAN 5.7: 0.6; no option of its own). */
     static final double REPULSOR_POWER = 0.6;
+    /** The Laser Burst's red (the flash where a laser of it meets a shield). */
+    static final int LASER_RED = 0xFF4033;
     /** The Dash Punch's length in ticks (its distance is covered evenly). */
     public static final int DASH_TICKS = 6;
     /** How close (blocks) a creature must be to his path to be punched. */
@@ -194,8 +198,22 @@ public final class Mark5Moves implements SuitMoves {
         points.add(centre);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius),
                 e -> e != player && e.isAlive())) {
-            if (e.distanceTo(player) <= radius && player.hasLineOfSight(e)
-                    && IronManAbilities.hurt(player, e, ModDamageTypes.UNIBEAM, damage, player)) {
+            if (e.distanceTo(player) > radius || !player.hasLineOfSight(e)
+                    || !com.kolodkingal.enhanced.ability.AreaTargets.mayHurt(player, e, false)) {
+                continue;
+            }
+            // (3.8.2) A laser that runs into a Chaos Shield (or another wall) ends at it in a flash, and the shield
+            // pays the cut; what is inside the shield is not touched.
+            WandaAbilities.ShieldStop wall = NanoTech.wallAcross(player, centre, e.position().add(0,
+                    e.getBbHeight() * 0.6, 0));
+            if (wall != null) {
+                NanoTech.stopped(player, wall, (float) damage, LASER_RED);
+                if (points.size() < IronFxPayload.MAX_POINTS) {
+                    points.add(wall.point());
+                }
+                continue;
+            }
+            if (IronManAbilities.hurt(player, e, ModDamageTypes.UNIBEAM, damage, player)) {
                 if (points.size() < IronFxPayload.MAX_POINTS) {
                     points.add(e.position().add(0, e.getBbHeight() * 0.6, 0));
                 }

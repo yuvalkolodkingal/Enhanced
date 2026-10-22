@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.falcon;
 
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.config.FalconConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.FalconFxPayload;
@@ -312,8 +313,15 @@ public final class Redwing {
             return false;
         }
         Vec3 to = best.getBoundingBox().getCenter();
-        FalconAbilities.hurt(player, best, ModDamageTypes.REDWING_LASER,
-                FalconAbilities.cfg(FalconConfig.REDWING_ZAP_DAMAGE, 2.0), drone);
+        float damage = (float) FalconAbilities.cfg(FalconConfig.REDWING_ZAP_DAMAGE, 2.0);
+        // (3.8.2) A Chaos Shield in the way stops the laser at its surface, and pays for the zap, as every beam.
+        WandaAbilities.ShieldStop wall = WandaAbilities.shieldAcross(level, player, eye, to, 1.0F);
+        if (wall != null) {
+            to = wall.point();
+            WandaAbilities.stopBeam(level, player, wall, damage, 0xFF5A5A);
+        } else {
+            FalconAbilities.hurt(player, best, ModDamageTypes.REDWING_LASER, damage, drone);
+        }
         FalconAbilities.sound(level, eye, ModSounds.REDWING_ZAP.get(), 0.8F, 1.0F);
         FalconAbilities.send(level, drone, FalconFxPayload.REDWING_ZAP, List.of(eye, to), best.getId());
         return true;

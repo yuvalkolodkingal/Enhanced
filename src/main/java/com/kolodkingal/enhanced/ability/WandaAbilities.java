@@ -620,6 +620,23 @@ public final class WandaAbilities {
     }
 
     /**
+     * 3.8.2: a beam, a ray, a laser or a bolt of {@code firer} has run into the wall {@code stop} and ends there (Iron
+     * Man's repulsors, lasers and the Refocuser's lightning, as every beam of the mod): a flash of the wall's colour and
+     * of the beam's own where it struck, a ring of sound, and the wall pays {@code amount}, what the hit would have done
+     * ({@link #pay}). The caller hurts nothing beyond it. Server.
+     *
+     * @param beamColor the colour of the beam (0xRRGGBB), for the flash
+     */
+    public static void stopBeam(ServerLevel level, @Nullable Entity firer, ShieldStop stop, float amount, int beamColor) {
+        Vec3 at = stop.point();
+        level.sendParticles(new EnergyParticleOptions(stop.color(), 1.4F), at.x, at.y, at.z, 10, 0.18, 0.18, 0.18, 0.12);
+        level.sendParticles(new EnergyParticleOptions(beamColor, 1.0F), at.x, at.y, at.z, 6, 0.1, 0.1, 0.1, 0.1);
+        level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 4, 0.12, 0.12, 0.12, 0.2);
+        level.playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.7F);
+        pay(stop, firer, amount);
+    }
+
+    /**
      * Wears the shield down by what it just stopped; when nothing is left it shatters.
      *
      * @return how much of {@code amount} the shield took (all of it, unless it had less strength left)

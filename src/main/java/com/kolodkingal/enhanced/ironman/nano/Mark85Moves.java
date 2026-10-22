@@ -153,7 +153,8 @@ public final class Mark85Moves implements SuitMoves {
 
     /**
      * A repulsor's instant ray from a palm (the nanotech suits' and the Hulkbuster's): the first creature or block at
-     * the crosshair takes the damage, a small boom where it lands.
+     * the crosshair takes the damage, a small boom where it lands. (3.8.2) A Chaos Shield in the way stops it at its
+     * surface: no damage, no boom, a flash there, and the shield pays the damage.
      */
     @Nullable
     static LivingEntity repulsorRay(ServerPlayer player, boolean right, double range, float damage, double power) {
@@ -165,7 +166,9 @@ public final class Mark85Moves implements SuitMoves {
         }
         ServerLevel level = player.serverLevel();
         Vec3 from = NanoTech.palm(player, right);
-        if (ray.hit()) {
+        if (ray.blocked()) {
+            NanoTech.stopped(player, ray.wall(), damage, NanoTech.REACTOR_BLUE);
+        } else if (ray.hit()) {
             NanoTech.boom(player, ray.end(), power, ModDamageTypes.REPULSOR, struck);
         }
         player.swing(right ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, true);

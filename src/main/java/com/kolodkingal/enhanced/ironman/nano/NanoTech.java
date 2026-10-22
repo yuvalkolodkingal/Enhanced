@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ironman.nano;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -40,6 +41,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * What the nanotech suits and the Hulkbuster share (3.8, lane L4, PLAN 6): their numbers read from the config (the
@@ -183,23 +185,57 @@ public final class NanoTech {
     // ---- the repulsor's ray and the small booms ----
 
     /**
-     * What a repulsor's instant ray met: the point, the creature (or null for a block or the empty air), and whether
-     * it met anything at all.
+     * What a repulsor's instant ray met: the point, the creature (or null for a block, a wall or the empty air),
+     * whether it met a creature or a block, and (3.8.2) the wall it ran into first (a Chaos Shield, a Hex Barrier...),
+     * where it ends instead: then it hurts nothing and makes no boom ({@link #stopped}).
      */
-    public record Ray(Vec3 end, @Nullable Entity target, boolean hit) {
+    public record Ray(Vec3 end, @Nullable Entity target, boolean hit, @Nullable WandaAbilities.ShieldStop wall) {
+        /** Whether a wall stopped it. */
+        public boolean blocked() {
+            return wall != null;
+        }
     }
 
     /**
      * An instant-hit ray along his look ({@code range} blocks): the first creature or block, as the crosshair sees it
-     * (PLAN 5.7's repulsor, which the nanotech suits share).
+     * (PLAN 5.7's repulsor, which the nanotech suits share), or the wall before them.
      */
     public static Ray ray(ServerPlayer player, double range) {
-        HitResult hit = Raycasts.any(player, range, ContinuousBeam.targets(player), 1.0F);
+        return ray(player, range, ContinuousBeam.targets(player));
+    }
+
+    /** {@link #ray(ServerPlayer, double)} that only hits what {@code targets} lets it (the classic suits': creatures). */
+    public static Ray ray(ServerPlayer player, double range, Predicate<Entity> targets) {
+        HitResult hit = Raycasts.any(player, range, targets, 1.0F);
+        // 3.8.2: a complete Chaos Shield in the way (or another wall) stops it at its surface, as it stops every beam.
+        WandaAbilities.ShieldStop wall = WandaAbilities.shieldAcross(player.level(), player, player.getEyePosition(),
+                hit.getLocation(), 1.0F);
+        if (wall != null) {
+            return new Ray(wall.point(), null, false, wall);
+        }
         Entity target = hit instanceof EntityHitResult e ? e.getEntity() : null;
         if (target instanceof PartEntity<?> part) {
             target = part.getParent();
         }
-        return new Ray(hit.getLocation(), target, hit.getType() != HitResult.Type.MISS);
+        return new Ray(hit.getLocation(), target, hit.getType() != HitResult.Type.MISS, null);
+    }
+
+    /**
+     * 3.8.2: where a laser or a bolt of {@code firer}'s from {@code from} to {@code to} ends: {@code to}, or the first
+     * wall in between (a Chaos Shield, a Hex Barrier...), returned as the stop. (A drone's laser, a laser of the Laser
+     * Burst, a link of the Refocuser's chain; a line that starts inside a shield is not stopped by it.)
+     */
+    @Nullable
+    public static WandaAbilities.ShieldStop wallAcross(Entity firer, Vec3 from, Vec3 to) {
+        return WandaAbilities.shieldAcross(firer.level(), firer, from, to, 1.0F);
+    }
+
+    /**
+     * A ray, laser or bolt of his ran into a wall: it ends there in a flash, and the wall pays {@code amount}, what the
+     * hit would have done (see {@link WandaAbilities#stopBeam}).
+     */
+    public static void stopped(ServerPlayer player, WandaAbilities.ShieldStop wall, float amount, int color) {
+        WandaAbilities.stopBeam(player.serverLevel(), player, wall, amount, color);
     }
 
     /**

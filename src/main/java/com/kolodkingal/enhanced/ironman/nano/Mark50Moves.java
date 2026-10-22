@@ -170,7 +170,11 @@ public final class Mark50Moves implements SuitMoves {
             struck = living;
             NanoTech.push(living, player.position(), 1.0, 0.25, player);
         }
-        if (ray.hit()) {
+        if (ray.blocked()) {
+            // (3.8.2) A Chaos Shield in the way takes the blast at its surface, and pays for it.
+            NanoTech.stopped(player, ray.wall(), (float) NanoTech.cfg(IronManConfig.MARK50_CANNON_DAMAGE, 14.0),
+                    NanoTech.REACTOR_BLUE);
+        } else if (ray.hit()) {
             NanoTech.boom(player, ray.end(), NanoTech.cfg(IronManConfig.MARK50_CANNON_POWER, 1.5),
                     ModDamageTypes.REPULSOR, struck);
         }

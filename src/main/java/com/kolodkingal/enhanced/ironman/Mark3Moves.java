@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.beam.AvengersBeams;
 import com.kolodkingal.enhanced.beam.BeamSpec;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.IronManConfig;
+import com.kolodkingal.enhanced.ironman.nano.NanoTech;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -20,7 +21,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,26 +120,25 @@ public final class Mark3Moves implements SuitMoves {
         IronManAbilities.sound(player.serverLevel(), player.position(), ModSounds.REPULSOR_CHARGE.get(), 0.55F, 1.1F);
     }
 
-    /** The ray itself: what it hits, the damage, the boom, the effect (from one palm or both). */
+    /**
+     * The ray itself: what it hits, the damage, the boom, the effect (from one palm or both). (3.8.2) A Chaos Shield
+     * in the way stops it at its surface: no damage, no boom, a flash there, and the shield pays the damage.
+     */
     private static void blast(ServerPlayer player, double damage, double power, boolean both) {
         ServerLevel level = player.serverLevel();
         double range = IronManAbilities.cfg(IronManConfig.MARK3_REPULSOR_RANGE, 32);
-        HitResult hit = Raycasts.any(player, range, e -> e instanceof LivingEntity && ContinuousBeam.targets(player)
-                .test(e), 1.0F);
-        Vec3 end = hit.getLocation();
+        NanoTech.Ray hit = NanoTech.ray(player, range, e -> e instanceof LivingEntity && ContinuousBeam.targets(player)
+                .test(e));
+        Vec3 end = hit.end();
         LivingEntity struck = null;
-        if (hit instanceof EntityHitResult entityHit) {
-            Entity target = entityHit.getEntity();
-            if (target instanceof PartEntity<?> part) {
-                target = part.getParent();
-            }
-            if (target instanceof LivingEntity living
-                    && IronManAbilities.hurt(player, living, ModDamageTypes.REPULSOR, damage, player)) {
-                struck = living;
-                IronManAbilities.push(player, living, player.position(), 0.4 * power);
-            }
+        if (hit.target() instanceof LivingEntity living
+                && IronManAbilities.hurt(player, living, ModDamageTypes.REPULSOR, damage, player)) {
+            struck = living;
+            IronManAbilities.push(player, living, player.position(), 0.4 * power);
         }
-        if (hit.getType() != HitResult.Type.MISS) {
+        if (hit.blocked()) {
+            NanoTech.stopped(player, hit.wall(), (float) damage, NanoTech.REACTOR_BLUE);
+        } else if (hit.hit()) {
             IronManAbilities.boom(player, end, power, IronMissileEntity.splashRadius(power),
                     IronMissileEntity.splashDamage(power), ModDamageTypes.REPULSOR, player, struck);
         }

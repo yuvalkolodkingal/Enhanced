@@ -3,11 +3,10 @@ package com.kolodkingal.enhanced.client.ironman.nano;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.client.render.IronManBeamFx;
+import com.kolodkingal.enhanced.ironman.nano.NanoBeams;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -15,7 +14,8 @@ import org.joml.Matrix4f;
  * How the wide chest beams of lane L4 are drawn (3.8), as {@link BeamRenderer.Drawer}s on lane L3's straight Unibeam
  * ({@link IronManBeamFx#chestBeam}): the Mark 85's giant <b>chest laser</b> (white-cyan, 0.75 across) and the
  * Hulkbuster's heavy <b>Unibeam</b> (white-blue, 1.0 across, from the reactor of a 3.5× chest), both from the reactor
- * to the first block along his look (they go through creatures, as the server's beams do).
+ * to the first block along his look (they go through creatures, as the server's beams do), or (3.8.2) to the surface of
+ * a Chaos Shield in the way ({@link NanoBeams#reach}).
  */
 public final class NanoBeamDrawers {
     /** The Unibeam's widths are lane L3's (0.35 across): these beams are drawn that many times wider. */
@@ -37,9 +37,8 @@ public final class NanoBeamDrawers {
                             float partialTick) {
                 Vec3 from = from(Minecraft.getInstance(), player, partialTick);
                 Vec3 aim = player.getEyePosition(partialTick).add(player.getViewVector(partialTick).scale(range));
-                HitResult wall = player.level().clip(new ClipContext(from, aim, ClipContext.Block.COLLIDER,
-                        ClipContext.Fluid.NONE, player));
-                return wall.getType() == HitResult.Type.MISS ? aim : wall.getLocation();
+                // (3.8.2) To the first block, or to a Chaos Shield before it: it ends on its surface, as on the server.
+                return NanoBeams.reach(player.level(), player, from, aim, partialTick);
             }
 
             @Override

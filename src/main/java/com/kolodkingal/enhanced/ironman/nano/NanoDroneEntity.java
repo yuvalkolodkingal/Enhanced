@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.ironman.nano;
 
+import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.beam.AvengersBeams;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -125,7 +127,10 @@ public class NanoDroneEntity extends Entity {
         }
     }
 
-    /** A laser flash at the nearest foe it can see, if any. */
+    /**
+     * A laser flash at the nearest foe it can see, if any. (3.8.2) A Chaos Shield in the way stops it at its surface:
+     * a flash there, and the shield pays the shot.
+     */
     @Nullable
     LivingEntity shoot(ServerPlayer owner) {
         LivingEntity target = target(owner);
@@ -135,8 +140,14 @@ public class NanoDroneEntity extends Entity {
         ServerLevel level = (ServerLevel) level();
         Vec3 from = position().add(0.0, getBbHeight() * 0.5, 0.0);
         Vec3 to = target.position().add(0.0, target.getBbHeight() * 0.5, 0.0);
-        NanoTech.hurt(owner, target, ModDamageTypes.DRONE_LASER,
-                (float) NanoTech.cfg(IronManConfig.MARK85_DRONE_DAMAGE, 6.0));
+        float damage = (float) NanoTech.cfg(IronManConfig.MARK85_DRONE_DAMAGE, 6.0);
+        WandaAbilities.ShieldStop wall = NanoTech.wallAcross(owner, from, to);
+        if (wall != null) {
+            to = wall.point();
+            NanoTech.stopped(owner, wall, damage, AvengersBeams.DRONE_LASER.main());
+        } else {
+            NanoTech.hurt(owner, target, ModDamageTypes.DRONE_LASER, damage);
+        }
         NanoTech.send(level, this, IronFxPayload.DRONE_SHOT, List.of(from, to), owner.getId());
         NanoTech.sound(level, from, ModSounds.DRONE_LASER.get(), 0.7F, 1.0F + level.random.nextFloat() * 0.2F);
         return target;

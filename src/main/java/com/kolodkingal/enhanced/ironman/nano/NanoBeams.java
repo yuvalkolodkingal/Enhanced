@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ironman.nano;
 
+import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.beam.AvengersBeams;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
@@ -7,6 +8,7 @@ import com.kolodkingal.enhanced.ironman.SuitEnergy;
 import com.kolodkingal.enhanced.network.BeamPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
+import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -14,7 +16,13 @@ import com.kolodkingal.enhanced.thanos.StonePowers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -110,6 +118,15 @@ public final class NanoBeams {
         }
         Vec3 end = hit.end();
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, end.x, end.y, end.z, 4, 0.2, 0.2, 0.2, 0.2);
+        if (hit.shield()) {
+            // (3.8.2) It ran into a Chaos Shield (which paid for it in StonePowers.beam): a flash where it stopped.
+            level.sendParticles(new EnergyParticleOptions(spec.style().core(), 1.4F), end.x, end.y, end.z, 10, 0.25,
+                    0.25, 0.25, 0.12);
+            level.sendParticles(new EnergyParticleOptions(Power.SCARLET_WITCH.glow, 1.2F), end.x, end.y, end.z, 8,
+                    0.25, 0.25, 0.25, 0.1);
+            level.playSound(null, end.x, end.y, end.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F,
+                    1.4F);
+        }
         if ((now - state.beamSince) % 20 == 0) {
             NanoTech.sound(level, from, spec.kind() == CHEST_LASER ? ModSounds.CHEST_LASER.get()
                     : ModSounds.UNIBEAM.get(), 0.8F, spec.kind() == HULKBUSTER_UNIBEAM ? 0.7F : 1.0F);
@@ -133,6 +150,20 @@ public final class NanoBeams {
             PacketDistributor.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(),
                     player.getZ(), 96.0, new BeamPayload(player.getId(), style.id(), 0.0F, false));
         }
+    }
+
+    /**
+     * 3.8.2: where a wide chest beam from {@code from} towards {@code aim} (the point at its range along his look)
+     * ends: the first block, or the first wall before it (a complete Chaos Shield, a Hex Barrier...: the beam stops at
+     * its surface, as {@link StonePowers#beam} stops it on the server). What the client draws it to ({@code
+     * NanoBeamDrawers}). Both sides.
+     */
+    public static Vec3 reach(Level level, Player player, Vec3 from, Vec3 aim, float partialTick) {
+        HitResult block = level.clip(new ClipContext(from, aim, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+                player));
+        Vec3 end = block.getType() == HitResult.Type.MISS ? aim : block.getLocation();
+        WandaAbilities.ShieldStop wall = WandaAbilities.shieldAcross(level, player, from, end, partialTick);
+        return wall == null ? end : wall.point();
     }
 
     private static void payload(ServerPlayer player, Spec spec, boolean on) {
