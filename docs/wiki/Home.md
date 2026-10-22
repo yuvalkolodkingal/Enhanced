@@ -49,6 +49,14 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.8.2
+
+Eilon's last two fixes: "Wanda's shield doesn't protect against Iron Man's laser beam: fix it so it doesn't go through the shield", and "Death, in her suit, has flowers on her, and in the series she had no flowers".
+
+* **[Wanda's Chaos Shield stops every beam of Iron Man](Scarlet-Witch#4-chaos-shield)**, as it stops Thor's lightning beam: the repulsors of every suit (and the Double-Hand Blast and the Mark 50's nano cannon), the Unibeam, the Mark 85's giant chest laser, the Hulkbuster's heavy Unibeam, the lasers of the Laser Burst and of the drones, and the Lightning Refocuser's chain lightning. The beam ends on the shield's surface with a flash, Wanda isn't touched, nothing behind or inside the shield is hit, and the hit costs the shield what it would have done (with the old shield rules). Fired from inside the shield, his beams still never touch her. **Redwing's** laser and **Love's** eye laser stop there too.
+* **[Death](Meeting-Death) wears no flowers.** Her crown of branches had pale tips that looked like little white blossoms: now it is dark dead twigs with a few dead leaves, and her gown has no pale specks. The clearing still has its little flowers and falling petals, but never on her: the grass at her feet has none, and the petals fade away before they reach her. At home in the cottage Rio is still the gardener she was.
+* Keep the server and the players on the same version (network protocol **13**, unchanged: 3.8.1 and 3.8.2 play together).
+
 ## What's new in 3.8.1
 
 Eilon asked: "draw Tony a skin".
@@ -59,7 +67,7 @@ Eilon asked: "draw Tony a skin".
 * **[Falcon](Falcon):** in first person, the spread wings show as long diagonals at the sides of your view, not just short stubs in the corners.
 * **The server's announcements** tell the story ("…put an Arc Reactor in their chest…", "…took the Super Soldier Serum…", "…made a wish to Eternity…") only when that really happened: a hero given by a command or by Choose a Hero is announced plainly ("Eilon has become Iron Man!").
 * **Avengers Tower** no longer writes six warnings to the server log when it is built.
-* Keep the server and the players on the same version (network protocol **12**, unchanged).
+* **Update the server and every player together** (network protocol **13**: a 3.8.0 player cannot join a 3.8.1 server, or the other way round).
 
 ## What's new in 3.8
 
