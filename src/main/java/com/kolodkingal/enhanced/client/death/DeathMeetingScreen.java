@@ -35,7 +35,8 @@ import java.util.List;
 /**
  * Death's screen (3.7, Eilon's request): in place of the plain death screen, the player meets Rio Vidal, the Green
  * Witch, in a misty green clearing: vines overhead, grass and small flowers underfoot, mist drifting by and leaves and
- * petals falling. She stands large on the left (the {@code cottage_resident} entity as Rio, drawn by its own renderer,
+ * petals falling (3.8.2: never over her: no flower or petal is drawn on her figure, the grass at her feet has none, and
+ * her Death look has no blossoms). She stands large on the left (the {@code cottage_resident} entity as Rio, drawn by its own renderer,
  * her eyes following the mouse), in her Death look (3.7.2, {@link DeathLook}: the dark gown and hood, the crown of
  * branches; at home she keeps her cottage skin); on the right, the title, one short line of hers (a few, EN/HE), how he
  * died and his score, and his choice: <b>Start again</b> (vanilla's respawn) and <b>Start again in the Nether</b> (when
@@ -52,6 +53,8 @@ public class DeathMeetingScreen extends DeathScreen {
     static final ResourceLocation GLOW = Enhanced.id("textures/gui/death/glow.png");
     static final ResourceLocation VINES = Enhanced.id("textures/gui/death/vines.png");
     static final ResourceLocation GRASS = Enhanced.id("textures/gui/death/grass.png");
+    /** 3.8.2: the same grass without its flowers, under Rio's figure (Death wore no flowers). */
+    static final ResourceLocation GRASS_BARE = Enhanced.id("textures/gui/death/grass_bare.png");
 
     /** The ticks before the buttons wake (vanilla's second, so a click meant for the fight does not choose). */
     static final int WAKE_TICKS = 20;
@@ -62,6 +65,10 @@ public class DeathMeetingScreen extends DeathScreen {
     private static final int NAME_COLOR = 0x9BE39A;
     private static final int NETHER_COLOR = 0xFFB46B;
     private static final int LEAF_COUNT = 34;
+    /** The leaves' kinds in {@code leaves.png} that are flowers: the pink petal and the white blossom. */
+    private static final int FIRST_FLOWER = 2;
+    /** Over how many pixels a petal falling toward Rio's figure fades out before it reaches her. */
+    private static final float FLOWER_FADE = 12.0F;
 
     @Nullable
     private final Component cause;
@@ -88,6 +95,10 @@ public class DeathMeetingScreen extends DeathScreen {
     private int rioX;
     private int rioFeet;
     private int rioScale;
+    /** 3.8.2: the box her figure (crown, arms and feet included) stands in: no flower is drawn over it. */
+    private int figureLeft;
+    private int figureRight;
+    private int figureTop;
     private int titleY;
     private int boxY;
     private int boxBottom;
@@ -136,6 +147,9 @@ public class DeathMeetingScreen extends DeathScreen {
         rioFeet = height - 16;
         int tallest = Math.min((int) (height * 0.62F), (int) (columnX * 1.3F));
         rioScale = Math.max(20, (int) (tallest / 1.8F));
+        figureLeft = rioX - (int) (rioScale * 0.62F);
+        figureRight = rioX + (int) (rioScale * 0.62F);
+        figureTop = rioFeet - (int) (rioScale * 2.3F);
 
         titleY = Math.max(8, (int) (height * 0.06F));
         boxY = titleY + 26;
@@ -267,7 +281,7 @@ public class DeathMeetingScreen extends DeathScreen {
         drawRio(graphics, mouseX, mouseY, partialTick);
         RenderSystem.enableBlend();
         mist(graphics, t, height * 0.62F, -0.32F, 0.22F * fade, 0.35F);
-        tiled(graphics, GRASS, 128, 24, true, fade);
+        grass(graphics, fade);
         leaves(graphics, t, true, fade);
         graphics.drawCenteredString(font, name, rioX, height - 12, NAME_COLOR);
         drawColumn(graphics, fade);
@@ -342,7 +356,37 @@ public class DeathMeetingScreen extends DeathScreen {
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    /** The leaves and petals: the far ones small and dim behind Rio, the near ones bigger in front of her. */
+    /**
+     * The grass along the bottom, its small flowers everywhere but at Rio's feet (3.8.2: under her figure the same
+     * grass without them, so no flower is drawn on her).
+     */
+    private void grass(GuiGraphics graphics, float fade) {
+        graphics.enableScissor(0, 0, figureLeft, height);
+        tiled(graphics, GRASS, 128, 24, true, fade);
+        graphics.disableScissor();
+        graphics.enableScissor(figureRight, 0, width, height);
+        tiled(graphics, GRASS, 128, 24, true, fade);
+        graphics.disableScissor();
+        graphics.enableScissor(figureLeft, 0, figureRight, height);
+        tiled(graphics, GRASS_BARE, 128, 24, true, fade);
+        graphics.disableScissor();
+    }
+
+    /**
+     * How much of a near flower (a petal or a blossom) of {@code size} at {@code x, y} is drawn: none over Rio's figure,
+     * fading in over {@link #FLOWER_FADE} pixels away from it (3.8.2: the flowers fall round her, never on her).
+     */
+    private float flowerShown(float x, float y, int size) {
+        float dx = Math.max(Math.max(figureLeft - x, x - figureRight), 0.0F);
+        float dy = Math.max(Math.max(figureTop - y, y - rioFeet), 0.0F);
+        float away = Math.max(dx, dy) - size * 0.75F;
+        return Mth.clamp(away / FLOWER_FADE, 0.0F, 1.0F);
+    }
+
+    /**
+     * The leaves and petals: the far ones small and dim behind Rio, the near ones bigger in front of her (3.8.2: the
+     * near petals and blossoms never over her: {@link #flowerShown}).
+     */
     private void leaves(GuiGraphics graphics, float t, boolean near, float fade) {
         float span = height + 32.0F;
         for (Leaf leaf : leaves) {
@@ -356,10 +400,14 @@ public class DeathMeetingScreen extends DeathScreen {
             x = Mth.positiveModulo(x + 20.0F, width + 40.0F) - 20.0F;
             float angle = leaf.turn() + t * leaf.spin() * 2.0F;
             int size = leaf.size();
+            float shown = near && leaf.kind() >= FIRST_FLOWER ? flowerShown(x, y, size) : 1.0F;
+            if (shown <= 0.0F) {
+                continue;
+            }
             graphics.pose().pushPose();
             graphics.pose().translate(x, y, 0.0F);
             graphics.pose().mulPose(Axis.ZP.rotationDegrees(angle));
-            graphics.setColor(1.0F, 1.0F, 1.0F, (near ? 0.95F : 0.6F) * fade);
+            graphics.setColor(1.0F, 1.0F, 1.0F, (near ? 0.95F : 0.6F) * fade * shown);
             graphics.blit(LEAVES, -size / 2, -size / 2, size, size, leaf.kind() * 16.0F, 0.0F, 16, 16, 64, 16);
             graphics.pose().popPose();
         }

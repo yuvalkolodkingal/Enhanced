@@ -400,4 +400,63 @@ public final class DeathMeetingTests {
         check(differ > 1000, "Death's look is not her cottage skin: " + differ);
         helper.succeed();
     }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // 3.8.2: no flowers on Death
+
+    private static java.awt.image.BufferedImage gui(net.neoforged.neoforgespi.locating.IModFile mod, String name)
+            throws java.io.IOException {
+        try (java.io.InputStream in = java.nio.file.Files.newInputStream(mod.findResource("assets", Enhanced.MODID,
+                "textures", "gui", "death", name))) {
+            return javax.imageio.ImageIO.read(in);
+        }
+    }
+
+    /** Whether a pixel is a flower's colour: bright and colourful (pink, yellow, light green), or a blossom's white. */
+    private static boolean blossom(int argb, boolean whiteToo) {
+        if ((argb >>> 24) < 16) {
+            return false;
+        }
+        float[] hsv = java.awt.Color.RGBtoHSB((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, null);
+        return hsv[1] >= 0.3F && hsv[2] >= 0.6F || whiteToo && hsv[1] < 0.12F && hsv[2] > 0.85F;
+    }
+
+    /**
+     * Eilon: in the series Death wore no flowers. Rio's Death look has none: her crown is dark (dead twigs, dead
+     * leaves, moss: nothing brighter than a dark bark), her gown and hood have no bright or colourful speck (only her
+     * pale face is light), and the grass drawn at her feet on Death's screen has no flowers (the rest of the clearing
+     * keeps its own).
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void riosDeathLookHasNoFlowers(GameTestHelper helper) throws java.io.IOException {
+        net.neoforged.neoforgespi.locating.IModFile mod =
+                net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile();
+        java.awt.image.BufferedImage crown = skin(mod, "rio_death_crown.png");
+        for (int y = 0; y < crown.getHeight(); y++) {
+            for (int x = 0; x < crown.getWidth(); x++) {
+                int c = crown.getRGB(x, y);
+                float[] hsv = java.awt.Color.RGBtoHSB((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, null);
+                check((c >>> 24) < 16 || hsv[2] <= 0.4F, "the crown is dark everywhere, no pale tip at " + x + "," + y);
+            }
+        }
+        java.awt.image.BufferedImage death = skin(mod, "rio_death.png");
+        for (int y = 0; y < 64; y++) {
+            for (int x = 0; x < 64; x++) {
+                boolean head = y < 16; // (her face is pale: the head may be light, never colourful)
+                check(!blossom(death.getRGB(x, y), !head), "no flower-coloured pixel on her look at " + x + "," + y);
+            }
+        }
+        java.awt.image.BufferedImage grass = gui(mod, "grass.png");
+        java.awt.image.BufferedImage bare = gui(mod, "grass_bare.png");
+        check(bare.getWidth() == grass.getWidth() && bare.getHeight() == grass.getHeight(), "the bare grass's size");
+        int flowers = 0;
+        for (int y = 0; y < grass.getHeight(); y++) {
+            for (int x = 0; x < grass.getWidth(); x++) {
+                check(!blossom(bare.getRGB(x, y), true), "no flower in the grass at her feet at " + x + "," + y);
+                flowers += blossom(grass.getRGB(x, y), true) ? 1 : 0;
+            }
+        }
+        check(flowers > 0, "the rest of the clearing keeps its flowers");
+        helper.succeed();
+    }
 }
