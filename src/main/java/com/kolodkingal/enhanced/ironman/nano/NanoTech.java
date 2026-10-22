@@ -204,7 +204,9 @@ public final class NanoTech {
         return ray(player, range, ContinuousBeam.targets(player));
     }
 
-    /** {@link #ray(ServerPlayer, double)} that only hits what {@code targets} lets it (the classic suits': creatures). */
+    /**
+     * {@link #ray(ServerPlayer, double)} that hits only what {@code targets} lets it (the classic suits': creatures).
+     */
     public static Ray ray(ServerPlayer player, double range, Predicate<Entity> targets) {
         HitResult hit = Raycasts.any(player, range, targets, 1.0F);
         // 3.8.2: a complete Chaos Shield in the way (or another wall) stops it at its surface, as it stops every beam.

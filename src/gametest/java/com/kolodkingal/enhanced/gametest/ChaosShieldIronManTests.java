@@ -163,7 +163,8 @@ public final class ChaosShieldIronManTests {
         Husk inside = husk(helper, WANDA_X, 11.7);
         Husk outside = husk(helper, 4.5, WANDA_Z);
         raise(f, wanda, () -> {
-            check(centre(inside).distanceTo(centre(wanda)) < WandaAbilities.SHIELD_RADIUS, "sanity: a husk in the shield");
+            check(centre(inside).distanceTo(centre(wanda)) < WandaAbilities.SHIELD_RADIUS,
+                    "sanity: a husk in the shield");
             IronMarkTests.press(tony, 5, false);
             untouched(wanda, "the Laser Burst");
             float damage = (float) IronManConfig.MARK5_LASER_BURST_DAMAGE.get().doubleValue();

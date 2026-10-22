@@ -35,14 +35,14 @@ import java.util.List;
 /**
  * Death's screen (3.7, Eilon's request): in place of the plain death screen, the player meets Rio Vidal, the Green
  * Witch, in a misty green clearing: vines overhead, grass and small flowers underfoot, mist drifting by and leaves and
- * petals falling (3.8.2: never over her: no flower or petal is drawn on her figure, the grass at her feet has none, and
- * her Death look has no blossoms). She stands large on the left (the {@code cottage_resident} entity as Rio, drawn by its own renderer,
- * her eyes following the mouse), in her Death look (3.7.2, {@link DeathLook}: the dark gown and hood, the crown of
- * branches; at home she keeps her cottage skin); on the right, the title, one short line of hers (a few, EN/HE), how he
- * died and his score, and his choice: <b>Start again</b> (vanilla's respawn) and <b>Start again in the Nether</b> (when
- * the server offers it), with vanilla's small <b>Title screen</b> under them. As vanilla's, its buttons wake after a
- * second, Esc does not close it, and it is a {@link DeathScreen} (so a respawn closes it as vanilla's). Gentle and
- * calm: nothing scary, nothing gory.
+ * petals falling (3.8.2: never over her: no flower or petal is drawn on her figure, the grass at her feet has none,
+ * and her Death look has no blossoms). She stands large on the left (the {@code cottage_resident} entity as Rio, drawn
+ * by its own renderer, her eyes following the mouse), in her Death look (3.7.2, {@link DeathLook}: the dark gown and
+ * hood, the crown of branches; at home she keeps her cottage skin); on the right, the title, one short line of hers (a
+ * few, EN/HE), how he died and his score, and his choice: <b>Start again</b> (vanilla's respawn) and <b>Start again in
+ * the Nether</b> (when the server offers it), with vanilla's small <b>Title screen</b> under them. As vanilla's, its
+ * buttons wake after a second, Esc does not close it, and it is a {@link DeathScreen} (so a respawn closes it as
+ * vanilla's). Gentle and calm: nothing scary, nothing gory.
  */
 public class DeathMeetingScreen extends DeathScreen {
     /** How many lines Rio has ({@code screen.enhanced.death_meeting.line.<n>}). */
@@ -373,8 +373,9 @@ public class DeathMeetingScreen extends DeathScreen {
     }
 
     /**
-     * How much of a near flower (a petal or a blossom) of {@code size} at {@code x, y} is drawn: none over Rio's figure,
-     * fading in over {@link #FLOWER_FADE} pixels away from it (3.8.2: the flowers fall round her, never on her).
+     * How much of a near flower (a petal or a blossom) of {@code size} at {@code x, y} is drawn: none over Rio's
+     * figure, fading in over {@link #FLOWER_FADE} pixels away from it (3.8.2: the flowers fall round her, never on
+     * her).
      */
     private float flowerShown(float x, float y, int size) {
         float dx = Math.max(Math.max(figureLeft - x, x - figureRight), 0.0F);

@@ -234,9 +234,10 @@ public final class ModTags {
     /** The Arc Reactor and the Nano Arc Reactor: either, carried, powers a classic suit. */
     public static final TagKey<Item> ARC_REACTORS = TagKey.create(Registries.ITEM, Enhanced.id("arc_reactors"));
     /**
-     * 3.8.2: the beams, rays, lasers and bolts that never get through a complete Chaos Shield, even fired from inside it
-     * at Wanda herself (as Thor's lightning): Iron Man's repulsors, Unibeams and chest lasers, the drones' lasers, the
-     * Refocuser's lightning, Redwing's laser and Love's eye laser. (From outside, every beam already stops at the sphere.)
+     * 3.8.2: the beams, rays, lasers and bolts that never get through a complete Chaos Shield, even fired from inside
+     * it at Wanda herself (as Thor's lightning): Iron Man's repulsors, Unibeams and chest lasers, the drones' lasers,
+     * the Refocuser's lightning, Redwing's laser and Love's eye laser. (From outside, every beam already stops at the
+     * sphere.)
      */
     public static final TagKey<DamageType> CHAOS_SHIELD_STOPS = damage("chaos_shield_stops");
     // ===== falcon (3.8) =====

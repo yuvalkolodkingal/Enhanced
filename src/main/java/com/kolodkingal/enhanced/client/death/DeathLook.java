@@ -23,9 +23,9 @@ import org.jetbrains.annotations.Nullable;
  * pale face with dark lips ({@code rio_death.png}), and over the hood a crown of thin dark branches with a few dead
  * leaves ({@link #headgear}: a small model of its own, {@code rio_death_crown.png}). No flower anywhere (3.8.2, Eilon:
  * in the series Death wore none; the crown's pale tips, which read as blossoms, are dead twig ends now, and the pale
- * specks of the gown are moss). The screen's Rio is marked by a persistent tag ({@link #wear}); the Asgardians' renderer
- * asks {@link #wears} for her skin, and draws the crown as her headgear (registered for the role RIO, drawn only on the
- * one who wears the look).
+ * specks of the gown are moss). The screen's Rio is marked by a persistent tag ({@link #wear}); the Asgardians'
+ * renderer asks {@link #wears} for her skin, and draws the crown as her headgear (registered for the role RIO, drawn
+ * only on the one who wears the look).
  */
 public final class DeathLook {
     /** The tag on the screen's own Rio (never on a Rio of the world). */
