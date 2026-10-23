@@ -79,107 +79,151 @@ public final class GameBindings {
     }
 
     public static void install(Map<Class<?>, Binding<?, ?>> table) {
-        Binding.put(table, PlayerEvent.PlayerLoggedInEvent.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent.class,
+        Binding.put(table, PlayerEvent.PlayerLoggedInEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent.class,
                 n -> new PlayerEvent.PlayerLoggedInEvent(n.getEntity()));
-        Binding.put(table, PlayerEvent.PlayerLoggedOutEvent.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent.class,
+        Binding.put(table, PlayerEvent.PlayerLoggedOutEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent.class,
                 n -> new PlayerEvent.PlayerLoggedOutEvent(n.getEntity()));
-        Binding.put(table, PlayerEvent.PlayerChangedDimensionEvent.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent.class,
+        Binding.put(table, PlayerEvent.PlayerChangedDimensionEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent.class,
                 n -> new PlayerEvent.PlayerChangedDimensionEvent(n.getEntity(), n.getFrom(), n.getTo()));
-        Binding.put(table, PlayerEvent.PlayerRespawnEvent.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerRespawnEvent.class,
+        Binding.put(table, PlayerEvent.PlayerRespawnEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerRespawnEvent.class,
                 n -> new PlayerEvent.PlayerRespawnEvent(n.getEntity(), n.isEndConquered()));
-        Binding.put(table, PlayerEvent.StartTracking.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.StartTracking.class,
+        Binding.put(table, PlayerEvent.StartTracking.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.StartTracking.class,
                 n -> new PlayerEvent.StartTracking(n.getEntity(), n.getTarget()));
         Binding.put(table, PlayerEvent.Clone.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.Clone.class,
                 n -> new PlayerEvent.Clone(n.getEntity(), n.getOriginal(), n.isWasDeath()));
-        Binding.put(table, PlayerEvent.BreakSpeed.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.BreakSpeed.class,
+        Binding.put(table, PlayerEvent.BreakSpeed.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.BreakSpeed.class,
                 NeoPlayerEventBreakSpeed::new);
-        Binding.put(table, PlayerEvent.ItemCraftedEvent.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent.class,
+        Binding.put(table, PlayerEvent.ItemCraftedEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent.class,
                 n -> new PlayerEvent.ItemCraftedEvent(n.getEntity(), n.getCrafting(), n.getInventory()));
-        Binding.put(table, PlayerEvent.PlayerChangeGameModeEvent.class, net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangeGameModeEvent.class,
+        Binding.put(table, PlayerEvent.PlayerChangeGameModeEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangeGameModeEvent.class,
                 NeoPlayerEventPlayerChangeGameModeEvent::new);
-        Binding.put(table, PlayerInteractEvent.EntityInteractSpecific.class, net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific.class,
+        Binding.put(table, PlayerInteractEvent.EntityInteractSpecific.class,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific.class,
                 NeoPlayerInteractEventEntityInteractSpecific::new);
-        Binding.put(table, PlayerInteractEvent.EntityInteract.class, net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract.class,
+        Binding.put(table, PlayerInteractEvent.EntityInteract.class,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract.class,
                 NeoPlayerInteractEventEntityInteract::new);
-        Binding.put(table, PlayerInteractEvent.RightClickBlock.class, net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock.class,
+        Binding.put(table, PlayerInteractEvent.RightClickBlock.class,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock.class,
                 NeoPlayerInteractEventRightClickBlock::new);
-        Binding.put(table, PlayerInteractEvent.RightClickItem.class, net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem.class,
+        Binding.put(table, PlayerInteractEvent.RightClickItem.class,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem.class,
                 NeoPlayerInteractEventRightClickItem::new);
-        Binding.put(table, PlayerInteractEvent.LeftClickBlock.class, net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock.class,
+        Binding.put(table, PlayerInteractEvent.LeftClickBlock.class,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock.class,
                 NeoPlayerInteractEventLeftClickBlock::new);
         Binding.put(table, AttackEntityEvent.class, net.neoforged.neoforge.event.entity.player.AttackEntityEvent.class,
                 NeoAttackEntityEvent::new);
-        Binding.put(table, CanPlayerSleepEvent.class, net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent.class,
+        Binding.put(table, CanPlayerSleepEvent.class,
+                net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent.class,
                 NeoCanPlayerSleepEvent::new);
-        Binding.put(table, PlayerRespawnPositionEvent.class, net.neoforged.neoforge.event.entity.player.PlayerRespawnPositionEvent.class,
+        Binding.put(table, PlayerRespawnPositionEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerRespawnPositionEvent.class,
                 NeoPlayerRespawnPositionEvent::new);
-        Binding.put(table, PlayerSetSpawnEvent.class, net.neoforged.neoforge.event.entity.player.PlayerSetSpawnEvent.class,
+        Binding.put(table, PlayerSetSpawnEvent.class,
+                net.neoforged.neoforge.event.entity.player.PlayerSetSpawnEvent.class,
                 NeoPlayerSetSpawnEvent::new);
         Binding.put(table, ItemTooltipEvent.class, net.neoforged.neoforge.event.entity.player.ItemTooltipEvent.class,
-                n -> new ItemTooltipEvent(n.getItemStack(), n.getEntity(), n.getToolTip(), n.getFlags(), n.getContext()));
-        Binding.put(table, ItemEntityPickupEvent.Pre.class, net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre.class,
+                n -> new ItemTooltipEvent(n.getItemStack(), n.getEntity(), n.getToolTip(), n.getFlags(),
+                        n.getContext()));
+        Binding.put(table, ItemEntityPickupEvent.Pre.class,
+                net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre.class,
                 NeoItemEntityPickupEventPre::new);
         Binding.put(table, ItemTossEvent.class, net.neoforged.neoforge.event.entity.item.ItemTossEvent.class,
                 NeoItemTossEvent::new);
-        Binding.put(table, LivingIncomingDamageEvent.class, net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent.class,
+        Binding.put(table, LivingIncomingDamageEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent.class,
                 NeoLivingIncomingDamageEvent::new);
-        Binding.put(table, LivingDamageEvent.Pre.class, net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre.class,
+        Binding.put(table, LivingDamageEvent.Pre.class,
+                net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre.class,
                 NeoLivingDamageEventPre::new);
-        Binding.put(table, LivingDamageEvent.Post.class, net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post.class,
-                n -> new LivingDamageEvent.Post(n.getEntity(), n.getSource(), n.getOriginalDamage(), n.getNewDamage(), n.getBlockedDamage(), n.getShieldDamage()));
+        Binding.put(table, LivingDamageEvent.Post.class,
+                net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post.class,
+                n -> new LivingDamageEvent.Post(n.getEntity(), n.getSource(), n.getOriginalDamage(),
+                        n.getNewDamage(), n.getBlockedDamage(), n.getShieldDamage()));
         Binding.put(table, LivingDeathEvent.class, net.neoforged.neoforge.event.entity.living.LivingDeathEvent.class,
                 NeoLivingDeathEvent::new);
-        Binding.put(table, LivingChangeTargetEvent.class, net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent.class,
+        Binding.put(table, LivingChangeTargetEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent.class,
                 NeoLivingChangeTargetEvent::new);
-        Binding.put(table, LivingDestroyBlockEvent.class, net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent.class,
+        Binding.put(table, LivingDestroyBlockEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent.class,
                 NeoLivingDestroyBlockEvent::new);
         Binding.put(table, LivingDropsEvent.class, net.neoforged.neoforge.event.entity.living.LivingDropsEvent.class,
                 NeoLivingDropsEvent::new);
-        Binding.put(table, LivingEntityUseItemEvent.Start.class, net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Start.class,
+        Binding.put(table, LivingEntityUseItemEvent.Start.class,
+                net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Start.class,
                 NeoLivingEntityUseItemEventStart::new);
-        Binding.put(table, LivingEntityUseItemEvent.Tick.class, net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick.class,
+        Binding.put(table, LivingEntityUseItemEvent.Tick.class,
+                net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick.class,
                 NeoLivingEntityUseItemEventTick::new);
-        Binding.put(table, LivingEquipmentChangeEvent.class, net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent.class,
+        Binding.put(table, LivingEquipmentChangeEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent.class,
                 n -> new LivingEquipmentChangeEvent(n.getEntity(), n.getSlot(), n.getFrom(), n.getTo()));
-        Binding.put(table, LivingExperienceDropEvent.class, net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent.class,
+        Binding.put(table, LivingExperienceDropEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent.class,
                 NeoLivingExperienceDropEvent::new);
         Binding.put(table, LivingFallEvent.class, net.neoforged.neoforge.event.entity.living.LivingFallEvent.class,
                 NeoLivingFallEvent::new);
-        Binding.put(table, LivingKnockBackEvent.class, net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent.class,
+        Binding.put(table, LivingKnockBackEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent.class,
                 NeoLivingKnockBackEvent::new);
-        Binding.put(table, LivingShieldBlockEvent.class, net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent.class,
+        Binding.put(table, LivingShieldBlockEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent.class,
                 NeoLivingShieldBlockEvent::new);
-        Binding.put(table, MobEffectEvent.Added.class, net.neoforged.neoforge.event.entity.living.MobEffectEvent.Added.class,
-                n -> new MobEffectEvent.Added(n.getEntity(), n.getEffectInstance(), n.getOldEffectInstance(), n.getEffectSource()));
-        Binding.put(table, MobEffectEvent.Applicable.class, net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable.class,
+        Binding.put(table, MobEffectEvent.Added.class,
+                net.neoforged.neoforge.event.entity.living.MobEffectEvent.Added.class,
+                n -> new MobEffectEvent.Added(n.getEntity(), n.getEffectInstance(), n.getOldEffectInstance(),
+                        n.getEffectSource()));
+        Binding.put(table, MobEffectEvent.Applicable.class,
+                net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable.class,
                 NeoMobEffectEventApplicable::new);
-        Binding.put(table, MobEffectEvent.Expired.class, net.neoforged.neoforge.event.entity.living.MobEffectEvent.Expired.class,
+        Binding.put(table, MobEffectEvent.Expired.class,
+                net.neoforged.neoforge.event.entity.living.MobEffectEvent.Expired.class,
                 NeoMobEffectEventExpired::new);
-        Binding.put(table, MobEffectEvent.Remove.class, net.neoforged.neoforge.event.entity.living.MobEffectEvent.Remove.class,
+        Binding.put(table, MobEffectEvent.Remove.class,
+                net.neoforged.neoforge.event.entity.living.MobEffectEvent.Remove.class,
                 NeoMobEffectEventRemove::new);
-        Binding.put(table, MobSpawnEvent.PositionCheck.class, net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck.class,
+        Binding.put(table, MobSpawnEvent.PositionCheck.class,
+                net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck.class,
                 NeoMobSpawnEventPositionCheck::new);
-        Binding.put(table, MobSpawnEvent.SpawnPlacementCheck.class, net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck.class,
+        Binding.put(table, MobSpawnEvent.SpawnPlacementCheck.class,
+                net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck.class,
                 NeoMobSpawnEventSpawnPlacementCheck::new);
-        Binding.put(table, FinalizeSpawnEvent.class, net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent.class,
+        Binding.put(table, FinalizeSpawnEvent.class,
+                net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent.class,
                 NeoFinalizeSpawnEvent::new);
         Binding.put(table, EntityJoinLevelEvent.class, net.neoforged.neoforge.event.entity.EntityJoinLevelEvent.class,
                 NeoEntityJoinLevelEvent::new);
         Binding.put(table, EntityLeaveLevelEvent.class, net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent.class,
                 n -> new EntityLeaveLevelEvent(n.getEntity(), n.getLevel()));
-        Binding.put(table, EntityMobGriefingEvent.class, net.neoforged.neoforge.event.entity.EntityMobGriefingEvent.class,
+        Binding.put(table, EntityMobGriefingEvent.class,
+                net.neoforged.neoforge.event.entity.EntityMobGriefingEvent.class,
                 NeoEntityMobGriefingEvent::new);
         Binding.put(table, EntityMountEvent.class, net.neoforged.neoforge.event.entity.EntityMountEvent.class,
                 NeoEntityMountEvent::new);
-        Binding.put(table, EntityStruckByLightningEvent.class, net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent.class,
+        Binding.put(table, EntityStruckByLightningEvent.class,
+                net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent.class,
                 NeoEntityStruckByLightningEvent::new);
-        Binding.put(table, EntityTeleportEvent.ChorusFruit.class, net.neoforged.neoforge.event.entity.EntityTeleportEvent.ChorusFruit.class,
+        Binding.put(table, EntityTeleportEvent.ChorusFruit.class,
+                net.neoforged.neoforge.event.entity.EntityTeleportEvent.ChorusFruit.class,
                 NeoEntityTeleportEventChorusFruit::new);
-        Binding.put(table, EntityTeleportEvent.EnderEntity.class, net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderEntity.class,
+        Binding.put(table, EntityTeleportEvent.EnderEntity.class,
+                net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderEntity.class,
                 NeoEntityTeleportEventEnderEntity::new);
-        Binding.put(table, EntityTeleportEvent.EnderPearl.class, net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderPearl.class,
+        Binding.put(table, EntityTeleportEvent.EnderPearl.class,
+                net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderPearl.class,
                 NeoEntityTeleportEventEnderPearl::new);
-        Binding.put(table, EntityTravelToDimensionEvent.class, net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent.class,
+        Binding.put(table, EntityTravelToDimensionEvent.class,
+                net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent.class,
                 NeoEntityTravelToDimensionEvent::new);
         Binding.put(table, ProjectileImpactEvent.class, net.neoforged.neoforge.event.entity.ProjectileImpactEvent.class,
                 NeoProjectileImpactEvent::new);
@@ -215,31 +259,40 @@ public final class GameBindings {
                 n -> new LevelEvent.Unload(n.getLevel()));
         Binding.put(table, BlockEvent.BreakEvent.class, net.neoforged.neoforge.event.level.BlockEvent.BreakEvent.class,
                 NeoBlockEventBreakEvent::new);
-        Binding.put(table, BlockEvent.EntityPlaceEvent.class, net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent.class,
+        Binding.put(table, BlockEvent.EntityPlaceEvent.class,
+                net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent.class,
                 NeoBlockEventEntityPlaceEvent::new);
-        Binding.put(table, BlockEvent.FarmlandTrampleEvent.class, net.neoforged.neoforge.event.level.BlockEvent.FarmlandTrampleEvent.class,
+        Binding.put(table, BlockEvent.FarmlandTrampleEvent.class,
+                net.neoforged.neoforge.event.level.BlockEvent.FarmlandTrampleEvent.class,
                 NeoBlockEventFarmlandTrampleEvent::new);
-        Binding.put(table, BlockEvent.FluidPlaceBlockEvent.class, net.neoforged.neoforge.event.level.BlockEvent.FluidPlaceBlockEvent.class,
+        Binding.put(table, BlockEvent.FluidPlaceBlockEvent.class,
+                net.neoforged.neoforge.event.level.BlockEvent.FluidPlaceBlockEvent.class,
                 NeoBlockEventFluidPlaceBlockEvent::new);
-        Binding.put(table, BlockEvent.NeighborNotifyEvent.class, net.neoforged.neoforge.event.level.BlockEvent.NeighborNotifyEvent.class,
+        Binding.put(table, BlockEvent.NeighborNotifyEvent.class,
+                net.neoforged.neoforge.event.level.BlockEvent.NeighborNotifyEvent.class,
                 NeoBlockEventNeighborNotifyEvent::new);
-        Binding.put(table, BlockEvent.PortalSpawnEvent.class, net.neoforged.neoforge.event.level.BlockEvent.PortalSpawnEvent.class,
+        Binding.put(table, BlockEvent.PortalSpawnEvent.class,
+                net.neoforged.neoforge.event.level.BlockEvent.PortalSpawnEvent.class,
                 NeoBlockEventPortalSpawnEvent::new);
-        Binding.put(table, BlockEvent.BlockToolModificationEvent.class, net.neoforged.neoforge.event.level.BlockEvent.BlockToolModificationEvent.class,
+        Binding.put(table, BlockEvent.BlockToolModificationEvent.class,
+                net.neoforged.neoforge.event.level.BlockEvent.BlockToolModificationEvent.class,
                 NeoBlockEventBlockToolModificationEvent::new);
         Binding.put(table, BlockDropsEvent.class, net.neoforged.neoforge.event.level.BlockDropsEvent.class,
                 NeoBlockDropsEvent::new);
         Binding.put(table, PistonEvent.Pre.class, net.neoforged.neoforge.event.level.PistonEvent.Pre.class,
                 NeoPistonEventPre::new);
-        Binding.put(table, ExplosionEvent.Detonate.class, net.neoforged.neoforge.event.level.ExplosionEvent.Detonate.class,
+        Binding.put(table, ExplosionEvent.Detonate.class,
+                net.neoforged.neoforge.event.level.ExplosionEvent.Detonate.class,
                 n -> new ExplosionEvent.Detonate(n.getLevel(), n.getExplosion(), n.getAffectedEntities()));
-        Binding.put(table, ExplosionKnockbackEvent.class, net.neoforged.neoforge.event.level.ExplosionKnockbackEvent.class,
+        Binding.put(table, ExplosionKnockbackEvent.class,
+                net.neoforged.neoforge.event.level.ExplosionKnockbackEvent.class,
                 NeoExplosionKnockbackEvent::new);
         Binding.put(table, RegisterCommandsEvent.class, net.neoforged.neoforge.event.RegisterCommandsEvent.class,
                 n -> new RegisterCommandsEvent(n.getDispatcher(), n.getCommandSelection(), n.getBuildContext()));
         Binding.put(table, OnDatapackSyncEvent.class, net.neoforged.neoforge.event.OnDatapackSyncEvent.class,
                 n -> new OnDatapackSyncEvent(n.getPlayerList(), n.getPlayer()));
-        Binding.put(table, ItemAttributeModifierEvent.class, net.neoforged.neoforge.event.ItemAttributeModifierEvent.class,
+        Binding.put(table, ItemAttributeModifierEvent.class,
+                net.neoforged.neoforge.event.ItemAttributeModifierEvent.class,
                 NeoItemAttributeModifierEvent::new);
         Binding.put(table, FMLCommonSetupEvent.class, net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent.class,
                 NeoFMLCommonSetupEvent::new);
@@ -277,7 +330,8 @@ public final class GameBindings {
     private static final class NeoPlayerEventPlayerChangeGameModeEvent extends PlayerEvent.PlayerChangeGameModeEvent {
         private final net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangeGameModeEvent n;
 
-        NeoPlayerEventPlayerChangeGameModeEvent(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangeGameModeEvent n) {
+        NeoPlayerEventPlayerChangeGameModeEvent(
+                net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangeGameModeEvent n) {
             super(n.getEntity(), n.getCurrentGameMode(), n.getNewGameMode());
             this.n = n;
         }
@@ -303,10 +357,12 @@ public final class GameBindings {
         }
     }
 
-    private static final class NeoPlayerInteractEventEntityInteractSpecific extends PlayerInteractEvent.EntityInteractSpecific {
+    private static final class NeoPlayerInteractEventEntityInteractSpecific
+            extends PlayerInteractEvent.EntityInteractSpecific {
         private final net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific n;
 
-        NeoPlayerInteractEventEntityInteractSpecific(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific n) {
+        NeoPlayerInteractEventEntityInteractSpecific(
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific n) {
             super(n.getEntity(), n.getHand(), n.getTarget(), n.getLocalPos());
             this.n = n;
         }
@@ -335,7 +391,8 @@ public final class GameBindings {
     private static final class NeoPlayerInteractEventEntityInteract extends PlayerInteractEvent.EntityInteract {
         private final net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract n;
 
-        NeoPlayerInteractEventEntityInteract(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract n) {
+        NeoPlayerInteractEventEntityInteract(
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract n) {
             super(n.getEntity(), n.getHand(), n.getTarget());
             this.n = n;
         }
@@ -364,7 +421,8 @@ public final class GameBindings {
     private static final class NeoPlayerInteractEventRightClickBlock extends PlayerInteractEvent.RightClickBlock {
         private final net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock n;
 
-        NeoPlayerInteractEventRightClickBlock(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock n) {
+        NeoPlayerInteractEventRightClickBlock(
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock n) {
             super(n.getEntity(), n.getHand(), n.getPos(), n.getHitVec());
             this.n = n;
         }
@@ -413,7 +471,8 @@ public final class GameBindings {
     private static final class NeoPlayerInteractEventRightClickItem extends PlayerInteractEvent.RightClickItem {
         private final net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem n;
 
-        NeoPlayerInteractEventRightClickItem(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem n) {
+        NeoPlayerInteractEventRightClickItem(
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem n) {
             super(n.getEntity(), n.getHand());
             this.n = n;
         }
@@ -442,7 +501,8 @@ public final class GameBindings {
     private static final class NeoPlayerInteractEventLeftClickBlock extends PlayerInteractEvent.LeftClickBlock {
         private final net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock n;
 
-        NeoPlayerInteractEventLeftClickBlock(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock n) {
+        NeoPlayerInteractEventLeftClickBlock(
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock n) {
             super(n.getEntity(), n.getPos(), n.getFace(), Action.valueOf(n.getAction().name()));
             this.n = n;
         }
@@ -971,7 +1031,8 @@ public final class GameBindings {
 
         @Override
         public void setResult(Result result) {
-            n.setResult(net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable.Result.valueOf(result.name()));
+            n.setResult(net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable.Result.valueOf(
+                    result.name()));
         }
     }
 
@@ -1028,14 +1089,16 @@ public final class GameBindings {
 
         @Override
         public void setResult(Result result) {
-            n.setResult(net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck.Result.valueOf(result.name()));
+            n.setResult(net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck.Result.valueOf(
+                    result.name()));
         }
     }
 
     private static final class NeoMobSpawnEventSpawnPlacementCheck extends MobSpawnEvent.SpawnPlacementCheck {
         private final net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck n;
 
-        NeoMobSpawnEventSpawnPlacementCheck(net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck n) {
+        NeoMobSpawnEventSpawnPlacementCheck(
+                net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck n) {
             super(n.getEntityType(), n.getLevel(), n.getSpawnType(), n.getPos(), n.getRandom(), n.getDefaultResult());
             this.n = n;
         }
@@ -1047,7 +1110,8 @@ public final class GameBindings {
 
         @Override
         public void setResult(Result result) {
-            n.setResult(net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck.Result.valueOf(result.name()));
+            n.setResult(net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck.Result.valueOf(
+                    result.name()));
         }
     }
 
@@ -1514,7 +1578,8 @@ public final class GameBindings {
     private static final class NeoBlockEventBlockToolModificationEvent extends BlockEvent.BlockToolModificationEvent {
         private final net.neoforged.neoforge.event.level.BlockEvent.BlockToolModificationEvent n;
 
-        NeoBlockEventBlockToolModificationEvent(net.neoforged.neoforge.event.level.BlockEvent.BlockToolModificationEvent n) {
+        NeoBlockEventBlockToolModificationEvent(
+                net.neoforged.neoforge.event.level.BlockEvent.BlockToolModificationEvent n) {
             super(n.getState(), n.getContext(), n.isSimulated());
             this.n = n;
         }
@@ -1544,7 +1609,8 @@ public final class GameBindings {
         private final net.neoforged.neoforge.event.level.BlockDropsEvent n;
 
         NeoBlockDropsEvent(net.neoforged.neoforge.event.level.BlockDropsEvent n) {
-            super(n.getLevel(), n.getPos(), n.getState(), n.getBlockEntity(), n.getDrops(), n.getBreaker(), n.getTool());
+            super(n.getLevel(), n.getPos(), n.getState(), n.getBlockEntity(), n.getDrops(), n.getBreaker(),
+                    n.getTool());
             this.n = n;
         }
 

@@ -19,9 +19,9 @@ import java.util.function.Consumer;
  * posted the event.
  *
  * <p>The loader's bridge learns which priorities are in use through the {@link Activator}: the first listener of a
- * priority of a hub activates it, once, and the bridge then calls {@link #post(Priority, Object)} for that priority from
- * a native listener of the same priority. ({@link #post(Object)} runs every priority at once: tests and loaders without
- * a bus of their own.)
+ * priority of a hub activates it, once, and the bridge then calls {@link #post(Priority, Object)} for that
+ * priority from a native listener of the same priority. ({@link #post(Object)} runs every priority at once: tests
+ * and loaders without a bus of their own.)
  *
  * @param <E> the common event type
  */

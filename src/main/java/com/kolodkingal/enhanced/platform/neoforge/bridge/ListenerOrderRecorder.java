@@ -36,8 +36,9 @@ import java.util.regex.Pattern;
  * has is placed after the one it follows there.
  *
  * <p>File format: {@code [server]} or {@code [client]} starts a section; {@code event <NeoForge type> -> <common type>}
- * (or {@code -} when the event has no common type) starts an event; each listener line is {@code <PRIORITY> <rc|-> <class>#<method>}
- * ({@code rc}: it receives cancelled events). Lines starting with {@code #} are comments.
+ * (or {@code -} when the event has no common type) starts an event; each listener line is
+ * {@code <PRIORITY> <rc|-> <class>#<method>} ({@code rc}: it receives cancelled events). Lines starting with
+ * {@code #} are comments.
  *
  * <p>How to record (development runs only, or with {@code -Denhanced.debug=true}): {@code /enhanced debug
  * listener_order} writes the section of the side it runs on to the file named by {@code -Denhanced.listenerOrder}
@@ -50,7 +51,8 @@ public final class ListenerOrderRecorder {
     public static final String FILE_PROPERTY = "enhanced.listenerOrder";
     static final String RECORD_PROPERTY = "enhanced.recordListenerOrder";
     /** A static listener registered by its class: {@code @SubscribeEvent: class <owner> <method>(<descriptor>)}. */
-    private static final Pattern SUBSCRIBE_EVENT = Pattern.compile("@SubscribeEvent: (?:class |interface )(\\S+) (\\w+)\\(");
+    private static final Pattern SUBSCRIBE_EVENT = Pattern.compile(
+            "@SubscribeEvent: (?:class |interface )(\\S+) (\\w+)\\(");
     /**
      * A listener registered by its method (NeoForge does that for a class with both mod-bus and game-bus listeners):
      * {@code @SubscribeEvent: public static void <owner>.<method>(<parameters>) <method>(<descriptor>)}.
@@ -129,8 +131,10 @@ public final class ListenerOrderRecorder {
             }
         }
         if (header.isEmpty()) {
-            header.add("# The order in which NeoForge 21.1 called Enhanced's listeners (3.8.2), per event and priority.");
-            header.add("# Written by ListenerOrderRecorder (/enhanced debug listener_order, or -PrecordListenerOrder);");
+            header.add("# The order in which NeoForge 21.1 called Enhanced's listeners (3.8.3), per event and "
+                    + "priority.");
+            header.add("# Written by ListenerOrderRecorder (/enhanced debug listener_order, or "
+                    + "-PrecordListenerOrder);");
             header.add("# read by the @Subscribe processor (the generated order) and ListenerOrderTests. Do not edit.");
             header.add("");
         }

@@ -13,7 +13,8 @@ import java.lang.annotation.Target;
  *
  * <p>Nothing scans for it at run time: the build's annotation processor ({@code processor/}) writes every listener into
  * {@code platform.event.generated.GeneratedSubscriptions}, in the order NeoForge called them in 3.8.2
- * ({@code docs/port/listener-order.txt}), and {@link Events#registerGenerated} registers them with their {@link EventHub}s.
+ * ({@code docs/port/listener-order.txt}), and {@link Events#registerGenerated} registers them with their
+ * {@link EventHub}s.
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)

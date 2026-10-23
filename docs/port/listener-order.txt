@@ -1,4 +1,4 @@
-# The order in which NeoForge 21.1 called Enhanced's listeners (3.8.2), per event and priority.
+# The order in which NeoForge 21.1 called Enhanced's listeners (3.8.3), per event and priority.
 # Written by ListenerOrderRecorder (/enhanced debug listener_order, or -PrecordListenerOrder);
 # read by the @Subscribe processor (the generated order) and ListenerOrderTests. Do not edit.
 

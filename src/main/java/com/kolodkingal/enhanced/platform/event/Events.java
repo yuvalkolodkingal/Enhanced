@@ -6,8 +6,9 @@ import com.kolodkingal.enhanced.platform.event.generated.GeneratedSubscriptions;
  * Posting common events, and registering the generated {@link Subscribe} listeners.
  *
  * <p>Migrating a test: {@code NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, pos, state, player))} becomes
- * {@code Events.post(new BlockEvent.BreakEvent(level, pos, state, player))} with the common {@code BlockEvent}; a test's
- * own listener, {@code NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BreakEvent.class, claim)}, becomes
+ * {@code Events.post(new BlockEvent.BreakEvent(level, pos, state, player))} with the common {@code BlockEvent}; a
+ * test's own listener, {@code NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BreakEvent.class,
+ * claim)}, becomes
  * {@code EventHub.of(BlockEvent.BreakEvent.class).register(Priority.NORMAL, false, claim)}, and its {@code unregister}
  * the returned registration's {@code close()}.
  */

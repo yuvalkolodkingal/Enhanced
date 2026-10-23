@@ -27,6 +27,7 @@ import com.kolodkingal.enhanced.platform.event.ServerStartingEvent;
 import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
 import com.kolodkingal.enhanced.platform.event.ServerStoppingEvent;
 import com.kolodkingal.enhanced.platform.event.ServerTickEvent;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -34,7 +35,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -66,8 +66,6 @@ import net.neoforged.fml.DeferredWorkQueue;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -86,14 +84,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * server's lifecycle and ticks, a level's tick and unloading, and the mod's setup are checked through the adapter only:
  * posting them on the live server would run the mod's (and NeoForge's) real work for them.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BridgeWorldTests {
     private BridgeWorldTests() {
     }
 
     private static Zombie zombie(GameTestHelper helper) {
-        return helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
     }
 
     private static BlockPos at(GameTestHelper helper, int x, int y, int z) {
@@ -102,7 +98,7 @@ public final class BridgeWorldTests {
 
     // ---- entities
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityJoinLevel(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Bridged<EntityJoinLevelEvent, net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> b =
@@ -112,7 +108,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityLeaveLevel(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         bridge(EntityLeaveLevelEvent.class, () -> new net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent(zombie,
@@ -120,12 +116,13 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityMobGriefing(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Bridged<EntityMobGriefingEvent, net.neoforged.neoforge.event.entity.EntityMobGriefingEvent> b =
                 bridge(EntityMobGriefingEvent.class,
-                        () -> new net.neoforged.neoforge.event.entity.EntityMobGriefingEvent(helper.getLevel(), zombie));
+                        () -> new net.neoforged.neoforge.event.entity.EntityMobGriefingEvent(helper.getLevel(),
+                                zombie));
         b.common().setCanGrief(false);
         check(!b.neo().canGrief(), "setCanGrief reaches NeoForge");
         b.common().setCanGrief(true);
@@ -133,16 +130,16 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityMount(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
-        Zombie horse = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 4.5));
+        Zombie horse = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 4.5));
         bridge(EntityMountEvent.class, () -> new net.neoforged.neoforge.event.entity.EntityMountEvent(zombie, horse,
                 helper.getLevel(), true));
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityStruckByLightning(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(helper.getLevel());
@@ -151,11 +148,12 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void chorusFruitTeleport(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Vec3 to = zombie.position().add(1.0, 0.0, 1.0);
-        Bridged<EntityTeleportEvent.ChorusFruit, net.neoforged.neoforge.event.entity.EntityTeleportEvent.ChorusFruit> b =
+        Bridged<EntityTeleportEvent.ChorusFruit,
+                net.neoforged.neoforge.event.entity.EntityTeleportEvent.ChorusFruit> b =
                 bridge(EntityTeleportEvent.ChorusFruit.class,
                         () -> new net.neoforged.neoforge.event.entity.EntityTeleportEvent.ChorusFruit(zombie, to.x,
                                 to.y, to.z));
@@ -164,11 +162,12 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void enderEntityTeleport(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Vec3 to = zombie.position().add(1.0, 0.0, 1.0);
-        Bridged<EntityTeleportEvent.EnderEntity, net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderEntity> b =
+        Bridged<EntityTeleportEvent.EnderEntity,
+                net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderEntity> b =
                 bridge(EntityTeleportEvent.EnderEntity.class,
                         () -> new net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderEntity(zombie, to.x,
                                 to.y, to.z));
@@ -177,7 +176,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void enderPearlTeleport(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         ThrownEnderpearl pearl = new ThrownEnderpearl(helper.getLevel(), p);
@@ -192,7 +191,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityTravelToDimension(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         bridge(EntityTravelToDimensionEvent.class,
@@ -200,7 +199,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void projectileImpact(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Arrow arrow = new Arrow(EntityType.ARROW, helper.getLevel());
@@ -213,14 +212,14 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityTickPre(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         bridge(EntityTickEvent.Pre.class, () -> new net.neoforged.neoforge.event.tick.EntityTickEvent.Pre(zombie));
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityTickPost(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         bridge(EntityTickEvent.Post.class, () -> new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(zombie));
@@ -229,7 +228,7 @@ public final class BridgeWorldTests {
 
     // ---- ticks and the server (the adapter only)
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void levelTicks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Bridged<LevelTickEvent.Pre, ?> pre = adapted(LevelTickEvent.Pre.class,
@@ -241,7 +240,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void serverTicks(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         Bridged<ServerTickEvent.Pre, ?> pre = adapted(ServerTickEvent.Pre.class,
@@ -253,7 +252,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void serverLifecycle(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         check(adapted(ServerStartingEvent.class, new net.neoforged.neoforge.event.server.ServerStartingEvent(server))
@@ -267,7 +266,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void commonSetup(GameTestHelper helper) {
         net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent neo = new net.neoforged.fml.event.lifecycle
                 .FMLCommonSetupEvent(ModList.get().getModContainerById(Enhanced.MODID).orElseThrow(),
@@ -281,26 +280,26 @@ public final class BridgeWorldTests {
 
     // ---- levels
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void levelLoad(GameTestHelper helper) {
         bridge(LevelEvent.Load.class, () -> new net.neoforged.neoforge.event.level.LevelEvent.Load(helper.getLevel()));
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void levelSave(GameTestHelper helper) {
         bridge(LevelEvent.Save.class, () -> new net.neoforged.neoforge.event.level.LevelEvent.Save(helper.getLevel()));
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void levelUnload(GameTestHelper helper) {
         check(adapted(LevelEvent.Unload.class, new net.neoforged.neoforge.event.level.LevelEvent.Unload(
                 helper.getLevel())).common().getLevel() == helper.getLevel(), "the level");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void explosionDetonate(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Vec3 c = zombie.position().add(1.0, 0.0, 0.0);
@@ -315,7 +314,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void explosionKnockback(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Vec3 c = zombie.position().add(1.0, 0.0, 0.0);
@@ -331,7 +330,7 @@ public final class BridgeWorldTests {
 
     // ---- blocks
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void blockBreak(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         BlockPos pos = at(helper, 6, 1, 6);
@@ -340,7 +339,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void blockEntityPlace(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         BlockPos pos = at(helper, 6, 2, 6);
@@ -353,7 +352,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void farmlandTrample(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         BlockPos pos = at(helper, 8, 1, 8);
@@ -363,7 +362,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void fluidPlaceBlock(GameTestHelper helper) {
         BlockPos pos = at(helper, 6, 2, 6);
         Bridged<BlockEvent.FluidPlaceBlockEvent, net.neoforged.neoforge.event.level.BlockEvent.FluidPlaceBlockEvent> b =
@@ -375,7 +374,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void neighborNotify(GameTestHelper helper) {
         BlockPos pos = at(helper, 6, 1, 6);
         bridge(BlockEvent.NeighborNotifyEvent.class,
@@ -384,7 +383,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void portalSpawn(GameTestHelper helper) {
         BlockPos pos = at(helper, 6, 2, 6);
         PortalShape shape = new PortalShape(helper.getLevel(), pos, Direction.Axis.X);
@@ -394,7 +393,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void blockToolModification(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_AXE));
@@ -413,7 +412,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void blockDrops(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         BlockPos pos = at(helper, 6, 1, 6);
@@ -426,7 +425,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void pistonPre(GameTestHelper helper) {
         BlockPos pos = at(helper, 6, 2, 6);
         Bridged<PistonEvent.Pre, net.neoforged.neoforge.event.level.PistonEvent.Pre> b =
@@ -439,7 +438,7 @@ public final class BridgeWorldTests {
 
     // ---- the rest
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void registerCommands(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         CommandBuildContext context = CommandBuildContext.simple(server.registryAccess(),
@@ -451,7 +450,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void datapackSync(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         MinecraftServer server = helper.getLevel().getServer();
@@ -462,7 +461,7 @@ public final class BridgeWorldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void itemAttributeModifiers(GameTestHelper helper) {
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
         ItemAttributeModifiers defaults = sword.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS,

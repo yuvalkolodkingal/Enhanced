@@ -45,41 +45,60 @@ public final class ClientBindings {
                 n -> new ClientTickEvent.Pre());
         Binding.put(table, ClientTickEvent.Post.class, net.neoforged.neoforge.client.event.ClientTickEvent.Post.class,
                 n -> new ClientTickEvent.Post());
-        Binding.put(table, ClientPlayerNetworkEvent.LoggingIn.class, net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingIn.class,
-                n -> new ClientPlayerNetworkEvent.LoggingIn(n.getMultiPlayerGameMode(), n.getPlayer(), n.getConnection()));
-        Binding.put(table, ClientPlayerNetworkEvent.LoggingOut.class, net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut.class,
-                n -> new ClientPlayerNetworkEvent.LoggingOut(n.getMultiPlayerGameMode(), n.getPlayer(), n.getConnection()));
-        Binding.put(table, ClientPlayerNetworkEvent.Clone.class, net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.Clone.class,
-                n -> new ClientPlayerNetworkEvent.Clone(n.getMultiPlayerGameMode(), n.getNewPlayer(), n.getConnection(), n.getOldPlayer()));
+        Binding.put(table, ClientPlayerNetworkEvent.LoggingIn.class,
+                net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingIn.class,
+                n -> new ClientPlayerNetworkEvent.LoggingIn(n.getMultiPlayerGameMode(), n.getPlayer(),
+                        n.getConnection()));
+        Binding.put(table, ClientPlayerNetworkEvent.LoggingOut.class,
+                net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut.class,
+                n -> new ClientPlayerNetworkEvent.LoggingOut(n.getMultiPlayerGameMode(), n.getPlayer(),
+                        n.getConnection()));
+        Binding.put(table, ClientPlayerNetworkEvent.Clone.class,
+                net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.Clone.class,
+                n -> new ClientPlayerNetworkEvent.Clone(n.getMultiPlayerGameMode(), n.getNewPlayer(),
+                        n.getConnection(), n.getOldPlayer()));
         Binding.put(table, RenderLevelStageEvent.class, net.neoforged.neoforge.client.event.RenderLevelStageEvent.class,
-                n -> new RenderLevelStageEvent(ClientConvert.stage(n.getStage()), n.getLevelRenderer(), n.getPoseStack(), n.getModelViewMatrix(), n.getProjectionMatrix(), n.getRenderTick(), n.getPartialTick(), n.getCamera(), n.getFrustum()));
-        Binding.put(table, ViewportEvent.ComputeCameraAngles.class, net.neoforged.neoforge.client.event.ViewportEvent.ComputeCameraAngles.class,
+                n -> new RenderLevelStageEvent(ClientConvert.stage(n.getStage()), n.getLevelRenderer(),
+                        n.getPoseStack(), n.getModelViewMatrix(), n.getProjectionMatrix(), n.getRenderTick(),
+                        n.getPartialTick(), n.getCamera(), n.getFrustum()));
+        Binding.put(table, ViewportEvent.ComputeCameraAngles.class,
+                net.neoforged.neoforge.client.event.ViewportEvent.ComputeCameraAngles.class,
                 NeoViewportEventComputeCameraAngles::new);
-        Binding.put(table, ViewportEvent.ComputeFogColor.class, net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor.class,
+        Binding.put(table, ViewportEvent.ComputeFogColor.class,
+                net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor.class,
                 NeoViewportEventComputeFogColor::new);
-        Binding.put(table, ViewportEvent.RenderFog.class, net.neoforged.neoforge.client.event.ViewportEvent.RenderFog.class,
+        Binding.put(table, ViewportEvent.RenderFog.class,
+                net.neoforged.neoforge.client.event.ViewportEvent.RenderFog.class,
                 NeoViewportEventRenderFog::new);
         Binding.put(table, RenderPlayerEvent.Pre.class, net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre.class,
                 NeoRenderPlayerEventPre::new);
-        Binding.put(table, RenderPlayerEvent.Post.class, net.neoforged.neoforge.client.event.RenderPlayerEvent.Post.class,
-                n -> new RenderPlayerEvent.Post(n.getEntity(), n.getRenderer(), n.getPartialTick(), n.getPoseStack(), n.getMultiBufferSource(), n.getPackedLight()));
+        Binding.put(table, RenderPlayerEvent.Post.class,
+                net.neoforged.neoforge.client.event.RenderPlayerEvent.Post.class,
+                n -> new RenderPlayerEvent.Post(n.getEntity(), n.getRenderer(), n.getPartialTick(),
+                        n.getPoseStack(), n.getMultiBufferSource(), n.getPackedLight()));
         Binding.put(table, RenderArmEvent.class, net.neoforged.neoforge.client.event.RenderArmEvent.class,
                 NeoRenderArmEvent::new);
         Binding.put(table, RenderHandEvent.class, net.neoforged.neoforge.client.event.RenderHandEvent.class,
                 NeoRenderHandEvent::new);
         Binding.put(table, InputEvent.Key.class, net.neoforged.neoforge.client.event.InputEvent.Key.class,
                 n -> new InputEvent.Key(n.getKey(), n.getScanCode(), n.getAction(), n.getModifiers()));
-        Binding.put(table, InputEvent.MouseButton.Pre.class, net.neoforged.neoforge.client.event.InputEvent.MouseButton.Pre.class,
+        Binding.put(table, InputEvent.MouseButton.Pre.class,
+                net.neoforged.neoforge.client.event.InputEvent.MouseButton.Pre.class,
                 NeoInputEventMouseButtonPre::new);
-        Binding.put(table, InputEvent.MouseButton.Post.class, net.neoforged.neoforge.client.event.InputEvent.MouseButton.Post.class,
+        Binding.put(table, InputEvent.MouseButton.Post.class,
+                net.neoforged.neoforge.client.event.InputEvent.MouseButton.Post.class,
                 n -> new InputEvent.MouseButton.Post(n.getButton(), n.getAction(), n.getModifiers()));
-        Binding.put(table, InputEvent.MouseScrollingEvent.class, net.neoforged.neoforge.client.event.InputEvent.MouseScrollingEvent.class,
+        Binding.put(table, InputEvent.MouseScrollingEvent.class,
+                net.neoforged.neoforge.client.event.InputEvent.MouseScrollingEvent.class,
                 NeoInputEventMouseScrollingEvent::new);
-        Binding.put(table, InputEvent.InteractionKeyMappingTriggered.class, net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered.class,
+        Binding.put(table, InputEvent.InteractionKeyMappingTriggered.class,
+                net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered.class,
                 NeoInputEventInteractionKeyMappingTriggered::new);
-        Binding.put(table, RenderGuiLayerEvent.Pre.class, net.neoforged.neoforge.client.event.RenderGuiLayerEvent.Pre.class,
+        Binding.put(table, RenderGuiLayerEvent.Pre.class,
+                net.neoforged.neoforge.client.event.RenderGuiLayerEvent.Pre.class,
                 NeoRenderGuiLayerEventPre::new);
-        Binding.put(table, RenderGuiLayerEvent.Post.class, net.neoforged.neoforge.client.event.RenderGuiLayerEvent.Post.class,
+        Binding.put(table, RenderGuiLayerEvent.Post.class,
+                net.neoforged.neoforge.client.event.RenderGuiLayerEvent.Post.class,
                 n -> new RenderGuiLayerEvent.Post(n.getGuiGraphics(), n.getPartialTick(), n.getName(), n.getLayer()));
         Binding.put(table, RenderGuiEvent.Pre.class, net.neoforged.neoforge.client.event.RenderGuiEvent.Pre.class,
                 NeoRenderGuiEventPre::new);
@@ -89,23 +108,29 @@ public final class ClientBindings {
                 n -> new RenderFrameEvent.Pre(n.getPartialTick()));
         Binding.put(table, RenderFrameEvent.Post.class, net.neoforged.neoforge.client.event.RenderFrameEvent.Post.class,
                 n -> new RenderFrameEvent.Post(n.getPartialTick()));
-        Binding.put(table, RenderHighlightEvent.Block.class, net.neoforged.neoforge.client.event.RenderHighlightEvent.Block.class,
+        Binding.put(table, RenderHighlightEvent.Block.class,
+                net.neoforged.neoforge.client.event.RenderHighlightEvent.Block.class,
                 NeoRenderHighlightEventBlock::new);
-        Binding.put(table, CustomizeGuiOverlayEvent.BossEventProgress.class, net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent.BossEventProgress.class,
+        Binding.put(table, CustomizeGuiOverlayEvent.BossEventProgress.class,
+                net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent.BossEventProgress.class,
                 NeoCustomizeGuiOverlayEventBossEventProgress::new);
         Binding.put(table, ScreenEvent.Opening.class, net.neoforged.neoforge.client.event.ScreenEvent.Opening.class,
                 NeoScreenEventOpening::new);
         Binding.put(table, SelectMusicEvent.class, net.neoforged.neoforge.client.event.SelectMusicEvent.class,
                 NeoSelectMusicEvent::new);
-        Binding.put(table, MovementInputUpdateEvent.class, net.neoforged.neoforge.client.event.MovementInputUpdateEvent.class,
+        Binding.put(table, MovementInputUpdateEvent.class,
+                net.neoforged.neoforge.client.event.MovementInputUpdateEvent.class,
                 n -> new MovementInputUpdateEvent(n.getEntity(), n.getInput()));
-        Binding.put(table, ComputeFovModifierEvent.class, net.neoforged.neoforge.client.event.ComputeFovModifierEvent.class,
+        Binding.put(table, ComputeFovModifierEvent.class,
+                net.neoforged.neoforge.client.event.ComputeFovModifierEvent.class,
                 NeoComputeFovModifierEvent::new);
-        Binding.put(table, CalculateDetachedCameraDistanceEvent.class, net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent.class,
+        Binding.put(table, CalculateDetachedCameraDistanceEvent.class,
+                net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent.class,
                 NeoCalculateDetachedCameraDistanceEvent::new);
         Binding.put(table, RenderNameTagEvent.class, net.neoforged.neoforge.client.event.RenderNameTagEvent.class,
                 NeoRenderNameTagEvent::new);
-        Binding.put(table, RegisterClientCommandsEvent.class, net.neoforged.neoforge.client.event.RegisterClientCommandsEvent.class,
+        Binding.put(table, RegisterClientCommandsEvent.class,
+                net.neoforged.neoforge.client.event.RegisterClientCommandsEvent.class,
                 n -> new RegisterClientCommandsEvent(n.getDispatcher(), n.getBuildContext()));
         Binding.put(table, FMLClientSetupEvent.class, net.neoforged.fml.event.lifecycle.FMLClientSetupEvent.class,
                 NeoFMLClientSetupEvent::new);
@@ -337,10 +362,12 @@ public final class ClientBindings {
         }
     }
 
-    private static final class NeoInputEventInteractionKeyMappingTriggered extends InputEvent.InteractionKeyMappingTriggered {
+    private static final class NeoInputEventInteractionKeyMappingTriggered
+            extends InputEvent.InteractionKeyMappingTriggered {
         private final net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered n;
 
-        NeoInputEventInteractionKeyMappingTriggered(net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered n) {
+        NeoInputEventInteractionKeyMappingTriggered(
+                net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered n) {
             super((n.isAttack() ? 0 : n.isUseItem() ? 1 : 2), n.getKeyMapping(), n.getHand());
             this.n = n;
         }
@@ -424,10 +451,12 @@ public final class ClientBindings {
         }
     }
 
-    private static final class NeoCustomizeGuiOverlayEventBossEventProgress extends CustomizeGuiOverlayEvent.BossEventProgress {
+    private static final class NeoCustomizeGuiOverlayEventBossEventProgress
+            extends CustomizeGuiOverlayEvent.BossEventProgress {
         private final net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent.BossEventProgress n;
 
-        NeoCustomizeGuiOverlayEventBossEventProgress(net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent.BossEventProgress n) {
+        NeoCustomizeGuiOverlayEventBossEventProgress(
+                net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent.BossEventProgress n) {
             super(n.getWindow(), n.getGuiGraphics(), n.getPartialTick(), n.getBossEvent(), n.getX(), n.getY(),
                     n.getIncrement());
             this.n = n;
@@ -534,7 +563,8 @@ public final class ClientBindings {
     private static final class NeoCalculateDetachedCameraDistanceEvent extends CalculateDetachedCameraDistanceEvent {
         private final net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent n;
 
-        NeoCalculateDetachedCameraDistanceEvent(net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent n) {
+        NeoCalculateDetachedCameraDistanceEvent(
+                net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent n) {
             super(n.getCamera(), n.isCameraFlipped(), n.getEntityScalingFactor(), n.getDistance());
             this.n = n;
         }
@@ -554,8 +584,8 @@ public final class ClientBindings {
         private final net.neoforged.neoforge.client.event.RenderNameTagEvent n;
 
         NeoRenderNameTagEvent(net.neoforged.neoforge.client.event.RenderNameTagEvent n) {
-            super(n.getEntity(), n.getContent(), n.getEntityRenderer(), n.getPoseStack(), n.getMultiBufferSource(),
-                    n.getPackedLight(), n.getPartialTick());
+            super(n.getEntity(), n.getContent(), n.getEntityRenderer(), n.getPoseStack(),
+                    n.getMultiBufferSource(), n.getPackedLight(), n.getPartialTick());
             this.n = n;
         }
 

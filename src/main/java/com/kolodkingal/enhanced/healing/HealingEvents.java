@@ -1,7 +1,21 @@
 package com.kolodkingal.enhanced.healing;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.HealingFxPayload;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.Cancellable;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEntityUseItemEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -12,21 +26,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.ICancellableEvent;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -53,7 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     {@code AbilityHandler}.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class HealingEvents {
     /** When each healer last showed a cut blow (the ring is not sent more than once in {@link Downed#CUT_GAP}). */
     private static final Map<UUID, Long> LAST_CUT = new ConcurrentHashMap<>();
@@ -80,7 +79,7 @@ public final class HealingEvents {
 
     // ---- damage and death ----
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || RoadTrials.isInside(player)
                 || Downed.downUntil(player) <= 0L) {
@@ -95,7 +94,7 @@ public final class HealingEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onDamage(LivingDamageEvent.Pre event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !HealingFactor.has(player)
                 || RoadTrials.isInside(player)) {
@@ -111,7 +110,7 @@ public final class HealingEvents {
         Downed.down(player);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDamaged(LivingDamageEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getNewDamage() > 0.0F
                 && HealingFactor.has(player)) {
@@ -119,7 +118,7 @@ public final class HealingEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onDeath(LivingDeathEvent event) {
         if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player) || RoadTrials.isInside(player)
                 || !HealingFactor.has(player)) {
@@ -135,7 +134,7 @@ public final class HealingEvents {
         Downed.down(player);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    @Subscribe(priority = Priority.LOWEST, receiveCanceled = true)
     public static void onDefeated(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -177,7 +176,7 @@ public final class HealingEvents {
 
     // ---- monsters, effects ----
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onChangeTarget(LivingChangeTargetEvent event) {
         if (event.getEntity() instanceof Mob && event.getNewAboutToBeSetTarget() instanceof ServerPlayer player
                 && HealingFactor.isDown(player) && Downed.mobsForget()) {
@@ -185,7 +184,7 @@ public final class HealingEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEffectAdded(MobEffectEvent.Added event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Suppression.onAdded(player, event.getEffectInstance());
@@ -194,27 +193,27 @@ public final class HealingEvents {
 
     // ---- ticking, logging in and out ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             tick(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Downed.login(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         Suppression.forget(event.getEntity().getUUID());
         LAST_CUT.remove(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         Suppression.clear();
         LAST_CUT.clear();
@@ -223,50 +222,50 @@ public final class HealingEvents {
 
     // ---- a DOWN healer does nothing (both sides: his client knows the bit) ----
 
-    private static void refuse(Player player, ICancellableEvent event) {
+    private static void refuse(Player player, Cancellable event) {
         if (player != null && HealingFactor.isDown(player)) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         refuse(event.getEntity(), event);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         refuse(event.getEntity(), event);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         refuse(event.getEntity(), event);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onInteractEntity(PlayerInteractEvent.EntityInteract event) {
         refuse(event.getEntity(), event);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onInteractEntitySpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         refuse(event.getEntity(), event);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onAttack(AttackEntityEvent event) {
         refuse(event.getEntity(), event);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onStartUsing(LivingEntityUseItemEvent.Start event) {
         if (event.getEntity() instanceof Player player) {
             refuse(player, event);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
         if (HealingFactor.isDown(event.getEntity())) {
             event.setNewSpeed(0.0F);

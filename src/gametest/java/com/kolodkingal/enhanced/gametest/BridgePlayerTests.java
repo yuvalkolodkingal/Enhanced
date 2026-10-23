@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.gametest.BridgeTestSupport.Bridged;
 import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
 import com.kolodkingal.enhanced.platform.event.CanPlayerSleepEvent;
@@ -13,9 +12,9 @@ import com.kolodkingal.enhanced.platform.event.PlayerRespawnPositionEvent;
 import com.kolodkingal.enhanced.platform.event.PlayerSetSpawnEvent;
 import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
 import com.kolodkingal.enhanced.platform.event.TriState;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -34,8 +33,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 
@@ -50,8 +47,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the same data, in priority order, cancellable as NeoForge's, and what a listener changes reaches NeoForge
  * ({@link BridgeTestSupport}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BridgePlayerTests {
     private BridgePlayerTests() {
     }
@@ -61,14 +56,14 @@ public final class BridgePlayerTests {
     }
 
     private static Zombie zombie(GameTestHelper helper) {
-        return helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
     }
 
     private static BlockPos floor(GameTestHelper helper) {
         return helper.absolutePos(new BlockPos(5, 1, 5));
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerLoggedIn(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         bridge(PlayerEvent.PlayerLoggedInEvent.class,
@@ -76,7 +71,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerLoggedOut(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         bridge(PlayerEvent.PlayerLoggedOutEvent.class,
@@ -84,7 +79,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerChangedDimension(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         bridge(PlayerEvent.PlayerChangedDimensionEvent.class,
@@ -93,7 +88,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerRespawn(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         bridge(PlayerEvent.PlayerRespawnEvent.class,
@@ -101,7 +96,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void startTracking(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         Zombie zombie = zombie(helper);
@@ -110,7 +105,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void clone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer old = f.player(4.5, FLOOR, 4.5);
@@ -120,7 +115,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void breakSpeed(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         BlockPos pos = floor(helper);
@@ -133,7 +128,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void itemCrafted(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         ItemStack sticks = new ItemStack(Items.STICK, 4);
@@ -143,7 +138,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerChangeGameMode(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         Bridged<PlayerEvent.PlayerChangeGameModeEvent,
@@ -156,7 +151,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityInteractSpecific(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         Zombie zombie = zombie(helper);
@@ -170,7 +165,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void entityInteract(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         Zombie zombie = zombie(helper);
@@ -184,7 +179,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void rightClickBlock(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         BlockPos pos = floor(helper);
@@ -204,7 +199,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void rightClickItem(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STICK));
@@ -219,7 +214,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void leftClickBlock(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         BlockPos pos = floor(helper);
@@ -235,7 +230,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void attackEntity(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         Zombie zombie = zombie(helper);
@@ -244,7 +239,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void canPlayerSleep(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         BlockPos pos = floor(helper);
@@ -256,7 +251,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerRespawnPosition(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         DimensionTransition home = new DimensionTransition(helper.getLevel(), new Vec3(1, 2, 3), Vec3.ZERO, 0.0F,
@@ -274,7 +269,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerSetSpawn(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         BlockPos pos = floor(helper);
@@ -283,7 +278,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void itemTooltip(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         ItemStack stick = new ItemStack(Items.STICK);
@@ -296,7 +291,7 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void itemEntityPickup(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         ItemEntity item = new ItemEntity(helper.getLevel(), p.getX(), p.getY(), p.getZ(), new ItemStack(Items.STICK));
@@ -304,11 +299,12 @@ public final class BridgePlayerTests {
                 bridge(ItemEntityPickupEvent.Pre.class,
                         () -> new net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre(p, item));
         b.common().setCanPickup(TriState.FALSE);
-        check(b.neo().canPickup() == net.neoforged.neoforge.common.util.TriState.FALSE, "setCanPickup reaches NeoForge");
+        check(b.neo().canPickup() == net.neoforged.neoforge.common.util.TriState.FALSE,
+                "setCanPickup reaches NeoForge");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void itemToss(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         ItemEntity item = new ItemEntity(helper.getLevel(), p.getX(), p.getY(), p.getZ(), new ItemStack(Items.STICK));
@@ -316,14 +312,14 @@ public final class BridgePlayerTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerTickPre(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         bridge(PlayerTickEvent.Pre.class, () -> new net.neoforged.neoforge.event.tick.PlayerTickEvent.Pre(p));
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void playerTickPost(GameTestHelper helper) {
         ServerPlayer p = player(helper);
         bridge(PlayerTickEvent.Post.class, () -> new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));

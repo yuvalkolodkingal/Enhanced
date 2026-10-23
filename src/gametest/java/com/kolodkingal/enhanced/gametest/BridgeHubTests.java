@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.platform.event.Cancellable;
 import com.kolodkingal.enhanced.platform.event.EventHub;
 import com.kolodkingal.enhanced.platform.event.Events;
@@ -8,13 +7,11 @@ import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
 import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.neoforge.bridge.Binding;
 import com.kolodkingal.enhanced.platform.neoforge.bridge.NeoForgeBridge;
-import net.minecraft.gametest.framework.GameTest;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -29,8 +26,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The hub's own rules (port P0, S-A): NeoForge's bus semantics without NeoForge (priorities, registration order,
  * cancellation and receiveCanceled, unregistering), and the table of bindings.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BridgeHubTests {
     private BridgeHubTests() {
     }
@@ -50,7 +45,7 @@ public final class BridgeHubTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void prioritiesRunInOrderAndListenersInTheirOrder(GameTestHelper helper) {
         EventHub<Probe> hub = EventHub.of(Probe.class);
         List<String> ran = new ArrayList<>();
@@ -69,7 +64,7 @@ public final class BridgeHubTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCancelledEventSkipsAllButTheListenersThatReceiveIt(GameTestHelper helper) {
         EventHub<Probe> hub = EventHub.of(Probe.class);
         List<String> ran = new ArrayList<>();
@@ -87,7 +82,7 @@ public final class BridgeHubTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void closingARegistrationRemovesOnlyThatListener(GameTestHelper helper) {
         EventHub<Probe> hub = EventHub.of(Probe.class);
         List<String> ran = new ArrayList<>();
@@ -103,7 +98,7 @@ public final class BridgeHubTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void postingOnePriorityRunsOnlyIt(GameTestHelper helper) {
         EventHub<Probe> hub = EventHub.of(Probe.class);
         List<String> ran = new ArrayList<>();
@@ -115,9 +110,9 @@ public final class BridgeHubTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void anAdaptedEventIsPostedToItsCommonHub(GameTestHelper helper) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
         LivingDeathEvent adapted = BridgeTestSupport.adapt(LivingDeathEvent.class,
                 new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(zombie,
                         helper.getLevel().damageSources().generic()));
@@ -136,7 +131,7 @@ public final class BridgeHubTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyBindingAgreesWithItsNeoForgeEvent(GameTestHelper helper) {
         int bindings = 0;
         for (Binding<?, ?> binding : NeoForgeBridge.bindings()) {

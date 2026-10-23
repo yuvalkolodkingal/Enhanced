@@ -6,11 +6,9 @@ import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.event.generated.GeneratedSubscriptions;
 import com.kolodkingal.enhanced.platform.neoforge.bridge.ListenerOrderRecorder;
 import com.kolodkingal.enhanced.platform.neoforge.bridge.NeoForgeBridge;
-import net.minecraft.gametest.framework.GameTest;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,8 +28,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * recorded in {@code docs/port/listener-order.txt} ({@code ListenerOrderRecorder}). A listener the recording does not
  * know fails the test: record again ({@code /enhanced debug listener_order} or {@code -PrecordListenerOrder}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ListenerOrderTests {
     private static final String BATCH = "listener_order";
     private static final String TOOLING = "com.kolodkingal.enhanced.platform.";
@@ -121,7 +117,7 @@ public final class ListenerOrderTests {
     }
 
     /** Every generated listener was recorded, with its receiveCanceled, and the generated order is the recorded one. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGeneratedOrderIsNeoForgesRecordedOrder(GameTestHelper helper) {
         Map<String, Boolean> receiveCanceled = new LinkedHashMap<>();
         Map<String, List<String>> recorded = recorded(receiveCanceled);
@@ -147,7 +143,7 @@ public final class ListenerOrderTests {
     }
 
     /** The hubs of this side hold the generated listeners in the generated order, with their priorities. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHubsRunTheGeneratedOrder(GameTestHelper helper) {
         for (Map.Entry<String, List<Entry>> group : byGroup(generated()).entrySet()) {
             List<Entry> entries = group.getValue().stream().filter(e -> !e.side().equals("CLIENT")).toList();
@@ -172,7 +168,7 @@ public final class ListenerOrderTests {
     }
 
     /** Every event a generated listener of this side listens to comes from a NeoForge event. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyGeneratedListenerHasANeoForgeEvent(GameTestHelper helper) {
         for (String line : GeneratedSubscriptions.INDEX) {
             Entry entry = Entry.parse(line);

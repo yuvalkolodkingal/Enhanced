@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.gametest.BridgeTestSupport.Bridged;
 import com.kolodkingal.enhanced.platform.event.FinalizeSpawnEvent;
 import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
@@ -17,8 +16,8 @@ import com.kolodkingal.enhanced.platform.event.LivingKnockBackEvent;
 import com.kolodkingal.enhanced.platform.event.LivingShieldBlockEvent;
 import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
 import com.kolodkingal.enhanced.platform.event.MobSpawnEvent;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -35,8 +34,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,21 +45,19 @@ import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** BridgeTests of the living-entity events (port P0, S-A; {@link BridgeTestSupport}). */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BridgeLivingTests {
     private BridgeLivingTests() {
     }
 
     private static Zombie zombie(GameTestHelper helper) {
-        return helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
     }
 
     private static DamageSource generic(GameTestHelper helper) {
         return helper.getLevel().damageSources().generic();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingIncomingDamage(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         DamageSource source = generic(helper);
@@ -85,7 +80,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingDamagePre(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         DamageContainer container = new DamageContainer(generic(helper), 6.0F);
@@ -97,7 +92,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingDamagePost(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         DamageContainer container = new DamageContainer(generic(helper), 6.0F);
@@ -109,7 +104,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingDeath(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         DamageSource source = generic(helper);
@@ -118,10 +113,10 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingChangeTarget(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
-        Zombie other = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 4.5));
+        Zombie other = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 4.5));
         Bridged<LivingChangeTargetEvent, net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent> b =
                 bridge(LivingChangeTargetEvent.class,
                         () -> new net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent(zombie, other,
@@ -133,7 +128,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingDestroyBlock(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         BlockPos pos = helper.absolutePos(new BlockPos(8, 1, 8));
@@ -143,7 +138,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingDrops(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         DamageSource source = generic(helper);
@@ -156,7 +151,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingUseItemStart(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         ItemStack apple = new ItemStack(Items.APPLE);
@@ -169,7 +164,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingUseItemTick(GameTestHelper helper) {
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
         ItemStack apple = new ItemStack(Items.APPLE);
@@ -181,7 +176,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingEquipmentChange(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         ItemStack helmet = new ItemStack(Items.IRON_HELMET);
@@ -191,7 +186,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingExperienceDrop(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         ServerPlayer p = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
@@ -203,7 +198,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingFall(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Bridged<LivingFallEvent, net.neoforged.neoforge.event.entity.living.LivingFallEvent> b =
@@ -215,7 +210,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingKnockBack(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Bridged<LivingKnockBackEvent, net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent> b =
@@ -230,7 +225,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void livingShieldBlock(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         DamageContainer container = new DamageContainer(generic(helper), 4.0F);
@@ -243,7 +238,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void mobEffectAdded(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         MobEffectInstance speed = new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100);
@@ -252,7 +247,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void mobEffectApplicable(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         MobEffectInstance speed = new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100);
@@ -267,7 +262,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void mobEffectExpired(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         MobEffectInstance speed = new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100);
@@ -276,7 +271,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void mobEffectRemove(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         zombie.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100));
@@ -288,7 +283,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void mobSpawnPositionCheck(GameTestHelper helper) {
         Zombie zombie = zombie(helper);
         Bridged<MobSpawnEvent.PositionCheck, net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck> b =
@@ -301,7 +296,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void mobSpawnPlacementCheck(GameTestHelper helper) {
         BlockPos pos = helper.absolutePos(new BlockPos(6, 2, 6));
         Bridged<MobSpawnEvent.SpawnPlacementCheck,
@@ -316,7 +311,7 @@ public final class BridgeLivingTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void finalizeSpawn(GameTestHelper helper) {
         // A mob not yet in the level: NeoForge refuses setSpawnCancelled once it is.
         Zombie zombie = EntityType.ZOMBIE.create(helper.getLevel());
