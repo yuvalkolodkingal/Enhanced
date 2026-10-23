@@ -127,6 +127,14 @@ public final class Net {
         service().sendToPlayersTrackingChunk(level, chunkPos, payload, payloads);
     }
 
+    /**
+     * Whether {@code player}'s client has the channel of {@code type} (a client without an optional channel, such as an
+     * older version of the mod, has not; a player with no connection has none).
+     */
+    public static boolean hasChannel(ServerPlayer player, CustomPacketPayload.Type<?> type) {
+        return service().hasChannel(player, type);
+    }
+
     private static NetService service() {
         return Platform.get().net();
     }
