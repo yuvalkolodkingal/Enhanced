@@ -3,6 +3,9 @@ package com.kolodkingal.enhanced.gametest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.road.RoadCanvas;
@@ -46,10 +49,6 @@ import net.minecraft.world.level.block.state.properties.WallSide;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -354,17 +353,17 @@ public final class RoadStructureTests {
                     BlockPos mc = StructureCopyChallenge.modelCorner(trial);
                     BlockState stone = Blocks.STONE.defaultBlockState();
                     BlockPos inside = pc.offset(model.sizeX() - 1, model.sizeY() + 1, model.sizeZ() - 1);
-                    check(!NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(road.dimension(), road, pc), stone, player)).isCanceled(), "he places on the plot's first cell");
-                    check(!NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(road.dimension(), road, inside), stone, player)).isCanceled(),
+                    check(!Events.post(new BlockEvent.EntityPlaceEvent(road, pc, road.getBlockState(pc), stone, player)).isCanceled(), "he places on the plot's first cell");
+                    check(!Events.post(new BlockEvent.EntityPlaceEvent(road, inside, road.getBlockState(inside), stone, player)).isCanceled(),
                             "and on its last, two layers above the model");
-                    check(!NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(road, pc, stone, player)).isCanceled(), "he breaks there");
+                    check(!Events.post(new BlockEvent.BreakEvent(road, pc, stone, player)).isCanceled(), "he breaks there");
                     // Not under it, not beside it, not above it, not on the model, not on the platform, not the console.
                     for (BlockPos no : new BlockPos[]{pc.below(), pc.west(), pc.east(model.sizeX()), pc.north(), pc.south(model.sizeZ()), inside.above(), mc, mc.above(2),
                             mc.offset(model.sizeX() - 1, 0, model.sizeZ() - 1), pc.offset(-3, -1, 8), trial.layout().exitDoor(), StructureCopyChallenge.checkButton(trial),
                             StructureCopyChallenge.supplyChest(trial)}) {
-                        check(NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(road.dimension(), road, no), stone, player)).isCanceled(),
+                        check(Events.post(new BlockEvent.EntityPlaceEvent(road, no, road.getBlockState(no), stone, player)).isCanceled(),
                                 "he cannot place at " + no.toShortString());
-                        check(NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(road, no, road.getBlockState(no), player)).isCanceled(), "or break at " + no.toShortString());
+                        check(Events.post(new BlockEvent.BreakEvent(road, no, road.getBlockState(no), player)).isCanceled(), "or break at " + no.toShortString());
                     }
                     // By the real way: right-clicking with a block of his supply in his hand.
                     int slot = 0;
@@ -424,9 +423,9 @@ public final class RoadStructureTests {
                     BlockPos modelBlock = StructureCopyChallenge.modelCorner(trial).offset(cell[0], cell[1], cell[2]);
                     check(!player.gameMode.destroyBlock(modelBlock) && !road.getBlockState(modelBlock).isAir(), "the model stays");
                     check(!player.gameMode.destroyBlock(pc.below()) && !road.getBlockState(pc.below()).isAir(), "so does the floor");
-                    PlayerEvent.BreakSpeed speed = NeoForge.EVENT_BUS.post(new PlayerEvent.BreakSpeed(player, Blocks.OBSIDIAN.defaultBlockState(), 1.0F, pos));
+                    PlayerEvent.BreakSpeed speed = Events.post(new PlayerEvent.BreakSpeed(player, Blocks.OBSIDIAN.defaultBlockState(), 1.0F, pos));
                     check(speed.getNewSpeed() >= 1000.0F, "breaking is instant in the Road: " + speed.getNewSpeed());
-                    PlayerEvent.BreakSpeed normal = NeoForge.EVENT_BUS.post(new PlayerEvent.BreakSpeed(outside, Blocks.OBSIDIAN.defaultBlockState(), 1.0F, BlockPos.ZERO));
+                    PlayerEvent.BreakSpeed normal = Events.post(new PlayerEvent.BreakSpeed(outside, Blocks.OBSIDIAN.defaultBlockState(), 1.0F, BlockPos.ZERO));
                     check(normal.getNewSpeed() == 1.0F, "outside the Road a block breaks as slowly as ever: " + normal.getNewSpeed());
                 })
                 .thenSucceed();
@@ -494,7 +493,8 @@ public final class RoadStructureTests {
                     check(RoadTestSupport.road(helper).getBlockState(trial.layout().gate().base().above()).isAir(), "the gate is open");
                     check(StructureCopyChallenge.compare(trial).perfect(), "and the copy stands");
                     BlockPos pc = StructureCopyChallenge.plotCorner(trial);
-                    check(NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(RoadTestSupport.road(helper).dimension(), RoadTestSupport.road(helper), pc.above(30)),
+                    ServerLevel road = RoadTestSupport.road(helper);
+                    check(Events.post(new BlockEvent.EntityPlaceEvent(road, pc.above(30), road.getBlockState(pc.above(30)),
                             Blocks.STONE.defaultBlockState(), player)).isCanceled(), "nothing more can be built");
                 })
                 .thenSucceed();

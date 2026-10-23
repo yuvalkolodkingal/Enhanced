@@ -1,12 +1,14 @@
 package com.kolodkingal.enhanced.stones;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.asgard.AsgardState;
 import com.kolodkingal.enhanced.asgard.CityPlan;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.block.StonePedestalBlock;
+import com.kolodkingal.enhanced.platform.event.ServerStartedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.core.BlockPos;
@@ -14,9 +16,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 /**
  * Where the site stones are put at run time (3.6): the Reality Stone's pedestal in Asgard's vault, put when the vault
@@ -24,7 +23,7 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
  * starts with Odin awake. It is never part of the city's chunk generation, so {@code CityPlan.VERSION} does not change.
  * Hogun, asked about the vault once it is open, warns of the Aether sleeping in it.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class StoneSites {
     /** The pedestal faces Gungnir's stand across the vault (east). */
     static final Direction ASGARD_FACING = Direction.EAST;
@@ -49,7 +48,7 @@ public final class StoneSites {
     }
 
     /** Worlds whose vault opened before 3.6 get the pedestal when the server starts; and Hogun's line is added. */
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStarted(ServerStartedEvent event) {
         registerDialogue();
         ServerLevel asgard = AsgardDimension.level(event.getServer());

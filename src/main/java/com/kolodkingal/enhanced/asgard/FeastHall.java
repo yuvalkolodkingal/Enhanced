@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.asgard;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.build.CityTemplates;
 import com.kolodkingal.enhanced.asgard.npc.Role;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -219,7 +220,7 @@ public final class FeastHall {
 
     /** Sends an Asgardian to his seat at the table now (his goal takes it on its next look; the tests use it). */
     public static void invite(net.minecraft.world.entity.Entity npc) {
-        npc.getPersistentData().putBoolean(INVITED, true);
+        ModAttachments.PERSISTENT_DATA.get(npc).putBoolean(INVITED, true);
     }
 
     // ---- mending a hall built before 3.7.2 ----

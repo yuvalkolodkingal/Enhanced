@@ -1,6 +1,17 @@
 package com.kolodkingal.enhanced.road;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTeleportEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.ItemTossEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEntityUseItemEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.TriState;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -21,18 +32,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MinecartItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.GameType;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.Set;
 
@@ -52,7 +51,7 @@ import java.util.Set;
  * Powers need no rule of their own: only a player without powers walks the Road, and one who is given a power inside is taken
  * out ({@link RoadTrials#serverTick}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class RoadRules {
     /** Items that cannot be used in the Road: they would carry the player over a trial. */
     private static final Set<Item> BANNED_ITEMS = Set.of(Items.ENDER_PEARL, Items.CHORUS_FRUIT, Items.WIND_CHARGE, Items.FIREWORK_ROCKET);
@@ -104,7 +103,7 @@ public final class RoadRules {
 
     // ---- damage and death ----
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !RoadTrials.isInside(player)) {
             return;
@@ -118,7 +117,7 @@ public final class RoadRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && RoadTrials.isInside(player)) {
             // (A player whose trial is still being built has no trial yet: he is only saved.)
@@ -133,7 +132,7 @@ public final class RoadRules {
 
     // ---- blocks ----
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onBreak(BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level) || !RoadDimension.is(level) || !inRoad(event.getPlayer())) {
             return;
@@ -144,7 +143,7 @@ public final class RoadRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onPlace(BlockEvent.EntityPlaceEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level) || !RoadDimension.is(level) || event.getEntity() instanceof ServerPlayer player && !inRoad(player)) {
             return;
@@ -155,7 +154,7 @@ public final class RoadRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onLeftClick(PlayerInteractEvent.LeftClickBlock event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !inRoad(player)) {
             return;
@@ -166,7 +165,7 @@ public final class RoadRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !inRoad(player)) {
             return;
@@ -186,7 +185,7 @@ public final class RoadRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (event.getEntity() instanceof ServerPlayer player && inRoad(player) && isBanned(event.getItemStack())) {
             event.setCanceled(true);
@@ -194,7 +193,7 @@ public final class RoadRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onUseItem(LivingEntityUseItemEvent.Start event) {
         if (event.getEntity() instanceof ServerPlayer player && inRoad(player) && isBanned(event.getItem())) {
             event.setCanceled(true);
@@ -203,21 +202,21 @@ public final class RoadRules {
 
     // ---- teleports ----
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onEnderPearl(EntityTeleportEvent.EnderPearl event) {
         if (RoadTrials.isInside(event.getPlayer())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onChorusFruit(EntityTeleportEvent.ChorusFruit event) {
         if (event.getEntityLiving() instanceof ServerPlayer player && RoadTrials.isInside(player)) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onTravel(EntityTravelToDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && (RoadTrials.isInside(player) || event.getDimension().equals(RoadDimension.KEY))
                 && !RoadTrials.isMoving(player) && !player.hasPermissions(2)) {
@@ -228,7 +227,7 @@ public final class RoadRules {
 
     // ---- the Gene ----
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onToss(ItemTossEvent event) {
         if (inRoad(event.getPlayer()) && event.getEntity().getItem().is(ModItems.SCARLET_WITCH_GENE.get())) {
             event.setCanceled(true);

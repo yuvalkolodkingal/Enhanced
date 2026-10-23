@@ -37,6 +37,7 @@ import com.kolodkingal.enhanced.odin.OdinAbilities;
 import com.kolodkingal.enhanced.odin.OdinDialogue;
 import com.kolodkingal.enhanced.odin.RavenEntity;
 import com.kolodkingal.enhanced.odin.Vault;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -69,13 +70,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -761,8 +762,8 @@ public final class OdinTests {
     }
 
     private static JsonObject lang(String name) throws IOException {
-        var file = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        try (InputStream in = Files.newInputStream(file.findResource("assets", Enhanced.MODID, "lang", name + ".json"))) {
+        Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json").orElseThrow();
+        try (InputStream in = Files.newInputStream(file)) {
             return JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
         }
     }

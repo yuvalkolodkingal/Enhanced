@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.asgard.AsgardState;
 import com.kolodkingal.enhanced.asgard.CityPlan;
 import com.kolodkingal.enhanced.config.AsgardConfig;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -235,7 +236,7 @@ public final class AsgardPopulation {
             horse.finalizeSpawn(level, level.getCurrentDifficultyAt(stand), MobSpawnType.STRUCTURE, null);
             horse.setPersistenceRequired();
             horse.restrictTo(CityPlan.STABLES, 8);
-            horse.getPersistentData().putString(SLOT_TAG, slot);
+            ModAttachments.PERSISTENT_DATA.get(horse).putString(SLOT_TAG, slot);
             residents.setResident(slot, horse.getUUID());
             level.addFreshEntity(horse);
         }
@@ -253,7 +254,7 @@ public final class AsgardPopulation {
             return false; // (3.7: a cottage's residents are judged by their own keeper, CottageKeeper)
         }
         String slot = entity instanceof AsgardianEntity npc && !npc.summoned() ? npc.slot()
-                : entity instanceof Horse ? entity.getPersistentData().getString(SLOT_TAG) : "";
+                : entity instanceof Horse ? ModAttachments.PERSISTENT_DATA.get(entity).getString(SLOT_TAG) : "";
         if (slot.isEmpty()) {
             return false;
         }

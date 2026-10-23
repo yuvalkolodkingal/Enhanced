@@ -4,6 +4,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -43,10 +48,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -126,7 +127,7 @@ public final class RoadReviewTests {
         check(!RoadDimension.in(player), "he is still where he was");
         // The way the Road's event is fired by a travel into the dimension.
         EntityTravelToDimensionEvent event = new EntityTravelToDimensionEvent(player, RoadDimension.KEY);
-        NeoForge.EVENT_BUS.post(event);
+        Events.post(event);
         check(event.isCanceled(), "so is a change of dimension into it");
         // An operator and the Road's own moves are free.
         ServerPlayer op = f.player(14.5, TestKit.FLOOR, 14.5);
@@ -139,14 +140,13 @@ public final class RoadReviewTests {
     }
 
     /** Another mod forbids the way out of the Road for as long as it is registered. */
-    private static Consumer<EntityTravelToDimensionEvent> forbidOut(ServerPlayer player, boolean[] active) {
+    private static EventHub.Registration forbidOut(ServerPlayer player, boolean[] active) {
         Consumer<EntityTravelToDimensionEvent> listener = event -> {
             if (active[0] && event.getEntity() == player && !event.getDimension().equals(RoadDimension.KEY)) {
                 event.setCanceled(true);
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, true, EntityTravelToDimensionEvent.class, listener);
-        return listener;
+        return EventHub.of(EntityTravelToDimensionEvent.class).register(Priority.LOWEST, true, listener);
     }
 
     @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
@@ -156,8 +156,8 @@ public final class RoadReviewTests {
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
         Vec3 home = player.position();
         boolean[] active = {true};
-        Consumer<EntityTravelToDimensionEvent> listener = forbidOut(player, active);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+        EventHub.Registration listener = forbidOut(player, active);
+        f.onClose(listener::close);
         check(RoadTrials.enter(player), "he walks the Road");
         RoadTrial[] trial = new RoadTrial[1];
         helper.startSequence()
@@ -189,8 +189,8 @@ public final class RoadReviewTests {
                 event.setCanceled(true);
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, true, EntityTravelToDimensionEvent.class, listener);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+        EventHub.Registration registration = EventHub.of(EntityTravelToDimensionEvent.class).register(Priority.LOWEST, true, listener);
+        f.onClose(registration::close);
         TestKit.sentPackets(player);
         check(RoadTrials.enter(player), "he walks the Road");
         helper.startSequence()
@@ -476,11 +476,11 @@ public final class RoadReviewTests {
         ServerLevel road = RoadTestSupport.road(helper);
         RoadTestSupport.put(player, road, new Vec3(0.5, 150.0, 0.5));
         ItemStack sticks = new ItemStack(Items.STICK, 4);
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player, sticks, player.inventoryMenu.getCraftSlots()));
+        Events.post(new PlayerEvent.ItemCraftedEvent(player, sticks, player.inventoryMenu.getCraftSlots()));
         check(StructureSupply.isSupply(sticks), "crafted in the Road: marked, so it is taken back with the blocks");
         ItemStack elsewhere = new ItemStack(Items.STICK, 4);
         RoadTestSupport.put(player, helper.getLevel(), helper.absoluteVec(new Vec3(10.5, 2.0, 10.5)));
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player, elsewhere, player.inventoryMenu.getCraftSlots()));
+        Events.post(new PlayerEvent.ItemCraftedEvent(player, elsewhere, player.inventoryMenu.getCraftSlots()));
         check(!StructureSupply.isSupply(elsewhere), "crafted in the world: not touched");
         player.inventoryMenu.getCraftSlots().setItem(0, StructureSupply.stack(Items.OAK_PLANKS, 2));
         player.inventoryMenu.getCraftSlots().setItem(1, new ItemStack(Items.OAK_PLANKS, 2));

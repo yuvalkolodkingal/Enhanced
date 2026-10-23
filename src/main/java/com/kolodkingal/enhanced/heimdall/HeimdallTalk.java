@@ -1,22 +1,21 @@
 package com.kolodkingal.enhanced.heimdall;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.AsgardProgress;
-import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Ctx;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Node;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Option;
+import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
+import com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -35,11 +34,11 @@ import java.util.function.Predicate;
  * take the Watch), {@code watch_rest} (he lost it and must rest), {@code watch_done} (won, and another power) and
  * {@code idle} (always).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, bus = EventBusSubscriber.Bus.MOD)
+@Subscriber
 public final class HeimdallTalk {
     private static boolean registered;
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         register();
     }

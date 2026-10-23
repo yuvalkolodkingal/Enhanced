@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonParser;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LevelEvent;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTicketTypes;
 import com.kolodkingal.enhanced.road.RoadChallenge;
@@ -24,8 +26,6 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
@@ -123,7 +123,7 @@ final class RoadTestSupport {
                 }
             }, false, BiomeManager.obfuscateSeed(server.getWorldData().worldGenOptions().seed()), List.of(), false, server.overworld().getRandomSequences());
             levels.put(RoadDimension.KEY, level);
-            NeoForge.EVENT_BUS.post(new LevelEvent.Load(level));
+            Events.post(new LevelEvent.Load(level));
             return level;
         } catch (IOException | ReflectiveOperationException e) {
             throw new IllegalStateException("The Road's level could not be made", e);

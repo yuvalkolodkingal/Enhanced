@@ -1,23 +1,22 @@
 package com.kolodkingal.enhanced.vormir;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.ExplosionEvent;
+import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDropsEvent;
+import com.kolodkingal.enhanced.platform.event.LivingExperienceDropEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.gametest.framework.GameTestServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /**
  * The Vormir Cliff's part of the game's events (3.6): the look at the cliffs' edges and the pets' souls every tick (and
@@ -26,13 +25,13 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
  * and experience of a sacrifice, the message on respawn, and the records forgotten when a player leaves his level or
  * the server stops.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class VormirEvents {
 
     private VormirEvents() {
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             VormirTracker.tick(level);
@@ -44,7 +43,7 @@ public final class VormirEvents {
     }
 
     /** A hit that reaches a creature is a push by whoever made it (a creature's: by no one). */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         Entity by = event.getSource().getEntity();
         if (by != null && !event.getEntity().level().isClientSide()) {
@@ -56,7 +55,7 @@ public final class VormirEvents {
      * A player attacks a creature (before the game decides whether the blow lands: with PvP off it does not): kept, so
      * that a seeker whose blow did not land is told why his sacrifice did not count (3.6.1).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onAttack(AttackEntityEvent event) {
         if (event.getTarget() instanceof LivingEntity victim) {
             VormirTracker.attempt(victim, event.getEntity());
@@ -64,7 +63,7 @@ public final class VormirEvents {
     }
 
     /** A blast that throws creatures (a wind charge, TNT a player lit) is a push by whoever set it off. */
-    @SubscribeEvent
+    @Subscribe
     public static void onDetonate(ExplosionEvent.Detonate event) {
         Entity by = event.getExplosion().getIndirectSourceEntity();
         if (by == null || event.getLevel().isClientSide()) {
@@ -77,21 +76,21 @@ public final class VormirEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onDeath(LivingDeathEvent event) {
         if (!event.isCanceled() && !event.getEntity().level().isClientSide()) {
             Sacrifice.onDeath(event.getEntity(), event.getSource());
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onExperience(LivingExperienceDropEvent event) {
         if (Sacrifice.swallows(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onDrops(LivingDropsEvent event) {
         if (Sacrifice.swallows(event.getEntity())) {
             event.setCanceled(true);
@@ -99,24 +98,24 @@ public final class VormirEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Sacrifice.onRespawn(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         VormirTracker.forget(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         VormirTracker.forget(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         VormirTracker.clear();
         Sacrifice.clear();

@@ -19,6 +19,11 @@ import com.kolodkingal.enhanced.asgard.RuneStones;
 import com.kolodkingal.enhanced.asgard.SeatEntity;
 import com.kolodkingal.enhanced.block.asgard.AsgardMuralBlock;
 import com.kolodkingal.enhanced.block.asgard.BifrostMechanismBlockEntity;
+import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
@@ -44,10 +49,6 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.portal.PortalShape;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -249,7 +250,7 @@ public final class AsgardRealmTests {
         check(AsgardDimension.in(player), "he is in Asgard, falling under the void's line");
         float health = player.getHealth();
         player.fallDistance = 100;
-        NeoForge.EVENT_BUS.post(new PlayerTickEvent.Post(player));
+        Events.post(new PlayerTickEvent.Post(player));
         check(player.position().distanceTo(CityPlan.ARRIVAL) < 0.01 && player.fallDistance == 0 && player.getHealth() == health,
                 "Heimdall caught him: in the Observatory, unhurt: " + player.position());
         check("message.enhanced.asgard.rescued".equals(BossTestSupport.lastActionBarKey(player)), "and he is told");
@@ -266,11 +267,11 @@ public final class AsgardRealmTests {
         ServerLevel asgard = AsgardTestSupport.withArrival(helper.getLevel().getServer());
         Zombie natural = new Zombie(EntityType.ZOMBIE, asgard);
         natural.moveTo(CityPlan.ARRIVAL);
-        EventHooks.finalizeMobSpawn(natural, asgard, asgard.getCurrentDifficultyAt(natural.blockPosition()), MobSpawnType.NATURAL, null);
+        Platform.get().hooks().finalizeMobSpawn(natural, asgard, asgard.getCurrentDifficultyAt(natural.blockPosition()), MobSpawnType.NATURAL, null);
         check(natural.isSpawnCancelled(), "no zombie is born there by nature");
         Zombie egg = new Zombie(EntityType.ZOMBIE, asgard);
         egg.moveTo(CityPlan.ARRIVAL);
-        EventHooks.finalizeMobSpawn(egg, asgard, asgard.getCurrentDifficultyAt(egg.blockPosition()), MobSpawnType.SPAWN_EGG, null);
+        Platform.get().hooks().finalizeMobSpawn(egg, asgard, asgard.getCurrentDifficultyAt(egg.blockPosition()), MobSpawnType.SPAWN_EGG, null);
         check(!egg.isSpawnCancelled(), "a spawn egg still works");
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
         player.setRespawnPosition(AsgardDimension.KEY, BlockPos.containing(CityPlan.ARRIVAL), 0, false, false);
@@ -295,7 +296,9 @@ public final class AsgardRealmTests {
         });
         Optional<PortalShape> shape = PortalShape.findEmptyPortalShape(asgard, base.offset(1, 1, 0), Direction.Axis.X);
         check(shape.isPresent(), "a good frame");
-        check(EventHooks.onTrySpawnPortal(asgard, base.offset(1, 1, 0), shape).isEmpty(), "but no portal is lit in Asgard");
+        BlockPos inFrame = base.offset(1, 1, 0);
+        check(Events.post(new BlockEvent.PortalSpawnEvent(asgard, inFrame, asgard.getBlockState(inFrame), shape.get())).isCanceled(),
+                "but no portal is lit in Asgard");
         helper.succeed();
     }
 
@@ -315,7 +318,7 @@ public final class AsgardRealmTests {
         int dropped = asgard.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, player.getBoundingBox().inflate(8)).size();
         check(dropped == 0, "nothing falls to the ground: " + dropped);
         ServerPlayer back = f.player(5.5, FLOOR, 7.5);
-        NeoForge.EVENT_BUS.post(new PlayerEvent.Clone(back, player, true));
+        Events.post(new PlayerEvent.Clone(back, player, true));
         check(back.getInventory().getItem(3).is(Items.DIAMOND) && back.getInventory().getItem(3).getCount() == 7
                 && back.getInventory().countItem(ModItems.HOFUND.get()) == 1 && back.experienceLevel == 5, "he comes back with all of it");
         // (with asgard.keepInventory off, only these stay)

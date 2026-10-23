@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced.asgard;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.stones.SpaceStone;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -9,11 +13,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 /**
  * The only door of Asgard (3.5): nothing travels into or out of Asgard but by the Bifrost ({@link Bifrost#isMoving}),
@@ -23,7 +22,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
  * refuses every way in, the Bifrost too (operators still may), and lets everyone out. A Nether portal cannot be lit in
  * Asgard. The Book of the Vishanti is refused before anything is spent ({@code PlaceBook.refusesAsgard}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class AsgardGate {
 
     /** Whether the gate lets {@code entity} travel from {@code from} to {@code to}. */
@@ -42,7 +41,7 @@ public final class AsgardGate {
         return Bifrost.isMoving(entity) && (!in || Bifrost.asgardEnabled());
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onTravel(EntityTravelToDimensionEvent event) {
         Entity entity = event.getEntity();
         if (!allows(entity, entity.level().dimension(), event.getDimension())) {
@@ -54,7 +53,7 @@ public final class AsgardGate {
     }
 
     /** No Nether portal is lit in Asgard. */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onPortal(BlockEvent.PortalSpawnEvent event) {
         if (event.getLevel() instanceof Level level && AsgardDimension.is(level)) {
             event.setCanceled(true);

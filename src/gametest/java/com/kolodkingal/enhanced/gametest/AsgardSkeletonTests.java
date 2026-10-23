@@ -26,6 +26,7 @@ import com.kolodkingal.enhanced.network.BifrostActionPayload;
 import com.kolodkingal.enhanced.network.HeimdallSightPayload;
 import com.kolodkingal.enhanced.network.ModNetwork;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
@@ -64,8 +65,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -99,9 +98,9 @@ public final class AsgardSkeletonTests {
                 && all[Power.CUSTOM.ordinal() + 3] == Power.HELA && all.length >= Power.CUSTOM.ordinal() + 4,
                 "…CUSTOM, HEIMDALL, ODIN, HELA (the stream sends the ordinal; 3.6 appends after them)");
         check(Power.AGATHA.ordinal() == 14 && Power.CUSTOM.ordinal() == 17, "nobody before them moved");
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String name : List.of("en_us", "he_il")) {
-            JsonObject lang = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang", name + ".json"),
+            Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json").orElseThrow();
+            JsonObject lang = JsonParser.parseString(Files.readString(file,
                     StandardCharsets.UTF_8)).getAsJsonObject();
             for (Power god : GODS) {
                 check(lang.has("power.enhanced." + god.getSerializedName()), god + " has a name in " + name);
