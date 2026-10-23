@@ -40,6 +40,15 @@ public interface TestHooks {
      */
     boolean isAttachmentSync(Object packet, AttachKey<?> key, int entityId);
 
+    /**
+     * The key of the compound in an entity's saved data that holds its attachments, by id (NeoForge
+     * {@code "neoforge:attachments"}; port P0, L8).
+     */
+    String attachmentsKey();
+
+    /** The version of the mod as the loader read it from the mod's metadata (port P0, L8). */
+    String modVersion();
+
     /** Finds the loader's hooks once. */
     final class Lookup {
         private static final TestHooks INSTANCE = load();

@@ -21,6 +21,7 @@ import net.minecraft.server.network.CommonListenerCookie;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.network.payload.SyncAttachmentsPayload;
@@ -101,6 +102,16 @@ public final class NeoTestHooks implements TestHooks {
                 && custom.payload() instanceof SyncAttachmentsPayload sync
                 && sync.types().contains(NeoAttach.typeOf(key))
                 && sync.target() instanceof SyncAttachmentsPayload.EntityTarget(int id) && id == entityId;
+    }
+
+    @Override
+    public String attachmentsKey() {
+        return AttachmentHolder.ATTACHMENTS_NBT_KEY;
+    }
+
+    @Override
+    public String modVersion() {
+        return ModList.get().getModContainerById(Enhanced.MODID).orElseThrow().getModInfo().getVersion().toString();
     }
 
     /** A channel set that contains every channel, so the fake client accepts every payload. */

@@ -1,5 +1,8 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.HeroServer;
 import com.kolodkingal.enhanced.ability.HeroServers;
@@ -13,12 +16,17 @@ import com.kolodkingal.enhanced.build.BuildScheduler;
 import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.ScepterRituals;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -468,6 +476,47 @@ public final class TestKit {
             }
         }
         return particles;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // The mod's own files and metadata (port P0: through the platform, not the loader's mod list)
+
+    /**
+     * The mod's own files (its assets and data, as the game loads them): {@code TestKit.modFiles().findResource("assets",
+     * Enhanced.MODID, "lang", "en_us.json")}. Replaces {@code ModList.get().getModFileById(MODID).getFile()}, whose
+     * method it keeps: a missing file is a path that does not exist ({@link Files#exists} is false, reading it throws).
+     */
+    public static ModFiles modFiles() {
+        return ModFiles.INSTANCE;
+    }
+
+    /** See {@link #modFiles()}. */
+    public static final class ModFiles {
+        private static final ModFiles INSTANCE = new ModFiles();
+
+        private ModFiles() {
+        }
+
+        public Path findResource(String... path) {
+            return Platform.get().modResource(String.join("/", path))
+                    .orElseGet(() -> Path.of("missing-mod-resource", path));
+        }
+    }
+
+    /** A lang file of the mod ({@code en_us}, {@code he_il}) as JSON. */
+    public static JsonObject lang(String name) throws IOException {
+        Path file = modFiles().findResource("assets", Enhanced.MODID, "lang", name + ".json");
+        return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+    }
+
+    /** The mod's version as the loader read it ({@code 3.8.3}). */
+    public static String modVersion() {
+        return TestHooks.get().modVersion();
+    }
+
+    /** The key of the compound of a saved entity that holds its attachments by id (the loader's). */
+    public static String attachmentsKey() {
+        return TestHooks.get().attachmentsKey();
     }
 
     // ------------------------------------------------------------------------------------------------------------

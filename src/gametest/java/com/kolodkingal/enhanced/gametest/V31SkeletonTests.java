@@ -22,6 +22,9 @@ import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.platform.attach.AttachKey;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Live;
@@ -58,10 +61,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.attachment.AttachmentHolder;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,11 +144,13 @@ public final class V31SkeletonTests {
             places[0]++;
             event.setCanceled(cancel[0]);
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, breakListener);
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.EntityPlaceEvent.class, placeListener);
+        EventHub.Registration breakRegistration = EventHub.of(BlockEvent.BreakEvent.class).register(Priority.NORMAL, false,
+                breakListener);
+        EventHub.Registration placeRegistration = EventHub.of(BlockEvent.EntityPlaceEvent.class).register(Priority.NORMAL, false,
+                placeListener);
         f.onClose(() -> {
-            NeoForge.EVENT_BUS.unregister(breakListener);
-            NeoForge.EVENT_BUS.unregister(placeListener);
+            breakRegistration.close();
+            placeRegistration.close();
         });
         check(BlockRights.postBreak(player, level, inside, floor) && breaks[0] == 1 && places[0] == 0, "postBreak posts one break event");
         check(BlockRights.postPlace(player, level, inside) && places[0] == 1 && breaks[0] == 1, "postPlace posts one place event");
@@ -419,11 +420,11 @@ public final class V31SkeletonTests {
         ModAttachments.BUILD_VIEW.set(billy, view);
         CompoundTag withIt = billy.saveWithoutId(new CompoundTag());
         withIt.remove("UUID");
-        check(withIt.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY).contains(Enhanced.id("build_data").toString())
-                && !withIt.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY).contains(Enhanced.id("build_view").toString()),
+        check(withIt.getCompound(TestKit.attachmentsKey()).contains(Enhanced.id("build_data").toString())
+                && !withIt.getCompound(TestKit.attachmentsKey()).contains(Enhanced.id("build_view").toString()),
                 "the data is saved with the player, the view is not");
         CompoundTag before31 = withIt.copy();
-        before31.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY).remove(Enhanced.id("build_data").toString());
+        before31.getCompound(TestKit.attachmentsKey()).remove(Enhanced.id("build_data").toString());
         ServerPlayer reloaded = f.player(8.5, FLOOR, 8.5);
         reloaded.load(withIt);
         check(ModAttachments.BUILD_DATA.get(reloaded).equals(saved), "the saved part comes back: " + ModAttachments.BUILD_DATA.get(reloaded));
