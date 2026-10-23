@@ -49,6 +49,12 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.9.0
+
+* **Under the hood, the mod now runs on its own platform layer.** It is the first step towards a Fabric version of Enhanced. Nothing changes in play: every hero, power, boss and place works exactly as in 3.8.4, and your worlds, heroes and settings carry over.
+* **A new settings screen.** Open it from the Mods list (Mods, then Enhanced, then Config): the client settings, and the [server settings](Server-Configuration) of the world you are playing in, with switches, sliders and an Undo button. Your changes are saved when you leave a page.
+* 3.8.x and 3.9 cannot play together: update the server and every player at the same time (network protocol **14**). See [Installation](Installation).
+
 ## What's new in 3.8.4
 
 * ***Sweet Dreams* is no longer built into the mod.** Quicksilver's Walkman plays his own theme, *Silver Hours*, as it has by default since 3.5. If you chose `quicksilverSong = "sweet_dreams"`, put your own copy in `config/enhanced/music/` as `sweet_dreams.mp3` (or `.ogg` or `.wav`) and it plays as before; without it you hear *Silver Hours*, and the game tells you once where to put the file. See [Music](Music#the-walkman-quicksilver-and-speed).
