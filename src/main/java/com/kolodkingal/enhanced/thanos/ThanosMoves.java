@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -545,7 +546,7 @@ final class ThanosMoves {
             victim.hurtMarked = true;
             victim.fallDistance = 0.0F;
             if (victim instanceof ServerPlayer player) {
-                player.connection.aboveGroundTickCount = 0;
+                ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
             }
             if (held > 0 && held % 10 == 0) {
                 blow(boss, victim, ModDamageTypes.THANOS_BLOW, ThanosBossConfig.CHOKE_DAMAGE.get().floatValue() / 4.0F, 0.0, false);
@@ -858,7 +859,7 @@ final class ThanosMoves {
                 victim.hurtMarked = true;
                 victim.fallDistance = 0.0F;
                 if (victim instanceof ServerPlayer player) {
-                    player.connection.aboveGroundTickCount = 0;
+                    ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
                 }
             }
             if (k % 4 == 0) {

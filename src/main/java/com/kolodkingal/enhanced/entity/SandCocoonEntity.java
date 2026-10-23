@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -184,7 +185,7 @@ public class SandCocoonEntity extends Entity {
                 player.getAbilities().flying = false;
                 player.onUpdateAbilities();
             }
-            player.connection.aboveGroundTickCount = 0;
+            ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
             PowerTicker.stopHoldAbilities(Powers.get(player));
         } else {
             Vec3 motion = victim.getDeltaMovement();

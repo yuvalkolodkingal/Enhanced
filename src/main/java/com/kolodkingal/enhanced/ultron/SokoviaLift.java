@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.network.SokoviaLiftPayload;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal.Header;
@@ -874,7 +875,7 @@ public final class SokoviaLift implements LiftHook {
             level.sendParticles(ParticleTypes.REVERSE_PORTAL, player.getX(), player.getY() + 1.0, player.getZ(), 12, 0.3, 0.6, 0.3, 0.05);
             SokoviaCarry.teleport(player, SokoviaCarry.freeSpot(player, spot));
             player.resetFallDistance();
-            player.connection.aboveGroundTickCount = 0;
+            ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
             float damage = (float) (double) UltronBossConfig.RESCUE_DAMAGE.get();
             float amount = Math.min(damage, player.getHealth() - 1.0F);
             if (!player.isCreative() && amount > 0.0F) {

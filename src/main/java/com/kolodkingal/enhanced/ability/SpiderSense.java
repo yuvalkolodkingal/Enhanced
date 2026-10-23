@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -88,7 +89,9 @@ public final class SpiderSense {
         double playerRange = Math.min(range, PLAYER_RANGE * scale);
 
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, around)) {
-            if (projectile.getOwner() == spider || projectile instanceof FishingHook || (projectile instanceof AbstractArrow arrow && arrow.inGround)) {
+            if (projectile.getOwner() == spider || projectile instanceof FishingHook
+                    || (projectile instanceof AbstractArrow arrow
+                    && ((AbstractArrowAccessor) arrow).enhanced$isInGround())) {
                 continue;
             }
             double[] approach = closestApproach(projectile.position(), projectile.getDeltaMovement(), body, HORIZON);

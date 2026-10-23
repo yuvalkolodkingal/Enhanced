@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -119,7 +120,7 @@ public final class MagnetoMetalTests {
         FallingBlockEntity sand = FallingBlockEntity.fall(level, helper.absolutePos(new BlockPos(15, 8, 5)), Blocks.SAND.defaultBlockState());
         check(!Metal.isMagnetic(sand), "not falling sand");
         Arrow stuck = flyingArrow(helper, new Vec3(3.5, FLOOR, 15.5));
-        stuck.inGround = true;
+        ((AbstractArrowAccessor) stuck).enhanced$setInGround(true);
         check(!Metal.isMagnetic(stuck), "not an arrow stuck in the floor");
         Snowball snowball = new Snowball(level, 0, 0, 0);
         snowball.setDeltaMovement(0.5, 0.0, 0.0);
@@ -294,7 +295,8 @@ public final class MagnetoMetalTests {
                 Vec3 flight = arrow.getDeltaMovement().normalize();
                 check(!Telekinesis.isHolding(magneto), "R again throws it");
                 check(flight.dot(magneto.getLookAngle()) > 0.99, "along his look");
-                check(arrow.getOwner() == magneto && arrow.pickup == pickup && !arrow.inGround,
+                check(arrow.getOwner() == magneto && arrow.pickup == pickup
+                        && !((AbstractArrowAccessor) arrow).enhanced$isInGround(),
                         "it flies for him, and its pickup rule is what it was");
                 arrow.discard();
 
@@ -312,7 +314,7 @@ public final class MagnetoMetalTests {
 
                 Arrow stuck = flyingArrow(helper, new Vec3(10.5, FLOOR - 0.1, 12.5));
                 stuck.setDeltaMovement(Vec3.ZERO);
-                stuck.inGround = true;
+                ((AbstractArrowAccessor) stuck).enhanced$setInGround(true);
                 lookAt(magneto, stuck);
                 AbilityHandler.onKey(magneto, 1, true);
                 check(!Telekinesis.isHolding(magneto), "an arrow stuck in the floor is not caught");

@@ -5,6 +5,9 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
+import com.kolodkingal.enhanced.mixin.ArmorStandAccessor;
+import com.kolodkingal.enhanced.mixin.ItemFrameAccessor;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -946,7 +949,8 @@ public final class MagnetPull {
         if (EnhancedConfig.PULL_FROM_STORAGE.get()) {
             if (e instanceof ItemFrame frame) {
                 // A fixed frame (a map maker's lock) gives its item to no hand, so to no pull either.
-                return !frame.fixed && Metal.isMetalItem(frame.getItem()) ? Act.FRAME : null;
+                return !((ItemFrameAccessor) frame).enhanced$isFixed() && Metal.isMetalItem(frame.getItem())
+                        ? Act.FRAME : null;
             }
             if (e instanceof ArmorStand stand) {
                 for (EquipmentSlot slot : EquipmentSlot.values()) {
@@ -965,7 +969,8 @@ public final class MagnetPull {
      */
     private static boolean standGives(ArmorStand stand, EquipmentSlot slot) {
         int flag = slot.getFilterFlag();
-        return (stand.disabledSlots & (1 << flag | 1 << flag + 8)) == 0 && Metal.isMetalItem(stand.getItemBySlot(slot));
+        return (((ArmorStandAccessor) stand).enhanced$getDisabledSlots() & (1 << flag | 1 << flag + 8)) == 0
+                && Metal.isMetalItem(stand.getItemBySlot(slot));
     }
 
     /**
@@ -1003,7 +1008,8 @@ public final class MagnetPull {
      * thrown trident goes back only to the one who threw it, so another player's stays where it is stuck).
      */
     private static boolean isStuckMetal(ServerPlayer player, AbstractArrow arrow) {
-        if (!arrow.inGround || arrow.shakeTime > 0 || arrow.pickup != AbstractArrow.Pickup.ALLOWED
+        if (!((AbstractArrowAccessor) arrow).enhanced$isInGround() || arrow.shakeTime > 0
+                || arrow.pickup != AbstractArrow.Pickup.ALLOWED
                 || !arrow.getType().is(ModTags.METALLIC_PROJECTILES) || arrow.getPickupItemStackOrigin().isEmpty()) {
             return false;
         }
