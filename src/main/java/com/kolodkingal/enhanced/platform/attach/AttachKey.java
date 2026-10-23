@@ -1,8 +1,6 @@
 package com.kolodkingal.enhanced.platform.attach;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -13,7 +11,7 @@ import java.util.Optional;
  * an {@code AttachmentType} with the same id, so existing worlds keep their data.
  */
 public final class AttachKey<T> {
-    /** The loader's attachment behind a key. The holder is an {@link Entity} or a {@link Level}. */
+    /** The loader's attachment behind a key. The holder is an entity or a level. */
     public interface Handle<T> {
         T get(Object holder);
 
@@ -47,61 +45,42 @@ public final class AttachKey<T> {
         return handle;
     }
 
-    /** The holder's value, made from the default (and kept) if it has none yet. */
-    public T get(Entity holder) {
-        return handle.get(holder);
-    }
+    /*
+     * The holder is an Object (an Entity or a Level), not overloads on Entity and Level: a call that passes a client
+     * type (Minecraft's ClientLevel or LocalPlayer) to a parameter of a vanilla supertype makes the JVM's verifier load
+     * that client class to check it, which fails on a dedicated server for every class holding such a call, even when
+     * the call never runs there. Nothing is loaded to pass a value as an Object.
+     */
 
-    public T get(Level holder) {
+    /** The holder's value, made from the default (and kept) if it has none yet. */
+    public T get(Object holder) {
         return handle.get(holder);
     }
 
     /** Sets the holder's value (synced, if the attachment is); returns the previous one, or null. */
     @Nullable
-    public T set(Entity holder, T value) {
-        return handle.set(holder, value);
-    }
-
-    @Nullable
-    public T set(Level holder, T value) {
+    public T set(Object holder, T value) {
         return handle.set(holder, value);
     }
 
     /** Whether the holder has a value (without making one). */
-    public boolean has(Entity holder) {
-        return handle.has(holder);
-    }
-
-    public boolean has(Level holder) {
+    public boolean has(Object holder) {
         return handle.has(holder);
     }
 
     /** Removes the holder's value; returns it, or null. */
     @Nullable
-    public T remove(Entity holder) {
-        return handle.remove(holder);
-    }
-
-    @Nullable
-    public T remove(Level holder) {
+    public T remove(Object holder) {
         return handle.remove(holder);
     }
 
     /** The holder's value if it has one (without making one). */
-    public Optional<T> getExisting(Entity holder) {
-        return handle.getExisting(holder);
-    }
-
-    public Optional<T> getExisting(Level holder) {
+    public Optional<T> getExisting(Object holder) {
         return handle.getExisting(holder);
     }
 
     /** Sends the holder's value again (after a change made inside a mutable value). */
-    public void sync(Entity holder) {
-        handle.sync(holder);
-    }
-
-    public void sync(Level holder) {
+    public void sync(Object holder) {
         handle.sync(holder);
     }
 

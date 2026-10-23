@@ -28,10 +28,26 @@ public final class NeoPersistentData implements AttachKey.Handle<CompoundTag> {
     /** Whether the key is the attachment (true) or a view of {@code getPersistentData()} (false). */
     public static final boolean ATTACHMENT_MODE = "attachment".equals(System.getProperty("enhanced.persistentData"));
 
+    private static NeoPersistentData instance;
+
     private final NeoAttach.Handle<CompoundTag> attachment;
 
     NeoPersistentData(NeoAttach.Handle<CompoundTag> attachment) {
         this.attachment = attachment;
+        instance = this;
+    }
+
+    /**
+     * Moves the mod's keys of {@code entity}'s old {@code NeoForgeData} into {@code enhanced:persistent_data} now, in
+     * either mode (for the migration's checks); returns how many moved.
+     */
+    public static int migrate(Entity entity) {
+        return migrate(entity, instance.attachment);
+    }
+
+    /** The attachment's own value (in either mode), made if missing (for the migration's checks). */
+    public static CompoundTag attachmentOf(Entity entity) {
+        return instance.attachment.get(entity);
     }
 
     NeoAttach.Handle<CompoundTag> attachment() {
