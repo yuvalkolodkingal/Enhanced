@@ -21,8 +21,9 @@ import java.util.List;
 
 /**
  * Sneak + N on the Mark 85: the <b>Nanotech Drones</b> (3.8, lane L4, PLAN 6.2): {@code droneCount} 2 {@link
- * NanoDroneEntity}s form behind his shoulders for {@code droneTicks} 400 (20 seconds). 30 energy, cooldown 900 (its
- * own: {@link NanoTech#ownReady}).
+ * NanoDroneEntity}s for {@code droneTicks} 400 (20 seconds), since 3.8.3 the Endgame wing units: each grows two curved
+ * crescent blades out of his arm and fans them out beside it ({@link WingFormation}), four blades in all. 30 energy,
+ * cooldown 900 (its own: {@link NanoTech#ownReady}).
  * {@link IronManState#DRONES} and {@code dronesUntil} say so to the clients (the HUD's drones' time).
  */
 public final class NanoDrones {
@@ -48,7 +49,8 @@ public final class NanoDrones {
         ServerLevel level = player.serverLevel();
         List<NanoDroneEntity> drones = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            // The first shots a few ticks after they form, staggered so the two do not fire together.
+            // The first shots a few ticks after they form, staggered so the two do not fire together (each then fires
+            // from its inner and outer blade in turn).
             NanoDroneEntity drone = NanoDroneEntity.of(player, i % 2, until, 10 + i * Math.max(1, gap / 2));
             level.addFreshEntity(drone);
             drones.add(drone);

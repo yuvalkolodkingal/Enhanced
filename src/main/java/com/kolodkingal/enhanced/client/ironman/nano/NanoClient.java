@@ -10,6 +10,8 @@ import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.ironman.IronManState;
 import com.kolodkingal.enhanced.ironman.IronMissileEntity;
+import com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity;
+import com.kolodkingal.enhanced.ironman.nano.WingFormation;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -23,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -48,8 +51,14 @@ import java.util.Map;
  */
 @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
 public final class NanoClient {
-    /** A flash in the world: what it is, its points, its argument, when it began (client game time) and how long. */
-    private record Flash(int kind, List<Vec3> points, int arg, long start, int ticks) {
+    /**
+     * A flash in the world: what it is, its points, its argument, when it began (client game time) and how long, and
+     * the entity it came from (a drone's laser follows its blade).
+     */
+    private record Flash(int kind, List<Vec3> points, int arg, long start, int ticks, int who) {
+        Flash(int kind, List<Vec3> points, int arg, long start, int ticks) {
+            this(kind, points, arg, start, ticks, -1);
+        }
     }
 
     private static final List<Flash> FLASHES = new ArrayList<>();
@@ -57,9 +66,9 @@ public final class NanoClient {
     private static final Map<Integer, Long> LOCKS = new HashMap<>();
     /** How long a lock's brackets show. */
     static final int LOCK_TICKS = 40;
-    /** The drones' laser: red-gold. */
-    static final int DRONE_CORE = 0xFFF0C8;
-    static final int DRONE_BODY = 0xFF6A2A;
+    /** The drones' laser (3.8.3): the cyan of the wing blades' panels round a white core. */
+    static final int DRONE_CORE = 0xE8FFFF;
+    static final int DRONE_BODY = 0x3FD2FF;
     static final int BOLT_CORE = 0xF4FDFF;
     static final int BOLT_BODY = 0x7FD8FF;
 
@@ -157,15 +166,24 @@ public final class NanoClient {
             }
             case IronFxPayload.LOCK -> LOCKS.put(payload.arg(), now + LOCK_TICKS);
             case IronFxPayload.DRONES_OUT, IronFxPayload.DRONES_IN -> {
-                for (Vec3 at : points) {
-                    burst(level, at.add(0, 0.2, 0), 0xD8323C, 12, 0.18);
-                    burst(level, at.add(0, 0.2, 0), 0xE8B23A, 8, 0.12);
+                // (3.8.3) The blades grow out of his arms and fold back into them (WingDraw); a puff of nanites there.
+                if (payload.kind() == IronFxPayload.DRONES_IN) {
+                    WingDraw.fold(payload.entityId());
+                }
+                if (level.getEntity(payload.entityId()) instanceof Player owner) {
+                    for (int side = 0; side < 2; side++) {
+                        Vec3 arm = WingFormation.world(owner.position(), owner.yBodyRot, owner.getScale(),
+                                WingFormation.arm(side));
+                        burst(level, arm, WingDraw.NANITE_RED, 8, 0.08);
+                        burst(level, arm, WingDraw.NANITE_GOLD, 5, 0.06);
+                    }
                 }
             }
             case IronFxPayload.DRONE_SHOT -> {
                 if (points.size() >= 2) {
-                    FLASHES.add(new Flash(payload.kind(), points, 0, now, 6));
-                    burst(level, points.get(1), 0xFFB040, 6, 0.2);
+                    // arg: which blade of the drone fired; the laser leaves it where this client draws it.
+                    FLASHES.add(new Flash(payload.kind(), points, payload.arg(), now, 6, payload.entityId()));
+                    burst(level, points.get(1), 0x7FE8FF, 6, 0.2);
                 }
             }
             case IronFxPayload.GRAB, IronFxPayload.THROW -> {
@@ -283,8 +301,12 @@ public final class NanoClient {
                 continue;
             }
             switch (f.kind()) {
-                case IronFxPayload.DRONE_SHOT -> laser(pose, vc, f.points().get(0).subtract(cam),
-                        f.points().get(1).subtract(cam), 0.09F, DRONE_CORE, DRONE_BODY, fade);
+                case IronFxPayload.DRONE_SHOT -> {
+                    Vec3 from = level.getEntity(f.who()) instanceof NanoDroneEntity drone
+                            ? WingDraw.muzzle(drone, f.arg(), partial) : null;
+                    laser(pose, vc, (from != null ? from : f.points().get(0)).subtract(cam),
+                            f.points().get(1).subtract(cam), 0.09F, DRONE_CORE, DRONE_BODY, fade);
+                }
                 case IronFxPayload.CANNON_FIRE -> laser(pose, vc, f.points().get(0).subtract(cam),
                         f.points().get(1).subtract(cam), 0.45F, 0xFFFFFF, 0x7FD8FF, fade);
                 case IronFxPayload.REFOCUSER -> {

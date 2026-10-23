@@ -49,6 +49,13 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.8.3
+
+Eilon asked: "Redesign the drones to look like that" (the Mark 85's wings in *Endgame*).
+
+* **[The Mark 85's Nanotech Drones](Iron-Man#mark-85-the-strongest-suit) are the *Endgame* wings now** (Sneak + N): **four big curved blades**, like crescent moons, grow out of Iron Man's arms nanite by nanite and fan out beside him, **two on each side**: dark-red metal and gold around a bright **cyan** glowing panel full of circuit lines, with a little thruster pod on the back. The inner blade floats just past his hand, the outer one further out and a little lower; they bob and sway, turn with him and stay with him in flight. Their **cyan lasers** leave from the inner edge of a blade. In first person they stay at the edges of the screen; when their time is up they fold back into his arms. Same damage, time, energy and cooldown as before.
+* Keep the server and the players on the same version (network protocol **13**, unchanged: 3.8.1, 3.8.2 and 3.8.3 play together).
+
 ## What's new in 3.8.2
 
 Eilon's last two fixes: "Wanda's shield doesn't protect against Iron Man's laser beam: fix it so it doesn't go through the shield", and "Death, in her suit, has flowers on her, and in the series she had no flowers".

@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.ironman.nano.HomingMissiles;
 import com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity;
 import com.kolodkingal.enhanced.ironman.nano.NanoDrones;
 import com.kolodkingal.enhanced.ironman.nano.NanoHousings;
+import com.kolodkingal.enhanced.ironman.nano.WingFormation;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -54,8 +55,9 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * 12), its chest laser through three creatures, its giant energy shield (a creeper's blast from the front stopped
  * whole, from behind not), the Lightning Refocuser's chain (10 / 8 / 6 / 5 / 4; charged by a bolt: free and × 1.5), the
  * homing missiles (six locks, a moving target hit, a new target when one dies, their ten seconds), the drones (they
- * shoot a creature, never a player without PvP, and go at 400 ticks); the Mark 50's nano blade (9), nano shield (−80 %)
- * and its cannon released early (refused, half the energy back). Batch {@code nano}.
+ * shoot a creature, never a player without PvP, and go at 400 ticks; since 3.8.3 their wing blades' formation); the
+ * Mark 50's nano blade (9), nano shield (−80 %) and its cannon released early (refused, half the energy back). Batch
+ * {@code nano}.
  */
 public final class NanoTechTests {
     private static final String BATCH = "nano";
@@ -439,6 +441,69 @@ public final class NanoTechTests {
                 helper.succeed();
             }, tony, peter);
         }, tony, peter);
+    }
+
+    /**
+     * (3.8.3) The drones are the Endgame wing units, two crescent blades each: the inner blades beside his arms at
+     * shoulder height, the outer ones further out, further back and a little lower, mirrored on his two sides; the
+     * formation turns with his body and grows with his size; the bob is small; the inner blade grows first and folds
+     * last. Live: the two drones fly to their side's place and their lasers leave from a blade beside him.
+     */
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    public static void theWingBladesFanOutBesideHim(GameTestHelper helper) {
+        for (double t : new double[] {0.0, 7.3, 41.0, 133.5, 977.0}) {
+            Vec3 rightIn = WingFormation.local(0, 0, t);
+            Vec3 rightOut = WingFormation.local(0, 1, t);
+            Vec3 leftIn = WingFormation.local(1, 0, t);
+            Vec3 leftOut = WingFormation.local(1, 1, t);
+            check(rightIn.x < -1.0 && leftIn.x > 1.0, "the inner blades beside his arms: " + rightIn + " " + leftIn);
+            check(-rightOut.x > -rightIn.x + 0.4 && leftOut.x > leftIn.x + 0.4, "the outer blades further out");
+            check(rightOut.z < rightIn.z - 0.1 && leftOut.z < leftIn.z - 0.1, "and further back");
+            for (Vec3 v : List.of(rightIn, rightOut, leftIn, leftOut)) {
+                check(v.y > 0.9 && v.y < 1.5, "at shoulder-to-hand height: " + v);
+            }
+            check(rightOut.y < rightIn.y + 2.0 * WingFormation.BOB && leftOut.y < leftIn.y + 2.0 * WingFormation.BOB,
+                    "the outer ones a little lower");
+            assertNear(-rightIn.x, leftIn.x, 2.0 * WingFormation.DRIFT + 1.0E-9, "the two sides mirrored");
+            assertNear(rightIn.y, leftIn.y, 2.0 * WingFormation.BOB + 1.0E-9, "the bob is small");
+        }
+        Vec3 base = new Vec3(10.0, 64.0, 10.0);
+        Vec3 local = WingFormation.local(0, 0, 0.0);
+        Vec3 south = WingFormation.world(base, 0.0F, 1.0F, local).subtract(base);
+        check(south.x < -1.0 && Math.abs(south.z) < 0.2, "facing south, his right wing is to the west: " + south);
+        Vec3 west = WingFormation.world(base, 90.0F, 1.0F, local).subtract(base);
+        check(west.z < -1.0 && Math.abs(west.x) < 0.2, "turned west, it is to the north: " + west);
+        assertNear(west.length(), south.length(), 1.0E-6, "the same place in his frame");
+        assertNear(WingFormation.world(base, 0.0F, 2.0F, local).subtract(base).length(), 2.0 * south.length(), 1.0E-6,
+                "twice as far for a giant");
+        check(WingFormation.grown(0, 0.0F) == 0.0F && WingFormation.grown(0, WingFormation.GROW_TICKS) == 1.0F
+                && WingFormation.grown(1, WingFormation.GROW_TICKS) < 1.0F, "the inner blade grows first");
+        check(WingFormation.left(1, WingFormation.RETRACT_TICKS * 0.6F) == 0.0F
+                && WingFormation.left(0, WingFormation.RETRACT_TICKS * 0.6F) > 0.0F
+                && WingFormation.left(0, WingFormation.RETRACT_TICKS) == 0.0F, "and folds last");
+
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer tony = deployed(f, 10.5, 10.5, SuitKind.MARK_85);
+        press(tony, 5, true);
+        List<NanoDroneEntity> drones = NanoDrones.of(tony);
+        check(drones.size() == 2 && drones.get(0).slot() != drones.get(1).slot(), "one wing unit on each side");
+        step(helper, 12, () -> {
+            long now = helper.getLevel().getGameTime();
+            Vec3 right = Vec3.directionFromRotation(0.0F, tony.yBodyRot + 90.0F);
+            for (NanoDroneEntity drone : NanoDrones.of(tony)) {
+                Vec3 place = WingFormation.centre(tony, drone.slot(), now);
+                check(drone.position().distanceTo(place) < 0.35, "the drone flies in its place: "
+                        + drone.position().distanceTo(place));
+                double towards = WingFormation.side(drone.slot()) == 0 ? 1.0 : -1.0;
+                for (int blade = 0; blade < WingFormation.BLADES; blade++) {
+                    Vec3 from = drone.muzzle(tony, blade).subtract(tony.position());
+                    double out = from.dot(right) * towards;
+                    check(out > 1.0 && out < 2.4, "blade " + blade + " fires from beside him: " + out);
+                    check(from.y > 0.9 && from.y < 1.5, "at shoulder-to-hand height: " + from.y);
+                }
+            }
+            helper.succeed();
+        }, tony);
     }
 
     // ------------------------------------------------------------------------------------------------------------
