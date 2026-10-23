@@ -84,6 +84,9 @@ neoForge {
             // (./gradlew runGameTestServer -Penhanced.tests=Captain*,FalconTests.redwing*).
             systemProperty 'enhanced.testReport', file('build/gametest').absolutePath
             systemProperty 'enhanced.tests', providers.gradleProperty('enhanced.tests').getOrElse('')
+            // PERSISTENT_DATA's mode on NeoForge (view by default; -Penhanced.persistentData=attachment for the real
+            // attachment, platform/neoforge/NeoPersistentData).
+            systemProperty 'enhanced.persistentData', providers.gradleProperty('enhanced.persistentData').getOrElse('view')
         }
 
         data {
