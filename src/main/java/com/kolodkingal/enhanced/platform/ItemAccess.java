@@ -36,5 +36,11 @@ public interface ItemAccess {
 
         /** Takes up to {@code amount} items out of the slot (or only says what it would take, if {@code simulate}). */
         ItemStack extractItem(int slot, int amount, boolean simulate);
+
+        /**
+         * Puts {@code stack} into the slot (or only says what would be left, if {@code simulate}); returns what did not
+         * fit. {@code stack} itself is not changed.
+         */
+        ItemStack insertItem(int slot, ItemStack stack, boolean simulate);
     }
 }
