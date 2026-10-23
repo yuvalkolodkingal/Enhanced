@@ -2008,10 +2008,10 @@ Its repulsor's boom (0.8), energy (4) and gap (10 ticks) are fixed, and so is it
 | `mark_85.missileTurnDegrees` | `12.0` | 1.0 to 180.0 | Degrees a missile may turn per tick. |
 | `mark_85.missileEnergy` | `15.0` | 0.0 to 100.0 | Suit energy a volley costs. |
 | `mark_85.missileCooldown` | `120` | 0 to 72000 | Cooldown (ticks) of the homing mini-missiles (120 = 6 seconds). |
-| `mark_85.droneCount` | `2` | 1 to 8 | Nanotech drones that form behind him. |
+| `mark_85.droneCount` | `2` | 1 to 8 | Nanotech drones: wing units of two crescent blades, one beside each arm (2 = four blades). |
 | `mark_85.droneTicks` | `400` | 1 to 12000 | Ticks the drones stay (400 = 20 seconds). |
 | `mark_85.droneDamage` | `6.0` | 0.0 to 200.0 | Damage of each drone's laser. |
-| `mark_85.droneShotGap` | `15` | 1 to 400 | Ticks between two shots of a drone (15 = 0.75 seconds). |
+| `mark_85.droneShotGap` | `15` | 1 to 400 | Ticks between two shots of a drone (15 = 0.75 seconds; its two blades fire in turn). |
 | `mark_85.droneRange` | `20.0` | 2.0 to 64.0 | Range (blocks) of the drones' lasers. |
 | `mark_85.droneEnergy` | `30.0` | 0.0 to 100.0 | Suit energy the drones cost. |
 | `mark_85.droneCooldown` | `900` | 0 to 72000 | Cooldown (ticks) of the nanotech drones (900 = 45 seconds). |

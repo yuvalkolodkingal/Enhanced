@@ -337,7 +337,7 @@ New in 3.8. A custom hero wears no suit: these cards are the **Mark 85**'s moves
 | **Repulsor** `iron_man.repulsor` | **R** (press) | Energy Blades (on/off) | 2 a point | Blasts of energy from your palms. Sneak: energy blades come out of your hands. |
 | **Unibeam** `iron_man.unibeam` | **V** (hold) | — | 2 a point | Hold: a big laser beam from your chest (the Mark 85's giant chest laser). |
 | **Energy Shield** `iron_man.shield` | **B** (hold) | Lightning Refocuser (press) | 2 a point | Hold up a giant energy shield. Sneak: chain lightning that jumps between foes. Shares the one shield. |
-| **Homing Missiles** `iron_man.missiles` | **N** (press) | Nanotech Drones (press) | 2 a point | Tiny missiles that chase foes and pop. Sneak: drones that fire lasers for you. |
+| **Homing Missiles** `iron_man.missiles` | **N** (press) | Nanotech Drones (press) | 2 a point | Tiny missiles that chase foes and pop. Sneak: glowing wing blades that fire lasers for you. |
 | **Suit** `iron_man.suit` | no key (always on) | — | 3 a point | Armour all over (+8 armour, +4 toughness) and a **suit energy** meter that powers the moves. |
 
 ### Falcon (5)
@@ -446,7 +446,7 @@ Since 3.5 every Sneak variant of the heroes is **a card of its own** too, so you
 | **Energy Absorb (Red Hulk)** `red_hulk.absorb` | `red_hulk.burst` | — | 3 a point | Hold to soak up fire, lightning and beams into your anger. Shares the one shield. (3.8) |
 | **Energy Blades (Iron Man)** `iron_man.energy_blades` | `iron_man.repulsor` | — | 2 a point | Energy blades come out of your hands. (3.8) |
 | **Lightning Refocuser (Iron Man)** `iron_man.lightning_refocuser` | `iron_man.shield` | — | 2 a point | Chain lightning that jumps between foes. (3.8) |
-| **Nanotech Drones (Iron Man)** `iron_man.drones` | `iron_man.missiles` | — | 2 a point | Drones form behind you and fire lasers. (3.8) |
+| **Nanotech Drones (Iron Man)** `iron_man.drones` | `iron_man.missiles` | — | 2 a point | Four glowing wing blades grow out of your arms, two on each side, and fire lasers. (3.8; the wings 3.8.3) |
 | **Wrist Rocket (Falcon)** `falcon.wrist_rocket` | `falcon.blasters` | — | 2 a point | A small rocket with a small boom. (3.8) |
 | **Boost Climb (Falcon)** `falcon.boost_climb` | `falcon.dive` | — | 2 a point | Shoot straight up into the sky. (3.8) |
 | **Wing Slash (Falcon)** `falcon.wing_slash` | `falcon.wing_shield` | — | 2 a point | Spin with your wings out. (3.8) |
