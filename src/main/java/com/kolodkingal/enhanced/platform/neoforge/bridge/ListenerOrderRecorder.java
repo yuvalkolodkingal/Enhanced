@@ -42,14 +42,20 @@ import java.util.regex.Pattern;
  * <p>How to record (development runs only, or with {@code -Denhanced.debug=true}): {@code /enhanced debug
  * listener_order} writes the section of the side it runs on to the file named by {@code -Denhanced.listenerOrder}
  * (set by the build for every run); {@code ./gradlew -PrecordListenerOrder runGameTestServer} (or {@code runClient})
- * writes it when loading completes, and a client then exits.
+ * writes it when loading completes, and a client then exits ({@code -PrecordListenerOrder=exit}: a server too).
  */
 public final class ListenerOrderRecorder {
     static final String MOD_PACKAGE = "com.kolodkingal.enhanced.";
     static final String TOOLING = "com.kolodkingal.enhanced.platform.";
     public static final String FILE_PROPERTY = "enhanced.listenerOrder";
     static final String RECORD_PROPERTY = "enhanced.recordListenerOrder";
-    private static final Pattern SUBSCRIBE_EVENT = Pattern.compile("@SubscribeEvent: (?:class |interface )?(\\S+) (\\w+)\\(");
+    /** A static listener registered by its class: {@code @SubscribeEvent: class <owner> <method>(<descriptor>)}. */
+    private static final Pattern SUBSCRIBE_EVENT = Pattern.compile("@SubscribeEvent: (?:class |interface )(\\S+) (\\w+)\\(");
+    /**
+     * A listener registered by its method (NeoForge does that for a class with both mod-bus and game-bus listeners):
+     * {@code @SubscribeEvent: public static void <owner>.<method>(<parameters>) <method>(<descriptor>)}.
+     */
+    private static final Pattern SUBSCRIBE_METHOD = Pattern.compile("@SubscribeEvent: [^(]*?([\\w.$]+)\\.([\\w$]+)\\(");
     private static final Pattern KEY = Pattern.compile("[\\w.$]+#[\\w$]+");
 
     private ListenerOrderRecorder() {
@@ -61,12 +67,13 @@ public final class ListenerOrderRecorder {
     }
 
     static void install(IEventBus modBus) {
-        if (enabled() && Boolean.getBoolean(RECORD_PROPERTY)) {
+        String record = System.getProperty(RECORD_PROPERTY);
+        if (enabled() && ("true".equals(record) || "exit".equals(record))) {
             modBus.addListener(FMLLoadCompleteEvent.class, event -> {
                 Result result = write(file());
                 Enhanced.LOGGER.info("Recorded {} listeners of {} events ({}) to {}", result.listeners(),
                         result.events(), result.section(), result.file());
-                if (FMLEnvironment.dist.isClient()) {
+                if (FMLEnvironment.dist.isClient() || "exit".equals(System.getProperty(RECORD_PROPERTY))) {
                     Runtime.getRuntime().halt(0);
                 }
             });
@@ -161,7 +168,10 @@ public final class ListenerOrderRecorder {
     private static void describe(EventListener listener, EventPriority priority, List<String> lines) {
         String text = listener.toString();
         Matcher m = SUBSCRIBE_EVENT.matcher(text);
-        if (m.find()) {
+        if (!m.find()) {
+            m = SUBSCRIBE_METHOD.matcher(text);
+        }
+        if (m.find(0)) {
             String owner = m.group(1);
             if (owner.startsWith(MOD_PACKAGE) && !owner.startsWith(TOOLING)) {
                 Object info = read(listener, "subInfo");

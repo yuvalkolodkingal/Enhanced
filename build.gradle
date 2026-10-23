@@ -228,11 +228,12 @@ tasks.named('compileJava', JavaCompile).configure {
 }
 // The recording's path, for the debug command that writes it and the GameTest that reads it; with
 // -PrecordListenerOrder a run records its side when loading completes (a client then exits).
-def recordListenerOrder = project.hasProperty('recordListenerOrder')
+// (-PrecordListenerOrder=exit: a server exits too.)
+def recordListenerOrder = project.findProperty('recordListenerOrder')
 neoForge.runs.configureEach {
     systemProperty 'enhanced.listenerOrder', listenerOrderFile.absolutePath
-    if (recordListenerOrder) {
-        systemProperty 'enhanced.recordListenerOrder', 'true'
+    if (recordListenerOrder != null) {
+        systemProperty 'enhanced.recordListenerOrder', recordListenerOrder == 'exit' ? 'exit' : 'true'
     }
 }
 // ===== end port P0 S-A =====
