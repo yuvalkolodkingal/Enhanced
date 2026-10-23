@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.asgard.AsgardDimension;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LevelEvent;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -17,8 +19,6 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -95,7 +95,7 @@ final class AsgardTestSupport {
                 }
             }, false, BiomeManager.obfuscateSeed(server.getWorldData().worldGenOptions().seed()), List.of(), false, server.overworld().getRandomSequences());
             levels.put(key, level);
-            NeoForge.EVENT_BUS.post(new LevelEvent.Load(level));
+            Events.post(new LevelEvent.Load(level));
             return level;
         } catch (IOException | ReflectiveOperationException e) {
             throw new IllegalStateException("The level " + key.location() + " could not be made", e);

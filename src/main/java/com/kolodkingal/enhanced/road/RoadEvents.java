@@ -1,49 +1,48 @@
 package com.kolodkingal.enhanced.road;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStartedEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppingEvent;
+import com.kolodkingal.enhanced.platform.event.ServerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /** The life of the Road: the trials run with the server's ticks, and players come and go. */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class RoadEvents {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerTick(ServerTickEvent.Post event) {
         RoadTrials.serverTick(event.getServer());
         RoadMusic.tick(event.getServer());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStarted(ServerStartedEvent event) {
         RoadTrials.onServerStarted(event.getServer());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopping(ServerStoppingEvent event) {
         RoadTrials.onServerStopping(event.getServer());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         RoadTrials.clear();
         RoadMusic.clear();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             RoadTrials.reconcile(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             RoadTrials.onLogout(player);
@@ -51,7 +50,7 @@ public final class RoadEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             RoadTrials.reconcile(player);

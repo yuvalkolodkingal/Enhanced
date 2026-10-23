@@ -1,12 +1,32 @@
 package com.kolodkingal.enhanced.asgard;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.asgard.build.CityTemplates;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.block.asgard.BifrostMechanismBlockEntity;
 import com.kolodkingal.enhanced.config.AsgardConfig;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EntityMobGriefingEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.ExplosionEvent;
+import com.kolodkingal.enhanced.platform.event.FinalizeSpawnEvent;
+import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDestroyBlockEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDropsEvent;
+import com.kolodkingal.enhanced.platform.event.LivingExperienceDropEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PistonEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerSetSpawnEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStartedEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -37,27 +57,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityMobGriefingEvent;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerSetSpawnEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.neoforge.event.level.PistonEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ import java.util.UUID;
  * logs in there while Asgard is closed is sent home. Also: the progress of those who come ({@code VISITED}, where they
  * came from), and the Observatory's mechanism, which spins when the Bifrost touches down or leaves near it.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class AsgardRules {
     /** How far from the Observatory's centre the Bifrost spins the mechanism. */
     public static final double MECHANISM_REACH = 24.0;
@@ -126,7 +125,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onBreak(BlockEvent.BreakEvent event) {
         if (event.getLevel() instanceof Level level && refuses(event.getPlayer(), level, event.getPos())) {
             event.setCanceled(true);
@@ -134,7 +133,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onPlace(BlockEvent.EntityPlaceEvent event) {
         if (!(event.getLevel() instanceof Level level) || !AsgardDimension.is(level)) {
             return;
@@ -153,7 +152,7 @@ public final class AsgardRules {
     }
 
     /** Buckets, flint and steel and fire charges used on the city. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onUseOnBlock(PlayerInteractEvent.RightClickBlock event) {
         ItemStack stack = event.getItemStack();
         if (!(stack.getItem() instanceof BucketItem || stack.getItem() instanceof FlintAndSteelItem || stack.getItem() instanceof FireChargeItem)) {
@@ -168,7 +167,7 @@ public final class AsgardRules {
     }
 
     /** A bucket emptied or filled toward the city (it aims by itself). */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onUseItem(PlayerInteractEvent.RightClickItem event) {
         if (!(event.getItemStack().getItem() instanceof BucketItem) || !AsgardDimension.is(event.getLevel())) {
             return;
@@ -184,42 +183,42 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onToolUse(BlockEvent.BlockToolModificationEvent event) {
         if (event.getContext().getLevel() instanceof Level level && refuses(event.getPlayer(), level, event.getPos())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTrample(BlockEvent.FarmlandTrampleEvent event) {
         if (event.getLevel() instanceof Level level && refuses(null, level, event.getPos())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onFluidPlace(BlockEvent.FluidPlaceBlockEvent event) {
         if (event.getLevel() instanceof Level level && refuses(null, level, event.getPos())) {
             event.setNewState(event.getOriginalState());
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onExplosion(ExplosionEvent.Detonate event) {
         if (event.getLevel() instanceof ServerLevel level && AsgardDimension.is(level)) {
             event.getAffectedBlocks().removeIf(pos -> protectsCity(null, level, pos));
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPiston(PistonEvent.Pre event) {
         if (event.getLevel() instanceof Level level && (refuses(null, level, event.getPos()) || refuses(null, level, event.getFaceOffsetPos()))) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onGrief(EntityMobGriefingEvent event) {
         Entity e = event.getEntity();
         if (e != null && e.level() instanceof ServerLevel level && AsgardDimension.is(level) && protectOn()
@@ -228,7 +227,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDestroy(LivingDestroyBlockEvent event) {
         if (refuses(null, event.getEntity().level(), event.getPos())) {
             event.setCanceled(true);
@@ -236,7 +235,7 @@ public final class AsgardRules {
     }
 
     /** Fire that appears in the city (from lightning or anything that sets it without asking) goes out at once. */
-    @SubscribeEvent
+    @Subscribe
     public static void onNeighbours(BlockEvent.NeighborNotifyEvent event) {
         if (event.getLevel() instanceof ServerLevel level && AsgardDimension.is(level) && event.getState().getBlock() instanceof BaseFireBlock
                 && protectsCity(null, level, event.getPos())) {
@@ -244,7 +243,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel asgard && AsgardDimension.is(asgard)) {
             FeastHall.tick(asgard); // 3.7.2: mends once a Hall of Feasts built before
@@ -263,7 +262,7 @@ public final class AsgardRules {
 
     // ---- no monsters by nature ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onFinalizeSpawn(FinalizeSpawnEvent event) {
         if (AsgardDimension.is(event.getLevel().getLevel()) && event.getEntity().getType().getCategory() == MobCategory.MONSTER
                 && NATURE.contains(event.getSpawnType())) {
@@ -273,7 +272,7 @@ public final class AsgardRules {
 
     // ---- the void, the edge ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !AsgardDimension.in(player) || player.isSpectator()) {
             return;
@@ -288,7 +287,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onVoidDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && AsgardDimension.in(player)
                 && event.getSource().is(DamageTypes.FELL_OUT_OF_WORLD) && !player.isSpectator()) {
@@ -330,7 +329,7 @@ public final class AsgardRules {
 
     // ---- no spawn point ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onSetSpawn(PlayerSetSpawnEvent event) {
         if (event.getSpawnLevel() == AsgardDimension.KEY && event.getNewSpawn() != null && !event.isForced()) {
             event.setCanceled(true);
@@ -352,7 +351,7 @@ public final class AsgardRules {
                 || stack.is(ModItems.GUNGNIR.get()) || stack.is(ModItems.HELA_HEADDRESS.get());
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onDeath(LivingDeathEvent event) {
         if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player) || !AsgardDimension.in(player)
                 || player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
@@ -366,7 +365,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onDrops(LivingDropsEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -388,14 +387,14 @@ public final class AsgardRules {
         });
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onXpDrop(LivingExperienceDropEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && KEPT.get(player.getUUID()) instanceof Kept kept && kept.inventory() != null) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClone(PlayerEvent.Clone event) {
         if (!event.isWasDeath()) {
             return;
@@ -421,7 +420,7 @@ public final class AsgardRules {
     // ---- who comes and goes ----
 
     /** Coming to Asgard (not from it): he has visited, and is remembered where he came from (Heimdall can send him back). */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onTravel(EntityTravelToDimensionEvent event) {
         if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player) || event.getDimension() != AsgardDimension.KEY
                 || AsgardDimension.in(player)) {
@@ -432,7 +431,7 @@ public final class AsgardRules {
                 .withCameFrom(GlobalPos.of(player.level().dimension(), player.blockPosition())));
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && AsgardDimension.in(player) && !Bifrost.asgardEnabled()
                 && !player.hasPermissions(2)) {
@@ -441,7 +440,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStarted(ServerStartedEvent event) {
         CityTemplates.clear();
         if (AsgardDimension.level(event.getServer()) != null) {
@@ -452,7 +451,7 @@ public final class AsgardRules {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         CityTemplates.clear();
         KEPT.clear();

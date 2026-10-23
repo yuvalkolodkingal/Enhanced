@@ -1,8 +1,18 @@
 package com.kolodkingal.enhanced.stones;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.item.InfinityStoneItem;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -14,17 +24,6 @@ import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -34,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
  * Mind Command's allies who never turn on their commander, and what is forgotten when a player leaves. The vessels
  * call {@link StoneUse} themselves ({@code ScepterRituals}, the Eye of Agamotto).
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class StoneEvents {
     static {
         StoneBeams.init();
@@ -87,7 +86,7 @@ public final class StoneEvents {
     }
 
     /** The Time Stone on a crop or a sapling grows it (with Sneak, takes a crop back). */
-    @SubscribeEvent
+    @Subscribe
     public static void onUseOnBlock(PlayerInteractEvent.RightClickBlock event) {
         Player player = event.getEntity();
         InHand stone = stoneOf(event.getItemStack(), player);
@@ -105,7 +104,7 @@ public final class StoneEvents {
     }
 
     /** The Time Stone on a baby animal: it grows up. */
-    @SubscribeEvent
+    @Subscribe
     public static void onUseOnEntity(PlayerInteractEvent.EntityInteract event) {
         Player player = event.getEntity();
         InHand stone = stoneOf(event.getItemStack(), player);
@@ -120,7 +119,7 @@ public final class StoneEvents {
         event.setCancellationResult(InteractionResult.SUCCESS);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player && player.isAlive()) {
             StoneUse.tick(player);
@@ -128,7 +127,7 @@ public final class StoneEvents {
     }
 
     /** A projectile about to hit a holder of the Reality Stone is a bubble instead. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         if (!event.getProjectile().level().isClientSide() && event.getRayTraceResult() instanceof EntityHitResult hit
                 && hit.getEntity() instanceof ServerPlayer player
@@ -137,7 +136,7 @@ public final class StoneEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onHurt(LivingDamageEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SoulStonePowers.hurt(player, event.getNewDamage());
@@ -145,21 +144,21 @@ public final class StoneEvents {
     }
 
     /** A creature under the Mind Command never takes its commander, nor his other allies, as its target. */
-    @SubscribeEvent
+    @Subscribe
     public static void onTarget(LivingChangeTargetEvent event) {
         if (!MindStonePowers.mayTarget(event.getEntity(), event.getNewAboutToBeSetTarget())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             StoneUse.forget(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             StoneUse.forget(player);
@@ -167,7 +166,7 @@ public final class StoneEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             StoneUse.end(player, true);
@@ -177,7 +176,7 @@ public final class StoneEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         StoneUse.clear();
     }

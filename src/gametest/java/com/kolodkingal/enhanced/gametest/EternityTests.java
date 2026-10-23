@@ -20,6 +20,8 @@ import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.network.EternityScreenPayload;
 import com.kolodkingal.enhanced.network.EternityWishPayload;
 import com.kolodkingal.enhanced.odin.GungnirStand;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
 import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
@@ -49,8 +51,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.io.IOException;
 import java.io.InputStream;

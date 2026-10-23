@@ -2,6 +2,11 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.ItemTossEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.TriState;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -31,11 +36,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.List;
 
@@ -68,26 +68,26 @@ public final class RoadRulesTests {
                     BlockPos plot = RoadTestSupport.PlotParkour.plot(trial);
                     BlockState floorState = road.getBlockState(floor);
                     check(!floorState.isAir(), "there is a floor");
-                    check(NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(road, floor, floorState, player)).isCanceled(), "he cannot break the floor");
-                    check(NeoForge.EVENT_BUS.post(new PlayerInteractEvent.LeftClickBlock(player, floor, Direction.UP,
+                    check(Events.post(new BlockEvent.BreakEvent(road, floor, floorState, player)).isCanceled(), "he cannot break the floor");
+                    check(Events.post(new PlayerInteractEvent.LeftClickBlock(player, floor, Direction.UP,
                             PlayerInteractEvent.LeftClickBlock.Action.START)).isCanceled(), "nor start to");
-                    check(NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(road.dimension(), road, floor.above(2)),
+                    check(Events.post(new BlockEvent.EntityPlaceEvent(road, floor.above(2), road.getBlockState(floor.above(2)),
                             floorState, player)).isCanceled(), "he cannot place a block");
-                    check(!NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(road.dimension(), road, plot), floorState, player)).isCanceled(),
+                    check(!Events.post(new BlockEvent.EntityPlaceEvent(road, plot, road.getBlockState(plot), floorState, player)).isCanceled(),
                             "but he can on the plot the trial opens");
-                    check(!NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(road, plot, Blocks.STONE.defaultBlockState(), player)).isCanceled(),
+                    check(!Events.post(new BlockEvent.BreakEvent(road, plot, Blocks.STONE.defaultBlockState(), player)).isCanceled(),
                             "and break there");
                     // Items that place blocks are turned away from everywhere else with the right click.
                     player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.STONE));
-                    PlayerInteractEvent.RightClickBlock click = NeoForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickBlock(player, InteractionHand.OFF_HAND, floor,
+                    PlayerInteractEvent.RightClickBlock click = Events.post(new PlayerInteractEvent.RightClickBlock(player, InteractionHand.OFF_HAND, floor,
                             new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(floor), Direction.UP, floor, false)));
-                    check(click.getUseItem() == net.neoforged.neoforge.common.util.TriState.FALSE, "a stone is not put down");
+                    check(click.getUseItem() == TriState.FALSE, "a stone is not put down");
                     player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
                 })
                 .thenSucceed();
         // The player outside the Road builds as ever.
         BlockPos near = helper.absolutePos(new BlockPos(6, 3, 6));
-        check(!NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(helper.getLevel(), near, Blocks.STONE.defaultBlockState(), other)).isCanceled(),
+        check(!Events.post(new BlockEvent.BreakEvent(helper.getLevel(), near, Blocks.STONE.defaultBlockState(), other)).isCanceled(),
                 "in the world he breaks blocks as ever");
     }
 
@@ -112,13 +112,13 @@ public final class RoadRulesTests {
                     for (ItemStack banned : new ItemStack[]{new ItemStack(Items.ENDER_PEARL), new ItemStack(Items.CHORUS_FRUIT), new ItemStack(Items.WIND_CHARGE),
                             new ItemStack(Items.FIREWORK_ROCKET)}) {
                         player.setItemInHand(InteractionHand.MAIN_HAND, banned);
-                        check(NeoForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickItem(player, InteractionHand.MAIN_HAND)).isCanceled(),
+                        check(Events.post(new PlayerInteractEvent.RightClickItem(player, InteractionHand.MAIN_HAND)).isCanceled(),
                                 banned.getItem() + " cannot be used");
                     }
                     player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STICK));
-                    check(!NeoForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickItem(player, InteractionHand.MAIN_HAND)).isCanceled(), "a stick can");
+                    check(!Events.post(new PlayerInteractEvent.RightClickItem(player, InteractionHand.MAIN_HAND)).isCanceled(), "a stick can");
                     outside.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.ENDER_PEARL));
-                    check(!NeoForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickItem(outside, InteractionHand.MAIN_HAND)).isCanceled(),
+                    check(!Events.post(new PlayerInteractEvent.RightClickItem(outside, InteractionHand.MAIN_HAND)).isCanceled(),
                             "an Ender Pearl works in the world");
                     check(RoadRules.isBanned(new ItemStack(Items.ENDER_PEARL)) && !RoadRules.isBanned(new ItemStack(Items.STICK)), "the list of banned items");
                     // Floating and flying.
@@ -151,11 +151,11 @@ public final class RoadRulesTests {
                 .thenExecute(() -> {
                     ServerLevel road = RoadTestSupport.road(helper);
                     ItemEntity gene = new ItemEntity(road, 0, 0, 0, new ItemStack(ModItems.SCARLET_WITCH_GENE.get()));
-                    check(NeoForge.EVENT_BUS.post(new ItemTossEvent(gene, player)).isCanceled(), "the Gene cannot be thrown away in the Road");
+                    check(Events.post(new ItemTossEvent(gene, player)).isCanceled(), "the Gene cannot be thrown away in the Road");
                     ItemEntity stick = new ItemEntity(road, 0, 0, 0, new ItemStack(Items.STICK));
-                    check(!NeoForge.EVENT_BUS.post(new ItemTossEvent(stick, player)).isCanceled(), "a stick can");
+                    check(!Events.post(new ItemTossEvent(stick, player)).isCanceled(), "a stick can");
                     ItemEntity world = new ItemEntity(helper.getLevel(), 0, 0, 0, new ItemStack(ModItems.SCARLET_WITCH_GENE.get()));
-                    check(!NeoForge.EVENT_BUS.post(new ItemTossEvent(world, outside)).isCanceled(), "in the world it can");
+                    check(!Events.post(new ItemTossEvent(world, outside)).isCanceled(), "in the world it can");
                 })
                 .thenSucceed();
     }

@@ -1,28 +1,27 @@
 package com.kolodkingal.enhanced.heimdall;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.HofundItem;
+import com.kolodkingal.enhanced.platform.event.LivingFallEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 /**
  * Heimdall's events (3.5): the Shadows of Hela of a Guardian's Watch, which only their watcher can strike; the harm the
  * Guardian's Ward takes off; the bonus of Hofund in Heimdall's hand; and his body's sure footing.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class HeimdallEvents {
 
     /** A shadow of a Watch: its watcher's blow strikes it, anyone else's (and anything else) does nothing. */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onShadowHurt(LivingIncomingDamageEvent event) {
         if (event.getEntity().level().isClientSide() || GuardiansWatch.watcherOf(event.getEntity()) == null) {
             return;
@@ -39,7 +38,7 @@ public final class HeimdallEvents {
      * Under the Guardian's Ward he takes {@link HeimdallAbilities#WARD_REDUCTION} less; Hofund in his hand strikes
      * {@code heimdall.hofundBonus} harder (his own blows: the Slash and the Lunge count it themselves).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity().level().isClientSide()) {
             return;
@@ -55,7 +54,7 @@ public final class HeimdallEvents {
     }
 
     /** His body: a fall shorter than {@link HeimdallAbilities#SAFE_FALL} blocks does him no harm. */
-    @SubscribeEvent
+    @Subscribe
     public static void onFall(LivingFallEvent event) {
         if (event.getEntity() instanceof Player player && !player.level().isClientSide()
                 && Powers.get(player).has(HeroAbility.HEIMDALL_BODY) && event.getDistance() < HeimdallAbilities.SAFE_FALL) {

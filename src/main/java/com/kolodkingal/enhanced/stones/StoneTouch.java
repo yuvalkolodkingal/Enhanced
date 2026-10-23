@@ -1,12 +1,18 @@
 package com.kolodkingal.enhanced.stones;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.item.InfinityStoneItem;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.EntityLeaveLevelEvent;
+import com.kolodkingal.enhanced.platform.event.ItemEntityPickupEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.TriState;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -24,13 +30,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ import java.util.UUID;
  * from slot to slot does not. Lost stones (killed or fallen out of the world) go back to the ledger ({@link
  * StoneLedger}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class StoneTouch {
     /** Ticks between two slips of the same player (the hop, the spark, the line). */
     private static final int SLIP_EVERY = 20;
@@ -157,7 +156,7 @@ public final class StoneTouch {
 
     // ---- the server ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             tick(player);
@@ -272,7 +271,7 @@ public final class StoneTouch {
     }
 
     /** A stone on the ground slips away from the hand of one who may not hold it. */
-    @SubscribeEvent
+    @Subscribe
     public static void onPickup(ItemEntityPickupEvent.Pre event) {
         ItemEntity item = event.getItemEntity();
         if (!(item.getItem().getItem() instanceof InfinityStoneItem stone)) {
@@ -313,7 +312,7 @@ public final class StoneTouch {
     }
 
     /** A stone killed (a command) or fallen out of the world is lost: the ledger returns it to its sites. */
-    @SubscribeEvent
+    @Subscribe
     public static void onLeave(EntityLeaveLevelEvent event) {
         if (event.getLevel().isClientSide() || !(event.getEntity() instanceof ItemEntity item)) {
             return;
@@ -333,14 +332,14 @@ public final class StoneTouch {
     }
 
     /** A player who comes back gets the stones lost while he was away (player mode: his bits cleared). */
-    @SubscribeEvent
+    @Subscribe
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             StoneLedger.progress(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         GRACE.remove(event.getEntity().getUUID());
         LAST_SLIP.remove(event.getEntity().getUUID());
