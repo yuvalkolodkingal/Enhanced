@@ -850,6 +850,7 @@ public final class SpellWheelScreen extends Screen {
     }
 
     private static boolean isMagicKey(int key, int scan) {
+        // TODO(port seam) S1b: NeoForge's KeyMapping extension method until the platform has one.
         return InputConstants.getKey(key, scan).equals(BuildKeys.MAGIC.getKey());
     }
 

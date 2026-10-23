@@ -5,6 +5,11 @@ import com.kolodkingal.enhanced.client.render.AnimMath;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.network.WardSyncPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.vishanti.Ward;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -18,11 +23,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import java.util.Map;
  * mesh no finer than the radius needs, and only wards the server sent for this dimension ({@link WardSyncPayload}) exist
  * here. With <em>Reduced motion</em> the hexagons do not drift and the veil does not breathe.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class WardFx {
     /** A ward is drawn while its edge is closer to the camera than this. */
     private static final double REACH = 64.0;
@@ -54,13 +54,13 @@ public final class WardFx {
                 .map(d -> new Ward(Util.NIL_UUID, "", new Vec3(d.x(), d.y(), d.z()), d.radius(), d.color())).toList());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         DOMES.clear();
         Shelters.forgetWards();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;

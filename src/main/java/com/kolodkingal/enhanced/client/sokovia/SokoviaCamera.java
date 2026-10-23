@@ -1,28 +1,27 @@
 package com.kolodkingal.enhanced.client.sokovia;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 
 /**
  * The shake of the camera while the island moves: a slow, low rumble (roll and pitch of under a degree) that grows with
  * the speed of the move and falls off with the distance from the island, for everybody within sight of it. It is not
  * played with the "reduced motion" option on, and it is nothing but the camera: the player is not moved.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SokoviaCamera {
     /** The shake reaches this far past the island's edge, falling off to nothing. */
     private static final double REACH = 48.0;
     /** The strongest roll or pitch, in degrees. */
     private static final float STRENGTH = 0.9F;
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
         SokoviaClient.Island island = SokoviaClient.current();
         if (island == null || EnhancedClientConfig.reducedMotion() || Minecraft.getInstance().level != island.level) {

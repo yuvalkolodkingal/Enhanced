@@ -8,6 +8,11 @@ import com.kolodkingal.enhanced.custom.CustomBeams;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ComputeFovModifierEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -34,11 +39,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -57,7 +57,7 @@ import java.util.Map;
  * synced state of the hero ({@link Live}), so a late joiner sees it too. Everything is drawn where the body really is
  * ({@link HandTracker}), thinned by the client's flight effects option, and calmer with reduced motion.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SpiderEffects {
     /** The splat a web leaves on a wall: eight spokes, three rings and a bright centre. */
     public static final ResourceLocation SPLAT = Enhanced.id("textures/effect/web_splat.png");
@@ -468,7 +468,7 @@ public final class SpiderEffects {
     // =================================================================================================================
 
     /** The field of view widens by a twentieth as a zip begins (not with reduced motion). */
-    @SubscribeEvent
+    @Subscribe
     public static void onComputeFov(ComputeFovModifierEvent event) {
         if (kick > 0.0F || kickOld > 0.0F) {
             if (EnhancedClientConfig.reducedMotion() || !EnhancedClientConfig.animations()) {
@@ -483,7 +483,7 @@ public final class SpiderEffects {
     // Drawing
     // =================================================================================================================
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;

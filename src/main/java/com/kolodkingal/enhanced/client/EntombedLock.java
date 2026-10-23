@@ -1,21 +1,20 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.MovementInputUpdateEvent;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import net.minecraft.client.player.Input;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 
 /**
  * While a cocoon of sand holds you, you can look around but your own keys do not move you: the server holds you in place
  * regardless (see {@code SandCocoonEntity}), so this only spares you the rubber-banding of walking into the sand.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class EntombedLock {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onMovementInput(MovementInputUpdateEvent event) {
         if (event.getEntity().hasEffect(ModEffects.ENTOMBED)) {
             Input input = event.getInput();

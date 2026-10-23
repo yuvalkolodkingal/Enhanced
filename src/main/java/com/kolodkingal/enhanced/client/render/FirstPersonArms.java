@@ -1,9 +1,12 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.mixin.client.ItemInHandRendererAccessor;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderHandEvent;
 import com.kolodkingal.enhanced.power.Power;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -14,10 +17,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
 
 import static com.kolodkingal.enhanced.client.render.AnimMath.lerp;
 import static com.kolodkingal.enhanced.client.render.AnimMath.ss;
@@ -38,7 +37,7 @@ import static com.kolodkingal.enhanced.client.render.AnimMath.ss;
  * sliding up from below the screen as vanilla's equip animation does. It stays at the edge: hands may enter the middle of
  * the screen only for the passes listed in the design, each under three ticks.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class FirstPersonArms {
     /** The pivot of a right hand's rotation (blocks, view space); the left hand's x is mirrored. */
     private static final float PIVOT_X = 0.40F;
@@ -87,7 +86,7 @@ public final class FirstPersonArms {
     private static final Offset LEFT = new Offset();
     private static double computedFor = Double.NaN;
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderHand(RenderHandEvent event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;

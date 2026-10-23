@@ -1,8 +1,12 @@
 package com.kolodkingal.enhanced.client.world;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.stones.StoneFx;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.world.SiteAmbience;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -12,11 +16,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -116,14 +115,14 @@ public final class SiteAmbienceClient {
     }
 
     /** The client's ticks and its leaving a world (the game bus). */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+    @Subscriber(side = Side.CLIENT)
     public static final class Events {
-        @SubscribeEvent
+        @Subscribe
         public static void onClientTick(ClientTickEvent.Post event) {
             tick(Minecraft.getInstance());
         }
 
-        @SubscribeEvent
+        @Subscribe
         public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
             if (loop != null) {
                 Minecraft.getInstance().getSoundManager().stop(loop);

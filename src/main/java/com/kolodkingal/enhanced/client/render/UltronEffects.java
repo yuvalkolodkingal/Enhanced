@@ -1,10 +1,15 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.ultron.UltronAttack;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
@@ -23,12 +28,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ import java.util.Map;
  * for the Sentries' light; the beams are the plasma amber with a red edge. Geometry is additive and drawn after the
  * particles; the particles of each effect are {@link UltronParticles}'. {@link #receive} is what the payload calls.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class UltronEffects {
     // The plasma of Prime, the danger red, the anti-gravity blue, the network.
     static final int PLASMA_CORE = 0xFFF3D6;
@@ -141,7 +140,7 @@ public final class UltronEffects {
     // ---------------------------------------------------------------------------------------------------------
     // Every tick: the particles of each effect
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -165,7 +164,7 @@ public final class UltronEffects {
     // ---------------------------------------------------------------------------------------------------------
     // Every frame: the geometry
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;
@@ -702,7 +701,7 @@ public final class UltronEffects {
     // The shake of the Tremor
 
     /** The ground shakes while the Tremor (and the rise of a lift that cannot happen) lasts: roll and pitch of under a degree. */
-    @SubscribeEvent
+    @Subscribe
     public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
         if (EnhancedClientConfig.reducedMotion() || EFFECTS.isEmpty()) {
             return;

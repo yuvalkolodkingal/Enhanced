@@ -95,6 +95,7 @@ public class StoneWheelScreen extends Screen {
             onClose();
             return;
         }
+        // TODO(port seam) S1b: NeoForge's KeyMapping extension method until the platform has one.
         InputConstants.Key key = KeyBindings.STONE_WHEEL.getKey();
         if (key.getType() == InputConstants.Type.KEYSYM && !InputConstants.isKeyDown(mc.getWindow().getWindow(),
                 key.getValue())) {

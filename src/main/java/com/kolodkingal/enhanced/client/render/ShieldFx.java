@@ -7,6 +7,10 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -20,10 +24,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import static com.kolodkingal.enhanced.client.render.EnergyGeometry.argb;
  * <p>Ripples and shatterings arrive as {@link com.kolodkingal.enhanced.network.ApocalypseFxPayload}s (the impact point and
  * the entity); the rest is read from the entity every frame, so a player who comes into view late sees the dome as it is.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ShieldFx {
     /** The lattice of the dome: a hexagonal web in the shield's gold. */
     public static final ResourceLocation WEB = Enhanced.id("textures/entity/golden_web.png");
@@ -134,7 +134,7 @@ public final class ShieldFx {
     // ---------------------------------------------------------------------------------------------------------
     // Drawing
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;

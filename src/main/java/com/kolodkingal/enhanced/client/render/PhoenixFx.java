@@ -8,6 +8,11 @@ import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.PhoenixBurstPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -31,11 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ import java.util.Set;
  * <p>Nothing here is sent by the server but the Burst itself ({@link PhoenixBurstPayload}); the charge, the field and
  * the reading are found from the synced {@link PowerData} of each player, as the other heroes' effects are.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class PhoenixFx {
     /** The texture of tongues of flame the shell and the body flame are drawn with. */
     public static final ResourceLocation FLAME_TEXTURE = Enhanced.id("textures/entity/phoenix_flame.png");
@@ -370,7 +370,7 @@ public final class PhoenixFx {
     // The camera
 
     /** A Burst shakes the camera of whoever is near: a quick roll and nod that die away. */
-    @SubscribeEvent
+    @Subscribe
     public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
         Minecraft mc = Minecraft.getInstance();
         if (BURSTS.isEmpty() || mc.level == null || EnhancedClientConfig.reducedMotion()) {
@@ -391,7 +391,7 @@ public final class PhoenixFx {
     // ------------------------------------------------------------------------------------------------------------
     // Drawing
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;

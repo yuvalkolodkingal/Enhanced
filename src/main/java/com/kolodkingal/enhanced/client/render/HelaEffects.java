@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.BossBarOverride;
 import com.kolodkingal.enhanced.client.asgard.AsgardFx;
 import com.kolodkingal.enhanced.hela.HelaFight;
@@ -8,6 +7,11 @@ import com.kolodkingal.enhanced.hela.HelaFx;
 import com.kolodkingal.enhanced.hela.HelaRules;
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.FMLClientSetupEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,11 +23,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ import java.util.List;
  * own boss bar ({@link #drawBar}: black with a green line, the phase's name; Fenris's bar under it in grey-red). A payload
  * whose doer is a player plays the hero's gesture for it ({@link HelaActing#onFx}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HelaEffects {
     /** A picture that lasts: what kind, where, from when to when, and its number. */
     private record Lasting(int kind, int entityId, List<Vec3> points, long start, long end, int arg) {
@@ -46,9 +45,9 @@ public final class HelaEffects {
     private static final int RING_SEGMENTS = 64;
 
     /** Registers the drawer of each of her kinds, once, when the client sets up. */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    @Subscriber(side = Side.CLIENT)
     public static final class Setup {
-        @SubscribeEvent
+        @Subscribe
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(HelaEffects::register);
         }
@@ -228,7 +227,7 @@ public final class HelaEffects {
     // ---------------------------------------------------------------------------------------------------------
     // The pictures on the floor
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || LASTING.isEmpty()) {
             return;

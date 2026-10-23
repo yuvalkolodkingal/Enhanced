@@ -6,13 +6,13 @@ import com.kolodkingal.enhanced.music.MusicFiles;
 import com.kolodkingal.enhanced.music.MusicTracks;
 import com.kolodkingal.enhanced.network.MusicManifestPayload;
 import com.kolodkingal.enhanced.network.MusicRequestPayload;
+import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
 import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.Util;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * config/enhanced/music_cache/{@code <hash>}.ogg, so each song is downloaded once, whatever server it came from. The Walkman
  * and the Road then play it ({@link MusicSources}) unless the player's own song wins, or he chose to ignore the world's music.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ServerMusicClient {
     /** The server's songs by name (empty: none, or a server without the music channel). */
     private static volatile Map<String, MusicManifestPayload.Track> manifest = Map.of();
@@ -47,7 +47,7 @@ public final class ServerMusicClient {
     private static final AtomicInteger GENERATION = new AtomicInteger();
 
     public static Path cacheFolder() {
-        return FMLPaths.CONFIGDIR.get().resolve(Enhanced.MODID).resolve("music_cache");
+        return Platform.get().configDir().resolve(Enhanced.MODID).resolve("music_cache");
     }
 
     public static Path cached(String hash) {
@@ -162,7 +162,7 @@ public final class ServerMusicClient {
     public record ServerSong(String name, String hash, Path file) {
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         manifest = Map.of();
         synchronized (INCOMING) {

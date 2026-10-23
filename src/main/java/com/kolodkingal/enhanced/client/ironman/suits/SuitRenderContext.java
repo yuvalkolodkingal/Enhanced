@@ -1,16 +1,15 @@
 package com.kolodkingal.enhanced.client.ironman.suits;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ironman.SuitKind;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderArmEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderFrameEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
-import net.neoforged.neoforge.client.event.RenderFrameEvent;
-import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
  * Hulkbuster's renderer swap) and before his first-person arm, at the highest priority; it holds for the frame and that
  * player only, so a stale one never leaks into another draw.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SuitRenderContext {
     @Nullable
     private static AbstractClientPlayer player;
@@ -65,25 +64,25 @@ public final class SuitRenderContext {
         look = null;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onFrame(RenderFrameEvent.Pre event) {
         frame++;
         end();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    @Subscribe(priority = Priority.HIGHEST, receiveCanceled = true)
     public static void onPlayerPre(RenderPlayerEvent.Pre event) {
         if (event.getEntity() instanceof AbstractClientPlayer p) {
             begin(p, event.getPartialTick(), false);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    @Subscribe(priority = Priority.LOWEST, receiveCanceled = true)
     public static void onPlayerPost(RenderPlayerEvent.Post event) {
         end();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onArm(RenderArmEvent event) {
         begin(event.getPlayer(), Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false), true);
     }

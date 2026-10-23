@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client.build;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BuildData;
@@ -13,6 +12,11 @@ import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderHighlightEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -35,11 +39,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderHighlightEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -88,7 +87,7 @@ import java.util.Optional;
  * Reduced motion ({@link EnhancedClientConfig#reducedMotion()}) keeps every glow steady: no pulse, no wave, no arc, no
  * turning, no flashing. Only ever loaded on a client.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class BuildRenderer {
     /** How far another builder's box is seen (D-B 14.7). */
     public static final int OTHERS_RANGE = 64;
@@ -173,7 +172,7 @@ public final class BuildRenderer {
     private record Label(Vec3 at, Component text, int colour) {
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         boolean ghost = event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS;
         if (!ghost && event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
@@ -291,7 +290,7 @@ public final class BuildRenderer {
     }
 
     /** Vanilla's block outline is hidden in build mode: the spell takes the aimed cell, which has its own outline. */
-    @SubscribeEvent
+    @Subscribe
     public static void onBlockHighlight(RenderHighlightEvent.Block event) {
         if (BuildClient.buildMode()) {
             event.setCanceled(true);

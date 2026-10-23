@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.client.PowerHud;
 import com.kolodkingal.enhanced.config.EternityConfig;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.love.LoveAbilities;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import net.minecraft.ChatFormatting;
@@ -31,7 +32,7 @@ public final class LoveHud {
                     ? "hud.enhanced.love.axe.hand" : flying ? "hud.enhanced.love.axe.flying"
                             : "hud.enhanced.love.axe.away"))
                     .withStyle(axe || flying ? ChatFormatting.GOLD : ChatFormatting.DARK_GRAY);
-            case 2 -> !player.mayFly() ? Component.translatable("hud.enhanced.love.needs_axe")
+            case 2 -> !mayFly(player) ? Component.translatable("hud.enhanced.love.needs_axe")
                     .withStyle(ChatFormatting.DARK_GRAY)
                     : Component.translatable(data.flying() ? "hud.enhanced.on" : "hud.enhanced.off")
                     .withStyle(data.flying() ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY);
@@ -61,5 +62,11 @@ public final class LoveHud {
     }
 
     private LoveHud() {
+    }
+
+    /** Whether the player may fly as in Creative (NeoForge's {@code mayFly}: the ability or the attribute). */
+    private static boolean mayFly(LocalPlayer player) {
+        return player.getAbilities().mayfly
+                || player.getAttributeValue(Platform.get().attributes().creativeFlight()) > 0;
     }
 }

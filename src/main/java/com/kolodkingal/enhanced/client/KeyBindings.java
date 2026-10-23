@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+// TODO(port seam) S1: a common key conflict context (notes/l6.md); NeoForge's until it lands.
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import org.lwjgl.glfw.GLFW;

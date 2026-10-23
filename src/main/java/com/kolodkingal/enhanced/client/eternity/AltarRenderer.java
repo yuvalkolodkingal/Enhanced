@@ -75,7 +75,7 @@ public class AltarRenderer implements BlockEntityRenderer<EternityAltarBlockEnti
         pose.popPose();
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(EternityAltarBlockEntity altar) {
         return new AABB(altar.getBlockPos()).expandTowards(0, 8, 0).inflate(1.0);
     }

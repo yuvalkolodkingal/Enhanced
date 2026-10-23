@@ -1,17 +1,15 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.CustomizeGuiOverlayEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderGuiLayerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -24,7 +22,7 @@ import java.util.Map;
  * bar is untouched, and so are the bars of a boss that is not tracked on the client in time to draw (the drawer is
  * asked only for the bars it is given).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class BossBarOverride {
 
     /** Draws a boss's own bar in the place of the vanilla one. */
@@ -65,15 +63,15 @@ public final class BossBarOverride {
     private static int barsLeft = Integer.MAX_VALUE;
 
     /** The boss bars are about to be drawn: none is yet. */
-    @SubscribeEvent
+    @Subscribe
     public static void onLayer(RenderGuiLayerEvent.Pre event) {
-        if (VanillaGuiLayers.BOSS_OVERLAY.equals(event.getName())) {
+        if (HudLayerIds.BOSS_OVERLAY.equals(event.getName())) {
             barsBottom = 0;
             barsLeft = Integer.MAX_VALUE;
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onBossBar(CustomizeGuiOverlayEvent.BossEventProgress event) {
         Drawer drawer = drawerFor(event.getBossEvent().getName());
         if (drawer != null) {

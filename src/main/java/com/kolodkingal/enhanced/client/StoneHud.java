@@ -1,8 +1,11 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.item.InfinityStoneItem;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.stones.GauntletContents;
 import com.kolodkingal.enhanced.stones.Snap;
@@ -23,10 +26,6 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ import java.util.function.ToDoubleFunction;
  * server counts it ({@link StoneTouch}, the same rule run here). The white flash of a Snap seen near. Nothing with the
  * GUI hidden.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public class StoneHud implements LayeredDraw.Layer {
     private static final int GAP = 18;
     private static final Map<StoneKind, List<Function<Player, Component>>> LINES = new EnumMap<>(StoneKind.class);
@@ -81,7 +80,7 @@ public class StoneHud implements LayeredDraw.Layer {
         burn = 1.0F;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         flash = Math.max(0.0F, flash - 0.08F);

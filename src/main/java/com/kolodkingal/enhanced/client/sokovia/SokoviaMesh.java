@@ -32,6 +32,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+// TODO(port seam) S2: drawing a block model per render type (notes/l6.md); NeoForge's until it lands.
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.shaders.Uniform;

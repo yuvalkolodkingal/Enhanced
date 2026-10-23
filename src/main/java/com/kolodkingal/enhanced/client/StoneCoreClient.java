@@ -6,6 +6,11 @@ import com.kolodkingal.enhanced.client.stones.StoneFx;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.ItemTooltipEvent;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.stones.GauntletContents;
 import com.kolodkingal.enhanced.stones.Snap;
@@ -18,11 +23,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 /**
  * The client of the stones' core (3.6, lane L1): the Gauntlet's socket model ({@code enhanced:stones}, the bitmask of
@@ -30,7 +30,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
  * {@code StoneFxPayload} that are lane L1's (a rejection, a slip, a stone taken, the Snap), the Stone Wheel key, and
  * the Snap's wait in the Gauntlet's tooltip.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class StoneCoreClient {
     /** The model predicate of the Gauntlet's lit sockets: the stones' bitmask over 64. */
     public static final net.minecraft.resources.ResourceLocation STONES = Enhanced.id("stones");
@@ -45,13 +45,13 @@ public final class StoneCoreClient {
         StoneFx.register(StoneFxPayload.SNAP, StoneCoreClient::snap);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         StoneWheelScreen.tick(Minecraft.getInstance());
     }
 
     /** A Gauntlet with six stones says when it may snap again. */
-    @SubscribeEvent
+    @Subscribe
     public static void onTooltip(ItemTooltipEvent event) {
         if (event.getEntity() == null || !InfinityGauntletItem.crafted(event.getItemStack())) {
             return;

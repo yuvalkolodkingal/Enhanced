@@ -4,6 +4,13 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderGuiEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.strange.StrangeAbilities;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -21,13 +28,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderGuiEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.joml.Matrix4f;
 
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import java.util.Map;
  * the screen. No shader and no copy of the world: the camera and an overlay. The client option {@code reducedMotion}
  * stills the sway and the turning.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class MirrorView {
     private static final ResourceLocation FRACTAL = Enhanced.id("textures/fx/mandala_ring.png");
     /** The longest a sphere is believed without its closing payload (ticks): its time and a margin. */
@@ -84,7 +84,7 @@ public final class MirrorView {
         return !SPHERES.isEmpty();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -115,7 +115,7 @@ public final class MirrorView {
     }
 
     /** The slow sway of the camera inside. */
-    @SubscribeEvent
+    @Subscribe
     public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
         float d = depth((float) event.getPartialTick());
         if (d <= 0.001F || EnhancedClientConfig.reducedMotion()) {
@@ -126,7 +126,7 @@ public final class MirrorView {
     }
 
     /** The fog turns through the mirror's hues inside. */
-    @SubscribeEvent
+    @Subscribe
     public static void onFogColour(ViewportEvent.ComputeFogColor event) {
         float d = depth((float) event.getPartialTick());
         if (d <= 0.001F) {
@@ -150,7 +150,7 @@ public final class MirrorView {
     }
 
     /** The sphere's shell: a faint kaleidoscope of the mirror's hues, brighter at its rim. */
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || SPHERES.isEmpty()) {
             return;
@@ -187,7 +187,7 @@ public final class MirrorView {
     }
 
     /** The fractal mandalas at the edges of the screen, inside. */
-    @SubscribeEvent
+    @Subscribe
     public static void onGui(RenderGuiEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         float d = depth(event.getPartialTick().getGameTimeDeltaPartialTick(false));

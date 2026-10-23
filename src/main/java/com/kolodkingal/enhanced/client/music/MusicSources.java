@@ -76,7 +76,7 @@ public final class MusicSources {
             return source;
         }
 
-        @Override
+        // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
         public CompletableFuture<AudioStream> getStream(SoundBufferLibrary buffers, Sound sound, boolean looping) {
             if (source.file() == null) {
                 Enhanced.LOGGER.info("Music {}: plays {}", source.track(), source.describe());

@@ -152,7 +152,7 @@ public class SuitDisplayRenderer implements BlockEntityRenderer<SuitDisplayBlock
                 .scale(1.0F / 16.0F);
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(SuitDisplayBlockEntity display) {
         BlockPos pos = display.getBlockPos();
         return new AABB(pos).inflate(5.0, 0.0, 5.0).expandTowards(0.0, 4.0, 0.0);

@@ -4,16 +4,16 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.MusicSources;
 import com.kolodkingal.enhanced.client.music.ServerMusicClient;
 import com.kolodkingal.enhanced.music.MusicTracks;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.SelectMusicEvent;
 import com.kolodkingal.enhanced.road.RoadMusic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import java.util.List;
  * ({@code witches_road_<part>.ogg}, {@code witches_road.ogg} or {@code music.ogg} in its music folder) plays instead
  * ({@link MusicSources}); when the next part plays the same file, it simply goes on.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class RoadMusicPlayer {
     /** How fast a loop comes in (two seconds), and goes when the next stage's takes over (two) or the Road is left (three). */
     private static final float FADE_IN = 1.0F / 40.0F;
@@ -53,7 +53,7 @@ public final class RoadMusicPlayer {
         return stage;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
@@ -93,14 +93,14 @@ public final class RoadMusicPlayer {
     }
 
     /** The game's own music waits while the Road's plays. */
-    @SubscribeEvent
+    @Subscribe
     public static void onSelectMusic(SelectMusicEvent event) {
         if (isPlaying() && event.getMusic() != null) {
             event.setMusic(null);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         stop();
     }

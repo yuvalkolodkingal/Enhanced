@@ -1,9 +1,17 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.screen.XavierChoiceScreen;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
 import com.kolodkingal.enhanced.network.XavierPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.InputEvent;
+import com.kolodkingal.enhanced.platform.event.client.MovementInputUpdateEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderHandEvent;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
@@ -11,15 +19,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -34,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
  * <p><b>The client of a player he steers</b> ({@link Live#MIND_CONTROLLED}): their keys do not move them and their
  * clicks do nothing (the server holds the same line, and moves them itself); they can still look around.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class XavierControl {
     /** How long a link the server announced is believed before the synced data says so (ticks). */
     private static final int DATA_GRACE = 10;
@@ -131,7 +130,7 @@ public final class XavierControl {
     }
 
     /** His keys are read for the body he steers, then stopped; a steered player's keys are only stopped. */
-    @SubscribeEvent
+    @Subscribe
     public static void onMovementInput(MovementInputUpdateEvent event) {
         Input input = event.getInput();
         if (linked()) {
@@ -146,7 +145,7 @@ public final class XavierControl {
     }
 
     /** His clicks are the body's blows; a steered player's clicks do nothing. Neither swings an arm here. */
-    @SubscribeEvent
+    @Subscribe
     public static void onClick(InputEvent.InteractionKeyMappingTriggered event) {
         if (linked()) {
             if (event.isAttack()) {
@@ -160,7 +159,7 @@ public final class XavierControl {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -192,7 +191,7 @@ public final class XavierControl {
     }
 
     /** In the body he steers, the camera turns as his own mouse turns him: smooth, with no wait for the server. */
-    @SubscribeEvent
+    @Subscribe
     public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (cameraTaken && player != null && event.getCamera().getEntity() != player) {
@@ -203,14 +202,14 @@ public final class XavierControl {
     }
 
     /** His own hands are not drawn in another body's eyes. */
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderHand(RenderHandEvent event) {
         if (cameraTaken) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         hostId = -1;
         cameraTaken = false;

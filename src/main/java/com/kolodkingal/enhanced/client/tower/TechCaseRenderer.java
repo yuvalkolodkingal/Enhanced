@@ -83,7 +83,7 @@ public class TechCaseRenderer implements BlockEntityRenderer<TechCaseBlockEntity
         pose.popPose();
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(TechCaseBlockEntity box) {
         return new AABB(box.getBlockPos()).expandTowards(0.0, 0.5, 0.0);
     }

@@ -46,7 +46,7 @@ public class HofundSocketRenderer implements BlockEntityRenderer<HofundSocketBlo
         pose.popPose();
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(HofundSocketBlockEntity be) {
         return new AABB(be.getBlockPos()).expandTowards(0, 2, 0);
     }

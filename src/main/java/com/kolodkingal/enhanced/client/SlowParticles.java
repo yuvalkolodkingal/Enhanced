@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
+import com.kolodkingal.enhanced.mixin.client.ParticleAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.world.phys.Vec3;
@@ -39,7 +40,12 @@ public final class SlowParticles {
             return false;
         }
         List<Vec3> zones = SlowMotion.zones(mc.level);
-        return !zones.isEmpty() && SlowMotion.isInZone(mc.level, particle.getPos());
+        return !zones.isEmpty() && SlowMotion.isInZone(mc.level, position(particle));
+    }
+
+    private static Vec3 position(Particle particle) {
+        ParticleAccessor at = (ParticleAccessor) particle;
+        return new Vec3(at.enhanced$getX(), at.enhanced$getY(), at.enhanced$getZ());
     }
 
     private SlowParticles() {

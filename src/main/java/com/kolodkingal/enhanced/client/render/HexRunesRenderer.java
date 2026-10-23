@@ -5,6 +5,10 @@ import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexRuneLayout;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -12,10 +16,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.Collection;
@@ -34,7 +34,7 @@ import java.util.Collection;
  * Wanda inscribes them they are drawn stroke by stroke; when she wipes them they fade. Each breathes on its own beat with a
  * rare flicker; under Reduced motion they glow steady.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HexRunesRenderer {
     static final ResourceLocation GLOW_TEXTURE = Enhanced.id("textures/entity/hex_rune_glow.png");
     /** Ticks the strokes take to be drawn when Wanda inscribes the runes, and the runes to fade when she wipes them. */
@@ -86,7 +86,7 @@ public final class HexRunesRenderer {
      * after the clouds and the weather, which would otherwise be drawn over them (nothing here writes depth): first the
      * dark mist behind them, then their light.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER || Minecraft.getInstance().level == null) {
             return;

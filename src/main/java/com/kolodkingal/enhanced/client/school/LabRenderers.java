@@ -110,7 +110,7 @@ public final class LabRenderers {
             pose.popPose();
         }
 
-        @Override
+        // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
         public AABB getRenderBoundingBox(WeaponXPodBlockEntity be) {
             return new AABB(be.getBlockPos()).expandTowards(0, 1, 0).inflate(1.0);
         }
@@ -152,7 +152,7 @@ public final class LabRenderers {
             pose.popPose();
         }
 
-        @Override
+        // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
         public AABB getRenderBoundingBox(CerebroConsoleBlockEntity be) {
             return new AABB(be.getBlockPos()).expandTowards(0, 1, 0);
         }

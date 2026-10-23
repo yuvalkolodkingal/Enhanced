@@ -1,22 +1,21 @@
 package com.kolodkingal.enhanced.client.death;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.mixin.client.DeathScreenAccessor;
 import com.kolodkingal.enhanced.network.DeathMeetingPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ScreenEvent;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 
 /**
  * The client's side of the meeting with Death (3.7, lane L8): the server's {@link DeathMeetingPayload.Offer} arrives
@@ -24,7 +23,7 @@ import java.lang.reflect.Field;
  * {@link DeathMeetingScreen}. Without an offer (Death off on the server, hardcore, {@code doImmediateRespawn}), in a
  * hardcore world, or with {@code showDeathMeeting} off, vanilla's screen stays. Forgotten when he respawns or leaves.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class DeathMeetingClient {
     @Nullable
     private static DeathMeetingPayload.Offer offer;
@@ -33,8 +32,6 @@ public final class DeathMeetingClient {
     private static Component cause;
     /** Rio's line for this death (one of {@link DeathMeetingScreen#LINES}), kept while the screen opens again. */
     private static int line = -1;
-    @Nullable
-    private static final Field CAUSE = causeField();
 
     private DeathMeetingClient() {
     }
@@ -52,7 +49,7 @@ public final class DeathMeetingClient {
                 && !minecraft.level.getLevelData().isHardcore() && EnhancedClientConfig.showDeathMeeting();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onOpening(ScreenEvent.Opening event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (!(event.getNewScreen() instanceof DeathScreen death) || death instanceof DeathMeetingScreen
@@ -72,12 +69,12 @@ public final class DeathMeetingClient {
     }
 
     /** A respawn (the new body): she is gone. */
-    @SubscribeEvent
+    @Subscribe
     public static void onClone(ClientPlayerNetworkEvent.Clone event) {
         forget();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         forget();
     }
@@ -88,28 +85,9 @@ public final class DeathMeetingClient {
         line = -1;
     }
 
-    /** The cause vanilla's screen was given (a private field), or null. */
+    /** The cause vanilla's screen was given (a private field, read through an accessor), or null. */
     @Nullable
     private static Component causeOf(DeathScreen screen) {
-        if (CAUSE == null) {
-            return null;
-        }
-        try {
-            return (Component) CAUSE.get(screen);
-        } catch (ReflectiveOperationException | ClassCastException e) {
-            return null;
-        }
-    }
-
-    @Nullable
-    private static Field causeField() {
-        try {
-            Field field = DeathScreen.class.getDeclaredField("causeOfDeath");
-            field.setAccessible(true);
-            return field;
-        } catch (ReflectiveOperationException | RuntimeException e) {
-            Enhanced.LOGGER.warn("The death screen's cause is not readable; Death's screen shows none", e);
-            return null;
-        }
+        return ((DeathScreenAccessor) screen).enhanced$getCauseOfDeath();
     }
 }

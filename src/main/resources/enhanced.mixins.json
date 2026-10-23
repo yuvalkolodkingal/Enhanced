@@ -10,6 +10,7 @@
   "client": [
     "client.AbstractClientPlayerMixin",
     "client.CapeLayerMixin",
+    "client.DeathScreenAccessor",
     "client.HumanoidArmorLayerMixin",
     "client.ItemInHandLayerMixin",
     "client.ItemInHandRendererAccessor",
@@ -18,6 +19,7 @@
     "client.MinecraftAccessor",
     "client.MinecraftMixin",
     "client.MultiPlayerGameModeAccessor",
+    "client.ParticleAccessor",
     "client.ParticleEngineMixin",
     "client.ParticleMixin",
     "client.PlayerModelMixin",

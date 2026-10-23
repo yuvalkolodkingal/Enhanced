@@ -7,6 +7,11 @@ import com.kolodkingal.enhanced.client.ThanosAtmosphere;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.thanos.StoneKind;
@@ -26,11 +31,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -50,7 +50,7 @@ import static com.kolodkingal.enhanced.client.render.EnergyGeometry.argb;
  * <p>What lasts as long as a flag of the boss does (the Barrier and the Veil) is drawn from the flag, so a player who
  * comes late sees it too. Nothing here changes the world; every shape is made of the shapes in {@link FxShapes}.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ThanosFx {
     public static final ResourceLocation PORTAL_RING = Enhanced.id("textures/effect/portal_ring.png");
     public static final ResourceLocation MANDALA = Enhanced.id("textures/effect/stone_mandala.png");
@@ -198,7 +198,7 @@ public final class ThanosFx {
     // ---------------------------------------------------------------------------------------------------------
     // Every tick: the effects that leave particles, and the ones that have ended
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -252,7 +252,7 @@ public final class ThanosFx {
     // ---------------------------------------------------------------------------------------------------------
     // Drawing
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;

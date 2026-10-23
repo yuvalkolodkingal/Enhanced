@@ -2,10 +2,10 @@ package com.kolodkingal.enhanced.client.music;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.music.MusicTracks;
+import com.kolodkingal.enhanced.platform.Platform;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.JOrbisAudioStream;
 import net.minecraft.client.sounds.LoopingAudioStream;
-import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public final class CustomMusic {
             """;
 
     public static Path folder() {
-        return FMLPaths.CONFIGDIR.get().resolve(Enhanced.MODID).resolve("music");
+        return Platform.get().configDir().resolve(Enhanced.MODID).resolve("music");
     }
 
     /** Creates the folder (with a short explanation) so players can find it. */

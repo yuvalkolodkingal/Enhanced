@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.SpiderClimb;
@@ -16,6 +15,13 @@ import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSwingPayload;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.InputEvent;
+import com.kolodkingal.enhanced.platform.event.client.MovementInputUpdateEvent;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -25,8 +31,8 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.Input;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,13 +43,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -71,7 +70,7 @@ import org.lwjgl.glfw.GLFW;
  * still held the next web goes out as he begins to fall; between two webs the air's drag is eased so that he keeps his
  * speed. The anchor it would take next is shown ({@link #preview}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SpiderMotion {
     /** What he is doing with his own movement. */
     public enum Mode {
@@ -303,14 +302,14 @@ public final class SpiderMotion {
      * the start of a tick would miss it, and the clicks are the input handler's to consume): G starts a zip or a swing
      * on this client's own aim, and a press of Sneak + B asks for (or confirms) Instant Kill, which the HUD shows.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onKey(InputEvent.Key event) {
         if (event.getAction() == GLFW.GLFW_PRESS) {
             pressedKey(InputConstants.getKey(event.getKey(), event.getScanCode()));
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onMouse(InputEvent.MouseButton.Pre event) {
         if (event.getAction() == GLFW.GLFW_PRESS) {
             pressedKey(InputConstants.Type.MOUSE.getOrCreate(event.getButton()));
@@ -325,6 +324,7 @@ public final class SpiderMotion {
         }
         PowerData data = Powers.get(player);
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
+            // TODO(port seam) S1b: NeoForge's KeyMapping extension method until the platform has one.
             if (KeyBindings.ability(i).isActiveAndMatches(key)) {
                 // (Sneak as the keys are now: a press of Sneak and G together comes before the tick that crouches him.)
                 boolean sneaking = player.isShiftKeyDown() || mc.options.keyShift.isDown();
@@ -371,7 +371,7 @@ public final class SpiderMotion {
     }
 
     /** The keys that would move him are cleared on their way into the game while his own movement has him. */
-    @SubscribeEvent
+    @Subscribe
     public static void onMovementInput(MovementInputUpdateEvent event) {
         if (event.getEntity() != owner || (mode == Mode.NONE && mantleTicks <= 0)) {
             return;
@@ -390,7 +390,7 @@ public final class SpiderMotion {
     // The tick
     // =================================================================================================================
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         if (!(event.getEntity() instanceof LocalPlayer player)) {
             return;
@@ -463,7 +463,7 @@ public final class SpiderMotion {
      * not see that he clings. So while he hangs, the position goes to the server every tick that vanilla would not send
      * it.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTickPost(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;

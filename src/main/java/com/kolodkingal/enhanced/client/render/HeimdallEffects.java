@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.asgard.AsgardFx;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -8,6 +7,10 @@ import com.kolodkingal.enhanced.heimdall.HeimdallAbilities;
 import com.kolodkingal.enhanced.heimdall.HeimdallFx;
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -22,10 +25,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ import java.util.List;
  * {@link Live#HEIMDALL_WARD}). Each kind also starts its gesture on the caster. The Bifrost screen's Send mode and the
  * Watch's shadows are handed on to {@link BifrostScreen} and {@link HeimdallSightView}.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HeimdallEffects {
     /** The seven colours of the Bifrost, from red to violet. */
     private static final int[] RAINBOW = {0xFF5A5A, 0xFFA54A, 0xFFF06A, 0x7CFF8A, 0x5FD2FF, 0x7F7CFF, 0xD98CFF};
@@ -201,7 +200,7 @@ public final class HeimdallEffects {
     // ---------------------------------------------------------------------------------------------------------
     // Drawing
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;

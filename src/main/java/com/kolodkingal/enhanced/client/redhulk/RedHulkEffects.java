@@ -1,10 +1,13 @@
 package com.kolodkingal.enhanced.client.redhulk;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.RedHulkActing;
 import com.kolodkingal.enhanced.network.RedHulkFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -28,10 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +48,7 @@ import java.util.Map;
  * while he absorbs. The camera shakes for a player near a blow (not with the client option {@code reduceMotion}).
  * Every payload that names him also plays his gesture ({@link RedHulkActing#onPayload}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class RedHulkEffects {
     /** A ring running out over the ground: the smash's crumbs ({@code fire} false) or the burst's flames. */
     private record Ring(Vec3 center, float radius, long start, float speed, boolean fire) {
@@ -395,7 +394,7 @@ public final class RedHulkEffects {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCamera(ViewportEvent.ComputeCameraAngles event) {
         if (shake <= 0.01F || EnhancedClientConfig.reducedMotion() || Minecraft.getInstance().player == null) {
             return;

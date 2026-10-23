@@ -5,6 +5,11 @@ import com.kolodkingal.enhanced.client.render.BodyLean;
 import com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity;
 import com.kolodkingal.enhanced.ironman.nano.WingFormation;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
@@ -21,11 +26,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
@@ -44,7 +44,7 @@ import java.util.Map;
  * <p>In first person his own blades frame the screen: they sit in the camera's frame at its left and right edges, a
  * little low, turned to show their glowing faces, and never cross the middle; their lasers leave from there.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class WingDraw {
     static final ResourceLocation METAL = Enhanced.id("textures/entity/iron_man/wing_drone.png");
     static final ResourceLocation LIGHT = Enhanced.id("textures/entity/iron_man/wing_drone_glow.png");
@@ -239,7 +239,7 @@ public final class WingDraw {
         FOLDING.put(ownerId, new Seen(level.getGameTime(), seen.slots()));
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES || FOLDING.isEmpty()) {
             return;
@@ -277,7 +277,7 @@ public final class WingDraw {
     }
 
     /** Every tick: the nanites stream while blades form or fold; old records go. */
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;

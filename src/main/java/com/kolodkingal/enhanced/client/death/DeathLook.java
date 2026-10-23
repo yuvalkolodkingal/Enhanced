@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.death;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -38,12 +39,12 @@ public final class DeathLook {
 
     /** Dresses {@code rio} (the screen's own, not in any level) in Death's look. */
     public static void wear(AsgardianEntity rio) {
-        rio.getPersistentData().putBoolean(TAG, true);
+        ModAttachments.PERSISTENT_DATA.get(rio).putBoolean(TAG, true);
     }
 
     /** Whether {@code npc} wears Death's look (only the Rio of Death's screen). */
     public static boolean wears(AsgardianEntity npc) {
-        return npc.getPersistentData().getBoolean(TAG);
+        return ModAttachments.PERSISTENT_DATA.get(npc).getBoolean(TAG);
     }
 
     /** The crown of branches over the hood, drawn in the head's space (as a headgear of {@code AsgardianRenderer}). */

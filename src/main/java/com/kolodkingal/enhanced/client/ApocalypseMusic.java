@@ -1,10 +1,13 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseState;
 import com.kolodkingal.enhanced.client.render.ApocalypseBosses;
 import com.kolodkingal.enhanced.client.render.ApocalypseFxMath;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.SelectMusicEvent;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
@@ -13,10 +16,6 @@ import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -30,7 +29,7 @@ import java.util.function.Supplier;
  * client has left the world). It is a music-volume sound, so the Music slider controls it (silent at 0), and it is not the
  * film's score.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ApocalypseMusic {
     /** Within this many blocks of him the music is heard: full to {@link #FULL}, falling to nothing at the edge. */
     public static final double REACH = ApocalypseFxMath.MUSIC_REACH;
@@ -93,7 +92,7 @@ public final class ApocalypseMusic {
     }
 
     /** The game's own music waits while the fight's plays. */
-    @SubscribeEvent
+    @Subscribe
     public static void onSelectMusic(SelectMusicEvent event) {
         Music chosen = event.getMusic();
         if (playing && chosen != null) {
