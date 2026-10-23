@@ -1,4 +1,4 @@
-package com.kolodkingal.enhanced.gametest;
+package com.kolodkingal.enhanced.platform.neoforge.test.bridge;
 
 import com.kolodkingal.enhanced.platform.event.Cancellable;
 import com.kolodkingal.enhanced.platform.event.EventHub;

@@ -1,14 +1,4 @@
 # Port P0 lint allow-list of lane L8-infra: the files it still has to migrate (net.neoforged, @SubscribeEvent,
 # getPersistentData()/hasChannel outside platform/neoforge/**). Remove a line when its file is clean; delete
 # this file when the lane is done. build.gradle portLint (region "port P0 L8") reads it.
-src/gametest/java/com/kolodkingal/enhanced/gametest/AsgardSkeletonTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/AvengersSkeletonTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/BridgeHubTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/BridgeLivingTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/BridgePlayerTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/BridgeTestSupport.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/BridgeWorldTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/MutantSkeletonTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/SkeletonTests.java
-src/gametest/java/com/kolodkingal/enhanced/gametest/V31SkeletonTests.java
 src/main/java/com/kolodkingal/enhanced/network/ModNetwork.java

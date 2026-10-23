@@ -1,6 +1,7 @@
-package com.kolodkingal.enhanced.gametest;
+package com.kolodkingal.enhanced.platform.neoforge.test.bridge;
 
-import com.kolodkingal.enhanced.gametest.BridgeTestSupport.Bridged;
+import com.kolodkingal.enhanced.gametest.TestKit;
+import com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.Bridged;
 import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
 import com.kolodkingal.enhanced.platform.event.CanPlayerSleepEvent;
 import com.kolodkingal.enhanced.platform.event.ItemEntityPickupEvent;
@@ -36,8 +37,8 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 
-import static com.kolodkingal.enhanced.gametest.BridgeTestSupport.BATCH;
-import static com.kolodkingal.enhanced.gametest.BridgeTestSupport.bridge;
+import static com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.BATCH;
+import static com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.bridge;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;

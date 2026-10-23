@@ -12,6 +12,7 @@ src/gametest/java/com/kolodkingal/enhanced/gametest/MagnetoMetalTests.java
 src/gametest/java/com/kolodkingal/enhanced/gametest/OneOfEachTests.java
 src/gametest/java/com/kolodkingal/enhanced/gametest/PhoenixTests.java
 src/gametest/java/com/kolodkingal/enhanced/gametest/QuicksilverTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/SkeletonTests.java  # (L8 file) the PlayerEvent posts of aHeroPlugInIsCalledForTheRightPlayersAndOncePerSessionEvent reach event/CommonEvents: L1 makes them Events.post when it migrates CommonEvents
 src/gametest/java/com/kolodkingal/enhanced/gametest/SoundAssetTests.java
 src/gametest/java/com/kolodkingal/enhanced/gametest/SpeedsterWaterTests.java
 src/gametest/java/com/kolodkingal/enhanced/gametest/SpiderClientTests.java

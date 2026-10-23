@@ -248,11 +248,14 @@ neoForge.runs.configureEach {
 //   subscribe - @SubscribeEvent / @EventBusSubscriber (the mod's listeners are @Subscribe on the common events),
 //   hidden    - NeoForge extension calls no import shows: getPersistentData() (-> ModAttachments.PERSISTENT_DATA) and
 //               hasChannel( (-> the platform's channel check),
+//   impl      - the platform's NeoForge implementation (com.kolodkingal.enhanced.platform.neoforge, P1's neoforge/)
+//               outside platform/**,
 // outside platform/neoforge/** (main and gametest: the bridge, the platform implementation and the GameTest adapter)
-// and, for neoforge only, the two @Mod entries (Enhanced, client/EnhancedClient). While P0's lanes are in progress the
-// files each lane has still to migrate are listed in docs/port/lint/<lane>.txt (one path or glob per line, # comments);
-// a lane empties its list (deletes the file) when it is done, so the P0 gate has no list left. A listed file that is
-// clean already is reported, so lists only shrink. `./gradlew portLint` alone; `check` (and so `build`) runs it.
+// and, for neoforge and impl, the two @Mod entries (Enhanced, client/EnhancedClient). While P0's lanes are in
+// progress the files each lane has still to migrate are listed in docs/port/lint/<lane>.txt (one path or glob per
+// line, # comments); a lane removes its lines as it goes and deletes its file when it is done, so the P0 gate has no
+// list left. A listed file that is clean already is reported, so lists only shrink. `./gradlew portLint` alone;
+// `check` (and so `build`) runs it.
 abstract class PortLint extends DefaultTask {
     @InputFiles @PathSensitive(PathSensitivity.RELATIVE)
     abstract ConfigurableFileCollection getSources()
@@ -266,14 +269,16 @@ abstract class PortLint extends DefaultTask {
     @OutputFile
     abstract RegularFileProperty getReport()
 
-    private static final List<String> LOADER_DIRS = ['src/main/java/com/kolodkingal/enhanced/platform/neoforge/',
-                                                     'src/gametest/java/com/kolodkingal/enhanced/platform/neoforge/']
-    private static final List<String> MOD_ENTRIES = ['src/main/java/com/kolodkingal/enhanced/Enhanced.java',
-                                                     'src/main/java/com/kolodkingal/enhanced/client/EnhancedClient.java']
+    private static final String MOD = 'com/kolodkingal/enhanced/'
+    private static final List<String> LOADER_DIRS = ["src/main/java/${MOD}platform/neoforge/".toString(),
+                                                     "src/gametest/java/${MOD}platform/neoforge/".toString()]
+    private static final List<String> MOD_ENTRIES = ["src/main/java/${MOD}Enhanced.java".toString(),
+                                                     "src/main/java/${MOD}client/EnhancedClient.java".toString()]
     private static final Map<String, java.util.regex.Pattern> RULES = [
             neoforge : ~/\bnet\.neoforged\./,
             subscribe: ~/@(SubscribeEvent|EventBusSubscriber)\b/,
             hidden   : ~/\bgetPersistentData\(\s*\)|\.hasChannel\(/,
+            impl     : ~/\bcom\.kolodkingal\.enhanced\.platform\.neoforge\b/,
     ]
 
     /** The code of a Java file without its comments (string and char literals kept). */
@@ -326,7 +331,9 @@ abstract class PortLint extends DefaultTask {
             allowed[lane] = list.readLines('UTF-8').collect { it.replaceFirst(/#.*/, '').trim() }.findAll { it }
         }
         Map<String, java.nio.file.PathMatcher> matchers = [:]
-        allowed.each { lane, globs -> globs.each { matchers[it] = java.nio.file.FileSystems.default.getPathMatcher("glob:" + it) } }
+        allowed.each { lane, globs ->
+            globs.each { matchers[it] = java.nio.file.FileSystems.default.getPathMatcher("glob:" + it) }
+        }
 
         List<String> errors = []
         Map<String, Integer> waived = new TreeMap<>()
@@ -341,7 +348,8 @@ abstract class PortLint extends DefaultTask {
             String text = code(file.getText('UTF-8'))
             List<String> hits = []
             RULES.each { rule, pattern ->
-                if (rule == 'neoforge' && MOD_ENTRIES.contains(rel)) {
+                if ((rule == 'neoforge' || rule == 'impl') && MOD_ENTRIES.contains(rel)
+                        || rule == 'impl' && rel.contains('/enhanced/platform/')) {
                     return
                 }
                 def lines = text.readLines()
@@ -364,11 +372,14 @@ abstract class PortLint extends DefaultTask {
             }
         }
         List<String> stale = []
-        allowed.each { lane, globs -> globs.findAll { !usedGlobs.contains(it) }.each { stale << "${lane}: ${it}".toString() } }
+        allowed.each { lane, globs ->
+            globs.findAll { !usedGlobs.contains(it) }.each { stale << "${lane}: ${it}".toString() }
+        }
 
         StringBuilder out = new StringBuilder()
         out.append("Port lint: ${scanned} files outside platform/neoforge; ${errors.size()} new coupling(s); ")
-        out.append("allow-listed files still to migrate: ${waived.isEmpty() ? 'none' : waived.collect { l, c -> "$l $c" }.join(', ')}\n")
+        String lanes = waived.isEmpty() ? 'none' : waived.collect { l, c -> "$l $c" }.join(', ')
+        out.append("allow-listed files still to migrate: ${lanes}\n")
         if (!stale.isEmpty()) {
             out.append("Clean already, remove from docs/port/lint/ (${stale.size()}):\n")
             stale.each { out.append("  ").append(it).append('\n') }
@@ -377,8 +388,8 @@ abstract class PortLint extends DefaultTask {
         report.get().asFile.text = out.toString()
         logger.lifecycle(out.toString().trim())
         if (!errors.isEmpty()) {
-            throw new GradleException("Port lint: ${errors.size()} reference(s) to the loader outside platform/neoforge/** "
-                    + "(see above; the platform API replaces them, PLAN2 3.3). Report: ${report.get().asFile}")
+            throw new GradleException("Port lint: ${errors.size()} reference(s) to the loader outside "
+                    + "platform/neoforge/** (see above; the platform API replaces them, PLAN2 3.3). Report: ${report.get().asFile}")
         }
     }
 }
@@ -386,7 +397,8 @@ def portLint = tasks.register('portLint', PortLint) {
     group = 'verification'
     description = 'Fails on NeoForge API outside platform/neoforge/** and the @Mod entries (port P0).'
     root = layout.projectDirectory
-    sources.from(fileTree('src/main/java') { include '**/*.java' }, fileTree('src/gametest/java') { include '**/*.java' })
+    sources.from(fileTree('src/main/java') { include '**/*.java' },
+            fileTree('src/gametest/java') { include '**/*.java' })
     allowLists.from(fileTree('docs/port/lint') { include '*.txt' })
     report = layout.buildDirectory.file('reports/portLint.txt')
 }
