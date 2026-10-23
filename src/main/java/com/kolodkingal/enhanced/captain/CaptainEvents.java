@@ -1,8 +1,15 @@
 package com.kolodkingal.enhanced.captain;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.CaptainConfig;
 import com.kolodkingal.enhanced.network.CaptainFxPayload;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingShieldBlockEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.ServerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -16,14 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.List;
 
@@ -39,12 +38,12 @@ import java.util.List;
  * PlayerTickEvent.Post}: an axe never leaves his shield disabled ({@code axeDisables} off);</li> <li>{@link
  * ServerTickEvent.Post}: the bash's stuns run out.</li> </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class CaptainEvents {
     /** The ring and flash of a block at most this often (ticks) per player: lava does not ring every tick. */
     static final int BLOCK_FX_GAP = 4;
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onIncomingGuard(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -92,7 +91,7 @@ public final class CaptainEvents {
         return chest.add(CaptainAbilities.flat(dir).scale(0.6));
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onIncomingResistance(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
             return;
@@ -107,7 +106,7 @@ public final class CaptainEvents {
     }
 
     /** With {@code capBlocksEverything} off his raised Vibranium Shield is up at once (no 5-tick raise). */
-    @SubscribeEvent
+    @Subscribe
     public static void onShieldBlock(LivingShieldBlockEvent event) {
         if (event.getBlocked() || !(event.getEntity() instanceof Player player) || !ShieldRules.isCap(player)
                 || !player.isUsingItem() || !ShieldRules.isVibranium(player.getUseItem())) {
@@ -121,7 +120,7 @@ public final class CaptainEvents {
     }
 
     /** A projectile reaching his raised shield from the front bounces back toward its shooter. */
-    @SubscribeEvent
+    @Subscribe
     public static void onImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (!(projectile.level() instanceof ServerLevel level)
@@ -164,7 +163,7 @@ public final class CaptainEvents {
     }
 
     /** An axe never leaves Captain America's Vibranium Shield disabled (unless {@code axeDisables} says so). */
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || CaptainAbilities.cfg(CaptainConfig.AXE_DISABLES,
                 false) || !player.getCooldowns().isOnCooldown(ModItems.VIBRANIUM_SHIELD.get())
@@ -174,7 +173,7 @@ public final class CaptainEvents {
         player.getCooldowns().removeCooldown(ModItems.VIBRANIUM_SHIELD.get());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerTick(ServerTickEvent.Post event) {
         ShieldCharge.tickStuns(event.getServer());
     }

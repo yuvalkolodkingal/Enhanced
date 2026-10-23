@@ -15,6 +15,8 @@ import com.kolodkingal.enhanced.healing.HealingState;
 import com.kolodkingal.enhanced.healing.Regeneration;
 import com.kolodkingal.enhanced.healing.Rescue;
 import com.kolodkingal.enhanced.healing.Suppression;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -45,9 +47,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.EffectCures;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -321,7 +320,7 @@ public final class HealingTests {
         logan.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BREAD));
         zombieBlow(logan, zombie(helper, 9.5, 6.5));
         PlayerInteractEvent.RightClickItem use = new PlayerInteractEvent.RightClickItem(logan, InteractionHand.MAIN_HAND);
-        NeoForge.EVENT_BUS.post(use);
+        Events.post(use);
         check(use.isCanceled(), "his items are refused");
         Downed.login(logan);
         check(!down(logan) && !Powers.get(logan).is(Live.HEALING_DOWN) && logan.getHealth() >= 8.0F
@@ -399,7 +398,7 @@ public final class HealingTests {
         check(wade.isDeadOrDying(), "a zombie kills a poisoned healer");
         ticks(helper, 40, false, () -> {
             check(logan.getHealth() <= 10.0F, "nothing healed while poisoned: " + logan.getHealth());
-            logan.removeEffectsCuredBy(EffectCures.MILK);
+            Items.MILK_BUCKET.finishUsingItem(new ItemStack(Items.MILK_BUCKET), helper.getLevel(), logan);
             check(HealingFactor.active(logan), "milk turns it back on");
             HealingEvents.tick(logan);
             check(!Suppression.toldOff(logan), "and he is told");

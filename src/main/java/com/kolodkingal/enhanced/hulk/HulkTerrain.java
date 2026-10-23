@@ -4,9 +4,13 @@ import com.kolodkingal.enhanced.ability.BlockRights;
 import com.kolodkingal.enhanced.config.HulkConfig;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -24,6 +28,10 @@ import java.util.List;
  * player-caused explosion would (one block in {@code radius}).
  */
 public final class HulkTerrain {
+    /** The common {@code c:} tags of glass blocks and panes (the loaders' shared tags, as NeoForge's {@code Tags}). */
+    private static final TagKey<Block> GLASS_BLOCKS = commonTag("glass_blocks");
+    private static final TagKey<Block> GLASS_PANES = commonTag("glass_panes");
+
     /** What one of his moves may break. */
     public enum Kind {
         /** Hulk Smash: soft round his feet (radius 3), a crater of 1.5 with {@code all}. */
@@ -46,6 +54,10 @@ public final class HulkTerrain {
             this.crater = crater;
             this.glassOnly = glassOnly;
         }
+    }
+
+    private static TagKey<Block> commonTag(String name) {
+        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", name));
     }
 
     /** The mode in the config (soft when it is not loaded). */
@@ -81,8 +93,7 @@ public final class HulkTerrain {
             return false;
         }
         if (kind.glassOnly) {
-            return state.is(net.neoforged.neoforge.common.Tags.Blocks.GLASS_BLOCKS)
-                    || state.is(net.neoforged.neoforge.common.Tags.Blocks.GLASS_PANES)
+            return state.is(GLASS_BLOCKS) || state.is(GLASS_PANES)
                     || state.is(Blocks.SNOW) || state.is(Blocks.SNOW_BLOCK);
         }
         if (state.is(ModTags.HULK_SOFT)) {

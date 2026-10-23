@@ -1,7 +1,13 @@
 package com.kolodkingal.enhanced.hulk;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -15,13 +21,6 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,7 @@ import java.util.UUID;
  * and the Mind Stone's confusion slide off him ("Hulk too angry.");</li> <li>{@link LivingChangeTargetEvent}: a
  * Frightened creature does not turn on the one it fears.</li> </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class HulkEvents {
     /** The Hulk's own damage types: his moves' rage is in their numbers already. */
     private static final Set<net.minecraft.resources.ResourceKey<net.minecraft.world.damagesource.DamageType>> OWN =
@@ -60,7 +59,7 @@ public final class HulkEvents {
         return until != null && now <= until && until - now <= 600;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onFall(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSource().is(DamageTypeTags.IS_FALL)
                 && fallGuarded(player)) {
@@ -68,7 +67,7 @@ public final class HulkEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onBlow(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         if (!(source.getEntity() instanceof ServerPlayer hulk) || source.getDirectEntity() != hulk
@@ -86,7 +85,7 @@ public final class HulkEvents {
         HulkRage.landed(hulk, data);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onHurt(LivingDamageEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || event.getNewDamage() <= 0.0F) {
             return;
@@ -103,7 +102,7 @@ public final class HulkEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEffect(MobEffectEvent.Applicable event) {
         LivingEntity entity = event.getEntity();
         if (!(entity instanceof ServerPlayer player) || !HulkRage.enraged(player)) {
@@ -121,7 +120,7 @@ public final class HulkEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTarget(LivingChangeTargetEvent event) {
         LivingEntity target = event.getNewAboutToBeSetTarget();
         if (target != null && com.kolodkingal.enhanced.effect.FrightenedEffect.fears(event.getEntity(), target)) {

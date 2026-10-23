@@ -1,8 +1,13 @@
 package com.kolodkingal.enhanced.deadpool;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.DeadpoolConfig;
 import com.kolodkingal.enhanced.network.DeadpoolFxPayload;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -16,12 +21,6 @@ import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.List;
 
@@ -35,10 +34,10 @@ import java.util.List;
  * smoke blinded does not find him ({@link Taunt#keepsOff}).</li> </ul> (The healing factor's own rules are lane L1's,
  * in {@code healing/}: a creature that loses a downed healer is let go of by the taunt.)
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class DeadpoolEvents {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onProjectile(ProjectileImpactEvent event) {
         if (!(event.getRayTraceResult() instanceof EntityHitResult hit) || !(hit.getEntity() instanceof ServerPlayer
                 player)) {
@@ -78,7 +77,7 @@ public final class DeadpoolEvents {
                 1.1F + level.random.nextFloat() * 0.2F);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onGuarded(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         if (event.getEntity() instanceof ServerPlayer player && source.is(DamageTypeTags.IS_FALL)
@@ -92,7 +91,7 @@ public final class DeadpoolEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onParried(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -111,7 +110,7 @@ public final class DeadpoolEvents {
         DeadpoolAbilities.sound(level, at, ModSounds.DEADPOOL_PARRY.get(), 1.0F, 1.0F);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTarget(LivingChangeTargetEvent event) {
         if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide()) {
             return;

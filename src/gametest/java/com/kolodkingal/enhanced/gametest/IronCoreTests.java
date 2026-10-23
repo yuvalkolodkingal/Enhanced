@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.ironman.SuitPhases;
 import com.kolodkingal.enhanced.item.ArcReactorItem;
 import com.kolodkingal.enhanced.item.IronSuitItem;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.neoforge.NeoAttach;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
@@ -503,6 +504,7 @@ public final class IronCoreTests {
         step(helper, 10, () -> {
             ServerPlayer watcher = f.player(9.5, FLOOR, 5.5);
             List<Object> packets = new ArrayList<>();
+            // TODO(port seam): TestHooks for an attachment's first sync to a watcher and its receipt (l5.md, S5-3)
             AttachmentSync.syncInitialEntityAttachments(tony, watcher, packets::add);
             SyncAttachmentsPayload payload = null;
             for (Object p : packets) {
@@ -584,8 +586,8 @@ public final class IronCoreTests {
     /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
-        java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
-                .findResource("assets", Enhanced.MODID, "hero_presets", "iron_man.json");
+        java.nio.file.Path file = Platform.get().modResource("assets/" + Enhanced.MODID
+                + "/hero_presets/iron_man.json").orElseThrow();
         String json = java.nio.file.Files.readString(file, java.nio.charset.StandardCharsets.UTF_8);
         com.kolodkingal.enhanced.custom.HeroPresets.Preset preset =
                 com.kolodkingal.enhanced.custom.HeroPresets.read("iron_man", json);

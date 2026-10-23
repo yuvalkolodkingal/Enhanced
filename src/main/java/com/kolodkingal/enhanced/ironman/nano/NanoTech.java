@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -37,7 +38,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -86,8 +86,8 @@ public final class NanoTech {
 
     /** Whether his blows may hurt the creature (PvP, teams, pets, Creative, the area rule; passives too: aimed). */
     public static boolean mayHurt(ServerPlayer player, Entity target) {
-        LivingEntity living = target instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity p ? p
-                : target instanceof LivingEntity l ? l : null;
+        Entity parent = Platform.get().parts().parentOf(target);
+        LivingEntity living = parent instanceof LivingEntity p ? p : target instanceof LivingEntity l ? l : null;
         return living != null && living != player && living.isAlive() && !living.isSpectator()
                 && AreaTargets.mayHurt(player, living, true);
     }
@@ -216,8 +216,8 @@ public final class NanoTech {
             return new Ray(wall.point(), null, false, wall);
         }
         Entity target = hit instanceof EntityHitResult e ? e.getEntity() : null;
-        if (target instanceof PartEntity<?> part) {
-            target = part.getParent();
+        if (target != null && Platform.get().parts().isPart(target)) {
+            target = Platform.get().parts().parentOf(target);
         }
         return new Ray(hit.getLocation(), target, hit.getType() != HitResult.Type.MISS, null);
     }

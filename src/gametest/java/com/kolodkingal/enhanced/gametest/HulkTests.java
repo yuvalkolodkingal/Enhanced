@@ -28,6 +28,8 @@ import com.kolodkingal.enhanced.hulk.HulkTerrain;
 import com.kolodkingal.enhanced.hulk.SuperLeap;
 import com.kolodkingal.enhanced.hulk.ThunderClap;
 import com.kolodkingal.enhanced.network.HulkFxPayload;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -58,8 +60,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -184,8 +184,8 @@ public final class HulkTests {
                 e.setCanceled(true);
             }
         };
-        NeoForge.EVENT_BUS.addListener(listener);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+        EventHub.Registration registration = EventHub.of(BlockEvent.BreakEvent.class).register(listener);
+        f.onClose(registration::close);
     }
 
     static void mobGriefing(TestKit.Fixture f, boolean on) {

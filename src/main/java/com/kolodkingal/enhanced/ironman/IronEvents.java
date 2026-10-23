@@ -1,9 +1,17 @@
 package com.kolodkingal.enhanced.ironman;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.item.IronSuitItem;
 import com.kolodkingal.enhanced.item.NanoArcReactorItem;
+import com.kolodkingal.enhanced.platform.event.ItemAttributeModifierEvent;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEntityUseItemEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEquipmentChangeEvent;
+import com.kolodkingal.enhanced.platform.event.LivingFallEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.resources.ResourceLocation;
@@ -15,15 +23,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 /**
  * Iron Man's event hooks (3.8, lane L3). Priorities as {@code docs/HEROES-AND-BOSSES.md} lists them:
@@ -36,11 +35,11 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
  * <li>{@link ItemAttributeModifierEvent}: a classic suit's armour, toughness and knockback resistance are the server's
  * ({@code [mark_*]}) and stand for the whole set.</li> </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class IronEvents {
     private static final ResourceLocation CHEST_ARMOR = ResourceLocation.withDefaultNamespace("armor.chestplate");
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onFallDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSource().is(DamageTypeTags.IS_FALL)
                 && Mark1Moves.crashing(player)) {
@@ -48,14 +47,14 @@ public final class IronEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onFall(LivingFallEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && Mark1Moves.crashing(player)) {
             event.setDamageMultiplier(0.0F);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDamage(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || Powers.power(player) != Power.IRON_MAN) {
             return;
@@ -69,7 +68,7 @@ public final class IronEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTarget(LivingChangeTargetEvent event) {
         LivingEntity target = event.getNewAboutToBeSetTarget();
         if (target != null && event.getEntity() instanceof Mob mob && Mark3Moves.flared(mob, target)) {
@@ -77,14 +76,14 @@ public final class IronEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onUseItem(LivingEntityUseItemEvent.Start event) {
         if (event.getEntity() instanceof ServerPlayer player && IronSuits.state(player).inPhase()) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEquip(LivingEquipmentChangeEvent event) {
         if (event.getSlot() == EquipmentSlot.CHEST && event.getEntity() instanceof ServerPlayer player
                 && event.getTo().getItem() instanceof NanoArcReactorItem
@@ -93,7 +92,7 @@ public final class IronEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onAttributes(ItemAttributeModifierEvent event) {
         if (!(event.getItemStack().getItem() instanceof IronSuitItem suit) || !suit.kind().classic()) {
             return;

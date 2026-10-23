@@ -1,22 +1,21 @@
 package com.kolodkingal.enhanced.ironman.hulkbuster;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.ironman.nano.NanoTech;
+import com.kolodkingal.enhanced.platform.event.CanPlayerSleepEvent;
+import com.kolodkingal.enhanced.platform.event.EntityMountEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityMountEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
  * The Hulkbuster's event hooks (3.8, lane L4, PLAN 6.4). Priorities as {@code docs/HEROES-AND-BOSSES.md} lists them:
@@ -29,10 +28,10 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
  * <li>death: he is his own size at once; a logout forgets his moves.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class HulkbusterEvents {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Hulkbuster.applyBody(player);
@@ -45,7 +44,7 @@ public final class HulkbusterEvents {
         return Hulkbuster.onChest(player) && Hulkbuster.mayHaveBody(player);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onExplosion(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof Player player && event.getSource().is(DamageTypeTags.IS_EXPLOSION)
                 && wearing(player) && NanoTech.cfg(IronManConfig.HULKBUSTER_EXPLOSION_IMMUNE, true)) {
@@ -53,21 +52,21 @@ public final class HulkbusterEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onMount(EntityMountEvent event) {
         if (event.isMounting() && event.getEntityMounting() instanceof Player player && wearing(player)) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onSleep(CanPlayerSleepEvent event) {
         if (wearing(event.getEntity())) {
             event.setProblem(Player.BedSleepingProblem.OTHER_PROBLEM);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onDeath(LivingDeathEvent event) {
         if (!event.isCanceled() && event.getEntity() instanceof ServerPlayer player) {
             Hulkbuster.shrinkNow(player);
@@ -76,7 +75,7 @@ public final class HulkbusterEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             HulkbusterMoves.forget(player);
@@ -85,7 +84,7 @@ public final class HulkbusterEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onStopped(ServerStoppedEvent event) {
         HulkbusterMoves.clear();
         Veronica.clear();

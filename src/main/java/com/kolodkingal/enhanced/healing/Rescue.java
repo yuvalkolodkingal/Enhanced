@@ -51,6 +51,7 @@ public final class Rescue {
         if (feet.is(BlockTags.FIRE) || feet.is(Blocks.POWDER_SNOW)) {
             return true;
         }
+        // TODO(port seam): a platform "can drown in the fluid at his eyes" (NeoForge FluidType; notes l5.md, S5-2)
         FluidType eyes = player.getEyeInFluidType();
         return !eyes.isAir() && player.canDrownInFluidType(eyes) && !player.canBreatheUnderwater();
     }

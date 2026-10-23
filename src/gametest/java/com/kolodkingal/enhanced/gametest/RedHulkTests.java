@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroPresets;
 import com.kolodkingal.enhanced.hulk.HulkAbilities;
 import com.kolodkingal.enhanced.network.RedHulkFxPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -560,8 +561,8 @@ public final class RedHulkTests {
     /** His preset reads, is his hero's, and fits 60 points with no note. */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
-        java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
-                .findResource("assets", Enhanced.MODID, "hero_presets", "red_hulk.json");
+        java.nio.file.Path file = Platform.get().modResource("assets/" + Enhanced.MODID
+                + "/hero_presets/red_hulk.json").orElseThrow();
         String json = java.nio.file.Files.readString(file, java.nio.charset.StandardCharsets.UTF_8);
         HeroPresets.Preset preset = HeroPresets.read("red_hulk", json);
         check(preset != null && preset.like() == Power.RED_HULK, "the preset reads, like Red Hulk");

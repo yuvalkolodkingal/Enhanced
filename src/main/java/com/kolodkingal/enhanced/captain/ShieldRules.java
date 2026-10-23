@@ -32,6 +32,7 @@ public final class ShieldRules {
 
     /** Whether the stack is a shield of any kind (the Vibranium Shield, vanilla's, a mod's): what a throw may throw. */
     public static boolean isShield(ItemStack stack) {
+        // TODO(port seam): a platform "is a shield" (NeoForge ItemAbilities.SHIELD_BLOCK; notes l5.md, seam S5-1)
         return !stack.isEmpty() && stack.canPerformAction(ItemAbilities.SHIELD_BLOCK);
     }
 
