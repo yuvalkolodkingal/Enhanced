@@ -670,7 +670,7 @@ public final class AvengersSkeletonTests {
         ThorAbilities.onKey(thor, Powers.get(thor), 3, false, false);
         check(!Powers.get(thor).is(Live.CALLING_LIGHTNING), "and stops");
         // The pure stand-ins.
-        Zombie dummy = helper.spawn(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie dummy = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         dummy.setDeltaMovement(0.1, 0.2, 0.3);
         check(MissileGuidance.steer(dummy).equals(new Vec3(0.1, 0.2, 0.3)), "missiles fly straight");
         dummy.discard();
@@ -708,11 +708,11 @@ public final class AvengersSkeletonTests {
                 "20 blocks");
         check(otherData.isReady(HeroAbility.HULK_BOUND, now), "no cooldown asked or started: the caller's");
         ServerPlayer grabber = f.player(15.5, FLOOR, 3.5, Power.HULK);
-        Zombie first = helper.spawn(EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 5.5));
+        Zombie first = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 5.5));
         check(GrabSmash.start(grabber, Powers.get(grabber)) == first, "the Hulk grabs the zombie in front");
         check(!Powers.get(grabber).isReady(HeroAbility.HULK_GRAB_SMASH, now), "with his cooldown");
         ServerPlayer red = f.player(3.5, FLOOR, 12.5, Power.HULK);
-        Zombie second = helper.spawn(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 14.5));
+        Zombie second = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 14.5));
         check(GrabSmash.start(red, Powers.get(red), new double[]{5, 5, 7}, 8.0) == second,
                 "the grab with the numbers given");
         check(Powers.get(red).isReady(HeroAbility.HULK_GRAB_SMASH, now), "and no cooldown of the Hulk's");

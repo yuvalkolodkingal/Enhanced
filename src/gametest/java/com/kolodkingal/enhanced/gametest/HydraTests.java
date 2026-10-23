@@ -292,7 +292,7 @@ public final class HydraTests {
     public static void aRiflemanFiresBurstsOfThreeAndReloadsEverySix(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity rifleman = soldier(f, Rank.RIFLEMAN, 10.5, 2.5, 0.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 13.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 13.5));
         target.setInvulnerable(true);
         rifleman.setTarget(target);
         Map<UUID, Long> seen = new HashMap<>();
@@ -328,7 +328,7 @@ public final class HydraTests {
         HydraSoldierEntity friend = soldier(f, Rank.RIFLEMAN, 7.5, 10.5, -90.0F);
         shooter.setNoAi(true);
         friend.setNoAi(true);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         Vec3 from = helper.absoluteVec(new Vec3(5.0, FLOOR + 1.2, 10.5));
         HydraBoltEntity bolt = HydraBoltEntity.create(helper.getLevel(), shooter, from, new Vec3(1, 0, 0), 2.2, 4.0F,
                 20.0, HydraBoltEntity.RIFLE);
@@ -385,7 +385,7 @@ public final class HydraTests {
     public static void theSnipersLaserWarnsThirtyTicksBeforeHisShot(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity sniper = soldier(f, Rank.SNIPER, 10.5, 1.5, 0.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 18.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 18.5));
         target.setInvulnerable(true);
         AtomicLong laserAt = new AtomicLong(-1);
         f.everyTick(75, tick -> {
@@ -410,7 +410,7 @@ public final class HydraTests {
     public static void theEnforcersBatonHurtsAndSlows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity enforcer = soldier(f, Rank.ENFORCER, 8.5, 10.5, -90.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.0, FLOOR, 10.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.0, FLOOR, 10.5));
         f.everyTick(75, tick -> {
             enforcer.setTarget(target);
             if (target.getHealth() >= target.getMaxHealth()) {
@@ -569,7 +569,7 @@ public final class HydraTests {
     public static void aRiflemanButtStrikesWhoComesTooClose(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity rifleman = soldier(f, Rank.RIFLEMAN, 10.5, 10.5, -90.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.0, FLOOR, 10.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(12.0, FLOOR, 10.5));
         f.everyTick(50, tick -> {
             rifleman.setTarget(target);
             if (target.getHealth() >= target.getMaxHealth()) {
@@ -692,7 +692,7 @@ public final class HydraTests {
     public static void theStandInPillagersAreSentAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraOutposts.Outpost outpost = outpost(f);
-        Pillager pillager = helper.spawn(EntityType.PILLAGER, new Vec3(10.5, FLOOR, 12.5));
+        Pillager pillager = TestKit.spawn(helper, EntityType.PILLAGER, new Vec3(10.5, FLOOR, 12.5));
         check(HydraGarrison.sendPillagersAway(helper.getLevel(), outpost) >= 1 && pillager.isRemoved(),
                 "the pillager is gone");
         helper.succeed();
@@ -705,7 +705,7 @@ public final class HydraTests {
         HydraOutposts.Outpost outpost = outpost(f, new BlockPos(70, 2, 10), Rotation.NONE, SHRINK);
         HydraSoldierEntity soldier = posted(outpost, Post.GATE_WEST.ordinal(),
                 soldier(f, Rank.RIFLEMAN, 5.5, 5.5, 0.0F));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(5.5, FLOOR, 9.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(5.5, FLOOR, 9.5));
         soldier.setTarget(villager);
         f.everyTick(10, tick -> tick == 10 && soldier.getTarget() == null);
     }
@@ -962,7 +962,7 @@ public final class HydraTests {
         officer.setNoAi(true);
         HydraSoldierEntity loyal = soldier(f, Rank.ENFORCER, 10.5, 16.5, 180.0F);
         loyal.setNoAi(true);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
         ItemStack scepter = new ItemStack(ModItems.LOKIS_SCEPTER.get());
         scepter.getItem().hurtEnemy(scepter, soldier, loki);
         check(soldier.isTurned() && soldier.turnedBy(loki), "the Scepter turned him");
@@ -1016,7 +1016,8 @@ public final class HydraTests {
         b.setNoAi(true);
         a.addEffect(new MobEffectInstance(ModEffects.POSSESSED, 200, 0), phoenix);
         check(HydraLoyalty.isTraitor(a) && !HydraLoyalty.sameSide(a, b), "a possessed soldier is not their side");
-        check(!HydraLoyalty.turn(helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 3.5)), phoenix,
+        check(!HydraLoyalty.turn(TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 3.5)),
+                phoenix,
                 100), "the seam turns only Hydra");
         check(HydraLoyalty.turn(b, phoenix, 100) && b.turnedTicksLeft() == 100, "the Mind Stone's command turns him");
         helper.succeed();

@@ -628,14 +628,14 @@ public final class ItemsTests {
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
         VishantiBook.savePlace(loki, "Fort", true);
         Vec3 center = loki.position();
-        Zombie near = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
-        Zombie deep = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 11.5));
-        Zombie outside = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(19.5, FLOOR, 10.5));
+        Zombie near = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        Zombie deep = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 11.5));
+        Zombie outside = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(19.5, FLOOR, 10.5));
         // The arena's ceiling lets the sun through: a zombie may burn by day, and "nobody was hurt" is about the ward alone.
         for (Zombie zombie : List.of(near, deep, outside)) {
             zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1000));
         }
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 9.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 9.5));
         Vec3 pigAt = pig.position();
         Vec3 outsideAt = outside.position();
         float health = near.getHealth();
@@ -672,7 +672,7 @@ public final class ItemsTests {
         check(!WardManager.keepsOut(EntityType.PIG) && !WardManager.keepsOut(EntityType.VILLAGER) && !WardManager.keepsOut(EntityType.IRON_GOLEM)
                         && !WardManager.keepsOut(EntityType.PLAYER),
                 "animals, villagers, golems and players are not monsters");
-        Mob wither = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(12.5, FLOOR + 1.0, 10.5));
+        Mob wither = TestKit.spawnWithNoFreeWill(helper, EntityType.WITHER, new Vec3(12.5, FLOOR + 1.0, 10.5));
         wither.setCustomName(net.minecraft.network.chat.Component.literal("Named"));
         check(!WardManager.exempt(wither), "a boss is never let through, whatever it is called (it is pushed out like any monster)");
         wither.discard();
@@ -869,7 +869,7 @@ public final class ItemsTests {
         store.put(new Ward(offline, "Away", center, 6, Power.LOKI.color));
         f.onClose(() -> WardManager.removeAll(level.getServer(), offline));
         ServerPlayer watcher = f.player(3.5, FLOOR, 3.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1000));
         Vec3 at = zombie.position();
         check(!WardManager.protects(level, center) && !WardManager.forbidsSpawn(level, EntityType.ZOMBIE, center), "the ward protects nothing and refuses no spawn");
@@ -887,12 +887,13 @@ public final class ItemsTests {
         TestKit.Fixture f = wardFixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
         VishantiBook.savePlace(loki, "Fort", true);
-        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 10.5));
-        Zombie named = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 9.0));
+        Zombie plain = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 10.5));
+        Zombie named = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 9.0));
         named.setCustomName(Component.literal("Zed"));
-        Zombie leashed = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.0));
+        Zombie leashed = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.0));
         leashed.setLeashedTo(loki, true);
-        ZombieVillager curing = helper.spawnWithNoFreeWill(EntityType.ZOMBIE_VILLAGER, new Vec3(10.5, FLOOR, 13.5));
+        ZombieVillager curing = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE_VILLAGER,
+                new Vec3(10.5, FLOOR, 13.5));
         // (The cure: weakness, then a golden apple.)
         curing.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 1000, 0));
         loki.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GOLDEN_APPLE));
@@ -933,9 +934,9 @@ public final class ItemsTests {
         check(WardManager.hazardous(level, body), "and magma underfoot");
         level.setBlockAndUpdate(spot.below(), Blocks.SMOOTH_STONE.defaultBlockState());
         check(!WardManager.hazardous(level, body), "the floor is back");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
-        Mob phantom = helper.spawnWithNoFreeWill(EntityType.PHANTOM, new Vec3(8.5, FLOOR + 3.0, 6.5));
-        Mob guardian = helper.spawnWithNoFreeWill(EntityType.GUARDIAN, new Vec3(8.5, FLOOR + 3.0, 4.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        Mob phantom = TestKit.spawnWithNoFreeWill(helper, EntityType.PHANTOM, new Vec3(8.5, FLOOR + 3.0, 6.5));
+        Mob guardian = TestKit.spawnWithNoFreeWill(helper, EntityType.GUARDIAN, new Vec3(8.5, FLOOR + 3.0, 4.5));
         check(WardManager.needsGround(zombie) && !WardManager.needsGround(phantom) && !WardManager.needsGround(guardian),
                 "a walker needs a floor, a flier and a swimmer do not (whatever they are doing at the instant of the look)");
         phantom.discard();

@@ -567,14 +567,14 @@ public final class CrossHeroTests {
         static Village round(TestKit.Fixture f, ServerPlayer caster, double x, double z) {
             GameTestHelper helper = f.helper();
             ServerPlayer neighbour = f.player(x + 3.0, FLOOR, z - 3.0);
-            Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(x + 3.0, FLOOR, z));
-            IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(x, FLOOR, z + 3.0));
-            Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(x - 3.0, FLOOR, z + 1.0));
-            Wolf othersPet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(x, FLOOR, z - 3.0));
+            Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(x + 3.0, FLOOR, z));
+            IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(x, FLOOR, z + 3.0));
+            Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(x - 3.0, FLOOR, z + 1.0));
+            Wolf othersPet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(x, FLOOR, z - 3.0));
             othersPet.tame(neighbour);
-            Wolf ownPet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(x + 2.0, FLOOR, z + 2.0));
+            Wolf ownPet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(x + 2.0, FLOOR, z + 2.0));
             ownPet.tame(caster);
-            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x - 2.0, FLOOR, z - 2.0));
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x - 2.0, FLOOR, z - 2.0));
             zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
             zombie.setHealth(200.0F);
             Map<LivingEntity, Float> health = new LinkedHashMap<>();

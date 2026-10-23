@@ -75,7 +75,7 @@ public final class CustomHeroModuleTests {
     }
 
     static Zombie zombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setNoAi(true);
         zombie.setPersistenceRequired();
         return zombie;
@@ -611,7 +611,7 @@ public final class CustomHeroModuleTests {
     public static void animalControlMakesAPack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.ANIMAL_CONTROL, "pack", 10);
-        Cow cow = helper.spawn(EntityType.COW, new Vec3(6.5, FLOOR, 12.5));
+        Cow cow = TestKit.spawn(helper, EntityType.COW, new Vec3(6.5, FLOOR, 12.5));
         Zombie z = zombie(helper, 10.5, 10.5);
         aim(player, z);
         press(player);
@@ -647,7 +647,7 @@ public final class CustomHeroModuleTests {
         check(helper.getBlockState(door).getValue(BlockStateProperties.OPEN), "the door opened");
         check(helper.getBlockState(lever).getValue(BlockStateProperties.POWERED), "the lever flipped");
         become(player, PowerModule.TECHNOPATHY, "command", 10);
-        IronGolem golem = helper.spawn(EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, 12.5));
+        IronGolem golem = TestKit.spawn(helper, EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, 12.5));
         press(player);
         check(MindPowers.control(golem) != null && MindPowers.control(golem).kind() == MindPowers.Kind.ALLY, "the golem obeys");
         helper.succeed();

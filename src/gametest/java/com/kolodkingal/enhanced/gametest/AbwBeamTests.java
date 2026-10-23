@@ -56,7 +56,7 @@ public final class AbwBeamTests {
 
     private static Pig dummy(GameTestHelper helper, double x, double z) {
         // (A pig: it has no armour to take a part of the damage.)
-        return helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(x, FLOOR, z));
     }
 
     private static TestKit.Fixture beamFixture(GameTestHelper helper) {

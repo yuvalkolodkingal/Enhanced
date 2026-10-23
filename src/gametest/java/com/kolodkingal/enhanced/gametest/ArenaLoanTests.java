@@ -170,7 +170,7 @@ public final class ArenaLoanTests {
 
     /** A zombie that stands still and does not burn in the sun (the tests run by day). */
     private static Zombie stillZombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         return zombie;
     }
@@ -801,7 +801,7 @@ public final class ArenaLoanTests {
                 check(helper.getBlockState(hanging).is(Blocks.SAND), "(b) it stays");
                 // (c)
                 dropDust(wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, lowGravel));
-                zombie[0] = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(lowGravel.getX() + 0.5, FLOOR, lowGravel.getZ() + 0.5));
+                zombie[0] = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(lowGravel.getX() + 0.5, FLOOR, lowGravel.getZ() + 0.5));
                 zombie[0].setBaby(true);
                 check(borrow(helper, wanda, Telekinesis.Mode.WANDA, highGravel) == null && ArenaLoans.HANGING.equals(lastActionBarKey(wanda)),
                         "(c) the gravel over the open home hangs: not lent");
@@ -1005,7 +1005,7 @@ public final class ArenaLoanTests {
                 return false;
             }
             if (tick == 25) {
-                Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 13.5));
+                Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 13.5));
                 lookAt(wanda, zombie);
                 pressV(wanda, false);
                 check(Telekinesis.holds(wanda, zombie), "she takes hold of a zombie");

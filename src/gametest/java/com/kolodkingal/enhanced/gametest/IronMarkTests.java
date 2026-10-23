@@ -51,8 +51,8 @@ public final class IronMarkTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no AI unless {@code free}). */
     static Husk husk(GameTestHelper helper, double x, double z, boolean free) {
-        Husk husk = free ? helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z))
-                : helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = free ? TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z))
+                : TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);

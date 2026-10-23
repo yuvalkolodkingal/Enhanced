@@ -85,12 +85,12 @@ public final class CustomWitchTests {
     }
 
     private static Pig pig(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(x, FLOOR, z));
     }
 
     /** A hostile creature that stands still and does not burn in the sun. */
     private static Zombie husk(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
     }
 
     private static long now(GameTestHelper helper) {

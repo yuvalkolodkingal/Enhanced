@@ -61,7 +61,7 @@ public final class AbwBarrierTests {
     }
 
     private static void arrowBlow(GameTestHelper helper, ServerPlayer victim, Vec3 from, float damage) {
-        Skeleton shooter = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
+        Skeleton shooter = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
         shooter.setNoAi(true);
         Arrow arrow = new Arrow(helper.getLevel(), shooter, new ItemStack(Items.ARROW), null);
         arrow.setPos(from);
@@ -71,7 +71,7 @@ public final class AbwBarrierTests {
     }
 
     private static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.setNoAi(true);
         return husk;
     }

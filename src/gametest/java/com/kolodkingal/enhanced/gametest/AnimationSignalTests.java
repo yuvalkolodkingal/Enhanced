@@ -87,7 +87,7 @@ public final class AnimationSignalTests {
     public static void aMoveThatWorksStartsItsCooldownAndRaisesItsState(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         lookAt(billy, pig);
         press(billy, 1);
         PowerTicker.tick(billy);
@@ -97,7 +97,7 @@ public final class AnimationSignalTests {
         check(!ready(billy, 4) && Powers.get(billy).is(Live.FREEZING), "freezing a creature starts the cooldown and the freezing state");
 
         ServerPlayer tommy = f.player(4.5, FLOOR, 4.5, Power.TOMMY);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 4.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 4.5));
         lookAt(tommy, zombie);
         press(tommy, 5);
         check(!ready(tommy, 5), "Molecular Acceleration on a creature starts its cooldown");
@@ -129,7 +129,7 @@ public final class AnimationSignalTests {
     public static void telekinesisNamesWhatItHolds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
         lookAt(wanda, pig);
         PowerData data = Powers.get(wanda);
         press(wanda, 3);
@@ -159,7 +159,7 @@ public final class AnimationSignalTests {
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
         lookAt(thor, zombie);
         PowerData data = Powers.get(thor);
         press(thor, 1);

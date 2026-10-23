@@ -129,7 +129,7 @@ public final class OdinTests {
 
     /** A husk with no armour and 200 health that stands where it is put. */
     private static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -413,7 +413,7 @@ public final class OdinTests {
         PowerData data = Powers.get(odin);
         press(odin, 2, false);
         check(data.chaosShieldActive(), "G raises it");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         f.everyTick(40, tick -> {
             PowerTicker.tick(odin);
             if (tick == OdinAbilities.SHIELD_WIND_UP + 2) {
@@ -444,7 +444,7 @@ public final class OdinTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 10.5, 10.5);
         ServerPlayer friend = f.player(12.5, FLOOR, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 10.5));
         odin.setHealth(10.0F);
         friend.setHealth(6.0F);
         friend.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0));
@@ -465,20 +465,20 @@ public final class OdinTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 3.5, 10.5);
         PowerData data = Powers.get(odin);
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(9.5, FLOOR, 10.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(9.5, FLOOR, 10.5));
         lookAt(odin, cow);
         check(OdinAbilities.banish(odin, data) == OdinAbilities.Banished.NONE && cow.isAlive(), "a cow means no harm: spared");
         check(data.isReady(HeroAbility.ODIN_BANISH, now(odin)), "and that costs nothing");
         cow.discard();
 
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         lookAt(odin, zombie);
         check(OdinAbilities.banish(odin, data) == OdinAbilities.Banished.GONE && zombie.isRemoved(), "the zombie is banished");
         check(f.level().getEntitiesOfClass(ItemEntity.class, zombie.getBoundingBox().inflate(3)).isEmpty(), "leaving nothing");
         check(!data.isReady(HeroAbility.ODIN_BANISH, now(odin)), "V rests");
 
         ServerPlayer second = odin(f, 3.5, 5.5);
-        Zombie named = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 5.5));
+        Zombie named = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 5.5));
         named.setCustomName(Component.literal("Gorm"));
         lookAt(second, named);
         float before = named.getHealth();

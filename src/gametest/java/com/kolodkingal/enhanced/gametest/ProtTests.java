@@ -91,7 +91,7 @@ public final class ProtTests {
         Hex hex = hexOf(f, wanda);
         HexManager.handleAction(wanda, HexAction.SET_CREATURES, Optional.empty(), 1);
         hex = hexOf(f, wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 3.0));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 3.0));
         check(HexManager.judge(hex, zombie) == HexManager.Verdict.PASS, "creatures allowed: a zombie may come in");
         net.minecraft.world.entity.LivingEntity boss = ModEntities.THANOS.get().create(helper.getLevel());
         check(boss != null && HexManager.judge(hex, boss) != HexManager.Verdict.PASS, "but never a boss");
@@ -166,9 +166,9 @@ public final class ProtTests {
     public static void projectilesStopAtTheWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(10.5, FLOOR, 1.0));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(10.5, FLOOR, 1.0));
         skeleton.setNoAi(true);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
         Vec3 from = abs(helper, 10.5, FLOOR + 0.6, 1.5);
         arrow.setPos(from);
@@ -197,7 +197,7 @@ public final class ProtTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
         ServerPlayer thor = f.player(10.5, FLOOR, 1.0, Power.THOR);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
         TestKit.lookAt(thor, pig);
         WandaAbilities.ShieldStop stop = WandaAbilities.shieldAcross(helper.getLevel(), thor, thor.getEyePosition(), Shelters.middle(pig), 1.0F);
         check(stop != null && stop.wall() == Shelters.Wall.HEX, "Thor's beam ends at the wall: " + stop);
@@ -216,7 +216,7 @@ public final class ProtTests {
         ServerPlayer wanda = HexTests.raiseHex(f);
         ServerPlayer friend = f.player(10.5, FLOOR, 3.5);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(friend.getUUID()), 1);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 1.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 1.5));
         ServerPlayer thor = f.player(1.5, FLOOR, 1.5, Power.THOR);
         f.pvp(true);
         check(!friend.hurt(helper.getLevel().damageSources().mobAttack(zombie), 4.0F), "the zombie's blow across the wall does nothing");
@@ -233,7 +233,7 @@ public final class ProtTests {
         ServerPlayer wanda = HexTests.raiseHex(f);
         BlockPos inside = BlockPos.containing(10.5, FLOOR, 4.5);
         helper.setBlock(inside, Blocks.STONE);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 4.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 4.0));
         Vec3 at = abs(helper, 10.5, FLOOR + 0.5, 1.5);
         helper.getLevel().explode(null, at.x, at.y, at.z, 4.0F, Level.ExplosionInteraction.TNT);
         helper.assertBlockPresent(Blocks.STONE, inside);
@@ -249,7 +249,7 @@ public final class ProtTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
         ServerPlayer billy = f.player(10.5, FLOOR, 1.0, Power.BILLY);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 5.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 5.0));
         check(!pig.addEffect(new MobEffectInstance(ModEffects.SPELLBOUND, 100), billy), "Billy's spell does not cross the wall");
         check(pig.addEffect(new MobEffectInstance(MobEffects.GLOWING, 100), wanda), "hers does");
         helper.succeed();
@@ -274,8 +274,8 @@ public final class ProtTests {
     public static void areaAttacksSpareWhatIsInside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HexTests.raiseHex(f);
-        Zombie inside = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 5.0));
-        Zombie outside = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 1.0));
+        Zombie inside = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 5.0));
+        Zombie outside = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 1.0));
         ServerPlayer phoenix = f.player(10.5, FLOOR, 1.0, Power.PHOENIX);
         check(!AreaTargets.mayHurt(phoenix, inside, false), "the zombie inside is out of her reach");
         check(AreaTargets.mayHurt(phoenix, outside, false), "the one outside is not");
@@ -326,7 +326,7 @@ public final class ProtTests {
         ward(f, 6);
         ServerPlayer player = f.player(10.5, FLOOR, 1.0);
         ServerPlayer inside = f.player(10.5, FLOOR, 10.5);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.0, FLOOR, 1.0));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(3.0, FLOOR, 1.0));
         skeleton.setNoAi(true);
         check(!inside.hurt(helper.getLevel().damageSources().mobAttack(skeleton), 3.0F), "a monster's harm from outside does not reach in");
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);

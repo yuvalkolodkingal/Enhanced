@@ -128,7 +128,7 @@ public final class FalconTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no blow moves it). */
     static Husk husk(GameTestHelper helper, double x, double y, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, y, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, y, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);

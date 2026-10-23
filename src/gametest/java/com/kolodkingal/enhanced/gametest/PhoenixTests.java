@@ -164,7 +164,7 @@ public final class PhoenixTests {
 
     /** A husk, which stands still and does not burn in the sun (a zombie does, in a test that runs by day). */
     static Zombie zombie(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
     }
 
     /** The action-bar lines the server has sent the player since the last call. */
@@ -424,7 +424,7 @@ public final class PhoenixTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
         Zombie zombie = zombie(helper, 10.5, 10.5);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(15.5, FLOOR, 15.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(15.5, FLOOR, 15.5));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         lookAt(jean, zombie);
@@ -537,12 +537,12 @@ public final class PhoenixTests {
         ServerPlayer jean = jean(f, 10.5, 10.5);
         ServerPlayer creative = f.player(14.5, FLOOR, 10.5, GameType.CREATIVE);
         ServerPlayer spectator = f.player(6.5, FLOOR, 10.5, GameType.SPECTATOR);
-        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(10.5, FLOOR, 14.5));
+        ArmorStand stand = TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(10.5, FLOOR, 14.5));
         ServerPlayer magneto = f.player(10.5, FLOOR, 6.5, Power.MAGNETO);
         magneto.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
         ServerPlayer loki = f.player(1.5, FLOOR, 1.5, Power.LOKI);
         LokiIllusionEntity copy = LokiIllusionEntity.conjure(loki, helper.absoluteVec(new Vec3(13.5, FLOOR, 13.5)), null, LokiIllusionEntity.Mode.DECOY, 200);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(7.5, FLOOR, 7.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(7.5, FLOOR, 7.5));
 
         for (Entity unreadable : List.of(creative, spectator, stand)) {
             lookAt(jean, unreadable);
@@ -725,12 +725,12 @@ public final class PhoenixTests {
         ServerPlayer jean = jean(f, 10.5, 10.5);
         zombie(helper, 13.5, 10.5);
         zombie(helper, 7.5, 10.5);
-        helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 14.5));
+        TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 14.5));
         f.player(8.5, FLOOR, 13.5);
         ServerPlayer magneto = f.player(10.5, FLOOR, 7.5, Power.MAGNETO);
         magneto.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
         f.player(12.5, FLOOR, 12.5, GameType.CREATIVE);
-        helper.spawn(EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 8.5));
+        TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 8.5));
         ServerPlayer loki = f.player(1.5, FLOOR, 1.5, Power.LOKI);
         LokiIllusionEntity.conjure(loki, helper.absoluteVec(new Vec3(12.5, FLOOR, 8.5)), null, LokiIllusionEntity.Mode.DECOY, 200);
 
@@ -920,7 +920,7 @@ public final class PhoenixTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
         PowerData data = Powers.get(jean);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
         lookAt(jean, pig);
         press(jean, 3);
         check(Telekinesis.isHolding(jean), "lifted");
@@ -943,7 +943,7 @@ public final class PhoenixTests {
         check(Telekinesis.Mode.WANDA.color == Power.SCARLET_WITCH.color && Telekinesis.Mode.BILLY.color == Power.BILLY.color
                 && Telekinesis.Mode.MAGNETO.color == Power.MAGNETO.color, "the others keep the colour of their power");
         ServerPlayer jean = jean(f, 4.5, 10.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
         lookAt(jean, pig);
         TestKit.sentPackets(jean);
         press(jean, 3);
@@ -975,7 +975,7 @@ public final class PhoenixTests {
         ServerPlayer jean = jean(f, 4.5, 10.5);
         PowerData data = Powers.get(jean);
         Zombie host = zombie(helper, 9.5, 10.5);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
         lookAt(jean, host);
         float exhaustion = jean.getFoodData().getExhaustionLevel();
         long now = level.getGameTime();
@@ -1012,16 +1012,16 @@ public final class PhoenixTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 5.5, 10.5);
         Zombie host = zombie(helper, 7.5, 10.5);
-        Skeleton nearest = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(9.5, FLOOR, 10.5));
-        Spider hit = helper.spawnWithNoFreeWill(EntityType.SPIDER, new Vec3(12.5, FLOOR, 12.5));
-        Creeper hurter = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(14.5, FLOOR, 6.5));
-        Pig bystander = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 6.5));
+        Skeleton nearest = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(9.5, FLOOR, 10.5));
+        Spider hit = TestKit.spawnWithNoFreeWill(helper, EntityType.SPIDER, new Vec3(12.5, FLOOR, 12.5));
+        Creeper hurter = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(14.5, FLOOR, 6.5));
+        Pig bystander = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(6.5, FLOOR, 6.5));
         lookAt(jean, host);
         press(jean, 4);
         check(host.hasEffect(ModEffects.POSSESSED), "possessed");
         check(host.getTarget() == nearest, "with nothing else to go for, the nearest hostile: " + host.getTarget());
         // A boss is never sent for, however near it stands.
-        WitherBoss boss = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(7.5, FLOOR, 11.5));
+        WitherBoss boss = TestKit.spawnWithNoFreeWill(helper, EntityType.WITHER, new Vec3(7.5, FLOOR, 11.5));
         PhoenixAbilities.steer(host);
         check(host.getTarget() == nearest, "never a boss, though it stands nearer: " + host.getTarget());
         boss.discard();
@@ -1035,7 +1035,7 @@ public final class PhoenixTests {
         check(host.getTarget() == hurter, "and the one that last hurt her before that: " + host.getTarget());
 
         // Never her pets, her hosts or the passive.
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
         pet.tame(jean);
         jean.setLastHurtMob(pet);
         jean.setLastHurtByMob(null);
@@ -1061,9 +1061,9 @@ public final class PhoenixTests {
     public static void aPossessedCreatureWithABrainNeverTurnsOnHerSide(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
-        Hoglin host = helper.spawnWithNoFreeWill(EntityType.HOGLIN, new Vec3(8.5, FLOOR, 10.5));
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(6.5, FLOOR, 6.5));
+        Hoglin host = TestKit.spawnWithNoFreeWill(helper, EntityType.HOGLIN, new Vec3(8.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(6.5, FLOOR, 6.5));
         pet.tame(jean);
         lookAt(jean, host);
         press(jean, 4);
@@ -1098,7 +1098,7 @@ public final class PhoenixTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
         Zombie host = zombie(helper, 9.5, 10.5);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(12.5, FLOOR, 14.5));
         lookAt(jean, host);
         press(jean, 4);
         check(host.hasEffect(ModEffects.POSSESSED) && host.getTarget() == skeleton, "taken, and sent after the skeleton");
@@ -1164,7 +1164,7 @@ public final class PhoenixTests {
         magneto.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
         ServerPlayer loki = f.player(1.5, FLOOR, 1.5, Power.LOKI);
         LokiIllusionEntity copy = LokiIllusionEntity.conjure(loki, helper.absoluteVec(new Vec3(14.5, FLOOR, 13.5)), null, LokiIllusionEntity.Mode.DECOY, 200);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(6.5, FLOOR, 14.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(6.5, FLOOR, 14.5));
         for (LivingEntity closed : List.of(creative, magneto, copy, warden)) {
             lookAt(jean, closed);
             actionBar(jean);
@@ -1293,15 +1293,15 @@ public final class PhoenixTests {
         helper.setBlock(new BlockPos(10, 2, 13), Blocks.STONE);
         helper.setBlock(new BlockPos(10, 3, 13), Blocks.STONE);
         Zombie farOut = zombie(helper, 17.0, 17.0);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(7.5, FLOOR, 10.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(7.5, FLOOR, 10.5));
         pet.tame(jean);
         Zombie host = zombie(helper, 10.5, 6.5);
         lookAt(jean, host);
         press(jean, 4);
         check(host.hasEffect(ModEffects.POSSESSED), "(one zombie is her host)");
         rested(jean, 4);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(6.5, FLOOR, 6.5));
-        Skeleton mate = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(13.5, FLOOR, 6.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(6.5, FLOOR, 6.5));
+        Skeleton mate = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(13.5, FLOOR, 6.5));
         ServerPlayer teammate = f.player(7.5, FLOOR, 13.5);
         ServerPlayer stranger = f.player(13.5, FLOOR, 13.5);
         ServerPlayer creative = f.player(6.5, FLOOR, 14.5, GameType.CREATIVE);
@@ -1408,7 +1408,7 @@ public final class PhoenixTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.PSIONIC_RADIUS, 8);
         ServerPlayer jean = jean(f, 4.5, 10.5);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 10.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(10.5, FLOOR, 10.5));
         List<String> told = new ArrayList<>();
         PhoenixPower.Listener listener = (phoenix, target, kind, amount) -> {
             if (phoenix == jean && target == warden) {
@@ -1558,7 +1558,7 @@ public final class PhoenixTests {
         check(data.is(Live.PHOENIX_CHARGING) && !jean.getAbilities().flying, "the charge works on the ground, in place");
         AbilityHandler.onKey(jean, 5, false);
 
-        Skeleton pinnedMob = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(14.5, FLOOR, 14.5));
+        Skeleton pinnedMob = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(14.5, FLOOR, 14.5));
         ServerPlayer thor2 = f.player(2.5, FLOOR, 2.5, Power.THOR);
         thor2.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.MJOLNIR.get()));
         PowerTicker.tick(thor2);

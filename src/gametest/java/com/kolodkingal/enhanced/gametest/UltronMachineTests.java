@@ -102,7 +102,7 @@ public final class UltronMachineTests {
         UltronBoltEntity bolt = UltronBoltEntity.create(level, boss, f.helper().absoluteVec(new Vec3(8.5, FLOOR + 1.5, 12.5)), new Vec3(0.5, 0.0, 0.0), 4.0F,
                 UltronBoltEntity.Palette.PRIME);
         fight.spawn(bolt);
-        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        Zombie plain = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
 
         AbilityHandler.onKey(quicksilver, 1, true);
         AbilityHandler.onKey(quicksilver, 1, false);
@@ -378,7 +378,7 @@ public final class UltronMachineTests {
         UltronSentryEntity sentry = sentryAt(f, fight, 14.5, 10.5);
         sentry.setHeld(true);
         sentry.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 6.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(6.5, FLOOR, 6.5));
         pig.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
         pig.setHealth(100.0F);
         ServerPlayer plain = f.player(4.5, FLOOR, 14.5);
@@ -867,7 +867,7 @@ public final class UltronMachineTests {
         drone.setOwner(hero.getUUID());
         level.addFreshEntity(drone);
         drone.setHeld(true);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 11.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(6.5, FLOOR, 11.5));
         pig.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
         pig.setHealth(100.0F);
         ServerPlayer other = f.player(6.5, FLOOR, 16.5);
@@ -916,9 +916,9 @@ public final class UltronMachineTests {
         UltronEntity boss = boss(fight);
         put(f, boss, 10.5, FLOOR + 1.0, 1.5);
         put(f, player, 19.5, FLOOR, 19.5);
-        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(3.5, FLOOR, 10.5));
-        Boat boat = helper.spawn(EntityType.BOAT, new Vec3(6.5, FLOOR, 10.5));
-        Minecart cart = helper.spawn(EntityType.MINECART, new Vec3(9.5, FLOOR, 10.5));
+        ArmorStand stand = TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(3.5, FLOOR, 10.5));
+        Boat boat = TestKit.spawn(helper, EntityType.BOAT, new Vec3(6.5, FLOOR, 10.5));
+        Minecart cart = TestKit.spawn(helper, EntityType.MINECART, new Vec3(9.5, FLOOR, 10.5));
         BlockPos wall = helper.absolutePos(new BlockPos(13, (int) FLOOR, 11));
         level.setBlock(wall, Blocks.STONE.defaultBlockState(), 3);
         f.onClose(() -> level.setBlock(wall, Blocks.AIR.defaultBlockState(), 3));

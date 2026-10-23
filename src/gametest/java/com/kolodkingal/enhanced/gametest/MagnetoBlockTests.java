@@ -520,7 +520,7 @@ public final class MagnetoBlockTests {
     public static void piglinsMindTheGoldHeTearsOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
-        Piglin piglin = helper.spawnWithNoFreeWill(EntityType.PIGLIN, new Vec3(12.5, FLOOR, 16.5));
+        Piglin piglin = TestKit.spawnWithNoFreeWill(helper, EntityType.PIGLIN, new Vec3(12.5, FLOOR, 16.5));
         BlockPos iron = new BlockPos(8, 2, 8);
         BlockPos gold = new BlockPos(8, 2, 12);
         helper.setBlock(iron, Blocks.IRON_BLOCK);

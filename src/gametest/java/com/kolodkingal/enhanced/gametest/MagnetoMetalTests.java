@@ -80,7 +80,7 @@ public final class MagnetoMetalTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer magneto = f.player(10.5, FLOOR, 10.5, Power.MAGNETO);
 
-        check(Metal.isMagnetic(helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(3.5, FLOOR, 3.5))), "an Iron Golem");
+        check(Metal.isMagnetic(TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(3.5, FLOOR, 3.5))), "an Iron Golem");
         for (EntityType<?> cart : List.of(EntityType.MINECART, EntityType.CHEST_MINECART, EntityType.FURNACE_MINECART,
                 EntityType.HOPPER_MINECART, EntityType.TNT_MINECART, EntityType.SPAWNER_MINECART, EntityType.COMMAND_BLOCK_MINECART)) {
             check(Metal.isMagnetic(cart.create(level)), "a " + BuiltInRegistries.ENTITY_TYPE.getKey(cart));
@@ -467,7 +467,7 @@ public final class MagnetoMetalTests {
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
         PowerData data = Powers.get(magneto);
         ServerPlayer owner = f.player(18.5, FLOOR, 18.5);
-        Horse theirs = helper.spawnWithNoFreeWill(EntityType.HORSE, new Vec3(10.5, FLOOR, 7.5));
+        Horse theirs = TestKit.spawnWithNoFreeWill(helper, EntityType.HORSE, new Vec3(10.5, FLOOR, 7.5));
         theirs.tameWithName(owner);
         theirs.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
         check(Metal.isRealGear(theirs, EquipmentSlot.BODY), "the horse's armour is real gear, which it would drop");
@@ -481,7 +481,7 @@ public final class MagnetoMetalTests {
         check(items(helper, Items.IRON_HORSE_ARMOR).isEmpty(), "and nothing falls");
         check(data.isReady(3, level.getGameTime()), "and V does not rest");
 
-        Horse his = helper.spawnWithNoFreeWill(EntityType.HORSE, new Vec3(10.5, FLOOR, 13.5));
+        Horse his = TestKit.spawnWithNoFreeWill(helper, EntityType.HORSE, new Vec3(10.5, FLOOR, 13.5));
         his.tameWithName(magneto);
         his.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
         lookAt(magneto, his);
@@ -623,7 +623,7 @@ public final class MagnetoMetalTests {
 
     /** A creature of {@code type} spawned at {@code at} (no free will), holding or wearing {@code item} in {@code slot}. */
     private static <T extends Mob> T wearing(GameTestHelper helper, EntityType<T> type, Vec3 at, EquipmentSlot slot, Item item) {
-        T mob = helper.spawnWithNoFreeWill(type, at);
+        T mob = TestKit.spawnWithNoFreeWill(helper, type, at);
         mob.setItemSlot(slot, new ItemStack(item));
         return mob;
     }

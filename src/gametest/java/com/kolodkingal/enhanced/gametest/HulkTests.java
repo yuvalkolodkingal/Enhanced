@@ -149,8 +149,8 @@ public final class HulkTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no AI, unless {@code free}). */
     static Husk husk(GameTestHelper helper, double x, double y, double z, boolean free) {
-        Husk husk = free ? helper.spawn(EntityType.HUSK, new Vec3(x, y, z))
-                : helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, y, z));
+        Husk husk = free ? TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, y, z))
+                : TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, y, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -393,7 +393,7 @@ public final class HulkTests {
         Husk c = husk(helper, 6.0, 10.5);
         Husk jumper = husk(helper, 10.5, FLOOR + 1.3, 7.5, false);
         jumper.setNoGravity(true);
-        Bat bat = helper.spawnWithNoFreeWill(EntityType.BAT, new Vec3(13.5, FLOOR + 2.0, 12.5));
+        Bat bat = TestKit.spawnWithNoFreeWill(helper, EntityType.BAT, new Vec3(13.5, FLOOR + 2.0, 12.5));
         ServerPlayer friend = f.player(8.5, FLOOR, 12.5);
         press(hulk, 1, false);
         step(helper, 16, () -> {
@@ -462,7 +462,8 @@ public final class HulkTests {
             step(helper, 32, () -> {
                 assertNear(lost(victim), 14.0, 0.02, "4 + 4 + 6");
                 ServerPlayer other = hulk(f, 14.5, 14.5, "ragnarok");
-                ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(14.5, FLOOR, 17.5));
+                ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN,
+                        new Vec3(14.5, FLOOR, 17.5));
                 lookAt(other, boss);
                 LivingEntity punched = GrabSmash.start(other, data(other));
                 check(punched == boss && !data(other).is(Live.HULK_GRABBING), "a boss is punched, not grabbed");
@@ -508,7 +509,7 @@ public final class HulkTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 6.5, 10.5, "ragnarok");
         Husk husk = husk(helper, 9.5, FLOOR, 10.5, true);
-        ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(6.5, FLOOR, 14.5));
+        ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN, new Vec3(6.5, FLOOR, 14.5));
         double before = husk.distanceTo(hulk);
         HulkAbilities.roar(hulk, data(hulk));
         check(husk.hasEffect(ModEffects.FRIGHTENED) && husk.hasEffect(MobEffects.WEAKNESS),

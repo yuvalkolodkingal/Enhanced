@@ -857,7 +857,7 @@ public final class CrossHeroBossTests {
         }
         UltronSentryEntity sentry = UltronTestSupport.sentryAt(f, fight, 12.5, 10.5);
         sentry.setHeld(true);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(8.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(8.5, FLOOR, 10.5));
         zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
         zombie.setHealth(100.0F);
         wear(spider, "iron_spider");

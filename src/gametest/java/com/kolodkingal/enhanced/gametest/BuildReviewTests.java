@@ -268,7 +268,7 @@ public final class BuildReviewTests {
         for (BlockPos pos : BlockPos.betweenClosed(abs(f, 3, 2, 3), abs(f, 5, 2, 5))) {
             level.setBlockAndUpdate(pos, Blocks.GOLD_BLOCK.defaultBlockState());
         }
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(4.5, 3, 4.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(4.5, 3, 4.5));
         Vec3 before = cow.position();
         BoundingBox everything = abs(f, new BoundingBox(0, 0, 0, 20, 12, 20));
         listen(f, BlockEvent.EntityPlaceEvent.class, event -> {

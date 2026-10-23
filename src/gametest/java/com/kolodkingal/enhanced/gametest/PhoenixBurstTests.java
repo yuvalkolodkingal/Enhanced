@@ -355,7 +355,7 @@ public final class PhoenixBurstTests {
         f.pvp(true);
         ServerLevel level = helper.getLevel();
         ServerPlayer jean = jean(f, X, Z);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(X + 3.0, FLOOR, Z));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(X + 3.0, FLOOR, Z));
         pet.tame(jean);
         ServerPlayer teammate = f.player(X + 3.0, FLOOR, Z + 3.0);
         ServerPlayer creative = f.player(X + 3.0, FLOOR, Z - 3.0, GameType.CREATIVE);
@@ -404,14 +404,14 @@ public final class PhoenixBurstTests {
         f.config(PhoenixConfig.BURST_MAX_DAMAGE, 5.0);
         ServerPlayer jean = jean(f, X, Z);
         ServerPlayer owner = f.player(2.5, FLOOR, 18.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(X + 3.0, FLOOR, Z + 2.0));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(X + 3.0, FLOOR, Z - 2.0));
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(X + 4.0, FLOOR, Z + 4.0));
-        Wolf strangers = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(X + 4.0, FLOOR, Z - 4.0));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(X + 3.0, FLOOR, Z + 2.0));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(X + 3.0, FLOOR, Z - 2.0));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(X + 4.0, FLOOR, Z + 4.0));
+        Wolf strangers = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(X + 4.0, FLOOR, Z - 4.0));
         strangers.tame(owner);
         Zombie zombie = sturdy(helper, X + 2.0, Z + 3.0);
-        Ghast ghast = helper.spawnWithNoFreeWill(EntityType.GHAST, new Vec3(X + 6.0, FLOOR + 1.0, Z));
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(X + 3.0, FLOOR, Z - 5.0));
+        Ghast ghast = TestKit.spawnWithNoFreeWill(helper, EntityType.GHAST, new Vec3(X + 6.0, FLOOR + 1.0, Z));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(X + 3.0, FLOOR, Z - 5.0));
         List<LivingEntity> passive = List.of(villager, golem, cow, strangers);
         List<LivingEntity> hostile = List.of(zombie, ghast, warden);
 
@@ -456,7 +456,7 @@ public final class PhoenixBurstTests {
         Zombie zombie = sturdy(helper, X + 3.0, Z);
         // The Warden shrugs off a push anyway; take that away, so that only the tag keeps it still. Every hit still gives
         // a creature the small kick of vanilla damage (0.4), which the boss keeps; the Burst's own push (1.2 more) it does not get.
-        Warden boss = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(X, FLOOR, Z + 3.0));
+        Warden boss = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(X, FLOOR, Z + 3.0));
         boss.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.0);
         float bossHealth = boss.getHealth();
         Vec3 zombieStart = zombie.position();
@@ -777,7 +777,7 @@ public final class PhoenixBurstTests {
         check(armoured.hurt(burst, 10.0F), "armour does not stop it");
         assertNear(before - armoured.getHealth(), 10.0, 0.01, "all of it gets through netherite");
 
-        Blaze blaze = helper.spawnWithNoFreeWill(EntityType.BLAZE, new Vec3(14.5, FLOOR, 14.5));
+        Blaze blaze = TestKit.spawnWithNoFreeWill(helper, EntityType.BLAZE, new Vec3(14.5, FLOOR, 14.5));
         float blazeBefore = blaze.getHealth();
         check(!blaze.hurt(level.damageSources().inFire(), 6.0F), "(control: fire does nothing to a Blaze)");
         check(blaze.hurt(burst, 6.0F), "but the Burst is not fire");

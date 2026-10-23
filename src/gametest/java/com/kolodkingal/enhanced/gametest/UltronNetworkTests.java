@@ -91,7 +91,7 @@ public final class UltronNetworkTests {
     }
 
     private static Zombie dummy(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(400.0);
         zombie.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
@@ -474,7 +474,7 @@ public final class UltronNetworkTests {
         check(far.distanceTo(hero) > UltronSentryEntity.DRONE_LEASH, "the far drone starts beyond the leash: " + far.distanceTo(hero));
         Zombie hostile = dummy(helper, 11.5, 3.5);
         Zombie distant = dummy(helper, 16.5, 16.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 10.5));
         ServerPlayer bystander = f.player(10.5, FLOOR, 8.5);
         tick(hero);
         f.everyTick(240, t -> {
@@ -585,7 +585,7 @@ public final class UltronNetworkTests {
         UltronSentryEntity far = drone(f, hero, 12.5, FLOOR + 1.0, 12.5, false);
         // Well away from him, so that the order is the only reason for what they do.
         Zombie fixed = dummy(helper, 18.5, 8.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 1.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 1.5));
         tick(hero);
         hero.setShiftKeyDown(true);
         lookAt(hero, pig);

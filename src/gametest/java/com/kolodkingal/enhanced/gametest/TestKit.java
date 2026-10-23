@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
@@ -31,7 +32,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -377,6 +380,45 @@ public final class TestKit {
 
     /** Yaw that looks along +X. */
     public static final float EAST = -90.0F;
+
+    // ------------------------------------------------------------------------------------------------------------
+    // Spawning (port P0: GameTestHelper's spawn methods, in one place for the versions that change them)
+
+    /** {@link GameTestHelper#spawn(EntityType, BlockPos)}: an entity at a position relative to the test. */
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, BlockPos pos) {
+        return helper.spawn(type, pos);
+    }
+
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, Vec3 pos) {
+        return helper.spawn(type, pos);
+    }
+
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, int x, int y, int z) {
+        return helper.spawn(type, x, y, z);
+    }
+
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, float x, float y, float z) {
+        return helper.spawn(type, x, y, z);
+    }
+
+    /** {@link GameTestHelper#spawnWithNoFreeWill(EntityType, BlockPos)}: a mob without AI, relative to the test. */
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, BlockPos pos) {
+        return helper.spawnWithNoFreeWill(type, pos);
+    }
+
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, Vec3 pos) {
+        return helper.spawnWithNoFreeWill(type, pos);
+    }
+
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, int x, int y,
+                                                        int z) {
+        return helper.spawnWithNoFreeWill(type, x, y, z);
+    }
+
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, float x, float y,
+                                                        float z) {
+        return helper.spawnWithNoFreeWill(type, x, y, z);
+    }
 
     // ------------------------------------------------------------------------------------------------------------
     // Sounds

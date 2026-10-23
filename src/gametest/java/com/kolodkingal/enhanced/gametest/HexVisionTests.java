@@ -162,7 +162,7 @@ public final class HexVisionTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 4.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 4.0, FLOOR, CENTER));
         check(vision.getTarget() == null, "Vision has nothing to fight");
         float health = zombie.getHealth();
 
@@ -183,7 +183,7 @@ public final class HexVisionTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER - 4.0, FLOOR, CENTER));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER - 4.0, FLOOR, CENTER));
 
         pig.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.CHAOS_BEAM, wanda, wanda), 1.0F);
         check(vision.getTarget() == pig, "what Wanda attacks, Vision attacks");
@@ -195,8 +195,8 @@ public final class HexVisionTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
-        Zombie behind = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER - 5.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
+        Zombie behind = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER - 5.0, FLOOR, CENTER));
         float health = zombie.getHealth();
         check(vision.getTarget() == null, "Vision has nothing to fight");
 
@@ -220,7 +220,7 @@ public final class HexVisionTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
 
         lookAt(wanda, zombie);
         HexManager.handleAction(wanda, HexAction.VISION_TARGET, Optional.empty(), 0);
@@ -239,9 +239,10 @@ public final class HexVisionTests {
         Hex hex = HexManager.ownedBy(helper.getLevel(), wanda.getUUID()).orElseThrow();
         ServerPlayer friend = f.player(CENTER + 2.5, FLOOR, CENTER + 2.5);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(friend.getUUID()), 1);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(CENTER - 2.5, FLOOR, CENTER - 2.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(CENTER - 2.5, FLOOR, CENTER - 2.5));
         pet.tame(wanda);
-        Wolf friendsPet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(CENTER - 2.5, FLOOR, CENTER + 2.5));
+        Wolf friendsPet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF,
+                new Vec3(CENTER - 2.5, FLOOR, CENTER + 2.5));
         friendsPet.tame(friend);
         f.pvp(true);
 
@@ -295,7 +296,7 @@ public final class HexVisionTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 2.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 2.0, FLOOR, CENTER));
         vision.setTarget(zombie);
         float before = zombie.getHealth();
         check(vision.doHurtTarget(zombie), "the punch lands");
@@ -311,7 +312,7 @@ public final class HexVisionTests {
         HexVisionEntity vision = visionOf(wanda);
         // Stays put (so the target stays out of reach of his fists); the zombie is six blocks off.
         HexManager.handleAction(wanda, HexAction.SET_VISION_STAYS, Optional.empty(), 1);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 6.5, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 6.5, FLOOR, CENTER));
         float before = zombie.getHealth();
         vision.defend(zombie);
 
@@ -412,7 +413,7 @@ public final class HexVisionTests {
         check(!vision.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.CHAOS_BEAM, wanda, wanda), 5.0F), "her Chaos Beam does nothing to him");
         check(!vision.hurt(helper.getLevel().damageSources().playerAttack(wanda), 5.0F), "nor do her blows");
         check(vision.getHealth() == health, "he is unhurt");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 3.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 3.0, FLOOR, CENTER));
         check(!WandaAbilities.beamTargets(wanda).test(vision), "her beam passes through him");
         check(WandaAbilities.beamTargets(wanda).test(zombie), "(and still strikes a zombie)");
         check(vision.hurt(helper.getLevel().damageSources().mobAttack(zombie), 5.0F), "(a zombie's does)");

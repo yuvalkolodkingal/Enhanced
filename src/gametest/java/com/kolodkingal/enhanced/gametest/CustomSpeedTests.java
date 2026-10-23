@@ -88,7 +88,7 @@ public final class CustomSpeedTests {
 
     /** A zombie with a helmet (no sunburn), standing still. */
     private static Zombie zombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         return zombie;
     }
@@ -154,7 +154,7 @@ public final class CustomSpeedTests {
         ServerPlayer blitzer = CustomKitSupport.hero(f, 3.5, 4.5, CustomKitSupport.def()
                 .pick("quicksilver.blitz", 5).key(5, "quicksilver.blitz").build());
         check(CustomHeroes.hero(blitzer).binding(5, true).equals("quicksilver.blitz#alt"), "Sneak + N holds the Pickpocket");
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, 4.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, 4.5));
         lookAt(blitzer, golem);
         float health = golem.getHealth();
         CustomKitSupport.tap(blitzer, 5, false);
@@ -292,7 +292,7 @@ public final class CustomSpeedTests {
             double z = 4.5 + i * 12;
             ServerPlayer p = CustomKitSupport.hero(f, 3.5, z, CustomKitSupport.def().pick("quicksilver.blitz", strengths[i])
                     .key(1, "quicksilver.blitz").build());
-            IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, z));
+            IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, z));
             lookAt(p, golem);
             float health = golem.getHealth();
             CustomKitSupport.tap(p, 1, false);
@@ -505,7 +505,7 @@ public final class CustomSpeedTests {
     public static void magnetosStripShrapnelAndGripOnOtherKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer stripper = CustomKitSupport.hero(f, 3.5, 3.5, CustomKitSupport.def().pick("magneto.disarm", 5).key(5, "magneto.disarm").build());
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 3.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 3.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         lookAt(stripper, zombie);
         CustomKitSupport.tap(stripper, 5, false);
@@ -524,7 +524,7 @@ public final class CustomSpeedTests {
         check(!Powers.get(storm).shrapnelActive(), "let go: it stops");
 
         ServerPlayer gripper = CustomKitSupport.hero(f, 3.5, 17.5, CustomKitSupport.def().pick("magneto.metal", 5).key(3, "magneto.metal").build());
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(8.5, FLOOR, 17.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(8.5, FLOOR, 17.5));
         lookAt(gripper, golem);
         CustomKitSupport.tap(gripper, 3, false);
         check(Telekinesis.isHolding(gripper), "V grips the iron golem");
@@ -542,7 +542,7 @@ public final class CustomSpeedTests {
         ServerPlayer m = CustomKitSupport.hero(f, 14.5, 10.5, CustomKitSupport.def().pick("magneto.shield", 5).key(3, "magneto.shield").build());
         CustomKitSupport.tap(m, 3, false);
         check(Powers.get(m).magneticShield() && MagnetoAbilities.hasShieldUp(m), "V raises the Magnetic Shield");
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         skeleton.setNoAi(true);
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);

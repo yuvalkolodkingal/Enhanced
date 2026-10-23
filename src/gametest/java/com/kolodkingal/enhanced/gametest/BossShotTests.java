@@ -135,7 +135,7 @@ public final class BossShotTests {
 
     /** A zombie that stands still and does not burn in the sun (the tests run by day). */
     private static Zombie stillZombie(GameTestHelper helper, double x, double y, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, y, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, y, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         return zombie;
     }

@@ -75,7 +75,7 @@ public final class MagnetoBossTests {
                 ultron.getUUID(), false, false);
         sentry.setHeld(true);
         f.level().addFreshEntity(sentry);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 10.5));
         ServerPlayer vision = f.player(10.5, FLOOR, 16.5, Power.VISION);
 
         for (LivingEntity body : List.<LivingEntity>of(sentry, golem, vision)) {
@@ -325,7 +325,7 @@ public final class MagnetoBossTests {
         arena.containAt(3.0).joinWithin(5.0).tractorDepth(0.0);
         BossFrameworkTests.start(f, BossKind.ULTRON, f.player(huskX, FLOOR, 8.5),
                 new BossTestSupport.TestFight(level, BossKind.ULTRON, arena));
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(huskX, FLOOR, 10.5));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(huskX, FLOOR, 10.5));
         husk.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         Vec3 at = helper.absoluteVec(new Vec3(huskX + 6.0, FLOOR, 10.5));
         ItemEntity ingot = new ItemEntity(level, at.x, at.y, at.z, new ItemStack(Items.IRON_INGOT), 0.0, 0.0, 0.0);

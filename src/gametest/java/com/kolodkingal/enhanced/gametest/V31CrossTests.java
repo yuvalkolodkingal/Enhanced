@@ -458,7 +458,7 @@ public final class V31CrossTests {
         check(!Telekinesis.isHolding(magneto) && !Telekinesis.isHeld(hammer), who + ": R holds no dropped Mjolnir");
         check(Telekinesis.MJOLNIR.equals(lastActionBarKey(magneto)), who + ": and says Mjolnir answers to no magnetism");
 
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER, FLOOR, 4.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER, FLOOR, 4.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // it does not burn in the sun
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.MJOLNIR.get()));
         lookAt(magneto, zombie);
@@ -1144,9 +1144,9 @@ public final class V31CrossTests {
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 20.5, Blocks.STONE);
         ServerPlayer thorOfThePig = thor(f, 19.5, 19.5);
         ServerPlayer thorOfTheGolem = thor(f, 19.5, 1.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(14.5, FLOOR, 14.5));
-        IronGolem pinnedGolem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(5.5, FLOOR, 5.5));
-        IronGolem freeGolem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(5.5, FLOOR, 15.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(14.5, FLOOR, 14.5));
+        IronGolem pinnedGolem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(5.5, FLOOR, 5.5));
+        IronGolem freeGolem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(5.5, FLOOR, 15.5));
         MjolnirPin.pin(thorOfThePig, InteractionHand.MAIN_HAND, pig);
         MjolnirPin.pin(thorOfTheGolem, InteractionHand.MAIN_HAND, pinnedGolem);
         check(MjolnirPin.isPinned(pig) && MjolnirPin.isPinned(pinnedGolem) && !MjolnirPin.isPinned(freeGolem), "the pig and one golem are pinned");

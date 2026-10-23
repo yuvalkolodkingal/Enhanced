@@ -59,7 +59,7 @@ public final class LoveTests {
 
     /** A zombie with no armour and 100 health that stands where it is put. */
     static Zombie dummy(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setNoAi(true);
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);

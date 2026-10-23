@@ -75,7 +75,7 @@ public final class ApocalypseShieldTests {
         ServerPlayer magneto = f.player(7.5, FLOOR, 3.5, Power.MAGNETO);
         ServerPlayer billy = f.player(9.5, FLOOR, 3.5, Power.BILLY);
         ServerPlayer plain = f.player(11.5, FLOOR, 3.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
 
         // The Chaos Beam: Wanda's counts in full, no one else's does.
         assertNear(MindPower.shieldDamage(by(level, ModDamageTypes.CHAOS_BEAM, wanda), 5.0F), 5.0, 1.0E-6, "a beam by a Scarlet Witch counts in full");
@@ -268,7 +268,7 @@ public final class ApocalypseShieldTests {
         ServerPlayer thor = d.f().player(5.5, FLOOR, 16.5, Power.THOR);
         ServerPlayer magneto = d.f().player(5.5, FLOOR, 18.5, Power.MAGNETO);
         ServerPlayer speedster = d.f().player(7.5, FLOOR, 18.5, Power.QUICKSILVER);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
         float health = boss.getHealth();
         float strength = boss.shield().strength();
         Vec3 motion = boss.getDeltaMovement();
@@ -428,7 +428,7 @@ public final class ApocalypseShieldTests {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
         ServerPlayer magneto = d.f().player(5.5, FLOOR, 17.5, Power.MAGNETO);
-        Zombie golem = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie golem = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
         float health = boss.getHealth();
         float max = boss.shield().strength();
 
@@ -439,7 +439,7 @@ public final class ApocalypseShieldTests {
 
         // Wanda's wears it: the whole chain. She lifts a Zombie (a block borrowed from his floor would do too, at half the
         // slam: ArenaLoanTests), throws it, and it is the shield that takes the blow, not his health.
-        Zombie thrown = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 10.5));
+        Zombie thrown = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 10.5));
         lookAt(d.hero(), thrown);
         AbilityHandler.onKey(d.hero(), 3, true);
         check(Telekinesis.isHolding(d.hero()), "she holds the Zombie");
@@ -539,7 +539,7 @@ public final class ApocalypseShieldTests {
         check(boss.floorFraction() > 0.66 && boss.floorFraction() < 0.67, "the floor of the window is two thirds");
 
         // The numbers of a window, with his armour out of the way: a quarter more, a fraction at most, half of a blast.
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         boss.setArmourCut(true);
         float h0 = boss.getHealth();

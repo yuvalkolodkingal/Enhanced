@@ -430,7 +430,7 @@ public final class MagnetPullTests {
     public static void sneakRWhileHoldingStillSetsDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = magneto(f);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 10.5));
         TestKit.lookAt(magneto, golem);
         AbilityHandler.onKey(magneto, 1, true);
         check(Telekinesis.isHolding(magneto), "R holds the golem");
@@ -453,7 +453,7 @@ public final class MagnetPullTests {
         PowerData data = Powers.get(magneto);
         BlockPos ore = new BlockPos(6, 1, 10);
         helper.setBlock(ore, Blocks.IRON_ORE);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 10.5));
         TestKit.lookAt(magneto, golem);
         AbilityHandler.onKey(magneto, 1, true);
         check(Telekinesis.isHolding(magneto), "R holds the golem");
@@ -1438,17 +1438,17 @@ public final class MagnetPullTests {
         ItemEntity diamond = loose(helper, new Vec3(12.5, FLOOR, 12.5), new ItemStack(Items.DIAMOND));
         Arrow anyones = stuck(helper, new Vec3(7.5, FLOOR, 8.5), AbstractArrow.Pickup.ALLOWED);
         Arrow nobodys = stuck(helper, new Vec3(13.5, FLOOR, 9.5), AbstractArrow.Pickup.DISALLOWED);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 13.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 13.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         zombie.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.LEATHER_BOOTS));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
         ServerPlayer owner = f.player(19.5, FLOOR, 1.5);
-        Horse horse = helper.spawnWithNoFreeWill(EntityType.HORSE, new Vec3(5.5, FLOOR, 10.5));
+        Horse horse = TestKit.spawnWithNoFreeWill(helper, EntityType.HORSE, new Vec3(5.5, FLOOR, 10.5));
         horse.tameWithName(owner);
         horse.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
-        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 6.5));
+        ArmorStand stand = TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 6.5));
         stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.GOLDEN_CHESTPLATE));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 5.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(12.5, FLOOR, 5.5));
         check(owner.distanceTo(magneto) > EnhancedConfig.PULL_RADIUS.get() + 2, "the horse's owner is out of reach");
         ThrownTrident his = stuckTrident(helper, new Vec3(14.5, FLOOR, 7.5), magneto);
         ThrownTrident others = stuckTrident(helper, new Vec3(9.5, FLOOR, 14.5), owner);
@@ -1484,7 +1484,7 @@ public final class MagnetPullTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer magneto = magneto(f);
         ServerPlayer other = f.player(18.5, FLOOR, 18.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
         Vec3 at = helper.absoluteVec(new Vec3(8.5, FLOOR, 12.5));
         ItemEntity thrown = new ItemEntity(level, at.x, at.y, at.z, new ItemStack(Items.IRON_INGOT), 0.0, 0.0, 0.0);
@@ -1527,7 +1527,7 @@ public final class MagnetPullTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer magneto = magneto(f);
         PowerData data = Powers.get(magneto);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(3.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(3.5, FLOOR, 10.5));
         double before = golem.distanceTo(magneto);
         double hunger = hunger(magneto);
         sneakR(magneto);
@@ -1558,7 +1558,7 @@ public final class MagnetPullTests {
                 chest.setItem(0, new ItemStack(Items.DIRT, 5));
                 carts[2] = chest;
                 carts[3] = cart(helper, EntityType.MINECART, new Vec3(7.5, FLOOR, 7.5));
-                Zombie rider = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.5, FLOOR, 7.5));
+                Zombie rider = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(7.5, FLOOR, 7.5));
                 check(rider.startRiding(carts[3], true), "a zombie rides a minecart");
                 carts[4] = cart(helper, EntityType.COMMAND_BLOCK_MINECART, new Vec3(12.5, FLOOR, 5.5));
                 ServerPlayer ultron = f.player(19.5, FLOOR, 1.5, Power.ULTRON);
@@ -1779,9 +1779,9 @@ public final class MagnetPullTests {
         f.config(EnhancedConfig.PULL_TAKES_GEAR, false);
         f.config(EnhancedConfig.PULL_TUG, 0.0);
         ServerPlayer magneto = magneto(f);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, FLOOR, 13.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(6.5, FLOOR, 13.5));
         ItemEntity ingot = ingot(helper, new Vec3(12.5, FLOOR, 8.5));
         Vec3 golemAt = golem.position();
         sneakR(magneto);
@@ -2093,7 +2093,7 @@ public final class MagnetPullTests {
     }
 
     private static Piglin piglin(GameTestHelper helper, Vec3 relative) {
-        Piglin piglin = helper.spawnWithNoFreeWill(EntityType.PIGLIN, relative);
+        Piglin piglin = TestKit.spawnWithNoFreeWill(helper, EntityType.PIGLIN, relative);
         piglin.setImmuneToZombification(true);
         return piglin;
     }

@@ -533,8 +533,8 @@ public final class CustomV2Tests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strong = CustomKitSupport.hero(f, 3, 3, CustomKitSupport.def().pick("thor.lightning", 10).build());
         ServerPlayer weak = CustomKitSupport.hero(f, 3, 9, CustomKitSupport.def().pick("thor.lightning", 1).build());
-        Zombie a = helper.spawn(EntityType.ZOMBIE, new Vec3(8, FLOOR, 3));
-        Zombie b = helper.spawn(EntityType.ZOMBIE, new Vec3(8, FLOOR, 9));
+        Zombie a = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(8, FLOOR, 3));
+        Zombie b = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(8, FLOOR, 9));
         a.setNoAi(true);
         b.setNoAi(true);
         a.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.LIGHTNING_BEAM, strong, strong), 6.0F);

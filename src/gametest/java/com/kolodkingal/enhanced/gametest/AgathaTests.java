@@ -109,11 +109,11 @@ public final class AgathaTests {
 
     /** A hostile creature that stands still (a husk: it does not burn in the sun, which would hurt it in the tests' place). */
     private static Zombie zombie(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
     }
 
     private static Pig pig(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(x, FLOOR, z));
     }
 
     private static List<AgathaFxPayload> payloads(ServerPlayer player) {

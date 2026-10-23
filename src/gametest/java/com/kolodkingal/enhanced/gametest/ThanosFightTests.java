@@ -246,7 +246,7 @@ public final class ThanosFightTests {
         check(!wither.addEffect(new MobEffectInstance(ModEffects.TIME_LOCKED, 80)) && !wither.addEffect(new MobEffectInstance(ModEffects.SOULWORLD, 80)),
                 "nor locked in time, nor taken to the Soul World");
         wither.discard();
-        net.minecraft.world.entity.monster.Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
+        net.minecraft.world.entity.monster.Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
         check(com.kolodkingal.enhanced.thanos.StonePowers.petrify(level, boss, zombie, 60) && zombie.hasEffect(ModEffects.PETRIFIED), "a zombie is");
         helper.succeed();
     }

@@ -81,7 +81,7 @@ public final class UltronTests {
 
     /** A zombie that stands still, takes its damage plainly (no armour) and does not die of it. */
     private static Zombie dummy(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(400.0);
         zombie.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
@@ -551,7 +551,7 @@ public final class UltronTests {
         Zombie flier = dummy(helper, 7.5, 10.5);
         flier.setNoGravity(true);
         flier.setPos(flier.getX(), flier.getY() + 3.0, flier.getZ());
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 7.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 7.5));
         pig.setHealth(pig.getMaxHealth());
         ServerPlayer creative = f.player(10.5, FLOOR, 8.5, GameType.CREATIVE);
         ServerPlayer player = f.player(8.5, FLOOR, 12.5);

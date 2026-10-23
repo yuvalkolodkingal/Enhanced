@@ -678,7 +678,7 @@ public final class SokoviaLoanTests {
             BlockEvent.BreakEvent onTheRing = new BlockEvent.BreakEvent(level, ringAt, level.getBlockState(ringAt), wanda);
             NeoForge.EVENT_BUS.post(onTheRing);
             check(onTheIsland.isCanceled() && !onTheRing.isCanceled(), "breaking on the island is refused, on the ring it is not");
-            zombie[0] = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(MIDDLE_X + 2.0, GROUND + LIFT, MIDDLE_Z + 2.0));
+            zombie[0] = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(MIDDLE_X + 2.0, GROUND + LIFT, MIDDLE_Z + 2.0));
             zombie[0].setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
             block[0] = borrowed(helper, wanda, copy);
             // The copy a step and a half before the zombie, at its chest, and thrown straight at it.

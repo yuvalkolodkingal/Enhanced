@@ -213,7 +213,7 @@ public final class LabTests {
         ServerPlayer far = f.player(10.5, 2, 15.5);
         LabDoors.openNear(far);
         check(!open(level, cells), "nobody near: shut");
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(10, 2, 11));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new BlockPos(10, 2, 11));
         zombie.setNoAi(true);
         check(!open(level, cells), "a zombie opens nothing");
         ServerPlayer near = f.player(10.5, 2, 12.0);
@@ -285,7 +285,7 @@ public final class LabTests {
         check(group.stream().allMatch(p -> level.getBlockState(p).getValue(SecretBookshelfBlock.OPEN)), "open");
         check(level.getBlockState(group.get(0)).getCollisionShape(level, group.get(0)).isEmpty(), "nothing to bump");
         // someone steps into the nook: they stay open past their time
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, base);
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, base);
         zombie.setNoAi(true);
         helper.runAfterDelay(SecretEntrance.OPEN_TICKS + 30, () -> {
             check(group.stream().allMatch(p -> level.getBlockState(p).getValue(SecretBookshelfBlock.OPEN)),

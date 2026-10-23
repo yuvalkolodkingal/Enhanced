@@ -245,7 +245,7 @@ public final class ThanosSoulTimeTests {
         ServerLevel level = f.level();
         ServerPlayer thanos = thanos(f, 3.5, 3.5);
         ServerPlayer loki = f.player(14.5, FLOOR, 14.5, Power.LOKI);
-        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 18.5));
+        Zombie model = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 18.5));
         lookAt(loki, model);
         press(loki, 3);
         model.discard();
@@ -283,7 +283,7 @@ public final class ThanosSoulTimeTests {
         ServerLevel level = f.level();
         ServerPlayer thanos = thanos(f, 3.5, 3.5);
         ServerPlayer loki = f.player(14.5, FLOOR, 14.5, Power.LOKI);
-        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 18.5));
+        Zombie model = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 18.5));
         lookAt(loki, model);
         press(loki, 3);
         model.discard();
@@ -477,7 +477,7 @@ public final class ThanosSoulTimeTests {
         ServerPlayer player = f.player(10.5, FLOOR, 13.5);
         Zombie inside = zombie(helper, 13.5, 10.5);
         Zombie outside = zombie(helper, 10.5, 19.5);
-        Wolf wolf = helper.spawn(EntityType.WOLF, new Vec3(10.5, FLOOR, 7.5));
+        Wolf wolf = TestKit.spawn(helper, EntityType.WOLF, new Vec3(10.5, FLOOR, 7.5));
         wolf.setNoAi(true);
         wolf.tame(thanos);
         Arrow arrow = EntityType.ARROW.create(level);

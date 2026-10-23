@@ -55,7 +55,7 @@ public final class BarrierMagicTests {
     }
 
     private static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.setNoAi(true);
         return husk;
     }
@@ -67,7 +67,7 @@ public final class BarrierMagicTests {
         Husk front = husk(helper, 10.5, 10.0);
         raise(f, billy, () -> {
             assertNear(health(billy), 60.0, 1.0E-3, "a whole barrier has 60 health");
-            Skeleton shooter = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
+            Skeleton shooter = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
             shooter.setNoAi(true);
             Arrow arrow = new Arrow(helper.getLevel(), shooter, new ItemStack(Items.ARROW), null);
             arrow.setPos(helper.absoluteVec(new Vec3(10.5, FLOOR + 1.0, 14.5)));

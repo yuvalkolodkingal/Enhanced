@@ -81,7 +81,7 @@ public final class StonePowerTests {
 
     /** A husk that stands still and has no armour (the sun does not burn it). */
     static Zombie husk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.setNoAi(true);
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return husk;

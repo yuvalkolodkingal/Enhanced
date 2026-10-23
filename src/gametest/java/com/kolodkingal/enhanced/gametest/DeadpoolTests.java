@@ -94,8 +94,8 @@ public final class DeadpoolTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no AI, unless {@code free}). */
     static Husk husk(GameTestHelper helper, double x, double z, boolean free) {
-        Husk husk = free ? helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z))
-                : helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = free ? TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z))
+                : TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -263,7 +263,7 @@ public final class DeadpoolTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 6.5);
         ServerPlayer plain = deadpool(f, 4.5, 14.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 6.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 6.5));
         TestKit.look(wade, TestKit.EAST, 0.0F);
         TestKit.look(plain, TestKit.EAST, 0.0F);
         hold(wade, 1);
@@ -452,14 +452,14 @@ public final class DeadpoolTests {
     public static void theTauntTurnsFiveZombiesOffAVillagerNotABoss(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 3.5, 10.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(15.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(15.5, FLOOR, 10.5));
         List<Zombie> zombies = new java.util.ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 6.5 + 2 * i));
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 6.5 + 2 * i));
             zombie.setTarget(villager);
             zombies.add(zombie);
         }
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(7.5, FLOOR, 16.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(7.5, FLOOR, 16.5));
         press(wade, 4, false);
         for (Zombie zombie : zombies) {
             check(zombie.getTarget() == wade, "a zombie turned on him");
@@ -510,7 +510,7 @@ public final class DeadpoolTests {
     public static void theSmokeVanishLosesTheMonsters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 3.5, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         zombie.setTarget(wade);
         press(wade, 5, true);
         check(wade.hasEffect(MobEffects.INVISIBILITY), "invisible");

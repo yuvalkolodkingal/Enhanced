@@ -479,7 +479,7 @@ public final class V31SkeletonTests {
         ServerPlayer wanda = f.player(6.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         check(Telekinesis.lastGripEnd(wanda) == Telekinesis.NEVER, "no grip of hers has ended yet");
 
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 10.5));
         Telekinesis.hold(wanda, pig, Telekinesis.Mode.WANDA);
         wanda.setShiftKeyDown(true);
         Telekinesis.press(wanda, Telekinesis.Mode.WANDA);
@@ -497,7 +497,7 @@ public final class V31SkeletonTests {
             pig.discard();
         });
         helper.runAfterDelay(4, () -> {
-            Pig other = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 12.5));
+            Pig other = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 12.5));
             Telekinesis.hold(wanda, other, Telekinesis.Mode.WANDA);
             Vec3 at = wanda.position();
             wanda.setPos(at.x, at.y + 60.0, at.z); // far out of reach (48 blocks), in the same chunks

@@ -116,7 +116,7 @@ public final class BossHookTests {
         sentry.moveTo(helper.absoluteVec(new Vec3(12.5, FLOOR, 10.5)));
         fight.spawn(boss);
         fight.spawn(sentry);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
 
         check(BossFights.isMember(boss) && BossFights.isMember(sentry) && BossFights.isMember(player) && !BossFights.isMember(zombie),
                 "the boss, its minion and the fighters are members, a bystander is not");
@@ -212,7 +212,7 @@ public final class BossHookTests {
 
         first.hurt(level.damageSources().playerAttack(player), 6.0F);
         assertNear(ledger.damage(), 6.0, 0.01, "the damage the player did is credited");
-        Wolf wolf = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(14.5, FLOOR, 14.5));
+        Wolf wolf = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(14.5, FLOOR, 14.5));
         wolf.tame(player);
         second.hurt(level.damageSources().mobAttack(wolf), 4.0F);
         assertNear(ledger.damage(), 6.0, 0.01, "what a tamed wolf does is credited to nobody");
@@ -240,7 +240,7 @@ public final class BossHookTests {
         check(Powers.get(quicksilver).slowMo(), "Quicksilver Time is on");
         SlowMotion.clear(); // (the zones are cached for the tick, and were cached before the time was on)
         int zone = SlowMotion.factor();
-        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        Zombie plain = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
         HookedZombie follows = hooked(helper, 14.5, 12.5);
         HookedZombie immune = hooked(helper, 14.5, 8.5);
         HookedZombie halved = hooked(helper, 16.5, 10.5);
@@ -310,7 +310,7 @@ public final class BossHookTests {
         boss.hurt(level.damageSources().playerAttack(thor), 2.0F);
         check(boss.lightning.isEmpty(), "nothing else is told as lightning: " + boss.lightning);
         // An entity that does not ask is left alone (and nothing breaks for it).
-        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 14.5));
+        Zombie plain = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 14.5));
         check(plain.hurt(level.damageSources().lightningBolt(), 2.0F), "an ordinary creature is struck as ever");
         helper.succeed();
     }
@@ -319,7 +319,7 @@ public final class BossHookTests {
     public static void wandasTelekinesisGoesToTheFightFirstWhenSheHoldsNothingAndWhenSheThrows(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = f.player(6.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         TestFight fight = start(f, BossKind.ULTRON, wanda, fight(f, BossKind.ULTRON, Containment.NONE, false));
         lookAt(wanda, zombie);
 

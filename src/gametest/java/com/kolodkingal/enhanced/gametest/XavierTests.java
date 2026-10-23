@@ -89,7 +89,7 @@ public final class XavierTests {
 
     /** A husk with its own will (it walks when steered and does not burn in the sun). */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.setPersistenceRequired();
         return husk;
     }
@@ -144,7 +144,7 @@ public final class XavierTests {
         check(Telepathy.isStronger(wanda, charles) && !Telepathy.isStronger(charles, wanda), "who is stronger");
         plain.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
         check(Telepathy.reach(charles, plain) == Telepathy.Verdict.SHIELDED && Telepathy.isShielded(plain), "Magneto's helmet shuts a mind");
-        var warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(14.5, FLOOR, 14.5));
+        var warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(14.5, FLOOR, 14.5));
         check(Telepathy.reach(charles, warden) == Telepathy.Verdict.SHIELDED, "and a boss's mind is too vast");
         warden.discard();
         helper.succeed();
@@ -271,7 +271,7 @@ public final class XavierTests {
         press(charles, 2);
         check(data.toggle(Toggle.HEAR_THOUGHTS) && Thoughts.listens(charles, data), "G: he hears thoughts");
         Zombie husk = PhoenixTests.zombie(helper, 8.5, 4.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 8.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 8.5));
         ServerPlayer wanda = f.player(4.5, FLOOR, 8.5, Power.SCARLET_WITCH);
         ServerPlayer hurt = f.player(12.5, FLOOR, 4.5);
         hurt.setHealth(4.0F);
@@ -376,7 +376,7 @@ public final class XavierTests {
         ServerPlayer charles = xavier(f, 3.5, 4.5);
         releaseOnClose(f, charles);
         Husk husk = husk(helper, 6.5, 4.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(8.0, FLOOR, 4.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(8.0, FLOOR, 4.5));
         lookAt(charles, husk);
         press(charles, 3);
         check(MindLink.isHost(husk), "in the husk");
@@ -613,8 +613,8 @@ public final class XavierTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 10.5, 10.5);
         Zombie husk = PhoenixTests.zombie(helper, 13.5, 10.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(7.5, FLOOR, 10.5));
-        Zombie helmet = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(10.5, FLOOR, 14.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(7.5, FLOOR, 10.5));
+        Zombie helmet = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(10.5, FLOOR, 14.5));
         helmet.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
         ServerPlayer plain = f.player(10.5, FLOOR, 6.5);
         press(charles, 4);

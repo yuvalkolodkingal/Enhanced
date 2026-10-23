@@ -130,7 +130,7 @@ public final class BossGripTests {
 
     /** A zombie that stands still and does not burn in the sun (the tests run by day). */
     private static Zombie stillZombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         return zombie;
     }
@@ -214,7 +214,7 @@ public final class BossGripTests {
 
         // The vanilla bosses in their untouchable states.
         ServerPlayer phoenix = f.player(8.5, FLOOR, 19.5, Power.PHOENIX);
-        WitherBoss wither = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(14.5, FLOOR, 19.5));
+        WitherBoss wither = TestKit.spawnWithNoFreeWill(helper, EntityType.WITHER, new Vec3(14.5, FLOOR, 19.5));
         wither.setInvulnerableTicks(100);
         Zombie past = stillZombie(helper, 18.5, 19.5);
         lookAt(phoenix, wither);
@@ -1207,7 +1207,7 @@ public final class BossGripTests {
         ServerPlayer magneto = f.player(3.5, FLOOR, 14.5, Power.MAGNETO);
         // The Apocalypse hero's sand: a hero's cocoon, which no fight owns and no sweep takes away.
         ServerPlayer caster = f.player(17.5, FLOOR, 10.5, Power.APOCALYPSE);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 6.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 6.5));
         Zombie zombie = stillZombie(helper, 8.5, 14.5);
         zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
         SandCocoonEntity pigCocoon = SandControl.entomb(level, caster, pig, 100, 0.0F, 20.0F, null);
@@ -1243,7 +1243,7 @@ public final class BossGripTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer wanda = f.player(3.5, FLOOR, 6.5, Power.SCARLET_WITCH);
         ServerPlayer phoenix = f.player(3.5, FLOOR, 14.5, Power.PHOENIX);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 6.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 6.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         Zombie other = stillZombie(helper, 8.5, 14.5);
         Zombie spare = stillZombie(helper, 8.5, 10.5);
@@ -2464,7 +2464,7 @@ public final class BossGripTests {
 
     /** A Wither standing on the floor, his spawn invulnerability over. */
     private static WitherBoss wither(GameTestHelper helper, double x, double z) {
-        WitherBoss wither = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(x, FLOOR, z));
+        WitherBoss wither = TestKit.spawnWithNoFreeWill(helper, EntityType.WITHER, new Vec3(x, FLOOR, z));
         wither.setInvulnerableTicks(0);
         return wither;
     }
@@ -2557,7 +2557,7 @@ public final class BossGripTests {
                     gathering.discard();
 
                     // A Warden, held by Billy for half as long.
-                    Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
+                    Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
                     lookAt(billy, warden);
                     press(billy, 3, false);
                     check(Telekinesis.holds(billy, warden) && BossGrip.GRABBED.equals(lastActionBarKey(billy)) && warden.isNoAi(),
@@ -2582,7 +2582,7 @@ public final class BossGripTests {
                     warden.discard();
 
                     // An Elder Guardian, held by the Phoenix.
-                    ElderGuardian guardian = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 15.5));
+                    ElderGuardian guardian = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 15.5));
                     lookAt(phoenix, guardian);
                     press(phoenix, 3, false);
                     check(Telekinesis.holds(phoenix, guardian) && BossGrip.GRABBED.equals(lastActionBarKey(phoenix)) && guardian.isNoAi(),
@@ -2661,7 +2661,7 @@ public final class BossGripTests {
         ServerLevel nether = helper.getLevel().getServer().getLevel(Level.NETHER);
         check(nether != null, "the server has a Nether");
         ServerPlayer wanda = creative(f, 3.5, 10.5, Power.SCARLET_WITCH);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 10.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(9.5, FLOOR, 10.5));
         lookAt(wanda, warden);
         press(wanda, 3, false);
         check(Telekinesis.holds(wanda, warden) && warden.isNoAi() && marked(warden), "Wanda holds a Warden without his will");
@@ -2703,13 +2703,14 @@ public final class BossGripTests {
                 "the Wither is too powerful to lift");
         check(!Telekinesis.canLift(wanda, wither, Mode.WANDA), "and cannot be lifted");
         wither.discard();
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
         lookAt(billy, warden);
         press(billy, 3, false);
         check(!Telekinesis.isHolding(billy) && BossGrip.TOO_POWERFUL.equals(lastActionBarKey(billy)) && !warden.isNoAi(),
                 "so is the Warden");
         warden.discard();
-        ElderGuardian guardian = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 14.5));
+        ElderGuardian guardian = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN,
+                new Vec3(9.5, FLOOR, 14.5));
         lookAt(phoenix, guardian);
         press(phoenix, 3, false);
         check(!Telekinesis.isHolding(phoenix) && BossGrip.TOO_POWERFUL.equals(lastActionBarKey(phoenix)) && !guardian.isNoAi(),

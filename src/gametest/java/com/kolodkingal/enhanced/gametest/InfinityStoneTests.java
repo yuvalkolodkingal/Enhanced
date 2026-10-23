@@ -321,7 +321,7 @@ public final class InfinityStoneTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer attacker = f.player(10.5, FLOOR, 10.5);
         attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         zombie.setNoAi(true);
         heard(attacker);
@@ -341,7 +341,7 @@ public final class InfinityStoneTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer attacker = f.player(10.5, FLOOR, 10.5);
         attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setNoAi(true);
         zombie.setHealth(0.1F);
         heard(attacker);

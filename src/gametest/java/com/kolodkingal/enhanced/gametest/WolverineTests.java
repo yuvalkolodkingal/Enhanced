@@ -139,7 +139,7 @@ public final class WolverineTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no blow moves it). */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -387,7 +387,8 @@ public final class WolverineTests {
     public static void aBossIsNotPinned(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 10.5);
-        ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(10.5, FLOOR, 10.5));
+        ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN,
+                new Vec3(10.5, FLOOR, 10.5));
         lookAt(logan, boss);
         check(Pounce.pounce(logan, data(logan)), "the pounce");
         until(helper, 60, () -> !Pounce.leaping(logan), () -> {
@@ -498,9 +499,9 @@ public final class WolverineTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 10.5, 10.5);
         Husk husk = husk(helper, 13.5, 10.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(7.5, FLOOR, 10.5));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
-        Pig poisoned = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 6.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(7.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
+        Pig poisoned = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 6.5));
         poisoned.addEffect(new MobEffectInstance(MobEffects.POISON, 200));
         ServerPlayer friend = f.player(15.5, FLOOR, 15.5);
         List<ScentPayload.Scent> scents = Senses.sniff(logan, data(logan));
@@ -529,7 +530,7 @@ public final class WolverineTests {
     public static void trackFollowsAPigUntilItDies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 3.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 9.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 9.5));
         lookAt(logan, pig);
         press(logan, 5, true);
         check(pig.getUUID().equals(Senses.tracked(logan)) && data(logan).toggle(Toggle.SCENT_TRACK), "tracking");

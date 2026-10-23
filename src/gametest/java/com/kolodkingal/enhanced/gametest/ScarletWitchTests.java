@@ -258,7 +258,7 @@ public final class ScarletWitchTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SCEPTER_CONFUSION_TICKS, 60);
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         zombie.setTarget(attacker);
         check(zombie.getTarget() == attacker, "the zombie is after the player");
@@ -331,7 +331,7 @@ public final class ScarletWitchTests {
         f.config(EnhancedConfig.SCEPTER_SLOWNESS_TICKS, 0);
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
         ServerPlayer victim = f.player(11.5, FLOOR, 10.5);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         zombie.setNoAi(true);
         float health = zombie.getHealth();
 
@@ -349,7 +349,7 @@ public final class ScarletWitchTests {
     public static void scepterLeavesAKilledCreatureAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setNoAi(true);
         zombie.setHealth(0.1F); // (the scepter's own damage only counts once the player has ticked with it in hand)
         TestKit.heardSounds(attacker);
@@ -372,7 +372,7 @@ public final class ScarletWitchTests {
         check(!EntityType.ZOMBIE.is(ModTags.CONFUSED_IMMUNE) && !EntityType.VILLAGER.is(ModTags.CONFUSED_IMMUNE), "ordinary creatures are not");
 
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
-        Warden warden = helper.spawn(EntityType.WARDEN, new Vec3(11.5, FLOOR, 10.5));
+        Warden warden = TestKit.spawn(helper, EntityType.WARDEN, new Vec3(11.5, FLOOR, 10.5));
         warden.setNoAi(true);
         float health = warden.getHealth();
 
@@ -421,7 +421,7 @@ public final class ScarletWitchTests {
     public static void chaosBeamHurtsAndNauseates(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         lookAt(wanda, pig);
         float before = pig.getHealth();
 
@@ -437,7 +437,7 @@ public final class ScarletWitchTests {
     public static void chaosBeamIsBlockedByWalls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         for (int y = 2; y <= 6; y++) {
             for (int z = 8; z <= 12; z++) {
                 helper.setBlock(new BlockPos(8, y, z), Blocks.STONE);
@@ -463,7 +463,7 @@ public final class ScarletWitchTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         PowerData data = Powers.get(wanda);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
 
         lookAt(wanda, pig);
         AbilityHandler.onKey(wanda, 3, true);
@@ -543,7 +543,7 @@ public final class ScarletWitchTests {
     public static void thrownCreatureSlamsIntoWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Pig pig = helper.spawn(EntityType.PIG, new Vec3(7.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawn(helper, EntityType.PIG, new Vec3(7.5, FLOOR, 10.5));
         buildWall(helper, 15);
         lookAt(wanda, pig);
         AbilityHandler.onKey(wanda, 3, true);
@@ -690,7 +690,7 @@ public final class ScarletWitchTests {
     }
 
     private static Skeleton harmlessSkeleton(GameTestHelper helper, Vec3 at) {
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, at);
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, at);
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         skeleton.setNoAi(true); // only the arrow may hurt Wanda (equipping a skeleton re-adds its melee goal)
         return skeleton;
@@ -783,7 +783,7 @@ public final class ScarletWitchTests {
 
     /** A husk (it does not burn in the sun) that takes damage as written: no armour to soften it. */
     private static Zombie bareHusk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return husk;
     }
@@ -1152,10 +1152,10 @@ public final class ScarletWitchTests {
         f.config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, 1000.0);
         ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         List<Mob> attackers = List.of(
-                helper.spawnWithNoFreeWill(EntityType.SPIDER, new Vec3(8.9, FLOOR, 10.5)),
-                helper.spawnWithNoFreeWill(EntityType.RAVAGER, new Vec3(12.0, FLOOR, 12.5)),
-                helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 7.9)),
-                helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(13.5, FLOOR, 8.5)));
+                TestKit.spawnWithNoFreeWill(helper, EntityType.SPIDER, new Vec3(8.9, FLOOR, 10.5)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.RAVAGER, new Vec3(12.0, FLOOR, 12.5)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(10.5, FLOOR, 7.9)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(13.5, FLOOR, 8.5)));
         raiseShield(f, wanda, () -> {
             float before = Powers.get(wanda).shieldStrength();
             for (Mob attacker : attackers) {
@@ -1308,7 +1308,7 @@ public final class ScarletWitchTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         Zombie husk = bareHusk(helper, 3.5, 12.0); // beside her, not on the line to the pig
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         raiseShield(f, wanda, () -> {
             float huskHealth = husk.getHealth();
             lookAt(wanda, husk);

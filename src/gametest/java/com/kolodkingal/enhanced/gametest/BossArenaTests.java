@@ -96,7 +96,8 @@ public final class BossArenaTests {
             NeoForge.EVENT_BUS.post(flowed);
             PistonEvent.Pre pushed = new PistonEvent.Pre(level, pos, Direction.UP, PistonEvent.PistonMoveType.EXTEND);
             NeoForge.EVENT_BUS.post(pushed);
-            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(inside ? 12.5 : 20.5, FLOOR, 12.5));
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE,
+                    new Vec3(inside ? 12.5 : 20.5, FLOOR, 12.5));
             LivingDestroyBlockEvent ate = new LivingDestroyBlockEvent(zombie, pos, dirt);
             NeoForge.EVENT_BUS.post(ate);
             EntityMobGriefingEvent griefed = new EntityMobGriefingEvent(level, zombie);

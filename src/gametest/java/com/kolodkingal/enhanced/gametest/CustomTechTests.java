@@ -134,7 +134,7 @@ public final class CustomTechTests {
 
     /** A husk with no armour and 200 health that stands where it is put. */
     private static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -143,12 +143,12 @@ public final class CustomTechTests {
 
     /** A husk that stands where it is put and does not burn in the sun. */
     private static Zombie zombie(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
     }
 
     /** A husk with its own will (it walks when steered). */
     private static Husk walker(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.setPersistenceRequired();
         return husk;
     }

@@ -240,7 +240,7 @@ public final class VormirTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer thor = thor(f);
-        Wolf wolf = helper.spawn(EntityType.WOLF, new BlockPos(16, 2, 16));
+        Wolf wolf = TestKit.spawn(helper, EntityType.WOLF, new BlockPos(16, 2, 16));
         wolf.tame(thor);
         wolf.setOrderedToSit(true);
         fall(f, cliff, wolf, () -> check(hit(thor, wolf), "Thor's blow reaches his wolf"), () -> {
@@ -261,7 +261,7 @@ public final class VormirTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer thor = thor(f);
-        Cat cat = helper.spawn(EntityType.CAT, new BlockPos(16, 2, 16));
+        Cat cat = TestKit.spawn(helper, EntityType.CAT, new BlockPos(16, 2, 16));
         cat.tame(thor);
         cat.setOrderedToSit(true);
         landsAndIsTaken(f, cliff, thor, cat, "the cat");
@@ -276,7 +276,7 @@ public final class VormirTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f, 11);
         ServerPlayer thor = f.player(16.5, 6.0, 12.5, Power.THOR);
-        Horse horse = helper.spawn(EntityType.HORSE, new BlockPos(5, 2, 18));
+        Horse horse = TestKit.spawn(helper, EntityType.HORSE, new BlockPos(5, 2, 18));
         horse.getAttribute(Attributes.MAX_HEALTH).setBaseValue(30.0);
         horse.setHealth(30.0F);
         horse.tameWithName(thor);
@@ -322,7 +322,7 @@ public final class VormirTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer thor = thor(f);
-        Wolf wolf = helper.spawn(EntityType.WOLF, new BlockPos(16, 2, 16));
+        Wolf wolf = TestKit.spawn(helper, EntityType.WOLF, new BlockPos(16, 2, 16));
         wolf.tame(thor);
         wolf.setOrderedToSit(true);
         Vec3 far = helper.absoluteVec(new Vec3(19.5, TestKit.FLOOR, 19.5));
@@ -401,7 +401,7 @@ public final class VormirTests {
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer thor = thor(f);
         ServerPlayer owner = f.player(16.5, TestKit.FLOOR, 4.5);
-        Wolf wolf = helper.spawn(EntityType.WOLF, new BlockPos(16, 2, 16));
+        Wolf wolf = TestKit.spawn(helper, EntityType.WOLF, new BlockPos(16, 2, 16));
         wolf.tame(owner);
         wolf.setOrderedToSit(true);
         fall(f, cliff, wolf, () -> hit(thor, wolf), () -> {
@@ -438,7 +438,7 @@ public final class VormirTests {
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer thor = thor(f);
         ServerPlayer friend = friend(f, Power.SPIDER_MAN);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(16, 2, 16));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(16, 2, 16));
         fall(f, cliff, friend, () -> {
             check(hit(thor, friend), "Thor hits him first");
             friend.invulnerableTime = 0;
@@ -830,8 +830,8 @@ public final class VormirTests {
     public static void theSharedPushesAreCredited(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(4.5, TestKit.FLOOR, 4.5, Power.THOR);
-        Zombie target = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(10, 2, 10));
-        Zombie other = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(14, 2, 14));
+        Zombie target = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(10, 2, 10));
+        Zombie other = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(14, 2, 14));
         StonePowers.shove(target, thor.position(), 1.0, 0.2, thor);
         check(VormirTracker.lastCredit(target) != null
                 && thor.getUUID().equals(VormirTracker.lastCredit(target).pusher()),
@@ -840,7 +840,7 @@ public final class VormirTests {
         check(thor.getUUID().equals(VormirTracker.lastCredit(target).pusher()), "a shove of no one changes nothing");
         StonePowers.shove(target, other.position(), 1.0, 0.2, other);
         check(VormirTracker.lastCredit(target).pusher() == null, "a zombie's shove takes the credit away");
-        Wolf wolf = helper.spawnWithNoFreeWill(EntityType.WOLF, new BlockPos(6, 2, 6));
+        Wolf wolf = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new BlockPos(6, 2, 6));
         wolf.tame(thor);
         VormirTracker.credit(target, wolf);
         check(thor.getUUID().equals(VormirTracker.lastCredit(target).pusher()), "his wolf's push is his");

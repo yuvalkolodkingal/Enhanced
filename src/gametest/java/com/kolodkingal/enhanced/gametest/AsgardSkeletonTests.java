@@ -243,7 +243,7 @@ public final class AsgardSkeletonTests {
         player.teleportTo(asgard, arrival.x, arrival.y, arrival.z, 0, 0);
         check(player.level() == helper.getLevel(), "a teleport into Asgard is refused");
         check("message.enhanced.asgard.only_bifrost".equals(BossTestSupport.lastActionBarKey(player)), "and he is told why");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         check(zombie.changeDimension(new DimensionTransition(asgard, arrival, Vec3.ZERO, 0, 0, DimensionTransition.DO_NOTHING)) == null
                 && zombie.level() == helper.getLevel(), "a creature cannot go in either");
         check(AsgardGate.allows(player, Level.OVERWORLD, Level.NETHER), "the gate does not care for other worlds");
@@ -315,7 +315,7 @@ public final class AsgardSkeletonTests {
         ServerPlayer traveller = f.player(5.5, FLOOR, 5.5);
         traveller.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.HOFUND.get()));
         ServerPlayer friend = f.player(5.5, FLOOR, 7.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(7.5, FLOOR, 5.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(7.5, FLOOR, 5.5));
         UUID pigId = pig.getUUID();
         f.onClose(() -> {
             Entity moved = asgard.getEntity(pigId);
@@ -355,8 +355,8 @@ public final class AsgardSkeletonTests {
         ServerPlayer sneaking = f.player(3.5, FLOOR, 4.5);
         sneaking.setShiftKeyDown(true);
         ServerPlayer outside = f.player(5.5, FLOOR, 5.5 + Bifrost.CIRCLE_RADIUS + 0.4);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(7.5, FLOOR, 5.5));
-        ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(3.5, FLOOR, 7.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(7.5, FLOOR, 5.5));
+        ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN, new Vec3(3.5, FLOOR, 7.0));
         // A pillar where the one inside would land: he must land on it, not in it.
         BlockPos pillar = BlockPos.containing(there.add(0, 0, 2));
         helper.getLevel().setBlockAndUpdate(pillar, Blocks.STONE.defaultBlockState());
@@ -430,7 +430,7 @@ public final class AsgardSkeletonTests {
     public static void aLandingIsNeverInsideABlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
         BlockPos wall = helper.absolutePos(new BlockPos(10, (int) FLOOR, 10));
         for (int y = 0; y < 3; y++) {
             level.setBlockAndUpdate(wall.above(y), Blocks.STONE.defaultBlockState());

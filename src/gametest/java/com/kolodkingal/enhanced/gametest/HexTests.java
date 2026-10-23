@@ -68,7 +68,7 @@ public final class HexTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
         ServerPlayer wanda = raiseHex(f);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
         check(!inside(f, wanda, pig), "the pig starts outside");
 
         f.everyTick(10, tick -> {
@@ -86,7 +86,7 @@ public final class HexTests {
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
         ServerPlayer wanda = raiseHex(f);
         HexManager.handleAction(wanda, HexAction.SET_CREATURES, Optional.empty(), 1);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
 
         f.everyTick(10, tick -> {
             if (tick == 2) {
@@ -169,9 +169,9 @@ public final class HexTests {
         ServerPlayer magneto = f.player(2.0, FLOOR, CENTER, Power.MAGNETO);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(friend.getUUID()), 1);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(magneto.getUUID()), 1);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(19.0, FLOOR, CENTER));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(19.0, FLOOR, CENTER));
         pet.tame(friend);
-        Pig stranger = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER, FLOOR, 19.5));
+        Pig stranger = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER, FLOOR, 19.5));
 
         f.everyTick(10, tick -> {
             if (tick == 2) {

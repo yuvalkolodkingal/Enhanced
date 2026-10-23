@@ -590,7 +590,7 @@ public final class ThanosStoneTests {
         ServerLevel level = f.level();
         ServerPlayer loki = fighter(f, 4, 4, Power.LOKI);
         ThanosEntity boss = boss(f, loki, 4);
-        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(ThanosBossTests.CENTRE.x + 4.0, FLOOR, ThanosBossTests.CENTRE.z + 6.0));
+        Zombie model = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(ThanosBossTests.CENTRE.x + 4.0, FLOOR, ThanosBossTests.CENTRE.z + 6.0));
         lookAt(loki, model);
         AbilityHandler.onKey(loki, 3, true);
         AbilityHandler.onKey(loki, 3, false);

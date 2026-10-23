@@ -95,7 +95,7 @@ public final class StrangeTests {
 
     /** A husk that stands still with plenty of health. */
     private static Zombie husk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
@@ -183,7 +183,7 @@ public final class StrangeTests {
         PowerData data = Powers.get(strange);
         check(data.is(Live.TIME_SLOWING) && data.toggle(Toggle.TIME_SLOW), "with the Eye: time slows round him");
         // The zone holds a zombie near him (the zones are gathered once a tick: look on the next one).
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 4.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 4.5));
         helper.runAfterDelay(1, () -> {
             check(com.kolodkingal.enhanced.ability.SlowMotion.isInZone(helper.getLevel(), zombie.position()),
                     "the zombie stands in the slowed time");
@@ -289,7 +289,7 @@ public final class StrangeTests {
         float before = friend.getHealth();
         friend.hurt(helper.getLevel().damageSources().generic(), 8.0F);
         assertNear(before - friend.getHealth(), 4.0, 0.01, "he takes half the harm");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 11.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 11.5));
         check(!SeraphimShield.shelters(zombie), "a monster inside is not sheltered");
         check(!Powers.get(strange).isReady(3, helper.getLevel().getGameTime() + SeraphimShield.domeCooldown() - 5),
                 "the Dome's long recharge");
@@ -311,7 +311,7 @@ public final class StrangeTests {
                 "the zombie is spellbound 4 s: " + bound);
         assertNear(200.0F - zombie.getHealth(), CrimsonBands.DAMAGE, 0.01, "the bands close with 2 harm");
         check(!Powers.get(strange).isReady(4, helper.getLevel().getGameTime() + 100), "the bands' cooldown");
-        Warden boss = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(4.5, FLOOR, 12.5));
+        Warden boss = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(4.5, FLOOR, 12.5));
         CrimsonBands.bind(strange, boss);
         MobEffectInstance held = boss.getEffect(ModEffects.SPELLBOUND);
         check(CrimsonBands.isBoss(boss) && (held == null ? CrimsonBands.heldTicks(boss) <= CrimsonBands.bossTicks()
@@ -417,7 +417,8 @@ public final class StrangeTests {
         check(near != null && far != null, "both rings stand");
         check(far.position().distanceTo(near.position()) > 4.0, "the far ring where he looks");
         Vec3 nc = near.center();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, helper.relativeVec(nc.add(0, -1.25, -0.6)));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE,
+                helper.relativeVec(nc.add(0, -1.25, -0.6)));
         ItemEntity item = new ItemEntity(level, nc.x + 0.3, nc.y, nc.z - 1.5, new ItemStack(Items.DIAMOND));
         item.setDeltaMovement(0, 0.05, 0.45);
         item.setNoGravity(true);

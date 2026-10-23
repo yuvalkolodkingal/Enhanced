@@ -267,9 +267,9 @@ public final class BillyTests {
     public static void hexBoltStrikesAndForks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
-        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
-        Pig near = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 13.5));
-        Pig far = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 1.5));
+        Pig target = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig near = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 13.5));
+        Pig far = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 1.5));
         lookAt(billy, target);
         press(billy, 1);
 
@@ -286,11 +286,11 @@ public final class BillyTests {
     public static void hexBoltForksToTwoAtMost(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
-        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig target = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         List<Pig> around = List.of(
-                helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 12.5)),
-                helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 8.5)),
-                helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(15.5, FLOOR, 10.5)));
+                TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 12.5)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 8.5)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(15.5, FLOOR, 10.5)));
         lookAt(billy, target);
         press(billy, 1);
         long hurt = around.stream().filter(p -> p.getHealth() < p.getMaxHealth()).count();
@@ -342,11 +342,11 @@ public final class BillyTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
         look(billy, EAST, 0.0F);
-        Zombie ahead = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
-        Zombie aside = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 13.5));
-        Zombie behind = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(1.5, FLOOR, 10.5));
-        Zombie wide = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 16.5));
-        Zombie tooFar = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(19.5, FLOOR, 10.5));
+        Zombie ahead = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie aside = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 13.5));
+        Zombie behind = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(1.5, FLOOR, 10.5));
+        Zombie wide = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 16.5));
+        Zombie tooFar = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(19.5, FLOOR, 10.5));
         ServerPlayer soldier = f.player(9.5, FLOOR, 8.5);
         press(billy, 4);
 
@@ -371,10 +371,10 @@ public final class BillyTests {
     @EnhancedTest(template = ARENA, timeoutTicks = 100)
     public static void aSpellboundZombieDoesNotGoAfterItsTarget(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        Zombie frozen = helper.spawn(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 6.5));
-        Zombie free = helper.spawn(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 14.5));
-        Villager frozenPrey = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 6.5));
-        Villager freePrey = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 14.5));
+        Zombie frozen = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 6.5));
+        Zombie free = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 14.5));
+        Villager frozenPrey = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(12.5, FLOOR, 6.5));
+        Villager freePrey = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(12.5, FLOOR, 14.5));
         frozen.addEffect(new MobEffectInstance(ModEffects.SPELLBOUND, 200));
         frozen.setTarget(frozenPrey);
         free.setTarget(freePrey);

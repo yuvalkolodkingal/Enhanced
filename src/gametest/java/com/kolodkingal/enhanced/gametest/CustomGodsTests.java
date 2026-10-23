@@ -59,7 +59,7 @@ public final class CustomGodsTests {
 
     /** A husk that stands where it is, with no armour (so a damage reads as it is) and no burning in the sun. */
     private static Zombie husk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return husk;
     }

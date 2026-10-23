@@ -144,7 +144,7 @@ public final class DataTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer player = f.player(5.5, 2, 10.5);
-        Witch witch = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(10.5, 2, 10.5));
+        Witch witch = TestKit.spawnWithNoFreeWill(helper, EntityType.WITCH, new Vec3(10.5, 2, 10.5));
         LootTable table = level.getServer().reloadableRegistries().getLootTable(EntityType.WITCH.getDefaultLootTable());
         LootParams byPlayer = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, witch)

@@ -131,7 +131,7 @@ public final class HealingTests {
     }
 
     static Zombie zombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // (no burning in the sun)
         return zombie;
     }

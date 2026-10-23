@@ -115,7 +115,7 @@ public final class ApocalypseTests {
 
     /** A husk with no armour and 200 health that stands where it is put: it takes damage as written, and a lot of it. */
     private static Husk bareHusk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -123,7 +123,7 @@ public final class ApocalypseTests {
     }
 
     private static Skeleton harmlessSkeleton(GameTestHelper helper, double x, double z) {
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(x, FLOOR, z));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(x, FLOOR, z));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         skeleton.setNoAi(true);
         return skeleton;
@@ -341,7 +341,7 @@ public final class ApocalypseTests {
         Husk far = bareHusk(helper, 18.5, 10.5);
         Husk behind = bareHusk(helper, 0.5, 10.5);
         Husk aside = bareHusk(helper, 8.5, 14.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(8.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(8.5, FLOOR, 10.5));
         ServerPlayer bystander = f.player(14.5, FLOOR, 10.5);
         Log log = new Log(hero).drain();
         log.clear();
@@ -447,7 +447,7 @@ public final class ApocalypseTests {
         sneakPress(hero, 1);
         check(log.drain().toldOnActionBar("message.enhanced.entomb.nothing") && cooldownLeft(hero, 1) <= 0, "nobody in reach");
 
-        Warden boss = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(6.5, FLOOR, 16.5));
+        Warden boss = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(6.5, FLOOR, 16.5));
         lookAt(hero, boss);
         log.clear();
         sneakPress(hero, 1);
@@ -492,9 +492,9 @@ public final class ApocalypseTests {
     public static void portalTakesPetsAndSneakingAlliesAlong(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 4.5, 4.5);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(5.5, FLOOR, 4.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(5.5, FLOOR, 4.5));
         pet.tame(hero);
-        Wolf stray = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(3.5, FLOOR, 4.5));
+        Wolf stray = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(3.5, FLOOR, 4.5));
         ServerPlayer sneaker = f.player(4.5, FLOOR, 6.0);
         sneaker.setShiftKeyDown(true);
         ServerPlayer stander = f.player(3.5, FLOOR, 6.0);
@@ -585,7 +585,7 @@ public final class ApocalypseTests {
         ServerPlayer wanda = f.player(5.5, FLOOR, 5.5, Power.SCARLET_WITCH);
         ServerPlayer phoenix = f.player(15.5, FLOOR, 5.5, Power.PHOENIX);
         ServerPlayer plain = f.player(5.5, FLOOR, 15.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         Skeleton skeleton = harmlessSkeleton(helper, 15.5, 15.5);
         PowerData data = Powers.get(hero);
         int windUp = ApocalypseConfig.SHIELD_WIND_UP_TICKS.get();
@@ -851,11 +851,11 @@ public final class ApocalypseTests {
         ServerLevel level = f.level();
         ServerPlayer hero = hero(f, 3.5, 10.5);
         ServerPlayer friend = f.player(10.5, FLOOR, 10.5);
-        Wolf wolf = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(7.5, FLOOR, 7.5));
+        Wolf wolf = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(7.5, FLOOR, 7.5));
         wolf.tame(hero);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 13.5));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(7.5, FLOOR, 13.5));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 5.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 13.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(7.5, FLOOR, 13.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 5.5));
         Log log = new Log(hero).drain();
         log.clear();
 
@@ -936,8 +936,8 @@ public final class ApocalypseTests {
         ServerPlayer hero = hero(f, 10.5, 10.5);
         Husk enemy = bareHusk(helper, 13.5, 10.5);
         Husk distant = bareHusk(helper, 19.5, 17.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
         pet.tame(hero);
         ServerPlayer victim = f.player(10.5, FLOOR, 6.5);
         PowerData data = Powers.get(hero);

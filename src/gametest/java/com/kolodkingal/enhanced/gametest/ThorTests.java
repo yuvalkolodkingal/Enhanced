@@ -255,7 +255,7 @@ public final class ThorTests {
         // stop ticking when that test finishes) freezes there and never comes home. 12 turns it at about x 17.
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
         ServerPlayer thor = thor(f, 3.5, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         lookAt(thor, zombie);
         float before = zombie.getHealth();
         press(thor, 1);
@@ -298,8 +298,8 @@ public final class ThorTests {
     public static void theGodOfThunderArcsLightningWithEveryBlow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 8.5, 10.5);
-        Zombie first = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.0, FLOOR, 10.5));
-        Zombie second = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.0, FLOOR, 10.5));
+        Zombie first = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.0, FLOOR, 10.5));
+        Zombie second = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.0, FLOOR, 10.5));
         press(thor, 4);
         PowerData data = Powers.get(thor);
         check(data.toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
@@ -377,7 +377,7 @@ public final class ThorTests {
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         PowerTicker.tick(thor);
         check(thor.mayFly(), "Thor flies with Stormbreaker too");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         lookAt(thor, zombie);
         float before = zombie.getHealth();
         press(thor, 1);
@@ -400,7 +400,7 @@ public final class ThorTests {
     public static void thorCallsHisWeaponOutOfACreaturesHands(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 10.5));
         zombie.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         press(thor, 1);
         check(zombie.getMainHandItem().isEmpty(), "it tears out of the zombie's hand");
@@ -506,7 +506,7 @@ public final class ThorTests {
 
     /** A zombie (a Husk, which does not burn in the sun) that takes damage as written: no armour to soften it. */
     private static Zombie bareZombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return zombie;
     }
@@ -703,7 +703,7 @@ public final class ThorTests {
     public static void theWeaponsBeamChargesCreepersTheFirstTimeItHitsThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.5, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.5, FLOOR, 10.5));
         lookAt(thor, creeper);
         hold(thor, 3);
         PowerTicker.tick(thor);
@@ -717,7 +717,7 @@ public final class ThorTests {
         check(creeper.getRemainingFireTicks() <= 0, "without setting it alight");
         letGo(thor, 3);
         // And a pig turns into a zombified piglin (unless the world is peaceful).
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 13.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 13.5));
         creeper.discard();
         lookAt(thor, pig);
         hold(thor, 3);
@@ -778,7 +778,7 @@ public final class ThorTests {
     public static void theBeamSparesTheSteedThorRidesAndLettingGoDoesNotResetItsPace(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
-        Pig steed = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(3.5, FLOOR, 10.5));
+        Pig steed = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(3.5, FLOOR, 10.5));
         check(thor.startRiding(steed, true), "Thor sits on the pig");
         Zombie zombie = bareZombie(helper, 9.5, 10.5);
         lookAt(thor, zombie);
@@ -819,7 +819,7 @@ public final class ThorTests {
         check(ownedBy(thor.getMainHandItem(), thor), "sanity: Mjolnir is Thor's");
         List<Zombie> zombies = List.of(bareZombie(helper, 5.5, 10.5), bareZombie(helper, 15.5, 8.5), bareZombie(helper, 10.5, 16.5));
         // A friendly creature isn't an enemy.
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 12.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 12.5));
         sneakPress(thor, 1);
         PowerData data = Powers.get(thor);
         check(!holdsMjolnir(thor), "Mjolnir leaves his hand");
@@ -971,7 +971,7 @@ public final class ThorTests {
         check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
         Zombie enemy = bareZombie(helper, 5.5, 10.5);
         // Not an enemy, so no fragment is sent for it, but near enough for the lightning to leap to it.
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.5, FLOOR, 13.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(5.5, FLOOR, 13.5));
         sneakPress(thor, 1);
         check(fragments(helper).size() == 1, "one fragment, for the zombie");
         f.everyTick(60, t -> {
@@ -1296,7 +1296,7 @@ public final class ThorTests {
         check(!EntityType.ZOMBIE.is(ModTags.PIN_IMMUNE), "a zombie is not");
         ServerPlayer thor = thor(f, 6.5, 10.5);
         PowerTicker.tick(thor);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(8.5, FLOOR, 10.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(8.5, FLOOR, 10.5));
         check(rightClick(thor, warden, true), "the click is taken (Mjolnir doesn't open the Bifrost), but ...");
         check(pinsNear(warden).isEmpty() && !MjolnirPin.isPinned(warden), "the Warden isn't pinned");
         check(holdsMjolnir(thor), "and Mjolnir stays in his hand");
@@ -1365,7 +1365,7 @@ public final class ThorTests {
         ServerPlayer thor = thor(f, 6.5, 10.5);
         PowerTicker.tick(thor);
         Zombie zombie = bareZombie(helper, 8.5, 10.5);
-        Pig steed = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 12.5));
+        Pig steed = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 12.5));
         check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "pinned");
         check(!zombie.startRiding(steed), "it can't climb onto a steed");
         Vec3 pinned = zombie.position();
@@ -1683,7 +1683,7 @@ public final class ThorTests {
         // next to Thor, and a fourth is in his own pocket.
         BlockPos odinsBlock = new BlockPos(6, 2, 10);
         check(MjolnirBlock.setDown(level, helper.absolutePos(odinsBlock), ownedMjolnir(odin)), "set Odin's Mjolnir down");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
         zombie.setItemInHand(InteractionHand.MAIN_HAND, ownedMjolnir(odin));
         Vec3 beside = helper.absoluteVec(new Vec3(4.5, FLOOR, 10.5));
         ItemEntity lying = new ItemEntity(level, beside.x, beside.y, beside.z, ownedMjolnir(odin));

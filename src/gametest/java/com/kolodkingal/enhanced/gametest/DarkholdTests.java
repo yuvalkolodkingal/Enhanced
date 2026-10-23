@@ -104,7 +104,7 @@ public final class DarkholdTests {
     }
 
     private static Pig dummy(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(x, FLOOR, z));
     }
 
     private static List<BeamPayload> beamPayloads(ServerPlayer player) {
@@ -501,7 +501,7 @@ public final class DarkholdTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
         Pig near = dummy(helper, 14.5, 10.5);
-        Zombie nearer = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie nearer = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         nearer.setHealth(5.0F);
         TestKit.look(loki, 0.0F, -90.0F);
         TestKit.sentPackets(loki);
@@ -575,14 +575,14 @@ public final class DarkholdTests {
     public static void aBossIsMarkedButNotSlowed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 3.5, 10.5, Power.LOKI);
-        Mob wither = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 10.5));
+        Mob wither = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(10.5, FLOOR, 10.5));
         lookAt(loki, wither);
         TestKit.sentPackets(loki);
         DarkholdBook.mark(loki, wither);
         check(wither.getEffect(MobEffects.GLOWING) != null, "the boss glows (" + wither.getActiveEffects() + ")");
         check(wither.getEffect(MobEffects.MOVEMENT_SLOWDOWN) == null, "but is not slowed");
         assertNear(DarkholdBook.markedFactor(wither, loki), 1.5, 1.0E-6, "and takes the marker's extra damage");
-        check(DarkholdBook.bossLike(wither) && !DarkholdBook.bossLike(helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 12.5))), "bosses are told from the rest");
+        check(DarkholdBook.bossLike(wither) && !DarkholdBook.bossLike(TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 12.5))), "bosses are told from the rest");
         wither.discard();
         helper.succeed();
     }

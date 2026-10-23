@@ -96,7 +96,7 @@ public final class CaptainTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no blow moves it). */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -183,7 +183,7 @@ public final class CaptainTests {
         ServerPlayer cap = cap(f, 3.5, 3.5);
         cap.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
         ServerPlayer plain = f.player(8.5, FLOOR, 3.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
         float before = cap.getHealth();
         cap.hurt(cap.damageSources().mobAttack(zombie), 10.0F);
         assertNear(before - cap.getHealth(), 8.0, 0.01, "20 % off");
@@ -204,7 +204,7 @@ public final class CaptainTests {
         look(cap, EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
         check(ShieldRules.guarding(cap) && !cap.isBlocking(), "up at once (vanilla's would wait 5 ticks)");
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
         float before = cap.getHealth();
         Vec3 at = creeper.position();
         helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
@@ -222,7 +222,7 @@ public final class CaptainTests {
         look(plain, EAST, 0.0F);
         plain.startUsingItem(InteractionHand.OFF_HAND);
         check(!ShieldRules.guarding(plain), "not Captain America");
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
         float before = plain.getHealth();
         Vec3 at = creeper.position();
         helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
@@ -238,7 +238,7 @@ public final class CaptainTests {
         ServerPlayer cap = cap(f, 6.5, 10.5);
         look(cap, -EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
         float before = cap.getHealth();
         Vec3 at = creeper.position();
         helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
@@ -254,7 +254,7 @@ public final class CaptainTests {
         ServerPlayer cap = cap(f, 5.5, 5.5);
         look(cap, EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
-        Vindicator vindicator = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(7.0, FLOOR, 5.5));
+        Vindicator vindicator = TestKit.spawnWithNoFreeWill(helper, EntityType.VINDICATOR, new Vec3(7.0, FLOOR, 5.5));
         vindicator.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_AXE));
         check(vindicator.canDisableShield(), "an axe can disable a shield");
         float before = cap.getHealth();
@@ -273,7 +273,7 @@ public final class CaptainTests {
         ServerPlayer cap = cap(f, 4.5, 10.5);
         look(cap, EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
-        var skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(14.5, FLOOR, 10.5));
+        var skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(14.5, FLOOR, 10.5));
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
         Vec3 from = helper.absoluteVec(new Vec3(8.5, FLOOR + 1.3, 10.5));
         arrow.setPos(from.x, from.y, from.z);
@@ -450,7 +450,7 @@ public final class CaptainTests {
         ServerPlayer cap = cap(f, 3.5, 4.5);
         look(cap, EAST, 0.0F);
         Vec3 start = cap.position();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 4.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 4.5));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         float health = cap.getHealth();
         press(cap, 3, false);
@@ -508,8 +508,8 @@ public final class CaptainTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 10.5, 10.5);
         ServerPlayer friend = f.player(14.5, FLOOR, 10.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(7.5, FLOOR, 10.5));
         int count = Assemble.assemble(cap, data(cap));
         check(count == 3, "him, the player and the villager: " + count);
         for (net.minecraft.world.entity.LivingEntity e : List.of(cap, friend, villager)) {

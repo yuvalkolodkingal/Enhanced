@@ -48,7 +48,7 @@ public final class SpeedStrikeTests {
 
     /** A zombie (a Husk: no burning in the sun) with no armour and plenty of health, so the numbers are as written. */
     private static Zombie target(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
         zombie.setHealth(100.0F);

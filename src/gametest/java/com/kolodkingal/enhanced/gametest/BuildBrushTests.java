@@ -189,7 +189,7 @@ public final class BuildBrushTests {
         meadow(f);
         BlockPos middle = abs(f, 10, MEADOW, 10);
         int radius = 4;
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(10.5, MEADOW + 1, 12.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(10.5, MEADOW + 1, 12.5));
         float health = cow.getHealth();
         IntConsumer raise = i -> {
             cast(wanda, recipe(Spell.LAND).style(LandStyle.RAISE).dab(1).at(middle, Direction.UP).size(radius).build());

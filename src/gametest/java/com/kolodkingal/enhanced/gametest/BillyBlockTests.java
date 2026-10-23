@@ -106,7 +106,7 @@ public final class BillyBlockTests {
 
     /** A zombie that stands still and does not burn in the sun (the tests run by day). */
     private static Zombie stillZombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         return zombie;
     }

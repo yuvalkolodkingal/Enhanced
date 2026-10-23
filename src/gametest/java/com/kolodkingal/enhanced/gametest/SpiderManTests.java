@@ -184,7 +184,7 @@ public final class SpiderManTests {
 
     /** A creature that does not burn in the sun and has no will of its own: a Husk, which is a Zombie. */
     private static Zombie zombie(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return husk;
     }
@@ -492,7 +492,7 @@ public final class SpiderManTests {
 
         // A cave spider killed by a player: 0.4 percent; killed by a fall: never.
         ServerPlayer killer = TestKit.fixture(helper).player(5.5, FLOOR, 5.5);
-        var cave = helper.spawnWithNoFreeWill(EntityType.CAVE_SPIDER, new Vec3(10.5, FLOOR, 10.5));
+        var cave = TestKit.spawnWithNoFreeWill(helper, EntityType.CAVE_SPIDER, new Vec3(10.5, FLOOR, 10.5));
         LootTable table = level.getServer().reloadableRegistries().getLootTable(EntityType.CAVE_SPIDER.getDefaultLootTable());
         LootParams byPlayer = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, cave)
@@ -1034,7 +1034,7 @@ public final class SpiderManTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
         List<Zombie> zombies = List.of(zombie(helper, 6.5, 10.5), zombie(helper, 14.5, 12.5), zombie(helper, 9.5, 5.5));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(13.5, FLOOR, 7.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(13.5, FLOOR, 7.5));
         PowerTicker.tick(player);
         resetHunger(player);
         seen(player);
@@ -2090,17 +2090,17 @@ public final class SpiderManTests {
         Zombie hostile = zombie(helper, 12.5, 10.5);
         hostile.setTarget(player);
         toughen(hostile);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(8.5, FLOOR, 10.5));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 12.5));
-        Wolf wolf = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(10.5, FLOOR, 8.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(8.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 12.5));
+        Wolf wolf = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(10.5, FLOOR, 8.5));
         wolf.tame(player);
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(9.5, FLOOR, 9.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(9.5, FLOOR, 9.5));
         f.pvp(true);
         ServerPlayer rival = f.player(11.5, FLOOR, 11.5);
         LokiIllusionEntity illusion = ModEntities.LOKI_ILLUSION.get().create(level);
         illusion.moveTo(abs(helper, 9.5, FLOOR, 11.5));
         level.addFreshEntity(illusion);
-        EnderMan neutral = helper.spawnWithNoFreeWill(EntityType.ENDERMAN, new Vec3(12.5, FLOOR, 8.5));
+        EnderMan neutral = TestKit.spawnWithNoFreeWill(helper, EntityType.ENDERMAN, new Vec3(12.5, FLOOR, 8.5));
         check(SpiderServer.isThreat(player, hostile), "a zombie that goes for him is a threat");
         for (LivingEntity spared : List.of(villager, golem, wolf, cow, rival, illusion)) {
             check(!SpiderServer.isThreat(player, spared), spared.getType() + " is no threat");
@@ -2199,7 +2199,7 @@ public final class SpiderManTests {
             zombie.setTarget(player);
             zombies.add(zombie);
         }
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 8.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 8.5));
         HookedWither wither = new HookedWither(level);
         wither.moveTo(abs(helper, 14.5, FLOOR, 10.5));
         level.addFreshEntity(wither);
@@ -2514,7 +2514,7 @@ public final class SpiderManTests {
         ServerLevel level = helper.getLevel();
         // A swelling creeper.
         ServerPlayer one = spider(f, 4.5, 4.5);
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(7.5, FLOOR, 4.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(7.5, FLOOR, 4.5));
         creeper.setSwellDir(1);
         PowerTicker.tick(one);
         check(data(one).is(Live.SENSING), "a swelling creeper is sensed");
@@ -2555,7 +2555,7 @@ public final class SpiderManTests {
         press(five, 3);
         pressSneaking(five, 3);
         check(!data(five).toggle(Toggle.SPIDER_SENSE), "Sneak + V switches the sense off");
-        Creeper another = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(12.5, FLOOR, 17.5));
+        Creeper another = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(12.5, FLOOR, 17.5));
         another.setSwellDir(1);
         seen(five);
         PowerTicker.tick(five);
@@ -2567,7 +2567,7 @@ public final class SpiderManTests {
     public static void theBlackEyesDoubleTheRangeOfTheSense(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 2.5);
-        Creeper far = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(10.5, FLOOR, 2.5 + 11.0));
+        Creeper far = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(10.5, FLOOR, 2.5 + 11.0));
         far.setSwellDir(1);
         check(SpiderSense.threats(player, 12.0, 1.0).stream().noneMatch(t -> t.entity() == far), "a swelling creeper 11 blocks away is outside the range of 7");
         check(SpiderSense.threats(player, 24.0, 2.0).stream().anyMatch(t -> t.entity() == far), "but inside the doubled range of the Black Eyes");

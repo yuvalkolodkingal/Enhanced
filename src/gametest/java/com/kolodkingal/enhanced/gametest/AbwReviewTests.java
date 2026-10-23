@@ -129,7 +129,7 @@ public final class AbwReviewTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.BILLY_BEAM, true);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
-        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 10.5));
+        Pig target = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 10.5));
         target.setNoAi(true);
         lookAt(billy, target);
         float perHit = EnhancedConfig.BILLY_BEAM_DAMAGE_PER_SECOND.get().floatValue() * EnhancedConfig.BILLY_BEAM_INTERVAL.get() / 20.0F;
@@ -188,7 +188,7 @@ public final class AbwReviewTests {
             float full = data.shieldStrength();
             float health = wanda.getHealth();
             // an arrow of an ordinary skeleton never wears an unlimited shield
-            Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
+            Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
             skeleton.setNoAi(true);
             Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
             wanda.invulnerableTime = 0;

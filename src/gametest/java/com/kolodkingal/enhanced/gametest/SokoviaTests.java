@@ -292,7 +292,7 @@ public final class SokoviaTests {
         drone.setOwner(a.getUUID());
         drone.setHeld(true);
         level.addFreshEntity(drone);
-        Cow cow = helper.spawn(EntityType.COW, new Vec3(MIDDLE_X + 6.0, GROUND, MIDDLE_Z + 5.0));
+        Cow cow = TestKit.spawn(helper, EntityType.COW, new Vec3(MIDDLE_X + 6.0, GROUND, MIDDLE_Z + 5.0));
         cow.setNoAi(true);
         ItemEntity item = new ItemEntity(level, helper.absoluteVec(new Vec3(MIDDLE_X - 6.0, GROUND, MIDDLE_Z - 5.0)).x,
                 helper.absoluteVec(new Vec3(MIDDLE_X - 6.0, GROUND, MIDDLE_Z - 5.0)).y, helper.absoluteVec(new Vec3(MIDDLE_X - 6.0, GROUND, MIDDLE_Z - 5.0)).z,

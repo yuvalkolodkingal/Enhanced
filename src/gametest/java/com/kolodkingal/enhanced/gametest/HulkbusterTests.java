@@ -99,7 +99,7 @@ public final class HulkbusterTests {
 
     /** A husk with no armour and 200 health that stands where it is put. */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -289,7 +289,7 @@ public final class HulkbusterTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         hulkbuster(helper, f, 10.5, 10.5, tony -> {
             assertNear(tony.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 1.0, 0.01, "full knockback resistance");
-            var creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(13.5, FLOOR, 10.5));
+            var creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(13.5, FLOOR, 10.5));
             Vec3 at = creeper.position();
             helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
             check(tony.getHealth() == tony.getMaxHealth(), "the blast did nothing: " + tony.getHealth());

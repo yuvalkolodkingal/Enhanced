@@ -92,7 +92,7 @@ public final class HeimdallTests {
 
     /** A husk that stands still with plenty of health (the blows are counted on it). */
     private static Zombie husk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
         return husk;
@@ -370,7 +370,7 @@ public final class HeimdallTests {
         ServerPlayer heimdall = heimdall(f, 3.5, 3.5);
         Zombie inside = husk(helper, 12.5, 12.5);
         Zombie outside = husk(helper, 17.5, 12.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(11.5, FLOOR, 12.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(11.5, FLOOR, 12.5));
         HeimdallAbilities.strikeAt(heimdall, helper.absoluteVec(new Vec3(12.5, FLOOR, 12.5)));
         float struck = 200.0F - inside.getHealth();
         check(struck > 12.0F && struck <= 14.0F, "14 to what is in its radius (less its armour): " + struck);

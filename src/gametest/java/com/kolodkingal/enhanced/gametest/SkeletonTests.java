@@ -614,7 +614,8 @@ public final class SkeletonTests {
             }
             entity.discard();
         }
-        check(!BossFights.isFightEntity(helper.spawn(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5))), "a zombie is not");
+        check(!BossFights.isFightEntity(TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5))),
+                "a zombie is not");
         helper.succeed();
     }
 
@@ -665,7 +666,7 @@ public final class SkeletonTests {
                 "enhanced:red_hulk_smash", "enhanced:iron_blade", "enhanced:hulkbuster_punch",
                 // (3.8.1: Captain America's combo and flip kick.)
                 "enhanced:cap_combo");
-        Zombie attacker = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
+        Zombie attacker = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
         Set<String> inTag = new LinkedHashSet<>();
         for (Holder.Reference<DamageType> holder : registry.holders().toList()) {
             String id = holder.key().location().toString();
@@ -681,7 +682,7 @@ public final class SkeletonTests {
                 check(melee, id + " is a melee blow of 3.0");
             }
             // A blow that is thrown or cast (nobody's own hand) is never melee, whatever its type.
-            check(!WandaAbilities.isMeleeHit(new DamageSource(holder, helper.spawn(EntityType.ARROW, new Vec3(3.5, FLOOR + 3, 3.5)), attacker)),
+            check(!WandaAbilities.isMeleeHit(new DamageSource(holder, TestKit.spawn(helper, EntityType.ARROW, new Vec3(3.5, FLOOR + 3, 3.5)), attacker)),
                     id + ": a projectile of it is not a blow");
         }
         Set<String> expected = new LinkedHashSet<>(before);
@@ -713,7 +714,7 @@ public final class SkeletonTests {
         ServerPlayer phoenix = f.player(5.5, FLOOR, 5.5, Power.PHOENIX);
         ServerPlayer wanda = f.player(9.5, FLOOR, 5.5, Power.SCARLET_WITCH);
         ServerPlayer nobody = f.player(13.5, FLOOR, 5.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 9.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 9.5));
 
         check(PhoenixPower.isPhoenix(phoenix) && !PhoenixPower.isPhoenix(wanda) && !PhoenixPower.isPhoenix(zombie), "who is a Phoenix");
         check(PhoenixPower.isPhoenixMindPower(ModDamageTypes.source(level, ModDamageTypes.PHOENIX_BURST, phoenix, phoenix)),
@@ -1046,14 +1047,14 @@ public final class SkeletonTests {
     public static void anAreaAttackSparesWhatItShouldAndHurtsTheRest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(10.5, FLOOR, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 12.5));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 12.5));
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(14.5, FLOOR, 10.5));
-        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 12.5));
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(12.5, FLOOR, 12.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 12.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(14.5, FLOOR, 10.5));
+        ArmorStand stand = TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 12.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
         pet.tame(owner);
-        Wolf stray = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(14.5, FLOOR, 8.5));
+        Wolf stray = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(14.5, FLOOR, 8.5));
 
         check(AreaTargets.mayHurt(owner, zombie, false), "a hostile creature is hurt");
         check(!AreaTargets.mayHurt(owner, owner, true), "the caster never is");
@@ -1081,7 +1082,7 @@ public final class SkeletonTests {
         check(AreaTargets.mayHurt(owner, other, false), "with PvP on another player is hurt");
         check(!AreaTargets.mayHurt(owner, creative, true) && !AreaTargets.mayHurt(owner, spectator, true),
                 "a Creative or Spectator player never is");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
         check(AreaTargets.mayHurt(zombie, other, false), "a monster may hurt a player whatever PvP says");
         helper.succeed();
     }
@@ -1106,7 +1107,7 @@ public final class SkeletonTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
         check(BossFights.active(level) == null && !BossFights.anyActive(level.getServer()), "no fight runs");
         check(!BossFights.isMember(player) && !BossFights.isMinion(zombie) && !BossFights.isHexExempt(player), "nobody is in one");
         check(BossFights.allowsTeleport(level, player, new Vec3(1, 2, 3)), "a teleport is allowed anywhere");
@@ -1167,7 +1168,7 @@ public final class SkeletonTests {
         fight.spawn(thanos);
         fight.spawn(sentry);
         fight.spawn(far);
-        Zombie bystander = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 12.5));
+        Zombie bystander = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 12.5));
         check(run(player, String.format(Locale.ROOT, "enhanced boss cleanup %f %f %f 8", here.x, here.y, here.z)) == 2,
                 "two boss entities were near");
         check(thanos.isRemoved() && sentry.isRemoved(), "they are gone");

@@ -673,16 +673,16 @@ public final class StoneCoreTests {
         ServerPlayer friend = f.player(12.5, FLOOR, 12.5);
         List<Zombie> zombies = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(3.5 + i * 1.5, FLOOR, 3.5));
+            Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5 + i * 1.5, FLOOR, 3.5));
             zombie.setNoAi(true);
             zombies.add(zombie);
         }
-        Zombie named = helper.spawn(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 17.5));
+        Zombie named = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 17.5));
         named.setNoAi(true);
         named.setCustomName(Component.literal("Bob"));
-        Villager villager = helper.spawn(EntityType.VILLAGER, new Vec3(17.5, FLOOR, 17.5));
+        Villager villager = TestKit.spawn(helper, EntityType.VILLAGER, new Vec3(17.5, FLOOR, 17.5));
         villager.setNoAi(true);
-        Wolf wolf = helper.spawn(EntityType.WOLF, new Vec3(15.5, FLOOR, 8.5));
+        Wolf wolf = TestKit.spawn(helper, EntityType.WOLF, new Vec3(15.5, FLOOR, 8.5));
         wolf.setNoAi(true);
         wolf.tame(thor);
         f.onClose(() -> {
@@ -720,8 +720,8 @@ public final class StoneCoreTests {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
         BossFrameworkTests.start(f, thor, Containment.FIELD, false);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 12.5));
-        Zombie other = helper.spawn(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 12.5));
+        Zombie other = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.5));
         f.onClose(() -> {
             zombie.discard();
             other.discard();

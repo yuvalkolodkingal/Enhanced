@@ -130,7 +130,7 @@ public final class LokiTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer loki = f.player(4.5, FLOOR, 10.5, Power.LOKI);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         // Out in the daylight it would burn, and a point of fire damage would look like the dagger's.
         zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1200));
         lookAt(loki, zombie);
@@ -173,7 +173,7 @@ public final class LokiTests {
         ServerLevel level = helper.getLevel();
         ServerPlayer loki = f.player(10.5, FLOOR, 10.5, Power.LOKI);
         PowerData data = Powers.get(loki);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(17.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(17.5, FLOOR, 10.5));
         skeleton.setTarget(loki);
         check(skeleton.getTarget() == loki, "the skeleton is after Loki");
 
@@ -211,7 +211,7 @@ public final class LokiTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(4.5, FLOOR, 10.5, Power.LOKI);
         PowerData data = Powers.get(loki);
-        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie model = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         lookAt(loki, model);
         press(loki, 3);
         check(LokiForm.of(data).map(LokiForm::type).orElse(null) == EntityType.ZOMBIE, "Loki takes the zombie's shape: " + data.form());
@@ -220,8 +220,8 @@ public final class LokiTests {
         check(model.getTarget() == null, "a zombie never goes after one of its own");
 
         // Real target selection: a zombie leaves him alone, while a husk (another kind) comes for him.
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 15.5));
-        Husk husk = helper.spawn(EntityType.HUSK, new Vec3(4.5, FLOOR, 5.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 15.5));
+        Husk husk = TestKit.spawn(helper, EntityType.HUSK, new Vec3(4.5, FLOOR, 5.5));
         f.everyTick(120, tick -> {
             check(zombie.getTarget() != loki, "the zombie doesn't pick Loki as its target");
             if (husk.getTarget() != loki) {
@@ -236,7 +236,7 @@ public final class LokiTests {
 
             zombie.discard();
             husk.discard();
-            ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR + 3.0, 14.5));
+            ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR + 3.0, 14.5));
             lookAt(loki, boss);
             press(loki, 3);
             check(data.form().isEmpty(), "a boss can't be copied");
@@ -250,7 +250,7 @@ public final class LokiTests {
     public static void vanishPutsLokiBehindACreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(3.5, FLOOR, 10.5, Power.LOKI);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         // The zombie faces Loki, to the west.
         zombie.setYRot(90.0F);
         zombie.setYBodyRot(90.0F);
@@ -300,7 +300,7 @@ public final class LokiTests {
         PowerTicker.tick(loki);
         check(loki.getTicksFrozen() == 0, "and he never freezes");
 
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
         loki.attack(zombie);
         MobEffectInstance slowness = zombie.getEffect(MobEffects.MOVEMENT_SLOWDOWN);
         check(slowness != null && slowness.getAmplifier() == 1 && slowness.getDuration() >= LokiAbilities.FREEZE_TICKS - 1,
@@ -373,7 +373,7 @@ public final class LokiTests {
             check(data.toggle(Toggle.FROST_GIANT), "N reveals the Frost Giant in the " + id + " look");
             assertNear(loki.getAttributeValue(Attributes.ARMOR) - armor, LokiAbilities.FROST_ARMOR_BONUS, 1.0E-6,
                     "with its armor in the " + id + " look");
-            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
             loki.attack(zombie);
             check(zombie.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "and its blow slows in the " + id + " look");
             zombie.discard();
@@ -429,7 +429,7 @@ public final class LokiTests {
         press(loki, 1);
         check(heard(loki, arena, ModSounds.LOKI_DAGGER) == 1, "throwing a dagger plays loki_dagger");
 
-        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie model = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         lookAt(loki, model);
         press(loki, 3);
         check(heard(loki, arena, ModSounds.LOKI_SHAPESHIFT) == 1, "taking a shape plays loki_shapeshift");

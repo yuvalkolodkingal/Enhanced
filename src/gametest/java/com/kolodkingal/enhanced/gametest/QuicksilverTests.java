@@ -99,7 +99,7 @@ public final class QuicksilverTests {
 
     /** A zombie that stands still with a long effect on it: the effect only runs down while the zombie really ticks. */
     private static Zombie timedZombie(GameTestHelper helper, double x) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, 10.5));
         zombie.addEffect(new MobEffectInstance(MobEffects.LUCK, EFFECT_TICKS));
         return zombie;
     }
@@ -665,7 +665,7 @@ public final class QuicksilverTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
 
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
         lookAt(peter, zombie);
 

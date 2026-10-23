@@ -63,7 +63,7 @@ public final class VisionTests {
     public static void mindStoneBeamHurts(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = f.player(3.5, FLOOR, 10.5, Power.VISION);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 10.5));
         lookAt(vision, zombie);
         float health = zombie.getHealth();
         AbilityHandler.onKey(vision, 1, true);

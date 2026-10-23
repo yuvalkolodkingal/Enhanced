@@ -245,7 +245,7 @@ public final class BuildSpellTests {
         AbilityHandler.onKey(wanda, 2, true);
         AbilityHandler.onKey(wanda, 2, false);
         check(wanda.getAbilities().flying, "the Scarlet Witch flies");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         TestKit.lookAt(billy, zombie);
         AbilityHandler.onKey(billy, 1, true);
         AbilityHandler.onKey(billy, 1, false);
@@ -757,7 +757,7 @@ public final class BuildSpellTests {
         ItemFrame frame = new ItemFrame(level, stone.east(), Direction.EAST);
         frame.setItem(new ItemStack(Items.APPLE));
         level.addFreshEntity(frame);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, FLOOR, 4.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(4.5, FLOOR, 4.5));
         Vec3 pigAt = pig.position();
         BoundingBox source = new BoundingBox(2, 2, 2, 4, 4, 4);
         cast(wanda, recipe(Spell.MOVE).op(SpellRecipe.Op.PUT_DOWN).box(abs(f, source)).at(abs(f, 8, 1, 3), Direction.UP).build());
@@ -1156,7 +1156,7 @@ public final class BuildSpellTests {
     public static void creaturesAreLiftedOutOfNewBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 15.5, 15.5, Blocks.STONE);
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(5.5, FLOOR, 5.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(5.5, FLOOR, 5.5));
         float health = cow.getHealth();
         cast(wanda, styled(f, Spell.FILL, FillStyle.SOLID, new BoundingBox(4, 2, 4, 6, 4, 6)));
         finish(wanda);

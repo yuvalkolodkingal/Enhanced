@@ -84,7 +84,7 @@ public final class ThanosTests {
     /** A zombie (a husk) that stands where it is: no mind, no armour (so a damage reads as it is). */
     static Zombie zombie(GameTestHelper helper, double x, double z) {
         // (A husk: the sun does not burn it, so what it loses is only what a test did to it.)
-        Zombie zombie = helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         zombie.setNoAi(true);
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return zombie;
@@ -229,7 +229,7 @@ public final class ThanosTests {
         Zombie target = zombie(helper, 9.5, 10.5);
         Zombie beside = zombie(helper, 10.5, 12.0);
         Zombie far = zombie(helper, 9.5, 17.5);
-        Cow cow = helper.spawn(EntityType.COW, new Vec3(10.5, FLOOR, 9.0));
+        Cow cow = TestKit.spawn(helper, EntityType.COW, new Vec3(10.5, FLOOR, 9.0));
         cow.setNoAi(true);
         BlockPos dirt = new BlockPos(11, (int) FLOOR, 10);
         helper.setBlock(dirt, Blocks.DIRT);
@@ -381,7 +381,7 @@ public final class ThanosTests {
         jumper.setNoGravity(true);
         Vec3 up = helper.absoluteVec(new Vec3(10.5, FLOOR + 1.5, 5.5));
         jumper.setPos(up);
-        Cow cow = helper.spawn(EntityType.COW, new Vec3(6.5, FLOOR, 10.5));
+        Cow cow = TestKit.spawn(helper, EntityType.COW, new Vec3(6.5, FLOOR, 10.5));
         cow.setNoAi(true);
         pressSneaking(thanos, 1);
         check(cooldownLeft(thanos, 1) == ThanosConfig.SLAM_COOLDOWN.get(), "the slam's cooldown");
@@ -577,12 +577,12 @@ public final class ThanosTests {
         ServerPlayer thanos = thanos(f, 10.5, 4.5);
         TestKit.look(thanos, 0.0F, 0.0F);
         // A boss cannot be pulled (nothing is paid), nor an armour stand.
-        var warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 16.5));
+        var warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(10.5, FLOOR, 16.5));
         TestKit.sentPackets(thanos);
         pressSneaking(thanos, 2);
         check(told(TestKit.sentPackets(thanos), "message.enhanced.thanos.no_target") && cooldownLeft(thanos, 2) <= 0, "a boss cannot be pulled: nothing paid");
         warden.discard();
-        var stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(10.5, FLOOR, 16.5));
+        var stand = TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(10.5, FLOOR, 16.5));
         pressSneaking(thanos, 2);
         check(cooldownLeft(thanos, 2) <= 0, "nor an armour stand");
         stand.discard();

@@ -130,7 +130,7 @@ public final class MagnetoTests {
     public static void disarmRipsMetalOffAZombie(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(4.5, FLOOR, 10.5, Power.MAGNETO);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
@@ -151,7 +151,7 @@ public final class MagnetoTests {
     public static void disarmIgnoresCreaturesWithoutMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(4.5, FLOOR, 10.5, Power.MAGNETO);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         lookAt(magneto, zombie);
@@ -207,7 +207,7 @@ public final class MagnetoTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
         magneto.getInventory().setItem(0, new ItemStack(Items.IRON_BLOCK));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         lookAt(magneto, zombie);
         AbilityHandler.onKey(magneto, 2, true);
@@ -244,10 +244,10 @@ public final class MagnetoTests {
     public static void metalTelekinesisOnlyLiftsMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(2.5, FLOOR, 10.5, Power.MAGNETO);
-        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
-        Zombie armored = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 17.5));
+        Zombie plain = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie armored = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 17.5));
         armored.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(9.5, FLOOR, 3.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(9.5, FLOOR, 3.5));
         PowerData data = Powers.get(magneto);
 
         lookAt(magneto, plain);
@@ -273,7 +273,7 @@ public final class MagnetoTests {
     public static void heldGolemFollowsMagnetosGaze(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(2.5, FLOOR, 10.5, Power.MAGNETO);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(8.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(8.5, FLOOR, 10.5));
         lookAt(magneto, golem);
         AbilityHandler.onKey(magneto, 1, true);
         check(Telekinesis.isHolding(magneto), "grabbed the golem");
@@ -290,8 +290,8 @@ public final class MagnetoTests {
     public static void thrownGolemIsAWreckingBall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(2.5, FLOOR, 10.5, Power.MAGNETO);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, FLOOR, 10.5));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(6.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         lookAt(magneto, golem);
         AbilityHandler.onKey(magneto, 1, true);
@@ -321,7 +321,7 @@ public final class MagnetoTests {
         f.config(EnhancedConfig.SHIELD_REFLECT_CHANCE, 1.0);
         ServerPlayer magneto = f.player(14.5, FLOOR, 10.5, Power.MAGNETO);
         AbilityHandler.onKey(magneto, 4, true);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         skeleton.setNoAi(true);
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
@@ -345,7 +345,7 @@ public final class MagnetoTests {
         f.config(EnhancedConfig.SHIELD_REFLECT_CHANCE, 0.0);
         ServerPlayer magneto = f.player(14.5, FLOOR, 10.5, Power.MAGNETO);
         AbilityHandler.onKey(magneto, 4, true);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         skeleton.setNoAi(true);
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
@@ -429,7 +429,7 @@ public final class MagnetoTests {
             AbilityHandler.onKey(magneto, 4, true);
             check(Powers.get(magneto).magneticShield(), "B turns the shield on");
         }
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(shooterX, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(shooterX, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         skeleton.setNoAi(true); // only the arrow may hurt Magneto (equipping a skeleton re-adds its melee goal)
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);

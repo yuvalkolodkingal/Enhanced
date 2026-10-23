@@ -92,7 +92,7 @@ public final class NanoTechTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no blow moves it). */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -308,7 +308,7 @@ public final class NanoTechTests {
         ServerPlayer back = deployed(f, 12.5, 10.5, SuitKind.MARK_85);
         look(front, EAST, 0.0F);
         look(back, EAST, 0.0F);
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(10.5, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(10.5, FLOOR, 10.5));
         hold(front, 4, false);
         hold(back, 4, false);
         check(EnergyShield.up(front) && EnergyShield.up(back), "both shields up");

@@ -74,16 +74,16 @@ public final class TommyTests {
     public static void disarmBlitzSnatchesEveryWeaponNearby(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(10.5, FLOOR, 10.5, Power.TOMMY);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
         zombie.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SWORD));
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(6.5, FLOOR, 12.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(6.5, FLOOR, 12.5));
         skeleton.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BOW));
         skeleton.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.SHIELD));
         ServerPlayer swordsman = f.player(10.5, FLOOR, 4.5);
         swordsman.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_SWORD));
         ServerPlayer builder = f.player(10.5, FLOOR, 16.5);
         builder.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STONE, 16));
-        Pillager far = helper.spawnWithNoFreeWill(EntityType.PILLAGER, new Vec3(10.5, FLOOR, 10.5 + TommyAbilities.BLITZ_RADIUS + 3));
+        Pillager far = TestKit.spawnWithNoFreeWill(helper, EntityType.PILLAGER, new Vec3(10.5, FLOOR, 10.5 + TommyAbilities.BLITZ_RADIUS + 3));
         far.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.CROSSBOW));
 
         tommy.setShiftKeyDown(true); // (3.3: Sneak + B)
@@ -106,7 +106,7 @@ public final class TommyTests {
     public static void whirlwindSpinsCreaturesAndFlingsThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(10.5, FLOOR, 10.5, Power.TOMMY);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 10.5));
         Vec3 center = tommy.position();
         press(tommy, 3);
         check(Powers.get(tommy).is(Live.WHIRLWIND), "the whirlwind starts");
@@ -184,7 +184,7 @@ public final class TommyTests {
         press(tommy, 5);
         helper.assertBlockPresent(Blocks.BEDROCK, bedrock);
 
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 8.5));
         float before = zombie.getHealth();
         lookAt(tommy, zombie);
         press(tommy, 5);

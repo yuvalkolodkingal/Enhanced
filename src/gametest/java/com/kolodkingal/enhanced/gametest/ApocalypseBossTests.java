@@ -213,14 +213,14 @@ public final class ApocalypseBossTests {
         ApocalypseTestSupport.tank(flier);
         flier.getAbilities().mayfly = true;
         flier.getAbilities().flying = true;
-        IronGolem zombie = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(7.5, FLOOR, 10.5));
+        IronGolem zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(7.5, FLOOR, 10.5));
         // A step of three blocks across the way, and a zombie behind it.
         for (int z = 4; z <= 17; z++) {
             for (int y = 2; y <= 4; y++) {
                 helper.setBlock(new BlockPos(2, y, z), Blocks.STONE);
             }
         }
-        IronGolem behind = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(0.9, FLOOR, 10.5));
+        IronGolem behind = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(0.9, FLOOR, 10.5));
         float jumperHealth = jumper.getHealth();
         float flierHealth = flier.getHealth();
 
@@ -431,7 +431,7 @@ public final class ApocalypseBossTests {
         check(cocoon.isRemoved() && !victim.hasEffect(ModEffects.ENTOMBED), "three hits of 7 break a cocoon of 20, and the effect goes with it");
 
         // A creature of the fight's side cannot be freed by hitting the cocoon of someone else... but Wanda lifting a friend can.
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(6.5, FLOOR, 10.5));
         SandCocoonEntity pigCocoon = SandControl.entomb(level, boss, pig, 100, 0.0F, 20.0F, d.fight());
         check(pigCocoon != null && SandCocoonEntity.cocoonOf(pig) == pigCocoon, "a pig in a cocoon");
         put(d.f(), d.hero(), 3.5, FLOOR, 10.5);
@@ -485,7 +485,7 @@ public final class ApocalypseBossTests {
         check("message.enhanced.entomb.slips".equals(SandControl.entombRefusal(creative)), "a Creative player slips out");
         check("message.enhanced.entomb.slips".equals(SandControl.entombRefusal(spectator)), "and a Spectator");
         check("message.enhanced.entomb.slips".equals(SandControl.entombRefusal(boss)), "and he himself, whose type is entomb_immune");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
         check(SandControl.entombRefusal(zombie) == null, "a Zombie can be held");
         SandCocoonEntity cocoon = SandControl.entomb(level, boss, zombie, 100, 0.0F, 20.0F, d.fight());
         check(cocoon != null && SandControl.entombRefusal(zombie) != null, "and only once");

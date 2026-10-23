@@ -324,7 +324,7 @@ public final class ApocalypseFightTests {
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         Log log = new Log(d.hero());
         double heightBefore = boss.getBbHeight();
@@ -401,7 +401,7 @@ public final class ApocalypseFightTests {
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         Log log = new Log(d.hero());
         // At 15 percent the channel starts by itself.
@@ -462,7 +462,7 @@ public final class ApocalypseFightTests {
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         int[] rounds = {0};
         every(helper, 380, tick -> {

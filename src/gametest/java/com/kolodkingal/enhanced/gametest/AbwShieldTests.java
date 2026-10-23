@@ -56,7 +56,7 @@ public final class AbwShieldTests {
     }
 
     private static Skeleton harmlessSkeleton(GameTestHelper helper) {
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(15.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(15.5, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         skeleton.setNoAi(true);
         return skeleton;
@@ -105,7 +105,7 @@ public final class AbwShieldTests {
         ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         PowerData data = Powers.get(wanda);
         Skeleton skeleton = harmlessSkeleton(helper);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.3, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.3, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         zombie.setNoAi(true);
         raise(f, wanda, () -> {
