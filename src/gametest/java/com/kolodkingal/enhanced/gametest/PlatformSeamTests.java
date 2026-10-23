@@ -2,16 +2,24 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
+import com.kolodkingal.enhanced.platform.test.TestHooks;
+import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
+import java.util.List;
+
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
+import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /**
@@ -52,5 +60,24 @@ public final class PlatformSeamTests {
             check(hooks.drownsInFluidAtEyes(wet), "water over his eyes");
             check(!hooks.drownsInFluidAtEyes(dry), "air at his eyes");
         });
+    }
+
+    /**
+     * S5-3: a new watcher's first sync carries a player's power; replayed on another player, it gives him that power.
+     */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theFirstSyncCarriesThePowerAndReplays(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = f.player(4.5, FLOOR, 4.5, Power.SCARLET_WITCH);
+        ServerPlayer watcher = f.player(8.5, FLOOR, 4.5);
+        ServerPlayer copy = f.player(12.5, FLOOR, 4.5);
+        TestHooks hooks = TestHooks.get();
+        List<Object> packets = hooks.initialSyncPackets(wanda, watcher);
+        check(packets.stream().anyMatch(p -> hooks.isAttachmentSync(p, ModAttachments.POWER, wanda.getId())),
+                "her power is in the first sync: " + packets);
+        check(Powers.get(copy).power() == Power.NONE, "the copy has no power yet");
+        packets.forEach(p -> hooks.receiveSync(p, copy));
+        check(Powers.get(copy).power() == Power.SCARLET_WITCH, "the replay gives the copy her power");
+        helper.succeed();
     }
 }
