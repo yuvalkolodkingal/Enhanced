@@ -1,22 +1,23 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.ultron.UltronEntity;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
-import com.kolodkingal.enhanced.ultron.UltronEntity;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ import java.util.Map;
  * effects that belong to a body ({@code beams_aim}, {@code beams_fire}, {@code glint}, {@code death}) use the body that
  * {@code /enhanced_model ultron} is showing, or the nearest one.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class UltronFxCommand {
     /** An effect the command can play: its kind, how long it lasts by default, and its radius. */
     private record Spec(int kind, int ticks, float radius, boolean fromBody) {
@@ -62,9 +63,9 @@ public final class UltronFxCommand {
         SPECS.put("command", new Spec(UltronFxPayload.COMMAND_MARK, 10, 1.5F, false));
     }
 
-    @SubscribeEvent
-    public static void onRegister(RegisterClientCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("enhanced_ultron_fx")
+    /** The command's registration (port P0: through the platform's client registrar, see ClientSetup). */
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
+        dispatcher.register(Commands.literal("enhanced_ultron_fx")
                 .then(Commands.argument("effect", StringArgumentType.word())
                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(SPECS.keySet(), builder))
                         .executes(ctx -> play(StringArgumentType.getString(ctx, "effect"), -1))

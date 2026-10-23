@@ -16,8 +16,8 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 @Mod(value = Enhanced.MODID, dist = Dist.CLIENT)
 public final class EnhancedClient {
     public EnhancedClient(ModContainer container, IEventBus modBus) {
-        // Port P0: the platform's client registrar, for the client's registrations made while the mod is set up.
-        NeoClientRegistrar.install(container, modBus);
+        // Port P0: the platform's client registrar, and every client registration of the mod through it.
+        ClientSetup.register(NeoClientRegistrar.install(container, modBus));
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 }

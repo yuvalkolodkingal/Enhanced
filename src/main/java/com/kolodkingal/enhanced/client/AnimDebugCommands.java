@@ -1,21 +1,21 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.HeroAnimator;
 import com.kolodkingal.enhanced.client.render.Stance;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 
 import java.util.Arrays;
 
@@ -35,12 +35,12 @@ import java.util.Arrays;
  * /enhanced_anim become &lt;file&gt;        become the custom hero of enhanced/heroes/&lt;file&gt;.json
  * </pre>
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class AnimDebugCommands {
 
-    @SubscribeEvent
-    public static void onRegister(RegisterClientCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("enhanced_anim")
+    /** The command's registration (port P0: through the platform's client registrar, see ClientSetup). */
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
+        dispatcher.register(Commands.literal("enhanced_anim")
                 .then(Commands.literal("fly")
                         .then(Commands.literal("off").executes(ctx -> {
                             HeroAnimator.debugFly(false, 0.0F, 0.0F, 0.0F);

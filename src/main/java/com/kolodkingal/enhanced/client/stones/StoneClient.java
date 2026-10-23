@@ -4,6 +4,11 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.FMLClientSetupEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.stones.StoneBeams;
@@ -18,13 +23,6 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 /**
  * The client's side of the stones' powers (3.6, lane L2): the beams' drawers ({@link StoneBeamFx}), the drawers of the
@@ -45,25 +43,26 @@ public final class StoneClient {
     private static final float ARRIVE_TICKS = 24.0F;
 
     /** The setup on the mod bus: drawers, the arm layer, the screen's edge. */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    @Subscriber(side = Side.CLIENT)
     public static final class Setup {
-        @SubscribeEvent
+        @Subscribe
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(StoneClient::register);
         }
 
-        @SubscribeEvent
-        public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
-            for (PlayerSkin.Model skin : event.getSkins()) {
-                if (event.getSkin(skin) instanceof PlayerRenderer renderer) {
+        /** The arm layer and the edges' HUD layer (port P0: through the platform's client registrar). */
+        public static void register(ClientRegistrar registrar) {
+            registrar.addLayers(Setup::addLayers);
+            registrar.guiLayer(Enhanced.id("stone_edges"), ClientRegistrar.HudAnchor.ABOVE,
+                    ClientRegistrar.VanillaHud.CAMERA_OVERLAYS, StoneClient::drawEdges);
+        }
+
+        private static void addLayers(ClientRegistrar.LayerContext layers) {
+            for (PlayerSkin.Model skin : layers.skins()) {
+                if (layers.playerRenderer(skin) instanceof PlayerRenderer renderer) {
                     renderer.addLayer(new StoneArmLayer(renderer));
                 }
             }
-        }
-
-        @SubscribeEvent
-        public static void onRegisterGui(RegisterGuiLayersEvent event) {
-            event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("stone_edges"), StoneClient::drawEdges);
         }
     }
 

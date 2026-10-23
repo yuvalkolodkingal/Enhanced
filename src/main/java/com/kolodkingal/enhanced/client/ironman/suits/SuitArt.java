@@ -4,13 +4,13 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.ironman.SuitModels;
 import com.kolodkingal.enhanced.ironman.SuitItemState;
 import com.kolodkingal.enhanced.ironman.SuitKind;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -56,13 +56,13 @@ public final class SuitArt {
     }
 
     /** The layer definitions (the {@code RegisterLayerDefinitions} event). */
-    public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+    public static void registerLayers(ClientRegistrar registrar) {
         for (SuitKind kind : SuitKind.VALUES) {
-            event.registerLayerDefinition(LAYERS.get(kind), mesh(kind));
+            registrar.layerDefinition(LAYERS.get(kind), mesh(kind));
         }
-        event.registerLayerDefinition(SUITCASE, SuitMeshes::suitcase);
-        event.registerLayerDefinition(GANTRY, SuitMeshes::suitGantry);
-        event.registerLayerDefinition(HulkbusterModel.LAYER, HulkbusterModel::createLayer);
+        registrar.layerDefinition(SUITCASE, SuitMeshes::suitcase);
+        registrar.layerDefinition(GANTRY, SuitMeshes::suitGantry);
+        registrar.layerDefinition(HulkbusterModel.LAYER, HulkbusterModel::createLayer);
     }
 
     /** The models, baked from the loaded model set (the {@code AddLayers} event: after every resource reload). */

@@ -1,17 +1,17 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+// TODO(port seam) S1: a common key conflict context (notes/l6.md); NeoForge's until it lands.
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import org.lwjgl.glfw.GLFW;
 
@@ -20,24 +20,23 @@ import org.lwjgl.glfw.GLFW;
  * {@code spider_man.webAssist}, which the config screen shows too). Registered by the Spider-Man lane itself, next to
  * the mod's other keys.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SpiderAssistKey {
     public static final KeyMapping WEB_ASSIST = new KeyMapping("key.enhanced.web_assist", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_J, KeyBindings.CATEGORY);
 
     /** The key's registration (an event of the mod's own bus, kept apart from the game's). */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
     public static final class Registration {
-        @SubscribeEvent
-        public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
-            event.register(WEB_ASSIST);
+        /** Port P0: through the platform's client registrar (see ClientSetup). */
+        public static void register(ClientRegistrar registrar) {
+            registrar.keyMapping(WEB_ASSIST);
         }
 
         private Registration() {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         boolean clicked = false;
         while (WEB_ASSIST.consumeClick()) {

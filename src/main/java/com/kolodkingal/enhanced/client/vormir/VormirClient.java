@@ -3,6 +3,12 @@ package com.kolodkingal.enhanced.client.vormir;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.stones.StoneFx;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.vormir.StonekeeperEntity;
 import net.minecraft.client.DeltaTracker;
@@ -13,13 +19,6 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 /**
  * The Vormir Cliff on the client (3.6, lane L5): the orange glow over the screen of one given the Soul Stone ({@link
@@ -138,14 +137,14 @@ public final class VormirClient {
     // ---- the events ----
 
     /** The client's ticks and its leaving a world (the game bus). */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+    @Subscriber(side = Side.CLIENT)
     public static final class Events {
-        @SubscribeEvent
+        @Subscribe
         public static void onClientTick(ClientTickEvent.Post event) {
             tick(Minecraft.getInstance());
         }
 
-        @SubscribeEvent
+        @Subscribe
         public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
             if (wind != null) {
                 Minecraft.getInstance().getSoundManager().stop(wind);
@@ -159,11 +158,11 @@ public final class VormirClient {
     }
 
     /** The glow's layer over the screen (the mod bus). */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
     public static final class Setup {
-        @SubscribeEvent
-        public static void onRegisterGui(RegisterGuiLayersEvent event) {
-            event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("vormir_gift"), VormirClient::drawFade);
+        /** The gift's fade (port P0: through the platform's client registrar, see ClientSetup). */
+        public static void register(ClientRegistrar registrar) {
+            registrar.guiLayer(Enhanced.id("vormir_gift"), ClientRegistrar.HudAnchor.ABOVE,
+                    ClientRegistrar.VanillaHud.CAMERA_OVERLAYS, VormirClient::drawFade);
         }
 
         private Setup() {
