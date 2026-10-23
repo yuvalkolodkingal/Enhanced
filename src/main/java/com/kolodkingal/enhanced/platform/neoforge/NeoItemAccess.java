@@ -37,5 +37,10 @@ final class NeoItemAccess implements ItemAccess {
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             return handler.extractItem(slot, amount, simulate);
         }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            return handler.insertItem(slot, stack, simulate);
+        }
     }
 }
