@@ -1,0 +1,317 @@
+[magneto]
+	#Magneto's flying speed (Creative flight is 0.05).
+	# Default: 0.075
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.075
+	#How far away (blocks) Magneto and Wanda can grab a target with telekinesis.
+	# Default: 32
+	# Range: 4 ~ 128
+	telekinesisRange = 32
+	#Launch speed (blocks per tick) of a telekinetic throw.
+	# Default: 2.6
+	# Range: 0.5 ~ 6.0
+	throwSpeed = 2.6
+	#Damage of one iron shrapnel shard.
+	# Default: 4.0
+	# Range: 0.0 ~ 100.0
+	shrapnelDamage = 4.0
+	#How many creatures a single shard can pierce through.
+	# Default: 3
+	# Range: 1 ~ 16
+	shrapnelPierce = 3
+	#Ticks between shards while the Shrapnel Storm is held (2 = 10 shards/second).
+	# Default: 2
+	# Range: 1 ~ 20
+	shrapnelFireInterval = 2
+	#Range of Armor & Weapon Strip.
+	# Default: 32
+	# Range: 4 ~ 128
+	disarmRange = 32
+	#Cooldown of Armor & Weapon Strip, in ticks.
+	# Default: 60
+	# Range: 0 ~ 6000
+	disarmCooldown = 60
+	#Chance that a metal projectile caught by the Magnetic Shield flies back at the shooter (otherwise it drops).
+	# Default: 0.5
+	# Range: 0.0 ~ 1.0
+	shieldReflectChance = 0.5
+
+[scarlet_witch]
+	#Wanda's flying speed (Creative flight is 0.05).
+	# Default: 0.09
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.09
+	#Damage per Chaos Beam hit (5 = 2.5 hearts). Minecraft's damage cooldown allows two hits per second.
+	# Default: 5.0
+	# Range: 0.0 ~ 100.0
+	chaosBeamDamage = 5.0
+	#Range in blocks of the Chaos Beam, and also of Vision's Mind Stone beam.
+	# Default: 32
+	# Range: 4 ~ 128
+	chaosBeamRange = 32
+	#Duration of the Nausea the Chaos Beam inflicts, in ticks.
+	# Default: 100
+	# Range: 0 ~ 6000
+	chaosBeamNauseaTicks = 100
+	#Food exhaustion per tick while the Chaos Shield is held (4.0 exhaustion = 1 food point).
+	# Default: 0.1
+	# Range: 0.0 ~ 4.0
+	chaosShieldExhaustion = 0.1
+	#Fraction of explosion damage that still gets through the Chaos Shield.
+	# Default: 0.25
+	# Range: 0.0 ~ 1.0
+	chaosShieldExplosionFactor = 0.25
+	#How far away (blocks) Wanda can tear a block out of the ground.
+	# Default: 24
+	# Range: 2 ~ 128
+	blockLiftRange = 24
+	#Hardest block Wanda can lift (stone = 1.5, iron block = 5, obsidian = 50).
+	# Default: 5.0
+	# Range: 0.0 ~ 100.0
+	blockLiftMaxHardness = 5.0
+	#Radius of a newly created Hex.
+	# Default: 32
+	# Range: 4 ~ 256
+	hexDefaultRadius = 32
+	# Default: 8
+	# Range: 4 ~ 256
+	hexMinRadius = 8
+	# Default: 96
+	# Range: 4 ~ 256
+	hexMaxRadius = 96
+	#Chance that an unauthorised creature without powers dies when crossing the Hex wall.
+	# Default: 0.95
+	# Range: 0.0 ~ 1.0
+	hexDeathChance = 0.95
+	#How long the Chaos Shield takes to form after B is pressed, in ticks (15 = 3/4 of a second).
+	#It blocks nothing until it is complete.
+	# Default: 15
+	# Range: 0 ~ 200
+	chaosShieldWindUpTicks = 15
+	#How long a complete Chaos Shield can be held before it drops, in ticks (160 = 8 seconds).
+	# Default: 160
+	# Range: 1 ~ 6000
+	chaosShieldMaxTicks = 160
+	#Points of damage the Chaos Shield can stop before it shatters. Everything it stops wears it down:
+	#the damage of a projectile, and the explosion damage it takes away.
+	# Default: 30.0
+	# Range: 1.0 ~ 1000.0
+	chaosShieldStrength = 30.0
+	#Ticks before the Chaos Shield can be raised again after it drops (120 = 6 seconds).
+	# Default: 120
+	# Range: 0 ~ 6000
+	chaosShieldCooldown = 120
+	#Ticks before the Chaos Shield can be raised again after it shattered or was held to its
+	#limit (300 = 15 seconds).
+	# Default: 300
+	# Range: 0 ~ 6000
+	chaosShieldBrokenCooldown = 300
+	#Damage Vision takes the first time he is thrown back at the wall of a Hex he is inside (2 = one heart).
+	#He can't leave a standing Hex, and comes apart a little at its edge; it never kills him.
+	# Default: 2.0
+	# Range: 0.0 ~ 20.0
+	hexHoldDamage = 2.0
+	#The most one throw back at the wall can do to Vision. Each time he pushes again within three
+	#seconds it grows by hexHoldDamage, up to this; it never takes his last half heart.
+	# Default: 8.0
+	# Range: 0.0 ~ 40.0
+	hexHoldDamageMax = 8.0
+	#A badly hurt Wanda can no longer hold Vision in her Hex: at or below this share of her health
+	#(0.3 = 30%) he can leave it. Her death (which dissolves the Hex) always frees him; 0 = only that does.
+	# Default: 0.3
+	# Range: 0.0 ~ 1.0
+	hexHoldReleaseHealth = 0.3
+
+[vision]
+	# Default: 0.08
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.08
+	#Damage per hit of the Mind Stone beam (two hits per second at most).
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	mindStoneBeamDamage = 6.0
+
+[quicksilver]
+	#During Quicksilver Time the world around him runs this many times slower.
+	# Default: 5
+	# Range: 2 ~ 20
+	slowMotionFactor = 5
+	#How far (blocks) from Quicksilver time slows down.
+	# Default: 32
+	# Range: 4 ~ 128
+	slowMotionRadius = 32
+	#Extra movement speed while he runs in Quicksilver Time or Super Speed
+	#(3.0 = four times as fast).
+	# Default: 3.0
+	# Range: 0.0 ~ 10.0
+	speedBonus = 3.0
+	#Food exhaustion per tick while he runs in Quicksilver Time or Super Speed
+	#(4.0 = 1 food point). Quicksilver Time also costs half of this while he is not running.
+	# Default: 0.03
+	# Range: 0.0 ~ 4.0
+	exhaustion = 0.03
+	#While Quicksilver Time or Super Speed is on he mines, attacks, eats, drinks,
+	#draws bows, loads crossbows, swims and places blocks this many times as fast (4.0 = four times as fast).
+	# Default: 4.0
+	# Range: 1.0 ~ 10.0
+	actionSpeed = 4.0
+
+[billy]
+	# Default: 0.08
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.08
+	#Damage of a Hex Bolt to the creature it strikes; each creature it forks to takes half.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	hexBoltDamage = 6.0
+	#How long (ticks) Billy's Freeze holds creatures spellbound.
+	# Default: 100
+	# Range: 1 ~ 1200
+	freezeDuration = 100
+	#How far away (blocks) Billy hears the thoughts of creatures while The Noise is on.
+	# Default: 32
+	# Range: 4 ~ 64
+	noiseRange = 32
+
+[tommy]
+	#Extra movement speed while Tommy runs at super speed (2.5 = three and a half times as fast).
+	# Default: 2.5
+	# Range: 0.0 ~ 10.0
+	speedBonus = 2.5
+	#Food exhaustion per tick while Tommy runs at super speed (4.0 = 1 food point).
+	# Default: 0.02
+	# Range: 0.0 ~ 4.0
+	exhaustion = 0.02
+
+[thor]
+	#Thor's flying speed while he holds Mjolnir or Stormbreaker (Creative flight is 0.05).
+	# Default: 0.11
+	# Range: 0.01 ~ 0.5
+	flightSpeed = 0.11
+	#If true, everyone is worthy of Mjolnir. If false (the default), only Thor, Vision,
+	#Creative and Spectator players and those who have earned the Hero of the Village advancement are worthy: they can
+	#claim a Mjolnir nobody owns yet (see mjolnirOwnerOnly), and lift it.
+	anyoneWorthy = false
+	#Damage of a thrown Mjolnir, both ways.
+	# Default: 10.0
+	# Range: 0.0 ~ 100.0
+	throwDamage = 10.0
+	#How far (blocks) a thrown Mjolnir or Stormbreaker flies before it turns back.
+	# Default: 40
+	# Range: 4 ~ 128
+	throwRange = 40
+	#How far away (blocks) Thor can call Mjolnir or Stormbreaker back from.
+	# Default: 64
+	# Range: 4 ~ 256
+	recallRange = 64
+	#Food exhaustion per tick while the God of Thunder is unleashed (4.0 = 1 food point).
+	# Default: 0.04
+	# Range: 0.0 ~ 4.0
+	godOfThunderExhaustion = 0.04
+	#Cooldown of the Bifrost (Thor's, or anyone's who wields Stormbreaker or Mjolnir), in ticks.
+	# Default: 1200
+	# Range: 0 ~ 72000
+	bifrostCooldown = 1200
+	#Damage of a thrown Stormbreaker, both ways (a fifth more than Mjolnir's).
+	# Default: 12.0
+	# Range: 0.0 ~ 100.0
+	stormbreakerThrowDamage = 12.0
+	#If true (the default), each Mjolnir belongs to the first worthy player who lifts it, and
+	#only they can lift it from then on (Creative and Spectator players always can, without taking it).
+	#If false, Mjolnirs are never claimed: the old rule, where any worthy player can lift any Mjolnir.
+	mjolnirOwnerOnly = true
+	#Damage of one hit of Thor's lightning beam, bare-handed (2 = one heart).
+	#Mjolnir in hand multiplies it by beamWeaponMultiplier, Stormbreaker by stormbreakerBeamMultiplier, the God
+	#of Thunder by godOfThunderBeamMultiplier on top.
+	# Default: 2.0
+	# Range: 0.0 ~ 100.0
+	beamDamage = 2.0
+	#Ticks between two hits of the lightning beam (5 = four hits a second). The beam ignores
+	#the creature's damage cooldown, so every hit lands.
+	# Default: 5
+	# Range: 1 ~ 40
+	beamInterval = 5
+	#How far (blocks) Thor's lightning beam reaches bare-handed.
+	# Default: 24
+	# Range: 4 ~ 128
+	beamRange = 24
+	#How far (blocks) the beam reaches with Mjolnir in hand.
+	# Default: 48
+	# Range: 4 ~ 256
+	beamWeaponRange = 48
+	#What Mjolnir in hand multiplies the beam's damage by.
+	#(With Mjolnir or Stormbreaker in hand the first hit on each creature also has the usual effects of lightning on it.)
+	# Default: 2.0
+	# Range: 1.0 ~ 20.0
+	beamWeaponMultiplier = 2.0
+	#What the God of Thunder multiplies the beam's damage by. Every hit also arcs to the
+	#next two creatures nearby.
+	# Default: 1.5
+	# Range: 1.0 ~ 20.0
+	godOfThunderBeamMultiplier = 1.5
+	#Food exhaustion per tick while the lightning beam is fired (4.0 = 1 food point).
+	# Default: 0.03
+	# Range: 0.0 ~ 4.0
+	beamExhaustion = 0.03
+	#Cooldown of shattering Mjolnir (Sneak + R), in ticks, from the moment it shatters.
+	# Default: 300
+	# Range: 0 ~ 72000
+	shatterCooldown = 300
+	#Damage of each fragment of a shattered Mjolnir to the enemy it strikes.
+	# Default: 6.0
+	# Range: 0.0 ~ 100.0
+	shatterDamage = 6.0
+	#How long (ticks) Mjolnir pins someone down before it lets go by itself (1200 = a minute).
+	# Default: 1200
+	# Range: 20 ~ 72000
+	pinDuration = 1200
+	#How far (blocks) the beam reaches with Stormbreaker in hand (a fifth farther than Mjolnir's).
+	# Default: 58
+	# Range: 4 ~ 256
+	stormbreakerBeamRange = 58
+	#What Stormbreaker in hand multiplies the beam's damage by (a fifth more than Mjolnir's).
+	# Default: 2.4
+	# Range: 1.0 ~ 20.0
+	stormbreakerBeamMultiplier = 2.4
+
+[loki]
+	#Damage of one of Loki's conjured daggers.
+	# Default: 5.0
+	# Range: 0.0 ~ 100.0
+	daggerDamage = 5.0
+	#How long a creature stays confused after a melee hit with Loki's Scepter, in ticks (120 = 6 seconds).
+	# Default: 120
+	# Range: 0 ~ 6000
+	scepterConfusionTicks = 120
+	#How long a player gets Nausea after a melee hit with Loki's Scepter, in ticks (160 = 8 seconds).
+	# Default: 160
+	# Range: 0 ~ 6000
+	scepterNauseaTicks = 160
+	#How long a player gets Slowness I after a melee hit with Loki's Scepter, in ticks (60 = 3 seconds).
+	# Default: 60
+	# Range: 0 ~ 6000
+	scepterSlownessTicks = 60
+
+[hex_vision]
+	#If true (the default), a Hex brings a Vision to fight at Wanda's side while it stands.
+	enabled = true
+	#Health of the Vision of the Hex (an Iron Golem has 100; 80 = 40 hearts).
+	# Default: 80.0
+	# Range: 1.0 ~ 1000.0
+	health = 80.0
+	#Damage of one of his dense punches, about one a second (12 = 6 hearts).
+	# Default: 12.0
+	# Range: 0.0 ~ 100.0
+	punchDamage = 12.0
+	#Damage per hit of his Mind Stone beam, two hits a second.
+	# Default: 4.0
+	# Range: 0.0 ~ 100.0
+	beamDamage = 4.0
+	#How far (blocks) his Mind Stone beam reaches. Up close he punches instead.
+	# Default: 16
+	# Range: 2 ~ 64
+	beamRange = 16
+	#How long (ticks) Wanda needs to rebuild him after he falls, while the Hex stands (1200 = a minute).
+	# Default: 1200
+	# Range: 20 ~ 72000
+	rebuildTicks = 1200

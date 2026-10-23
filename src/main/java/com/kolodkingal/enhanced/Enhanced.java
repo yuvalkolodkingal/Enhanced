@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.config.core.ConfigFile;
+import com.kolodkingal.enhanced.config.core.Configs;
+import com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge;
 import com.kolodkingal.enhanced.network.ModNetwork;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.neoforge.NeoRegistrars;
 import com.kolodkingal.enhanced.platform.neoforge.NeoSetup;
 import com.kolodkingal.enhanced.registry.ModArmorMaterials;
@@ -20,7 +24,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -62,8 +65,15 @@ public class Enhanced {
         com.kolodkingal.enhanced.network.SpeedNetwork.register();
         com.kolodkingal.enhanced.network.SpiderNetwork.register();
         ModEntities.registerAttributes();
-        container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC.neoSpec());
-        container.registerConfig(ModConfig.Type.CLIENT, EnhancedClientConfig.SPEC.neoSpec());
+        // ===== port P0 L7 =====
+        // The mod's own config files (config/core): the server's read as a server starts, the client's now on a client.
+        Configs.register(ConfigFile.Type.SERVER, EnhancedConfig.SPEC);
+        Configs.register(ConfigFile.Type.CLIENT, EnhancedClientConfig.SPEC);
+        ConfigNeoForge.install(modBus);
+        if (Platform.get().isPhysicalClient()) {
+            Configs.loadClientConfigs();
+        }
+        // ===== end port P0 L7 =====
     }
 
     public static ResourceLocation id(String path) {

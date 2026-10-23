@@ -1,13 +1,13 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.config.screen.ConfigScreen;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
 import com.kolodkingal.enhanced.platform.neoforge.client.NeoClientRegistrar;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 /**
  * The client half of the mod's entry point (only loaded on a client): gives the Mods screen a Config button for the client
@@ -18,6 +18,7 @@ public final class EnhancedClient {
     public EnhancedClient(ModContainer container, IEventBus modBus) {
         // Port P0: the platform's client registrar, for the client's registrations made while the mod is set up.
         NeoClientRegistrar.install(container, modBus);
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        // Port P0 L7: the mod's own settings screen (NeoForge's Mods list opens it).
+        ClientRegistrar.get().configScreen(ConfigScreen::new);
     }
 }
