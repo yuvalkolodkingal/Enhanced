@@ -1,4 +1,6 @@
 # Port P0 lint allow-list of lane L7-config: the files it still has to migrate (net.neoforged, @SubscribeEvent,
 # getPersistentData()/hasChannel outside platform/neoforge/**). Remove a line when its file is clean; delete
 # this file when the lane is done. build.gradle portLint (region "port P0 L8") reads it.
-src/main/java/com/kolodkingal/enhanced/config/core/ConfigSpec.java
+# Kept after P0 (TODO(port seam), P1): the platform has no "server about to start" event and no configuration-phase
+# message or task yet (L7's seam requests 1 and 2), so the config backend's loader glue stays on NeoForge here.
+src/main/java/com/kolodkingal/enhanced/config/neoforge/ConfigNeoForge.java
