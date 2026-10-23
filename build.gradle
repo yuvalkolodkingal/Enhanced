@@ -207,3 +207,32 @@ idea {
         downloadJavadoc = true
     }
 }
+
+// ===== port P0 S-A =====
+// The common-event annotation processor (processor/, plain Java, never shipped): it writes the registration index of the
+// @Subscribe listeners (platform.event.generated) when main compiles, in the order recorded in
+// docs/port/listener-order.txt. It is a source set of the root project for now; P1-S makes processor/ a subproject.
+sourceSets {
+    processor {
+        java.srcDirs = ['processor/src/main/java']
+        resources.srcDirs = ['processor/src/main/resources']
+    }
+}
+dependencies {
+    annotationProcessor sourceSets.processor.output
+}
+def listenerOrderFile = file('docs/port/listener-order.txt')
+tasks.named('compileJava', JavaCompile).configure {
+    options.compilerArgs.add("-Aenhanced.listenerOrder=${listenerOrderFile.absolutePath}".toString())
+    inputs.files(listenerOrderFile).withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName('listenerOrder')
+}
+// The recording's path, for the debug command that writes it and the GameTest that reads it; with
+// -PrecordListenerOrder a run records its side when loading completes (a client then exits).
+def recordListenerOrder = project.hasProperty('recordListenerOrder')
+neoForge.runs.configureEach {
+    systemProperty 'enhanced.listenerOrder', listenerOrderFile.absolutePath
+    if (recordListenerOrder) {
+        systemProperty 'enhanced.recordListenerOrder', 'true'
+    }
+}
+// ===== end port P0 S-A =====
