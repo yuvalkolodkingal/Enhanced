@@ -1,11 +1,17 @@
 package com.kolodkingal.enhanced.cottage;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.SeatEntity;
 import com.kolodkingal.enhanced.asgard.npc.AsgardTalk;
 import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
 import com.kolodkingal.enhanced.asgard.npc.NpcState;
 import com.kolodkingal.enhanced.asgard.npc.Role;
+import com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.ChatFormatting;
@@ -20,13 +26,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,20 +36,20 @@ import java.util.UUID;
  * while a player is Agatha, anyone while {@code residents} is off), a sleeper's "Zzz..." instead of a talk, the
  * cottage's chairs and benches to sit on, and the cellar door asleep while {@code roadDoor} is off.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class CottageEvents {
 
     private CottageEvents() {
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             CottageKeeper.tick(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onJoin(EntityJoinLevelEvent event) {
         if (event.getLevel() instanceof ServerLevel level && refuses(level, event.getEntity())) {
             event.setCanceled(true);
@@ -95,7 +94,7 @@ public final class CottageEvents {
     }
 
     /** A sleeping resident is not woken by a talk: he murmurs in his sleep. */
-    @SubscribeEvent
+    @Subscribe
     public static void onInteractEntity(PlayerInteractEvent.EntityInteract event) {
         if (event.getHand() != InteractionHand.MAIN_HAND || !(event.getTarget() instanceof AsgardianEntity npc)
                 || !npc.role().cottage() || npc.state() != NpcState.SLEEPING) {
@@ -109,7 +108,7 @@ public final class CottageEvents {
     }
 
     /** The cottage's chairs and benches seat a player (an empty hand, not sneaking); its door sleeps while off. */
-    @SubscribeEvent
+    @Subscribe
     public static void onUseBlock(PlayerInteractEvent.RightClickBlock event) {
         Level world = event.getLevel();
         if (!(world instanceof ServerLevel level) || !(event.getEntity() instanceof ServerPlayer player)
@@ -146,12 +145,12 @@ public final class CottageEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         CottageKeeper.forget(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         CottageKeeper.clear();
     }

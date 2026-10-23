@@ -1,7 +1,22 @@
 package com.kolodkingal.enhanced.strange;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EntityMobGriefingEvent;
+import com.kolodkingal.enhanced.platform.event.ExplosionEvent;
+import com.kolodkingal.enhanced.platform.event.ExplosionKnockbackEvent;
+import com.kolodkingal.enhanced.platform.event.ItemEntityPickupEvent;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingFallEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.ServerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.TriState;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.core.BlockPos;
@@ -15,22 +30,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.EntityMobGriefingEvent;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.neoforge.event.level.ExplosionKnockbackEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ import java.util.List;
  * <li>{@code ServerTickEvent.Post}: the portals' pairs, the bands that hold a boss, the Mirror's fire.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class StrangeEvents {
     /** Fire that a Mirror Dimension put out this tick (cleared at the end of the server tick). */
     private static final List<Fire> FIRES = new ArrayList<>();
@@ -59,7 +58,7 @@ public final class StrangeEvents {
 
     // ---- the harm ----
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         LivingEntity victim = event.getEntity();
         if (victim.level().isClientSide()) {
@@ -78,7 +77,7 @@ public final class StrangeEvents {
         event.setAmount(amount);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)
@@ -95,7 +94,7 @@ public final class StrangeEvents {
     }
 
     /** The Cloak catches him: a fall shorter than {@code safeFall} does nothing, a longer one less; a swing nothing. */
-    @SubscribeEvent
+    @Subscribe
     public static void onFall(LivingFallEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -117,7 +116,7 @@ public final class StrangeEvents {
 
     // ---- the Mirror Dimension's world, the Dome ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDetonate(ExplosionEvent.Detonate event) {
         Level level = event.getLevel();
         if (!level.isClientSide()) {
@@ -125,7 +124,7 @@ public final class StrangeEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onExplosionKnockback(ExplosionKnockbackEvent event) {
         if (event.getAffectedEntity() instanceof LivingEntity living && !living.level().isClientSide()
                 && SeraphimShield.shelters(living)) {
@@ -133,7 +132,7 @@ public final class StrangeEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onBreak(BlockEvent.BreakEvent event) {
         if (event.getLevel() instanceof ServerLevel level && event.getPlayer() instanceof ServerPlayer player
                 && MirrorDimension.protects(player, level, event.getPos())) {
@@ -141,7 +140,7 @@ public final class StrangeEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlace(BlockEvent.EntityPlaceEvent event) {
         if (event.getLevel() instanceof ServerLevel level
                 && MirrorDimension.protects(event.getEntity() instanceof ServerPlayer p ? p : null, level,
@@ -150,7 +149,7 @@ public final class StrangeEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onGrief(EntityMobGriefingEvent event) {
         if (event.getEntity() != null && !event.getEntity().level().isClientSide()
                 && MirrorDimension.shields(event.getEntity().level(), event.getEntity().blockPosition())) {
@@ -159,7 +158,7 @@ public final class StrangeEvents {
     }
 
     /** Fire that spreads into a Mirror Dimension is put out at the end of the tick. */
-    @SubscribeEvent
+    @Subscribe
     public static void onNeighborNotify(BlockEvent.NeighborNotifyEvent event) {
         if (event.getLevel() instanceof ServerLevel level && event.getState().is(BlockTags.FIRE)
                 && MirrorDimension.shields(level, event.getPos())) {
@@ -173,49 +172,49 @@ public final class StrangeEvents {
         return player != null && AstralProjection.isAstral(player);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onAttack(AttackEntityEvent event) {
         if (astral(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onUseBlock(PlayerInteractEvent.RightClickBlock event) {
         if (astral(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onUseItem(PlayerInteractEvent.RightClickItem event) {
         if (astral(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onUseEntity(PlayerInteractEvent.EntityInteract event) {
         if (astral(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onHitBlock(PlayerInteractEvent.LeftClickBlock event) {
         if (astral(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPickup(ItemEntityPickupEvent.Pre event) {
         if (astral(event.getPlayer())) {
             event.setCanPickup(TriState.FALSE);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onChangeTarget(LivingChangeTargetEvent event) {
         if (event.getNewAboutToBeSetTarget() instanceof Player player && astral(player)) {
             event.setCanceled(true);
@@ -224,7 +223,7 @@ public final class StrangeEvents {
 
     // ---- the server's tick ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerTick(ServerTickEvent.Post event) {
         SlingPortals.serverTick(event.getServer());
         CrimsonBands.serverTick();

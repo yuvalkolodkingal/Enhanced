@@ -13,6 +13,8 @@ import com.kolodkingal.enhanced.build.UndoHistory;
 import com.kolodkingal.enhanced.build.UndoStep;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
@@ -31,9 +33,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -404,9 +403,9 @@ final class BuildTestSupport {
     }
 
     /** Adds a listener for the test's length (a claim mod, a counter of events). */
-    static <T extends Event> void listen(TestKit.Fixture f, Class<T> type, Consumer<T> listener) {
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, type, listener);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+    static <T> void listen(TestKit.Fixture f, Class<T> type, Consumer<T> listener) {
+        EventHub.Registration registration = EventHub.of(type).register(Priority.NORMAL, false, listener);
+        f.onClose(registration::close);
     }
 
     /** Whether {@code player} is in build mode, as the server and everyone who sees her know it. */

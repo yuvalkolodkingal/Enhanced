@@ -1,9 +1,12 @@
 package com.kolodkingal.enhanced.custom;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.CustomHeroConfig;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -16,10 +19,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
@@ -30,10 +29,10 @@ import java.util.Map;
  * The strength of a custom hero's hero abilities in their damage (3.4): a hit of a built-in hero's damage type dealt by
  * a custom hero (by him, his projectile, his illusion or his drone) is multiplied by the strength factor of the ability of
  * his kit that deals it ({@link HeroKit#damageFactor}) and by {@code custom_hero.damageScale}. The generic modules scale
- * their own numbers ({@link ModuleStats}). Runs at {@link EventPriority#LOW}, after the rules that cancel or set the
+ * their own numbers ({@link ModuleStats}). Runs at {@link Priority#LOW}, after the rules that cancel or set the
  * damage (shields, wards, immunities) and before the ones that only read it.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class HeroDamage {
     /**
      * How the ability of a damage type is found in a kit: the first of the list it has, or the strongest of them. (3.6:
@@ -189,7 +188,7 @@ public final class HeroDamage {
         return e instanceof Player player ? player : null;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         Player attacker = attacker(event.getSource(), event.getEntity().level());
         if (attacker == null) {

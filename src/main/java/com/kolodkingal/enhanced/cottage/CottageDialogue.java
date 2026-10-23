@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.cottage;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Ctx;
@@ -10,6 +9,9 @@ import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
 import com.kolodkingal.enhanced.asgard.npc.Asgardians;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.config.CottageConfig;
+import com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -20,9 +22,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -47,11 +46,11 @@ import java.util.Map;
  * are picked by the answers' actions, not by {@code AsgardDialogue.swap}: the 3.5.1 tests check that every swap names
  * the player who is Odin.)
  */
-@EventBusSubscriber(modid = Enhanced.MODID, bus = EventBusSubscriber.Bus.MOD)
+@Subscriber
 public final class CottageDialogue {
     private static boolean registered;
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(CottageDialogue::register);
     }
