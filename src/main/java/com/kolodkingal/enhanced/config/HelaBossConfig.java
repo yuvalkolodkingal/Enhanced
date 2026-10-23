@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The fight against Hela in the throne room of Asgard (3.5). Every option of the plan is defined here by the 3.5
@@ -13,29 +13,29 @@ public final class HelaBossConfig {
     public static final String SECTION = "hela_boss";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue SUMMON_ENABLED;
-    public static ModConfigSpec.DoubleValue HEALTH;
-    public static ModConfigSpec.DoubleValue HEALTH_PER_EXTRA_FIGHTER;
-    public static ModConfigSpec.DoubleValue ARMOR;
-    public static ModConfigSpec.DoubleValue PHASE2_AT;
-    public static ModConfigSpec.DoubleValue PHASE3_AT;
-    public static ModConfigSpec.DoubleValue VOLLEY_DAMAGE;
-    public static ModConfigSpec.DoubleValue WALL_DAMAGE;
-    public static ModConfigSpec.DoubleValue RAIN_DAMAGE;
-    public static ModConfigSpec.DoubleValue MELEE_DAMAGE;
-    public static ModConfigSpec.DoubleValue STORM_DAMAGE;
-    public static ModConfigSpec.IntValue CHANNEL_SECONDS;
-    public static ModConfigSpec.IntValue CHANNEL_EVERY;
-    public static ModConfigSpec.DoubleValue CHANNEL_BREAK_FRACTION;
-    public static ModConfigSpec.DoubleValue CHANNEL_HEAL;
-    public static ModConfigSpec.IntValue BERSERKER_WAVE;
-    public static ModConfigSpec.IntValue BERSERKER_PER_FIGHTER;
-    public static ModConfigSpec.IntValue BERSERKER_MAX;
-    public static ModConfigSpec.DoubleValue FENRIS_HEALTH;
-    public static ModConfigSpec.IntValue REST_TICKS;
-    public static ModConfigSpec.BooleanValue CATCH_MJOLNIR;
+    public static ConfigSpec.BooleanValue SUMMON_ENABLED;
+    public static ConfigSpec.DoubleValue HEALTH;
+    public static ConfigSpec.DoubleValue HEALTH_PER_EXTRA_FIGHTER;
+    public static ConfigSpec.DoubleValue ARMOR;
+    public static ConfigSpec.DoubleValue PHASE2_AT;
+    public static ConfigSpec.DoubleValue PHASE3_AT;
+    public static ConfigSpec.DoubleValue VOLLEY_DAMAGE;
+    public static ConfigSpec.DoubleValue WALL_DAMAGE;
+    public static ConfigSpec.DoubleValue RAIN_DAMAGE;
+    public static ConfigSpec.DoubleValue MELEE_DAMAGE;
+    public static ConfigSpec.DoubleValue STORM_DAMAGE;
+    public static ConfigSpec.IntValue CHANNEL_SECONDS;
+    public static ConfigSpec.IntValue CHANNEL_EVERY;
+    public static ConfigSpec.DoubleValue CHANNEL_BREAK_FRACTION;
+    public static ConfigSpec.DoubleValue CHANNEL_HEAL;
+    public static ConfigSpec.IntValue BERSERKER_WAVE;
+    public static ConfigSpec.IntValue BERSERKER_PER_FIGHTER;
+    public static ConfigSpec.IntValue BERSERKER_MAX;
+    public static ConfigSpec.DoubleValue FENRIS_HEALTH;
+    public static ConfigSpec.IntValue REST_TICKS;
+    public static ConfigSpec.BooleanValue CATCH_MJOLNIR;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         SUMMON_ENABLED = builder.comment("Whether breaking Hela's Seal calls her (operators can always start the fight by command).")
                 .define("summonEnabled", true);

@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The Stone Locator (3.7): its recipe and how far and how fast it searches for the Infinity Stones' sites. Every
@@ -13,17 +13,17 @@ public final class LocatorConfig {
     public static final String SECTION = "stone_locator";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue CRAFTABLE;
-    public static ModConfigSpec.BooleanValue RETURNS_CORE;
-    public static ModConfigSpec.IntValue SEARCH_RADIUS;
-    public static ModConfigSpec.IntValue NETHER_SEARCH_RADIUS;
-    public static ModConfigSpec.IntValue START_CHECKS_PER_TICK;
-    public static ModConfigSpec.IntValue RECHECK_TICKS;
-    public static ModConfigSpec.IntValue MOVE_RECHECK;
-    public static ModConfigSpec.IntValue PULSE_COOLDOWN;
-    public static ModConfigSpec.BooleanValue POINTS_TO_GATEWAYS;
+    public static ConfigSpec.BooleanValue CRAFTABLE;
+    public static ConfigSpec.BooleanValue RETURNS_CORE;
+    public static ConfigSpec.IntValue SEARCH_RADIUS;
+    public static ConfigSpec.IntValue NETHER_SEARCH_RADIUS;
+    public static ConfigSpec.IntValue START_CHECKS_PER_TICK;
+    public static ConfigSpec.IntValue RECHECK_TICKS;
+    public static ConfigSpec.IntValue MOVE_RECHECK;
+    public static ConfigSpec.IntValue PULSE_COOLDOWN;
+    public static ConfigSpec.BooleanValue POINTS_TO_GATEWAYS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("stone_locator");
         CRAFTABLE = builder.comment("Whether the Stone Locator can be crafted.")
                 .define("craftable", true);

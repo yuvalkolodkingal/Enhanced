@@ -2,9 +2,9 @@ package com.kolodkingal.enhanced.world;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.StoneSitesConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public final class SiteSwitch {
         if (option.isEmpty() || !EnhancedConfig.SPEC.isLoaded()) {
             return true;
         }
-        ModConfigSpec.BooleanValue value = option(option.get());
+        ConfigSpec.BooleanValue value = option(option.get());
         return value == null || value.get();
     }
 
@@ -52,7 +52,7 @@ public final class SiteSwitch {
         };
     }
 
-    private static ModConfigSpec.BooleanValue option(String name) {
+    private static ConfigSpec.BooleanValue option(String name) {
         return switch (name.toLowerCase(Locale.ROOT)) {
             case "sanctums" -> StoneSitesConfig.SANCTUMS;
             case "avengerstowers" -> StoneSitesConfig.AVENGERS_TOWERS;

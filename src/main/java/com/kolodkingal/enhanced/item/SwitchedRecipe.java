@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.item;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.config.SerumConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.registry.ModRecipes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -14,7 +15,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.function.Supplier;
 
@@ -30,10 +30,10 @@ public class SwitchedRecipe extends ShapedRecipe {
         SERUM(() -> SerumConfig.CRAFTABLE, ModRecipes.SERUM),
         ARC_REACTOR(() -> IronManConfig.REACTORS_CRAFTABLE, ModRecipes.ARC_REACTOR);
 
-        private final Supplier<ModConfigSpec.BooleanValue> option;
+        private final Supplier<ConfigSpec.BooleanValue> option;
         private final Supplier<? extends RecipeSerializer<?>> serializer;
 
-        Switch(Supplier<ModConfigSpec.BooleanValue> option, Supplier<? extends RecipeSerializer<?>> serializer) {
+        Switch(Supplier<ConfigSpec.BooleanValue> option, Supplier<? extends RecipeSerializer<?>> serializer) {
             this.option = option;
             this.serializer = serializer;
         }

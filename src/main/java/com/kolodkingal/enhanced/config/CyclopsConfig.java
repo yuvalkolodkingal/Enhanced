@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The balance numbers of Cyclops (3.3): his body, the optic blast he fires through his ruby-quartz glasses, the giant
@@ -16,49 +16,49 @@ public final class CyclopsConfig {
      * cannot be final because the options are defined in a method, not in a static block).
      */
     // the body
-    public static ModConfigSpec.DoubleValue BODY_HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue ARMOR;
+    public static ConfigSpec.DoubleValue BODY_HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue ARMOR;
     // the optic blast (R held)
-    public static ModConfigSpec.DoubleValue OPTIC_RANGE;
-    public static ModConfigSpec.DoubleValue OPTIC_DAMAGE;
-    public static ModConfigSpec.IntValue OPTIC_INTERVAL;
-    public static ModConfigSpec.DoubleValue OPTIC_PUSH;
-    public static ModConfigSpec.DoubleValue OPTIC_EXHAUSTION_PER_SECOND;
+    public static ConfigSpec.DoubleValue OPTIC_RANGE;
+    public static ConfigSpec.DoubleValue OPTIC_DAMAGE;
+    public static ConfigSpec.IntValue OPTIC_INTERVAL;
+    public static ConfigSpec.DoubleValue OPTIC_PUSH;
+    public static ConfigSpec.DoubleValue OPTIC_EXHAUSTION_PER_SECOND;
     // the glasses off: the giant beam
-    public static ModConfigSpec.DoubleValue UNLEASHED_RANGE;
-    public static ModConfigSpec.DoubleValue UNLEASHED_DAMAGE;
-    public static ModConfigSpec.IntValue UNLEASHED_INTERVAL;
-    public static ModConfigSpec.DoubleValue UNLEASHED_RADIUS;
-    public static ModConfigSpec.DoubleValue UNLEASHED_PUSH;
-    public static ModConfigSpec.BooleanValue UNLEASHED_BREAKS_BLOCKS;
-    public static ModConfigSpec.DoubleValue UNLEASHED_MAX_HARDNESS;
+    public static ConfigSpec.DoubleValue UNLEASHED_RANGE;
+    public static ConfigSpec.DoubleValue UNLEASHED_DAMAGE;
+    public static ConfigSpec.IntValue UNLEASHED_INTERVAL;
+    public static ConfigSpec.DoubleValue UNLEASHED_RADIUS;
+    public static ConfigSpec.DoubleValue UNLEASHED_PUSH;
+    public static ConfigSpec.BooleanValue UNLEASHED_BREAKS_BLOCKS;
+    public static ConfigSpec.DoubleValue UNLEASHED_MAX_HARDNESS;
     // the ricochet (Sneak + R)
-    public static ModConfigSpec.DoubleValue RICOCHET_DAMAGE;
-    public static ModConfigSpec.IntValue RICOCHET_BOUNCES;
-    public static ModConfigSpec.DoubleValue RICOCHET_RANGE;
-    public static ModConfigSpec.IntValue RICOCHET_COOLDOWN;
-    public static ModConfigSpec.DoubleValue RICOCHET_EXHAUSTION;
+    public static ConfigSpec.DoubleValue RICOCHET_DAMAGE;
+    public static ConfigSpec.IntValue RICOCHET_BOUNCES;
+    public static ConfigSpec.DoubleValue RICOCHET_RANGE;
+    public static ConfigSpec.IntValue RICOCHET_COOLDOWN;
+    public static ConfigSpec.DoubleValue RICOCHET_EXHAUSTION;
     // the concussion blast (G)
-    public static ModConfigSpec.DoubleValue CONCUSSION_RANGE;
-    public static ModConfigSpec.DoubleValue CONCUSSION_ANGLE;
-    public static ModConfigSpec.DoubleValue CONCUSSION_DAMAGE;
-    public static ModConfigSpec.DoubleValue CONCUSSION_KNOCKBACK;
-    public static ModConfigSpec.IntValue CONCUSSION_COOLDOWN;
-    public static ModConfigSpec.DoubleValue CONCUSSION_EXHAUSTION;
+    public static ConfigSpec.DoubleValue CONCUSSION_RANGE;
+    public static ConfigSpec.DoubleValue CONCUSSION_ANGLE;
+    public static ConfigSpec.DoubleValue CONCUSSION_DAMAGE;
+    public static ConfigSpec.DoubleValue CONCUSSION_KNOCKBACK;
+    public static ConfigSpec.IntValue CONCUSSION_COOLDOWN;
+    public static ConfigSpec.DoubleValue CONCUSSION_EXHAUSTION;
     // the optic leap (V)
-    public static ModConfigSpec.DoubleValue LEAP_UP;
-    public static ModConfigSpec.DoubleValue LEAP_FORWARD;
-    public static ModConfigSpec.DoubleValue LEAP_BLAST_RADIUS;
-    public static ModConfigSpec.DoubleValue LEAP_BLAST_DAMAGE;
-    public static ModConfigSpec.IntValue LEAP_COOLDOWN;
-    public static ModConfigSpec.DoubleValue LEAP_EXHAUSTION;
+    public static ConfigSpec.DoubleValue LEAP_UP;
+    public static ConfigSpec.DoubleValue LEAP_FORWARD;
+    public static ConfigSpec.DoubleValue LEAP_BLAST_RADIUS;
+    public static ConfigSpec.DoubleValue LEAP_BLAST_DAMAGE;
+    public static ConfigSpec.IntValue LEAP_COOLDOWN;
+    public static ConfigSpec.DoubleValue LEAP_EXHAUSTION;
     // the rally (B)
-    public static ModConfigSpec.IntValue RALLY_RADIUS;
-    public static ModConfigSpec.IntValue RALLY_TICKS;
-    public static ModConfigSpec.IntValue RALLY_COOLDOWN;
-    public static ModConfigSpec.DoubleValue RALLY_EXHAUSTION;
+    public static ConfigSpec.IntValue RALLY_RADIUS;
+    public static ConfigSpec.IntValue RALLY_TICKS;
+    public static ConfigSpec.IntValue RALLY_COOLDOWN;
+    public static ConfigSpec.DoubleValue RALLY_EXHAUSTION;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         BODY_HEALTH_BONUS = builder.comment("Extra max health while Cyclops (10 = 5 hearts, so 30).")
                 .defineInRange("bodyHealthBonus", 10.0, 0.0, 200.0);

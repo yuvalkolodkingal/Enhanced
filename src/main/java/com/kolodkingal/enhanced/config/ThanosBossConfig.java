@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The balance numbers of the Thanos boss fight (the rules all bosses share are in {@link BossConfig}). Its options are
@@ -13,106 +13,106 @@ public final class ThanosBossConfig {
     public static final String SECTION = "thanos_boss";
 
     // ---- the summoning ----
-    public static ModConfigSpec.BooleanValue SUMMON_ENABLED;
-    public static ModConfigSpec.BooleanValue SUMMON_OVERWORLD_ONLY;
-    public static ModConfigSpec.IntValue SUMMON_CHARGE_TICKS;
-    public static ModConfigSpec.IntValue SUMMON_COUNTDOWN_TICKS;
-    public static ModConfigSpec.IntValue SUMMON_SKY_BLOCKS;
-    public static ModConfigSpec.DoubleValue SUMMON_OPEN_FRACTION;
-    public static ModConfigSpec.IntValue SUMMON_COOLDOWN_TICKS;
+    public static ConfigSpec.BooleanValue SUMMON_ENABLED;
+    public static ConfigSpec.BooleanValue SUMMON_OVERWORLD_ONLY;
+    public static ConfigSpec.IntValue SUMMON_CHARGE_TICKS;
+    public static ConfigSpec.IntValue SUMMON_COUNTDOWN_TICKS;
+    public static ConfigSpec.IntValue SUMMON_SKY_BLOCKS;
+    public static ConfigSpec.DoubleValue SUMMON_OPEN_FRACTION;
+    public static ConfigSpec.IntValue SUMMON_COOLDOWN_TICKS;
 
     // ---- the body, the clock and the arena ----
-    public static ModConfigSpec.DoubleValue HEALTH;
-    public static ModConfigSpec.DoubleValue HEALTH_PER_EXTRA_PLAYER;
-    public static ModConfigSpec.IntValue MAX_FIGHTERS_COUNTED;
-    public static ModConfigSpec.IntValue ARENA_RADIUS;
-    public static ModConfigSpec.IntValue XP_REWARD;
-    public static ModConfigSpec.IntValue MAX_STONES;
-    public static ModConfigSpec.IntValue STONE_INTERVAL_TICKS;
-    public static ModConfigSpec.IntValue SURGE_TICKS;
-    public static ModConfigSpec.DoubleValue SURGE_DAMAGE_FACTOR;
-    public static ModConfigSpec.DoubleValue DAMAGE_SCALE_PER_STONE;
-    public static ModConfigSpec.IntValue ENRAGE_AFTER_TICKS;
-    public static ModConfigSpec.DoubleValue ENRAGE_STEP_PER_MINUTE;
-    public static ModConfigSpec.DoubleValue ENRAGE_MAX;
-    public static ModConfigSpec.IntValue GAP_PER_EXTRA_PLAYER;
-    public static ModConfigSpec.BooleanValue BLOCK_DAMAGE;
+    public static ConfigSpec.DoubleValue HEALTH;
+    public static ConfigSpec.DoubleValue HEALTH_PER_EXTRA_PLAYER;
+    public static ConfigSpec.IntValue MAX_FIGHTERS_COUNTED;
+    public static ConfigSpec.IntValue ARENA_RADIUS;
+    public static ConfigSpec.IntValue XP_REWARD;
+    public static ConfigSpec.IntValue MAX_STONES;
+    public static ConfigSpec.IntValue STONE_INTERVAL_TICKS;
+    public static ConfigSpec.IntValue SURGE_TICKS;
+    public static ConfigSpec.DoubleValue SURGE_DAMAGE_FACTOR;
+    public static ConfigSpec.DoubleValue DAMAGE_SCALE_PER_STONE;
+    public static ConfigSpec.IntValue ENRAGE_AFTER_TICKS;
+    public static ConfigSpec.DoubleValue ENRAGE_STEP_PER_MINUTE;
+    public static ConfigSpec.DoubleValue ENRAGE_MAX;
+    public static ConfigSpec.IntValue GAP_PER_EXTRA_PLAYER;
+    public static ConfigSpec.BooleanValue BLOCK_DAMAGE;
 
     // ---- his damage (Normal, raw) ----
-    public static ModConfigSpec.DoubleValue SWORD_DAMAGE;
-    public static ModConfigSpec.DoubleValue SMASH_DAMAGE;
-    public static ModConfigSpec.DoubleValue SMASH_RING_DAMAGE;
-    public static ModConfigSpec.DoubleValue JAB_DAMAGE;
-    public static ModConfigSpec.DoubleValue SWORD_THROW_DAMAGE;
-    public static ModConfigSpec.DoubleValue CHOKE_DAMAGE;
-    public static ModConfigSpec.DoubleValue LEAP_DAMAGE;
-    public static ModConfigSpec.DoubleValue POWER_BLAST_DAMAGE;
-    public static ModConfigSpec.DoubleValue POWER_BLAST_SPLASH;
-    public static ModConfigSpec.DoubleValue OVERLOAD_DAMAGE;
-    public static ModConfigSpec.DoubleValue SHOCKWAVE_DAMAGE;
-    public static ModConfigSpec.DoubleValue METEOR_DAMAGE;
-    public static ModConfigSpec.DoubleValue PULL_CRUSH_DAMAGE;
-    public static ModConfigSpec.DoubleValue SOUL_DRAIN_TICK;
-    public static ModConfigSpec.DoubleValue PULSE_DAMAGE;
-    public static ModConfigSpec.DoubleValue INFINITY_BEAM_DAMAGE;
-    public static ModConfigSpec.DoubleValue PHANTOM_DAMAGE;
-    public static ModConfigSpec.DoubleValue SWORD_SHIELD_FACTOR;
+    public static ConfigSpec.DoubleValue SWORD_DAMAGE;
+    public static ConfigSpec.DoubleValue SMASH_DAMAGE;
+    public static ConfigSpec.DoubleValue SMASH_RING_DAMAGE;
+    public static ConfigSpec.DoubleValue JAB_DAMAGE;
+    public static ConfigSpec.DoubleValue SWORD_THROW_DAMAGE;
+    public static ConfigSpec.DoubleValue CHOKE_DAMAGE;
+    public static ConfigSpec.DoubleValue LEAP_DAMAGE;
+    public static ConfigSpec.DoubleValue POWER_BLAST_DAMAGE;
+    public static ConfigSpec.DoubleValue POWER_BLAST_SPLASH;
+    public static ConfigSpec.DoubleValue OVERLOAD_DAMAGE;
+    public static ConfigSpec.DoubleValue SHOCKWAVE_DAMAGE;
+    public static ConfigSpec.DoubleValue METEOR_DAMAGE;
+    public static ConfigSpec.DoubleValue PULL_CRUSH_DAMAGE;
+    public static ConfigSpec.DoubleValue SOUL_DRAIN_TICK;
+    public static ConfigSpec.DoubleValue PULSE_DAMAGE;
+    public static ConfigSpec.DoubleValue INFINITY_BEAM_DAMAGE;
+    public static ConfigSpec.DoubleValue PHANTOM_DAMAGE;
+    public static ConfigSpec.DoubleValue SWORD_SHIELD_FACTOR;
 
     // ---- his cooldowns (ticks) ----
-    public static ModConfigSpec.IntValue SWORD_COOLDOWN;
-    public static ModConfigSpec.IntValue SMASH_COOLDOWN;
-    public static ModConfigSpec.IntValue JAB_COOLDOWN;
-    public static ModConfigSpec.IntValue SWORD_THROW_COOLDOWN;
-    public static ModConfigSpec.IntValue CHOKE_COOLDOWN;
-    public static ModConfigSpec.IntValue LEAP_COOLDOWN;
-    public static ModConfigSpec.IntValue POWER_BLAST_COOLDOWN;
-    public static ModConfigSpec.IntValue OVERLOAD_COOLDOWN;
-    public static ModConfigSpec.IntValue SHOCKWAVE_COOLDOWN;
-    public static ModConfigSpec.IntValue STEP_COOLDOWN;
-    public static ModConfigSpec.IntValue METEOR_COOLDOWN;
-    public static ModConfigSpec.IntValue PULL_COOLDOWN;
-    public static ModConfigSpec.IntValue BARRIER_COOLDOWN;
-    public static ModConfigSpec.IntValue VEIL_COOLDOWN;
-    public static ModConfigSpec.IntValue PHANTOMS_COOLDOWN;
-    public static ModConfigSpec.IntValue ORB_COOLDOWN;
-    public static ModConfigSpec.IntValue SIGHT_COOLDOWN;
-    public static ModConfigSpec.IntValue DRAIN_COOLDOWN;
-    public static ModConfigSpec.IntValue SOULWORLD_COOLDOWN;
-    public static ModConfigSpec.IntValue REWIND_COOLDOWN;
-    public static ModConfigSpec.IntValue SNARE_COOLDOWN;
-    public static ModConfigSpec.IntValue INFINITY_BEAM_COOLDOWN;
-    public static ModConfigSpec.IntValue PULSE_COOLDOWN;
+    public static ConfigSpec.IntValue SWORD_COOLDOWN;
+    public static ConfigSpec.IntValue SMASH_COOLDOWN;
+    public static ConfigSpec.IntValue JAB_COOLDOWN;
+    public static ConfigSpec.IntValue SWORD_THROW_COOLDOWN;
+    public static ConfigSpec.IntValue CHOKE_COOLDOWN;
+    public static ConfigSpec.IntValue LEAP_COOLDOWN;
+    public static ConfigSpec.IntValue POWER_BLAST_COOLDOWN;
+    public static ConfigSpec.IntValue OVERLOAD_COOLDOWN;
+    public static ConfigSpec.IntValue SHOCKWAVE_COOLDOWN;
+    public static ConfigSpec.IntValue STEP_COOLDOWN;
+    public static ConfigSpec.IntValue METEOR_COOLDOWN;
+    public static ConfigSpec.IntValue PULL_COOLDOWN;
+    public static ConfigSpec.IntValue BARRIER_COOLDOWN;
+    public static ConfigSpec.IntValue VEIL_COOLDOWN;
+    public static ConfigSpec.IntValue PHANTOMS_COOLDOWN;
+    public static ConfigSpec.IntValue ORB_COOLDOWN;
+    public static ConfigSpec.IntValue SIGHT_COOLDOWN;
+    public static ConfigSpec.IntValue DRAIN_COOLDOWN;
+    public static ConfigSpec.IntValue SOULWORLD_COOLDOWN;
+    public static ConfigSpec.IntValue REWIND_COOLDOWN;
+    public static ConfigSpec.IntValue SNARE_COOLDOWN;
+    public static ConfigSpec.IntValue INFINITY_BEAM_COOLDOWN;
+    public static ConfigSpec.IntValue PULSE_COOLDOWN;
 
     // ---- durations and rules ----
-    public static ModConfigSpec.IntValue BARRIER_TICKS;
-    public static ModConfigSpec.IntValue VEIL_TICKS;
-    public static ModConfigSpec.IntValue SNARE_TICKS;
-    public static ModConfigSpec.IntValue SOULWORLD_TICKS;
-    public static ModConfigSpec.DoubleValue SOULWORLD_HEAL;
-    public static ModConfigSpec.DoubleValue DRAIN_HEAL_FRACTION;
-    public static ModConfigSpec.IntValue REWIND_SECONDS;
-    public static ModConfigSpec.DoubleValue REWIND_MAX_HEAL;
-    public static ModConfigSpec.DoubleValue REWIND_TRIGGER;
-    public static ModConfigSpec.DoubleValue PLATE_REDUCTION;
-    public static ModConfigSpec.IntValue PLATE_TEAR_SECONDS;
-    public static ModConfigSpec.IntValue STAGGER_POISE;
-    public static ModConfigSpec.DoubleValue POISE_HIT;
-    public static ModConfigSpec.IntValue LOCK_TICKS;
-    public static ModConfigSpec.DoubleValue STORMBREAKER_FACTOR;
-    public static ModConfigSpec.DoubleValue MAX_HIT_FRACTION;
-    public static ModConfigSpec.DoubleValue MAX_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.DoubleValue MOB_DAMAGE_FACTOR;
-    public static ModConfigSpec.IntValue METEOR_EXTRA;
-    public static ModConfigSpec.IntValue UNREACHABLE_TICKS;
-    public static ModConfigSpec.DoubleValue IDLE_REGEN_PER_MINUTE;
-    public static ModConfigSpec.DoubleValue REWARD_MIN_SHARE;
-    public static ModConfigSpec.IntValue GAUNTLET_RITUAL_TICKS;
-    public static ModConfigSpec.IntValue WEB_LOCK_TICKS;
-    public static ModConfigSpec.IntValue WEB_LOCK_COOLDOWN;
-    public static ModConfigSpec.IntValue HOLD_TICKS;
-    public static ModConfigSpec.IntValue SWORD_HOLD_TICKS;
+    public static ConfigSpec.IntValue BARRIER_TICKS;
+    public static ConfigSpec.IntValue VEIL_TICKS;
+    public static ConfigSpec.IntValue SNARE_TICKS;
+    public static ConfigSpec.IntValue SOULWORLD_TICKS;
+    public static ConfigSpec.DoubleValue SOULWORLD_HEAL;
+    public static ConfigSpec.DoubleValue DRAIN_HEAL_FRACTION;
+    public static ConfigSpec.IntValue REWIND_SECONDS;
+    public static ConfigSpec.DoubleValue REWIND_MAX_HEAL;
+    public static ConfigSpec.DoubleValue REWIND_TRIGGER;
+    public static ConfigSpec.DoubleValue PLATE_REDUCTION;
+    public static ConfigSpec.IntValue PLATE_TEAR_SECONDS;
+    public static ConfigSpec.IntValue STAGGER_POISE;
+    public static ConfigSpec.DoubleValue POISE_HIT;
+    public static ConfigSpec.IntValue LOCK_TICKS;
+    public static ConfigSpec.DoubleValue STORMBREAKER_FACTOR;
+    public static ConfigSpec.DoubleValue MAX_HIT_FRACTION;
+    public static ConfigSpec.DoubleValue MAX_DAMAGE_PER_SECOND;
+    public static ConfigSpec.DoubleValue MOB_DAMAGE_FACTOR;
+    public static ConfigSpec.IntValue METEOR_EXTRA;
+    public static ConfigSpec.IntValue UNREACHABLE_TICKS;
+    public static ConfigSpec.DoubleValue IDLE_REGEN_PER_MINUTE;
+    public static ConfigSpec.DoubleValue REWARD_MIN_SHARE;
+    public static ConfigSpec.IntValue GAUNTLET_RITUAL_TICKS;
+    public static ConfigSpec.IntValue WEB_LOCK_TICKS;
+    public static ConfigSpec.IntValue WEB_LOCK_COOLDOWN;
+    public static ConfigSpec.IntValue HOLD_TICKS;
+    public static ConfigSpec.IntValue SWORD_HOLD_TICKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
 
         // The summoning.
@@ -264,11 +264,11 @@ public final class ThanosBossConfig {
         builder.pop();
     }
 
-    private static ModConfigSpec.DoubleValue damage(ModConfigSpec.Builder builder, String name, double value, String what) {
+    private static ConfigSpec.DoubleValue damage(ConfigSpec.Builder builder, String name, double value, String what) {
         return builder.comment("Damage of his attack: " + what).defineInRange(name, value, 0.0, 400.0);
     }
 
-    private static ModConfigSpec.IntValue cooldown(ModConfigSpec.Builder builder, String name, int ticks) {
+    private static ConfigSpec.IntValue cooldown(ConfigSpec.Builder builder, String name, int ticks) {
         return builder.comment("How long that move waits before he can use it again (ticks).").defineInRange(name, ticks, 0, 6000);
     }
 

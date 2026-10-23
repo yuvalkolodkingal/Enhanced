@@ -1,11 +1,11 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -50,7 +50,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
@@ -388,7 +387,7 @@ public final class DataTests {
                 "build_cast_billy", "build_hum", "build_fizzle", "build_undo", "build_rank_up")) {
             keys.add("subtitles." + Enhanced.MODID + "." + sound);
         }
-        for (var option : List.<ModConfigSpec.ConfigValue<?>>of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION,
+        for (var option : List.<ConfigSpec.ConfigValue<?>>of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION,
                 EnhancedClientConfig.FLIGHT_EFFECTS, EnhancedClientConfig.BUILD_HINTS, EnhancedClientConfig.BUILD_TIPS,
                 EnhancedClientConfig.BUILD_GHOST_DETAIL, EnhancedClientConfig.BUILD_SEE_THROUGH, EnhancedClientConfig.BUILD_SHOW_OTHERS)) {
             String key = option.getSpec().getTranslationKey();
@@ -400,15 +399,13 @@ public final class DataTests {
         // else by "enhanced.configuration.<section>", and shows the bare key when the lang files lack it; the row also has
         // a tooltip and the text of its button.
         List<String> sections = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : EnhancedClientConfig.SPEC.getSpec().valueMap().entrySet()) {
-            if (entry.getValue() instanceof UnmodifiableConfig) {
-                sections.add(entry.getKey());
-                String key = Optional.ofNullable(EnhancedClientConfig.SPEC.getLevelTranslationKey(List.of(entry.getKey())))
-                        .orElse(Enhanced.MODID + ".configuration." + entry.getKey());
-                keys.add(key);
-                keys.add(key + ".tooltip");
-                keys.add(key + ".button");
-            }
+        for (String section : EnhancedClientConfig.SPEC.sections()) {
+            sections.add(section);
+            String key = Optional.ofNullable(EnhancedClientConfig.SPEC.getLevelTranslationKey(List.of(section)))
+                    .orElse(Enhanced.MODID + ".configuration." + section);
+            keys.add(key);
+            keys.add(key + ".tooltip");
+            keys.add(key + ".button");
         }
         check(sections.containsAll(List.of("animation", "appearance", "thanos", "build_magic")),
                 "the sections of the client options are read from its spec (" + sections + ")");

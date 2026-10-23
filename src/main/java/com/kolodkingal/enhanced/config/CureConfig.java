@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The Mutant Cure (3.3.1). Its options are defined in {@link #define}, which {@code EnhancedConfig} calls while it builds
@@ -16,11 +16,11 @@ public final class CureConfig {
      * Assigned by {@link #define} when the config is built, which is at mod construction: before anything reads it (it
      * cannot be final because the options are defined in a method, not in a static block).
      */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue HOLD_TICKS;
-    public static ModConfigSpec.BooleanValue ON_OTHERS;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue HOLD_TICKS;
+    public static ConfigSpec.BooleanValue ON_OTHERS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Whether the Mutant Cure works (false: using it does nothing and nothing is used up).")
                 .define("enabled", true);

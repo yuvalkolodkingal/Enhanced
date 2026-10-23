@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The balance numbers of Apocalypse, the hero (a player who became En Sabah Nur by the Essence). Its options are
@@ -15,57 +15,57 @@ public final class ApocalypseConfig {
      * Assigned by {@link #define} when the config is built, which is at mod construction: before anything reads it (it
      * cannot be final because the options are defined in a method, not in a static block).
      */
-    public static ModConfigSpec.DoubleValue FLIGHT_SPEED;
+    public static ConfigSpec.DoubleValue FLIGHT_SPEED;
     // the body
-    public static ModConfigSpec.DoubleValue BODY_HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue ARMOR;
-    public static ModConfigSpec.DoubleValue ARMOR_TOUGHNESS;
-    public static ModConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
-    public static ModConfigSpec.DoubleValue REGEN_PER_SECOND;
-    public static ModConfigSpec.IntValue REGEN_DELAY_TICKS;
+    public static ConfigSpec.DoubleValue BODY_HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue ARMOR;
+    public static ConfigSpec.DoubleValue ARMOR_TOUGHNESS;
+    public static ConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
+    public static ConfigSpec.DoubleValue REGEN_PER_SECOND;
+    public static ConfigSpec.IntValue REGEN_DELAY_TICKS;
     // Sand Control: the Wave and the Entomb
-    public static ModConfigSpec.DoubleValue WAVE_DAMAGE;
-    public static ModConfigSpec.IntValue WAVE_LENGTH;
-    public static ModConfigSpec.DoubleValue WAVE_SPEED;
-    public static ModConfigSpec.IntValue WAVE_SLOW_TICKS;
-    public static ModConfigSpec.IntValue WAVE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue WAVE_EXHAUSTION;
-    public static ModConfigSpec.IntValue ENTOMB_RANGE;
-    public static ModConfigSpec.IntValue ENTOMB_TICKS;
-    public static ModConfigSpec.DoubleValue ENTOMB_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.DoubleValue COCOON_HEALTH;
-    public static ModConfigSpec.IntValue ENTOMB_COOLDOWN;
-    public static ModConfigSpec.DoubleValue ENTOMB_EXHAUSTION;
+    public static ConfigSpec.DoubleValue WAVE_DAMAGE;
+    public static ConfigSpec.IntValue WAVE_LENGTH;
+    public static ConfigSpec.DoubleValue WAVE_SPEED;
+    public static ConfigSpec.IntValue WAVE_SLOW_TICKS;
+    public static ConfigSpec.IntValue WAVE_COOLDOWN;
+    public static ConfigSpec.DoubleValue WAVE_EXHAUSTION;
+    public static ConfigSpec.IntValue ENTOMB_RANGE;
+    public static ConfigSpec.IntValue ENTOMB_TICKS;
+    public static ConfigSpec.DoubleValue ENTOMB_DAMAGE_PER_SECOND;
+    public static ConfigSpec.DoubleValue COCOON_HEALTH;
+    public static ConfigSpec.IntValue ENTOMB_COOLDOWN;
+    public static ConfigSpec.DoubleValue ENTOMB_EXHAUSTION;
     // Portal
-    public static ModConfigSpec.IntValue PORTAL_RANGE;
-    public static ModConfigSpec.IntValue PORTAL_ALLY_RADIUS;
-    public static ModConfigSpec.IntValue PORTAL_COOLDOWN;
-    public static ModConfigSpec.DoubleValue PORTAL_EXHAUSTION;
+    public static ConfigSpec.IntValue PORTAL_RANGE;
+    public static ConfigSpec.IntValue PORTAL_ALLY_RADIUS;
+    public static ConfigSpec.IntValue PORTAL_COOLDOWN;
+    public static ConfigSpec.DoubleValue PORTAL_EXHAUSTION;
     // Apocalypse's Shield
-    public static ModConfigSpec.DoubleValue SHIELD_RADIUS;
-    public static ModConfigSpec.IntValue SHIELD_WIND_UP_TICKS;
-    public static ModConfigSpec.IntValue SHIELD_MAX_TICKS;
-    public static ModConfigSpec.DoubleValue SHIELD_STRENGTH;
-    public static ModConfigSpec.DoubleValue SHIELD_OTHER_WEAR;
-    public static ModConfigSpec.IntValue SHIELD_COOLDOWN;
-    public static ModConfigSpec.IntValue SHIELD_BROKEN_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SHIELD_EXHAUSTION;
+    public static ConfigSpec.DoubleValue SHIELD_RADIUS;
+    public static ConfigSpec.IntValue SHIELD_WIND_UP_TICKS;
+    public static ConfigSpec.IntValue SHIELD_MAX_TICKS;
+    public static ConfigSpec.DoubleValue SHIELD_STRENGTH;
+    public static ConfigSpec.DoubleValue SHIELD_OTHER_WEAR;
+    public static ConfigSpec.IntValue SHIELD_COOLDOWN;
+    public static ConfigSpec.IntValue SHIELD_BROKEN_COOLDOWN;
+    public static ConfigSpec.DoubleValue SHIELD_EXHAUSTION;
     // Power Bestowal and the Sandstorm
-    public static ModConfigSpec.IntValue BESTOW_RANGE;
-    public static ModConfigSpec.IntValue BESTOW_TICKS;
-    public static ModConfigSpec.IntValue BESTOW_MAX;
-    public static ModConfigSpec.IntValue BESTOW_COOLDOWN;
-    public static ModConfigSpec.DoubleValue BESTOW_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue EMPOWER_COOLDOWN_BOOST;
-    public static ModConfigSpec.IntValue STORM_RADIUS;
-    public static ModConfigSpec.IntValue STORM_TICKS;
-    public static ModConfigSpec.DoubleValue STORM_DAMAGE;
-    public static ModConfigSpec.IntValue STORM_COOLDOWN;
-    public static ModConfigSpec.DoubleValue STORM_EXHAUSTION;
+    public static ConfigSpec.IntValue BESTOW_RANGE;
+    public static ConfigSpec.IntValue BESTOW_TICKS;
+    public static ConfigSpec.IntValue BESTOW_MAX;
+    public static ConfigSpec.IntValue BESTOW_COOLDOWN;
+    public static ConfigSpec.DoubleValue BESTOW_EXHAUSTION;
+    public static ConfigSpec.DoubleValue EMPOWER_COOLDOWN_BOOST;
+    public static ConfigSpec.IntValue STORM_RADIUS;
+    public static ConfigSpec.IntValue STORM_TICKS;
+    public static ConfigSpec.DoubleValue STORM_DAMAGE;
+    public static ConfigSpec.IntValue STORM_COOLDOWN;
+    public static ConfigSpec.DoubleValue STORM_EXHAUSTION;
     // the Essence
-    public static ModConfigSpec.IntValue ESSENCE_RITUAL_TICKS;
+    public static ConfigSpec.IntValue ESSENCE_RITUAL_TICKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         FLIGHT_SPEED = builder.comment("Apocalypse's levitation speed (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.08, 0.01, 0.5);

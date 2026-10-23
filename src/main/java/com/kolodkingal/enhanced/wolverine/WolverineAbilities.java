@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.config.WolverineConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingBurst;
 import com.kolodkingal.enhanced.healing.HealingFactor;
@@ -32,7 +33,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import org.jetbrains.annotations.Nullable;
 
@@ -127,15 +127,15 @@ public final class WolverineAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(ConfigSpec.DoubleValue value, double fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 

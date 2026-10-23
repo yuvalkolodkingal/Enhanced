@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The balance numbers of Professor X (Charles Xavier, 3.3). Its options are defined in {@link #define}, which {@code
@@ -18,44 +18,44 @@ public final class XavierConfig {
      * Assigned by {@link #define} when the config is built, which is at mod construction: before anything reads it (it
      * cannot be final because the options are defined in a method, not in a static block).
      */
-    public static ModConfigSpec.IntValue WHEELCHAIR_RITUAL_TICKS;
+    public static ConfigSpec.IntValue WHEELCHAIR_RITUAL_TICKS;
 
     // ---- Mental Blast (R) ----
-    public static ModConfigSpec.IntValue BLAST_RANGE;
-    public static ModConfigSpec.DoubleValue BLAST_DAMAGE;
-    public static ModConfigSpec.IntValue BLAST_DIZZY_TICKS;
-    public static ModConfigSpec.IntValue BLAST_COOLDOWN;
+    public static ConfigSpec.IntValue BLAST_RANGE;
+    public static ConfigSpec.DoubleValue BLAST_DAMAGE;
+    public static ConfigSpec.IntValue BLAST_DIZZY_TICKS;
+    public static ConfigSpec.IntValue BLAST_COOLDOWN;
 
     // ---- Hear Thoughts (G) ----
-    public static ModConfigSpec.IntValue THOUGHTS_RANGE;
+    public static ConfigSpec.IntValue THOUGHTS_RANGE;
 
     // ---- Take Over a Body (V) ----
-    public static ModConfigSpec.IntValue LINK_RANGE;
-    public static ModConfigSpec.IntValue LINK_MAX_DISTANCE;
-    public static ModConfigSpec.IntValue LINK_CREATURE_TICKS;
-    public static ModConfigSpec.IntValue LINK_PLAYER_TICKS;
-    public static ModConfigSpec.IntValue LINK_COOLDOWN;
-    public static ModConfigSpec.BooleanValue LINK_BREAKS_ON_HURT;
-    public static ModConfigSpec.DoubleValue BACKLASH_DAMAGE;
-    public static ModConfigSpec.IntValue BACKLASH_STUN_TICKS;
+    public static ConfigSpec.IntValue LINK_RANGE;
+    public static ConfigSpec.IntValue LINK_MAX_DISTANCE;
+    public static ConfigSpec.IntValue LINK_CREATURE_TICKS;
+    public static ConfigSpec.IntValue LINK_PLAYER_TICKS;
+    public static ConfigSpec.IntValue LINK_COOLDOWN;
+    public static ConfigSpec.BooleanValue LINK_BREAKS_ON_HURT;
+    public static ConfigSpec.DoubleValue BACKLASH_DAMAGE;
+    public static ConfigSpec.IntValue BACKLASH_STUN_TICKS;
 
     // ---- Freeze Minds (B) ----
-    public static ModConfigSpec.IntValue FREEZE_RADIUS;
-    public static ModConfigSpec.IntValue FREEZE_TICKS;
-    public static ModConfigSpec.IntValue FREEZE_COOLDOWN;
+    public static ConfigSpec.IntValue FREEZE_RADIUS;
+    public static ConfigSpec.IntValue FREEZE_TICKS;
+    public static ConfigSpec.IntValue FREEZE_COOLDOWN;
 
     // ---- Cerebro (N) ----
-    public static ModConfigSpec.IntValue CEREBRO_RANGE;
-    public static ModConfigSpec.IntValue CEREBRO_TICKS;
-    public static ModConfigSpec.IntValue CEREBRO_COOLDOWN;
+    public static ConfigSpec.IntValue CEREBRO_RANGE;
+    public static ConfigSpec.IntValue CEREBRO_TICKS;
+    public static ConfigSpec.IntValue CEREBRO_COOLDOWN;
     /** 3.7: the lab's Cerebro (lane L5 reads them). */
-    public static ModConfigSpec.IntValue CEREBRO_AMPLIFIED_TICKS;
-    public static ModConfigSpec.BooleanValue CEREBRO_AMPLIFIED_ALL_DIMENSIONS;
-    public static ModConfigSpec.BooleanValue CEREBRO_SHOWS_STONE_SITES;
-    public static ModConfigSpec.IntValue CEREBRO_CONSOLE_REACH;
-    public static ModConfigSpec.BooleanValue CEREBRO_CONSOLE_TELEPATHS_ONLY;
+    public static ConfigSpec.IntValue CEREBRO_AMPLIFIED_TICKS;
+    public static ConfigSpec.BooleanValue CEREBRO_AMPLIFIED_ALL_DIMENSIONS;
+    public static ConfigSpec.BooleanValue CEREBRO_SHOWS_STONE_SITES;
+    public static ConfigSpec.IntValue CEREBRO_CONSOLE_REACH;
+    public static ConfigSpec.BooleanValue CEREBRO_CONSOLE_TELEPATHS_ONLY;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         WHEELCHAIR_RITUAL_TICKS = builder.comment("How long (ticks) right-click is held on Professor X's wheelchair to awaken as him.")
                 .defineInRange("wheelchairRitualTicks", 60, 1, 600);

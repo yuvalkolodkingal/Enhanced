@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Hela, the Goddess of Death (3.5), the hero. Every option of the plan is defined here by the 3.5 skeleton (lane L4
@@ -13,24 +13,24 @@ public final class HelaConfig {
     public static final String SECTION = "hela";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue VOLLEY_DAMAGE;
-    public static ModConfigSpec.IntValue VOLLEY_COOLDOWN;
-    public static ModConfigSpec.IntValue RAIN_COOLDOWN;
-    public static ModConfigSpec.DoubleValue WALL_DAMAGE;
-    public static ModConfigSpec.IntValue WALL_COOLDOWN;
-    public static ModConfigSpec.IntValue BURST_COOLDOWN;
-    public static ModConfigSpec.IntValue FORM_STRENGTH;
-    public static ModConfigSpec.IntValue DASH_COOLDOWN;
-    public static ModConfigSpec.IntValue RAISE_COUNT;
-    public static ModConfigSpec.IntValue RAISE_COUNT_ASGARD;
-    public static ModConfigSpec.IntValue RAISE_COOLDOWN;
-    public static ModConfigSpec.IntValue FENRIS_COOLDOWN;
-    public static ModConfigSpec.IntValue GRASP_SECONDS;
-    public static ModConfigSpec.IntValue GRASP_COOLDOWN;
-    public static ModConfigSpec.DoubleValue ASGARD_FACTOR;
-    public static ModConfigSpec.BooleanValue SHATTER_MJOLNIR;
+    public static ConfigSpec.DoubleValue VOLLEY_DAMAGE;
+    public static ConfigSpec.IntValue VOLLEY_COOLDOWN;
+    public static ConfigSpec.IntValue RAIN_COOLDOWN;
+    public static ConfigSpec.DoubleValue WALL_DAMAGE;
+    public static ConfigSpec.IntValue WALL_COOLDOWN;
+    public static ConfigSpec.IntValue BURST_COOLDOWN;
+    public static ConfigSpec.IntValue FORM_STRENGTH;
+    public static ConfigSpec.IntValue DASH_COOLDOWN;
+    public static ConfigSpec.IntValue RAISE_COUNT;
+    public static ConfigSpec.IntValue RAISE_COUNT_ASGARD;
+    public static ConfigSpec.IntValue RAISE_COOLDOWN;
+    public static ConfigSpec.IntValue FENRIS_COOLDOWN;
+    public static ConfigSpec.IntValue GRASP_SECONDS;
+    public static ConfigSpec.IntValue GRASP_COOLDOWN;
+    public static ConfigSpec.DoubleValue ASGARD_FACTOR;
+    public static ConfigSpec.BooleanValue SHATTER_MJOLNIR;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         VOLLEY_DAMAGE = builder.comment("Damage of each necrosword of the Necrosword Volley.")
                 .defineInRange("volleyDamage", 7.0, 0.0, 100.0);

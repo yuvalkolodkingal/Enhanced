@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.config.IronManConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.IronFxPayload;
 import com.kolodkingal.enhanced.platform.net.Net;
@@ -36,7 +37,6 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -108,15 +108,15 @@ public final class IronManAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    public static double cfg(@Nullable ModConfigSpec.DoubleValue value, double fallback) {
+    public static double cfg(@Nullable ConfigSpec.DoubleValue value, double fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    public static int cfg(@Nullable ModConfigSpec.IntValue value, int fallback) {
+    public static int cfg(@Nullable ConfigSpec.IntValue value, int fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    public static boolean cfg(@Nullable ModConfigSpec.BooleanValue value, boolean fallback) {
+    public static boolean cfg(@Nullable ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 

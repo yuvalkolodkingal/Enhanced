@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.Telepathy;
 import com.kolodkingal.enhanced.block.CerebroConsoleBlock;
 import com.kolodkingal.enhanced.config.XavierConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
@@ -31,7 +32,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -408,11 +408,11 @@ public final class CerebroRoom {
         RESTING.clear();
     }
 
-    private static int config(ModConfigSpec.IntValue value, int fallback) {
+    private static int config(ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 
-    private static boolean bool(ModConfigSpec.BooleanValue value, boolean fallback) {
+    private static boolean bool(ConfigSpec.BooleanValue value, boolean fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 

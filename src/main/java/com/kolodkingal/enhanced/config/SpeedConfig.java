@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The numbers of the speedsters' 3.3 moves (Quicksilver and Tommy): running up walls and along ceilings, Tommy's slow
@@ -14,32 +14,32 @@ public final class SpeedConfig {
     public static final String SECTION = "speedsters";
 
     // ---- wall and ceiling running ----
-    public static ModConfigSpec.BooleanValue SURFACE_RUN;
-    public static ModConfigSpec.BooleanValue CEILING_RUN;
-    public static ModConfigSpec.DoubleValue SURFACE_SPEED_FACTOR;
-    public static ModConfigSpec.DoubleValue SURFACE_MAX_SPEED;
-    public static ModConfigSpec.DoubleValue SURFACE_MIN_SPEED;
+    public static ConfigSpec.BooleanValue SURFACE_RUN;
+    public static ConfigSpec.BooleanValue CEILING_RUN;
+    public static ConfigSpec.DoubleValue SURFACE_SPEED_FACTOR;
+    public static ConfigSpec.DoubleValue SURFACE_MAX_SPEED;
+    public static ConfigSpec.DoubleValue SURFACE_MIN_SPEED;
 
     // ---- Tommy's slow time ----
-    public static ModConfigSpec.DoubleValue TOMMY_TIME_EXHAUSTION;
+    public static ConfigSpec.DoubleValue TOMMY_TIME_EXHAUSTION;
 
     // ---- Dash Strike ----
-    public static ModConfigSpec.IntValue DASH_RANGE;
-    public static ModConfigSpec.DoubleValue DASH_DAMAGE;
-    public static ModConfigSpec.IntValue DASH_COOLDOWN;
+    public static ConfigSpec.IntValue DASH_RANGE;
+    public static ConfigSpec.DoubleValue DASH_DAMAGE;
+    public static ConfigSpec.IntValue DASH_COOLDOWN;
 
     // ---- Pebble Barrage ----
-    public static ModConfigSpec.IntValue BARRAGE_PEBBLES;
-    public static ModConfigSpec.DoubleValue BARRAGE_DAMAGE;
-    public static ModConfigSpec.IntValue BARRAGE_RANGE;
-    public static ModConfigSpec.IntValue BARRAGE_COOLDOWN;
+    public static ConfigSpec.IntValue BARRAGE_PEBBLES;
+    public static ConfigSpec.DoubleValue BARRAGE_DAMAGE;
+    public static ConfigSpec.IntValue BARRAGE_RANGE;
+    public static ConfigSpec.IntValue BARRAGE_COOLDOWN;
 
     // ---- Sonic Boom ----
-    public static ModConfigSpec.DoubleValue BOOM_RADIUS;
-    public static ModConfigSpec.DoubleValue BOOM_DAMAGE;
-    public static ModConfigSpec.IntValue BOOM_COOLDOWN;
+    public static ConfigSpec.DoubleValue BOOM_RADIUS;
+    public static ConfigSpec.DoubleValue BOOM_DAMAGE;
+    public static ConfigSpec.IntValue BOOM_COOLDOWN;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.comment("The speedsters (Quicksilver and Tommy): running up walls and along ceilings, Tommy's slow time and",
                 "the speed strikes.").push(SECTION);
         SURFACE_RUN = builder.comment("Speedsters run up walls they sprint into at super speed (Quicksilver: Wall & Water Run on;",

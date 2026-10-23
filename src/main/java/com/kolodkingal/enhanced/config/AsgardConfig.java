@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Asgard, the realm eternal (3.5): the dimension reached only by the Bifrost, its rules and its people. Every option of
@@ -13,17 +13,17 @@ public final class AsgardConfig {
     public static final String SECTION = "asgard";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue PROTECT_CITY;
-    public static ModConfigSpec.BooleanValue KEEP_INVENTORY;
-    public static ModConfigSpec.BooleanValue HOFUND_OPENS_BIFROST;
-    public static ModConfigSpec.IntValue RUNE_STONE_COOLDOWN;
-    public static ModConfigSpec.IntValue VOID_CATCH_Y;
-    public static ModConfigSpec.IntValue EDGE_RADIUS;
-    public static ModConfigSpec.BooleanValue NPCS;
-    public static ModConfigSpec.DoubleValue TALK_DISTANCE;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue PROTECT_CITY;
+    public static ConfigSpec.BooleanValue KEEP_INVENTORY;
+    public static ConfigSpec.BooleanValue HOFUND_OPENS_BIFROST;
+    public static ConfigSpec.IntValue RUNE_STONE_COOLDOWN;
+    public static ConfigSpec.IntValue VOID_CATCH_Y;
+    public static ConfigSpec.IntValue EDGE_RADIUS;
+    public static ConfigSpec.BooleanValue NPCS;
+    public static ConfigSpec.DoubleValue TALK_DISTANCE;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Whether Asgard can be reached (false: the Bifrost does not offer it, the rune stones "
                         + "fizzle and the gate refuses every way in; operators may still /tp).")

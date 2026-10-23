@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.block.EternityAltarBlock;
 import com.kolodkingal.enhanced.config.EternityConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
 import com.kolodkingal.enhanced.network.EternityScreenPayload;
 import com.kolodkingal.enhanced.network.EternityWishPayload;
@@ -35,7 +36,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -438,11 +438,11 @@ public final class EternityRealm {
         }
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() && value != null ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return EnhancedConfig.SPEC.isLoaded() && value != null ? value.get() : fallback;
     }
 

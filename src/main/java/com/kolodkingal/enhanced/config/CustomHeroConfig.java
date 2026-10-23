@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import java.util.List;
 
 /**
@@ -18,37 +18,37 @@ public final class CustomHeroConfig {
     /** The TOML section of these options. */
     public static final String SECTION = "custom_hero";
 
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue OPERATORS_ONLY;
-    public static ModConfigSpec.BooleanValue ALLOW_CHOOSE_EXISTING;
-    public static ModConfigSpec.IntValue BUDGET;
-    public static ModConfigSpec.IntValue MAX_POWERS;
-    public static ModConfigSpec.IntValue MAX_STRENGTH;
-    public static ModConfigSpec.IntValue MAX_SKIN_BYTES;
-    public static ModConfigSpec.ConfigValue<List<? extends String>> DISABLED_POWERS;
-    public static ModConfigSpec.IntValue APPLY_COOLDOWN;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue OPERATORS_ONLY;
+    public static ConfigSpec.BooleanValue ALLOW_CHOOSE_EXISTING;
+    public static ConfigSpec.IntValue BUDGET;
+    public static ConfigSpec.IntValue MAX_POWERS;
+    public static ConfigSpec.IntValue MAX_STRENGTH;
+    public static ConfigSpec.IntValue MAX_SKIN_BYTES;
+    public static ConfigSpec.ConfigValue<List<? extends String>> DISABLED_POWERS;
+    public static ConfigSpec.IntValue APPLY_COOLDOWN;
     // the balance of the powers
-    public static ModConfigSpec.DoubleValue DAMAGE_SCALE;
-    public static ModConfigSpec.DoubleValue COOLDOWN_SCALE;
-    public static ModConfigSpec.DoubleValue EXHAUSTION_SCALE;
-    public static ModConfigSpec.DoubleValue FLIGHT_SPEED;
-    public static ModConfigSpec.DoubleValue FORCE_FIELD_STRENGTH;
-    public static ModConfigSpec.IntValue CONTROL_SECONDS;
-    public static ModConfigSpec.IntValue TELEPORT_RANGE;
-    public static ModConfigSpec.IntValue SUPPRESS_SECONDS;
-    public static ModConfigSpec.BooleanValue BLOCK_CHANGES;
-    public static ModConfigSpec.BooleanValue WEATHER_CHANGES_WORLD;
+    public static ConfigSpec.DoubleValue DAMAGE_SCALE;
+    public static ConfigSpec.DoubleValue COOLDOWN_SCALE;
+    public static ConfigSpec.DoubleValue EXHAUSTION_SCALE;
+    public static ConfigSpec.DoubleValue FLIGHT_SPEED;
+    public static ConfigSpec.DoubleValue FORCE_FIELD_STRENGTH;
+    public static ConfigSpec.IntValue CONTROL_SECONDS;
+    public static ConfigSpec.IntValue TELEPORT_RANGE;
+    public static ConfigSpec.IntValue SUPPRESS_SECONDS;
+    public static ConfigSpec.BooleanValue BLOCK_CHANGES;
+    public static ConfigSpec.BooleanValue WEATHER_CHANGES_WORLD;
     // 3.4: the built-in heroes' abilities and the looks
-    public static ModConfigSpec.BooleanValue HERO_MODULES;
-    public static ModConfigSpec.BooleanValue WORLD_POWERS;
-    public static ModConfigSpec.DoubleValue HERO_STRENGTH_SPREAD;
-    public static ModConfigSpec.BooleanValue LAYERS;
+    public static ConfigSpec.BooleanValue HERO_MODULES;
+    public static ConfigSpec.BooleanValue WORLD_POWERS;
+    public static ConfigSpec.DoubleValue HERO_STRENGTH_SPREAD;
+    public static ConfigSpec.BooleanValue LAYERS;
     /** 3.4 (L6, R8): "Choose a hero" also gives the hero's own items. */
-    public static ModConfigSpec.BooleanValue CHOOSE_GIVES_ITEMS;
+    public static ConfigSpec.BooleanValue CHOOSE_GIVES_ITEMS;
     /** 3.6: a custom hero may put the Infinity Stones he carries on his keys (the stone rows). */
-    public static ModConfigSpec.BooleanValue STONE_ROWS;
+    public static ConfigSpec.BooleanValue STONE_ROWS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.comment("The Hero Creator: a Creative-only item with which a player becomes any hero of the mod, or makes a hero",
                 "of their own (a name, powers from a catalogue of thirty, keys, colours and a skin).").push(SECTION);
         ENABLED = builder.comment("The Hero Creator works (false: its screen says it is switched off, and custom heroes are judged by",

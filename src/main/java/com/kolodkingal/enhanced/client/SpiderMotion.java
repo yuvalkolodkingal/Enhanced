@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.ability.SpiderWebs;
 import com.kolodkingal.enhanced.ability.SwingAssist;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
@@ -42,7 +43,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -544,11 +544,11 @@ public final class SpiderMotion {
         return data.toggle(Toggle.SPIDER_LEGS) && SpiderServer.mayGrowLegs(data);
     }
 
-    private static double value(ModConfigSpec.DoubleValue option, double fallback) {
+    private static double value(ConfigSpec.DoubleValue option, double fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? option.get() : fallback;
     }
 
-    private static int value(ModConfigSpec.IntValue option, int fallback) {
+    private static int value(ConfigSpec.IntValue option, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? option.get() : fallback;
     }
 

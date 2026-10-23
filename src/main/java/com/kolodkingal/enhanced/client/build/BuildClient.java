@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.build.SpellPlanner;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
 import com.kolodkingal.enhanced.config.BuildConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
@@ -53,7 +54,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -1374,7 +1374,7 @@ public final class BuildClient {
         }
     }
 
-    private static int config(ModConfigSpec.IntValue value, int fallback) {
+    private static int config(ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 

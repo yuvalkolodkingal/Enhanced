@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.config.CustomHeroConfig;
 import com.kolodkingal.enhanced.config.FalconConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.FalconFxPayload;
@@ -36,7 +37,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -123,11 +123,11 @@ public final class FalconAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(ConfigSpec.DoubleValue value, double fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 

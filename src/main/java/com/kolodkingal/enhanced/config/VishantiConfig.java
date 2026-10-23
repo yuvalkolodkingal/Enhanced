@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import java.util.List;
 
 /**
@@ -16,31 +16,31 @@ public final class VishantiConfig {
     public static final String SECTION = "vishanti";
 
     // ---- the book ----
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue TELEPORT_COOLDOWN;
-    public static ModConfigSpec.IntValue TELEPORT_CHARGE_TICKS;
-    public static ModConfigSpec.DoubleValue TELEPORT_EXHAUSTION;
-    public static ModConfigSpec.ConfigValue<List<? extends String>> DENIED_DIMENSIONS;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue TELEPORT_COOLDOWN;
+    public static ConfigSpec.IntValue TELEPORT_CHARGE_TICKS;
+    public static ConfigSpec.DoubleValue TELEPORT_EXHAUSTION;
+    public static ConfigSpec.ConfigValue<List<? extends String>> DENIED_DIMENSIONS;
 
     // ---- the ward ----
-    public static ModConfigSpec.BooleanValue WARDS_ENABLED;
-    public static ModConfigSpec.IntValue MAX_WARDS;
-    public static ModConfigSpec.IntValue WARD_COOLDOWN;
-    public static ModConfigSpec.DoubleValue WARD_EXHAUSTION;
-    public static ModConfigSpec.IntValue WARD_RADIUS_WANDA;
-    public static ModConfigSpec.IntValue WARD_RADIUS_BILLY_MIN;
-    public static ModConfigSpec.IntValue WARD_RADIUS_BILLY_MAX;
-    public static ModConfigSpec.IntValue WARD_RADIUS_LOKI;
+    public static ConfigSpec.BooleanValue WARDS_ENABLED;
+    public static ConfigSpec.IntValue MAX_WARDS;
+    public static ConfigSpec.IntValue WARD_COOLDOWN;
+    public static ConfigSpec.DoubleValue WARD_EXHAUSTION;
+    public static ConfigSpec.IntValue WARD_RADIUS_WANDA;
+    public static ConfigSpec.IntValue WARD_RADIUS_BILLY_MIN;
+    public static ConfigSpec.IntValue WARD_RADIUS_BILLY_MAX;
+    public static ConfigSpec.IntValue WARD_RADIUS_LOKI;
     /** 3.3: Agatha reads the book too. */
-    public static ModConfigSpec.IntValue WARD_RADIUS_AGATHA;
-    public static ModConfigSpec.IntValue WARD_CHECK_TICKS;
-    public static ModConfigSpec.DoubleValue WARD_PUSH;
-    public static ModConfigSpec.BooleanValue WARD_BLOCKS_SPAWNS;
+    public static ConfigSpec.IntValue WARD_RADIUS_AGATHA;
+    public static ConfigSpec.IntValue WARD_CHECK_TICKS;
+    public static ConfigSpec.DoubleValue WARD_PUSH;
+    public static ConfigSpec.BooleanValue WARD_BLOCKS_SPAWNS;
 
     /** The biggest ward there can be, whatever the radii above say (the sweep looks at this much space). */
     public static final int MAX_RADIUS = 128;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.comment("The Book of the Vishanti: a sorcerer (Loki, the Scarlet Witch, Billy or Agatha) saves places and teleports to them,",
                 "and raises a ward round a base that no monster can enter.").push(SECTION);
         ENABLED = builder.comment("The Book of the Vishanti works (false: it can be held but nobody can read it).")

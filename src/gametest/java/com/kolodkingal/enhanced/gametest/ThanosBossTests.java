@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -30,7 +31,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -177,19 +177,19 @@ public final class ThanosBossTests {
         int checked = 0;
         for (Class<?> config : List.of(ThanosBossConfig.class, ThanosConfig.class)) {
             for (Field field : config.getDeclaredFields()) {
-                if (!Modifier.isStatic(field.getModifiers()) || !ModConfigSpec.ConfigValue.class.isAssignableFrom(field.getType())) {
+                if (!Modifier.isStatic(field.getModifiers()) || !ConfigSpec.ConfigValue.class.isAssignableFrom(field.getType())) {
                     continue;
                 }
-                ModConfigSpec.ConfigValue<?> value = (ModConfigSpec.ConfigValue<?>) field.get(null);
+                ConfigSpec.ConfigValue<?> value = (ConfigSpec.ConfigValue<?>) field.get(null);
                 check(value != null, config.getSimpleName() + "." + field.getName() + " is defined");
                 Object spec = EnhancedConfig.SPEC.getSpec().get(value.getPath());
-                check(spec instanceof ModConfigSpec.ValueSpec valueSpec && valueSpec.test(value.getDefault()),
+                check(spec instanceof ConfigSpec.ValueSpec valueSpec && valueSpec.test(value.getDefault()),
                         config.getSimpleName() + "." + field.getName() + " has a default in its range");
                 checked++;
             }
         }
         check(checked >= 139, "all the numbers are there (" + checked + ")");
-        ModConfigSpec.ValueSpec stones = (ModConfigSpec.ValueSpec) EnhancedConfig.SPEC.getSpec().get(ThanosBossConfig.MAX_STONES.getPath());
+        ConfigSpec.ValueSpec stones = (ConfigSpec.ValueSpec) EnhancedConfig.SPEC.getSpec().get(ThanosBossConfig.MAX_STONES.getPath());
         check(stones.test(5) && !stones.test(6), "maxStones ends at five: there is no sixth stone to ask for");
         helper.succeed();
     }

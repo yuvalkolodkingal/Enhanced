@@ -61,8 +61,8 @@ public class Enhanced {
         com.kolodkingal.enhanced.network.SpeedNetwork.register();
         com.kolodkingal.enhanced.network.SpiderNetwork.register();
         modBus.addListener(ModEntities::registerAttributes);
-        container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC);
-        container.registerConfig(ModConfig.Type.CLIENT, EnhancedClientConfig.SPEC);
+        container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC.neoSpec());
+        container.registerConfig(ModConfig.Type.CLIENT, EnhancedClientConfig.SPEC.neoSpec());
     }
 
     public static ResourceLocation id(String path) {

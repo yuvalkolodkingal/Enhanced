@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Falcon and the Exo-Wings (3.8, lane L5). Every option of the plan is defined here by the 3.8 skeleton (the lanes
@@ -12,46 +12,46 @@ public final class FalconConfig {
     public static final String SECTION = "falcon";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue FLIGHT_SPEED;
-    public static ModConfigSpec.DoubleValue GLIDE_BOOST;
-    public static ModConfigSpec.IntValue GLIDE_BOOST_TICKS;
-    public static ModConfigSpec.DoubleValue DART_DAMAGE;
-    public static ModConfigSpec.DoubleValue DART_SPEED;
-    public static ModConfigSpec.IntValue DART_RANGE;
-    public static ModConfigSpec.IntValue DART_GAP;
-    public static ModConfigSpec.DoubleValue ROCKET_DAMAGE;
-    public static ModConfigSpec.DoubleValue ROCKET_POWER;
-    public static ModConfigSpec.IntValue ROCKET_COOLDOWN;
-    public static ModConfigSpec.IntValue DIVE_RANGE;
-    public static ModConfigSpec.DoubleValue DIVE_SPEED;
-    public static ModConfigSpec.DoubleValue DIVE_DAMAGE;
-    public static ModConfigSpec.DoubleValue DIVE_SPLASH;
-    public static ModConfigSpec.DoubleValue DIVE_MIN_HEIGHT;
-    public static ModConfigSpec.IntValue DIVE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue CLIMB_HEIGHT;
-    public static ModConfigSpec.IntValue CLIMB_COOLDOWN;
-    public static ModConfigSpec.IntValue SHIELD_MAX_TICKS;
-    public static ModConfigSpec.DoubleValue SHIELD_MELEE_REDUCTION;
-    public static ModConfigSpec.DoubleValue SHIELD_EXPLOSION_REDUCTION;
-    public static ModConfigSpec.IntValue SHIELD_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SLASH_DAMAGE;
-    public static ModConfigSpec.DoubleValue SLASH_RADIUS;
-    public static ModConfigSpec.IntValue SLASH_COOLDOWN;
-    public static ModConfigSpec.DoubleValue REDWING_HEALTH;
-    public static ModConfigSpec.IntValue REDWING_TICKS;
-    public static ModConfigSpec.DoubleValue REDWING_MARK_RADIUS;
-    public static ModConfigSpec.DoubleValue REDWING_ZAP_DAMAGE;
-    public static ModConfigSpec.DoubleValue REDWING_ZAP_RANGE;
-    public static ModConfigSpec.IntValue REDWING_ZAP_GAP;
-    public static ModConfigSpec.IntValue REDWING_REPAIR_TICKS;
-    public static ModConfigSpec.DoubleValue STRIKE_DAMAGE;
-    public static ModConfigSpec.IntValue STRIKE_RANGE;
-    public static ModConfigSpec.IntValue STRIKE_COOLDOWN;
-    public static ModConfigSpec.IntValue WINGS_DURABILITY;
+    public static ConfigSpec.DoubleValue HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue SPEED_BONUS;
+    public static ConfigSpec.DoubleValue FLIGHT_SPEED;
+    public static ConfigSpec.DoubleValue GLIDE_BOOST;
+    public static ConfigSpec.IntValue GLIDE_BOOST_TICKS;
+    public static ConfigSpec.DoubleValue DART_DAMAGE;
+    public static ConfigSpec.DoubleValue DART_SPEED;
+    public static ConfigSpec.IntValue DART_RANGE;
+    public static ConfigSpec.IntValue DART_GAP;
+    public static ConfigSpec.DoubleValue ROCKET_DAMAGE;
+    public static ConfigSpec.DoubleValue ROCKET_POWER;
+    public static ConfigSpec.IntValue ROCKET_COOLDOWN;
+    public static ConfigSpec.IntValue DIVE_RANGE;
+    public static ConfigSpec.DoubleValue DIVE_SPEED;
+    public static ConfigSpec.DoubleValue DIVE_DAMAGE;
+    public static ConfigSpec.DoubleValue DIVE_SPLASH;
+    public static ConfigSpec.DoubleValue DIVE_MIN_HEIGHT;
+    public static ConfigSpec.IntValue DIVE_COOLDOWN;
+    public static ConfigSpec.DoubleValue CLIMB_HEIGHT;
+    public static ConfigSpec.IntValue CLIMB_COOLDOWN;
+    public static ConfigSpec.IntValue SHIELD_MAX_TICKS;
+    public static ConfigSpec.DoubleValue SHIELD_MELEE_REDUCTION;
+    public static ConfigSpec.DoubleValue SHIELD_EXPLOSION_REDUCTION;
+    public static ConfigSpec.IntValue SHIELD_COOLDOWN;
+    public static ConfigSpec.DoubleValue SLASH_DAMAGE;
+    public static ConfigSpec.DoubleValue SLASH_RADIUS;
+    public static ConfigSpec.IntValue SLASH_COOLDOWN;
+    public static ConfigSpec.DoubleValue REDWING_HEALTH;
+    public static ConfigSpec.IntValue REDWING_TICKS;
+    public static ConfigSpec.DoubleValue REDWING_MARK_RADIUS;
+    public static ConfigSpec.DoubleValue REDWING_ZAP_DAMAGE;
+    public static ConfigSpec.DoubleValue REDWING_ZAP_RANGE;
+    public static ConfigSpec.IntValue REDWING_ZAP_GAP;
+    public static ConfigSpec.IntValue REDWING_REPAIR_TICKS;
+    public static ConfigSpec.DoubleValue STRIKE_DAMAGE;
+    public static ConfigSpec.IntValue STRIKE_RANGE;
+    public static ConfigSpec.IntValue STRIKE_COOLDOWN;
+    public static ConfigSpec.IntValue WINGS_DURABILITY;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("falcon");
         HEALTH_BONUS = builder.comment("Max health added to his 20.")
                 .defineInRange("healthBonus", 4.0, 0.0, 100.0);

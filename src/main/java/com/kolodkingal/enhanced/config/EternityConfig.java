@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Eternity and Love (3.8, lane L8): the Shrine of the Cosmic Entities, Eternity's realm and the wish, and Love, Thor's
@@ -15,34 +15,34 @@ public final class EternityConfig {
     public static final String SECTION_LOVE = "love";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue ALTAR_CHARGE_TICKS;
-    public static ModConfigSpec.IntValue WISHES_PER_PLAYER;
-    public static ModConfigSpec.BooleanValue WISH_FULL_STACK;
-    public static ModConfigSpec.BooleanValue LOVE_WISH;
-    public static ModConfigSpec.IntValue RETURN_DELAY_TICKS;
-    public static ModConfigSpec.IntValue SCREEN_DELAY_TICKS;
-    public static ModConfigSpec.DoubleValue LOVE_HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue LOVE_ARMOR_BONUS;
-    public static ModConfigSpec.DoubleValue LOVE_ATTACK_BONUS;
-    public static ModConfigSpec.DoubleValue LOVE_KNOCKBACK_RESISTANCE;
-    public static ModConfigSpec.DoubleValue LOVE_SAFE_FALL;
-    public static ModConfigSpec.DoubleValue LOVE_FLIGHT_SPEED;
-    public static ModConfigSpec.BooleanValue LOVE_FLIGHT_NEEDS_AXE;
-    public static ModConfigSpec.BooleanValue LOVE_WORTHY;
-    public static ModConfigSpec.DoubleValue LOVE_STRIKE_DAMAGE;
-    public static ModConfigSpec.DoubleValue LOVE_STRIKE_RADIUS;
-    public static ModConfigSpec.IntValue LOVE_STRIKE_RANGE;
-    public static ModConfigSpec.IntValue LOVE_STRIKE_COOLDOWN;
-    public static ModConfigSpec.BooleanValue LOVE_STRIKE_SETS_FIRE;
-    public static ModConfigSpec.DoubleValue LOVE_EYE_LASER_DAMAGE;
-    public static ModConfigSpec.IntValue LOVE_EYE_LASER_RANGE;
-    public static ModConfigSpec.IntValue LOVE_EYE_LASER_HIT_GAP;
-    public static ModConfigSpec.IntValue LOVE_EYE_LASER_FIRE_SECONDS;
-    public static ModConfigSpec.IntValue LOVE_EYE_LASER_MAX_TICKS;
-    public static ModConfigSpec.IntValue LOVE_EYE_LASER_COOLDOWN;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue ALTAR_CHARGE_TICKS;
+    public static ConfigSpec.IntValue WISHES_PER_PLAYER;
+    public static ConfigSpec.BooleanValue WISH_FULL_STACK;
+    public static ConfigSpec.BooleanValue LOVE_WISH;
+    public static ConfigSpec.IntValue RETURN_DELAY_TICKS;
+    public static ConfigSpec.IntValue SCREEN_DELAY_TICKS;
+    public static ConfigSpec.DoubleValue LOVE_HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue LOVE_ARMOR_BONUS;
+    public static ConfigSpec.DoubleValue LOVE_ATTACK_BONUS;
+    public static ConfigSpec.DoubleValue LOVE_KNOCKBACK_RESISTANCE;
+    public static ConfigSpec.DoubleValue LOVE_SAFE_FALL;
+    public static ConfigSpec.DoubleValue LOVE_FLIGHT_SPEED;
+    public static ConfigSpec.BooleanValue LOVE_FLIGHT_NEEDS_AXE;
+    public static ConfigSpec.BooleanValue LOVE_WORTHY;
+    public static ConfigSpec.DoubleValue LOVE_STRIKE_DAMAGE;
+    public static ConfigSpec.DoubleValue LOVE_STRIKE_RADIUS;
+    public static ConfigSpec.IntValue LOVE_STRIKE_RANGE;
+    public static ConfigSpec.IntValue LOVE_STRIKE_COOLDOWN;
+    public static ConfigSpec.BooleanValue LOVE_STRIKE_SETS_FIRE;
+    public static ConfigSpec.DoubleValue LOVE_EYE_LASER_DAMAGE;
+    public static ConfigSpec.IntValue LOVE_EYE_LASER_RANGE;
+    public static ConfigSpec.IntValue LOVE_EYE_LASER_HIT_GAP;
+    public static ConfigSpec.IntValue LOVE_EYE_LASER_FIRE_SECONDS;
+    public static ConfigSpec.IntValue LOVE_EYE_LASER_MAX_TICKS;
+    public static ConfigSpec.IntValue LOVE_EYE_LASER_COOLDOWN;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("eternity");
         ENABLED = builder.comment("Whether the Shrine of the Cosmic Entities generates in new End chunks (existing",
                 "shrines stay).")

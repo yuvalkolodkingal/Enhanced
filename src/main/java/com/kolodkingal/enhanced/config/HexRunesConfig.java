@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The numbers of the Hex Runes (3.3): the runes the Scarlet Witch inscribes on the four walls of her Hex, which leave every
@@ -13,11 +13,11 @@ public final class HexRunesConfig {
     /** The TOML section of these options. */
     public static final String SECTION = "hex_runes";
 
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue COOLDOWN;
-    public static ModConfigSpec.DoubleValue EXHAUSTION;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue COOLDOWN;
+    public static ConfigSpec.DoubleValue EXHAUSTION;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.comment("3.3: the Hex Runes. The Scarlet Witch inscribes them on the four walls of her Hex (and wipes them) from her Hex",
                 "Control screen (N with a Hex up). While they glow, every other sorcerer inside the Hex cannot use powers: Loki, Billy,",
                 "Agatha, another Scarlet Witch, and anyone holding the Darkhold or the Book of the Vishanti. She keeps hers.").push(SECTION);

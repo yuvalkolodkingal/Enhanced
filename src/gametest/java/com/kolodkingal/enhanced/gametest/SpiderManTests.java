@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.SpiderConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -89,7 +90,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -2702,13 +2702,13 @@ public final class SpiderManTests {
     public static void spiderManConfigIsSane(GameTestHelper helper) throws IllegalAccessException {
         int options = 0;
         for (Field field : SpiderConfig.class.getDeclaredFields()) {
-            if (!Modifier.isStatic(field.getModifiers()) || !ModConfigSpec.ConfigValue.class.isAssignableFrom(field.getType())) {
+            if (!Modifier.isStatic(field.getModifiers()) || !ConfigSpec.ConfigValue.class.isAssignableFrom(field.getType())) {
                 continue;
             }
             options++;
-            ModConfigSpec.ConfigValue<?> value = (ModConfigSpec.ConfigValue<?>) field.get(null);
+            ConfigSpec.ConfigValue<?> value = (ConfigSpec.ConfigValue<?>) field.get(null);
             check(value != null, field.getName() + " is defined");
-            ModConfigSpec.ValueSpec spec = value.getSpec();
+            ConfigSpec.ValueSpec spec = value.getSpec();
             check(spec.getComment() != null && !spec.getComment().isBlank(), field.getName() + " has a comment");
             check(spec.test(spec.getDefault()), field.getName() + " has a default inside its range");
             if (spec.getDefault() instanceof Number number) {

@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The Soul Stone and its sacrifice at the Vormir Cliff (3.6). Every option of the plan is defined here by the 3.6
@@ -31,25 +31,25 @@ public final class SoulStoneConfig {
     public static final String SECTION = "soul_stone";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue PLAYER_SACRIFICE;
-    public static ModConfigSpec.BooleanValue PET_SACRIFICE;
-    public static ModConfigSpec.BooleanValue DESTROY_ITEMS;
-    public static ModConfigSpec.BooleanValue REMOVE_POWER;
-    public static ModConfigSpec.EnumValue<FriendRule> FRIEND_RULE;
-    public static ModConfigSpec.EnumValue<OnePer> ONE_PER;
-    public static ModConfigSpec.IntValue PUSH_WINDOW_TICKS;
-    public static ModConfigSpec.IntValue MIN_FALL;
-    public static ModConfigSpec.IntValue DEATH_WINDOW_TICKS;
-    public static ModConfigSpec.DoubleValue DRAIN_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.IntValue DRAIN_RANGE;
-    public static ModConfigSpec.DoubleValue DRAIN_HEAL_FRACTION;
-    public static ModConfigSpec.IntValue DRAIN_COOLDOWN;
-    public static ModConfigSpec.IntValue SIGHT_RANGE;
-    public static ModConfigSpec.IntValue SIGHT_TICKS;
-    public static ModConfigSpec.IntValue SIGHT_COOLDOWN;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue PLAYER_SACRIFICE;
+    public static ConfigSpec.BooleanValue PET_SACRIFICE;
+    public static ConfigSpec.BooleanValue DESTROY_ITEMS;
+    public static ConfigSpec.BooleanValue REMOVE_POWER;
+    public static ConfigSpec.EnumValue<FriendRule> FRIEND_RULE;
+    public static ConfigSpec.EnumValue<OnePer> ONE_PER;
+    public static ConfigSpec.IntValue PUSH_WINDOW_TICKS;
+    public static ConfigSpec.IntValue MIN_FALL;
+    public static ConfigSpec.IntValue DEATH_WINDOW_TICKS;
+    public static ConfigSpec.DoubleValue DRAIN_DAMAGE_PER_SECOND;
+    public static ConfigSpec.IntValue DRAIN_RANGE;
+    public static ConfigSpec.DoubleValue DRAIN_HEAL_FRACTION;
+    public static ConfigSpec.IntValue DRAIN_COOLDOWN;
+    public static ConfigSpec.IntValue SIGHT_RANGE;
+    public static ConfigSpec.IntValue SIGHT_TICKS;
+    public static ConfigSpec.IntValue SIGHT_COOLDOWN;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("soul_stone");
         ENABLED = builder.comment("Whether the Vormir Cliff gives the Soul Stone for a sacrifice.")
                 .define("enabled", true);

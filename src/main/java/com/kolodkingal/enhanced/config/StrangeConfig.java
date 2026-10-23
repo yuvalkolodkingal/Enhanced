@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Doctor Strange, the Eye of Agamotto and the Sling Ring (3.6). Every option of the plan is defined here by the 3.6
@@ -16,44 +16,44 @@ public final class StrangeConfig {
     public static final String SECTION_SLING_RING = "sling_ring";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue FLIGHT_SPEED;
-    public static ModConfigSpec.DoubleValue WHIP_DAMAGE1;
-    public static ModConfigSpec.DoubleValue WHIP_DAMAGE2;
-    public static ModConfigSpec.DoubleValue WHIP_DAMAGE3;
-    public static ModConfigSpec.DoubleValue WHIP_REACH;
-    public static ModConfigSpec.IntValue GRAPPLE_RANGE;
-    public static ModConfigSpec.IntValue GRAPPLE_COOLDOWN;
-    public static ModConfigSpec.IntValue SHIELD_SECONDS;
-    public static ModConfigSpec.IntValue SHIELD_COOLDOWN;
-    public static ModConfigSpec.IntValue DOME_SECONDS;
-    public static ModConfigSpec.DoubleValue DOME_RADIUS;
-    public static ModConfigSpec.IntValue DOME_COOLDOWN;
-    public static ModConfigSpec.IntValue BANDS_RANGE;
-    public static ModConfigSpec.IntValue BANDS_TICKS;
-    public static ModConfigSpec.IntValue BANDS_BOSS_TICKS;
-    public static ModConfigSpec.IntValue BANDS_COOLDOWN;
-    public static ModConfigSpec.IntValue ASTRAL_SECONDS;
-    public static ModConfigSpec.IntValue ASTRAL_RANGE;
-    public static ModConfigSpec.IntValue ASTRAL_COOLDOWN;
-    public static ModConfigSpec.IntValue PORTAL_RANGE;
-    public static ModConfigSpec.IntValue PORTAL_SECONDS;
-    public static ModConfigSpec.IntValue PORTAL_COOLDOWN;
-    public static ModConfigSpec.IntValue MIRROR_RADIUS;
-    public static ModConfigSpec.IntValue MIRROR_SECONDS;
-    public static ModConfigSpec.IntValue MIRROR_COOLDOWN;
-    public static ModConfigSpec.DoubleValue MIRROR_DAMAGE_BONUS;
-    public static ModConfigSpec.DoubleValue HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue ARMOR_BONUS;
-    public static ModConfigSpec.DoubleValue SAFE_FALL;
-    public static ModConfigSpec.IntValue WARD_RADIUS;
-    public static ModConfigSpec.IntValue EYE_AWAKEN_TICKS;
-    public static ModConfigSpec.BooleanValue EYE_OWNER_ONLY;
-    public static ModConfigSpec.BooleanValue EYE_NON_SORCERER_MESSAGE;
-    public static ModConfigSpec.IntValue RING_PLACES;
-    public static ModConfigSpec.IntValue RING_COOLDOWN;
-    public static ModConfigSpec.BooleanValue RING_CROSS_DIMENSION;
+    public static ConfigSpec.DoubleValue FLIGHT_SPEED;
+    public static ConfigSpec.DoubleValue WHIP_DAMAGE1;
+    public static ConfigSpec.DoubleValue WHIP_DAMAGE2;
+    public static ConfigSpec.DoubleValue WHIP_DAMAGE3;
+    public static ConfigSpec.DoubleValue WHIP_REACH;
+    public static ConfigSpec.IntValue GRAPPLE_RANGE;
+    public static ConfigSpec.IntValue GRAPPLE_COOLDOWN;
+    public static ConfigSpec.IntValue SHIELD_SECONDS;
+    public static ConfigSpec.IntValue SHIELD_COOLDOWN;
+    public static ConfigSpec.IntValue DOME_SECONDS;
+    public static ConfigSpec.DoubleValue DOME_RADIUS;
+    public static ConfigSpec.IntValue DOME_COOLDOWN;
+    public static ConfigSpec.IntValue BANDS_RANGE;
+    public static ConfigSpec.IntValue BANDS_TICKS;
+    public static ConfigSpec.IntValue BANDS_BOSS_TICKS;
+    public static ConfigSpec.IntValue BANDS_COOLDOWN;
+    public static ConfigSpec.IntValue ASTRAL_SECONDS;
+    public static ConfigSpec.IntValue ASTRAL_RANGE;
+    public static ConfigSpec.IntValue ASTRAL_COOLDOWN;
+    public static ConfigSpec.IntValue PORTAL_RANGE;
+    public static ConfigSpec.IntValue PORTAL_SECONDS;
+    public static ConfigSpec.IntValue PORTAL_COOLDOWN;
+    public static ConfigSpec.IntValue MIRROR_RADIUS;
+    public static ConfigSpec.IntValue MIRROR_SECONDS;
+    public static ConfigSpec.IntValue MIRROR_COOLDOWN;
+    public static ConfigSpec.DoubleValue MIRROR_DAMAGE_BONUS;
+    public static ConfigSpec.DoubleValue HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue ARMOR_BONUS;
+    public static ConfigSpec.DoubleValue SAFE_FALL;
+    public static ConfigSpec.IntValue WARD_RADIUS;
+    public static ConfigSpec.IntValue EYE_AWAKEN_TICKS;
+    public static ConfigSpec.BooleanValue EYE_OWNER_ONLY;
+    public static ConfigSpec.BooleanValue EYE_NON_SORCERER_MESSAGE;
+    public static ConfigSpec.IntValue RING_PLACES;
+    public static ConfigSpec.IntValue RING_COOLDOWN;
+    public static ConfigSpec.BooleanValue RING_CROSS_DIMENSION;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("doctor_strange");
         FLIGHT_SPEED = builder.comment("Flight speed on the Cloak of Levitation (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.06, 0.01, 0.5);

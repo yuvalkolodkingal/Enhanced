@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Odin, the Allfather (3.5). Every option of the plan is defined here by the 3.5 skeleton (lane L3 reads them); {@code
@@ -12,25 +12,25 @@ public final class OdinConfig {
     public static final String SECTION = "odin";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue BLAST_DAMAGE;
-    public static ModConfigSpec.IntValue BLAST_COOLDOWN;
-    public static ModConfigSpec.DoubleValue THROW_DAMAGE;
-    public static ModConfigSpec.IntValue THROW_COOLDOWN;
-    public static ModConfigSpec.IntValue SHIELD_SECONDS;
-    public static ModConfigSpec.IntValue SHIELD_COOLDOWN;
-    public static ModConfigSpec.DoubleValue HEAL;
-    public static ModConfigSpec.IntValue HEAL_COOLDOWN;
-    public static ModConfigSpec.IntValue BANISH_COOLDOWN;
-    public static ModConfigSpec.BooleanValue BANISH_PLAYERS;
-    public static ModConfigSpec.DoubleValue WAVE_DAMAGE;
-    public static ModConfigSpec.IntValue WAVE_COOLDOWN;
-    public static ModConfigSpec.IntValue RAVENS_SECONDS;
-    public static ModConfigSpec.IntValue RAVENS_COOLDOWN;
-    public static ModConfigSpec.IntValue COMMAND_COOLDOWN;
-    public static ModConfigSpec.IntValue ODINSLEEP_MAX_SECONDS;
-    public static ModConfigSpec.IntValue ODINSLEEP_COOLDOWN;
+    public static ConfigSpec.DoubleValue BLAST_DAMAGE;
+    public static ConfigSpec.IntValue BLAST_COOLDOWN;
+    public static ConfigSpec.DoubleValue THROW_DAMAGE;
+    public static ConfigSpec.IntValue THROW_COOLDOWN;
+    public static ConfigSpec.IntValue SHIELD_SECONDS;
+    public static ConfigSpec.IntValue SHIELD_COOLDOWN;
+    public static ConfigSpec.DoubleValue HEAL;
+    public static ConfigSpec.IntValue HEAL_COOLDOWN;
+    public static ConfigSpec.IntValue BANISH_COOLDOWN;
+    public static ConfigSpec.BooleanValue BANISH_PLAYERS;
+    public static ConfigSpec.DoubleValue WAVE_DAMAGE;
+    public static ConfigSpec.IntValue WAVE_COOLDOWN;
+    public static ConfigSpec.IntValue RAVENS_SECONDS;
+    public static ConfigSpec.IntValue RAVENS_COOLDOWN;
+    public static ConfigSpec.IntValue COMMAND_COOLDOWN;
+    public static ConfigSpec.IntValue ODINSLEEP_MAX_SECONDS;
+    public static ConfigSpec.IntValue ODINSLEEP_COOLDOWN;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         BLAST_DAMAGE = builder.comment("Damage of the Gungnir Blast.")
                 .defineInRange("blastDamage", 12.0, 0.0, 100.0);

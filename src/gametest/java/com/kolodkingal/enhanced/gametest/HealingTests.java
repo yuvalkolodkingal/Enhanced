@@ -663,8 +663,8 @@ public final class HealingTests {
                 {HealingConfig.PHOENIX_DEFEATS, ModDamageTypes.PHOENIX_BURST}};
         for (int i = 0; i < groups.length; i++) {
             @SuppressWarnings("unchecked")
-            net.neoforged.neoforge.common.ModConfigSpec.BooleanValue option =
-                    (net.neoforged.neoforge.common.ModConfigSpec.BooleanValue) groups[i][0];
+            com.kolodkingal.enhanced.config.core.ConfigSpec.BooleanValue option =
+                    (com.kolodkingal.enhanced.config.core.ConfigSpec.BooleanValue) groups[i][0];
             @SuppressWarnings("unchecked")
             ResourceKey<DamageType> type = (ResourceKey<DamageType>) groups[i][1];
             f.config(option, false);

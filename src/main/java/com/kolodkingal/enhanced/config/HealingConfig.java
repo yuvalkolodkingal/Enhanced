@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The healing factor (3.7) of Wolverine, Deadpool and a custom hero with their body rows: regeneration, the DOWN state
@@ -14,30 +14,30 @@ public final class HealingConfig {
     public static final String SECTION = "healing_factor";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue CUSTOM_HEROES;
-    public static ModConfigSpec.DoubleValue REGEN_PER_SECOND;
-    public static ModConfigSpec.DoubleValue REGEN_OUT_OF_COMBAT;
-    public static ModConfigSpec.IntValue OUT_OF_COMBAT_TICKS;
-    public static ModConfigSpec.DoubleValue EXHAUSTION_PER_HEALTH;
-    public static ModConfigSpec.DoubleValue SHRUG_FACTOR;
-    public static ModConfigSpec.IntValue DOWN_TICKS;
-    public static ModConfigSpec.DoubleValue RISE_HEALTH;
-    public static ModConfigSpec.IntValue RISE_RESISTANCE_TICKS;
-    public static ModConfigSpec.BooleanValue DOWN_MOBS_FORGET;
-    public static ModConfigSpec.IntValue RESCUE_RADIUS;
-    public static ModConfigSpec.BooleanValue STONES_DEFEAT;
-    public static ModConfigSpec.BooleanValue CHAOS_DEFEATS;
-    public static ModConfigSpec.BooleanValue ODIN_DEFEATS;
-    public static ModConfigSpec.BooleanValue PHOENIX_DEFEATS;
-    public static ModConfigSpec.BooleanValue DARKHOLD_DEFEATS;
-    public static ModConfigSpec.BooleanValue VORMIR_DEFEATS;
-    public static ModConfigSpec.BooleanValue POISON_STOPS_HEALING;
-    public static ModConfigSpec.DoubleValue BURST_FRACTION;
-    public static ModConfigSpec.IntValue BURST_COOLDOWN;
-    public static ModConfigSpec.BooleanValue TIP_ONCE;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue CUSTOM_HEROES;
+    public static ConfigSpec.DoubleValue REGEN_PER_SECOND;
+    public static ConfigSpec.DoubleValue REGEN_OUT_OF_COMBAT;
+    public static ConfigSpec.IntValue OUT_OF_COMBAT_TICKS;
+    public static ConfigSpec.DoubleValue EXHAUSTION_PER_HEALTH;
+    public static ConfigSpec.DoubleValue SHRUG_FACTOR;
+    public static ConfigSpec.IntValue DOWN_TICKS;
+    public static ConfigSpec.DoubleValue RISE_HEALTH;
+    public static ConfigSpec.IntValue RISE_RESISTANCE_TICKS;
+    public static ConfigSpec.BooleanValue DOWN_MOBS_FORGET;
+    public static ConfigSpec.IntValue RESCUE_RADIUS;
+    public static ConfigSpec.BooleanValue STONES_DEFEAT;
+    public static ConfigSpec.BooleanValue CHAOS_DEFEATS;
+    public static ConfigSpec.BooleanValue ODIN_DEFEATS;
+    public static ConfigSpec.BooleanValue PHOENIX_DEFEATS;
+    public static ConfigSpec.BooleanValue DARKHOLD_DEFEATS;
+    public static ConfigSpec.BooleanValue VORMIR_DEFEATS;
+    public static ConfigSpec.BooleanValue POISON_STOPS_HEALING;
+    public static ConfigSpec.DoubleValue BURST_FRACTION;
+    public static ConfigSpec.IntValue BURST_COOLDOWN;
+    public static ConfigSpec.BooleanValue TIP_ONCE;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("healing_factor");
         ENABLED = builder.comment("Whether the healing factor works at all (off: Wolverine and Deadpool die as",
                 "anyone).")

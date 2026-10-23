@@ -2,8 +2,8 @@ package com.kolodkingal.enhanced.ironman;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.IronManConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import net.minecraft.util.StringRepresentable;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -84,7 +84,7 @@ public enum SuitKind implements StringRepresentable {
      * The ticks of its suit-up ({@code [iron_man] suitUpTicks...}; the plan's defaults where the config is not loaded).
      */
     public int upTicks() {
-        ModConfigSpec.IntValue value = switch (this) {
+        ConfigSpec.IntValue value = switch (this) {
             case MARK_1 -> IronManConfig.SUIT_UP_TICKS_MARK1;
             case MARK_3 -> IronManConfig.SUIT_UP_TICKS_MARK3;
             case MARK_5 -> IronManConfig.SUIT_UP_TICKS_MARK5;

@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Deadpool and Dogpool (3.7). Every option of the plan is defined here by the 3.7 skeleton (lane L3 reads them);
@@ -13,52 +13,52 @@ public final class DeadpoolConfig {
     public static final String SECTION_DOGPOOL = "dogpool";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue ATTACK_BONUS;
-    public static ModConfigSpec.DoubleValue ATTACK_SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue JUMP_BONUS;
-    public static ModConfigSpec.DoubleValue SAFE_FALL;
-    public static ModConfigSpec.DoubleValue KATANA_DAMAGE_1;
-    public static ModConfigSpec.DoubleValue KATANA_DAMAGE_2;
-    public static ModConfigSpec.DoubleValue KATANA_DAMAGE_3;
-    public static ModConfigSpec.DoubleValue KATANA_REACH;
-    public static ModConfigSpec.IntValue KATANA_GAP;
-    public static ModConfigSpec.IntValue PARRY_MAX_TICKS;
-    public static ModConfigSpec.DoubleValue PARRY_MELEE_REDUCTION;
-    public static ModConfigSpec.IntValue PARRY_COOLDOWN;
-    public static ModConfigSpec.DoubleValue PISTOL_DAMAGE;
-    public static ModConfigSpec.IntValue PISTOL_RANGE;
-    public static ModConfigSpec.IntValue MAGAZINE;
-    public static ModConfigSpec.IntValue RELOAD_TICKS;
-    public static ModConfigSpec.IntValue SHOT_GAP;
-    public static ModConfigSpec.DoubleValue TRICK_SHOT_DAMAGE;
-    public static ModConfigSpec.IntValue TRICK_SHOT_SEEK;
-    public static ModConfigSpec.IntValue TRICK_SHOT_COOLDOWN;
-    public static ModConfigSpec.IntValue BLINK_RANGE;
-    public static ModConfigSpec.IntValue BLINK_COOLDOWN;
-    public static ModConfigSpec.DoubleValue GLITCH_CHANCE;
-    public static ModConfigSpec.IntValue DROP_IN_RANGE;
-    public static ModConfigSpec.IntValue DROP_IN_HEIGHT;
-    public static ModConfigSpec.DoubleValue DROP_IN_DAMAGE;
-    public static ModConfigSpec.IntValue DROP_IN_COOLDOWN;
-    public static ModConfigSpec.IntValue TAUNT_RADIUS;
-    public static ModConfigSpec.IntValue TAUNT_TICKS;
-    public static ModConfigSpec.IntValue TAUNT_COOLDOWN;
-    public static ModConfigSpec.IntValue SMOKE_TICKS;
-    public static ModConfigSpec.IntValue SMOKE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue CHIMICHANGA_FRACTION;
-    public static ModConfigSpec.BooleanValue POD_AWAKENS;
-    public static ModConfigSpec.IntValue POD_TICKS;
-    public static ModConfigSpec.BooleanValue LINES_ENABLED;
-    public static ModConfigSpec.IntValue LINE_GAP_TICKS;
-    public static ModConfigSpec.BooleanValue DOGPOOL_ENABLED;
-    public static ModConfigSpec.IntValue DOGPOOL_SECONDS;
-    public static ModConfigSpec.DoubleValue DOGPOOL_HEALTH;
-    public static ModConfigSpec.DoubleValue DOGPOOL_BITE_DAMAGE;
-    public static ModConfigSpec.IntValue DOGPOOL_COOLDOWN;
+    public static ConfigSpec.DoubleValue HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue SPEED_BONUS;
+    public static ConfigSpec.DoubleValue ATTACK_BONUS;
+    public static ConfigSpec.DoubleValue ATTACK_SPEED_BONUS;
+    public static ConfigSpec.DoubleValue JUMP_BONUS;
+    public static ConfigSpec.DoubleValue SAFE_FALL;
+    public static ConfigSpec.DoubleValue KATANA_DAMAGE_1;
+    public static ConfigSpec.DoubleValue KATANA_DAMAGE_2;
+    public static ConfigSpec.DoubleValue KATANA_DAMAGE_3;
+    public static ConfigSpec.DoubleValue KATANA_REACH;
+    public static ConfigSpec.IntValue KATANA_GAP;
+    public static ConfigSpec.IntValue PARRY_MAX_TICKS;
+    public static ConfigSpec.DoubleValue PARRY_MELEE_REDUCTION;
+    public static ConfigSpec.IntValue PARRY_COOLDOWN;
+    public static ConfigSpec.DoubleValue PISTOL_DAMAGE;
+    public static ConfigSpec.IntValue PISTOL_RANGE;
+    public static ConfigSpec.IntValue MAGAZINE;
+    public static ConfigSpec.IntValue RELOAD_TICKS;
+    public static ConfigSpec.IntValue SHOT_GAP;
+    public static ConfigSpec.DoubleValue TRICK_SHOT_DAMAGE;
+    public static ConfigSpec.IntValue TRICK_SHOT_SEEK;
+    public static ConfigSpec.IntValue TRICK_SHOT_COOLDOWN;
+    public static ConfigSpec.IntValue BLINK_RANGE;
+    public static ConfigSpec.IntValue BLINK_COOLDOWN;
+    public static ConfigSpec.DoubleValue GLITCH_CHANCE;
+    public static ConfigSpec.IntValue DROP_IN_RANGE;
+    public static ConfigSpec.IntValue DROP_IN_HEIGHT;
+    public static ConfigSpec.DoubleValue DROP_IN_DAMAGE;
+    public static ConfigSpec.IntValue DROP_IN_COOLDOWN;
+    public static ConfigSpec.IntValue TAUNT_RADIUS;
+    public static ConfigSpec.IntValue TAUNT_TICKS;
+    public static ConfigSpec.IntValue TAUNT_COOLDOWN;
+    public static ConfigSpec.IntValue SMOKE_TICKS;
+    public static ConfigSpec.IntValue SMOKE_COOLDOWN;
+    public static ConfigSpec.DoubleValue CHIMICHANGA_FRACTION;
+    public static ConfigSpec.BooleanValue POD_AWAKENS;
+    public static ConfigSpec.IntValue POD_TICKS;
+    public static ConfigSpec.BooleanValue LINES_ENABLED;
+    public static ConfigSpec.IntValue LINE_GAP_TICKS;
+    public static ConfigSpec.BooleanValue DOGPOOL_ENABLED;
+    public static ConfigSpec.IntValue DOGPOOL_SECONDS;
+    public static ConfigSpec.DoubleValue DOGPOOL_HEALTH;
+    public static ConfigSpec.DoubleValue DOGPOOL_BITE_DAMAGE;
+    public static ConfigSpec.IntValue DOGPOOL_COOLDOWN;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("deadpool");
         HEALTH_BONUS = builder.comment("Max health added to his 20.")
                 .defineInRange("healthBonus", 10.0, 0.0, 100.0);

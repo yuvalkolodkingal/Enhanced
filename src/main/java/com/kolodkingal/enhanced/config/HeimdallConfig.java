@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Heimdall, the Guardian of the Bifrost (3.5). Every option of the plan is defined here by the 3.5 skeleton (lane L2
@@ -13,27 +13,27 @@ public final class HeimdallConfig {
     public static final String SECTION = "heimdall";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.IntValue SIGHT_RANGE;
-    public static ModConfigSpec.BooleanValue SEE_OTHER_REALMS;
-    public static ModConfigSpec.DoubleValue SLASH_DAMAGE1;
-    public static ModConfigSpec.DoubleValue SLASH_DAMAGE2;
-    public static ModConfigSpec.DoubleValue SLASH_DAMAGE3;
-    public static ModConfigSpec.DoubleValue LUNGE_DAMAGE;
-    public static ModConfigSpec.IntValue LUNGE_COOLDOWN;
-    public static ModConfigSpec.IntValue WARD_SECONDS;
-    public static ModConfigSpec.IntValue WARD_COOLDOWN;
-    public static ModConfigSpec.IntValue CALL_COOLDOWN;
-    public static ModConfigSpec.IntValue CALL_SECONDS;
-    public static ModConfigSpec.DoubleValue STRIKE_DAMAGE;
-    public static ModConfigSpec.IntValue STRIKE_COOLDOWN;
-    public static ModConfigSpec.IntValue SEND_RANGE;
-    public static ModConfigSpec.IntValue WATCH_SECONDS;
-    public static ModConfigSpec.IntValue WATCH_RETRY;
-    public static ModConfigSpec.DoubleValue HOFUND_BONUS;
+    public static ConfigSpec.IntValue SIGHT_RANGE;
+    public static ConfigSpec.BooleanValue SEE_OTHER_REALMS;
+    public static ConfigSpec.DoubleValue SLASH_DAMAGE1;
+    public static ConfigSpec.DoubleValue SLASH_DAMAGE2;
+    public static ConfigSpec.DoubleValue SLASH_DAMAGE3;
+    public static ConfigSpec.DoubleValue LUNGE_DAMAGE;
+    public static ConfigSpec.IntValue LUNGE_COOLDOWN;
+    public static ConfigSpec.IntValue WARD_SECONDS;
+    public static ConfigSpec.IntValue WARD_COOLDOWN;
+    public static ConfigSpec.IntValue CALL_COOLDOWN;
+    public static ConfigSpec.IntValue CALL_SECONDS;
+    public static ConfigSpec.DoubleValue STRIKE_DAMAGE;
+    public static ConfigSpec.IntValue STRIKE_COOLDOWN;
+    public static ConfigSpec.IntValue SEND_RANGE;
+    public static ConfigSpec.IntValue WATCH_SECONDS;
+    public static ConfigSpec.IntValue WATCH_RETRY;
+    public static ConfigSpec.DoubleValue HOFUND_BONUS;
     /** 3.5.1: how long the Heimdall of the city leaves his post to a player who is Heimdall. */
-    public static ModConfigSpec.IntValue POST_SECONDS;
+    public static ConfigSpec.IntValue POST_SECONDS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         SIGHT_RANGE = builder.comment("How far (blocks) the All-Seeing Sight shows creatures through walls.")
                 .defineInRange("sightRange", 96, 16, 256);

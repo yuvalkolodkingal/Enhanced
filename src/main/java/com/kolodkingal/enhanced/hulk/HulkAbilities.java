@@ -182,15 +182,15 @@ public final class HulkAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(net.neoforged.neoforge.common.ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(com.kolodkingal.enhanced.config.core.ConfigSpec.DoubleValue value, double fallback) {
         return loaded() ? value.get() : fallback;
     }
 
-    static int cfg(net.neoforged.neoforge.common.ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(com.kolodkingal.enhanced.config.core.ConfigSpec.IntValue value, int fallback) {
         return loaded() ? value.get() : fallback;
     }
 
-    static boolean cfg(net.neoforged.neoforge.common.ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(com.kolodkingal.enhanced.config.core.ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() ? value.get() : fallback;
     }
 

@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.BossLane;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildScheduler;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.power.Power;
@@ -37,7 +38,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -219,7 +219,7 @@ public final class TestKit {
         }
 
         /** Temporarily changes a server config value; the old value comes back when the test ends. */
-        public <T> void config(ModConfigSpec.ConfigValue<T> value, T newValue) {
+        public <T> void config(ConfigSpec.ConfigValue<T> value, T newValue) {
             undo.add(hold(value, value.get(), value::set));
             value.set(newValue);
         }

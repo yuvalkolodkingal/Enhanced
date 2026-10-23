@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The X-Men lower lab under every Mutant School (3.7): built at run time, its secret entrance, the lift, the Weapon X
@@ -13,18 +13,18 @@ public final class SchoolLabConfig {
     public static final String SECTION = "school_lab";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue AUTO_BUILD;
-    public static ModConfigSpec.IntValue BUILD_RADIUS;
-    public static ModConfigSpec.IntValue LAYERS_PER_TICK;
-    public static ModConfigSpec.BooleanValue OPEN_TO_ALL;
-    public static ModConfigSpec.IntValue LIFT_SNEAK_TICKS;
-    public static ModConfigSpec.BooleanValue LECTERN_HINT;
-    public static ModConfigSpec.IntValue INJECTIONS_PER_PLAYER;
-    public static ModConfigSpec.BooleanValue CURE_STATION;
-    public static ModConfigSpec.IntValue CURE_STATION_COOLDOWN;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue AUTO_BUILD;
+    public static ConfigSpec.IntValue BUILD_RADIUS;
+    public static ConfigSpec.IntValue LAYERS_PER_TICK;
+    public static ConfigSpec.BooleanValue OPEN_TO_ALL;
+    public static ConfigSpec.IntValue LIFT_SNEAK_TICKS;
+    public static ConfigSpec.BooleanValue LECTERN_HINT;
+    public static ConfigSpec.IntValue INJECTIONS_PER_PLAYER;
+    public static ConfigSpec.BooleanValue CURE_STATION;
+    public static ConfigSpec.IntValue CURE_STATION_COOLDOWN;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("school_lab");
         ENABLED = builder.comment("Whether the schools get their lower lab (off: no labs are built and no entrance",
                 "appears; built ones stay).")

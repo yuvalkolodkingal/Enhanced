@@ -1,36 +1,36 @@
 package com.kolodkingal.enhanced.client;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Client-side switches for how the heroes move and look, and how Build Magic shows itself. Lives in
  * config/enhanced-client.toml; nothing here is synced.
  */
 public final class EnhancedClientConfig {
-    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    private static final ConfigSpec.Builder BUILDER = new ConfigSpec.Builder();
 
-    public static final ModConfigSpec.BooleanValue ANIMATIONS;
-    public static final ModConfigSpec.BooleanValue REDUCED_MOTION;
-    public static final ModConfigSpec.BooleanValue FLIGHT_EFFECTS;
-    public static final ModConfigSpec.BooleanValue HIDE_HERO_ARMOUR;
-    public static final ModConfigSpec.BooleanValue BOSS_MUSIC;
-    public static final ModConfigSpec.BooleanValue BOSS_ATMOSPHERE;
-    public static final ModConfigSpec.BooleanValue BUILD_HINTS;
-    public static final ModConfigSpec.BooleanValue BUILD_TIPS;
-    public static final ModConfigSpec.IntValue BUILD_GHOST_DETAIL;
-    public static final ModConfigSpec.BooleanValue BUILD_SEE_THROUGH;
-    public static final ModConfigSpec.BooleanValue BUILD_SHOW_OTHERS;
-    public static final ModConfigSpec.BooleanValue WEB_ASSIST;
-    public static final ModConfigSpec.BooleanValue WEB_ASSIST_PREVIEW;
-    public static final ModConfigSpec.ConfigValue<String> QUICKSILVER_SONG;
-    public static final ModConfigSpec.BooleanValue IGNORE_SERVER_MUSIC;
-    public static final ModConfigSpec.BooleanValue HULK_MODEL;
-    public static final ModConfigSpec.BooleanValue DEADPOOL_LINES;
-    public static final ModConfigSpec.BooleanValue SHOW_DEATH_MEETING;
-    public static final ModConfigSpec.BooleanValue SUIT_UP_OVERLAY;
-    public static final ModConfigSpec.BooleanValue IRON_HELMET_HUD;
-    public static final ModConfigSpec.BooleanValue ETERNITY_REFLECTIONS;
-    public static final ModConfigSpec.BooleanValue ETERNITY_FOG;
+    public static final ConfigSpec.BooleanValue ANIMATIONS;
+    public static final ConfigSpec.BooleanValue REDUCED_MOTION;
+    public static final ConfigSpec.BooleanValue FLIGHT_EFFECTS;
+    public static final ConfigSpec.BooleanValue HIDE_HERO_ARMOUR;
+    public static final ConfigSpec.BooleanValue BOSS_MUSIC;
+    public static final ConfigSpec.BooleanValue BOSS_ATMOSPHERE;
+    public static final ConfigSpec.BooleanValue BUILD_HINTS;
+    public static final ConfigSpec.BooleanValue BUILD_TIPS;
+    public static final ConfigSpec.IntValue BUILD_GHOST_DETAIL;
+    public static final ConfigSpec.BooleanValue BUILD_SEE_THROUGH;
+    public static final ConfigSpec.BooleanValue BUILD_SHOW_OTHERS;
+    public static final ConfigSpec.BooleanValue WEB_ASSIST;
+    public static final ConfigSpec.BooleanValue WEB_ASSIST_PREVIEW;
+    public static final ConfigSpec.ConfigValue<String> QUICKSILVER_SONG;
+    public static final ConfigSpec.BooleanValue IGNORE_SERVER_MUSIC;
+    public static final ConfigSpec.BooleanValue HULK_MODEL;
+    public static final ConfigSpec.BooleanValue DEADPOOL_LINES;
+    public static final ConfigSpec.BooleanValue SHOW_DEATH_MEETING;
+    public static final ConfigSpec.BooleanValue SUIT_UP_OVERLAY;
+    public static final ConfigSpec.BooleanValue IRON_HELMET_HUD;
+    public static final ConfigSpec.BooleanValue ETERNITY_REFLECTIONS;
+    public static final ConfigSpec.BooleanValue ETERNITY_FOG;
 
     static {
         BUILDER.push("animation");
@@ -140,7 +140,7 @@ public final class EnhancedClientConfig {
         BUILDER.pop();
     }
 
-    public static final ModConfigSpec SPEC = BUILDER.build();
+    public static final ConfigSpec SPEC = BUILDER.build();
 
     /** Whether the hero animation runs at all (true until the config has loaded). */
     public static boolean animations() {

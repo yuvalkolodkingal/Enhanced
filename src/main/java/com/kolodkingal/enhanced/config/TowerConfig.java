@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The Avengers Tower's armoury (3.8, lane L6): the suit displays and tech cases, and the run-time refit of old towers.
@@ -13,12 +13,12 @@ public final class TowerConfig {
     public static final String SECTION = "avengers_tower";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.IntValue DISPLAYS_PER_PLAYER;
-    public static ModConfigSpec.BooleanValue REFIT;
-    public static ModConfigSpec.IntValue REFIT_RADIUS;
-    public static ModConfigSpec.IntValue REFIT_INTERVAL_TICKS;
+    public static ConfigSpec.IntValue DISPLAYS_PER_PLAYER;
+    public static ConfigSpec.BooleanValue REFIT;
+    public static ConfigSpec.IntValue REFIT_RADIUS;
+    public static ConfigSpec.IntValue REFIT_INTERVAL_TICKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("avengers_tower");
         DISPLAYS_PER_PLAYER = builder.comment("Items each player may take from one display or case (0: unlimited, for",
                 "creative servers).")

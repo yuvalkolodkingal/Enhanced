@@ -403,7 +403,7 @@ public final class StoneLocator {
         return !EnhancedConfig.SPEC.isLoaded() || LocatorConfig.POINTS_TO_GATEWAYS.get();
     }
 
-    private static int config(net.neoforged.neoforge.common.ModConfigSpec.IntValue value, int fallback) {
+    private static int config(com.kolodkingal.enhanced.config.core.ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 

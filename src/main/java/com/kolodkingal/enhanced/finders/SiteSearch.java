@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.finders;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.LocatorConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap;
 import net.minecraft.core.BlockPos;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStr
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraft.resources.ResourceKey;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -686,7 +686,7 @@ public final class SiteSearch {
         return (int) QUEUE.stream().filter(j -> !j.done()).count();
     }
 
-    private static int config(ModConfigSpec.IntValue value, int fallback) {
+    private static int config(ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 

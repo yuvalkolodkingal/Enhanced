@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.config.EternityConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.power.Live;
@@ -29,7 +30,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -305,15 +305,15 @@ public final class LoveAbilities {
 
     // ---- the numbers ----
 
-    static double cfg(ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(ConfigSpec.DoubleValue value, double fallback) {
         return EnhancedConfig.SPEC.isLoaded() && value != null ? value.get() : fallback;
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() && value != null ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return EnhancedConfig.SPEC.isLoaded() && value != null ? value.get() : fallback;
     }
 

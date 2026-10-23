@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The rules the three boss fights (Ultron, Thanos, Apocalypse) share: how many may run, what happens to a fight that is
@@ -13,32 +13,32 @@ public final class BossConfig {
     /** The TOML section of these options. */
     public static final String SECTION = "boss";
 
-    public static ModConfigSpec.IntValue MAX_ACTIVE_FIGHTS;
-    public static ModConfigSpec.IntValue WIPE_SECONDS;
-    public static ModConfigSpec.IntValue ABANDON_SECONDS;
-    public static ModConfigSpec.IntValue MAX_FIGHT_MINUTES;
-    public static ModConfigSpec.IntValue REWARD_MIN_SECONDS;
-    public static ModConfigSpec.BooleanValue CREATIVE_GETS_REWARD;
-    public static ModConfigSpec.IntValue XP_REWARD_PER_PLAYER;
-    public static ModConfigSpec.BooleanValue ANNOUNCE_FIGHTS;
-    public static ModConfigSpec.BooleanValue PROTECT_ARENA;
-    public static ModConfigSpec.DoubleValue DIFFICULTY_SCALE;
+    public static ConfigSpec.IntValue MAX_ACTIVE_FIGHTS;
+    public static ConfigSpec.IntValue WIPE_SECONDS;
+    public static ConfigSpec.IntValue ABANDON_SECONDS;
+    public static ConfigSpec.IntValue MAX_FIGHT_MINUTES;
+    public static ConfigSpec.IntValue REWARD_MIN_SECONDS;
+    public static ConfigSpec.BooleanValue CREATIVE_GETS_REWARD;
+    public static ConfigSpec.IntValue XP_REWARD_PER_PLAYER;
+    public static ConfigSpec.BooleanValue ANNOUNCE_FIGHTS;
+    public static ConfigSpec.BooleanValue PROTECT_ARENA;
+    public static ConfigSpec.DoubleValue DIFFICULTY_SCALE;
     // 3.1: telekinesis in the boss fights
-    public static ModConfigSpec.BooleanValue TELEKINESIS_HOLDS_BOSSES;
-    public static ModConfigSpec.BooleanValue TELEKINESIS_HOLDS_VANILLA_BOSSES;
-    public static ModConfigSpec.IntValue VANILLA_HOLD_TICKS;
-    public static ModConfigSpec.BooleanValue TELEKINESIS_CATCHES_BOSS_SHOTS;
-    public static ModConfigSpec.IntValue REGRIP_TICKS;
-    public static ModConfigSpec.IntValue THROWN_STILL_TICKS;
-    public static ModConfigSpec.DoubleValue BILLY_HOLD_FACTOR;
-    public static ModConfigSpec.DoubleValue MAGNETO_HOLD_FACTOR;
-    public static ModConfigSpec.BooleanValue LEND_ARENA_BLOCKS;
-    public static ModConfigSpec.IntValue ARENA_MEND_TICKS;
-    public static ModConfigSpec.IntValue BORROWED_BLOCK_TICKS;
-    public static ModConfigSpec.IntValue MAX_STANDING_PER_PLAYER;
-    public static ModConfigSpec.IntValue MAX_BORROWED_BLOCKS;
+    public static ConfigSpec.BooleanValue TELEKINESIS_HOLDS_BOSSES;
+    public static ConfigSpec.BooleanValue TELEKINESIS_HOLDS_VANILLA_BOSSES;
+    public static ConfigSpec.IntValue VANILLA_HOLD_TICKS;
+    public static ConfigSpec.BooleanValue TELEKINESIS_CATCHES_BOSS_SHOTS;
+    public static ConfigSpec.IntValue REGRIP_TICKS;
+    public static ConfigSpec.IntValue THROWN_STILL_TICKS;
+    public static ConfigSpec.DoubleValue BILLY_HOLD_FACTOR;
+    public static ConfigSpec.DoubleValue MAGNETO_HOLD_FACTOR;
+    public static ConfigSpec.BooleanValue LEND_ARENA_BLOCKS;
+    public static ConfigSpec.IntValue ARENA_MEND_TICKS;
+    public static ConfigSpec.IntValue BORROWED_BLOCK_TICKS;
+    public static ConfigSpec.IntValue MAX_STANDING_PER_PLAYER;
+    public static ConfigSpec.IntValue MAX_BORROWED_BLOCKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         MAX_ACTIVE_FIGHTS = builder.comment("How many boss fights may run at once on the whole server (Ultron, Thanos and Apocalypse together).",
                         "A ritual that would start another one is refused.")

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.config.IronManConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.ironman.IronManAbilities;
 import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitControl;
@@ -23,7 +24,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -112,7 +112,7 @@ public class IronSuitItem extends ArmorItem {
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        ModConfigSpec.IntValue value = switch (kind) {
+        ConfigSpec.IntValue value = switch (kind) {
             case MARK_1 -> IronManConfig.MARK1_DURABILITY;
             case MARK_3 -> IronManConfig.MARK3_DURABILITY;
             case MARK_5 -> IronManConfig.MARK5_DURABILITY;

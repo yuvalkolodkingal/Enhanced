@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.config.RedHulkConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hulk.GrabSmash;
 import com.kolodkingal.enhanced.hulk.HulkAbilities;
@@ -45,7 +46,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -160,15 +160,15 @@ public final class RedHulkAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(ConfigSpec.DoubleValue value, double fallback) {
         return loaded() ? value.get() : fallback;
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return loaded() ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() ? value.get() : fallback;
     }
 

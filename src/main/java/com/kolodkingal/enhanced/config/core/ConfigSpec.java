@@ -1,9 +1,13 @@
 package com.kolodkingal.enhanced.config.core;
 
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
@@ -39,6 +43,23 @@ public final class ConfigSpec {
     /** The value specs by path (each a {@link ValueSpec}; {@code null} if none). */
     public Specs getSpec() {
         return new Specs();
+    }
+
+    /** The names of the top-level sections ({@code push}), in the spec's order. */
+    public List<String> sections() {
+        List<String> sections = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : spec.getSpec().valueMap().entrySet()) {
+            if (entry.getValue() instanceof UnmodifiableConfig) {
+                sections.add(entry.getKey());
+            }
+        }
+        return sections;
+    }
+
+    /** The translation key of the section at {@code path}, or null if it has none. */
+    @Nullable
+    public String getLevelTranslationKey(List<String> path) {
+        return spec.getLevelTranslationKey(path);
     }
 
     /** P0 only: NeoForge's spec underneath, for the loader's entry point to register. */
