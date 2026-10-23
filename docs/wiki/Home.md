@@ -52,7 +52,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 ## What's new in 3.9.0
 
 * **Under the hood, the mod now runs on its own platform layer.** It is the first step towards a Fabric version of Enhanced. Nothing changes in play: every hero, power, boss and place works exactly as in 3.8.4, and your worlds, heroes and settings carry over.
-* **A new settings screen.** Open it from the Mods list (Mods, then Enhanced, then Config): the client settings, and the [server settings](Server-Configuration) of the world you are playing in, with switches, sliders and an Undo button. Your changes are saved when you leave a page.
+* **A new settings screen.** Open it from the Mods list (Mods, then Enhanced, then Config): your own game's settings and, in a world of your own, its [server settings](Server-Configuration) (on a server they are the server's to change), with switches, sliders and an Undo button. Your changes are saved when you leave a page.
 * 3.8.x and 3.9 cannot play together: update the server and every player at the same time (network protocol **14**). See [Installation](Installation).
 
 ## What's new in 3.8.4
