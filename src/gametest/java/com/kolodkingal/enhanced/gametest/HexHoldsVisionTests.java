@@ -64,15 +64,10 @@ public final class HexHoldsVisionTests {
         return sounds.stream().anyMatch(sound -> sound.id().equals(event.getLocation()));
     }
 
-    /**
-     * Whether a portal to the Nether is refused to {@code entity} (the travel-to-dimension event). TODO(port L1): post
-     * the common event ({@code Events.post(new EntityTravelToDimensionEvent(entity, Level.NETHER)).isCanceled()}) once
-     * {@code CommonEvents.onTravelToDimension} (L1) is a {@code @Subscribe} handler; until then only NeoForge's bus
-     * reaches it (and, through the bridge, every handler already moved).
-     */
+    /** Whether a portal to the Nether is refused to {@code entity} (the travel-to-dimension event). */
     private static boolean portalRefused(ServerPlayer entity) {
-        var portal = new net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent(entity, Level.NETHER);
-        return net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(portal).isCanceled();
+        return com.kolodkingal.enhanced.platform.event.Events.post(
+                new com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent(entity, Level.NETHER)).isCanceled();
     }
 
     @EnhancedTest(template = ARENA, batch = "hex_holds_walk")
