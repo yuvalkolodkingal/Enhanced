@@ -1,5 +1,0 @@
-# Port P0 lint allow-list of lane L1-core: the files it still has to migrate (net.neoforged, @SubscribeEvent,
-# getPersistentData()/hasChannel outside platform/neoforge/**). Remove a line when its file is clean; delete
-# this file when the lane is done. build.gradle portLint (region "port P0 L8") reads it.
-src/gametest/java/com/kolodkingal/enhanced/gametest/ItemsTests.java  # the MobSpawnEvent posts and the WardEvents.onLogin line reach L4's vishanti handlers: Events.post / L4's line once L4 is merged
-src/main/java/com/kolodkingal/enhanced/ability/ApocalypseGuard.java  # the NeoForge-typed guard overload for L2's ApocalypseEvents: dropped when L2 is merged

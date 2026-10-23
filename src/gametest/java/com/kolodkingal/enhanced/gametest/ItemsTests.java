@@ -11,6 +11,9 @@ import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.network.WardSyncPayload;
 import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.MobSpawnEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Power;
@@ -66,9 +69,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -694,11 +694,11 @@ public final class ItemsTests {
         // The spawn placement check every natural spawn and every spawner goes through.
         MobSpawnEvent.SpawnPlacementCheck placement = new MobSpawnEvent.SpawnPlacementCheck(EntityType.ZOMBIE, level, MobSpawnType.NATURAL,
                 inside, level.getRandom(), true);
-        NeoForge.EVENT_BUS.post(placement);
+        Events.post(placement);
         check(placement.getResult() == MobSpawnEvent.SpawnPlacementCheck.Result.FAIL, "the spawn placement of a zombie fails");
         MobSpawnEvent.SpawnPlacementCheck free = new MobSpawnEvent.SpawnPlacementCheck(EntityType.ZOMBIE, level, MobSpawnType.NATURAL,
                 outside, level.getRandom(), true);
-        NeoForge.EVENT_BUS.post(free);
+        Events.post(free);
         check(free.getResult() == MobSpawnEvent.SpawnPlacementCheck.Result.DEFAULT, "outside it is left alone");
         // And the finishing of a spawn that got past the placement (a spawner's, a structure's).
         Zombie zombie = EntityType.ZOMBIE.create(level);
@@ -851,7 +851,7 @@ public final class ItemsTests {
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
         WardStore.get(level).put(new Ward(loki.getUUID(), "Lost", loki.position(), 6, Power.LOKI.color));
         check(book(loki).bases() == 0 && wardOf(level, loki, "Lost") != null, "a ward stands that the book knows nothing of");
-        WardEvents.onLogin(new com.kolodkingal.enhanced.platform.event.PlayerEvent.PlayerLoggedInEvent(loki));
+        WardEvents.onLogin(new PlayerEvent.PlayerLoggedInEvent(loki));
         check(wardOf(level, loki, "Lost") == null, "logging in takes it away");
         UUID gone = UUID.randomUUID();
         WardStore.get(level).put(new Ward(gone, "Old", loki.position(), 6, Power.LOKI.color));
