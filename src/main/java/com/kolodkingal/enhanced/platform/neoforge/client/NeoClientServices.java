@@ -7,6 +7,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
@@ -64,6 +65,16 @@ public final class NeoClientServices implements ClientServices {
     @Override
     public boolean conflicts(KeyContext.Vanilla context, KeyContext other) {
         return toNeo(context).conflicts(other == null ? null : toNeo(other));
+    }
+
+    @Override
+    public int hudLeftHeight() {
+        return Minecraft.getInstance().gui.leftHeight;
+    }
+
+    @Override
+    public int hudRightHeight() {
+        return Minecraft.getInstance().gui.rightHeight;
     }
 
     @Override
