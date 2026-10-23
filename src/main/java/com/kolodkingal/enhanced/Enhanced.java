@@ -61,7 +61,7 @@ public class Enhanced {
         ModNetwork.register();
         com.kolodkingal.enhanced.network.SpeedNetwork.register();
         com.kolodkingal.enhanced.network.SpiderNetwork.register();
-        modBus.addListener(ModEntities::registerAttributes);
+        ModEntities.registerAttributes();
         container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC.neoSpec());
         container.registerConfig(ModConfig.Type.CLIENT, EnhancedClientConfig.SPEC.neoSpec());
     }
