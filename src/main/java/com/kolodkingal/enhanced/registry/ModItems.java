@@ -46,7 +46,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.Unbreakable;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 
 import java.util.List;
 
@@ -245,12 +244,12 @@ public final class ModItems {
     /** The Hydra blaster (lane L8): 96 uses. */
     public static final ItemEntry<HydraBlasterItem> HYDRA_BLASTER = ITEMS.register("hydra_blaster",
             () -> new HydraBlasterItem(new Item.Properties().stacksTo(1).durability(96).rarity(Rarity.RARE)));
-    public static final ItemEntry<DeferredSpawnEggItem> HYDRA_SOLDIER_SPAWN_EGG = ITEMS.register(
+    public static final ItemEntry<Item> HYDRA_SOLDIER_SPAWN_EGG = ITEMS.register(
             "hydra_soldier_spawn_egg",
-            () -> new DeferredSpawnEggItem(ModEntities.HYDRA_SOLDIER, 0x1C1C1E, 0xB3161C, new Item.Properties()));
-    public static final ItemEntry<DeferredSpawnEggItem> HYDRA_OFFICER_SPAWN_EGG = ITEMS.register(
+            () -> Registrars.spawnEgg(ModEntities.HYDRA_SOLDIER, 0x1C1C1E, 0xB3161C, new Item.Properties()));
+    public static final ItemEntry<Item> HYDRA_OFFICER_SPAWN_EGG = ITEMS.register(
             "hydra_officer_spawn_egg",
-            () -> new DeferredSpawnEggItem(ModEntities.HYDRA_OFFICER, 0x2A2A2E, 0xD8B23A, new Item.Properties()));
+            () -> Registrars.spawnEgg(ModEntities.HYDRA_OFFICER, 0x2A2A2E, 0xD8B23A, new Item.Properties()));
 
     // ===== wolverine (3.7) =====
     // (The skeleton registers every item of 3.7; each lane owns its classes.)

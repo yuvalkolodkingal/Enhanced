@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.SpeedSurfaces;
 import com.kolodkingal.enhanced.ability.SurfaceRun;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
@@ -295,9 +296,10 @@ public final class SpeedsterSurfaceTests {
         PowerTicker.tick(peter);
         check(data.is(Live.SURFACE_WALL) && !data.is(Live.SURFACE_CEILING), "his client's word, with a wall right there, is believed");
         check(peter.fallDistance == 0.0F && SpeedSurfaces.fallSafe(peter), "a fall does not count");
-        peter.connection.aboveGroundTickCount = 70;
+        ((ServerGamePacketListenerImplAccessor) peter.connection).enhanced$setAboveGroundTickCount(70);
         PowerTicker.tick(peter);
-        check(peter.connection.aboveGroundTickCount == 0, "the fly-kick counter is reset while he runs on it");
+        check(((ServerGamePacketListenerImplAccessor) peter.connection).enhanced$getAboveGroundTickCount() == 0,
+                "the fly-kick counter is reset while he runs on it");
 
         // A ceiling where there is none, or a wall on the wrong side, is not believed.
         report(peter, SurfaceRun.Surface.CEILING);

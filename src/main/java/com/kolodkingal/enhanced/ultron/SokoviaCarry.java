@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ultron;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -203,7 +204,7 @@ final class SokoviaCarry {
         entity.resetFallDistance();
         if (entity instanceof ServerPlayer player) {
             Powers.get(player).set(Live.LIFTED, false);
-            player.connection.aboveGroundTickCount = 0;
+            ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
             player.setDeltaMovement(Vec3.ZERO);
             player.hurtMarked = true;
         } else {
@@ -274,7 +275,7 @@ final class SokoviaCarry {
     }
 
     private void carryPlayer(ServerPlayer player, Rider rider, double delta) {
-        player.connection.aboveGroundTickCount = 0;
+        ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
         player.resetFallDistance();
         if (player.isFallFlying()) {
             player.stopFallFlying();

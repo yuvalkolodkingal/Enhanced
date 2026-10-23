@@ -4,15 +4,21 @@
   "package": "com.kolodkingal.enhanced.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AbstractArrowAccessor",
+    "ArmorStandAccessor",
     "ChunkMapInvoker",
     "HangingEntityInvoker",
+    "ItemFrameAccessor",
     "MobEffectInstanceAccessor",
+    "MobInvoker",
     "PlayerMixin",
+    "ServerGamePacketListenerImplAccessor",
     "TamableAnimalMixin"
   ],
   "client": [
     "client.AbstractClientPlayerMixin",
     "client.CapeLayerMixin",
+    "client.GuiAccessor",
     "client.HumanoidArmorLayerMixin",
     "client.ItemInHandLayerMixin",
     "client.ItemInHandRendererAccessor",

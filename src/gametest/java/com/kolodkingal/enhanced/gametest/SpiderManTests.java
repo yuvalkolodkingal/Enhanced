@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
@@ -1542,20 +1543,22 @@ public final class SpiderManTests {
     public static void theKickCounterIsResetWhileHanging(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = zipping(f, helper);
-        player.connection.aboveGroundTickCount = 50;
+        ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(50);
         player.fallDistance = 12.0F;
         PowerTicker.tick(player);
-        check(player.connection.aboveGroundTickCount == 0 && player.fallDistance == 0.0F, "a zip resets the kick counter, and the fall");
+        check(((ServerGamePacketListenerImplAccessor) player.connection).enhanced$getAboveGroundTickCount() == 0
+                && player.fallDistance == 0.0F, "a zip resets the kick counter, and the fall");
         ServerPlayer swinger = spider(f, 8.5, 4.5);
         fill(helper, 7, 6, 8, 9, 8, 8, Blocks.STONE);
         put(helper, swinger, 8.5, 5.0, 4.5);
         lookAt(swinger, abs(helper, 8.5, 6.5, 8.0));
         PowerTicker.tick(swinger);
         hold(swinger, 2, true);
-        swinger.connection.aboveGroundTickCount = 50;
+        ((ServerGamePacketListenerImplAccessor) swinger.connection).enhanced$setAboveGroundTickCount(50);
         swinger.fallDistance = 12.0F;
         PowerTicker.tick(swinger);
-        check(swinger.connection.aboveGroundTickCount == 0 && swinger.fallDistance == 0.0F, "a swing does too");
+        check(((ServerGamePacketListenerImplAccessor) swinger.connection).enhanced$getAboveGroundTickCount() == 0
+                && swinger.fallDistance == 0.0F, "a swing does too");
         helper.succeed();
     }
 

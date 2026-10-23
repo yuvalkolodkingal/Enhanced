@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -333,7 +334,7 @@ public class BossArena {
         player.setDeltaMovement(Vec3.ZERO);
         player.hurtMarked = true;
         player.resetFallDistance();
-        player.connection.aboveGroundTickCount = 0;
+        ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, spot.x, spot.y + 1.0, spot.z, 12, 0.3, 0.6, 0.3, 0.05);
         level.playSound(null, spot.x, spot.y, spot.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 1.4F);
     }

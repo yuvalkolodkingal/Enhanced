@@ -1,6 +1,7 @@
-package com.kolodkingal.enhanced.gametest;
+package com.kolodkingal.enhanced.platform.neoforge.test.bridge;
 
-import com.kolodkingal.enhanced.gametest.BridgeTestSupport.Bridged;
+import com.kolodkingal.enhanced.gametest.TestKit;
+import com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.Bridged;
 import com.kolodkingal.enhanced.platform.event.FinalizeSpawnEvent;
 import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
 import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
@@ -38,8 +39,8 @@ import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kolodkingal.enhanced.gametest.BridgeTestSupport.BATCH;
-import static com.kolodkingal.enhanced.gametest.BridgeTestSupport.bridge;
+import static com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.BATCH;
+import static com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.bridge;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;

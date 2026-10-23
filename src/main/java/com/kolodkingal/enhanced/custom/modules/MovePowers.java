@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.custom.ModuleStats;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.Shots;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -271,7 +272,7 @@ public final class MovePowers {
             boolean wall = on && touchesWall(p);
             if (wall) {
                 p.resetFallDistance();
-                p.connection.aboveGroundTickCount = 0;
+                ((ServerGamePacketListenerImplAccessor) p.connection).enhanced$setAboveGroundTickCount(0);
             }
             // (3.4) The flags everyone's client reads for Spider-Man's cling stances: on a wall off the ground, or under a
             // ceiling with no wall beside him.

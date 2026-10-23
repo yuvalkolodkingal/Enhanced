@@ -1,7 +1,8 @@
-package com.kolodkingal.enhanced.gametest;
+package com.kolodkingal.enhanced.platform.neoforge.test.bridge;
 
 import com.kolodkingal.enhanced.Enhanced;
-import com.kolodkingal.enhanced.gametest.BridgeTestSupport.Bridged;
+import com.kolodkingal.enhanced.gametest.TestKit;
+import com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.Bridged;
 import com.kolodkingal.enhanced.platform.event.BlockDropsEvent;
 import com.kolodkingal.enhanced.platform.event.BlockEvent;
 import com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent;
@@ -72,9 +73,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.kolodkingal.enhanced.gametest.BridgeTestSupport.BATCH;
-import static com.kolodkingal.enhanced.gametest.BridgeTestSupport.adapted;
-import static com.kolodkingal.enhanced.gametest.BridgeTestSupport.bridge;
+import static com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.BATCH;
+import static com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.adapted;
+import static com.kolodkingal.enhanced.platform.neoforge.test.bridge.BridgeTestSupport.bridge;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;

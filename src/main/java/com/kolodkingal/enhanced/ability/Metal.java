@@ -5,6 +5,8 @@ import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
+import com.kolodkingal.enhanced.mixin.MobInvoker;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -110,7 +112,8 @@ public final class Metal {
 
     /** A projectile still flying: not stuck in the ground, not a trident flying home, not caught by Magneto. */
     public static boolean inFlight(Projectile projectile) {
-        if (projectile instanceof AbstractArrow arrow && (arrow.inGround || arrow.isNoPhysics())) {
+        if (projectile instanceof AbstractArrow arrow && (((AbstractArrowAccessor) arrow).enhanced$isInGround()
+                || arrow.isNoPhysics())) {
             return false;
         }
         return !(projectile instanceof FishingHook) && !MagnetoAbilities.isHeld(projectile);
@@ -192,7 +195,7 @@ public final class Metal {
         if (isConjured(entity)) {
             return false;
         }
-        return !(entity instanceof Mob mob) || mob.getEquipmentDropChance(slot) > 0.0F;
+        return !(entity instanceof Mob mob) || ((MobInvoker) mob).enhanced$getEquipmentDropChance(slot) > 0.0F;
     }
 
     /**

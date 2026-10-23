@@ -12,6 +12,8 @@ import com.kolodkingal.enhanced.custom.CustomTelekinesis;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -643,7 +645,7 @@ public final class Telekinesis {
             held.setDeltaMovement(vel);
             held.hurtMarked = true;
             held.resetFallDistance();
-            held.connection.aboveGroundTickCount = 0;
+            ((ServerGamePacketListenerImplAccessor) held.connection).enhanced$setAboveGroundTickCount(0);
         } else {
             e.move(MoverType.SELF, clampLength(diff.scale(0.45), 1.6));
             // A held arrow keeps pointing where the holder looks (an arrow turns to face the way it moves).
@@ -844,7 +846,7 @@ public final class Telekinesis {
             BossFights.disown(projectile);
         }
         if (projectile instanceof AbstractArrow arrow) {
-            arrow.inGround = false;
+            ((AbstractArrowAccessor) arrow).enhanced$setInGround(false);
             if (!(arrow instanceof ThrownTrident)) {
                 // The holder gets the credit, but nobody gains the right to pick up an arrow they couldn't before.
                 AbstractArrow.Pickup pickup = arrow.pickup;
@@ -926,7 +928,7 @@ public final class Telekinesis {
             }
 
             if (e instanceof ServerPlayer held) {
-                held.connection.aboveGroundTickCount = 0;
+                ((ServerGamePacketListenerImplAccessor) held.connection).enhanced$setAboveGroundTickCount(0);
             }
             if (e instanceof IronGolem golem && golem.getTarget() == thrower) {
                 golem.setTarget(null);

@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.gametest;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.network.SokoviaLiftPayload;
 import com.kolodkingal.enhanced.platform.event.BlockEvent;
 import com.kolodkingal.enhanced.platform.event.Events;
@@ -251,7 +252,8 @@ public final class SokoviaTests {
             client(player);
             if (carried) {
                 carriedTicks[0]++;
-                highest[0] = Math.max(highest[0], player.connection.aboveGroundTickCount);
+                highest[0] = Math.max(highest[0],
+                        ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$getAboveGroundTickCount());
             }
             for (Object packet : TestKit.sentPackets(player)) {
                 check(!(packet instanceof ClientboundDisconnectPacket), "the player was kicked after " + carriedTicks[0] + " ticks");

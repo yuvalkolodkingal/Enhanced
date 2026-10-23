@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.build.SpellPlanner;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.build.HudDraw.Picture;
+import com.kolodkingal.enhanced.mixin.client.GuiAccessor;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -245,8 +246,9 @@ public final class BuildHud implements LayeredDraw.Layer {
      * four rows or more (the line is centred, 68 above the bottom). At most as far as keeps the line on the screen.
      */
     private static float messageShift(Minecraft mc, int width, int height) {
-        Component line = mc.gui.overlayMessageString;
-        if (line == null || mc.gui.overlayMessageTime <= 0 || stripLeft == Integer.MAX_VALUE || stripTop >= height - MESSAGE_BAND) {
+        Component line = ((GuiAccessor) mc.gui).enhanced$getOverlayMessageString();
+        if (line == null || ((GuiAccessor) mc.gui).enhanced$getOverlayMessageTime() <= 0
+                || stripLeft == Integer.MAX_VALUE || stripTop >= height - MESSAGE_BAND) {
             return 0.0F;
         }
         int w = mc.font.width(line) + 4;

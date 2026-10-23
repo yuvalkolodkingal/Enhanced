@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.config.XavierConfig;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
 import com.kolodkingal.enhanced.network.XavierPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -579,7 +580,7 @@ public final class MindLink {
         host.setDeltaMovement(motion);
         host.hurtMarked = true;
         host.resetFallDistance();
-        host.connection.aboveGroundTickCount = 0;
+        ((ServerGamePacketListenerImplAccessor) host.connection).enhanced$setAboveGroundTickCount(0);
     }
 
     /**

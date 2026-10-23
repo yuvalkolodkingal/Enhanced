@@ -42,6 +42,15 @@ public interface TestHooks {
     boolean isAttachmentSync(Object packet, AttachKey<?> key, int entityId);
 
     /**
+     * The key of the compound in an entity's saved data that holds its attachments, by id (NeoForge
+     * {@code "neoforge:attachments"}; port P0, L8).
+     */
+    String attachmentsKey();
+
+    /** The version of the mod as the loader read it from the mod's metadata (port P0, L8). */
+    String modVersion();
+
+    /**
      * The packets the server sends {@code watcher} about {@code holder}'s synced attachments when he starts seeing it
      * (the first sync), in order; check them with {@link #isAttachmentSync}.
      */
