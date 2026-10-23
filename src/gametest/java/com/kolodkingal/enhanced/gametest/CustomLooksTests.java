@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.custom.KeyLayout;
 import com.kolodkingal.enhanced.custom.LookCatalog;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
@@ -28,8 +29,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -56,14 +56,12 @@ public final class CustomLooksTests {
     private static final String ITEMS = "hero_items";
     private static final String ITEMS_CONFIG = "hero_items_config";
 
-    private static IModFile mod() {
-        return ModList.get().getModFileById(Enhanced.MODID).getFile();
+    private static Optional<Path> find(String path) {
+        return Platform.get().modResource("assets/" + Enhanced.MODID + "/" + path);
     }
 
     private static Path resource(String path) {
-        List<String> parts = new ArrayList<>(List.of("assets", Enhanced.MODID));
-        parts.addAll(List.of(path.split("/")));
-        return mod().findResource(parts.toArray(new String[0]));
+        return find(path).orElseThrow();
     }
 
     private static String text(String path) throws IOException {
@@ -92,7 +90,7 @@ public final class CustomLooksTests {
             for (String style : LookCatalog.styles(kind)) {
                 for (String path : LookCatalog.textures(kind, style)) {
                     seen++;
-                    if (!Files.exists(resource(path))) {
+                    if (find(path).isEmpty()) {
                         missing.add(style + ": " + path);
                     }
                 }

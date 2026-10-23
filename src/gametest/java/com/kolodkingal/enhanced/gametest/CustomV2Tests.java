@@ -30,6 +30,7 @@ import com.kolodkingal.enhanced.custom.StoneRow;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -51,8 +52,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -548,8 +547,7 @@ public final class CustomV2Tests {
     // ---- the words ----
 
     private static JsonObject lang(String name) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        Path path = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+        Path path = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json").orElseThrow();
         try (InputStream in = Files.newInputStream(path)) {
             return JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
         }

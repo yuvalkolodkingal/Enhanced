@@ -7,8 +7,8 @@ import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BuildJob;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildRules.Left;
-import com.kolodkingal.enhanced.build.BuildScheduler;
 import com.kolodkingal.enhanced.build.BuildScheduler.Budget;
+import com.kolodkingal.enhanced.build.BuildScheduler;
 import com.kolodkingal.enhanced.build.BuildSession;
 import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.build.ChangeStyle;
@@ -24,6 +24,9 @@ import com.kolodkingal.enhanced.gametest.BuildTestSupport.Seen;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildPocketPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -76,9 +79,6 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -193,7 +193,7 @@ public final class BuildSpellTests {
         cast(reborn, boxSpell(f, Spell.FILL, second));
         job = working(reborn);
         BuildScheduler.step(List.of(id), five);
-        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerRespawnEvent(reborn, false));
+        Events.post(new PlayerEvent.PlayerRespawnEvent(reborn, false));
         check(!mode(id) && !building(reborn), "a respawn ends build mode");
         finish(ENDLESS, id);
         check(job.endCode() == BuildVerdictPayload.DONE && count(f, second, Blocks.STONE) == 27 && UndoHistory.of(id).steps().size() == 2,

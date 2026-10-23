@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.love.EyeLaser;
 import com.kolodkingal.enhanced.love.LoveAbilities;
 import com.kolodkingal.enhanced.love.ThunderStrike;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -28,7 +29,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -206,8 +206,7 @@ public final class LoveTests {
     /** Her preset (for the integrator's {@code HeroPresets.HEROES}) passes the rules at 60 points, with no note. */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herPresetFitsSixtyPoints(GameTestHelper helper) throws IOException {
-        Path file = ModList.get().getModFileById(Enhanced.MODID).getFile()
-                .findResource("assets", Enhanced.MODID, "hero_presets", "love.json");
+        Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/hero_presets/love.json").orElseThrow();
         String json = Files.readString(file);
         HeroPresets.Preset preset = HeroPresets.read("love", json);
         check(preset != null && preset.like() == Power.LOVE, "her preset reads as Love's");

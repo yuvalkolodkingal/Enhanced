@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -20,10 +21,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +62,17 @@ public final class HexHoldsVisionTests {
 
     private static boolean heard(List<TestKit.HeardSound> sounds, net.minecraft.sounds.SoundEvent event) {
         return sounds.stream().anyMatch(sound -> sound.id().equals(event.getLocation()));
+    }
+
+    /**
+     * Whether a portal to the Nether is refused to {@code entity} (the travel-to-dimension event). TODO(port L1): post
+     * the common event ({@code Events.post(new EntityTravelToDimensionEvent(entity, Level.NETHER)).isCanceled()}) once
+     * {@code CommonEvents.onTravelToDimension} (L1) is a {@code @Subscribe} handler; until then only NeoForge's bus
+     * reaches it (and, through the bridge, every handler already moved).
+     */
+    private static boolean portalRefused(ServerPlayer entity) {
+        var portal = new net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent(entity, Level.NETHER);
+        return net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(portal).isCanceled();
     }
 
     @EnhancedTest(template = ARENA, batch = "hex_holds_walk")
@@ -319,9 +327,9 @@ public final class HexHoldsVisionTests {
         TestKit.sentPackets(vision);
 
         // An Ender Pearl.
-        EntityTeleportEvent.EnderPearl pearl = EventHooks.onEnderPearlLand(vision, outside.x, outside.y, outside.z,
+        boolean pearl = Platform.get().hooks().enderPearlTeleportCancelled(vision, outside.x, outside.y, outside.z,
                 new ThrownEnderpearl(helper.getLevel(), vision), 5.0F, BlockHitResult.miss(outside, Direction.UP, vision.blockPosition()));
-        check(pearl.isCanceled(), "an Ender Pearl doesn't take Vision out of the Hex");
+        check(pearl, "an Ender Pearl doesn't take Vision out of the Hex");
         check(flakedOrange(TestKit.sentPackets(vision)), "he flakes where he stands");
         // The mod's own teleports (the Bifrost, Loki's Tesseract, the Witches' Road, a Vibrate...) ask the same.
         check(!HexManager.onTeleport(helper.getLevel(), vision, outside), "no teleport of the mod takes him out");
@@ -329,10 +337,9 @@ public final class HexHoldsVisionTests {
         check(inside(f, wanda, vision) && vision.getHealth() == health, "he is where he was, unhurt");
 
         // A portal.
-        EntityTravelToDimensionEvent portal = NeoForge.EVENT_BUS.post(new EntityTravelToDimensionEvent(vision, Level.NETHER));
-        check(portal.isCanceled(), "a portal doesn't take him out either");
+        check(portalRefused(vision), "a portal doesn't take him out either");
         ServerPlayer nobody = f.player(CENTER, FLOOR, 6.0);
-        check(!NeoForge.EVENT_BUS.post(new EntityTravelToDimensionEvent(nobody, Level.NETHER)).isCanceled(), "(control: anyone else may go)");
+        check(!portalRefused(nobody), "(control: anyone else may go)");
 
         // Chorus Fruit: it lands first and is judged after, and then he is thrown back.
         HexManager.rememberTeleportStart(vision);

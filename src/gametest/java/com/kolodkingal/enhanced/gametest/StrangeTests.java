@@ -15,6 +15,8 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKeys;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.SlingRingActionPayload;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LivingFallEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
@@ -45,8 +47,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -345,11 +347,9 @@ public final class StrangeTests {
         PowerTicker.tick(strange);
         assertNear(strange.getAttributeValue(Attributes.MAX_HEALTH), 26.0, 0.01, "+6 health");
         assertNear(strange.getAttributeValue(Attributes.ARMOR), 2.0, 0.01, "+2 armour");
-        net.neoforged.neoforge.event.entity.living.LivingFallEvent short_ = net.neoforged.neoforge.common.NeoForge.EVENT_BUS
-                .post(new net.neoforged.neoforge.event.entity.living.LivingFallEvent(strange, 10.0F, 1.0F));
+        LivingFallEvent short_ = Events.post(new LivingFallEvent(strange, 10.0F, 1.0F));
         check(short_.isCanceled(), "the Cloak catches a fall of 10 blocks");
-        net.neoforged.neoforge.event.entity.living.LivingFallEvent long_ = net.neoforged.neoforge.common.NeoForge.EVENT_BUS
-                .post(new net.neoforged.neoforge.event.entity.living.LivingFallEvent(strange, 16.0F, 1.0F));
+        LivingFallEvent long_ = Events.post(new LivingFallEvent(strange, 16.0F, 1.0F));
         check(!long_.isCanceled(), "a fall of 16 is not caught whole");
         assertNear(long_.getDistance(), 4.0, 0.01, "a fall of 16 hurts as one of 4");
         Powers.setPower(strange, Power.NONE);

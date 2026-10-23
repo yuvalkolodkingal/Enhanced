@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.cottage;
 
 import com.kolodkingal.enhanced.asgard.npc.AsgardTrades;
 import com.kolodkingal.enhanced.asgard.npc.Role;
+import com.kolodkingal.enhanced.platform.Platform;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
@@ -23,7 +24,6 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.List;
 import java.util.Optional;
@@ -95,7 +95,7 @@ public final class CottageTrades {
 
     /** An enchanted book of one of {@link #BOOKS} at level 1 or 2 (empty if no server is running). */
     static ItemStack book(RandomSource random) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = Platform.get().currentServer();
         if (server == null) {
             return ItemStack.EMPTY;
         }

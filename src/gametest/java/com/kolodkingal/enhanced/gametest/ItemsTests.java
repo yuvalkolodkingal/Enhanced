@@ -849,7 +849,7 @@ public final class ItemsTests {
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
         WardStore.get(level).put(new Ward(loki.getUUID(), "Lost", loki.position(), 6, Power.LOKI.color));
         check(book(loki).bases() == 0 && wardOf(level, loki, "Lost") != null, "a ward stands that the book knows nothing of");
-        WardEvents.onLogin(new PlayerEvent.PlayerLoggedInEvent(loki));
+        WardEvents.onLogin(new com.kolodkingal.enhanced.platform.event.PlayerEvent.PlayerLoggedInEvent(loki));
         check(wardOf(level, loki, "Lost") == null, "logging in takes it away");
         UUID gone = UUID.randomUUID();
         WardStore.get(level).put(new Ward(gone, "Old", loki.position(), 6, Power.LOKI.color));

@@ -19,6 +19,7 @@ import com.kolodkingal.enhanced.gametest.BuildTestSupport.Seen;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -38,7 +39,6 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.List;
 import java.util.UUID;

@@ -20,6 +20,9 @@ import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -44,9 +47,6 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
@@ -109,9 +109,9 @@ public final class BuildRulesTests {
     }
 
     /** Adds a listener for the test's length. */
-    private static <T extends net.neoforged.bus.api.Event> void listen(TestKit.Fixture f, Class<T> type, Consumer<T> listener) {
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, type, listener);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+    private static <T> void listen(TestKit.Fixture f, Class<T> type, Consumer<T> listener) {
+        EventHub.Registration registration = EventHub.of(type).register(Priority.NORMAL, false, listener);
+        f.onClose(registration::close);
     }
 
     // B55

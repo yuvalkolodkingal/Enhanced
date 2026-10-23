@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -17,8 +18,6 @@ import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 
 import java.util.Optional;
 
@@ -203,19 +202,19 @@ public final class HexTests {
         ServerPlayer nobody = f.player(1.5, FLOOR, CENTER);
         Vec3 target = abs(helper, CENTER, FLOOR, CENTER + 3);
 
-        EntityTeleportEvent.EnderPearl magnetoPearl = EventHooks.onEnderPearlLand(magneto, target.x, target.y, target.z,
+        boolean magnetoPearl = Platform.get().hooks().enderPearlTeleportCancelled(magneto, target.x, target.y, target.z,
                 new ThrownEnderpearl(helper.getLevel(), magneto), 5.0F, BlockHitResult.miss(target, net.minecraft.core.Direction.UP, magneto.blockPosition()));
-        check(magnetoPearl.isCanceled(), "a hero can't pearl into the Hex");
+        check(magnetoPearl, "a hero can't pearl into the Hex");
         check(magneto.isAlive(), "and isn't hurt by trying");
 
-        EntityTeleportEvent.EnderPearl nobodyPearl = EventHooks.onEnderPearlLand(nobody, target.x, target.y, target.z,
+        boolean nobodyPearl = Platform.get().hooks().enderPearlTeleportCancelled(nobody, target.x, target.y, target.z,
                 new ThrownEnderpearl(helper.getLevel(), nobody), 5.0F, BlockHitResult.miss(target, net.minecraft.core.Direction.UP, nobody.blockPosition()));
-        check(nobodyPearl.isCanceled(), "the unlucky player doesn't arrive");
+        check(nobodyPearl, "the unlucky player doesn't arrive");
         check(nobody.isDeadOrDying(), "teleporting across the wall faces the same price (death chance forced to 100%)");
 
-        EntityTeleportEvent.EnderPearl wandaPearl = EventHooks.onEnderPearlLand(wanda, target.x, target.y, target.z,
+        boolean wandaPearl = Platform.get().hooks().enderPearlTeleportCancelled(wanda, target.x, target.y, target.z,
                 new ThrownEnderpearl(helper.getLevel(), wanda), 5.0F, BlockHitResult.miss(target, net.minecraft.core.Direction.UP, wanda.blockPosition()));
-        check(!wandaPearl.isCanceled(), "Wanda goes where she likes");
+        check(!wandaPearl, "Wanda goes where she likes");
         helper.succeed();
     }
 

@@ -22,6 +22,7 @@ import com.kolodkingal.enhanced.custom.HeroDamage;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -47,8 +48,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -98,10 +97,10 @@ public final class CustomSpeedTests {
     /** Every row of the four heroes has its name and line (and its Sneak variant's name iff it has one) in both languages. */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyRowOfSpeedAndMetalIsNamedInBothLanguages(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
         for (String name : List.of("en_us", "he_il")) {
-            Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+            Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json")
+                    .orElseThrow();
             JsonObject lang = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
             for (Power hero : HEROES) {
                 for (HeroAbility a : HeroAbility.of(hero)) {

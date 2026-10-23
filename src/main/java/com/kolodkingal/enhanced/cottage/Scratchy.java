@@ -66,12 +66,12 @@ public final class Scratchy {
 
     /** Whether an entity is a cottage's Scratchy. */
     public static boolean is(Entity entity) {
-        return entity instanceof Rabbit && entity.getPersistentData().contains(TAG);
+        return entity instanceof Rabbit && ModAttachments.PERSISTENT_DATA.get(entity).contains(TAG);
     }
 
     /** The key of the cottage a Scratchy belongs to. */
     public static long cottageOf(Entity entity) {
-        return entity.getPersistentData().getLong(TAG);
+        return ModAttachments.PERSISTENT_DATA.get(entity).getLong(TAG);
     }
 
     /** The cottage's Scratchy, if he is loaded and alive. */
@@ -136,7 +136,7 @@ public final class Scratchy {
         rabbit.setVariant(Rabbit.Variant.BROWN);
         rabbit.setCustomName(Component.translatable(NAME));
         rabbit.setPersistenceRequired();
-        rabbit.getPersistentData().putLong(TAG, cottage.key());
+        ModAttachments.PERSISTENT_DATA.get(rabbit).putLong(TAG, cottage.key());
         rabbit.moveTo(hutch.getX() + 0.5, hutch.getY(), hutch.getZ() + 0.5, level.getRandom().nextFloat() * 360.0F,
                 0.0F);
         return rabbit;
