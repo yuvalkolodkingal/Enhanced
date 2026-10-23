@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.build.BuildGrammar;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
+import com.kolodkingal.enhanced.platform.client.Keys;
 import com.kolodkingal.enhanced.platform.event.Side;
 import com.kolodkingal.enhanced.platform.event.Subscribe;
 import com.kolodkingal.enhanced.platform.event.Subscriber;
@@ -299,8 +300,8 @@ public final class BuildInput {
     private static void pressed(InputConstants.Key key) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        // TODO(port seam) S1b: NeoForge's KeyMapping extension method until the platform has one.
-        if (player != null && mc.screen == null && BuildClient.buildMode() && mc.options.keyPickItem.isActiveAndMatches(key)) {
+        if (player != null && mc.screen == null && BuildClient.buildMode() && Keys.matches(mc.options.keyPickItem,
+                key)) {
             BuildClient.pick(player);
         }
     }

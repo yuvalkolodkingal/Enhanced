@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.HudLayerIds;
 import com.kolodkingal.enhanced.client.build.HudDraw.Picture;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.client.HudHeights;
 import com.kolodkingal.enhanced.platform.event.Side;
 import com.kolodkingal.enhanced.platform.event.Subscribe;
 import com.kolodkingal.enhanced.platform.event.Subscriber;
@@ -785,8 +786,7 @@ public final class BuildHud implements LayeredDraw.Layer {
         }
         if (left < width / 2 + 91 + 4) {
             // It would run into the hotbar: over the food bar instead.
-            // TODO(port seam) S3: NeoForge's Gui.leftHeight/rightHeight until the platform has them.
-            bottom = Math.min(bottom, height - Math.max(22, mc.gui.rightHeight) - 3);
+            bottom = Math.min(bottom, height - Math.max(22, HudHeights.right()) - 3);
         }
         int top = bottom - h;
         stripLeft = left;
@@ -836,8 +836,7 @@ public final class BuildHud implements LayeredDraw.Layer {
         int w = pad + pw + 8 + font.width(text) + pad + 1;
         int h = pad + arrow + ph + pad;
         // Over the action bar, which stands over the hearts and the food (or 68 above the bottom).
-        // TODO(port seam) S3: NeoForge's Gui.leftHeight/rightHeight until the platform has them.
-        int bottom = height - Math.max(68, Math.max(mc.gui.leftHeight, mc.gui.rightHeight) + 9) - 7;
+        int bottom = height - Math.max(68, Math.max(HudHeights.left(), HudHeights.right()) + 9) - 7;
         int left = width / 2 - w / 2;
         int top = bottom - h;
         if (badge != null && top < badge[1] + badge[3] && bottom > badge[1] && left < badge[0] + badge[2] && left + w > badge[0]) {

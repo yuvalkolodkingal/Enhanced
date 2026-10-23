@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.screen;
 import com.kolodkingal.enhanced.client.KeyBindings;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.network.StoneActionPayload;
+import com.kolodkingal.enhanced.platform.client.Keys;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.stones.GauntletContents;
@@ -95,8 +96,7 @@ public class StoneWheelScreen extends Screen {
             onClose();
             return;
         }
-        // TODO(port seam) S1b: NeoForge's KeyMapping extension method until the platform has one.
-        InputConstants.Key key = KeyBindings.STONE_WHEEL.getKey();
+        InputConstants.Key key = Keys.boundKey(KeyBindings.STONE_WHEEL);
         if (key.getType() == InputConstants.Type.KEYSYM && !InputConstants.isKeyDown(mc.getWindow().getWindow(),
                 key.getValue())) {
             choose();

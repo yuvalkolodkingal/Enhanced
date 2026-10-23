@@ -324,8 +324,7 @@ public final class SpiderMotion {
         }
         PowerData data = Powers.get(player);
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
-            // TODO(port seam) S1b: NeoForge's KeyMapping extension method until the platform has one.
-            if (KeyBindings.ability(i).isActiveAndMatches(key)) {
+            if (com.kolodkingal.enhanced.platform.client.Keys.matches(KeyBindings.ability(i), key)) {
                 // (Sneak as the keys are now: a press of Sneak and G together comes before the tick that crouches him.)
                 boolean sneaking = player.isShiftKeyDown() || mc.options.keyShift.isDown();
                 HeroKit kit = data.kit();

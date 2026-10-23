@@ -1,14 +1,13 @@
 package com.kolodkingal.enhanced.client.build;
 
 import com.kolodkingal.enhanced.client.KeyBindings;
+import com.kolodkingal.enhanced.platform.client.KeyContext;
+import com.kolodkingal.enhanced.platform.client.KeyMod;
+import com.kolodkingal.enhanced.platform.client.Keys;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-// TODO(port seam) S1: a common key conflict context (notes/l6.md); NeoForge's until it lands.
-import net.neoforged.neoforge.client.settings.IKeyConflictContext;
-import net.neoforged.neoforge.client.settings.KeyConflictContext;
-import net.neoforged.neoforge.client.settings.KeyModifier;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -39,35 +38,35 @@ import org.lwjgl.glfw.GLFW;
  */
 public final class BuildKeys {
     /** Y: build mode on or off (tap), the Spell Wheel (hold). */
-    public static final KeyMapping MAGIC = new KeyMapping("key.enhanced.build_magic", KeyConflictContext.IN_GAME,
+    public static final KeyMapping MAGIC = Keys.newKey("key.enhanced.build_magic", KeyContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, KeyBindings.CATEGORY);
     /** Left Alt, held: the scroll wheel turns the second knob (a style, a shape, a turn, a gap). */
-    public static final KeyMapping MORE = create("build_more", Context.BUILD, KeyModifier.NONE, GLFW.GLFW_KEY_LEFT_ALT);
+    public static final KeyMapping MORE = create("build_more", Context.BUILD, KeyMod.NONE, GLFW.GLFW_KEY_LEFT_ALT);
     /** Ctrl + Z: undo (D-B 12.2), in build mode or out of it. */
-    public static final KeyMapping UNDO = create("build_undo", Context.WITCH, KeyModifier.CONTROL, GLFW.GLFW_KEY_Z);
+    public static final KeyMapping UNDO = create("build_undo", Context.WITCH, KeyMod.CONTROL, GLFW.GLFW_KEY_Z);
     /** Ctrl + Y: redo, in build mode or out of it. */
-    public static final KeyMapping REDO = create("build_redo", Context.WITCH, KeyModifier.CONTROL, GLFW.GLFW_KEY_Y);
+    public static final KeyMapping REDO = create("build_redo", Context.WITCH, KeyMod.CONTROL, GLFW.GLFW_KEY_Y);
     /** Ctrl + R: turn a ghost a quarter clockwise. */
-    public static final KeyMapping TURN = create("build_turn", Context.BUILD, KeyModifier.CONTROL, GLFW.GLFW_KEY_R);
+    public static final KeyMapping TURN = create("build_turn", Context.BUILD, KeyMod.CONTROL, GLFW.GLFW_KEY_R);
     /** Ctrl + F: flip a ghost along the way you look. */
-    public static final KeyMapping FLIP = create("build_flip", Context.BUILD, KeyModifier.CONTROL, GLFW.GLFW_KEY_F);
+    public static final KeyMapping FLIP = create("build_flip", Context.BUILD, KeyMod.CONTROL, GLFW.GLFW_KEY_F);
     /** Ctrl + C: copy the box (the spell becomes Copy). */
-    public static final KeyMapping COPY = create("build_copy", Context.BUILD, KeyModifier.CONTROL, GLFW.GLFW_KEY_C);
+    public static final KeyMapping COPY = create("build_copy", Context.BUILD, KeyMod.CONTROL, GLFW.GLFW_KEY_C);
     /** Ctrl + X: pick the box up (the spell becomes Move). */
-    public static final KeyMapping CUT = create("build_cut", Context.BUILD, KeyModifier.CONTROL, GLFW.GLFW_KEY_X);
+    public static final KeyMapping CUT = create("build_cut", Context.BUILD, KeyMod.CONTROL, GLFW.GLFW_KEY_X);
     /** Ctrl + V: the pocket's ghost back. */
-    public static final KeyMapping PASTE = create("build_paste", Context.BUILD, KeyModifier.CONTROL, GLFW.GLFW_KEY_V);
+    public static final KeyMapping PASTE = create("build_paste", Context.BUILD, KeyMod.CONTROL, GLFW.GLFW_KEY_V);
     /** Delete: vanish everything in the box (with its hold). */
-    public static final KeyMapping VANISH = create("build_vanish", Context.BUILD, KeyModifier.NONE, GLFW.GLFW_KEY_DELETE);
+    public static final KeyMapping VANISH = create("build_vanish", Context.BUILD, KeyMod.NONE, GLFW.GLFW_KEY_DELETE);
 
     /** Ctrl + I (3.2): the Scarlet Witch's Instant switch on or off; her spells, undos and redos are then written all at once. */
-    public static final KeyMapping INSTANT = create("build_instant", Context.BUILD, KeyModifier.CONTROL, GLFW.GLFW_KEY_I);
+    public static final KeyMapping INSTANT = create("build_instant", Context.BUILD, KeyMod.CONTROL, GLFW.GLFW_KEY_I);
 
     /** The eleven, in the order of the spec's table (the Instant switch of 3.2 last). */
     public static final KeyMapping[] ALL = {MAGIC, MORE, UNDO, REDO, TURN, FLIP, COPY, CUT, PASTE, VANISH, INSTANT};
 
     /** When the build mappings are read. */
-    public enum Context implements IKeyConflictContext {
+    public enum Context implements KeyContext {
         /**
          * No screen open and build mode on. It conflicts with itself and with {@code IN_GAME}, so the Controls screen shows
          * a real clash when a build key is rebound onto a hero key, and a build key without Ctrl (Delete, Left Alt) still
@@ -76,12 +75,12 @@ public final class BuildKeys {
         BUILD {
             @Override
             public boolean isActive() {
-                return KeyConflictContext.IN_GAME.isActive() && BuildClient.buildMode();
+                return KeyContext.IN_GAME.isActive() && BuildClient.buildMode();
             }
 
             @Override
-            public boolean conflicts(IKeyConflictContext other) {
-                return other == this || other == KeyConflictContext.IN_GAME;
+            public boolean conflicts(KeyContext other) {
+                return other == this || other == KeyContext.IN_GAME;
             }
         },
         /**
@@ -92,18 +91,20 @@ public final class BuildKeys {
             @Override
             public boolean isActive() {
                 LocalPlayer player = Minecraft.getInstance().player;
-                return KeyConflictContext.IN_GAME.isActive() && player != null && BuildClient.isBuilder(BuildClient.hero(player));
+                return KeyContext.IN_GAME.isActive() && player != null
+                        && BuildClient.isBuilder(BuildClient.hero(player));
             }
 
             @Override
-            public boolean conflicts(IKeyConflictContext other) {
-                return other == this || other == BUILD || other == KeyConflictContext.IN_GAME;
+            public boolean conflicts(KeyContext other) {
+                return other == this || other == BUILD || other == KeyContext.IN_GAME;
             }
         }
     }
 
-    private static KeyMapping create(String name, IKeyConflictContext context, KeyModifier modifier, int key) {
-        return new KeyMapping("key.enhanced." + name, context, modifier, InputConstants.Type.KEYSYM, key, KeyBindings.CATEGORY);
+    private static KeyMapping create(String name, KeyContext context, KeyMod modifier, int key) {
+        return Keys.newKey("key.enhanced." + name, context, modifier, InputConstants.Type.KEYSYM, key,
+                KeyBindings.CATEGORY);
     }
 
     private BuildKeys() {

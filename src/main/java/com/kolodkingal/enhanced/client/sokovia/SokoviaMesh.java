@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.sokovia;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.client.BlockModels;
 import com.kolodkingal.enhanced.ultron.SokoviaTemplate;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -18,7 +19,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -32,8 +32,6 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-// TODO(port seam) S2: drawing a block model per render type (notes/l6.md); NeoForge's until it lands.
-import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.shaders.Uniform;
 
@@ -118,16 +116,12 @@ final class SokoviaMesh implements AutoCloseable {
                 if (state == null || state.getRenderShape() != RenderShape.MODEL) {
                     continue;
                 }
-                BakedModel model = dispatcher.getBlockModel(state);
-                ModelData data = model.getModelData(view, pos, state, ModelData.EMPTY);
                 random.setSeed(state.getSeed(pos));
-                for (RenderType type : model.getRenderTypes(state, random, data)) {
-                    Layer layer = layers.computeIfAbsent(type, Layer::new);
-                    pose.pushPose();
-                    pose.translate(pos.getX() - origin.getX(), pos.getY() - origin.getY(), pos.getZ() - origin.getZ());
-                    dispatcher.renderBatched(state, pos, view, pose, layer.builder, true, random, data, type);
-                    pose.popPose();
-                }
+                pose.pushPose();
+                pose.translate(pos.getX() - origin.getX(), pos.getY() - origin.getY(), pos.getZ() - origin.getZ());
+                BlockModels.renderBatched(dispatcher, state, pos, view, pose, true, random,
+                        type -> layers.computeIfAbsent(type, Layer::new).builder);
+                pose.popPose();
             }
         } finally {
             ModelBlockRenderer.clearCache();

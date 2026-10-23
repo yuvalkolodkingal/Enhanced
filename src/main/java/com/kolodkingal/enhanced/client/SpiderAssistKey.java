@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
+import com.kolodkingal.enhanced.platform.client.KeyContext;
+import com.kolodkingal.enhanced.platform.client.Keys;
 import com.kolodkingal.enhanced.platform.event.Side;
 import com.kolodkingal.enhanced.platform.event.Subscribe;
 import com.kolodkingal.enhanced.platform.event.Subscriber;
@@ -11,8 +13,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-// TODO(port seam) S1: a common key conflict context (notes/l6.md); NeoForge's until it lands.
-import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -22,7 +22,8 @@ import org.lwjgl.glfw.GLFW;
  */
 @Subscriber(side = Side.CLIENT)
 public final class SpiderAssistKey {
-    public static final KeyMapping WEB_ASSIST = new KeyMapping("key.enhanced.web_assist", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
+    public static final KeyMapping WEB_ASSIST = Keys.newKey("key.enhanced.web_assist", KeyContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_J, KeyBindings.CATEGORY);
 
     /** The key's registration (an event of the mod's own bus, kept apart from the game's). */

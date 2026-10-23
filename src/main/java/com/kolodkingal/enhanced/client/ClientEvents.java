@@ -30,6 +30,7 @@ import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.ChangeLookPayload;
 import com.kolodkingal.enhanced.network.HexActionPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.client.Keys;
 import com.kolodkingal.enhanced.platform.event.LevelEvent;
 import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
 import com.kolodkingal.enhanced.platform.event.Side;
@@ -91,8 +92,7 @@ public final class ClientEvents {
     private static void pressed(com.mojang.blaze3d.platform.InputConstants.Key input) {
         Minecraft mc = Minecraft.getInstance();
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
-            // TODO(port seam) S1b: NeoForge's KeyMapping extension method until the platform has one.
-            if (PRESS_SNEAK[i] == 0 && KeyBindings.ability(i).isActiveAndMatches(input)) {
+            if (PRESS_SNEAK[i] == 0 && Keys.matches(KeyBindings.ability(i), input)) {
                 PRESS_SNEAK[i] = (byte) (mc.options.keyShift.isDown() ? 2 : 1);
             }
         }
