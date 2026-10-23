@@ -20,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -28,11 +29,14 @@ import java.util.List;
 
 /**
  * One of the Mark 85's <b>nanotech drones</b> (3.8, lane L4, PLAN 6.2; Eilon's "nanotech drones appear behind you and
- * fire very strong laser beams"). Two form behind his shoulders (Sneak + N) and follow him there for {@code droneTicks}
- * 400; every {@code droneShotGap} 15 ticks each fires a laser flash ({@code drone_laser}, {@code droneDamage} 6) at the
- * nearest hostile or attacker of his within {@code droneRange} 20 that it can see (never a player without PvP, never a
- * pet, never a passive creature: {@code AreaTargets}' rule). It has no health: a hit only makes it flicker. It ends
- * with him (his time, his death or logout, another dimension, the suit off) and is never saved.
+ * fire very strong laser beams"). Since 3.8.3 each drone is one side's <b>wing unit</b> of the Endgame look: two curved
+ * crescent blades fanned out beside his arm ({@link WingFormation}), so the two drones (Sneak + N) make four blades,
+ * two on each side. They follow him for {@code droneTicks} 400; every {@code droneShotGap} 15 ticks each drone fires a
+ * laser flash ({@code drone_laser}, {@code droneDamage} 6) from its inner and outer blade in turn (the middle of the
+ * blade's inner edge) at the nearest hostile or attacker of his within {@code droneRange} 20 that it can see (never a
+ * player without PvP, never a pet, never a passive creature: {@code AreaTargets}' rule). The same shots as before, only
+ * from four blades: the damage per second is unchanged. It has no health: a hit only makes it flicker. It ends with him
+ * (his time, his death or logout, another dimension, the suit off) and is never saved.
  */
 public class NanoDroneEntity extends Entity {
     private static final EntityDataAccessor<Integer> OWNER = SynchedEntityData.defineId(NanoDroneEntity.class,
@@ -45,9 +49,10 @@ public class NanoDroneEntity extends Entity {
     /** How long a hit's flicker lasts. */
     public static final int FLICKER_TICKS = 10;
 
-    /** When it goes (game time), and its next shot's tick (its age). */
+    /** When it goes (game time), its next shot's tick (its age), and its shots so far (which blade fires next). */
     private long until;
     private int nextShot;
+    private int shots;
 
     public NanoDroneEntity(EntityType<? extends NanoDroneEntity> type, Level level) {
         super(type, level);
@@ -56,7 +61,8 @@ public class NanoDroneEntity extends Entity {
     }
 
     /**
-     * A new drone of {@code owner} in shoulder slot {@code slot} (0 right, 1 left), gone at game time {@code until}.
+     * A new drone of {@code owner} in slot {@code slot} (0 his right wing, 1 his left; {@link WingFormation#side}),
+     * gone at game time {@code until}.
      */
     public static NanoDroneEntity of(ServerPlayer owner, int slot, long until, int firstShot) {
         NanoDroneEntity drone = new NanoDroneEntity(com.kolodkingal.enhanced.registry.ModEntities.NANO_DRONE.get(),
@@ -93,14 +99,19 @@ public class NanoDroneEntity extends Entity {
         return since < 0.0F || since > FLICKER_TICKS ? 0.0F : 1.0F - since / FLICKER_TICKS;
     }
 
-    /** Where it hovers: behind his shoulder (its slot's side), a little above it. */
+    /** Where it hovers: the middle of its two blades beside his arm ({@link WingFormation#centre}). */
     public Vec3 post(Player owner) {
-        float scale = owner.getScale();
-        float yaw = owner.yBodyRot;
-        Vec3 back = Vec3.directionFromRotation(0.0F, yaw).scale(-0.9 * scale);
-        Vec3 side = Vec3.directionFromRotation(0.0F, yaw + (slot() == 0 ? 90.0F : -90.0F)).scale(0.75 * scale);
-        double bob = Math.sin((tickCount + slot() * 10) * 0.15) * 0.06;
-        return owner.position().add(0.0, 1.75 * scale + bob, 0.0).add(back).add(side);
+        return WingFormation.centre(owner, slot(), level().getGameTime());
+    }
+
+    /** Where blade {@code blade} (0 inner, 1 outer) of this drone fires from now: its inner edge's middle. */
+    public Vec3 muzzle(Player owner, int blade) {
+        return WingFormation.muzzle(owner, slot(), blade, level().getGameTime());
+    }
+
+    /** The blade (0 inner, 1 outer) that fires the next shot. */
+    public int nextBlade() {
+        return shots % WingFormation.BLADES;
     }
 
     @Override
@@ -120,7 +131,7 @@ public class NanoDroneEntity extends Entity {
         // Follow smoothly (a quick catch-up when far: he flies fast).
         Vec3 next = now.distanceToSqr(want) > 64.0 ? want : now.add(want.subtract(now).scale(0.45));
         setPos(next.x, next.y, next.z);
-        setYRot(Mth.rotLerp(0.4F, getYRot(), owner.getYRot()));
+        setYRot(Mth.rotLerp(0.4F, getYRot(), owner.yBodyRot));
         if (tickCount >= nextShot) {
             nextShot = tickCount + NanoTech.cfg(IronManConfig.MARK85_DRONE_SHOT_GAP, 15);
             shoot(owner);
@@ -128,17 +139,19 @@ public class NanoDroneEntity extends Entity {
     }
 
     /**
-     * A laser flash at the nearest foe it can see, if any. (3.8.2) A Chaos Shield in the way stops it at its surface:
-     * a flash there, and the shield pays the shot.
+     * A laser flash at the nearest foe it can see, if any, from its next blade's inner edge (3.8.3). (3.8.2) A Chaos
+     * Shield in the way stops it at its surface: a flash there, and the shield pays the shot.
      */
     @Nullable
     LivingEntity shoot(ServerPlayer owner) {
-        LivingEntity target = target(owner);
+        int blade = nextBlade();
+        Vec3 from = muzzle(owner, blade);
+        LivingEntity target = target(owner, from);
         if (target == null) {
             return null;
         }
+        shots++;
         ServerLevel level = (ServerLevel) level();
-        Vec3 from = position().add(0.0, getBbHeight() * 0.5, 0.0);
         Vec3 to = target.position().add(0.0, target.getBbHeight() * 0.5, 0.0);
         float damage = (float) NanoTech.cfg(IronManConfig.MARK85_DRONE_DAMAGE, 6.0);
         WandaAbilities.ShieldStop wall = NanoTech.wallAcross(owner, from, to);
@@ -148,20 +161,20 @@ public class NanoDroneEntity extends Entity {
         } else {
             NanoTech.hurt(owner, target, ModDamageTypes.DRONE_LASER, damage);
         }
-        NanoTech.send(level, this, IronFxPayload.DRONE_SHOT, List.of(from, to), owner.getId());
+        // The clients draw the laser from the blade as they see it ({@code arg}: which blade).
+        NanoTech.send(level, this, IronFxPayload.DRONE_SHOT, List.of(from, to), blade);
         NanoTech.sound(level, from, ModSounds.DRONE_LASER.get(), 0.7F, 1.0F + level.random.nextFloat() * 0.2F);
         return target;
     }
 
-    /** The nearest hostile or attacker of his it may shoot within range and sight. */
+    /** The nearest hostile or attacker of his it may shoot from {@code from} within range and sight. */
     @Nullable
-    LivingEntity target(ServerPlayer owner) {
+    LivingEntity target(ServerPlayer owner, Vec3 from) {
         double range = NanoTech.cfg(IronManConfig.MARK85_DRONE_RANGE, 20.0);
-        Vec3 from = position().add(0.0, getBbHeight() * 0.5, 0.0);
         LivingEntity attacker = owner.getLastHurtByMob();
         LivingEntity best = null;
         double bestDist = Double.MAX_VALUE;
-        for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(range),
+        for (LivingEntity e : level().getEntitiesOfClass(LivingEntity.class, new AABB(from, from).inflate(range),
                 e -> HomingMissiles.hostile(owner, e) || e == attacker && NanoTech.mayHurt(owner, e))) {
             Vec3 middle = e.position().add(0.0, e.getBbHeight() * 0.5, 0.0);
             double dist = middle.distanceTo(from);
@@ -186,6 +199,12 @@ public class NanoDroneEntity extends Entity {
             entityData.set(FLICKER, tickCount);
         }
         return false;
+    }
+
+    /** Seen from far: the wings are big (a second player sees them across a battle). */
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return distance < 96.0 * 96.0;
     }
 
     @Override

@@ -360,7 +360,7 @@ public final class ChaosShieldIronManTests {
                 check(paid >= damage - 1.0E-3F && Math.abs(paid / damage - Math.round(paid / damage)) < 1.0E-3,
                         "each laser costs the shield a shot: " + paid);
                 NanoDroneEntity drone = drones.get(0);
-                Vec3 from = drone.position().add(0, drone.getBbHeight() * 0.5, 0);
+                Vec3 from = drone.muzzle(tony, 0);
                 WandaAbilities.ShieldStop stop = NanoTech.wallAcross(tony, from, centre(wanda));
                 check(stop != null && stop.owner() == wanda, "the laser runs into her shield");
                 onTheShield(wanda, stop.point(), from, "the drone's laser");
