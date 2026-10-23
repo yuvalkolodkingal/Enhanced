@@ -1,8 +1,18 @@
 package com.kolodkingal.enhanced.thanos;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ThanosAbilities;
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEntityUseItemEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -12,17 +22,6 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 /**
  * The Thanos lane's own events: it registers the fight and the summoning when the mod loads, and gives the three
@@ -32,10 +31,10 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
  * his tick cannot see: the damage he takes (the Titan healing factor waits, a hard blow tears the Soul Drain's chain)
  * and the projectile that is too fast for the Reality Veil's tick.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class ThanosEvents {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(ThanosSummon::register);
     }
@@ -44,7 +43,7 @@ public final class ThanosEvents {
      * The damage a creature of the stones takes: nothing at all in the Soul World (unless it cannot be stopped), and in
      * stone only {@code petrifyDamageFactor} of it. Late, so that every defence has already had its say.
      */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onStoneDamage(LivingIncomingDamageEvent event) {
         LivingEntity victim = event.getEntity();
         if (victim.level().isClientSide() || event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
@@ -58,7 +57,7 @@ public final class ThanosEvents {
     }
 
     /** Thanos the hero was hurt: his healing factor waits a while, and a hard enough blow tears a chain. */
-    @SubscribeEvent
+    @Subscribe
     public static void onHeroHurt(LivingDamageEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).acts(Power.THANOS)) {
             ThanosAbilities.hurt(player, event.getNewDamage());
@@ -66,7 +65,7 @@ public final class ThanosEvents {
     }
 
     /** A projectile about to hit Thanos while the Reality Veil is drawn is a bubble that pops instead. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         if (!event.getProjectile().level().isClientSide() && event.getRayTraceResult() instanceof EntityHitResult hit
                 && hit.getEntity() instanceof ServerPlayer player && ThanosAbilities.veilTakes(player, event.getProjectile())) {
@@ -75,7 +74,7 @@ public final class ThanosEvents {
     }
 
     /** Stone and time do not take on what cannot be held. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
         LivingEntity entity = event.getEntity();
         if (!entity.getType().is(ModTags.SPELLBOUND_IMMUNE)) {
@@ -92,21 +91,21 @@ public final class ThanosEvents {
         return entity.hasEffect(ModEffects.PETRIFIED) || entity.hasEffect(ModEffects.SOULWORLD);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onAttack(AttackEntityEvent event) {
         if (held(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onUseItem(LivingEntityUseItemEvent.Start event) {
         if (held(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (held(event.getEntity())) {
             event.setCancellationResult(InteractionResult.FAIL);
@@ -114,7 +113,7 @@ public final class ThanosEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (held(event.getEntity())) {
             event.setCancellationResult(InteractionResult.FAIL);
@@ -122,14 +121,14 @@ public final class ThanosEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         if (held(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if (held(event.getEntity())) {
             event.setCancellationResult(InteractionResult.FAIL);

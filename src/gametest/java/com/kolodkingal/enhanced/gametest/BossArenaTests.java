@@ -1,7 +1,12 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.boss.BossArena;
+import com.kolodkingal.enhanced.ability.AbilityHandler;
+import com.kolodkingal.enhanced.ability.BlockLifting;
+import com.kolodkingal.enhanced.ability.LokiAbilities;
+import com.kolodkingal.enhanced.ability.PowerTicker;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
+import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
@@ -9,12 +14,16 @@ import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
-import com.kolodkingal.enhanced.ability.AbilityHandler;
-import com.kolodkingal.enhanced.ability.BlockLifting;
-import com.kolodkingal.enhanced.ability.LokiAbilities;
-import com.kolodkingal.enhanced.ability.PowerTicker;
-import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EntityMobGriefingEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTeleportEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LivingDestroyBlockEvent;
+import com.kolodkingal.enhanced.platform.event.MobSpawnEvent;
+import com.kolodkingal.enhanced.platform.event.PistonEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -40,16 +49,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.entity.EntityMobGriefingEvent;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent;
-import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.PistonEvent;
 
 import java.util.List;
 
@@ -89,21 +88,22 @@ public final class BossArenaTests {
         for (BlockPos pos : List.of(in, out)) {
             boolean inside = pos == in;
             BlockEvent.BreakEvent broke = new BlockEvent.BreakEvent(level, pos, dirt, player);
-            NeoForge.EVENT_BUS.post(broke);
-            BlockEvent.EntityPlaceEvent placed = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(level.dimension(), level, pos), dirt, player);
-            NeoForge.EVENT_BUS.post(placed);
+            Events.post(broke);
+            BlockEvent.EntityPlaceEvent placed =
+                    new BlockEvent.EntityPlaceEvent(level, pos, level.getBlockState(pos), dirt, player);
+            Events.post(placed);
             BlockEvent.FluidPlaceBlockEvent flowed = new BlockEvent.FluidPlaceBlockEvent(level, pos, pos.above(), Blocks.COBBLESTONE.defaultBlockState());
-            NeoForge.EVENT_BUS.post(flowed);
+            Events.post(flowed);
             PistonEvent.Pre pushed = new PistonEvent.Pre(level, pos, Direction.UP, PistonEvent.PistonMoveType.EXTEND);
-            NeoForge.EVENT_BUS.post(pushed);
+            Events.post(pushed);
             Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE,
                     new Vec3(inside ? 12.5 : 20.5, FLOOR, 12.5));
             LivingDestroyBlockEvent ate = new LivingDestroyBlockEvent(zombie, pos, dirt);
-            NeoForge.EVENT_BUS.post(ate);
+            Events.post(ate);
             EntityMobGriefingEvent griefed = new EntityMobGriefingEvent(level, zombie);
-            NeoForge.EVENT_BUS.post(griefed);
+            Events.post(griefed);
             MobSpawnEvent.PositionCheck spawned = new MobSpawnEvent.PositionCheck(zombie, level, MobSpawnType.NATURAL, null);
-            NeoForge.EVENT_BUS.post(spawned);
+            Events.post(spawned);
             String where = inside ? "inside" : "outside";
             check(broke.isCanceled() == inside, "breaking a block " + where);
             check(placed.isCanceled() == inside, "placing a block " + where);
@@ -119,10 +119,10 @@ public final class BossArenaTests {
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(in), Direction.UP, in, false);
         PlayerInteractEvent.RightClickBlock bucket = new PlayerInteractEvent.RightClickBlock(player, InteractionHand.MAIN_HAND, in, hit);
-        NeoForge.EVENT_BUS.post(bucket);
+        Events.post(bucket);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STICK));
         PlayerInteractEvent.RightClickBlock stick = new PlayerInteractEvent.RightClickBlock(player, InteractionHand.MAIN_HAND, in, hit);
-        NeoForge.EVENT_BUS.post(stick);
+        Events.post(stick);
         check(bucket.isCanceled() && !stick.isCanceled(), "a bucket is stopped, a stick is not");
         check("message.enhanced.boss.protected".equals(lastActionBarKey(player)), "and the player is told why");
         helper.succeed();
@@ -388,14 +388,14 @@ public final class BossArenaTests {
         check(HexManager.onTeleport(level, fighter, inside) && HexManager.onTeleport(level, stranger, outside), "and allows the rest");
 
         EntityTeleportEvent.ChorusFruit fruit = new EntityTeleportEvent.ChorusFruit(fighter, outside.x, outside.y, outside.z);
-        NeoForge.EVENT_BUS.post(fruit);
+        Events.post(fruit);
         EntityTeleportEvent.ChorusFruit nearby = new EntityTeleportEvent.ChorusFruit(fighter, inside.x, inside.y, inside.z);
-        NeoForge.EVENT_BUS.post(nearby);
+        Events.post(nearby);
         check(fruit.isCanceled() && !nearby.isCanceled(), "a Chorus Fruit cannot take the fighter out");
         EntityTravelToDimensionEvent portal = new EntityTravelToDimensionEvent(fighter, Level.NETHER);
-        NeoForge.EVENT_BUS.post(portal);
+        Events.post(portal);
         EntityTravelToDimensionEvent strangerPortal = new EntityTravelToDimensionEvent(stranger, Level.NETHER);
-        NeoForge.EVENT_BUS.post(strangerPortal);
+        Events.post(strangerPortal);
         check(portal.isCanceled() && !strangerPortal.isCanceled(), "nor can a portal");
 
         // Whoever is already outside the cylinder (but near enough to fight) is free to go.
@@ -420,7 +420,7 @@ public final class BossArenaTests {
                 "Thanos's fighters teleport as they like");
         check(HexManager.onTeleport(level, fighter, outside), "through the Hex gate too");
         EntityTravelToDimensionEvent portal = new EntityTravelToDimensionEvent(fighter, Level.NETHER);
-        NeoForge.EVENT_BUS.post(portal);
+        Events.post(portal);
         check(!portal.isCanceled(), "and by portal");
         helper.succeed();
     }

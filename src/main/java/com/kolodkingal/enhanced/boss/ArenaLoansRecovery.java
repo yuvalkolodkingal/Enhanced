@@ -1,6 +1,11 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStartingEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -16,11 +21,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ import java.util.stream.Stream;
  * lists repairs already made changes nothing there. A restored journal is kept until two saves of its dimension hold the
  * restored ground (R48), then deleted.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class ArenaLoansRecovery {
     /** A journal read from the disk: the fight it was written for, its dimension and what it says. */
     private record Journal(UUID fight, ResourceKey<Level> dimension, CompoundTag journal) {
@@ -65,13 +65,13 @@ public final class ArenaLoansRecovery {
     /** The journals restored, by fight. */
     private static final Map<UUID, Restored> RESTORED = new HashMap<>();
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onServerStarting(ServerStartingEvent event) {
         recoverAll(event.getServer());
     }
 
     /** The first tick of a dimension with journals waiting restores them, before the island's recovery takes its turn. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (!WAITING.isEmpty() && event.getLevel() instanceof ServerLevel level) {
             restore(level);

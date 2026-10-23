@@ -19,6 +19,8 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -26,6 +28,7 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -55,9 +58,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.damagesource.DamageContainer;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,8 +135,8 @@ public final class ApocalypseTests {
 
     /** Offers a blow of this size to the damage chain as it would come to the target, and reports what is left of it. */
     private static Blow blow(ServerPlayer target, DamageSource source, float amount) {
-        LivingIncomingDamageEvent event = new LivingIncomingDamageEvent(target, new DamageContainer(source, amount));
-        NeoForge.EVENT_BUS.post(event);
+        LivingIncomingDamageEvent event = new LivingIncomingDamageEvent(target, source, amount);
+        Events.post(event);
         return new Blow(event.isCanceled(), event.isCanceled() ? 0.0F : event.getAmount());
     }
 
@@ -1013,7 +1013,7 @@ public final class ApocalypseTests {
         }
         PowerTicker.tick(hero);
         assertNear(theirs.getDeltaMovement().length(), 0.5, 0.01, "an arrow that enters the storm is slowed to half");
-        check(theirs.getPersistentData().getBoolean(ApocalypseAbilities.SLOWED_TAG), "and marked");
+        check(ModAttachments.PERSISTENT_DATA.get(theirs).getBoolean(ApocalypseAbilities.SLOWED_TAG), "and marked");
         PowerTicker.tick(hero);
         assertNear(theirs.getDeltaMovement().length(), 0.5, 0.01, "once: it is not slowed again");
         assertNear(far.getDeltaMovement().length(), 1.0, 0.01, "an arrow beyond the storm is not slowed");

@@ -1,9 +1,15 @@
 package com.kolodkingal.enhanced.death;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.DeathMeetingConfig;
 import com.kolodkingal.enhanced.network.DeathMeetingPayload;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerRespawnPositionEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
@@ -20,13 +26,6 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerRespawnPositionEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -50,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * the Nether. A hardcore world and {@code doImmediateRespawn} keep vanilla's way: no offer, and the Nether is refused.
  * Server only.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class DeathMeeting {
     /** The choices of {@link DeathMeetingPayload.Choose}: start again at home (vanilla), or in the Nether. */
     public static final int AGAIN = 0;
@@ -160,7 +159,7 @@ public final class DeathMeeting {
      * The last handler of a death that happens (a cancelled one never gets here): Death's offer, before vanilla's
      * packet.
      */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @Subscribe(priority = Priority.LOWEST)
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             tell(player);
@@ -168,7 +167,7 @@ public final class DeathMeeting {
     }
 
     /** A player who logs in dead (he left on the death screen) meets her again. */
-    @SubscribeEvent
+    @Subscribe
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && player.isDeadOrDying()) {
             tell(player);
@@ -179,7 +178,7 @@ public final class DeathMeeting {
      * Where a player who chose the Nether stands up. Low priority: a handler that already changed his respawn wins. A
      * respawn that already goes to the Nether (his charged anchor there) stays as it is.
      */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onRespawnPosition(PlayerRespawnPositionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !TO_NETHER.contains(player.getUUID())
                 || event.isFromEndFight() || event.getDimensionTransition() != event.getOriginalDimensionTransition()) {
@@ -201,7 +200,7 @@ public final class DeathMeeting {
     }
 
     /** He wakes in the Nether: Fire Resistance, Rio's line, her green magic round him. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !ARRIVING.remove(player.getUUID())) {
             return;
@@ -224,12 +223,12 @@ public final class DeathMeeting {
                 0.5, 0.8, 0.0);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         ARRIVING.remove(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         TO_NETHER.clear();
         ARRIVING.clear();

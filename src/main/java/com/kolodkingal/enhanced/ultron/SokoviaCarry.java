@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -147,7 +148,7 @@ final class SokoviaCarry {
         if (riders.containsKey(entity.getUUID())) {
             return;
         }
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(entity);
         data.putUUID(MARK, fight);
         data.putBoolean(GRAVITY, entity.isNoGravity());
         entity.setNoGravity(true);
@@ -189,7 +190,7 @@ final class SokoviaCarry {
      * carrying was cut short (a crash): that is what a login does.
      */
     static void release(Entity entity) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(entity);
         if (data.hasUUID(MARK)) {
             entity.setNoGravity(data.getBoolean(GRAVITY));
             if (data.contains(AI) && entity instanceof Mob mob) {
@@ -213,7 +214,7 @@ final class SokoviaCarry {
     /** The id of the fight that carries this entity, or null. */
     @Nullable
     static UUID markOf(Entity entity) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(entity);
         return data.hasUUID(MARK) ? data.getUUID(MARK) : null;
     }
 

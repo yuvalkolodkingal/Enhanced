@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -18,8 +19,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
@@ -27,7 +28,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -192,7 +192,7 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
         AABB probe = getBoundingBox().inflate(0.3);
         for (Entity target : level().getEntities(this, probe, this::canHitEntity)) {
             EntityHitResult hit = new EntityHitResult(target, position());
-            if (!EventHooks.onProjectileImpact(this, hit)) {
+            if (!Platform.get().hooks().projectileImpactCancelled(this, hit)) {
                 hitTargetOrDeflectSelf(hit);
             }
             if (isRemoved()) {

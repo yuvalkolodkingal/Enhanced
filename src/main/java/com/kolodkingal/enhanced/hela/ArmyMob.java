@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.hela;
 
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -150,7 +151,8 @@ public abstract class ArmyMob extends Monster {
                 crumble();
                 return;
             }
-        } else if (BossFights.fightOf(this) == null && !getPersistentData().getBoolean(HelaArmy.LOOSE_TAG)) {
+        } else if (BossFights.fightOf(this) == null
+                && !ModAttachments.PERSISTENT_DATA.get(this).getBoolean(HelaArmy.LOOSE_TAG)) {
             // The boss's army outlives no fight (a fight's entities are discarded when it finishes; this is a stray one).
             crumble();
             return;

@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.ThanosConfig;
 import com.kolodkingal.enhanced.config.core.ConfigSpec;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -21,6 +22,7 @@ import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosFight;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import com.kolodkingal.enhanced.thanos.ThanosState;
+import java.nio.file.NoSuchFileException;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -30,8 +32,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -101,8 +101,9 @@ public final class ThanosBossTests {
         return found;
     }
 
-    private static JsonObject lang(IModFile mod, String name) throws IOException {
-        Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+    private static JsonObject lang(String name) throws IOException {
+        String path = "assets/" + Enhanced.MODID + "/lang/" + name + ".json";
+        Path file = Platform.get().modResource(path).orElseThrow(() -> new NoSuchFileException(path));
         return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
     }
 
@@ -112,9 +113,8 @@ public final class ThanosBossTests {
     /** Every key the fight uses is in both languages with the same placeholders. */
     @EnhancedTest(template = ARENA, batch = "thanos_data")
     public static void everyThanosKeyIsInBothLanguagesWithTheSamePlaceholders(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        JsonObject en = lang(mod, "en_us");
-        JsonObject he = lang(mod, "he_il");
+        JsonObject en = lang("en_us");
+        JsonObject he = lang("he_il");
         List<String> keys = new ArrayList<>(List.of("boss.enhanced.thanos", "boss.enhanced.thanos.enraged", "boss.enhanced.thanos.five",
                 "boss.enhanced.thanos.next", "message.enhanced.thanos.stone.subtitle", "message.enhanced.thanos.stone.soon",
                 "message.enhanced.thanos.summon.title", "message.enhanced.thanos.summon.subtitle", "message.enhanced.thanos.summon.charging",

@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.ThanosBossPoses;
 import com.kolodkingal.enhanced.client.render.ThanosGlow;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -15,8 +16,6 @@ import com.kolodkingal.enhanced.thanos.ThanosState;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -213,9 +212,8 @@ public final class ThanosClientTests {
     // What the renderers ask for
 
     private static BufferedImage image(String path) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        Path file = mod.findResource(("assets/" + Enhanced.MODID + "/" + path).split("/"));
-        check(Files.exists(file), path + " exists");
+        Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/" + path).orElse(null);
+        check(file != null && Files.exists(file), path + " exists");
         try (InputStream in = Files.newInputStream(file)) {
             BufferedImage image = ImageIO.read(in);
             check(image != null, path + " is a readable image");

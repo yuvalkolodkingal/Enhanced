@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.ultron;
 
+import com.kolodkingal.enhanced.ability.BlockRights;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
@@ -8,15 +9,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.HangingEntity;
-import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -78,7 +77,7 @@ public final class SokoviaValidator {
             for (BlockPos probe : probes(spec, centre)) {
                 BlockPos sky = probe.above(spec.height());
                 BlockState state = level.getBlockState(sky);
-                if (!level.mayInteract(starter, sky) || NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, sky, state, starter)).isCanceled()) {
+                if (!level.mayInteract(starter, sky) || !BlockRights.postBreak(starter, level, sky, state)) {
                     return Component.translatable("message.enhanced.ultron.refuse.protected");
                 }
             }

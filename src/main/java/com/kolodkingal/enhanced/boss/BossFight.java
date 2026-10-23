@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.boss;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -426,7 +427,7 @@ public abstract class BossFight {
      * entity joins the level. The fight discards every entity it marked when it finishes.
      */
     public final <T extends Entity> T adopt(T entity) {
-        entity.getPersistentData().putUUID(MARK, id);
+        ModAttachments.PERSISTENT_DATA.get(entity).putUUID(MARK, id);
         return entity;
     }
 
@@ -445,13 +446,13 @@ public abstract class BossFight {
     /** The id of the fight an entity is marked for, or null if it is marked for none. */
     @Nullable
     static UUID markOf(Entity entity) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(entity);
         return data.hasUUID(MARK) ? data.getUUID(MARK) : null;
     }
 
     /** Takes the mark of its fight off the entity: it is nobody's side any more (see {@link BossFights#disown}). */
     static void unmark(Entity entity) {
-        entity.getPersistentData().remove(MARK);
+        ModAttachments.PERSISTENT_DATA.get(entity).remove(MARK);
     }
 
     /**

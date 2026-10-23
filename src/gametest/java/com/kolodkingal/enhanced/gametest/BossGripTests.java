@@ -2,8 +2,8 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
-import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.Telekinesis.Mode;
+import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseArena;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseAttack;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
@@ -11,8 +11,8 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseFight;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseShield;
 import com.kolodkingal.enhanced.apocalypse.Horsemen;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
-import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
+import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
@@ -28,9 +28,13 @@ import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -82,9 +86,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1576,8 +1577,7 @@ public final class BossGripTests {
                 slams[0]++;
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true, LivingIncomingDamageEvent.class, counter);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(counter));
+        f.onClose(EventHub.of(LivingIncomingDamageEvent.class).register(Priority.HIGHEST, true, counter)::close);
         int[] thrownAt = {-1, -1};
         int[] slammedAt = {-1, -1};
         f.everyTick(110, tick -> {
@@ -1697,8 +1697,7 @@ public final class BossGripTests {
                 firstHitAt[0] = now;
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true, LivingIncomingDamageEvent.class, counter);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(counter));
+        f.onClose(EventHub.of(LivingIncomingDamageEvent.class).register(Priority.HIGHEST, true, counter)::close);
         TestKit.heardSounds(wanda); // (what she heard before the throw is not counted)
         lookAt(wanda, body);
         press(wanda, 3, false);
@@ -2470,7 +2469,7 @@ public final class BossGripTests {
     }
 
     private static boolean marked(Entity e) {
-        return e.getPersistentData().contains(BossGrip.NO_AI_MARK);
+        return ModAttachments.PERSISTENT_DATA.get(e).contains(BossGrip.NO_AI_MARK);
     }
 
     /**
@@ -2631,7 +2630,7 @@ public final class BossGripTests {
                     Warden plain = EntityType.WARDEN.create(level);
                     check(saved != null && plain != null, "two Wardens are made");
                     saved.setNoAi(true);
-                    saved.getPersistentData().putBoolean(BossGrip.NO_AI_MARK, true);
+                    ModAttachments.PERSISTENT_DATA.get(saved).putBoolean(BossGrip.NO_AI_MARK, true);
                     saved.moveTo(at.x, at.y, at.z);
                     plain.setNoAi(true);
                     plain.moveTo(at.x + 3.0, at.y, at.z);

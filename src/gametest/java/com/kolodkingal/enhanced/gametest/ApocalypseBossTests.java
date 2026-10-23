@@ -17,6 +17,8 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -41,8 +43,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -460,7 +460,7 @@ public final class ApocalypseBossTests {
             check(!wanda.getAbilities().flying, "nor does the key of flight");
             AbilityHandler.onKey(wanda, 1, false);
             // She cannot swing a sword or use an item either.
-            check(NeoForge.EVENT_BUS.post(new AttackEntityEvent(wanda, boss)).isCanceled(), "her attacks are cancelled");
+            check(Events.post(new AttackEntityEvent(wanda, boss)).isCanceled(), "her attacks are cancelled");
             cocoon.release();
             check(!wanda.hasEffect(ModEffects.ENTOMBED), "free");
             AbilityHandler.onKey(wanda, 1, true);

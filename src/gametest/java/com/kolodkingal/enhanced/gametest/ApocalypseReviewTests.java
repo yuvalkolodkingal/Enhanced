@@ -21,6 +21,7 @@ import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -117,8 +118,10 @@ public final class ApocalypseReviewTests {
         SandLanceEntity inside = lance(level, shooter, helper.absoluteVec(new Vec3(12.5, FLOOR + 1.0, 10.5)));
         SandLanceEntity outside = lance(level, shooter, helper.absoluteVec(new Vec3(19.5, FLOOR + 1.0, 10.5)));
         PowerTicker.tick(hero);
-        check(inside.getPersistentData().getBoolean(ApocalypseAbilities.SLOWED_TAG), "the lance in the storm is marked slowed");
-        check(!outside.getPersistentData().getBoolean(ApocalypseAbilities.SLOWED_TAG), "the one beyond it is not");
+        check(ModAttachments.PERSISTENT_DATA.get(inside).getBoolean(ApocalypseAbilities.SLOWED_TAG),
+                "the lance in the storm is marked slowed");
+        check(!ModAttachments.PERSISTENT_DATA.get(outside).getBoolean(ApocalypseAbilities.SLOWED_TAG),
+                "the one beyond it is not");
         every(helper, 4, tick -> {
             if (tick == 3) {
                 // The lance flies at its own speed every tick (the air takes nothing from it): the slowing must survive that.

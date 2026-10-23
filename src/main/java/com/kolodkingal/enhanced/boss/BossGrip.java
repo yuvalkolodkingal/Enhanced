@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.boss;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -218,15 +219,15 @@ public final class BossGrip {
     private static void takeWill(Mob mob) {
         if (!mob.isNoAi()) {
             mob.setNoAi(true);
-            mob.getPersistentData().putBoolean(NO_AI_MARK, true);
+            ModAttachments.PERSISTENT_DATA.get(mob).putBoolean(NO_AI_MARK, true);
         }
     }
 
     /** The will {@link #takeWill} took is given back: {@code NoAI} off and the mark gone. Nothing if the grip took none. */
     private static void giveWillBack(Entity e) {
         WILL_TAKEN.remove(e.getUUID());
-        if (e instanceof Mob mob && mob.getPersistentData().contains(NO_AI_MARK)) {
-            mob.getPersistentData().remove(NO_AI_MARK);
+        if (e instanceof Mob mob && ModAttachments.PERSISTENT_DATA.get(mob).contains(NO_AI_MARK)) {
+            ModAttachments.PERSISTENT_DATA.get(mob).remove(NO_AI_MARK);
             mob.setNoAi(false);
         }
     }
@@ -376,7 +377,8 @@ public final class BossGrip {
      * loaded part of the new level yet, where {@link #tick} could find it).
      */
     public static void onJoin(Entity e) {
-        if (e instanceof Mob mob && mob.getPersistentData().contains(NO_AI_MARK) && !Telekinesis.isHeld(e)) {
+        if (e instanceof Mob mob && ModAttachments.PERSISTENT_DATA.get(mob).contains(NO_AI_MARK)
+                && !Telekinesis.isHeld(e)) {
             giveWillBack(mob);
         }
     }

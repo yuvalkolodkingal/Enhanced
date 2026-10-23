@@ -8,6 +8,11 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -42,10 +47,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,8 +195,7 @@ public final class BossShotTests {
                 slams.add(event.getSource());
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true, LivingIncomingDamageEvent.class, listener);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+        f.onClose(EventHub.of(LivingIncomingDamageEvent.class).register(Priority.HIGHEST, true, listener)::close);
         return slams;
     }
 
@@ -430,8 +430,7 @@ public final class BossShotTests {
                 blasts[0]++;
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, true, LivingIncomingDamageEvent.class, listener);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(listener));
+        f.onClose(EventHub.of(LivingIncomingDamageEvent.class).register(Priority.HIGHEST, true, listener)::close);
 
         // The meteor: caught, and held below where it would land.
         double landingY = helper.absoluteVec(new Vec3(0.0, FLOOR + 4.0, 0.0)).y;
@@ -574,7 +573,7 @@ public final class BossShotTests {
         check(!Telekinesis.isHolding(billy) && first.getOwner() == billy, "and throws it at a Sentry: it is his");
         check(BossFights.fightOf(first) == null, "it left the fight");
         EntityJoinLevelEvent join = new EntityJoinLevelEvent(first, level);
-        NeoForge.EVENT_BUS.post(join);
+        Events.post(join);
         check(!join.isCanceled(), "and the orphan sweep leaves it alone");
 
         UltronBoltEntity[] second = {null};

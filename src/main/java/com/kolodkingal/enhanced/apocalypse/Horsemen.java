@@ -7,9 +7,11 @@ import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.protect.Shelters;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -127,7 +129,8 @@ public final class Horsemen {
     /** The kind of Horseman an entity is, or null if it is none. */
     @Nullable
     public static Kind kindOf(Entity entity) {
-        return entity.getPersistentData().contains(MARK) ? Kind.byId(entity.getPersistentData().getString(MARK)) : null;
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(entity);
+        return data.contains(MARK) ? Kind.byId(data.getString(MARK)) : null;
     }
 
     /** How many Horsemen the fight calls for {@code fighters} fighters: {@code min(horsemenMax, 1 + fighters)}. */
@@ -168,7 +171,7 @@ public final class Horsemen {
         husk.setPersistenceRequired();
         husk.setCanPickUpLoot(false);
         husk.setBaby(false);
-        husk.getPersistentData().putString(MARK, kind.id());
+        ModAttachments.PERSISTENT_DATA.get(husk).putString(MARK, kind.id());
         enhance(husk);
         switch (kind) {
             case WAR -> {

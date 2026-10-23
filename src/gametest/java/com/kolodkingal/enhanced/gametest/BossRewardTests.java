@@ -10,6 +10,8 @@ import com.kolodkingal.enhanced.boss.BossRewards;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
@@ -21,8 +23,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import java.util.List;
 
@@ -180,18 +180,18 @@ public final class BossRewardTests {
         BossGifts.add(server, player.getUUID(), ItemStack.EMPTY);
         check(BossGifts.pending(server, player.getUUID()).size() == 1, "an empty stack is no gift");
         lastActionBarKey(player);
-        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
+        Events.post(new PlayerEvent.PlayerLoggedInEvent(player));
         check(has(player, Items.NETHER_STAR) && BossGifts.pending(server, player.getUUID()).isEmpty(), "login delivers it");
         check("message.enhanced.boss.gift".equals(lastActionBarKey(player)), "and says so");
 
         BossGifts.add(server, player.getUUID(), new ItemStack(Items.ECHO_SHARD));
         BossGifts.add(server, player.getUUID(), new ItemStack(Items.ECHO_SHARD));
-        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(player, Level.OVERWORLD, Level.NETHER));
+        Events.post(new PlayerEvent.PlayerChangedDimensionEvent(player, Level.OVERWORLD, Level.NETHER));
         check(player.getInventory().countItem(Items.ECHO_SHARD) == 2 && BossGifts.pending(server, player.getUUID()).isEmpty(),
                 "a change of dimension delivers every one that waits");
 
         BossGifts.add(server, player.getUUID(), new ItemStack(Items.TOTEM_OF_UNDYING));
-        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerRespawnEvent(player, false));
+        Events.post(new PlayerEvent.PlayerRespawnEvent(player, false));
         check(has(player, Items.TOTEM_OF_UNDYING), "so does a respawn");
         check(BossGifts.deliver(player) == 0, "and there is nothing left to deliver");
         helper.succeed();

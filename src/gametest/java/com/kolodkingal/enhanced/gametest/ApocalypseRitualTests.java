@@ -11,8 +11,11 @@ import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -40,8 +43,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -322,10 +323,10 @@ public final class ApocalypseRitualTests {
 
                 // A protected block (a claim or spawn protection says no to a break).
                 Consumer<BlockEvent.BreakEvent> claim = event -> event.setCanceled(true);
-                NeoForge.EVENT_BUS.addListener(claim);
-                f.onClose(() -> NeoForge.EVENT_BUS.unregister(claim));
+                EventHub.Registration claimRegistration = EventHub.of(BlockEvent.BreakEvent.class).register(claim);
+                f.onClose(claimRegistration::close);
                 refused(f, starter, log, click, "message.enhanced.apocalypse.refuse.protected", "a claimed block", true);
-                NeoForge.EVENT_BUS.unregister(claim);
+                claimRegistration.close();
 
                 // The border cuts through the arena.
                 WorldBorder border = level.getWorldBorder();
@@ -424,7 +425,7 @@ public final class ApocalypseRitualTests {
         // A marked Husk that no fight owns never joins the level.
         Husk husk = EntityType.HUSK.create(level);
         husk.moveTo(helper.absoluteVec(new Vec3(8.5, FLOOR, 12.5)));
-        husk.getPersistentData().putString(Horsemen.MARK, "war");
+        ModAttachments.PERSISTENT_DATA.get(husk).putString(Horsemen.MARK, "war");
         check(!level.addFreshEntity(husk), "a Horseman with no fight is turned away at the door");
         Husk plain = EntityType.HUSK.create(level);
         plain.moveTo(helper.absoluteVec(new Vec3(8.5, FLOOR, 8.5)));

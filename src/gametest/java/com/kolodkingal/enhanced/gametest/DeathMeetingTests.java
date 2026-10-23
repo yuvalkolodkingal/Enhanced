@@ -343,11 +343,14 @@ public final class DeathMeetingTests {
     // ------------------------------------------------------------------------------------------------------------
     // 3.7.2: Death's line and Rio's Death look
 
-    private static java.awt.image.BufferedImage skin(net.neoforged.neoforgespi.locating.IModFile mod, String name)
-            throws java.io.IOException {
-        try (java.io.InputStream in = java.nio.file.Files.newInputStream(mod.findResource("assets", Enhanced.MODID,
-                "textures",
-                "entity", "asgardian", name))) {
+    /** A file the mod ships under {@code assets/enhanced/}. */
+    private static java.nio.file.Path asset(String path) throws java.io.IOException {
+        return com.kolodkingal.enhanced.platform.Platform.get().modResource("assets/" + Enhanced.MODID + "/" + path)
+                .orElseThrow(() -> new java.nio.file.NoSuchFileException(path));
+    }
+
+    private static java.awt.image.BufferedImage skin(String name) throws java.io.IOException {
+        try (java.io.InputStream in = java.nio.file.Files.newInputStream(asset("textures/entity/asgardian/" + name))) {
             return javax.imageio.ImageIO.read(in);
         }
     }
@@ -359,13 +362,11 @@ public final class DeathMeetingTests {
      */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void deathsLinesAndRiosDeathLook(GameTestHelper helper) throws java.io.IOException {
-        net.neoforged.neoforgespi.locating.IModFile mod =
-                net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile();
         java.util.Map<String, String> one = java.util.Map.of("en_us", "All roads lead to me.", "he_il",
                 "כל הדרכים מובילות אליי.");
         for (String name : List.of("en_us", "he_il")) {
             com.google.gson.JsonObject lang = com.google.gson.JsonParser.parseString(java.nio.file.Files.readString(
-                    mod.findResource("assets", Enhanced.MODID, "lang", name + ".json"),
+                    asset("lang/" + name + ".json"),
                             java.nio.charset.StandardCharsets.UTF_8))
                     .getAsJsonObject();
             java.util.Set<String> lines = new java.util.HashSet<>();
@@ -380,9 +381,9 @@ public final class DeathMeetingTests {
             check(one.get(name).equals(lang.get("screen.enhanced.death_meeting.line.1").getAsString()),
                     name + ": Death's line: " + lang.get("screen.enhanced.death_meeting.line.1"));
         }
-        java.awt.image.BufferedImage death = skin(mod, "rio_death.png");
-        java.awt.image.BufferedImage home = skin(mod, "rio.png");
-        java.awt.image.BufferedImage crown = skin(mod, "rio_death_crown.png");
+        java.awt.image.BufferedImage death = skin("rio_death.png");
+        java.awt.image.BufferedImage home = skin("rio.png");
+        java.awt.image.BufferedImage crown = skin("rio_death_crown.png");
         check(death.getWidth() == 64 && death.getHeight() == 64 && crown.getWidth() == 32 && crown.getHeight() == 16,
                 "the Death skin and its crown");
         int differ = 0;
@@ -400,10 +401,8 @@ public final class DeathMeetingTests {
     // ------------------------------------------------------------------------------------------------------------
     // 3.8.2: no flowers on Death
 
-    private static java.awt.image.BufferedImage gui(net.neoforged.neoforgespi.locating.IModFile mod, String name)
-            throws java.io.IOException {
-        try (java.io.InputStream in = java.nio.file.Files.newInputStream(mod.findResource("assets", Enhanced.MODID,
-                "textures", "gui", "death", name))) {
+    private static java.awt.image.BufferedImage gui(String name) throws java.io.IOException {
+        try (java.io.InputStream in = java.nio.file.Files.newInputStream(asset("textures/gui/death/" + name))) {
             return javax.imageio.ImageIO.read(in);
         }
     }
@@ -425,9 +424,7 @@ public final class DeathMeetingTests {
      */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void riosDeathLookHasNoFlowers(GameTestHelper helper) throws java.io.IOException {
-        net.neoforged.neoforgespi.locating.IModFile mod =
-                net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile();
-        java.awt.image.BufferedImage crown = skin(mod, "rio_death_crown.png");
+        java.awt.image.BufferedImage crown = skin("rio_death_crown.png");
         for (int y = 0; y < crown.getHeight(); y++) {
             for (int x = 0; x < crown.getWidth(); x++) {
                 int c = crown.getRGB(x, y);
@@ -435,15 +432,15 @@ public final class DeathMeetingTests {
                 check((c >>> 24) < 16 || hsv[2] <= 0.4F, "the crown is dark everywhere, no pale tip at " + x + "," + y);
             }
         }
-        java.awt.image.BufferedImage death = skin(mod, "rio_death.png");
+        java.awt.image.BufferedImage death = skin("rio_death.png");
         for (int y = 0; y < 64; y++) {
             for (int x = 0; x < 64; x++) {
                 boolean head = y < 16; // (her face is pale: the head may be light, never colourful)
                 check(!blossom(death.getRGB(x, y), !head), "no flower-coloured pixel on her look at " + x + "," + y);
             }
         }
-        java.awt.image.BufferedImage grass = gui(mod, "grass.png");
-        java.awt.image.BufferedImage bare = gui(mod, "grass_bare.png");
+        java.awt.image.BufferedImage grass = gui("grass.png");
+        java.awt.image.BufferedImage bare = gui("grass_bare.png");
         check(bare.getWidth() == grass.getWidth() && bare.getHeight() == grass.getHeight(), "the bare grass's size");
         int flowers = 0;
         for (int y = 0; y < grass.getHeight(); y++) {

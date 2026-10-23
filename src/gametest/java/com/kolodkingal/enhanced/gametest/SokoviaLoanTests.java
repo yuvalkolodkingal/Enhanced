@@ -13,6 +13,9 @@ import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LevelEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -50,9 +53,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -210,7 +210,7 @@ public final class SokoviaLoanTests {
 
     /** One save of the dimension, as the game posts it once the chunks are queued to the disk. */
     private static void saveHook(ServerLevel level) {
-        NeoForge.EVENT_BUS.post(new LevelEvent.Save(level));
+        Events.post(new LevelEvent.Save(level));
     }
 
     /** The state the lift's copy holds for a cell of the ground (absolute), or null if it copied none there. */
@@ -674,9 +674,9 @@ public final class SokoviaLoanTests {
             quiet(fight);
             check(BossFights.protects(level, islandAt) && !BossFights.protects(level, ringAt), "the island alone is protected");
             BlockEvent.BreakEvent onTheIsland = new BlockEvent.BreakEvent(level, islandAt, level.getBlockState(islandAt), wanda);
-            NeoForge.EVENT_BUS.post(onTheIsland);
+            Events.post(onTheIsland);
             BlockEvent.BreakEvent onTheRing = new BlockEvent.BreakEvent(level, ringAt, level.getBlockState(ringAt), wanda);
-            NeoForge.EVENT_BUS.post(onTheRing);
+            Events.post(onTheRing);
             check(onTheIsland.isCanceled() && !onTheRing.isCanceled(), "breaking on the island is refused, on the ring it is not");
             zombie[0] = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(MIDDLE_X + 2.0, GROUND + LIFT, MIDDLE_Z + 2.0));
             zombie[0].setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));

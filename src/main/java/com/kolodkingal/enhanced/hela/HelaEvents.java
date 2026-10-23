@@ -1,9 +1,12 @@
 package com.kolodkingal.enhanced.hela;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.config.HelaConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -11,10 +14,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 /**
  * Hela's events (3.5): what the hero's damage becomes, and what her dead are spared.
@@ -26,12 +25,12 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
  *     percent stronger.</li>
  *     <li>Her dead are never hurt by her or her side (a sweep of her own sword, a teammate's arrow).</li>
  * </ul>
- * At {@link EventPriority#NORMAL}: before {@code HeroDamage} (LOW) scales a custom hero's hit by his strength.
+ * At {@link Priority#NORMAL}: before {@code HeroDamage} (LOW) scales a custom hero's hit by his strength.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class HelaEvents {
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
+    @Subscribe(priority = Priority.NORMAL)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         LivingEntity victim = event.getEntity();
