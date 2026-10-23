@@ -2,7 +2,11 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.network.MusicManifestPayload;
 import com.kolodkingal.enhanced.platform.CommonTags;
+import com.kolodkingal.enhanced.platform.ItemAccess;
 import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.platform.test.TestHooks;
@@ -22,7 +26,9 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -124,6 +130,52 @@ public final class PlatformSeamTests {
         ServerPlayer unconnected = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
                 new GameProfile(UUID.randomUUID(), "unconnected"), ClientInformation.createDefault());
         check(!Net.hasChannel(unconnected, MusicManifestPayload.TYPE), "no connection, no channel");
+        helper.succeed();
+    }
+
+    /**
+     * SR-L1-1: a chest's slots take what fits and give back the rest; a simulated insert changes nothing.
+     */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aStoreTakesWhatFits(GameTestHelper helper) {
+        BlockPos at = new BlockPos(4, 2, 4);
+        helper.setBlock(at, Blocks.CHEST);
+        BlockPos abs = helper.absolutePos(at);
+        ItemAccess.Slots slots = Platform.get().itemAccess().blockSlots(helper.getLevel(), abs);
+        check(slots != null && slots.getSlots() == 27, "a chest has 27 slots");
+        ItemStack dirt = new ItemStack(Items.DIRT, 5);
+        check(slots.insertItem(0, dirt, true).isEmpty() && slots.getStackInSlot(0).isEmpty(),
+                "a simulated insert fits and changes nothing");
+        check(slots.insertItem(0, dirt, false).isEmpty() && dirt.getCount() == 5, "the insert fits; the stack is kept");
+        check(((ChestBlockEntity) helper.getLevel().getBlockEntity(abs)).getItem(0).getCount() == 5, "5 dirt inside");
+        ItemStack left = slots.insertItem(0, new ItemStack(Items.DIRT, 64), false);
+        check(left.getCount() == 5 && slots.getStackInSlot(0).getCount() == 64, "what did not fit comes back: " + left);
+        check(slots.insertItem(0, new ItemStack(Items.STONE), false).getCount() == 1,
+                "a full slot of dirt takes no stone");
+        helper.succeed();
+    }
+
+    /** SR-L1-2: the plain block-break event reaches the mod's listeners, and their cancellation is the answer. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theBreakEventIsPostedAndCancelled(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(4.5, FLOOR, 4.5);
+        BlockPos at = helper.absolutePos(new BlockPos(6, 2, 6));
+        helper.setBlock(new BlockPos(6, 2, 6), Blocks.STONE);
+        List<BlockPos> seen = new ArrayList<>();
+        boolean cancelled;
+        try (EventHub.Registration r = EventHub.of(BlockEvent.BreakEvent.class).register(Priority.LOWEST, e -> {
+            if (e.getPlayer() == player) {
+                seen.add(e.getPos());
+                e.setCanceled(true);
+            }
+        })) {
+            cancelled = Platform.get().hooks().blockBreakEventCancelled(helper.getLevel(), at,
+                    Blocks.STONE.defaultBlockState(), player);
+        }
+        check(seen.equals(List.of(at)), "the listener saw the break at " + at + ": " + seen);
+        check(cancelled, "its cancellation is the answer");
+        helper.assertBlockPresent(Blocks.STONE, new BlockPos(6, 2, 6));
         helper.succeed();
     }
 }
