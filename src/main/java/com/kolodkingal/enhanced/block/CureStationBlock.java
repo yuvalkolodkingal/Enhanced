@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.block;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.CureConfig;
 import com.kolodkingal.enhanced.config.SchoolLabConfig;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.mojang.serialization.MapCodec;
@@ -110,7 +111,7 @@ public class CureStationBlock extends Block {
             player.displayClientMessage(Component.translatable("message.enhanced.school_lab.cure_station_off"), true);
             return false;
         }
-        CompoundTag data = player.getPersistentData();
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(player);
         long now = level.getGameTime();
         if (data.contains(LAST) && now - data.getLong(LAST) < cooldown() && now >= data.getLong(LAST)) {
             long seconds = (cooldown() - (now - data.getLong(LAST)) + 19) / 20;

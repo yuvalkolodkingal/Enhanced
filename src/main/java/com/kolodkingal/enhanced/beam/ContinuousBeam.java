@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.network.BeamPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -19,7 +20,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -137,7 +137,7 @@ public final class ContinuousBeam {
             Entity target = entityHit.getEntity();
             target.hurt(ModDamageTypes.source(level, spec.damageType(), shooter, shooter), spec.damage());
             if (spec.onHit() != null) {
-                spec.onHit().accept(shooter, target instanceof PartEntity<?> part ? part.getParent() : target);
+                spec.onHit().accept(shooter, Platform.get().parts().root(target));
             }
             Vec3 at = entityHit.getLocation();
             level.sendParticles(new EnergyParticleOptions(spec.style().main(), 1.0F), at.x, at.y, at.z, 4, 0.12, 0.12, 0.12, 0.1);

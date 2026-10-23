@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.strange.MirrorDimension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,8 +15,6 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 /**
@@ -47,6 +46,8 @@ public final class BlockRights {
      *
      * @return true if nobody cancelled it
      */
+    // TODO(port seam): posts NeoForge's own event (claim mods listen there); a LoaderHooks method is requested (P0 L1
+    // notes).
     public static boolean postBreak(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState old) {
         BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(level, pos, old, player);
         NeoForge.EVENT_BUS.post(event);
@@ -60,7 +61,7 @@ public final class BlockRights {
      * @return true if nobody cancelled it
      */
     public static boolean postPlace(ServerPlayer player, ServerLevel level, BlockPos pos) {
-        return !EventHooks.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP);
+        return !Platform.get().hooks().blockPlaceCancelled(player, level, pos, Direction.UP);
     }
 
     /**

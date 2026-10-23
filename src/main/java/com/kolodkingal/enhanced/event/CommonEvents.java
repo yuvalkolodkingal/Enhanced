@@ -1,11 +1,10 @@
 package com.kolodkingal.enhanced.event;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
-import com.kolodkingal.enhanced.ability.HeroLifecycle;
-import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
+import com.kolodkingal.enhanced.ability.HeroLifecycle;
+import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.MjolnirShatter;
@@ -14,17 +13,45 @@ import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
-import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.VisionAbilities;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
+import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.command.EnhancedCommand;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent;
+import com.kolodkingal.enhanced.platform.event.EntityMountEvent;
+import com.kolodkingal.enhanced.platform.event.EntityStruckByLightningEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTeleportEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTickEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.ItemEntityPickupEvent;
+import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEntityUseItemEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingKnockBackEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.RegisterCommandsEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.ServerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.TriState;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -43,54 +70,26 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.common.damagesource.DamageContainer;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.EntityMountEvent;
-import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /** Game-bus events shared by the server and singleplayer. */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class CommonEvents {
 
     // ---- ticking ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             PowerTicker.tick(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerTick(ServerTickEvent.Post event) {
         Telekinesis.tickFlights(event.getServer());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             HexManager.tickLevel(level);
@@ -101,7 +100,7 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         HeroLifecycle.onServerStopped();
         Telekinesis.clear();
@@ -120,7 +119,7 @@ public final class CommonEvents {
     // ---- Quicksilver does everything faster (runs on both sides, so the client's use animation keeps up) ----
 
     /** Eating, drinking, drawing a bow, loading a crossbow: most uses of an item go faster while a mode is on. */
-    @SubscribeEvent
+    @Subscribe
     public static void onUseItemTick(LivingEntityUseItemEvent.Tick event) {
         if (event.getEntity() instanceof Player player) {
             event.setDuration(QuicksilverAbilities.fasterUse(player, event.getItem(), event.getDuration()));
@@ -129,7 +128,7 @@ public final class CommonEvents {
 
     // ---- Quicksilver Time slows the world around him (runs on both sides) ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEntityTick(EntityTickEvent.Pre event) {
         MjolnirPin.beforeTick(event.getEntity());
         if (SlowMotion.skipTick(event.getEntity())) {
@@ -137,20 +136,20 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEntityTickDone(EntityTickEvent.Post event) {
         SlowMotion.afterTick(event.getEntity());
         MjolnirPin.afterTick(event.getEntity());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onStartTracking(PlayerEvent.StartTracking event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SlowMotion.onStartTracking(event.getTarget(), player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (!event.getLevel().isClientSide()) {
             SlowMotion.onJoin(event.getEntity());
@@ -161,7 +160,7 @@ public final class CommonEvents {
 
     // ---- lifecycle ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Telekinesis.onLogout(player);
@@ -180,7 +179,7 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Telekinesis.release(player, false);
@@ -189,7 +188,7 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         HexManager.forget(event.getEntity().getUUID());
         if (event.getEntity() instanceof ServerPlayer player) {
@@ -197,7 +196,7 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         HexManager.forget(event.getEntity().getUUID());
         if (event.getEntity() instanceof ServerPlayer player) {
@@ -205,7 +204,7 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Telekinesis.release(player, false);
@@ -219,14 +218,14 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         EnhancedCommand.register(event.getDispatcher());
     }
 
     // ---- Magneto's mental immunity; the few too powerful to be spellbound or confused ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
         if (event.getEffectInstance().is(MobEffects.CONFUSION) && MagnetoAbilities.wearsHelmet(event.getEntity())) {
             event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
@@ -241,7 +240,7 @@ public final class CommonEvents {
 
     // ---- defences ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
             return;
@@ -299,8 +298,8 @@ public final class CommonEvents {
         }
         if (MagnetoAbilities.wearsHelmet(player) && isWandasAttack(source)) {
             // The helmet only blocks Nausea: Magneto takes Wanda's attacks at full strength.
-            event.addReductionModifier(DamageContainer.Reduction.ARMOR, (container, reduction) -> 0F);
-            event.addReductionModifier(DamageContainer.Reduction.ENCHANTMENTS, (container, reduction) -> 0F);
+            event.addReductionModifier(LivingIncomingDamageEvent.Reduction.ARMOR, (container, reduction) -> 0F);
+            event.addReductionModifier(LivingIncomingDamageEvent.Reduction.ENCHANTMENTS, (container, reduction) -> 0F);
         }
         if (source.is(DamageTypeTags.IS_FALL) && (QuicksilverAbilities.isRunning(player) || TommyAbilities.isRunning(player))) {
             event.setCanceled(true);
@@ -322,7 +321,7 @@ public final class CommonEvents {
      * Thor's lightning beam hits again and again: it leaves no invulnerability behind, and ignores what is left of
      * anyone's.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onBeamHit(LivingIncomingDamageEvent event) {
         if (event.getSource().is(ModDamageTypes.LIGHTNING_BEAM)) {
             event.setInvulnerabilityTicks(0);
@@ -333,7 +332,7 @@ public final class CommonEvents {
      * Every blow the God of Thunder lands with his own hands (or his weapon in them) arcs lightning. (Last: a blow that
      * a Chaos Shield, or any other defence, has stopped lands nothing.)
      */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onThorMelee(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         if (source.is(DamageTypes.PLAYER_ATTACK) && source.getDirectEntity() instanceof ServerPlayer thor && source.getEntity() == thor
@@ -343,7 +342,7 @@ public final class CommonEvents {
     }
 
     /** Lightning doesn't hurt or burn Thor. */
-    @SubscribeEvent
+    @Subscribe
     public static void onStruckByLightning(EntityStruckByLightningEvent event) {
         if (ThorAbilities.isThor(event.getEntity())) {
             event.setCanceled(true);
@@ -351,7 +350,7 @@ public final class CommonEvents {
     }
 
     /** Only the worthy can pick Mjolnir up, and only its owner once it has one. */
-    @SubscribeEvent
+    @Subscribe
     public static void onItemPickup(ItemEntityPickupEvent.Pre event) {
         ItemStack stack = event.getItemEntity().getItem();
         if (ThorAbilities.isMjolnir(stack) && !Worthiness.canLift(event.getPlayer(), stack)) {
@@ -365,7 +364,7 @@ public final class CommonEvents {
      * Sneak + right click with Mjolnir sets it down on a creature; right click on the pinned one lifts it (its owner
      * only).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onInteractEntity(PlayerInteractEvent.EntityInteract event) {
         InteractionResult result = MjolnirPin.interact(event.getEntity(), event.getHand(), event.getTarget());
         if (result != null) {
@@ -375,21 +374,21 @@ public final class CommonEvents {
     }
 
     /** Whoever is pinned can't be knocked about, climb onto a mount or leave for another dimension. */
-    @SubscribeEvent
+    @Subscribe
     public static void onKnockBack(LivingKnockBackEvent event) {
         if (MjolnirPin.isPinned(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onMount(EntityMountEvent event) {
         if (event.isMounting() && MjolnirPin.isPinned(event.getEntityMounting())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTravelToDimension(EntityTravelToDimensionEvent event) {
         if (MjolnirPin.isPinned(event.getEntity())) {
             event.setCanceled(true);
@@ -404,7 +403,7 @@ public final class CommonEvents {
     // ---- the Vision of the Hex fights for Wanda ----
 
     /** Whoever hurts Wanda (or her Vision), or whom she hurts, he goes for. */
-    @SubscribeEvent
+    @Subscribe
     public static void onHurtForHexVision(LivingDamageEvent.Post event) {
         HexVisions.onDamage(event.getEntity(), event.getSource());
     }
@@ -417,14 +416,14 @@ public final class CommonEvents {
     }
 
     /** A slowed projectile gets its full speed back the moment it hits someone, so it hits as hard as it would have. */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onSlowedProjectileImpact(ProjectileImpactEvent event) {
         if (!event.getProjectile().level().isClientSide() && event.getRayTraceResult() instanceof EntityHitResult) {
             SlowMotion.unslow(event.getProjectile());
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)
@@ -442,13 +441,13 @@ public final class CommonEvents {
         }
         if (MagnetoAbilities.hasShieldUp(player) && MagnetoAbilities.isMetalProjectile(projectile)) {
             event.setCanceled(true);
-            if (!projectile.getPersistentData().getBoolean(MagnetoAbilities.DEMAGNETIZED_TAG)) {
+            if (!ModAttachments.PERSISTENT_DATA.get(projectile).getBoolean(MagnetoAbilities.DEMAGNETIZED_TAG)) {
                 MagnetoAbilities.repel(player, projectile);
             }
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onAttack(AttackEntityEvent event) {
         if (VisionAbilities.isPhased(event.getEntity())) {
             event.setCanceled(true);
@@ -460,7 +459,7 @@ public final class CommonEvents {
     }
 
     /** A blow that landed: a Frost Giant's freezes. */
-    @SubscribeEvent
+    @Subscribe
     public static void onDamageDealt(LivingDamageEvent.Post event) {
         DamageSource source = event.getSource();
         if (source.is(DamageTypes.PLAYER_ATTACK) && source.getEntity() instanceof ServerPlayer player && source.getDirectEntity() == player) {
@@ -474,7 +473,7 @@ public final class CommonEvents {
      * A spellbound or confused mob can't pick anyone to go after (it may only let go of its target); and a shapeshifted
      * Loki is one of them: creatures of his new kind never go after him.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onChangeTarget(LivingChangeTargetEvent event) {
         LivingEntity target = event.getNewAboutToBeSetTarget();
         if (target != null && (event.getEntity().hasEffect(ModEffects.SPELLBOUND) || event.getEntity().hasEffect(ModEffects.CONFUSED))) {
@@ -486,12 +485,12 @@ public final class CommonEvents {
 
     // ---- the Hex wall also stops teleports ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEnderPearl(EntityTeleportEvent.EnderPearl event) {
         checkHexTeleport(event);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onChorusFruit(EntityTeleportEvent.ChorusFruit event) {
         if (MjolnirPin.isPinned(event.getEntityLiving())) {
             event.setCanceled(true);
@@ -500,7 +499,7 @@ public final class CommonEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onEnderTeleport(EntityTeleportEvent.EnderEntity event) {
         if (MjolnirPin.isPinned(event.getEntityLiving())) {
             event.setCanceled(true);

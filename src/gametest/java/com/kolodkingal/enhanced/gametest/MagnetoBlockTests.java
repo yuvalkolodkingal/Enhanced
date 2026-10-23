@@ -8,6 +8,8 @@ import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -40,9 +42,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
 
 import java.util.function.Consumer;
 
@@ -604,8 +604,8 @@ public final class MagnetoBlockTests {
                 event.setCanceled(true);
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, claim);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(claim));
+        EventHub.Registration claimHook = EventHub.of(BlockEvent.BreakEvent.class).register(Priority.NORMAL, false, claim);
+        f.onClose(claimHook::close);
 
         lastActionBarKey(magneto);
         lookAtBlock(helper, magneto, iron);
@@ -614,7 +614,7 @@ public final class MagnetoBlockTests {
         check(PROTECTED.equals(lastActionBarKey(magneto)), "a claim: this place is protected");
         check(!Telekinesis.isHolding(magneto) && helper.getBlockState(iron).is(Blocks.IRON_BLOCK), "the iron block stays");
 
-        NeoForge.EVENT_BUS.unregister(claim);
+        claimHook.close();
         pressR(magneto, false);
         TelekineticBlockEntity held = heldBlock(helper, magneto);
         check(held != null && helper.getBlockState(iron).isAir(), "without the claim, lifted");

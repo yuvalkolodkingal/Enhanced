@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -42,7 +43,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -280,7 +280,7 @@ public final class BillyAbilities {
 
     /** What a Hex Bolt forks to: any other living creature (Billy and armor stands aside). */
     private static boolean canFork(ServerPlayer billy, Entity struck, LivingEntity e) {
-        Entity body = struck instanceof PartEntity<?> part ? part.getParent() : struck;
+        Entity body = Platform.get().parts().root(struck);
         return e != billy && e != struck && e != body && e.isAlive() && !e.isSpectator() && !(e instanceof ArmorStand)
                 && e.distanceTo(struck) <= FORK_RANGE;
     }

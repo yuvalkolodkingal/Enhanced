@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.network.WardSyncPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Power;
@@ -66,7 +67,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
@@ -704,11 +704,13 @@ public final class ItemsTests {
         Zombie zombie = EntityType.ZOMBIE.create(level);
         Vec3 at = Vec3.atBottomCenterOf(inside);
         zombie.moveTo(at.x, at.y, at.z);
-        EventHooks.finalizeMobSpawn(zombie, level, level.getCurrentDifficultyAt(inside), MobSpawnType.SPAWNER, null);
+        Platform.get().hooks().finalizeMobSpawn(zombie, level, level.getCurrentDifficultyAt(inside),
+                MobSpawnType.SPAWNER, null);
         check(zombie.isSpawnCancelled(), "a spawner's zombie is turned away");
         Zombie eggs = EntityType.ZOMBIE.create(level);
         eggs.moveTo(at.x, at.y, at.z);
-        EventHooks.finalizeMobSpawn(eggs, level, level.getCurrentDifficultyAt(inside), MobSpawnType.COMMAND, null);
+        Platform.get().hooks().finalizeMobSpawn(eggs, level, level.getCurrentDifficultyAt(inside),
+                MobSpawnType.COMMAND, null);
         check(!eggs.isSpawnCancelled(), "(a command's is let through; the look will see to it)");
         helper.succeed();
     }

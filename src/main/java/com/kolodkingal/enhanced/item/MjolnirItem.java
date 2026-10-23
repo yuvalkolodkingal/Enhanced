@@ -87,6 +87,7 @@ public class MjolnirItem extends Item {
     }
 
     /** A dropped Mjolnir comes to rest as a block where it lands; until then it never despawns. */
+    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (entity.level() instanceof ServerLevel level) {

@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
@@ -68,7 +69,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -101,7 +101,7 @@ public final class ThorAbilities {
      * the Ender Dragon and End Crystals. Shared by the server (who is hit) and the client (where the beam is drawn to).
      */
     public static final Predicate<Entity> BEAM_TARGET = e -> e.isPickable() && !e.isSpectator() && e.isAlive()
-            && (e instanceof LivingEntity || e instanceof PartEntity<?> || e instanceof EndCrystal) && !isThor(e);
+            && (e instanceof LivingEntity || Platform.get().parts().isPart(e) || e instanceof EndCrystal) && !isThor(e);
 
     /**
      * What this Thor's own beam can hit: {@link #BEAM_TARGET}, but never the steed he rides, nor whoever rides with
@@ -685,7 +685,7 @@ public final class ThorAbilities {
     private static void beamHit(ServerLevel level, ServerPlayer thor, Beam beam, EntityHitResult hit, ItemStack weapon, boolean thunder) {
         Entity target = hit.getEntity();
         LivingEntity living = target instanceof LivingEntity l ? l
-                : target instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity l ? l : null;
+                : Platform.get().parts().parentOf(target) instanceof LivingEntity l ? l : null;
         // (Not on players: lightning has nothing to do to them but a flinch, and PvP rules are not for it to bypass.)
         if (!weapon.isEmpty() && living != null && !(living instanceof Player) && beam.struck.add(living.getId())) {
             thunderStruck(level, thor, living);

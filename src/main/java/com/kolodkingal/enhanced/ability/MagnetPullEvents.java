@@ -1,12 +1,11 @@
 package com.kolodkingal.enhanced.ability;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 /**
  * The game-bus events of Magneto's Magnetic Pull, at NORMAL priority (spec 5.6; R16: {@code CommonEvents} is not edited
@@ -17,31 +16,31 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
  *     <li><b>Server stopped:</b> every pull and every grace is forgotten, so nothing of one world reaches the next.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class MagnetPullEvents {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             MagnetPull.cancel(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             MagnetPull.cancel(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             MagnetPull.cancel(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         MagnetPull.clear();
     }

@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced.event;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SpiderServer;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -10,11 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 /**
  * Spider-Man's own game events (DESIGN section 14), so that {@code CommonEvents} needs no edit: the bite of the
@@ -23,7 +22,7 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
  * is ordered against another hero's handler, except that the refusal of a web runs at HIGH (the priority of a boss
  * tag's refusals, integration 5.5).
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class SpiderEvents {
     /** A blow of at least this much tears the web off a webbed creature a little. */
     public static final float TEAR_DAMAGE = 6.0F;
@@ -34,7 +33,7 @@ public final class SpiderEvents {
      * The sickness of the bite ran out: if the player is still there, alive and has no power, Spider-Man wakes in them (in
      * the Homemade Suit). With a power of their own the bite changes nothing.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onBiteExpired(MobEffectEvent.Expired event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || !event.getEffectInstance().is(ModEffects.RADIOACTIVE_BITE)) {
             return;
@@ -50,7 +49,7 @@ public final class SpiderEvents {
     }
 
     /** Milk, or anything else that takes the bite off before it ends, cures it: the spider is gone, nothing awakens. */
-    @SubscribeEvent
+    @Subscribe
     public static void onBiteRemoved(MobEffectEvent.Remove event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getEffectInstance() != null
                 && event.getEffectInstance().is(ModEffects.RADIOACTIVE_BITE) && player.isAlive()) {
@@ -66,7 +65,7 @@ public final class SpiderEvents {
      * A web never wraps Spider-Man, nor a boss (the {@code enhanced:web_immune} tag). HIGH, like the other refusals by a
      * boss tag (integration 5.5): it is decided before the existing handlers of Spellbound and the rest look at it.
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
         if (event.getEffectInstance().is(ModEffects.WEBBED)
                 && (event.getEntity().getType().is(ModTags.WEB_IMMUNE) || SpiderServer.isSpiderMan(event.getEntity()))) {
@@ -75,7 +74,7 @@ public final class SpiderEvents {
     }
 
     /** A hard blow tears the web: a creature that is being beaten breaks free sooner. */
-    @SubscribeEvent
+    @Subscribe
     public static void onWebTorn(LivingDamageEvent.Post event) {
         LivingEntity victim = event.getEntity();
         MobEffectInstance web = victim.getEffect(ModEffects.WEBBED);

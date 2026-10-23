@@ -74,6 +74,7 @@ public class HofundItem extends SwordItem {
     }
 
     /** And one lying on the ground. */
+    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (entity.level() instanceof ServerLevel server && entity.tickCount % 10 == 0 && HofundBond.shouldCrumble(server.getServer(), stack)) {

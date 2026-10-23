@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -20,7 +21,6 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.entity.PartEntity;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
@@ -45,7 +45,7 @@ public final class SpiderWebs {
 
     /** The creature a part of a creature belongs to (the Ender Dragon's parts), or the entity itself. */
     public static Entity body(Entity entity) {
-        return entity instanceof PartEntity<?> part ? part.getParent() : entity;
+        return Platform.get().parts().root(entity);
     }
 
     /**

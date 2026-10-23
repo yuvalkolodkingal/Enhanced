@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.event.Events;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
@@ -73,8 +74,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1081,7 +1081,7 @@ public final class ThorTests {
     private static boolean rightClick(ServerPlayer player, Entity target, boolean sneaking) {
         player.setShiftKeyDown(sneaking);
         PlayerInteractEvent.EntityInteract click = new PlayerInteractEvent.EntityInteract(player, InteractionHand.MAIN_HAND, target);
-        NeoForge.EVENT_BUS.post(click);
+        Events.post(click);
         player.setShiftKeyDown(false);
         return click.isCanceled();
     }

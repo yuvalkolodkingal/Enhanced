@@ -16,11 +16,15 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
+import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -76,15 +80,12 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforgespi.locating.IModFile;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.Bidi;
 import java.util.ArrayList;
 import java.util.List;
@@ -730,8 +731,8 @@ public final class MagnetPullTests {
 
         // A claim on everything.
         Consumer<BlockEvent.BreakEvent> all = event -> event.setCanceled(true);
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, all);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(all));
+        EventHub.Registration allHook = EventHub.of(BlockEvent.BreakEvent.class).register(Priority.NORMAL, false, all);
+        f.onClose(allHook::close);
         List<BlockPos> four = List.of(new BlockPos(6, 1, 10), new BlockPos(14, 1, 10), new BlockPos(10, 1, 6), new BlockPos(10, 1, 14));
         for (BlockPos ore : four) {
             helper.setBlock(ore, Blocks.IRON_ORE);
@@ -739,7 +740,7 @@ public final class MagnetPullTests {
         ServerPlayer first = magneto(f);
         BossTestSupport.lastActionBarKey(first);
         sneakR(first);
-        NeoForge.EVENT_BUS.unregister(all);
+        allHook.close();
         check("message.enhanced.pull.protected".equals(BossTestSupport.lastActionBarKey(first)), "everything protected: he is told so");
         check(four.stream().allMatch(ore -> helper.getBlockState(ore).is(Blocks.IRON_ORE)) && count(first, Items.RAW_IRON) == 0, "nothing came");
         check(Powers.get(first).isReady(1, level.getGameTime()), "and the pull does not rest");
@@ -749,8 +750,8 @@ public final class MagnetPullTests {
 
         // A claim on the chunks west of the border.
         Consumer<BlockEvent.BreakEvent> west = event -> event.setCanceled(event.getPos().getX() < border);
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, west);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(west));
+        EventHub.Registration westHook = EventHub.of(BlockEvent.BreakEvent.class).register(Priority.NORMAL, false, west);
+        f.onClose(westHook::close);
         for (BlockPos ore : westOres) {
             helper.setBlock(ore, Blocks.IRON_ORE);
         }
@@ -783,7 +784,7 @@ public final class MagnetPullTests {
                 drifter.move(MoverType.SELF, new Vec3(-1.0, -0.1, 0.0));
             }
             if (tick == 6) {
-                NeoForge.EVENT_BUS.unregister(west);
+                westHook.close();
                 check(!MagnetPull.isPulling(second), "the second pull is over");
                 check(westOres.stream().allMatch(ore -> helper.getBlockState(ore).is(Blocks.IRON_ORE)), "the claimed ores stay");
                 check(westIngot.isAlive(), "and so does the ingot on the claim");
@@ -1317,8 +1318,8 @@ public final class MagnetPullTests {
         lockedStand.disabledSlots = 1 << EquipmentSlot.CHEST.getFilterFlag() + 8; // its chestplate cannot be taken out
         ServerPlayer[] adventurer = new ServerPlayer[1];
         ItemEntity[] loose = new ItemEntity[1];
-        List<Consumer<BlockEvent.BreakEvent>> claims = new ArrayList<>();
-        f.onClose(() -> claims.forEach(NeoForge.EVENT_BUS::unregister));
+        List<EventHub.Registration> claims = new ArrayList<>();
+        f.onClose(() -> claims.forEach(EventHub.Registration::close));
         List<Object> packets = new ArrayList<>();
         int[] stage = {0};
         f.everyTick(90, tick -> {
@@ -1363,8 +1364,7 @@ public final class MagnetPullTests {
                     stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
                     BlockPos standCell = stand.blockPosition();
                     Consumer<BlockEvent.BreakEvent> standClaim = event -> event.setCanceled(event.getPos().equals(standCell));
-                    NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, standClaim);
-                    claims.add(standClaim);
+                    claims.add(EventHub.of(BlockEvent.BreakEvent.class).register(Priority.NORMAL, false, standClaim));
                     loose[0] = ingot(helper, new Vec3(12.5, FLOOR, 12.5));
                     Powers.get(magneto).startCooldown(1, level.getGameTime(), 0);
                     packets.clear();
@@ -1379,7 +1379,7 @@ public final class MagnetPullTests {
                     check(!lines.isEmpty() && "message.enhanced.pull.done_protected".equals(lines.get(lines.size() - 1)),
                             "and he reads that the rest is protected: " + lines);
                     stand.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
-                    claims.forEach(NeoForge.EVENT_BUS::unregister);
+                    claims.forEach(EventHub.Registration::close);
 
                     // A claim on one chest's cell.
                     helper.setBlock(claimedChest, Blocks.CHEST);
@@ -1387,8 +1387,7 @@ public final class MagnetPullTests {
                     container(helper, claimedChest).setItem(0, new ItemStack(Items.IRON_INGOT, 2));
                     BlockPos claimed = helper.absolutePos(claimedChest);
                     Consumer<BlockEvent.BreakEvent> claim = event -> event.setCanceled(event.getPos().equals(claimed));
-                    NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, claim);
-                    claims.add(claim);
+                    claims.add(EventHub.of(BlockEvent.BreakEvent.class).register(Priority.NORMAL, false, claim));
                     Powers.get(magneto).startCooldown(1, level.getGameTime(), 0);
                     sneakR(magneto);
                 }
@@ -1398,7 +1397,7 @@ public final class MagnetPullTests {
 
                     // Adventure, no claim anywhere: what lies on the ground is anyone's; a frame or a stand is someone's build,
                     // as a chest is.
-                    claims.forEach(NeoForge.EVENT_BUS::unregister);
+                    claims.forEach(EventHub.Registration::close);
                     frame.setItem(new ItemStack(Items.IRON_SWORD));
                     stand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
                     loose[0] = ingot(helper, new Vec3(12.5, FLOOR, 12.5));
@@ -1697,7 +1696,7 @@ public final class MagnetPullTests {
                     if (toFeet) {
                         List<ItemEntity> swords = helper.getEntities(EntityType.ITEM).stream().filter(item -> item.getItem().is(Items.IRON_SWORD)).toList();
                         check(swords.size() == 1 && swords.get(0).position().distanceTo(a.position()) <= 1.5, "the sword lies at A's feet");
-                        check(swords.get(0).hasPickUpDelay() && !swords.get(0).getPersistentData().contains(MagnetoAbilities.STRIPPED_BY_TAG),
+                        check(swords.get(0).hasPickUpDelay() && !ModAttachments.PERSISTENT_DATA.get(swords.get(0)).contains(MagnetoAbilities.STRIPPED_BY_TAG),
                                 "unmarked, and waiting out its delay so that A can take it back");
                         check(count(magneto, Items.IRON_SWORD) == 0 && !streamed, "it flew to nobody");
                         sword[0] = swords.get(0);
@@ -1761,7 +1760,7 @@ public final class MagnetPullTests {
                     AbilityHandler.onKey(magneto, 3, true);
                     List<ItemEntity> chests = helper.getEntities(EntityType.ITEM).stream().filter(item -> item.getItem().is(Items.IRON_CHESTPLATE)).toList();
                     check(a.getItemBySlot(EquipmentSlot.CHEST).isEmpty() && chests.size() == 1, "V at A: his chestplate falls");
-                    check(!chests.get(0).getPersistentData().contains(MagnetoAbilities.STRIPPED_BY_TAG), "unmarked: torn off a player");
+                    check(!ModAttachments.PERSISTENT_DATA.get(chests.get(0)).contains(MagnetoAbilities.STRIPPED_BY_TAG), "unmarked: torn off a player");
                     return true;
                 }
             }
@@ -1917,8 +1916,7 @@ public final class MagnetPullTests {
      */
     @EnhancedTest(template = ARENA, batch = PULL)
     public static void thePullsHudLineKeepsItsSecondsTogetherInHebrew(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        JsonObject he = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang", "he_il.json"),
+        JsonObject he = JsonParser.parseString(Files.readString(modFile("assets", Enhanced.MODID, "lang", "he_il.json"),
                 StandardCharsets.UTF_8)).getAsJsonObject();
         String seconds = he.get("hud.enhanced.seconds").getAsString();
         String line = "[R] " + he.get(Power.MAGNETO.abilityKey(1)).getAsString() + "  "
@@ -2199,5 +2197,10 @@ public final class MagnetPullTests {
     }
 
     private MagnetPullTests() {
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -536,7 +537,7 @@ public final class ApocalypseAbilities {
                 player.getY() + radius, player.getZ() + radius);
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box, p -> slowable(player, p, radius))) {
             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.5));
-            projectile.getPersistentData().putBoolean(SLOWED_TAG, true);
+            ModAttachments.PERSISTENT_DATA.get(projectile).putBoolean(SLOWED_TAG, true);
             projectile.hasImpulse = true;
         }
         long age = now - state.stormStart;
@@ -563,7 +564,8 @@ public final class ApocalypseAbilities {
 
     private static boolean slowable(ServerPlayer hero, Projectile projectile, double radius) {
         Entity owner = projectile.getOwner();
-        return owner != hero && !(owner != null && owner.isAlliedTo(hero)) && !projectile.getPersistentData().getBoolean(SLOWED_TAG)
+        return owner != hero && !(owner != null && owner.isAlliedTo(hero))
+                && !ModAttachments.PERSISTENT_DATA.get(projectile).getBoolean(SLOWED_TAG)
                 && !ApocalypseGuard.headingHome(projectile) && !Shelters.keepsOut(hero.level(), hero, hero.getEyePosition(), projectile.position(), false)
                 && Math.hypot(projectile.getX() - hero.getX(), projectile.getZ() - hero.getZ()) <= radius;
     }

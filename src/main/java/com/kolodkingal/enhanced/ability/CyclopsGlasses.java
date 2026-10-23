@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.CyclopsConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -28,7 +29,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -291,8 +291,8 @@ public final class CyclopsGlasses {
         Vec3 end = unleashedEnd(player, block);
         HitResult crosshair = Raycasts.any(player, CyclopsConfig.UNLEASHED_RANGE.get(), ContinuousBeam.targets(player), 1.0F);
         Entity aimed = crosshair instanceof EntityHitResult entityHit ? entityHit.getEntity() : null;
-        if (aimed instanceof PartEntity<?> part) {
-            aimed = part.getParent();
+        if (aimed != null) {
+            aimed = Platform.get().parts().root(aimed);
         }
         float damage = CyclopsConfig.UNLEASHED_DAMAGE.get().floatValue();
         double push = CyclopsConfig.UNLEASHED_PUSH.get();

@@ -8,6 +8,8 @@ import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -31,9 +33,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -505,8 +505,8 @@ public final class BillyBlockTests {
                 event.setCanceled(true);
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.EntityPlaceEvent.class, claim);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(claim));
+        EventHub.Registration claimHook = EventHub.of(BlockEvent.EntityPlaceEvent.class).register(Priority.NORMAL, false, claim);
+        f.onClose(claimHook::close);
 
         BlockPos claimStone = new BlockPos(7, 2, 16);
         BlockPos outside = new BlockPos(1, 2, 1);
@@ -680,8 +680,8 @@ public final class BillyBlockTests {
                 event.setCanceled(true);
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.EntityPlaceEvent.class, claim);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(claim));
+        EventHub.Registration claimHook = EventHub.of(BlockEvent.EntityPlaceEvent.class).register(Priority.NORMAL, false, claim);
+        f.onClose(claimHook::close);
         for (int i = 0; i < 3; i++) {
             int z = 4 + 6 * i;
             billies[i] = f.player(3.5, FLOOR, z + 0.5, Power.BILLY);

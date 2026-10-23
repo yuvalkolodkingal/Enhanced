@@ -42,6 +42,7 @@ public class StormbreakerItem extends AxeItem {
     }
 
     /** A dropped Stormbreaker never despawns (but {@code /give}'s look-alike still vanishes). */
+    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (!entity.level().isClientSide() && entity.tickCount == 1 && !ThorAbilities.isFakeDrop(entity)) {

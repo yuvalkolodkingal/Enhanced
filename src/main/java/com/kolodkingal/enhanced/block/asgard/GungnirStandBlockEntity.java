@@ -54,10 +54,14 @@ public class GungnirStandBlockEntity extends BlockEntity {
         return tag;
     }
 
+    // TODO(port seam): NeoForge IBlockEntityExtension#handleUpdateTag; a platform hook is requested (P0 L1 notes).
+
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
     }
+
+    // TODO(port seam): NeoForge IBlockEntityExtension#onDataPacket; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet,

@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -568,7 +569,7 @@ public final class Telekinesis {
             // Caught: it stops dead and hangs weightless in front of the holder.
             SlowMotion.unslow(projectile);
             projectile.setDeltaMovement(Vec3.ZERO);
-            projectile.getPersistentData().putBoolean(HELD_PROJECTILE_TAG, projectile.isNoGravity());
+            ModAttachments.PERSISTENT_DATA.get(projectile).putBoolean(HELD_PROJECTILE_TAG, projectile.isNoGravity());
             projectile.setNoGravity(true);
         }
         target.resetFallDistance();
@@ -826,9 +827,10 @@ public final class Telekinesis {
 
     /** A held projectile gets its weight back. */
     private static void letGo(Entity e) {
-        if (e instanceof Projectile projectile && projectile.getPersistentData().contains(HELD_PROJECTILE_TAG)) {
-            projectile.setNoGravity(projectile.getPersistentData().getBoolean(HELD_PROJECTILE_TAG));
-            projectile.getPersistentData().remove(HELD_PROJECTILE_TAG);
+        if (e instanceof Projectile projectile
+                && ModAttachments.PERSISTENT_DATA.get(projectile).contains(HELD_PROJECTILE_TAG)) {
+            projectile.setNoGravity(ModAttachments.PERSISTENT_DATA.get(projectile).getBoolean(HELD_PROJECTILE_TAG));
+            ModAttachments.PERSISTENT_DATA.get(projectile).remove(HELD_PROJECTILE_TAG);
         }
     }
 
@@ -860,7 +862,8 @@ public final class Telekinesis {
 
     /** A projectile saved to disk while held comes back as a normal projectile. */
     public static void onJoin(Entity entity) {
-        if (entity instanceof Projectile projectile && projectile.getPersistentData().contains(HELD_PROJECTILE_TAG) && !isHeld(projectile)) {
+        if (entity instanceof Projectile projectile && ModAttachments.PERSISTENT_DATA.get(projectile).contains(HELD_PROJECTILE_TAG)
+                && !isHeld(projectile)) {
             letGo(projectile);
         }
     }

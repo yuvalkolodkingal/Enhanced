@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -314,7 +315,7 @@ public final class MagnetoAbilities {
             item.setPickUpDelay(40);
             if (creature) {
                 // His pull may take it at once; what fell off a player waits its 40 ticks, so the player can take it back first.
-                item.getPersistentData().putUUID(STRIPPED_BY_TAG, player.getUUID());
+                ModAttachments.PERSISTENT_DATA.get(item).putUUID(STRIPPED_BY_TAG, player.getUUID());
             }
             level.addFreshEntity(item);
         }
@@ -383,7 +384,8 @@ public final class MagnetoAbilities {
     private static void shieldTick(ServerPlayer player) {
         Vec3 center = player.position().add(0, player.getBbHeight() * 0.5, 0);
         for (Projectile projectile : player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(SHIELD_RADIUS + 3),
-                p -> isMetalProjectile(p) && p.getOwner() != player && !p.getPersistentData().getBoolean(DEMAGNETIZED_TAG) && !isHeld(p)
+                p -> isMetalProjectile(p) && p.getOwner() != player
+                        && !ModAttachments.PERSISTENT_DATA.get(p).getBoolean(DEMAGNETIZED_TAG) && !isHeld(p)
                         && !Shelters.keepsOut(player.level(), player, center, p.position(), false))) {
             Vec3 velocity = projectile.getDeltaMovement();
             Vec3 toPlayer = center.subtract(projectile.position());
@@ -422,7 +424,7 @@ public final class MagnetoAbilities {
         }
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("NoGravity", projectile.isNoGravity());
-        projectile.getPersistentData().put(HELD_TAG, tag);
+        ModAttachments.PERSISTENT_DATA.get(projectile).put(HELD_TAG, tag);
         projectile.setNoGravity(true);
         projectile.setDeltaMovement(Vec3.ZERO);
         projectile.hasImpulse = true;
@@ -445,7 +447,7 @@ public final class MagnetoAbilities {
 
     /** Whether this projectile is hanging in a Magnetic Shield right now. */
     public static boolean isHeld(Entity entity) {
-        return entity.getPersistentData().contains(HELD_TAG);
+        return ModAttachments.PERSISTENT_DATA.get(entity).contains(HELD_TAG);
     }
 
     /**
@@ -484,8 +486,8 @@ public final class MagnetoAbilities {
     }
 
     private static void release(ServerLevel level, Projectile projectile, Hold hold) {
-        CompoundTag tag = projectile.getPersistentData().getCompound(HELD_TAG);
-        projectile.getPersistentData().remove(HELD_TAG);
+        CompoundTag tag = ModAttachments.PERSISTENT_DATA.get(projectile).getCompound(HELD_TAG);
+        ModAttachments.PERSISTENT_DATA.get(projectile).remove(HELD_TAG);
         projectile.setNoGravity(tag.getBoolean("NoGravity"));
         Entity shooter = projectile.getOwner();
         Player magneto = level.getPlayerByUUID(hold.magneto());
@@ -505,7 +507,7 @@ public final class MagnetoAbilities {
         } else {
             RandomSource random = level.getRandom();
             projectile.setDeltaMovement((random.nextDouble() - 0.5) * 0.05, -0.05, (random.nextDouble() - 0.5) * 0.05);
-            projectile.getPersistentData().putBoolean(DEMAGNETIZED_TAG, true);
+            ModAttachments.PERSISTENT_DATA.get(projectile).putBoolean(DEMAGNETIZED_TAG, true);
             level.playSound(null, projectile.getX(), projectile.getY(), projectile.getZ(), SoundEvents.CHAIN_FALL, SoundSource.PLAYERS, 0.8F, 1.4F);
         }
         projectile.hasImpulse = true;
@@ -515,8 +517,8 @@ public final class MagnetoAbilities {
     /** A projectile saved to disk while hanging in a field comes back as a normal projectile. */
     public static void onJoin(Entity entity) {
         if (entity instanceof Projectile projectile && !HELD.containsKey(projectile) && isHeld(projectile)) {
-            CompoundTag tag = projectile.getPersistentData().getCompound(HELD_TAG);
-            projectile.getPersistentData().remove(HELD_TAG);
+            CompoundTag tag = ModAttachments.PERSISTENT_DATA.get(projectile).getCompound(HELD_TAG);
+            ModAttachments.PERSISTENT_DATA.get(projectile).remove(HELD_TAG);
             projectile.setNoGravity(tag.getBoolean("NoGravity"));
         }
     }

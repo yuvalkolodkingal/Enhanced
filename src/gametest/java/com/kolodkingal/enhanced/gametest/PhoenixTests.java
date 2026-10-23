@@ -23,6 +23,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.PhoenixEmberItem;
 import com.kolodkingal.enhanced.network.MindReadPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
@@ -108,8 +109,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -333,7 +332,6 @@ public final class PhoenixTests {
     @EnhancedTest(template = ARENA, batch = QUICK)
     public static void emberIsInTheChestsLikeTheTesseract(GameTestHelper helper) throws IOException {
         ServerLevel level = helper.getLevel();
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
 
         // The data: six modifiers, each for its chest, with its chance, all listed in the global list.
         record Chest(String name, String table, double chance, ResourceKey<LootTable> key) {
@@ -345,13 +343,13 @@ public final class PhoenixTests {
                 new Chest("stronghold_library", "stronghold_library", 0.03, BuiltInLootTables.STRONGHOLD_LIBRARY),
                 new Chest("nether_bridge", "nether_bridge", 0.03, BuiltInLootTables.NETHER_BRIDGE),
                 new Chest("woodland_mansion", "woodland_mansion", 0.03, BuiltInLootTables.WOODLAND_MANSION));
-        Path list = mod.findResource("data", "neoforge", "loot_modifiers", "global_loot_modifiers.json");
+        Path list = modFile("data", "neoforge", "loot_modifiers", "global_loot_modifiers.json");
         JsonArray listed = JsonParser.parseString(Files.readString(list, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonArray("entries");
         Set<String> names = new HashSet<>();
         listed.forEach(e -> names.add(e.getAsString()));
         for (Chest chest : chests) {
             check(names.contains("enhanced:ember_from_" + chest.name()), "the global list has ember_from_" + chest.name());
-            Path file = mod.findResource("data", Enhanced.MODID, "loot_modifiers", "ember_from_" + chest.name() + ".json");
+            Path file = modFile("data", Enhanced.MODID, "loot_modifiers", "ember_from_" + chest.name() + ".json");
             JsonObject modifier = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
             check(modifier.get("type").getAsString().equals("neoforge:add_table") && modifier.get("table").getAsString().equals("enhanced:inject/phoenix_ember"),
                     chest.name() + " adds the Ember's table");
@@ -1615,5 +1613,10 @@ public final class PhoenixTests {
     }
 
     private PhoenixTests() {
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }
