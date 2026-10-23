@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.music;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.MusicConfig;
+import com.kolodkingal.enhanced.network.ModNetwork;
 import com.kolodkingal.enhanced.network.MusicChunkPayload;
 import com.kolodkingal.enhanced.network.MusicManifestPayload;
 import com.kolodkingal.enhanced.platform.net.Net;
@@ -239,7 +240,7 @@ public final class ServerMusic {
 
     /** Whether the player's client has the music channel (a client of an older version of the mod has not). */
     public static boolean canHear(ServerPlayer player) {
-        return player.connection != null && player.connection.hasChannel(MusicManifestPayload.TYPE);
+        return ModNetwork.hasMusic(player);
     }
 
     /** Tells the player what songs the world has (nothing for a client without the channel). */
