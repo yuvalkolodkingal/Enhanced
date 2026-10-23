@@ -1,10 +1,10 @@
 package com.kolodkingal.enhanced.hela;
 
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public final class HelaFx {
     public static void send(ServerLevel level, int kind, int entityId, List<Vec3> points, int arg) {
         Vec3 at = points.isEmpty() ? Vec3.ZERO : points.get(0);
         List<Vec3> capped = points.size() > AsgardFxPayload.MAX_POINTS ? points.subList(0, AsgardFxPayload.MAX_POINTS) : points;
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE, new AsgardFxPayload(kind, entityId, List.copyOf(capped), arg));
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE, new AsgardFxPayload(kind, entityId, List.copyOf(capped), arg));
     }
 
     public static void send(ServerLevel level, int kind, int entityId, Vec3 at, int arg) {
@@ -66,7 +66,7 @@ public final class HelaFx {
 
     /** To one player only (one who comes into a fight that is already channelling, for instance). */
     public static void sendTo(ServerPlayer player, int kind, int entityId, List<Vec3> points, int arg) {
-        PacketDistributor.sendToPlayer(player, new AsgardFxPayload(kind, entityId, List.copyOf(points), arg));
+        Net.sendToPlayer(player, new AsgardFxPayload(kind, entityId, List.copyOf(points), arg));
     }
 
     private HelaFx() {

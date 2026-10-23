@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.XavierAbilities;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server (3.3): Professor X chose his version on the screen that opens when he awakens ({@code young} or
@@ -25,7 +25,7 @@ public record XavierChoicePayload(String version) implements CustomPacketPayload
         return TYPE;
     }
 
-    static void handle(XavierChoicePayload payload, IPayloadContext context) {
+    static void handle(XavierChoicePayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             XavierAbilities.choose(player, payload.version());
         }

@@ -53,8 +53,8 @@ public final class ShieldThrow {
         }
         player.setItemInHand(hand, ItemStack.EMPTY);
         level.addFreshEntity(thrown);
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
-        player.setData(ModAttachments.CAPTAIN, cs.withShield(thrown.getId())
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
+        ModAttachments.CAPTAIN.set(player, cs.withShield(thrown.getId())
                 .with(CaptainState.OFF_HAND, hand == InteractionHand.OFF_HAND)
                 .with(CaptainState.RICOCHET, ricochet).withBouncesLeft(bounces).with(CaptainState.BACK, false));
         player.swing(hand, true);
@@ -67,7 +67,7 @@ public final class ShieldThrow {
     /** His shield in flight, or null. */
     @Nullable
     public static ThrownShieldEntity flying(ServerPlayer player) {
-        int id = player.getData(ModAttachments.CAPTAIN).shieldEntity();
+        int id = ModAttachments.CAPTAIN.get(player).shieldEntity();
         if (id < 0) {
             return null;
         }
@@ -77,9 +77,9 @@ public final class ShieldThrow {
 
     /** Every tick: a shield that was caught, dropped or unloaded is no longer in flight. */
     static void tick(ServerPlayer player, PowerData data) {
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
         if (cs.shieldEntity() >= 0 && flying(player) == null) {
-            player.setData(ModAttachments.CAPTAIN, cs.withShield(-1).with(CaptainState.OFF_HAND, false)
+            ModAttachments.CAPTAIN.set(player, cs.withShield(-1).with(CaptainState.OFF_HAND, false)
                     .with(CaptainState.RICOCHET, false).withBouncesLeft(0));
         }
     }

@@ -1,10 +1,9 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -12,8 +11,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -25,8 +22,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * it is never deleted. It stays for its own hero, for a custom hero with that hero's abilities, and when the power is only
  * taken away.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HeroChangeItemTests {
 
     private static int count(ServerPlayer player, Item item) {
@@ -40,7 +35,7 @@ public final class HeroChangeItemTests {
         return n;
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void anotherHerosWornItemGoesIntoTheInventory(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Item glasses = ModItems.RUBY_QUARTZ_GLASSES.get();

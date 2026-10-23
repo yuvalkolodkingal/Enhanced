@@ -97,7 +97,7 @@ public class ThanosSwordEntity extends Projectile implements ShieldCost, BossHoo
     public void tick() {
         super.tick();
         Vec3 from = position();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             setPos(from.add(getDeltaMovement()));
             return;
         }
@@ -282,7 +282,7 @@ public class ThanosSwordEntity extends Projectile implements ShieldCost, BossHoo
 
     @Override
     public void remove(Entity.RemovalReason reason) {
-        if (!level().isClientSide && getOwner() instanceof ThanosEntity thanos) {
+        if (!level().isClientSide() && getOwner() instanceof ThanosEntity thanos) {
             thanos.swordGone(this);
         }
         super.remove(reason);

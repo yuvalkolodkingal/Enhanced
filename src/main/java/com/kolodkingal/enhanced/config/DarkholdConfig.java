@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The numbers of the Darkhold (3.2): Agatha's book. Its options are defined in {@link #define}, which {@code
@@ -21,37 +21,37 @@ public final class DarkholdConfig {
     }
 
     // ---- the book ----
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue ANYONE_CAN_USE;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue ANYONE_CAN_USE;
 
     // ---- the purple beam (hold use) ----
-    public static ModConfigSpec.DoubleValue BEAM_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.IntValue BEAM_RANGE;
-    public static ModConfigSpec.IntValue BEAM_INTERVAL;
-    public static ModConfigSpec.DoubleValue BEAM_EXHAUSTION_PER_SECOND;
+    public static ConfigSpec.DoubleValue BEAM_DAMAGE_PER_SECOND;
+    public static ConfigSpec.IntValue BEAM_RANGE;
+    public static ConfigSpec.IntValue BEAM_INTERVAL;
+    public static ConfigSpec.DoubleValue BEAM_EXHAUSTION_PER_SECOND;
 
     // ---- the retaliation ----
-    public static ModConfigSpec.EnumValue<PoisonTarget> POISON_TARGET;
-    public static ModConfigSpec.IntValue POISON_TICKS;
-    public static ModConfigSpec.IntValue POISON_AMPLIFIER;
-    public static ModConfigSpec.IntValue POISON_COOLDOWN_TICKS;
+    public static ConfigSpec.EnumValue<PoisonTarget> POISON_TARGET;
+    public static ConfigSpec.IntValue POISON_TICKS;
+    public static ConfigSpec.IntValue POISON_AMPLIFIER;
+    public static ConfigSpec.IntValue POISON_COOLDOWN_TICKS;
 
     // ---- the hex mark (Sneak + use on a creature) ----
-    public static ModConfigSpec.IntValue MARK_RANGE;
-    public static ModConfigSpec.IntValue MARK_TICKS;
-    public static ModConfigSpec.IntValue MARK_SLOW_AMPLIFIER;
-    public static ModConfigSpec.DoubleValue MARK_DAMAGE_BONUS;
-    public static ModConfigSpec.IntValue MARK_COOLDOWN;
-    public static ModConfigSpec.DoubleValue MARK_EXHAUSTION;
+    public static ConfigSpec.IntValue MARK_RANGE;
+    public static ConfigSpec.IntValue MARK_TICKS;
+    public static ConfigSpec.IntValue MARK_SLOW_AMPLIFIER;
+    public static ConfigSpec.DoubleValue MARK_DAMAGE_BONUS;
+    public static ConfigSpec.IntValue MARK_COOLDOWN;
+    public static ConfigSpec.DoubleValue MARK_EXHAUSTION;
 
     // ---- the mind glimpse (Sneak + use at nothing) ----
-    public static ModConfigSpec.IntValue GLIMPSE_RANGE;
-    public static ModConfigSpec.IntValue GLIMPSE_TICKS;
-    public static ModConfigSpec.IntValue GLIMPSE_MAX;
-    public static ModConfigSpec.IntValue GLIMPSE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue GLIMPSE_EXHAUSTION;
+    public static ConfigSpec.IntValue GLIMPSE_RANGE;
+    public static ConfigSpec.IntValue GLIMPSE_TICKS;
+    public static ConfigSpec.IntValue GLIMPSE_MAX;
+    public static ConfigSpec.IntValue GLIMPSE_COOLDOWN;
+    public static ConfigSpec.DoubleValue GLIMPSE_EXHAUSTION;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.comment("The Darkhold, Agatha's book: a purple beam, a retaliation against magic used on its holder, a hex mark and a",
                 "mind glimpse. Its abilities need the book in hand and do not work in the Witches' Road.").push(SECTION);
         ENABLED = builder.comment("The Darkhold works (false: it can be held but does nothing).")

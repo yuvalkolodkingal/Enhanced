@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.HeroServer;
 import com.kolodkingal.enhanced.asgard.AsgardProgress;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -12,7 +13,6 @@ import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -63,14 +63,14 @@ public final class HeimdallServer implements HeroServer {
      * Hofund bound to him; as the worthy become Thor holding their Mjolnir.
      */
     public static boolean awakens(ServerPlayer player, PowerData data) {
-        return data.power() == Power.NONE && player.getData(ModAttachments.ASGARD).has(AsgardProgress.WATCH_WON)
+        return data.power() == Power.NONE && ModAttachments.ASGARD.get(player).has(AsgardProgress.WATCH_WON)
                 && HofundBond.holdsOwn(player);
     }
 
     /** He becomes Heimdall, in the light of the Bifrost. */
     static void awaken(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 128,
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_ARRIVAL, player.getId(), List.of(player.position())));
         Bifrost.mark(level, player.position());
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_ARRIVE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);

@@ -51,16 +51,16 @@ public class HofundSocketBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer server
+        if (!level.isClientSide() && player instanceof net.minecraft.server.level.ServerPlayer server
                 && com.kolodkingal.enhanced.heimdall.HeimdallPost.touchSocket(server)) {
             // 3.5.1: it answers to the keeper of Heimdall's post (the mechanism spins, he may send a traveller).
             return InteractionResult.sidedSuccess(false);
         }
-        if (!level.isClientSide && !HofundItem.isHofund(player.getMainHandItem())
+        if (!level.isClientSide() && !HofundItem.isHofund(player.getMainHandItem())
                 && !HofundItem.isHofund(player.getOffhandItem()) && !heimdallAnswers(player)) {
             player.displayClientMessage(Component.translatable("message.enhanced.asgard.socket").withStyle(ChatFormatting.GOLD), true);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     /** Heimdall of the city, near enough to talk, answers a touch of his socket: his talk opens. */

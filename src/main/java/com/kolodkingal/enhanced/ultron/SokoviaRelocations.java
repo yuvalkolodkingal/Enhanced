@@ -86,11 +86,11 @@ public record SokoviaRelocations(Map<UUID, Entry> entries) {
 
     /** The records of this world (kept on the Overworld). */
     public static SokoviaRelocations of(MinecraftServer server) {
-        return server.overworld().getData(ModAttachments.SOKOVIA_RELOCATIONS);
+        return ModAttachments.SOKOVIA_RELOCATIONS.get(server.overworld());
     }
 
     /** Puts the records back (which also marks the Overworld for saving). */
     public static void store(MinecraftServer server, SokoviaRelocations data) {
-        server.overworld().setData(ModAttachments.SOKOVIA_RELOCATIONS, data);
+        ModAttachments.SOKOVIA_RELOCATIONS.set(server.overworld(), data);
     }
 }

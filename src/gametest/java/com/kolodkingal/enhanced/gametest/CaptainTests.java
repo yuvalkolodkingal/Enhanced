@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -22,7 +23,6 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,8 +44,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -68,8 +66,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * combo (4, 4, 7), the flip kick, a custom hero's throw of a vanilla shield (it comes back, no ricochet), and with PvP
  * off no player hurt (with it on, yes). Batches {@code captain} and {@code captain_pvp} (PvP is server-wide).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CaptainTests {
     private static final String BATCH = "captain";
     private static final String BATCH_PVP = "captain_pvp";
@@ -100,7 +96,7 @@ public final class CaptainTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no blow moves it). */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -152,7 +148,7 @@ public final class CaptainTests {
     // The body
 
     /** Speed II, Strength II, 26 health, a better jump and fall, quicker blows; worthy of Mjolnir. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSuperSoldiersBody(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 3.5, 3.5);
@@ -181,13 +177,13 @@ public final class CaptainTests {
     }
 
     /** Resistance I: a zombie's blow of 10 takes 8 from him (and 10 from anyone else). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void resistanceCutsAZombiesBlow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 3.5, 3.5);
         cap.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
         ServerPlayer plain = f.player(8.5, FLOOR, 3.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
         float before = cap.getHealth();
         cap.hurt(cap.damageSources().mobAttack(zombie), 10.0F);
         assertNear(before - cap.getHealth(), 8.0, 0.01, "20 % off");
@@ -201,14 +197,14 @@ public final class CaptainTests {
     // The shield
 
     /** A creeper blows up before him: his raised shield (raised this very tick) takes all of it. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShieldBlocksAnExplosionFromTheFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 6.5, 10.5);
         look(cap, EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
         check(ShieldRules.guarding(cap) && !cap.isBlocking(), "up at once (vanilla's would wait 5 ticks)");
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
         float before = cap.getHealth();
         Vec3 at = creeper.position();
         helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
@@ -218,7 +214,7 @@ public final class CaptainTests {
     }
 
     /** A powerless player raising the same shield this tick is not yet guarded: vanilla's shield waits 5 ticks. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aPowerlessHolderGetsVanillasShare(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer plain = f.player(6.5, FLOOR, 10.5);
@@ -226,7 +222,7 @@ public final class CaptainTests {
         look(plain, EAST, 0.0F);
         plain.startUsingItem(InteractionHand.OFF_HAND);
         check(!ShieldRules.guarding(plain), "not Captain America");
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
         float before = plain.getHealth();
         Vec3 at = creeper.position();
         helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
@@ -236,13 +232,13 @@ public final class CaptainTests {
     }
 
     /** From behind, the shield takes nothing (only his Resistance cuts the blow). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShieldNeverBlocksFromBehind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 6.5, 10.5);
         look(cap, -EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.0, FLOOR, 10.5));
         float before = cap.getHealth();
         Vec3 at = creeper.position();
         helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
@@ -252,13 +248,13 @@ public final class CaptainTests {
     }
 
     /** A vindicator's axe on his raised shield: no harm, the shield stays up and is never disabled. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void anAxeNeverDisablesIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 5.5, 5.5);
         look(cap, EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
-        Vindicator vindicator = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(7.0, FLOOR, 5.5));
+        Vindicator vindicator = TestKit.spawnWithNoFreeWill(helper, EntityType.VINDICATOR, new Vec3(7.0, FLOOR, 5.5));
         vindicator.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_AXE));
         check(vindicator.canDisableShield(), "an axe can disable a shield");
         float before = cap.getHealth();
@@ -271,13 +267,13 @@ public final class CaptainTests {
     }
 
     /** An arrow shot at him from the front bounces back toward the skeleton that shot it. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void anArrowFromTheFrontBouncesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 4.5, 10.5);
         look(cap, EAST, 0.0F);
         cap.startUsingItem(InteractionHand.OFF_HAND);
-        var skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(14.5, FLOOR, 10.5));
+        var skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(14.5, FLOOR, 10.5));
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
         Vec3 from = helper.absoluteVec(new Vec3(8.5, FLOOR + 1.3, 10.5));
         arrow.setPos(from.x, from.y, from.z);
@@ -297,7 +293,7 @@ public final class CaptainTests {
     // R: the throw and the ricochet
 
     /** R: the shield leaves his off hand, strikes a husk for 8, and is back in the off hand within 40 ticks. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
     public static void theThrowHitsAndComesBackToTheOffHand(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 4.5, 10.5);
@@ -306,7 +302,7 @@ public final class CaptainTests {
         press(cap, 1, false);
         ThrownShieldEntity shield = ShieldThrow.flying(cap);
         check(shield != null && cap.getOffhandItem().isEmpty(), "it flies; the hand is empty");
-        check(cap.getData(ModAttachments.CAPTAIN).has(CaptainState.OFF_HAND), "from the off hand");
+        check(ModAttachments.CAPTAIN.get(cap).has(CaptainState.OFF_HAND), "from the off hand");
         press(cap, 1, false);
         check(ShieldThrow.flying(cap) == shield, "no second throw while it flies");
         until(helper, 40, () -> shieldIn(cap, InteractionHand.OFF_HAND), () -> {
@@ -319,7 +315,7 @@ public final class CaptainTests {
     }
 
     /** His off hand full when it comes back: it goes into his inventory. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
     public static void aFullHandSendsItToTheInventory(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 4.5, 10.5);
@@ -338,7 +334,7 @@ public final class CaptainTests {
     }
 
     /** He leaves while it flies: it drops where it is, as an item. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theThrowerGoneItDrops(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 4.5, 10.5);
@@ -361,7 +357,7 @@ public final class CaptainTests {
     }
 
     /** Sneak + R: the shield strikes three husks in turn, 8, 7, 6, and comes home. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theRicochetStrikesThree(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 2.5, 10.5);
@@ -383,7 +379,7 @@ public final class CaptainTests {
     }
 
     /** A custom hero with the Shield Throw throws a plain shield: it comes back to his hand, and never ricochets. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
     public static void aCustomHeroThrowsAPlainShield(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("captain.shield_throw", 3, "both").key(3, "captain.shield_throw")
@@ -407,7 +403,7 @@ public final class CaptainTests {
     // G, V: the slam, the leap, the charge, the bash
 
     /** G: the slam's shockwave hurts the two husks within 4 for 6, not the one at 6. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theSlamHitsWithinFour(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 10.5, 10.5);
@@ -426,7 +422,7 @@ public final class CaptainTests {
     }
 
     /** V: the charge runs 8 blocks (unhindered) in about 12 ticks. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theChargeRunsEightBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 3.5, 10.5);
@@ -443,7 +439,7 @@ public final class CaptainTests {
     }
 
     /** A wall 4 blocks ahead stops the charge; he is not hurt; a husk in the way is struck and thrown. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void aWallStopsTheCharge(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (int y = 2; y <= 4; y++) {
@@ -454,7 +450,7 @@ public final class CaptainTests {
         ServerPlayer cap = cap(f, 3.5, 4.5);
         look(cap, EAST, 0.0F);
         Vec3 start = cap.position();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 4.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 4.5));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         float health = cap.getHealth();
         press(cap, 3, false);
@@ -468,7 +464,7 @@ public final class CaptainTests {
     }
 
     /** Sneak + V: the bash strikes the husk in front for 5 and stuns it 30 ticks (Slowness IV, no jump). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBashStuns(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 5.5, 5.5);
@@ -487,7 +483,7 @@ public final class CaptainTests {
     }
 
     /** Sneak + G: a long running leap forward; no fall damage when he lands. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
     public static void theSuperSoldierLeap(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 3.5, 10.5);
@@ -507,13 +503,13 @@ public final class CaptainTests {
     // B, N: Assemble, Inspire, the combo, the flip kick
 
     /** B: a villager and a player near him get Strength I and Speed I for 400 ticks (and he); a zombie does not. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void assembleRalliesAllies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 10.5, 10.5);
         ServerPlayer friend = f.player(14.5, FLOOR, 10.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(7.5, FLOOR, 10.5));
         int count = Assemble.assemble(cap, data(cap));
         check(count == 3, "him, the player and the villager: " + count);
         for (net.minecraft.world.entity.LivingEntity e : List.of(cap, friend, villager)) {
@@ -527,7 +523,7 @@ public final class CaptainTests {
     }
 
     /** Sneak + B: Inspire heals a hurt friend 6 and lifts his Weakness. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void inspireHeals(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 10.5, 10.5);
@@ -541,7 +537,7 @@ public final class CaptainTests {
     }
 
     /** N: two punches and a spinning kick, 4, 4, 7, at least 8 ticks apart. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theComboIsFourFourSeven(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 5.5, 5.5);
@@ -565,7 +561,7 @@ public final class CaptainTests {
     }
 
     /** Sneak + N: the flip kick strikes the husk in front for 5; he lands well back, unhurt. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theFlipKick(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 10.5, 10.5);
@@ -587,7 +583,7 @@ public final class CaptainTests {
     // PvP
 
     /** PvP off: his throw, slam and bash pass a player by. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void withoutPvpNoPlayerIsHurt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 10.5, 10.5);
@@ -604,7 +600,7 @@ public final class CaptainTests {
     }
 
     /** PvP on: the bash and the slam hurt a player. */
-    @GameTest(template = ARENA, batch = BATCH_PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH_PVP, timeoutTicks = 60)
     public static void withPvpHisBlowsHurtAPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -618,16 +614,16 @@ public final class CaptainTests {
     }
 
     /** The shield is drawn on his back by everyone (a synced flag) while he carries it but does not hold it. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShieldOnHisBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 5.5, 5.5);
-        check(!cap.getData(ModAttachments.CAPTAIN).has(CaptainState.BACK), "in his hand: not on his back");
+        check(!ModAttachments.CAPTAIN.get(cap).has(CaptainState.BACK), "in his hand: not on his back");
         ItemStack shield = cap.getOffhandItem();
         cap.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
         cap.getInventory().setItem(20, shield);
         step(helper, 1, () -> {
-            check(cap.getData(ModAttachments.CAPTAIN).has(CaptainState.BACK), "in his inventory: on his back");
+            check(ModAttachments.CAPTAIN.get(cap).has(CaptainState.BACK), "in his inventory: on his back");
             helper.succeed();
         }, cap);
     }
@@ -636,7 +632,7 @@ public final class CaptainTests {
     // The pure tables
 
     /** His gestures' keys and routes, his states' reasons, his rows' moves, his run, his payloads' gestures. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theAnimationTables(GameTestHelper helper) {
         int count = 0;
         for (com.kolodkingal.enhanced.client.render.GestureId id
@@ -670,7 +666,7 @@ public final class CaptainTests {
     }
 
     /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
         java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
                 .findResource("assets", Enhanced.MODID, "hero_presets", "captain_america.json");

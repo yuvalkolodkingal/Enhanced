@@ -80,7 +80,7 @@ public final class WolverineEvents {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
-        if (player.level().isClientSide && !player.isLocalPlayer()) {
+        if (player.level().isClientSide() && !player.isLocalPlayer()) {
             return; // (another player on this client: his own client moves him)
         }
         Adamantium.sink(player);
@@ -152,7 +152,7 @@ public final class WolverineEvents {
     }
 
     private static void tooAngry(Player player) {
-        if (player.level().isClientSide) {
+        if (player.level().isClientSide()) {
             return;
         }
         long now = player.level().getGameTime();

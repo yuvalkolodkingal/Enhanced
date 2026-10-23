@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
 import com.kolodkingal.enhanced.client.render.Gestures;
@@ -10,14 +9,12 @@ import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.SpiderEdges;
 import com.kolodkingal.enhanced.client.render.SpiderGestures;
 import com.kolodkingal.enhanced.client.render.Stance;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,8 +31,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * in first person look like in the world is checked by eye in a real game (the {@code /enhanced_anim} tools freeze each
  * one). A test class has no client class in a signature, so nothing here names one.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SpiderAnimationTests {
     private static final String BATCH = "spider_anim";
 
@@ -89,7 +84,7 @@ public final class SpiderAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The gestures
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisFifteenGesturesAreTimedAsDesigned(GameTestHelper helper) {
         // id, group, duration, attack, release, force (the table of the design, section 6.3)
         Object[][] table = {
@@ -126,7 +121,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisTwoArmedGesturesMirrorTheirArms(GameTestHelper helper) {
         for (GestureId id : new GestureId[]{GestureId.SPIDER_BURST, GestureId.SPIDER_CRAWL_ON, GestureId.SPIDER_CRAWL_OFF,
                 GestureId.SPIDER_ALERT_START, GestureId.SPIDER_LEGS_OUT, GestureId.SPIDER_LEGS_IN, GestureId.SPIDER_KILL_ON,
@@ -153,7 +148,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theThwipSnapsTheArmToTheAimAndTheOtherArmBalances(GameTestHelper helper) {
         Gestures.Def shoot = Gestures.get(GestureId.SPIDER_SHOOT);
         check(shoot.m.size() == 4 && shoot.o.size() == 3, "the web arm has four keys, the balancing arm three");
@@ -169,7 +164,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBurstGathersInACrouchAndIsFlungWide(GameTestHelper helper) {
         Gestures.Def burst = Gestures.get(GestureId.SPIDER_BURST);
         // Gathered across the chest: at the ninth tick both forearms cross in front of him (the right arm to its left).
@@ -188,7 +183,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWebArmEndsOnTheStanceOfAZipAndOfASwing(GameTestHelper helper) {
         for (Object[] row : new Object[][]{
                 {GestureId.SPIDER_ZIP_START, SpiderGestures.ZIP_AIM, SpiderGestures.ZIP_O, SpiderGestures.ZIP_LEAN},
@@ -209,7 +204,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGesturesThatLeadIntoAStanceEndOnItsNumbers(GameTestHelper helper) {
         // The alert: the guard, the head a little up, a dip.
         Gestures.Def alert = Gestures.get(GestureId.SPIDER_ALERT_START);
@@ -235,7 +230,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGestureThatLeadsIntoAStanceTakesItsLeanDipAndHeadFromIt(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.SPIDER_MAN);
         HeroAnimState state = new HeroAnimState(UUID.randomUUID());
@@ -281,7 +276,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSuperheroLandingSinksHimAndRisesAgain(GameTestHelper helper) {
         Gestures.Def land = Gestures.get(GestureId.SPIDER_LAND);
         check(GestureId.SPIDER_LAND.group == GestureId.Group.LAND, "it is a landing: a landing before it is replaced");
@@ -302,7 +297,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHandsThatClimbSpreadAndShakeLoose(GameTestHelper helper) {
         float[] spread = arm(GestureId.SPIDER_CRAWL_ON, true, 3);
         check(spread[0] < -100 && spread[1] > 10, "Wall Crawl on: the hands go up and out at tick 3");
@@ -323,7 +318,7 @@ public final class SpiderAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The routes
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisAbilitiesAreActedAndNoneIsPending(GameTestHelper helper) {
         String[] expected = {"cooldown", "live:ZIPPING", "toggle:WALL_CRAWL", "toggle:SPIDER_LEGS", "live:BLACK_EYES"};
         for (int ability = 1; ability <= 5; ability++) {
@@ -376,7 +371,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyGestureOfHisIsStartedBySomething(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.SPIDER_MAN);
         check(hero != null && hero.power() == Power.SPIDER_MAN, "he has a plug-in");
@@ -406,7 +401,7 @@ public final class SpiderAnimationTests {
         return new SpiderGestures.Sight(shotReady, shotTarget, burstTarget, iron, stripped, confirming, true, true);
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisKeyPressesActBeforeTheServerAnswersOnlyWhereTheyWillWork(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000L;
@@ -474,7 +469,7 @@ public final class SpiderAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // What the animator sees of his motion
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aClingThatBeginsJustAfterAZipIsTheArrival(GameTestHelper helper) {
         SpiderEdges.Memory m = new SpiderEdges.Memory();
         // On the ground, then a zip for five ticks, then he clings the very next tick.
@@ -518,7 +513,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aClingThatEndsWithAnUpwardPushIsALeap(GameTestHelper helper) {
         SpiderEdges.Memory m = new SpiderEdges.Memory();
         SpiderEdges.step(m, true, false, false, 0.0F);
@@ -544,7 +539,7 @@ public final class SpiderAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hardLandingsAreHeroLandingsAndHisOwnJumpsAreNot(GameTestHelper helper) {
         int away = 50;
         check(SpiderEdges.landing(10, 0.58F, away) == SpiderEdges.Landing.NONE, "his own jump comes down at 0.58: no landing of its own");

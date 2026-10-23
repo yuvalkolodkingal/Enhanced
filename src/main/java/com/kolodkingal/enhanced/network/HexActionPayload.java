@@ -3,13 +3,13 @@ package com.kolodkingal.enhanced.network;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public record HexActionPayload(HexAction action, Optional<UUID> target, int valu
         return TYPE;
     }
 
-    static void handle(HexActionPayload payload, IPayloadContext context) {
+    static void handle(HexActionPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             HexManager.handleAction(player, payload.action(), payload.target(), payload.value());
         }

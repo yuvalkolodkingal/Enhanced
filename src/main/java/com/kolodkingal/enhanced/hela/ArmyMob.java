@@ -138,7 +138,7 @@ public abstract class ArmyMob extends Monster {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (rising() && random.nextInt(2) == 0) {
                 level().addParticle(ParticleTypes.LARGE_SMOKE, getRandomX(0.6), getY() + 0.1, getRandomZ(0.6), 0.0, 0.03, 0.0);
             }

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossBars;
 import com.kolodkingal.enhanced.boss.BossData;
 import com.kolodkingal.enhanced.boss.BossEnd;
@@ -9,11 +8,11 @@ import com.kolodkingal.enhanced.client.BossBarOverride;
 import com.kolodkingal.enhanced.client.render.HeroClient;
 import com.kolodkingal.enhanced.client.render.ShieldStyle;
 import com.kolodkingal.enhanced.client.render.ShieldStyles;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModTicketTypes;
 import net.minecraft.ChatFormatting;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -22,8 +21,6 @@ import net.minecraft.world.BossEvent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,8 +34,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The pieces of the boss framework that need no fight: the hero-generic shield (Wanda's numbers, another hero's), the
  * boss bars and the client's bar override, the saved data and the tables of endings and kinds.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossClientTests {
     private static final String CLIENT = "boss_client_pure";
 
@@ -46,7 +41,7 @@ public final class BossClientTests {
         return component.getContents() instanceof TranslatableContents translatable ? translatable.getKey() : "";
     }
 
-    @GameTest(template = ARENA, batch = CLIENT)
+    @EnhancedTest(template = ARENA, batch = CLIENT)
     public static void theGenericShieldDrawsWandasChaosShieldWithWandasNumbers(GameTestHelper helper) {
         check(ShieldStyles.of(Power.SCARLET_WITCH) == ShieldStyles.CHAOS_SHIELD, "the Scarlet Witch has the Chaos Shield");
         for (Power power : Power.values()) {
@@ -83,7 +78,7 @@ public final class BossClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CLIENT)
+    @EnhancedTest(template = ARENA, batch = CLIENT)
     public static void theHudLineOfAShieldTakesTheHerosOwnNumbers(GameTestHelper helper) {
         PowerData data = new PowerData();
         check(ShieldStyles.hudLine(data, 1000L, 30.0F, 160) == null, "no shield, no line");
@@ -105,7 +100,7 @@ public final class BossClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CLIENT)
+    @EnhancedTest(template = ARENA, batch = CLIENT)
     public static void aBossBarIsFoundByTheKeyOfItsName(GameTestHelper helper) {
         check(BossBarOverride.nameKey(Component.translatable("boss.enhanced.thanos")).equals("boss.enhanced.thanos"), "a translation is found by its key");
         check(BossBarOverride.nameKey(Component.translatable("boss.enhanced.thanos", "x").append(" more")).equals("boss.enhanced.thanos"),
@@ -117,7 +112,7 @@ public final class BossClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_bars")
+    @EnhancedTest(template = ARENA, batch = "boss_bars")
     public static void theBarsAreShownToFightersAndToWhoeverIsNearAndTakenFromTheRest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer fighter = f.player(2.5, FLOOR, 2.5);
@@ -144,7 +139,7 @@ public final class BossClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CLIENT)
+    @EnhancedTest(template = ARENA, batch = CLIENT)
     public static void theSavedDataAreNeverChangedInPlaceAndTheTablesAgree(GameTestHelper helper) {
         UUID who = UUID.randomUUID();
         BossData empty = BossData.EMPTY;

@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The Super Soldier Serum (3.8, lane L1): the item that opens the choice of Captain America, Red Hulk or Falcon. Every
@@ -13,12 +13,12 @@ public final class SerumConfig {
     public static final String SECTION = "super_soldier_serum";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue PENDING_TICKS;
-    public static ModConfigSpec.BooleanValue CRAFTABLE;
-    public static ModConfigSpec.IntValue CASE_PER_PLAYER;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue PENDING_TICKS;
+    public static ConfigSpec.BooleanValue CRAFTABLE;
+    public static ConfigSpec.IntValue CASE_PER_PLAYER;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("super_soldier_serum");
         ENABLED = builder.comment("Whether the serum works (off: using it does nothing).")
                 .define("enabled", true);

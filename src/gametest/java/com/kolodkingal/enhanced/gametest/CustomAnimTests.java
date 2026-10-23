@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.custom.CustomAnimRoutes;
 import com.kolodkingal.enhanced.client.custom.HeroAbilityAnims;
 import com.kolodkingal.enhanced.client.render.FirstPersonMoves;
@@ -15,14 +14,12 @@ import com.kolodkingal.enhanced.custom.CustomState;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.custom.PowerModule;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -38,8 +35,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the kit filter, the flight styles, run characters, speedster runs and idles of the editor, and the first-person rows
  * of every move of the catalogue. No client class beyond the pure enums and tables.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomAnimTests {
     private static final String BATCH = "custom_anim";
 
@@ -53,7 +48,7 @@ public final class CustomAnimTests {
     }
 
     /** Every option of every module has a default move, and a held one a stance; each gesture has its keys. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyModuleOptionHasItsDefaultMoveAndStance(GameTestHelper helper) {
         for (PowerModule module : PowerModule.values()) {
             for (PowerModule.Option option : module.options()) {
@@ -84,7 +79,7 @@ public final class CustomAnimTests {
      * Every built-in hero's ability has its row; what the cast marker plays for it is what its hero's cooldown plays, and
      * what its own routes play is what its hero's routes give for the bits it owns.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyHeroAbilityIsAnimatedAsItsHeroAnimatesIt(GameTestHelper helper) {
         for (HeroAbility a : HeroAbility.values()) {
             check(HeroAbilityAnims.covers(a), a.id() + " has no animation row");
@@ -165,7 +160,7 @@ public final class CustomAnimTests {
     }
 
     /** The marker of a binding plays the hero's gesture for its main action and its variant, a module's default, or the move chosen. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCastOfABindingIsItsHerosItsModulesOrItsMove(GameTestHelper helper) {
         CustomHero hero = CustomKitSupport.def()
                 .pick("thanos.power", 5).key(1, "thanos.power")
@@ -194,7 +189,7 @@ public final class CustomAnimTests {
     }
 
     /** Every bit an ability owns resolves to it in a kit that has it, and to nothing in one that has not. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyBitResolvesToItsOwnerInAKit(GameTestHelper helper) {
         HeroKit empty = kit("flight");
         for (Live live : Live.values()) {
@@ -225,7 +220,7 @@ public final class CustomAnimTests {
     }
 
     /** The kit filter: a kit acts its abilities' gestures, its modules' defaults and the body's, not other heroes'. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theKitFilterKeepsAHeroToHisOwnMoves(GameTestHelper helper) {
         HeroKit kit = kit("thor.lightning", "energy_blast");
         check(HeroAbilityAnims.allows(kit, GestureId.THOR_BEAM_KICK_BARE), "the lightning's kick");
@@ -240,7 +235,7 @@ public final class CustomAnimTests {
     }
 
     /** A pick's stance: its module's default, the one chosen, or none; and when it is up. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aHeldPowerStandsInItsChosenStance(GameTestHelper helper) {
         CustomHero.Pick beam = new CustomHero.Pick("energy_blast", 5, "beam", -1);
         check(CustomAnimRoutes.stanceOf(beam) == Stance.BEAM_HAND, "the beam's own");
@@ -264,7 +259,7 @@ public final class CustomAnimTests {
     }
 
     /** Every flight style is a profile, every run character a character, every speedster run and idle a style; and auto. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theStylesOfTheEditorAreTheHeroesOwn(GameTestHelper helper) {
         for (String style : AnimCatalog.FLIGHT_STYLES) {
             Power power = CustomAnimRoutes.flightPower(style);
@@ -309,7 +304,7 @@ public final class CustomAnimTests {
     }
 
     /** Every move and stance of the catalogue is a constant, and every move moves the hands in first person. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCatalogueIsMadeOfTheHeroesMovesAndShowsInFirstPerson(GameTestHelper helper) {
         for (String move : AnimCatalog.GESTURES) {
             GestureId id = CustomAnimRoutes.gesture(move);

@@ -16,7 +16,7 @@ import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 public final class SpeedEvents {
     @SubscribeEvent
     public static void onFall(LivingFallEvent event) {
-        if (event.getEntity() instanceof Player player && !player.level().isClientSide && SpeedSurfaces.fallSafe(player)) {
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide() && SpeedSurfaces.fallSafe(player)) {
             event.setDamageMultiplier(0.0F);
             event.setCanceled(true);
         }

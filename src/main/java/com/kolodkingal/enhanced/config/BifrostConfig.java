@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The Bifrost of 3.5 (Thor's, Hofund's, Gungnir's, Heimdall's and the rune stones'): who it takes with its traveller.
@@ -13,10 +13,10 @@ public final class BifrostConfig {
     public static final String SECTION = "bifrost";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue GROUP_RADIUS;
-    public static ModConfigSpec.BooleanValue SNEAK_TO_STAY;
+    public static ConfigSpec.DoubleValue GROUP_RADIUS;
+    public static ConfigSpec.BooleanValue SNEAK_TO_STAY;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         GROUP_RADIUS = builder.comment("The radius (blocks) of the Bifrost's circle: every player and creature whose feet are "
                         + "inside it (and within a few blocks up or down) travels with the one who opened it. The "

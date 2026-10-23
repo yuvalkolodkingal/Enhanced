@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The numbers of Agatha Harkness (3.3), the hero a player with no power becomes by the Darkhold. Its options are defined
@@ -15,47 +15,47 @@ public final class AgathaConfig {
     public static final String SECTION = "agatha";
 
     // ---- becoming Agatha ----
-    public static ModConfigSpec.BooleanValue DARKHOLD_AWAKENS;
-    public static ModConfigSpec.IntValue AWAKEN_TICKS;
+    public static ConfigSpec.BooleanValue DARKHOLD_AWAKENS;
+    public static ConfigSpec.IntValue AWAKEN_TICKS;
 
     // ---- the body ----
-    public static ModConfigSpec.DoubleValue FLIGHT_SPEED;
-    public static ModConfigSpec.DoubleValue BODY_HEALTH_BONUS;
-    public static ModConfigSpec.BooleanValue RETALIATES;
+    public static ConfigSpec.DoubleValue FLIGHT_SPEED;
+    public static ConfigSpec.DoubleValue BODY_HEALTH_BONUS;
+    public static ConfigSpec.BooleanValue RETALIATES;
 
     // ---- R: the Purple Beam ----
-    public static ModConfigSpec.DoubleValue BEAM_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.IntValue BEAM_RANGE;
-    public static ModConfigSpec.IntValue BEAM_INTERVAL;
-    public static ModConfigSpec.DoubleValue BEAM_EXHAUSTION_PER_SECOND;
+    public static ConfigSpec.DoubleValue BEAM_DAMAGE_PER_SECOND;
+    public static ConfigSpec.IntValue BEAM_RANGE;
+    public static ConfigSpec.IntValue BEAM_INTERVAL;
+    public static ConfigSpec.DoubleValue BEAM_EXHAUSTION_PER_SECOND;
 
     // ---- V: the Power Drain ----
-    public static ModConfigSpec.IntValue DRAIN_RANGE;
-    public static ModConfigSpec.IntValue DRAIN_TICKS;
-    public static ModConfigSpec.DoubleValue DRAIN_DAMAGE;
-    public static ModConfigSpec.DoubleValue DRAIN_HEAL;
-    public static ModConfigSpec.IntValue DRAIN_COOLDOWN;
-    public static ModConfigSpec.DoubleValue DRAIN_EXHAUSTION;
-    public static ModConfigSpec.BooleanValue DRAIN_ONLY_SORCERERS;
+    public static ConfigSpec.IntValue DRAIN_RANGE;
+    public static ConfigSpec.IntValue DRAIN_TICKS;
+    public static ConfigSpec.DoubleValue DRAIN_DAMAGE;
+    public static ConfigSpec.DoubleValue DRAIN_HEAL;
+    public static ConfigSpec.IntValue DRAIN_COOLDOWN;
+    public static ConfigSpec.DoubleValue DRAIN_EXHAUSTION;
+    public static ConfigSpec.BooleanValue DRAIN_ONLY_SORCERERS;
 
     // ---- B: the Witch's Shield ----
-    public static ModConfigSpec.DoubleValue SHIELD_RADIUS;
-    public static ModConfigSpec.IntValue SHIELD_WIND_UP_TICKS;
-    public static ModConfigSpec.IntValue SHIELD_MAX_TICKS;
-    public static ModConfigSpec.DoubleValue SHIELD_STRENGTH;
-    public static ModConfigSpec.IntValue SHIELD_COOLDOWN;
-    public static ModConfigSpec.IntValue SHIELD_BROKEN_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SHIELD_EXHAUSTION;
+    public static ConfigSpec.DoubleValue SHIELD_RADIUS;
+    public static ConfigSpec.IntValue SHIELD_WIND_UP_TICKS;
+    public static ConfigSpec.IntValue SHIELD_MAX_TICKS;
+    public static ConfigSpec.DoubleValue SHIELD_STRENGTH;
+    public static ConfigSpec.IntValue SHIELD_COOLDOWN;
+    public static ConfigSpec.IntValue SHIELD_BROKEN_COOLDOWN;
+    public static ConfigSpec.DoubleValue SHIELD_EXHAUSTION;
 
     // ---- N: the Rune Trap ----
-    public static ModConfigSpec.IntValue RUNE_RANGE;
-    public static ModConfigSpec.DoubleValue RUNE_RADIUS;
-    public static ModConfigSpec.IntValue RUNE_TICKS;
-    public static ModConfigSpec.DoubleValue RUNE_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.IntValue RUNE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue RUNE_EXHAUSTION;
+    public static ConfigSpec.IntValue RUNE_RANGE;
+    public static ConfigSpec.DoubleValue RUNE_RADIUS;
+    public static ConfigSpec.IntValue RUNE_TICKS;
+    public static ConfigSpec.DoubleValue RUNE_DAMAGE_PER_SECOND;
+    public static ConfigSpec.IntValue RUNE_COOLDOWN;
+    public static ConfigSpec.DoubleValue RUNE_EXHAUSTION;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.comment("Agatha Harkness (3.3): a player with no power who holds use on the Darkhold becomes her. R the Purple Beam",
                 "(Sneak: the hex mark or the mind glimpse), G flight, V the Power Drain, B the Witch's Shield (hold), N the Rune Trap.",
                 "Magic used on her poisons whoever used it, as the Darkhold does for its holder.").push(SECTION);

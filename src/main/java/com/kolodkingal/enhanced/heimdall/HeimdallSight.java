@@ -4,13 +4,13 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.HeimdallConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.HeimdallSightPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -66,12 +66,12 @@ public final class HeimdallSight {
 
     /** Sends him what the Sight shows. */
     public static void send(ServerPlayer seer) {
-        PacketDistributor.sendToPlayer(seer, new HeimdallSightPayload(far(seer)));
+        Net.sendToPlayer(seer, new HeimdallSightPayload(far(seer)));
     }
 
     /** The Sight closed: his client forgets the far players. */
     public static void stop(ServerPlayer seer) {
-        PacketDistributor.sendToPlayer(seer, new HeimdallSightPayload(List.of()));
+        Net.sendToPlayer(seer, new HeimdallSightPayload(List.of()));
     }
 
     private HeimdallSight() {

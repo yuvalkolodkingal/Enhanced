@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.DarkholdConfig;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.network.BeamPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -18,7 +19,6 @@ import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -47,8 +47,6 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +64,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * is poisoned), the hex mark and the mind glimpse. Quick tests share the batch {@code items_darkhold}; one that changes a
  * setting the others rely on has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class DarkholdTests {
     private static final String BATCH = "items_darkhold";
 
@@ -108,7 +104,7 @@ public final class DarkholdTests {
     }
 
     private static Pig dummy(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(x, FLOOR, z));
     }
 
     private static List<BeamPayload> beamPayloads(ServerPlayer player) {
@@ -132,7 +128,7 @@ public final class DarkholdTests {
     // ------------------------------------------------------------------------------------------------------------
     // The item
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDarkholdIsCraftedFromWitherAndEchoAndScrap(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("darkhold"));
@@ -152,7 +148,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDarkholdSaysWhoCanReadIt(GameTestHelper helper) {
         ItemStack stack = new ItemStack(ModItems.DARKHOLD.get());
         check(stack.getMaxStackSize() == 1, "one to a stack");
@@ -169,7 +165,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theMagicTagNamesTheMagicOfTheMod(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         for (ResourceKey<DamageType> key : List.of(ModDamageTypes.HEX_BOLT, ModDamageTypes.HEX_BEAM,
@@ -189,7 +185,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDarkholdDoesNothingInTheWitchesRoad(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ResourceKey<Level> road = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse("enhanced:witches_road"));
@@ -203,7 +199,7 @@ public final class DarkholdTests {
     // ------------------------------------------------------------------------------------------------------------
     // Who can use it
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyLokiTheScarletWitchAndBillyCanUseIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(!DarkholdConfig.ANYONE_CAN_USE.get(), "anyoneCanUse is off by default");
@@ -215,7 +211,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void anyoneElseHearsOnlyWhispers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Pig pig = dummy(helper, 14.5, 10.5);
@@ -236,7 +232,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_anyone")
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_anyone")
     public static void anyoneCanUseItWhenTheConfigSaysSo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DarkholdConfig.ANYONE_CAN_USE, true);
@@ -264,7 +260,7 @@ public final class DarkholdTests {
     // ------------------------------------------------------------------------------------------------------------
     // The purple beam
 
-    @GameTest(template = ARENA, batch = "items_darkhold_beam", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_beam", timeoutTicks = 100)
     public static void theBeamHurtsWhatTheCrosshairIsOnForTheConfiguredDamage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 3.5, 10.5, Power.LOKI);
@@ -308,7 +304,7 @@ public final class DarkholdTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theBeamCostsHungerNeedsFoodAndWorksFromTheOffHand(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -338,7 +334,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_billy", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_billy", timeoutTicks = 60)
     public static void billyWithTheDarkholdFiresOnlyItsBeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = holder(f, 3.5, 10.5, Power.BILLY);
@@ -361,7 +357,7 @@ public final class DarkholdTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_pvp", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_pvp", timeoutTicks = 80)
     public static void theBeamKeepsTheRulesOfPvP(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(false);
@@ -389,7 +385,7 @@ public final class DarkholdTests {
     // ------------------------------------------------------------------------------------------------------------
     // The retaliation
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void magicUsedOnTheHolderPoisonsTheAttackerNotTheHolder(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -431,7 +427,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_holder")
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_holder")
     public static void theConfigCanPoisonTheHolderInstead(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DarkholdConfig.POISON_TARGET, DarkholdConfig.PoisonTarget.HOLDER);
@@ -449,7 +445,7 @@ public final class DarkholdTests {
     // ------------------------------------------------------------------------------------------------------------
     // The hex mark and the mind glimpse
 
-    @GameTest(template = ARENA, batch = "items_darkhold_marks", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_marks", timeoutTicks = 80)
     public static void sneakAndUseMarksWhatYouLookAtAndItTakesMoreFromYou(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DarkholdConfig.MARK_TICKS, 30);
@@ -487,7 +483,7 @@ public final class DarkholdTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aPlayerCanOnlyBeMarkedWhereTheyCanBeHarmed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 3.5, 10.5, Power.LOKI);
@@ -500,12 +496,12 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sneakAndUseAtNothingGlimpsesTheCreaturesNear(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
         Pig near = dummy(helper, 14.5, 10.5);
-        Zombie nearer = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie nearer = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         nearer.setHealth(5.0F);
         TestKit.look(loki, 0.0F, -90.0F);
         TestKit.sentPackets(loki);
@@ -527,7 +523,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_glimpse")
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_glimpse")
     public static void theGlimpseSeesNothingBeyondItsRangeAndSaysSoWhenNothingIsNear(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DarkholdConfig.GLIMPSE_RANGE, 5);
@@ -544,7 +540,7 @@ public final class DarkholdTests {
     // ------------------------------------------------------------------------------------------------------------
     // Review fixes
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void magicEffectsOnTheHolderAnswerToo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
@@ -560,7 +556,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_billy_r", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_billy_r", timeoutTicks = 60)
     public static void releasingRDoesNotStopTheDarkholdsBeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = holder(f, 3.5, 10.5, Power.BILLY);
@@ -575,23 +571,23 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_boss_mark")
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_boss_mark")
     public static void aBossIsMarkedButNotSlowed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 3.5, 10.5, Power.LOKI);
-        Mob wither = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 10.5));
+        Mob wither = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(10.5, FLOOR, 10.5));
         lookAt(loki, wither);
         TestKit.sentPackets(loki);
         DarkholdBook.mark(loki, wither);
         check(wither.getEffect(MobEffects.GLOWING) != null, "the boss glows (" + wither.getActiveEffects() + ")");
         check(wither.getEffect(MobEffects.MOVEMENT_SLOWDOWN) == null, "but is not slowed");
         assertNear(DarkholdBook.markedFactor(wither, loki), 1.5, 1.0E-6, "and takes the marker's extra damage");
-        check(DarkholdBook.bossLike(wither) && !DarkholdBook.bossLike(helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 12.5))), "bosses are told from the rest");
+        check(DarkholdBook.bossLike(wither) && !DarkholdBook.bossLike(TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 12.5))), "bosses are told from the rest");
         wither.discard();
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGlimpseDoesNotShowWhatHides(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
@@ -608,7 +604,7 @@ public final class DarkholdTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_darkhold_marks_prune", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "items_darkhold_marks_prune", timeoutTicks = 80)
     public static void endedMarksAreDropped(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DarkholdConfig.MARK_TICKS, 20);

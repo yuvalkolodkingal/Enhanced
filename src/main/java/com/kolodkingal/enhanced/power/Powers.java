@@ -27,10 +27,10 @@ public final class Powers {
      * the client has just received. Every reader of the power data comes through here.
      */
     public static PowerData get(Player player) {
-        PowerData data = player.getData(ModAttachments.POWER);
+        PowerData data = ModAttachments.POWER.get(player);
         if (data.power() == Power.CUSTOM) {
-            com.kolodkingal.enhanced.custom.CustomState state = player.getData(ModAttachments.CUSTOM_STATE);
-            com.kolodkingal.enhanced.custom.HeroKit kit = state.kitFor(player.getData(ModAttachments.CUSTOM_HERO));
+            com.kolodkingal.enhanced.custom.CustomState state = ModAttachments.CUSTOM_STATE.get(player);
+            com.kolodkingal.enhanced.custom.HeroKit kit = state.kitFor(ModAttachments.CUSTOM_HERO.get(player));
             if (data.kit() != kit) {
                 data.setKit(kit);
             }
@@ -51,7 +51,7 @@ public final class Powers {
         PowerData data = get(player);
         if (data.isDirty()) {
             data.clearDirty();
-            player.syncData(ModAttachments.POWER);
+            ModAttachments.POWER.sync(player);
         }
     }
 

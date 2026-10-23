@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Captain America and the Vibranium Shield (3.8, lane L1). Every option of the plan is defined here by the 3.8
@@ -14,53 +14,53 @@ public final class CaptainConfig {
     public static final String SECTION_VIBRANIUM_SHIELD = "vibranium_shield";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue ATTACK_BONUS;
-    public static ModConfigSpec.DoubleValue RESISTANCE;
-    public static ModConfigSpec.DoubleValue JUMP_BONUS;
-    public static ModConfigSpec.DoubleValue SAFE_FALL;
-    public static ModConfigSpec.DoubleValue ATTACK_SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue ATTACK_KNOCKBACK;
-    public static ModConfigSpec.BooleanValue WORTHY;
-    public static ModConfigSpec.DoubleValue THROW_DAMAGE;
-    public static ModConfigSpec.DoubleValue THROW_SPEED;
-    public static ModConfigSpec.IntValue THROW_RANGE;
-    public static ModConfigSpec.IntValue THROW_COOLDOWN;
-    public static ModConfigSpec.IntValue RICOCHETS;
-    public static ModConfigSpec.DoubleValue RICOCHET_RADIUS;
-    public static ModConfigSpec.DoubleValue RICOCHET_FALLOFF;
-    public static ModConfigSpec.IntValue RICOCHET_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SLAM_DAMAGE;
-    public static ModConfigSpec.DoubleValue SLAM_RADIUS;
-    public static ModConfigSpec.IntValue SLAM_COOLDOWN;
-    public static ModConfigSpec.IntValue LEAP_COOLDOWN;
-    public static ModConfigSpec.DoubleValue CHARGE_DISTANCE;
-    public static ModConfigSpec.DoubleValue CHARGE_DAMAGE;
-    public static ModConfigSpec.IntValue CHARGE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue BASH_DAMAGE;
-    public static ModConfigSpec.IntValue BASH_STUN_TICKS;
-    public static ModConfigSpec.IntValue BASH_COOLDOWN;
-    public static ModConfigSpec.DoubleValue RALLY_RADIUS;
-    public static ModConfigSpec.IntValue RALLY_TICKS;
-    public static ModConfigSpec.IntValue RALLY_COOLDOWN;
-    public static ModConfigSpec.DoubleValue INSPIRE_HEAL;
-    public static ModConfigSpec.IntValue INSPIRE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue COMBO_DAMAGE_1;
-    public static ModConfigSpec.DoubleValue COMBO_DAMAGE_2;
-    public static ModConfigSpec.DoubleValue COMBO_DAMAGE_3;
-    public static ModConfigSpec.IntValue COMBO_GAP;
-    public static ModConfigSpec.IntValue COMBO_RESET;
-    public static ModConfigSpec.DoubleValue FLIP_DAMAGE;
-    public static ModConfigSpec.IntValue FLIP_COOLDOWN;
-    public static ModConfigSpec.BooleanValue CAP_BLOCKS_EVERYTHING;
-    public static ModConfigSpec.DoubleValue CAP_BLOCK_ANGLE;
-    public static ModConfigSpec.BooleanValue REFLECT_PROJECTILES;
-    public static ModConfigSpec.DoubleValue REFLECT_SPEED;
-    public static ModConfigSpec.BooleanValue AXE_DISABLES;
-    public static ModConfigSpec.DoubleValue MELEE_PUSH;
+    public static ConfigSpec.DoubleValue HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue SPEED_BONUS;
+    public static ConfigSpec.DoubleValue ATTACK_BONUS;
+    public static ConfigSpec.DoubleValue RESISTANCE;
+    public static ConfigSpec.DoubleValue JUMP_BONUS;
+    public static ConfigSpec.DoubleValue SAFE_FALL;
+    public static ConfigSpec.DoubleValue ATTACK_SPEED_BONUS;
+    public static ConfigSpec.DoubleValue ATTACK_KNOCKBACK;
+    public static ConfigSpec.BooleanValue WORTHY;
+    public static ConfigSpec.DoubleValue THROW_DAMAGE;
+    public static ConfigSpec.DoubleValue THROW_SPEED;
+    public static ConfigSpec.IntValue THROW_RANGE;
+    public static ConfigSpec.IntValue THROW_COOLDOWN;
+    public static ConfigSpec.IntValue RICOCHETS;
+    public static ConfigSpec.DoubleValue RICOCHET_RADIUS;
+    public static ConfigSpec.DoubleValue RICOCHET_FALLOFF;
+    public static ConfigSpec.IntValue RICOCHET_COOLDOWN;
+    public static ConfigSpec.DoubleValue SLAM_DAMAGE;
+    public static ConfigSpec.DoubleValue SLAM_RADIUS;
+    public static ConfigSpec.IntValue SLAM_COOLDOWN;
+    public static ConfigSpec.IntValue LEAP_COOLDOWN;
+    public static ConfigSpec.DoubleValue CHARGE_DISTANCE;
+    public static ConfigSpec.DoubleValue CHARGE_DAMAGE;
+    public static ConfigSpec.IntValue CHARGE_COOLDOWN;
+    public static ConfigSpec.DoubleValue BASH_DAMAGE;
+    public static ConfigSpec.IntValue BASH_STUN_TICKS;
+    public static ConfigSpec.IntValue BASH_COOLDOWN;
+    public static ConfigSpec.DoubleValue RALLY_RADIUS;
+    public static ConfigSpec.IntValue RALLY_TICKS;
+    public static ConfigSpec.IntValue RALLY_COOLDOWN;
+    public static ConfigSpec.DoubleValue INSPIRE_HEAL;
+    public static ConfigSpec.IntValue INSPIRE_COOLDOWN;
+    public static ConfigSpec.DoubleValue COMBO_DAMAGE_1;
+    public static ConfigSpec.DoubleValue COMBO_DAMAGE_2;
+    public static ConfigSpec.DoubleValue COMBO_DAMAGE_3;
+    public static ConfigSpec.IntValue COMBO_GAP;
+    public static ConfigSpec.IntValue COMBO_RESET;
+    public static ConfigSpec.DoubleValue FLIP_DAMAGE;
+    public static ConfigSpec.IntValue FLIP_COOLDOWN;
+    public static ConfigSpec.BooleanValue CAP_BLOCKS_EVERYTHING;
+    public static ConfigSpec.DoubleValue CAP_BLOCK_ANGLE;
+    public static ConfigSpec.BooleanValue REFLECT_PROJECTILES;
+    public static ConfigSpec.DoubleValue REFLECT_SPEED;
+    public static ConfigSpec.BooleanValue AXE_DISABLES;
+    public static ConfigSpec.DoubleValue MELEE_PUSH;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("captain_america");
         HEALTH_BONUS = builder.comment("Max health added to his 20.")
                 .defineInRange("healthBonus", 6.0, 0.0, 100.0);

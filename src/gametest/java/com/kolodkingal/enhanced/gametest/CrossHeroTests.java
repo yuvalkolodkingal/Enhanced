@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PhoenixBurst;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
@@ -20,6 +19,7 @@ import com.kolodkingal.enhanced.gametest.UltronTestSupport.Log;
 import com.kolodkingal.enhanced.item.AwakeningItem;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.item.ScepterRituals.Ritual;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -45,7 +45,6 @@ import com.kolodkingal.enhanced.config.UltronConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -76,8 +75,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,8 +104,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  *
  * <p>Every test that starts a fight or changes a server-wide value has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CrossHeroTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -187,7 +182,7 @@ public final class CrossHeroTests {
      * the item, the Ultron Program in the air only says to aim at the ground, and the stone knows Wanda, Vision and Ultron.
      * Nobody dies, nothing else changes and no fight starts.
      */
-    @GameTest(template = ARENA, batch = "cross_scepter")
+    @EnhancedTest(template = ARENA, batch = "cross_scepter")
     public static void theScepterAnswersEachItemAndEachHeroAsTheTableSays(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -246,7 +241,7 @@ public final class CrossHeroTests {
      * die"). A Creative player is only told, keeps the item and gains no power; a survival player with the Gauntlet dies of it
      * and does not become Thanos.
      */
-    @GameTest(template = ARENA, batch = "cross_scepter_explodes")
+    @EnhancedTest(template = ARENA, batch = "cross_scepter_explodes")
     public static void theScepterTearsApartWhoeverHoldsANewItemThatIsNoRitual(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Item scepter = ModItems.LOKIS_SCEPTER.get();
@@ -281,7 +276,7 @@ public final class CrossHeroTests {
      * stand: with the gene a powerless player becomes the Scarlet Witch, a hero jumps; and with a reward item in the other
      * hand it is Loki's escape for a powerless player, never the Mad Titan.
      */
-    @GameTest(template = ARENA, batch = "cross_tesseract", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "cross_tesseract", timeoutTicks = 60)
     public static void theTesseractAndTheScepterCallTheRealMadTitanForAnyHero(GameTestHelper helper) {
         TestKit.Fixture f = ThanosSummonTests.fixture(helper);
         Item scepter = ModItems.LOKIS_SCEPTER.get();
@@ -338,7 +333,7 @@ public final class CrossHeroTests {
      * The Scepter with the Ultron Program, Sneak + use on the ground, wakes the real Ultron, for a hero too (integration.md
      * 3.2), and uses the Program up; a second ritual while he fights is refused and uses nothing.
      */
-    @GameTest(template = ARENA, batch = "cross_scepter_ultron", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "cross_scepter_ultron", timeoutTicks = 40)
     public static void theScepterAndTheProgramWakeTheRealUltronAndOnlyOnce(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         ServerPlayer phoenix = tank(f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.PHOENIX));
@@ -368,7 +363,7 @@ public final class CrossHeroTests {
      * bosses: no recipe makes one, no loot table or loot modifier holds one, the bosses cannot be summoned, and of every item
      * of the game only the Gauntlet awakens Thanos and only the Essence Apocalypse (Ultron's Core is a Scepter ritual).
      */
-    @GameTest(template = ARENA, batch = "cross_rewards_data")
+    @EnhancedTest(template = ARENA, batch = "cross_rewards_data")
     public static void theThreeBossPowersAreMadeByNothingButTheirBosses(GameTestHelper helper) throws IOException {
         ServerLevel level = helper.getLevel();
         MinecraftServer server = level.getServer();
@@ -431,7 +426,7 @@ public final class CrossHeroTests {
      * then lost (a wipe for Thanos, an abandonment for Ultron, a withdrawal for Apocalypse); then the same fight won gives each
      * of them the reward. The control shows the fighters were the kind the reward goes to.
      */
-    @GameTest(template = ARENA, batch = "cross_rewards_lost", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "cross_rewards_lost", timeoutTicks = 200)
     public static void aBossFightThatIsNotWonGivesNoPowerAndAWonOneDoes(GameTestHelper helper) {
         TestKit.Fixture f = threeBosses(helper);
         f.config(BossConfig.REWARD_MIN_SECONDS, 0);
@@ -526,7 +521,7 @@ public final class CrossHeroTests {
      * fifth for more than the time of another stone and nothing comes, and a Vision among the fighters (the Mind Stone is in
      * his forehead) does not change it, not even when Thanos kills him (thanos.md 3.4).
      */
-    @GameTest(template = ARENA, batch = "cross_thanos_stones", timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = "cross_thanos_stones", timeoutTicks = 600)
     public static void thanosGathersFiveStonesAndNeverTheSixth(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         int interval = 200;
@@ -572,14 +567,14 @@ public final class CrossHeroTests {
         static Village round(TestKit.Fixture f, ServerPlayer caster, double x, double z) {
             GameTestHelper helper = f.helper();
             ServerPlayer neighbour = f.player(x + 3.0, FLOOR, z - 3.0);
-            Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(x + 3.0, FLOOR, z));
-            IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(x, FLOOR, z + 3.0));
-            Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(x - 3.0, FLOOR, z + 1.0));
-            Wolf othersPet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(x, FLOOR, z - 3.0));
+            Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(x + 3.0, FLOOR, z));
+            IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(x, FLOOR, z + 3.0));
+            Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(x - 3.0, FLOOR, z + 1.0));
+            Wolf othersPet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(x, FLOOR, z - 3.0));
             othersPet.tame(neighbour);
-            Wolf ownPet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(x + 2.0, FLOOR, z + 2.0));
+            Wolf ownPet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(x + 2.0, FLOOR, z + 2.0));
             ownPet.tame(caster);
-            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x - 2.0, FLOOR, z - 2.0));
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x - 2.0, FLOOR, z - 2.0));
             zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
             zombie.setHealth(200.0F);
             Map<LivingEntity, Float> health = new LinkedHashMap<>();
@@ -606,7 +601,7 @@ public final class CrossHeroTests {
     }
 
     /** The Phoenix Burst spares the village (phoenix.md 4.5, {@code burstHurtsPassives} false) and burns the Zombie. */
-    @GameTest(template = ARENA, batch = "cross_area_burst", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "cross_area_burst", timeoutTicks = 80)
     public static void thePhoenixBurstSparesAVillage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.BURST_CHARGE_TICKS, 10);
@@ -631,7 +626,7 @@ public final class CrossHeroTests {
     }
 
     /** The Web Burst webs the Zombie and no villager, golem, animal or pet (spider-man.md 4.3.1 and the area rule). */
-    @GameTest(template = ARENA, batch = "cross_area_web_burst", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "cross_area_web_burst", timeoutTicks = 40)
     public static void theWebBurstSparesAVillage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer spider = f.player(10.5, FLOOR, 10.5, Power.SPIDER_MAN);
@@ -643,7 +638,7 @@ public final class CrossHeroTests {
     }
 
     /** The Thanos hero's Titan Slam and the splash of his Power Blast spare the village and hurt the Zombie. */
-    @GameTest(template = ARENA, batch = "cross_area_thanos", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "cross_area_thanos", timeoutTicks = 80)
     public static void theTitansSlamAndBlastSpareAVillage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = tank(f.player(10.5, FLOOR, 10.5, Power.THANOS));
@@ -671,7 +666,7 @@ public final class CrossHeroTests {
     }
 
     /** The Ultron hero's Gravity Slam and the splash of his Overcharge spare the village and hurt the Zombie. */
-    @GameTest(template = ARENA, batch = "cross_area_ultron", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "cross_area_ultron", timeoutTicks = 100)
     public static void ultronsSlamAndOverchargeSpareAVillage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer ultron = tank(f.player(10.5, FLOOR, 10.5, Power.ULTRON));
@@ -698,7 +693,7 @@ public final class CrossHeroTests {
     }
 
     /** The Apocalypse hero's Sand Wave and Sandstorm spare the village and hurt the Zombie. */
-    @GameTest(template = ARENA, batch = "cross_area_apocalypse", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "cross_area_apocalypse", timeoutTicks = 100)
     public static void apocalypsesSandSparesAVillage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer apocalypse = tank(f.player(4.5, FLOOR, 10.5, Power.APOCALYPSE));
@@ -732,7 +727,7 @@ public final class CrossHeroTests {
      * While one boss fights, neither of the other two can be started, by an operator or by its ritual, and the ritual item is
      * kept (integration.md 5.4: one fight at a time, forced starts too): every ordered pair of the three.
      */
-    @GameTest(template = ARENA, batch = "cross_one_fight", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "cross_one_fight", timeoutTicks = 60)
     public static void neverTwoBossFightsAtOnceWhicheverStartsFirst(GameTestHelper helper) {
         TestKit.Fixture f = threeBosses(helper);
         ServerLevel level = f.level();
@@ -790,7 +785,7 @@ public final class CrossHeroTests {
      * Each boss beaten with one fighter logged out and one dead: the reward of each lane (the Gauntlet, the Core, the Essence)
      * waits for them as a gift, and arrives when the one logs in again and when the other respawns.
      */
-    @GameTest(template = ARENA, batch = "cross_gifts", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "cross_gifts", timeoutTicks = 200)
     public static void aBeatenBossesRewardWaitsForTheAbsentAndTheDead(GameTestHelper helper) {
         TestKit.Fixture f = threeBosses(helper);
         f.config(BossConfig.REWARD_MIN_SECONDS, 0);
@@ -897,7 +892,7 @@ public final class CrossHeroTests {
      * up comes back (the Ultron Program, the Capstone) as a gift, which arrives after a change of dimension and at the next
      * login; the Mad Titan's call uses nothing up, so nothing is owed and the Tesseract and the Scepter are still in the hands.
      */
-    @GameTest(template = ARENA, batch = "cross_server_stop", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "cross_server_stop", timeoutTicks = 200)
     public static void aServerStopEndsEachFightAndGivesTheRitualItemBack(GameTestHelper helper) {
         TestKit.Fixture f = threeBosses(helper);
         ApocalypseRitualTests.readyGround(f);
@@ -1007,7 +1002,7 @@ public final class CrossHeroTests {
      * 80 in the air): a Spider-Man, a Phoenix, a Thanos (taller than a player), an Apocalypse and a powerless player are all
      * carried, ticked by their own heroes' code as a connected client's would be, and none is kicked.
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "cross_lift_kick", timeoutTicks = 700)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "cross_lift_kick", timeoutTicks = 700)
     public static void heroesCarriedByTheLiftAreNotKickedForFlying(GameTestHelper helper) {
         TestKit.Fixture f = SokoviaTestSupport.pad(helper);
         f.config(UltronBossConfig.LIFT_TICKS, 200);
@@ -1092,7 +1087,7 @@ public final class CrossHeroTests {
      * lets in come in), so at the warning the lift is refused and the fight goes on as the Tremor (ultron.md: the lift's
      * warning asks whether the sky is still free).
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "cross_hex_lift", timeoutTicks = 200)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "cross_hex_lift", timeoutTicks = 200)
     public static void theSokoviaLiftDoesNotRiseThroughAHexWall(GameTestHelper helper) {
         TestKit.Fixture f = SokoviaTestSupport.pad(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);

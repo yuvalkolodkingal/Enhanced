@@ -1,11 +1,11 @@
 package com.kolodkingal.enhanced.heimdall;
 
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -43,13 +43,13 @@ public final class HeimdallFx {
 
     /** Sends an effect to everyone near {@code at} (the caster's own client too). */
     public static void near(ServerLevel level, Vec3 at, int kind, Entity who, List<Vec3> points, int arg) {
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE,
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE,
                 new AsgardFxPayload(kind, who == null ? -1 : who.getId(), cap(points), arg));
     }
 
     /** Sends an effect to one player alone. */
     public static void to(ServerPlayer player, int kind, int entityId, List<Vec3> points, int arg) {
-        PacketDistributor.sendToPlayer(player, new AsgardFxPayload(kind, entityId, cap(points), arg));
+        Net.sendToPlayer(player, new AsgardFxPayload(kind, entityId, cap(points), arg));
     }
 
     private static List<Vec3> cap(List<Vec3> points) {

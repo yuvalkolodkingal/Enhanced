@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -9,12 +8,12 @@ import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -44,8 +43,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.function.Consumer;
 
@@ -63,8 +60,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * its head, sets a hanging lantern down standing, angers the piglins whose gold he takes, tells the truth about a fixed
  * block his Magnetic Pull would take, and asks the same rights as a hand.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MagnetoBlockTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -148,7 +143,7 @@ public final class MagnetoBlockTests {
      * and set down with Sneak + R, it stands as an iron block under where it floated and nothing drops. R at a stone block:
      * {@code no_metal}, the stone unchanged. R at a netherite block (hardness 50): lifted.
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 100)
     public static void magnetoTearsOutMetalBlocksOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
@@ -206,7 +201,7 @@ public final class MagnetoBlockTests {
     }
 
     /** M12 (D-M 3.3): with {@code magneto.blockLiftMaxHardness} 5, a netherite block is too strong; an iron block (5) lifts. */
-    @GameTest(template = ARENA, batch = "magneto_blocks_hardness")
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks_hardness")
     public static void magnetosHardnessLimit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -242,7 +237,7 @@ public final class MagnetoBlockTests {
      * lifted; an iron block seen past an open oak trapdoor is lifted. A stone block in front of a rail stops the ray: the
      * rail is not lifted, and he is told there is no metal.
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 100)
     public static void magnetoAimsAtRailsAndPlatesPastGrass(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
 
@@ -328,7 +323,7 @@ public final class MagnetoBlockTests {
      * retracted: its head's cell is air and nothing drops; set down beside a redstone block, it stands and pushes out a new
      * head within 3 ticks.
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 200)
     public static void magnetoCarriesADoorWhole(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
 
@@ -445,7 +440,7 @@ public final class MagnetoBlockTests {
      * D-M 3.3 (an extra test of step 8): in a boss's protected arena an iron door is never borrowed, whichever half he
      * aims at (two cells cannot be one loan): {@code protected}, and both halves stay; an iron block beside it is.
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks_arena")
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks_arena")
     public static void aDoorIsNeverBorrowed(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -482,7 +477,7 @@ public final class MagnetoBlockTests {
      * D-M 3.4 (an extra test of step 8): a lantern hanging under a block is held as it hung; set down on the floor, where
      * it has nothing to hang from, it stands on the floor.
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks", timeoutTicks = 80)
     public static void aHangingLanternStandsWhereItCannotHang(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
@@ -521,11 +516,11 @@ public final class MagnetoBlockTests {
      * D-M 3.3 (an extra test of step 8): a gold block torn out angers the piglins near him, as breaking their gold by hand
      * does; an iron block does not.
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks")
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks")
     public static void piglinsMindTheGoldHeTearsOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
-        Piglin piglin = helper.spawnWithNoFreeWill(EntityType.PIGLIN, new Vec3(12.5, FLOOR, 16.5));
+        Piglin piglin = TestKit.spawnWithNoFreeWill(helper, EntityType.PIGLIN, new Vec3(12.5, FLOOR, 16.5));
         BlockPos iron = new BlockPos(8, 2, 8);
         BlockPos gold = new BlockPos(8, 2, 12);
         helper.setBlock(iron, Blocks.IRON_BLOCK);
@@ -556,7 +551,7 @@ public final class MagnetoBlockTests {
      * fixed_metal_full} and still holds 3; an empty hopper and an unclaimed bell (the pull would take them) say {@code
      * fixed_metal}. (A villager's bell is integration test X3.)
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks")
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks")
     public static void blocksThatHoldThingsStayForR(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
@@ -593,7 +588,7 @@ public final class MagnetoBlockTests {
      * M16 (D-M 3.3, 7): R asks the rights a hand would need. A claim (a NORMAL-priority listener that cancels his break
      * events): {@code protected}, the iron block stays; without it, lifted. An Adventure Magneto: {@code protected}.
      */
-    @GameTest(template = ARENA, batch = "magneto_blocks_rights")
+    @EnhancedTest(template = ARENA, batch = "magneto_blocks_rights")
     public static void magnetosLiftAsksTheRights(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);

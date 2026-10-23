@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
 import com.kolodkingal.enhanced.network.SpiderSwingPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -58,7 +59,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -462,7 +462,7 @@ public final class SpiderServer implements HeroServer {
     }
 
     private static void send(ServerLevel level, ServerPlayer player, SpiderFxPayload payload) {
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0, payload);
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0, payload);
     }
 
     /**
@@ -471,7 +471,7 @@ public final class SpiderServer implements HeroServer {
      * came, and it stops (code 2 of {@link SpiderFxPayload}). Nobody else is told: nobody else saw anything.
      */
     private static void refuse(ServerPlayer player, boolean swing) {
-        PacketDistributor.sendToPlayer(player, new SpiderFxPayload(swing ? SpiderFxPayload.Kind.SWING_END : SpiderFxPayload.Kind.ZIP_END,
+        Net.sendToPlayer(player, new SpiderFxPayload(swing ? SpiderFxPayload.Kind.SWING_END : SpiderFxPayload.Kind.ZIP_END,
                 player.getId(), player.position(), player.position(), Vec3.ZERO, 2, 0F, false, 0L, List.of()));
     }
 
@@ -1573,7 +1573,7 @@ public final class SpiderServer implements HeroServer {
             ids.add(threat.entity().getId());
             strong |= threat.strong();
         }
-        PacketDistributor.sendToPlayer(player, new SpiderSensePayload(ids, strong));
+        Net.sendToPlayer(player, new SpiderSensePayload(ids, strong));
         player.playNotifySound(ModSounds.SPIDER_SENSE.get(), SoundSource.PLAYERS, 0.8F, strong ? 1.1F : 1.0F);
     }
 

@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import java.util.List;
 
 /**
@@ -15,96 +15,96 @@ public final class SpiderConfig {
     public static final String SECTION = "spider_man";
 
     // ---- body and falls ----
-    public static ModConfigSpec.DoubleValue SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue JUMP_BONUS;
-    public static ModConfigSpec.DoubleValue STRENGTH_BONUS;
-    public static ModConfigSpec.DoubleValue FALL_DAMAGE_REDUCTION;
-    public static ModConfigSpec.IntValue BITE_DELAY_TICKS;
+    public static ConfigSpec.DoubleValue SPEED_BONUS;
+    public static ConfigSpec.DoubleValue JUMP_BONUS;
+    public static ConfigSpec.DoubleValue STRENGTH_BONUS;
+    public static ConfigSpec.DoubleValue FALL_DAMAGE_REDUCTION;
+    public static ConfigSpec.IntValue BITE_DELAY_TICKS;
 
     // ---- spider-sense ----
-    public static ModConfigSpec.IntValue SPIDER_SENSE_RANGE;
-    public static ModConfigSpec.IntValue SPIDER_SENSE_INTERVAL;
+    public static ConfigSpec.IntValue SPIDER_SENSE_RANGE;
+    public static ConfigSpec.IntValue SPIDER_SENSE_INTERVAL;
 
     // ---- Web Shot, organic webs and web blocks ----
-    public static ModConfigSpec.IntValue WEB_SHOT_RANGE;
-    public static ModConfigSpec.IntValue WEB_SHOT_COOLDOWN;
-    public static ModConfigSpec.DoubleValue WEB_SHOT_EXHAUSTION;
-    public static ModConfigSpec.IntValue WEBBED_TICKS;
-    public static ModConfigSpec.DoubleValue ORGANIC_WEB_FACTOR;
-    public static ModConfigSpec.DoubleValue ORGANIC_WEB_COST_FACTOR;
-    public static ModConfigSpec.BooleanValue WEB_BLOCKS;
-    public static ModConfigSpec.IntValue WEB_BLOCK_TICKS;
-    public static ModConfigSpec.IntValue WEB_PATCH_RADIUS;
-    public static ModConfigSpec.IntValue WEB_BLOCK_CAP;
+    public static ConfigSpec.IntValue WEB_SHOT_RANGE;
+    public static ConfigSpec.IntValue WEB_SHOT_COOLDOWN;
+    public static ConfigSpec.DoubleValue WEB_SHOT_EXHAUSTION;
+    public static ConfigSpec.IntValue WEBBED_TICKS;
+    public static ConfigSpec.DoubleValue ORGANIC_WEB_FACTOR;
+    public static ConfigSpec.DoubleValue ORGANIC_WEB_COST_FACTOR;
+    public static ConfigSpec.BooleanValue WEB_BLOCKS;
+    public static ConfigSpec.IntValue WEB_BLOCK_TICKS;
+    public static ConfigSpec.IntValue WEB_PATCH_RADIUS;
+    public static ConfigSpec.IntValue WEB_BLOCK_CAP;
 
     // ---- Web Burst ----
-    public static ModConfigSpec.IntValue WEB_BURST_STRANDS;
-    public static ModConfigSpec.IntValue WEB_BURST_RANGE;
-    public static ModConfigSpec.IntValue WEB_BURST_COOLDOWN;
-    public static ModConfigSpec.DoubleValue WEB_BURST_EXHAUSTION;
-    public static ModConfigSpec.IntValue WEB_BURST_WEBBED_TICKS;
+    public static ConfigSpec.IntValue WEB_BURST_STRANDS;
+    public static ConfigSpec.IntValue WEB_BURST_RANGE;
+    public static ConfigSpec.IntValue WEB_BURST_COOLDOWN;
+    public static ConfigSpec.DoubleValue WEB_BURST_EXHAUSTION;
+    public static ConfigSpec.IntValue WEB_BURST_WEBBED_TICKS;
 
     // ---- Web Zip and Web Swing ----
-    public static ModConfigSpec.IntValue ZIP_RANGE;
-    public static ModConfigSpec.DoubleValue ZIP_SPEED;
-    public static ModConfigSpec.IntValue ZIP_COOLDOWN;
-    public static ModConfigSpec.IntValue ZIP_MAX_TICKS;
-    public static ModConfigSpec.DoubleValue ZIP_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue ZIP_KICK_DAMAGE;
-    public static ModConfigSpec.IntValue SWING_RANGE;
-    public static ModConfigSpec.IntValue SWING_MAX_TICKS;
-    public static ModConfigSpec.DoubleValue SWING_MAX_SPEED;
-    public static ModConfigSpec.DoubleValue SWING_GRAVITY;
-    public static ModConfigSpec.DoubleValue SWING_EXHAUSTION;
+    public static ConfigSpec.IntValue ZIP_RANGE;
+    public static ConfigSpec.DoubleValue ZIP_SPEED;
+    public static ConfigSpec.IntValue ZIP_COOLDOWN;
+    public static ConfigSpec.IntValue ZIP_MAX_TICKS;
+    public static ConfigSpec.DoubleValue ZIP_EXHAUSTION;
+    public static ConfigSpec.DoubleValue ZIP_KICK_DAMAGE;
+    public static ConfigSpec.IntValue SWING_RANGE;
+    public static ConfigSpec.IntValue SWING_MAX_TICKS;
+    public static ConfigSpec.DoubleValue SWING_MAX_SPEED;
+    public static ConfigSpec.DoubleValue SWING_GRAVITY;
+    public static ConfigSpec.DoubleValue SWING_EXHAUSTION;
 
     // ---- Web Assist (3.3) ----
-    public static ModConfigSpec.BooleanValue WEB_ASSIST;
-    public static ModConfigSpec.ConfigValue<String> WEB_ASSIST_OPEN_LAND;
-    public static ModConfigSpec.IntValue WEB_ASSIST_RANGE;
-    public static ModConfigSpec.IntValue SKY_ANCHOR_MAX_TICKS;
-    public static ModConfigSpec.IntValue WEB_BOOST_COOLDOWN;
+    public static ConfigSpec.BooleanValue WEB_ASSIST;
+    public static ConfigSpec.ConfigValue<String> WEB_ASSIST_OPEN_LAND;
+    public static ConfigSpec.IntValue WEB_ASSIST_RANGE;
+    public static ConfigSpec.IntValue SKY_ANCHOR_MAX_TICKS;
+    public static ConfigSpec.IntValue WEB_BOOST_COOLDOWN;
 
     // ---- Wall Crawl ----
-    public static ModConfigSpec.DoubleValue CRAWL_SPEED;
-    public static ModConfigSpec.DoubleValue CRAWL_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue LEAP_SPEED;
+    public static ConfigSpec.DoubleValue CRAWL_SPEED;
+    public static ConfigSpec.DoubleValue CRAWL_EXHAUSTION;
+    public static ConfigSpec.DoubleValue LEAP_SPEED;
 
     // ---- suits and the Iron Spider ----
-    public static ModConfigSpec.DoubleValue HOMEMADE_ARMOR;
-    public static ModConfigSpec.DoubleValue BRAND_NEW_DAY_ARMOR;
-    public static ModConfigSpec.DoubleValue BRAND_NEW_DAY_TOUGHNESS;
-    public static ModConfigSpec.DoubleValue IRON_SPIDER_ARMOR;
-    public static ModConfigSpec.DoubleValue IRON_SPIDER_TOUGHNESS;
-    public static ModConfigSpec.DoubleValue IRON_SPIDER_KNOCKBACK_RESISTANCE;
-    public static ModConfigSpec.IntValue IRON_SPIDER_STRIP_TICKS;
-    public static ModConfigSpec.DoubleValue LEGS_DAMAGE;
-    public static ModConfigSpec.IntValue LEGS_INTERVAL;
-    public static ModConfigSpec.DoubleValue LEGS_RANGE;
-    public static ModConfigSpec.DoubleValue LEGS_REACH_BONUS;
-    public static ModConfigSpec.DoubleValue LEGS_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue INSTANT_KILL_RANGE;
-    public static ModConfigSpec.IntValue INSTANT_KILL_INTERVAL;
-    public static ModConfigSpec.DoubleValue INSTANT_KILL_DAMAGE;
-    public static ModConfigSpec.IntValue INSTANT_KILL_MAX_TICKS;
-    public static ModConfigSpec.IntValue INSTANT_KILL_COOLDOWN;
-    public static ModConfigSpec.DoubleValue INSTANT_KILL_EXHAUSTION;
-    public static ModConfigSpec.IntValue INSTANT_KILL_CONFIRM_TICKS;
-    public static ModConfigSpec.BooleanValue INSTANT_KILL_PLAYERS;
+    public static ConfigSpec.DoubleValue HOMEMADE_ARMOR;
+    public static ConfigSpec.DoubleValue BRAND_NEW_DAY_ARMOR;
+    public static ConfigSpec.DoubleValue BRAND_NEW_DAY_TOUGHNESS;
+    public static ConfigSpec.DoubleValue IRON_SPIDER_ARMOR;
+    public static ConfigSpec.DoubleValue IRON_SPIDER_TOUGHNESS;
+    public static ConfigSpec.DoubleValue IRON_SPIDER_KNOCKBACK_RESISTANCE;
+    public static ConfigSpec.IntValue IRON_SPIDER_STRIP_TICKS;
+    public static ConfigSpec.DoubleValue LEGS_DAMAGE;
+    public static ConfigSpec.IntValue LEGS_INTERVAL;
+    public static ConfigSpec.DoubleValue LEGS_RANGE;
+    public static ConfigSpec.DoubleValue LEGS_REACH_BONUS;
+    public static ConfigSpec.DoubleValue LEGS_EXHAUSTION;
+    public static ConfigSpec.DoubleValue INSTANT_KILL_RANGE;
+    public static ConfigSpec.IntValue INSTANT_KILL_INTERVAL;
+    public static ConfigSpec.DoubleValue INSTANT_KILL_DAMAGE;
+    public static ConfigSpec.IntValue INSTANT_KILL_MAX_TICKS;
+    public static ConfigSpec.IntValue INSTANT_KILL_COOLDOWN;
+    public static ConfigSpec.DoubleValue INSTANT_KILL_EXHAUSTION;
+    public static ConfigSpec.IntValue INSTANT_KILL_CONFIRM_TICKS;
+    public static ConfigSpec.BooleanValue INSTANT_KILL_PLAYERS;
 
     // ---- Black Eyes ----
-    public static ModConfigSpec.DoubleValue BLACK_EYES_SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue BLACK_EYES_STRENGTH_BONUS;
-    public static ModConfigSpec.DoubleValue BLACK_EYES_ATTACK_SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue BLACK_EYES_JUMP_BONUS;
-    public static ModConfigSpec.DoubleValue BLACK_EYES_KNOCKBACK_RESISTANCE;
-    public static ModConfigSpec.DoubleValue BLACK_EYES_EXHAUSTION;
-    public static ModConfigSpec.IntValue BLACK_EYES_MAX_TICKS;
-    public static ModConfigSpec.IntValue BLACK_EYES_COOLDOWN;
-    public static ModConfigSpec.IntValue BLACK_EYES_CRASH_TICKS;
-    public static ModConfigSpec.DoubleValue BLACK_EYES_PANIC_HEALTH;
-    public static ModConfigSpec.DoubleValue BLACK_EYES_SENSE_FACTOR;
+    public static ConfigSpec.DoubleValue BLACK_EYES_SPEED_BONUS;
+    public static ConfigSpec.DoubleValue BLACK_EYES_STRENGTH_BONUS;
+    public static ConfigSpec.DoubleValue BLACK_EYES_ATTACK_SPEED_BONUS;
+    public static ConfigSpec.DoubleValue BLACK_EYES_JUMP_BONUS;
+    public static ConfigSpec.DoubleValue BLACK_EYES_KNOCKBACK_RESISTANCE;
+    public static ConfigSpec.DoubleValue BLACK_EYES_EXHAUSTION;
+    public static ConfigSpec.IntValue BLACK_EYES_MAX_TICKS;
+    public static ConfigSpec.IntValue BLACK_EYES_COOLDOWN;
+    public static ConfigSpec.IntValue BLACK_EYES_CRASH_TICKS;
+    public static ConfigSpec.DoubleValue BLACK_EYES_PANIC_HEALTH;
+    public static ConfigSpec.DoubleValue BLACK_EYES_SENSE_FACTOR;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
 
         SPEED_BONUS = builder.comment("Extra walking speed of Spider-Man (a fraction of the normal speed).")

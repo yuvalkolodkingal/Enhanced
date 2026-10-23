@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.eternity.EternityFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public record EternityScreenPayload(boolean mayWish, boolean loveAllowed, List<L
     }
 
     /** Only ever runs on a client, so the screen classes are only ever loaded there. */
-    static void handle(EternityScreenPayload payload, IPayloadContext context) {
+    static void handle(EternityScreenPayload payload, PacketContext context) {
         EternityFx.open(payload);
     }
 

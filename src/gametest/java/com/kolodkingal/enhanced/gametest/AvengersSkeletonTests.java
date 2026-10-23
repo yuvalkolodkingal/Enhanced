@@ -57,6 +57,8 @@ import com.kolodkingal.enhanced.network.SerumChoicePayload;
 import com.kolodkingal.enhanced.network.SerumScreenPayload;
 import com.kolodkingal.enhanced.network.TowerFxPayload;
 import com.kolodkingal.enhanced.odin.GungnirStand;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -81,7 +83,6 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -107,9 +108,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforgespi.language.IModFileInfo;
 
 import java.io.IOException;
@@ -138,8 +136,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * points, and the seams, neutral until their lanes. Batch {@code avengers_skel}; a test that changes the config or
  * server-wide state has the batch {@code avengers_skel_cfg}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AvengersSkeletonTests {
     static final String BATCH = "avengers_skel";
     static final String CFG = "avengers_skel_cfg";
@@ -148,7 +144,7 @@ public final class AvengersSkeletonTests {
 
     // ---- the heroes, the bits, the protocol ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFiveHeroesComeAfterDeadpool(GameTestHelper helper) {
         Power[] all = Power.values();
         int d = Power.DEADPOOL.ordinal();
@@ -207,7 +203,7 @@ public final class AvengersSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTwelve(GameTestHelper helper) {
         check(ModNetwork.PROTOCOL_VERSION.equals("13"), "protocol 13");
         check(Live.values().length == 75 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 = 75: "
@@ -233,7 +229,7 @@ public final class AvengersSkeletonTests {
     }
 
     /** The second word: a state past the 64th sets, clears and survives the sync, and leaves the first word alone. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aStatePastTheSixtyFourthRoundTrips(GameTestHelper helper) {
         PowerData data = new PowerData();
         check(Live.IRON_SUITING.ordinal() >= 64 && Live.IRON_SUITING.word() == 1, "IRON_SUITING is in the high word");
@@ -274,7 +270,7 @@ public final class AvengersSkeletonTests {
 
     // ---- the payloads ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePayloadsOfThreeEightRoundTripAtTheirLargest(GameTestHelper helper) {
         List<Vec3> ten = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -342,7 +338,7 @@ public final class AvengersSkeletonTests {
 
     // ---- the Hero Creator ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsAre221(GameTestHelper helper) throws IOException {
         check(HeroAbility.values().length == 221, "176 + 27 + 18 rows: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.CAPTAIN_SHIELD_THROW.ordinal() - 1] == HeroAbility.DEADPOOL_BODY,
@@ -409,7 +405,7 @@ public final class AvengersSkeletonTests {
 
     // ---- the data ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDataOfThreeEightLoads(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         check(server.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).containsKey(Enhanced.id("eternity")),
@@ -514,7 +510,7 @@ public final class AvengersSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theConfigsHaveThePlansDefaults(GameTestHelper helper) {
         check(SerumConfig.ENABLED.getDefault() && SerumConfig.PENDING_TICKS.getDefault() == 600
                 && !SerumConfig.CRAFTABLE.getDefault() && SerumConfig.CASE_PER_PLAYER.getDefault() == 1, "the serum's");
@@ -550,7 +546,7 @@ public final class AvengersSkeletonTests {
 
     // ---- the fixed points ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShrinesFixedPointsHoldTheirBlocks(GameTestHelper helper) throws IOException {
         Map<BlockPos, String> blocks = template(helper, ShrinePlan.TEMPLATE);
         check(size(helper, ShrinePlan.TEMPLATE).equals(List.of(47, 34, 47)), "the shrine is 47 x 34 x 47");
@@ -578,7 +574,7 @@ public final class AvengersSkeletonTests {
     }
 
     /** The armoury's points lie in their rooms, and map into the tower's three templates as the cradle does. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTowerPointsLieInTheirRooms(GameTestHelper helper) {
         check(TowerPlan.SUIT_DISPLAYS.size() == SuitKind.values().length, "a display for every suit");
         for (Map.Entry<SuitKind, BlockPos> e : TowerPlan.SUIT_DISPLAYS.entrySet()) {
@@ -616,7 +612,7 @@ public final class AvengersSkeletonTests {
 
     // ---- the seams, neutral until the lanes ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSeamsAreNeutralUntilTheLanes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // Only Iron Man (or a Creative player) may wear a suit. (3.8, lane L3: the suits work now: a Mark 3 with a
@@ -674,7 +670,7 @@ public final class AvengersSkeletonTests {
         ThorAbilities.onKey(thor, Powers.get(thor), 3, false, false);
         check(!Powers.get(thor).is(Live.CALLING_LIGHTNING), "and stops");
         // The pure stand-ins.
-        Zombie dummy = helper.spawn(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie dummy = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         dummy.setDeltaMovement(0.1, 0.2, 0.3);
         check(MissileGuidance.steer(dummy).equals(new Vec3(0.1, 0.2, 0.3)), "missiles fly straight");
         dummy.discard();
@@ -691,7 +687,7 @@ public final class AvengersSkeletonTests {
     }
 
     /** The Hulk's moves through their new doors: the old signatures keep the Hulk's numbers and cooldowns. */
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void theHulksMovesKeepTheirNumbers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hulk = f.player(3.5, FLOOR, 3.5, Power.HULK);
@@ -712,11 +708,11 @@ public final class AvengersSkeletonTests {
                 "20 blocks");
         check(otherData.isReady(HeroAbility.HULK_BOUND, now), "no cooldown asked or started: the caller's");
         ServerPlayer grabber = f.player(15.5, FLOOR, 3.5, Power.HULK);
-        Zombie first = helper.spawn(EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 5.5));
+        Zombie first = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 5.5));
         check(GrabSmash.start(grabber, Powers.get(grabber)) == first, "the Hulk grabs the zombie in front");
         check(!Powers.get(grabber).isReady(HeroAbility.HULK_GRAB_SMASH, now), "with his cooldown");
         ServerPlayer red = f.player(3.5, FLOOR, 12.5, Power.HULK);
-        Zombie second = helper.spawn(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 14.5));
+        Zombie second = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 14.5));
         check(GrabSmash.start(red, Powers.get(red), new double[]{5, 5, 7}, 8.0) == second,
                 "the grab with the numbers given");
         check(Powers.get(red).isReady(HeroAbility.HULK_GRAB_SMASH, now), "and no cooldown of the Hulk's");
@@ -726,7 +722,7 @@ public final class AvengersSkeletonTests {
     }
 
     /** Gungnir's give-and-record, out of the stand for Eternity's wish: bound to him, the world's bearer recorded. */
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void gungnirsGiveRecordsTheBearer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -750,10 +746,10 @@ public final class AvengersSkeletonTests {
     /** What the server does with a message the client sends (the payload's own handler, as in RoadEndingTests). */
     private static <T> void answer(Class<T> type, T payload, ServerPlayer player) {
         try {
-            Method handle = type.getDeclaredMethod("handle", type, IPayloadContext.class);
+            Method handle = type.getDeclaredMethod("handle", type, PacketContext.class);
             handle.setAccessible(true);
-            IPayloadContext context = (IPayloadContext) Proxy.newProxyInstance(IPayloadContext.class.getClassLoader(),
-                    new Class[]{IPayloadContext.class}, (proxy, method, args) -> method.getName().equals("player")
+            PacketContext context = (PacketContext) Proxy.newProxyInstance(PacketContext.class.getClassLoader(),
+                    new Class[]{PacketContext.class}, (proxy, method, args) -> method.getName().equals("player")
                             ? player : null);
             handle.invoke(null, payload, context);
         } catch (ReflectiveOperationException e) {

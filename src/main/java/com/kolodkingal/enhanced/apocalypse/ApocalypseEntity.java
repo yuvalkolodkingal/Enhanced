@@ -282,7 +282,7 @@ public class ApocalypseEntity extends Monster implements BossHooks {
      */
     @Override
     public void setHealth(float health) {
-        if (!level().isClientSide && floorFraction > 0.0 && !(hurtSource != null && hurtSource.is(DamageTypes.GENERIC_KILL))) {
+        if (!level().isClientSide() && floorFraction > 0.0 && !(hurtSource != null && hurtSource.is(DamageTypes.GENERIC_KILL))) {
             float floor = Math.min(getHealth(), floorHealth());
             if (health < floor) {
                 health = floor;
@@ -533,7 +533,7 @@ public class ApocalypseEntity extends Monster implements BossHooks {
     /** The routing of every blow (spec 3.5.3). */
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return false;
         }
         ApocalypseFight fight = fight();
@@ -765,7 +765,7 @@ public class ApocalypseEntity extends Monster implements BossHooks {
      */
     @Override
     public int slowFactor(int zoneFactor) {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return zoneFactor;
         }
         long now = level().getGameTime();
@@ -799,7 +799,7 @@ public class ApocalypseEntity extends Monster implements BossHooks {
      */
     @Override
     public boolean onMagnetoStrip(ServerPlayer magneto) {
-        if (!level().isClientSide && shield.extendWindow(ApocalypseBossConfig.MAGNETO_STRIP_EXTEND_TICKS.get())) {
+        if (!level().isClientSide() && shield.extendWindow(ApocalypseBossConfig.MAGNETO_STRIP_EXTEND_TICKS.get())) {
             setArmourCut(true);
             if (level() instanceof ServerLevel server) {
                 server.playSound(null, getX(), getY(), getZ(), SoundEvents.ITEM_BREAK, SoundSource.HOSTILE, 1.0F, 0.6F);

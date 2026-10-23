@@ -1305,7 +1305,7 @@ public final class BuildJob {
             return true;
         }
         ServerPlayer online = online();
-        BuildData data = (online != null ? online : castBy).getData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA);
+        BuildData data = com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA.get((online != null ? online : castBy));
         long time = level.getServer().overworld().getGameTime();
         int price = BillyMagic.cost(cells, mom);
         int verdict = BillyMagic.verdict(data, time, price);
@@ -1315,7 +1315,7 @@ public final class BuildJob {
         }
         cost = price;
         if (online != null) {
-            online.setData(com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA, BillyMagic.pay(data, time, price));
+            com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA.set(online, BillyMagic.pay(data, time, price));
         } else {
             BuildSession.of(caster).owe(price, 0);
         }
@@ -3248,7 +3248,7 @@ public final class BuildJob {
     }
 
     private static void send(ServerPlayer player, net.minecraft.network.protocol.common.custom.CustomPacketPayload payload) {
-        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, payload);
+        com.kolodkingal.enhanced.platform.net.Net.sendToPlayer(player, payload);
     }
 
     // ------------------------------------------------------------------------------------------------------------

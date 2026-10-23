@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildJob;
@@ -19,12 +18,12 @@ import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -36,8 +35,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.UUID;
 
@@ -66,8 +63,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * histories and the sessions are server-wide, and several tests change a setting. Between Billy's spells a test ends
  * his pause itself, as a test's time stands still while it runs (B44 waits it out instead).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildLimitsTests {
     /** The Scarlet Witch's spells (and undos) in B49: one more than the 100 undos she once kept (R39). */
     private static final int SPELLS = 101;
@@ -81,7 +76,7 @@ public final class BuildLimitsTests {
      * Billy's meter holds 512; a 140-block fill leaves 372, and a second later it holds 388 (16 a second); a Billy in
      * Creative pays the same (his limits apply in Creative); a Scarlet Witch's spell touches no meter.
      */
-    @GameTest(template = ARENA, batch = "build_limits_meter")
+    @EnhancedTest(template = ARENA, batch = "build_limits_meter")
     public static void billysMeterPaysAndRefills(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
@@ -124,12 +119,12 @@ public final class BuildLimitsTests {
      * Billy with 100 in his meter: a 140-block spell is {@code REFILLING}, "3 more seconds"; a 600-block spell is
      * {@code TOO_BIG}, "600 of 512"; neither changes anything in the world, and his meter stays at 100.
      */
-    @GameTest(template = ARENA, batch = "build_limits_not_yet")
+    @EnhancedTest(template = ARENA, batch = "build_limits_not_yet")
     public static void billyHearsNotYetOrNever(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withMeter(100.0, time));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withMeter(100.0, time));
         BoundingBox small = new BoundingBox(1, 2, 1, 7, 5, 5);
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, small));
@@ -155,7 +150,7 @@ public final class BuildLimitsTests {
     // B43
 
     /** A box 25 blocks wide is {@code TOO_WIDE} (at most 24); a corner 30 blocks away is {@code TOO_FAR} (24). */
-    @GameTest(template = ARENA, batch = "build_limits_side")
+    @EnhancedTest(template = ARENA, batch = "build_limits_side")
     public static void billysSideAndReach(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer billy = builder(f, Power.BILLY, 10.5, 10.5, Blocks.STONE);
@@ -177,7 +172,7 @@ public final class BuildLimitsTests {
      * Billy casts one spell at a time: a second cast while the first works is {@code WAIT} ("Wait for your spell to
      * finish"); one in the 10 ticks after it is {@code WAIT} too, with the fizzle alone; after the pause he casts.
      */
-    @GameTest(template = ARENA, batch = "build_limits_one_at_a_time")
+    @EnhancedTest(template = ARENA, batch = "build_limits_one_at_a_time")
     public static void billyCastsOneSpellAtATime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
@@ -211,12 +206,12 @@ public final class BuildLimitsTests {
      * Billy with 1,990 blocks of practice fills 20: he reaches rank 2 (the line, his crown's moment for those near),
      * his meter holds 1,024 and is full, his side is 32; an undo of that fill takes the 20 back, and his rank stays 2.
      */
-    @GameTest(template = ARENA, batch = "build_limits_rank")
+    @EnhancedTest(template = ARENA, batch = "build_limits_rank")
     public static void billyLearnsAndRanksUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withPractice(1990L));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withPractice(1990L));
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, new BoundingBox(2, 2, 2, 6, 2, 5)));
         finish(billy);
@@ -243,7 +238,7 @@ public final class BuildLimitsTests {
      * A Scarlet Witch 5 blocks from Billy: his 100-block fill costs 50 and teaches 100, its START carries her id and he
      * is told "Mom is near"; 20 blocks away she does not help: it costs 100. Back near him, his badge learns it.
      */
-    @GameTest(template = ARENA, batch = "build_limits_mom")
+    @EnhancedTest(template = ARENA, batch = "build_limits_mom")
     public static void momsHelpHalvesTheCost(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
@@ -279,7 +274,7 @@ public final class BuildLimitsTests {
      * Billy fills 27 (his meter 27 less), undoes it (27 back), redoes it (27 less again); a new spell empties the redo
      * list.
      */
-    @GameTest(template = ARENA, batch = "build_limits_undo_meter")
+    @EnhancedTest(template = ARENA, batch = "build_limits_undo_meter")
     public static void undoRefundsAndRedoPays(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
@@ -317,7 +312,7 @@ public final class BuildLimitsTests {
      * Eleven one-block fills of Billy's: "Your oldest spell can no longer be undone" is said once (at the eleventh);
      * ten undos work, the eleventh is "Nothing to undo", and the first fill stays.
      */
-    @GameTest(template = ARENA, batch = "build_limits_ten_undos")
+    @EnhancedTest(template = ARENA, batch = "build_limits_ten_undos")
     public static void billyKeepsTenUndos(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
@@ -349,7 +344,7 @@ public final class BuildLimitsTests {
      * Whole or nothing, beyond the register: Billy's redo he cannot pay now is {@code REFILLING} and redoes nothing; a
      * stamp of the TNT he copied is {@code VOLATILE} ("too dangerous for your magic") and places nothing.
      */
-    @GameTest(template = ARENA, batch = "build_limits_redo")
+    @EnhancedTest(template = ARENA, batch = "build_limits_redo")
     public static void billysRedosAndCopiesAreWholeOrNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
@@ -359,7 +354,7 @@ public final class BuildLimitsTests {
         finish(billy);
         BuildMagic.undo(billy);
         finish(billy);
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withMeter(10.0, time));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withMeter(10.0, time));
         Seen.of(billy);
         BuildMagic.redo(billy);
         Seen seen = Seen.of(billy);
@@ -386,7 +381,7 @@ public final class BuildLimitsTests {
      * A spell of Billy's that outlives him (he logs out before it is counted): it is checked against the meter he left
      * with and finished; at his next login it is paid (27 less) and its practice booked.
      */
-    @GameTest(template = ARENA, batch = "build_limits_away")
+    @EnhancedTest(template = ARENA, batch = "build_limits_away")
     public static void billyPaysForASpellThatOutlivesHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
@@ -417,7 +412,7 @@ public final class BuildLimitsTests {
      * 300 copies is cast (and undone); a 21 x 8 x 21 fill (3,528) is cast and done, and she has no meter. The 101
      * spells and undos go one a tick, as a client sends them.
      */
-    @GameTest(template = ARENA, batch = "build_limits_wanda", timeoutTicks = 2 * SPELLS + 40)
+    @EnhancedTest(template = ARENA, batch = "build_limits_wanda", timeoutTicks = 2 * SPELLS + 40)
     public static void wandaHasNoLimit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 10.5, 10.5, Blocks.STONE);
@@ -511,7 +506,7 @@ public final class BuildLimitsTests {
     // B50
 
     /** With {@code wanda.maxBlocks} 1,000, her 3,528 fill is {@code CEILING} 1,000, and nothing changes. */
-    @GameTest(template = ARENA, batch = "build_ceiling")
+    @EnhancedTest(template = ARENA, batch = "build_ceiling")
     public static void wandasCeiling(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.WANDA_MAX_BLOCKS, 1000);
@@ -529,7 +524,7 @@ public final class BuildLimitsTests {
     // B51
 
     /** With {@code wanda.volatilePerSpell} 10, her 27 TNT are {@code VOLATILE_CAP} "27 of 10": nothing is placed. */
-    @GameTest(template = ARENA, batch = "build_volatile")
+    @EnhancedTest(template = ARENA, batch = "build_volatile")
     public static void wandasVolatileCap(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.WANDA_VOLATILE_PER_SPELL, 10);
@@ -549,7 +544,7 @@ public final class BuildLimitsTests {
     // B52
 
     /** With {@code hugeSpellBlocks} 1,000, a 1,500-cell fill without the long hold is {@code HOLD}; held, it is done. */
-    @GameTest(template = ARENA, batch = "build_huge")
+    @EnhancedTest(template = ARENA, batch = "build_huge")
     public static void aHugeSpellNeedsTheLongHold(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.HUGE_SPELL_BLOCKS, 1000);
@@ -573,7 +568,7 @@ public final class BuildLimitsTests {
      * With {@code operatorsOnly}, a player who is no operator turning build mode on is {@code OPERATORS} ("Only
      * operators may use Build Magic here") and so is his cast; an operator's build mode goes on.
      */
-    @GameTest(template = ARENA, batch = "build_ops")
+    @EnhancedTest(template = ARENA, batch = "build_ops")
     public static void operatorsOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.OPERATORS_ONLY, true);
@@ -605,7 +600,7 @@ public final class BuildLimitsTests {
      * 2 more Stone"); a 9-block fill takes 9 and its undo gives them back; a Vanish of 3 stone puts 3 in his inventory
      * and its undo takes them back; a Billy in Creative pays nothing.
      */
-    @GameTest(template = ARENA, batch = "build_materials")
+    @EnhancedTest(template = ARENA, batch = "build_materials")
     public static void materialsArePaidAndGivenBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.REQUIRE_MATERIALS, true);
@@ -663,12 +658,12 @@ public final class BuildLimitsTests {
     }
 
     private static BuildData data(ServerPlayer player) {
-        return player.getData(ModAttachments.BUILD_DATA);
+        return ModAttachments.BUILD_DATA.get(player);
     }
 
     /** Billy's pause after his last spell is over (the test's time stands still while it runs). */
     private static void unpause(ServerPlayer billy) {
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withPauseUntil(0L));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withPauseUntil(0L));
     }
 
     /** The builder floats above what the test builds (nobody ticks her, so she does not fall). */

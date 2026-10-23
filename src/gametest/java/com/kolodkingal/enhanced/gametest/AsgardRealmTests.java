@@ -19,13 +19,13 @@ import com.kolodkingal.enhanced.asgard.RuneStones;
 import com.kolodkingal.enhanced.asgard.SeatEntity;
 import com.kolodkingal.enhanced.block.asgard.AsgardMuralBlock;
 import com.kolodkingal.enhanced.block.asgard.BifrostMechanismBlockEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -48,8 +48,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashSet;
 import java.util.List;
@@ -66,8 +64,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the void catch, no monsters by nature, no spawn point, the inventory kept, the soft edge, no Nether portal, the
  * rune stones (batch {@code asgard_rules}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AsgardRealmTests {
     static final String REALM = "asgard_realm";
     static final String RULES = "asgard_rules";
@@ -80,7 +76,7 @@ public final class AsgardRealmTests {
 
     // ---- the land ----
 
-    @GameTest(template = ARENA, batch = REALM)
+    @EnhancedTest(template = ARENA, batch = REALM)
     public static void theLandTheSeaTheVoidAndTheUnderside(GameTestHelper helper) {
         AsgardTerrain.Column middle = AsgardTerrain.column(0, 0);
         check(middle.kind() == AsgardTerrain.Kind.LAND && middle.top() == 77 && middle.pad() != null, "land at (0, 0), the plaza at 77: " + middle);
@@ -104,7 +100,7 @@ public final class AsgardRealmTests {
 
     // ---- the plan ----
 
-    @GameTest(template = ARENA, batch = REALM)
+    @EnhancedTest(template = ARENA, batch = REALM)
     public static void thePiecesOfThePlanStandOnTheLandAndTheirTemplatesLoad(GameTestHelper helper) {
         List<CityPlan.Piece> pieces = CityPlan.pieces();
         check(pieces.size() >= 100, "about a hundred and more pieces: " + pieces.size());
@@ -148,7 +144,7 @@ public final class AsgardRealmTests {
 
     // ---- the city, generated ----
 
-    @GameTest(template = ARENA, batch = REALM, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = REALM, timeoutTicks = 400)
     public static void theGeneratedCityHasItsFixedPoints(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         ServerLevel asgard = AsgardTestSupport.withArrival(server);
@@ -203,7 +199,7 @@ public final class AsgardRealmTests {
         return n;
     }
 
-    @GameTest(template = ARENA, batch = REALM)
+    @EnhancedTest(template = ARENA, batch = REALM)
     public static void theSkysColoursByTheTimeOfDay(GameTestHelper helper) {
         check(AsgardSky.dayColour(0.0F) == AsgardSky.DAY && AsgardSky.dayColour(0.5F) == AsgardSky.NIGHT, "blue at noon, deep space at midnight");
         check(Math.abs(AsgardSky.nebulaAlpha(0.0F) - 0.35F) < 1e-4 && Math.abs(AsgardSky.nebulaAlpha(0.5F) - 1.0F) < 1e-4,
@@ -218,7 +214,7 @@ public final class AsgardRealmTests {
 
     // ---- the rules ----
 
-    @GameTest(template = ARENA, batch = RULES)
+    @EnhancedTest(template = ARENA, batch = RULES)
     public static void theCityIsProtectedTheWildLandIsNot(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerLevel asgard = AsgardTestSupport.ensureAsgard(helper.getLevel().getServer());
@@ -241,7 +237,7 @@ public final class AsgardRealmTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = RULES, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = RULES, timeoutTicks = 200)
     public static void heimdallCatchesAFallIntoTheVoidAndTheEdgePushesBack(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -264,7 +260,7 @@ public final class AsgardRealmTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = RULES)
+    @EnhancedTest(template = ARENA, batch = RULES)
     public static void noMonstersByNatureNoSpawnPointNoPortal(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerLevel asgard = AsgardTestSupport.withArrival(helper.getLevel().getServer());
@@ -303,7 +299,7 @@ public final class AsgardRealmTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = RULES)
+    @EnhancedTest(template = ARENA, batch = RULES)
     public static void whoDiesInAsgardKeepsHisThings(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -328,7 +324,7 @@ public final class AsgardRealmTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = RULES, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = RULES, timeoutTicks = 300)
     public static void theRuneStoneTakesTheCircleToAsgardAndRests(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerLevel asgard = AsgardTestSupport.withArrival(helper.getLevel().getServer());
@@ -347,15 +343,15 @@ public final class AsgardRealmTests {
             }
             check(AsgardDimension.in(friend), "his friend in the circle comes along");
             check(caller.position().distanceTo(CityPlan.ARRIVAL) < 1.5, "to the Observatory: " + caller.position());
-            AsgardProgress progress = caller.getData(ModAttachments.ASGARD);
+            AsgardProgress progress = ModAttachments.ASGARD.get(caller);
             check(progress.has(AsgardProgress.VISITED) && progress.cameFrom() != null
                     && progress.cameFrom().pos().closerThan(stone, 4), "he has visited, and is remembered where he came from");
-            check(friend.getData(ModAttachments.ASGARD).has(AsgardProgress.VISITED), "so is his friend");
+            check(ModAttachments.ASGARD.get(friend).has(AsgardProgress.VISITED), "so is his friend");
             return true;
         });
     }
 
-    @GameTest(template = ARENA, batch = RULES)
+    @EnhancedTest(template = ARENA, batch = RULES)
     public static void theThroneSeatsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos throne = helper.absolutePos(new BlockPos(10, 2, 10));
@@ -393,7 +389,7 @@ public final class AsgardRealmTests {
      * the high table has its six; nothing floats (the dishes stand on the boards, the lanterns hang from the ceiling),
      * no fence arms reach into the air, the doors (three at the front, two to the kitchen at the back) are open.
      */
-    @GameTest(template = ARENA, batch = REALM, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = REALM, timeoutTicks = 400)
     public static void theHallOfFeastsHasItsTablesSeatsAndLightsInPlace(GameTestHelper helper) {
         ServerLevel asgard = hall(helper.getLevel().getServer());
         List<CityPlan.Bench> seats = FeastHall.seats();
@@ -454,7 +450,7 @@ public final class AsgardRealmTests {
      * An Asgardian finds his way from the hall's front door to every one of its seats, and from the kitchen to the high
      * table, and never over a table or a dish on one.
      */
-    @GameTest(template = ARENA, batch = REALM, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = REALM, timeoutTicks = 400)
     public static void everySeatOfTheHallIsReachedAndNeverOverATable(GameTestHelper helper) {
         ServerLevel asgard = hall(helper.getLevel().getServer());
         AsgardianEntity walker = com.kolodkingal.enhanced.registry.ModEntities.ASGARDIAN.get().create(asgard);
@@ -496,7 +492,7 @@ public final class AsgardRealmTests {
      * A city built before 3.7.2 has the hall of 3.5: the first time all of it is loaded it is mended once, block by
      * block, to the new hall, leaving alone a block a player changed (and the banners come with their colours).
      */
-    @GameTest(template = ARENA, batch = "asgard_feast_mend", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "asgard_feast_mend", timeoutTicks = 400)
     public static void aHallOfFeastsBuiltBeforeIsMendedOnce(GameTestHelper helper) {
         ServerLevel asgard = hall(helper.getLevel().getServer());
         var templates = asgard.getStructureManager();

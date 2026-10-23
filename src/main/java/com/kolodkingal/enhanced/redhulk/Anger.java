@@ -20,12 +20,12 @@ public final class Anger {
     public static final float MAX = 100.0F;
 
     public static RedHulkState get(Player player) {
-        return player.getData(ModAttachments.RED_HULK);
+        return ModAttachments.RED_HULK.get(player);
     }
 
     static void set(Player player, RedHulkState state) {
         if (!state.equals(get(player))) {
-            player.setData(ModAttachments.RED_HULK, state);
+            ModAttachments.RED_HULK.set(player, state);
         }
     }
 

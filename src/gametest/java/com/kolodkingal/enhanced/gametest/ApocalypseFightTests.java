@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
@@ -25,12 +24,12 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -56,8 +55,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashSet;
 import java.util.List;
@@ -81,14 +78,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * fight can end and what each ending gives back, the arena, the bars, and the three things the heroes do to him (Quicksilver
  * Time, Magneto's strip). The fight is jumped to a stage with {@code forceState}, so each test is only about its stage.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ApocalypseFightTests {
 
     // ------------------------------------------------------------------------------------------------------------
     // The first transition: the Horsemen
 
-    @GameTest(template = ARENA, batch = "apocalypse_t1", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_t1", timeoutTicks = 260)
     public static void transitionOneCallsTheHorsemen(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ApocalypseFight fight = d.fight();
@@ -192,7 +187,7 @@ public final class ApocalypseFightTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_horseman_war", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_horseman_war", timeoutTicks = 160)
     public static void warFiresAVolleyOfThreeIronShards(GameTestHelper helper) {
         traitTest(helper, Horsemen.Kind.WAR, 3.5, run -> {
             for (IronShrapnelEntity shard : run.d.level().getEntitiesOfClass(IronShrapnelEntity.class, new AABB(run.husk.blockPosition()).inflate(25.0))) {
@@ -207,7 +202,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_horseman_famine", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_horseman_famine", timeoutTicks = 160)
     public static void famineCallsAVisualBoltAndAGust(GameTestHelper helper) {
         traitTest(helper, Horsemen.Kind.FAMINE, 5.5, run -> {
             List<LightningBolt> bolts = run.d.level().getEntitiesOfClass(LightningBolt.class, new AABB(run.husk.blockPosition()).inflate(30.0));
@@ -220,7 +215,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_horseman_pestilence", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_horseman_pestilence", timeoutTicks = 160)
     public static void pestilenceLeapsWithASlowingBlade(GameTestHelper helper) {
         traitTest(helper, Horsemen.Kind.PESTILENCE, 9.5, run -> {
             if (run.d.hero().hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
@@ -230,7 +225,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_horseman_death", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_horseman_death", timeoutTicks = 160)
     public static void deathDivesAndSlamsInARadius(GameTestHelper helper) {
         traitTest(helper, Horsemen.Kind.DEATH, 8.5, run -> {
             if (run.d.hero().getHealth() < run.heroHealth) {
@@ -246,7 +241,7 @@ public final class ApocalypseFightTests {
      * hurt the boss, and no Horseman takes another for a target. One that a Phoenix holds is hers: it fights them, and
      * they may fight it back.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_horsemen_one_side", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_horsemen_one_side", timeoutTicks = 60)
     public static void horsemenDoNotHurtOneAnother(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.NONE);
         ServerLevel level = d.level();
@@ -278,7 +273,7 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The second transition: the Cairo Collapse
 
-    @GameTest(template = ARENA, batch = "apocalypse_t2", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_t2", timeoutTicks = 260)
     public static void transitionTwoIsTheCairoCollapse(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.NONE);
         ApocalypseFight fight = d.fight();
@@ -322,14 +317,14 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The third break and the true form
 
-    @GameTest(template = ARENA, batch = "apocalypse_armour", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_armour", timeoutTicks = 260)
     public static void theThirdBreakDismantlesTheArmour(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.SCARLET_WITCH);
         noCrits(d.f()); // the armour and the floors, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         Log log = new Log(d.hero());
         double heightBefore = boss.getBbHeight();
@@ -363,7 +358,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_true_regen", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_true_regen", timeoutTicks = 300)
     public static void theTrueFormRegeneratesWhenLeftAlone(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
         d.f().config(ApocalypseBossConfig.TRUE_FORM_REGEN_PER_SECOND, 3.0); // 3.0's healing: since 3.1 his health never heals
@@ -399,14 +394,14 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Escape
 
-    @GameTest(template = ARENA, batch = "apocalypse_escape", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_escape", timeoutTicks = 500)
     public static void theEscapeIsInterruptedByDamageAndStaggersHimOnce(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
         noCrits(d.f()); // the Escape, the blows counted as in 3.0 (8a.2)
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         Log log = new Log(d.hero());
         // At 15 percent the channel starts by itself.
@@ -459,7 +454,7 @@ public final class ApocalypseFightTests {
      * ticks, which meets every moment of that second. (Since 3.1 his health never heals by default: the test gives him 3.0's
      * healing back, or there would be nothing to come first.)
      */
-    @GameTest(template = ARENA, batch = "apocalypse_escape_heal", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_escape_heal", timeoutTicks = 400)
     public static void theBlowThatEarnsTheEscapeStartsItEvenWhenHealingIsDue(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
         d.f().config(ApocalypseBossConfig.TRUE_FORM_REGEN_PER_SECOND, 3.0); // 3.0's healing: since 3.1 his health never heals
@@ -467,7 +462,7 @@ public final class ApocalypseFightTests {
         ApocalypseFight fight = d.fight();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         int[] rounds = {0};
         every(helper, 380, tick -> {
@@ -492,7 +487,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_escape_bolt", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_escape_bolt", timeoutTicks = 200)
     public static void lightningAndAHexWallInterruptTheEscape(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
         ApocalypseFight fight = d.fight();
@@ -523,7 +518,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_vanish", timeoutTicks = 420)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_vanish", timeoutTicks = 420)
     public static void anUninterruptedEscapeReturnsHimHealedWithANewThirdShield(GameTestHelper helper) {
         Duel d = duel(helper, 3, Power.NONE);
         ApocalypseFight fight = d.fight();
@@ -555,12 +550,12 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The end
 
-    @GameTest(template = ARENA, batch = "apocalypse_end_sand", timeoutTicks = 480)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_end_sand", timeoutTicks = 480)
     public static void theEndKneelsThenDiesInSand(GameTestHelper helper) {
         endTest(helper, false);
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_end_fire", timeoutTicks = 480)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_end_fire", timeoutTicks = 480)
     public static void theEndKneelsThenDiesInThePhoenixFire(GameTestHelper helper) {
         endTest(helper, true);
     }
@@ -610,7 +605,7 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The reward
 
-    @GameTest(template = ARENA, batch = "apocalypse_rewards", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_rewards", timeoutTicks = 400)
     public static void everyQualifyingFighterGetsTheEssence(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         f.config(BossConfig.REWARD_MIN_SECONDS, 3);
@@ -671,7 +666,7 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // How it can end, and what is given back
 
-    @GameTest(template = ARENA, batch = "apocalypse_withdraw", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_withdraw", timeoutTicks = 400)
     public static void noBreakerWithdrawsAndRefundsTheCapstone(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ApocalypseRitualTests.readyGround(f);
@@ -707,7 +702,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_stop", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_stop", timeoutTicks = 200)
     public static void anOperatorStopRefundsAndAWipeDoesNot(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ApocalypseRitualTests.readyGround(f);
@@ -748,7 +743,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_server_stop", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_server_stop", timeoutTicks = 200)
     public static void aServerStopRefundsLeavesNothingBehindAndReleasesTheChunks(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ApocalypseRitualTests.readyGround(f);
@@ -792,7 +787,7 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The arena
 
-    @GameTest(template = ARENA, batch = "apocalypse_arena", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_arena", timeoutTicks = 200)
     public static void theArenaIsProtectedAndClosed(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         f.config(ApocalypseBossConfig.ARENA_RADIUS, 5);
@@ -843,7 +838,7 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The bars
 
-    @GameTest(template = ARENA, batch = "apocalypse_bars", timeoutTicks = 320)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_bars", timeoutTicks = 320)
     public static void twoBossBarsShowHealthAndShield(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         noCrits(d.f()); // the bars, the blows counted as in 3.0 (8a.2)
@@ -889,7 +884,7 @@ public final class ApocalypseFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The heroes against him
 
-    @GameTest(template = ARENA, batch = "apocalypse_adapt", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_adapt", timeoutTicks = 400)
     public static void heAdaptsToQuicksilverTime(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.QUICKSILVER);
         ApocalypseFight fight = d.fight();
@@ -925,7 +920,7 @@ public final class ApocalypseFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_strip", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_strip", timeoutTicks = 260)
     public static void magnetosStripCutsHisArmourInAWindow(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseFight fight = d.fight();

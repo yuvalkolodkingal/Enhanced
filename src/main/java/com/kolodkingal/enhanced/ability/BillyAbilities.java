@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -42,7 +43,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -141,7 +141,7 @@ public final class BillyAbilities {
         Spells spells = SPELLS.get(player.getUUID());
         long now = player.level().getGameTime();
         boolean flying = player.getAbilities().flying;
-        boolean building = player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
+        boolean building = ModAttachments.BUILD_VIEW.getExisting(player).map(BuildView::active).orElse(false);
         data.set(Live.CROWNED, flying || building || (spells != null && now < spells.crown));
         // (3.4: a custom hero's beam is his Hex Beam only if he has it: the one continuous beam may be another hero's.)
         if ((data.is(Live.BEAMING) || ContinuousBeam.isFiring(player)) && !DarkholdBook.firing(player) && data.has(HeroAbility.BILLY_HEX_BEAM)) {
@@ -205,7 +205,7 @@ public final class BillyAbilities {
 
     /** The numbers of his beam for one tick, for his rank now. */
     public static BeamSpec beamSpec(ServerPlayer player) {
-        BuildData build = player.getData(ModAttachments.BUILD_DATA);
+        BuildData build = ModAttachments.BUILD_DATA.get(player);
         int interval = EnhancedConfig.BILLY_BEAM_INTERVAL.get();
         float perHit = beamDamagePerSecond(build) * interval / 20.0F;
         float exhaustion = EnhancedConfig.BILLY_BEAM_EXHAUSTION_PER_SECOND.get().floatValue() / 20.0F;
@@ -245,7 +245,7 @@ public final class BillyAbilities {
             player.displayClientMessage(Component.translatable("message.enhanced.billy_beam.hungry"), true);
             return;
         }
-        BuildData build = player.getData(ModAttachments.BUILD_DATA);
+        BuildData build = ModAttachments.BUILD_DATA.get(player);
         ContinuousBeam.start(player, beamStyle(player), beamRange(build));
         spells(player).crown = player.level().getGameTime() + CROWN_TICKS;
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.HEX_BOLT.get(), SoundSource.PLAYERS, 0.8F, 0.8F);
@@ -328,7 +328,7 @@ public final class BillyAbilities {
         sparks(level, player, end, 12);
 
         Vec3 from = player.getEyePosition().add(0, -0.3, 0).add(player.getLookAngle().scale(0.75));
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0,
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0,
                 new HexBoltPayload(player.getId(), from, end, forks, player.getRandom().nextLong()));
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.HEX_BOLT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }

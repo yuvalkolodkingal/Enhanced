@@ -1,16 +1,15 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -20,8 +19,6 @@ import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.BossTestSupport.lastActionBarKey;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -35,8 +32,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * it nothing; enough chaos or dark magic shatters it, with its cooldown. Billy stands at (10.5, 8.5) looking south (+z).
  * 3.4: a custom hero whose Hex Barrier it is (billy.freeze with its variant) lives by the same rule.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BarrierMagicTests {
     private static ServerPlayer billy(TestKit.Fixture f) {
         ServerPlayer billy = f.player(10.5, FLOOR, 8.5, Power.BILLY);
@@ -60,19 +55,19 @@ public final class BarrierMagicTests {
     }
 
     private static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.setNoAi(true);
         return husk;
     }
 
-    @GameTest(template = ARENA, batch = "barrier_magic_plain", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "barrier_magic_plain", timeoutTicks = 60)
     public static void anArrowOrABlowLeavesItsHealth(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
         Husk front = husk(helper, 10.5, 10.0);
         raise(f, billy, () -> {
             assertNear(health(billy), 60.0, 1.0E-3, "a whole barrier has 60 health");
-            Skeleton shooter = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
+            Skeleton shooter = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(1.5, FLOOR, 1.5));
             shooter.setNoAi(true);
             Arrow arrow = new Arrow(helper.getLevel(), shooter, new ItemStack(Items.ARROW), null);
             arrow.setPos(helper.absoluteVec(new Vec3(10.5, FLOOR + 1.0, 14.5)));
@@ -90,7 +85,7 @@ public final class BarrierMagicTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "barrier_magic_dark", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "barrier_magic_dark", timeoutTicks = 60)
     public static void darkMagicWearsItDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -109,7 +104,7 @@ public final class BarrierMagicTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "barrier_magic_chaos", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "barrier_magic_chaos", timeoutTicks = 60)
     public static void chaosMagicWearsItDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -127,7 +122,7 @@ public final class BarrierMagicTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "barrier_magic_shatter", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "barrier_magic_shatter", timeoutTicks = 80)
     public static void enoughChaosOrDarkMagicShattersIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -164,7 +159,7 @@ public final class BarrierMagicTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "barrier_magic_custom", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "barrier_magic_custom", timeoutTicks = 60)
     public static void aCustomHerosBarrierKeepsTheSameRule(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // (3.4) Billy's Freeze with its variant on G: the barrier is on Sneak + G, its cooldown on G.

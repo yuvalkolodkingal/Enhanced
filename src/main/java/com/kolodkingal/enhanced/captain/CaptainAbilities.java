@@ -4,9 +4,11 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.config.CaptainConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.CaptainFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -31,8 +33,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -106,15 +106,15 @@ public final class CaptainAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(ConfigSpec.DoubleValue value, double fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
@@ -198,10 +198,10 @@ public final class CaptainAbilities {
      * a hand, and none in flight. Everyone who sees him draws it on his back ({@code CapShieldLayer}).
      */
     static void backFlag(ServerPlayer player) {
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
         boolean back = ShieldRules.carriesOnBack(player) && cs.shieldEntity() < 0;
         if (cs.has(CaptainState.BACK) != back) {
-            player.setData(ModAttachments.CAPTAIN, cs.with(CaptainState.BACK, back));
+            ModAttachments.CAPTAIN.set(player, cs.with(CaptainState.BACK, back));
         }
     }
 
@@ -333,7 +333,7 @@ public final class CaptainAbilities {
     static void send(ServerLevel level, Entity who, int kind, List<Vec3> points, int arg) {
         List<Vec3> list = points.size() > CaptainFxPayload.MAX_POINTS ? points.subList(0, CaptainFxPayload.MAX_POINTS)
                 : points;
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new CaptainFxPayload(kind, who.getId(), List.copyOf(list), arg));
     }
 
@@ -366,9 +366,9 @@ public final class CaptainAbilities {
             state.chargeHit.clear();
         }
         ShieldThrow.dropFlying(player);
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
         if (!cs.equals(CaptainState.EMPTY)) {
-            player.setData(ModAttachments.CAPTAIN, CaptainState.EMPTY);
+            ModAttachments.CAPTAIN.set(player, CaptainState.EMPTY);
         }
         data.set(Live.CAP_SLAMMING, false);
         data.set(Live.CAP_CHARGING, false);
@@ -378,7 +378,7 @@ public final class CaptainAbilities {
     static void onGone(ServerPlayer player) {
         PowerData data = Powers.get(player);
         if (STATES.containsKey(player.getUUID()) || data.acts(Power.CAPTAIN_AMERICA)
-                || player.getData(ModAttachments.CAPTAIN).shieldEntity() >= 0) {
+                || ModAttachments.CAPTAIN.get(player).shieldEntity() >= 0) {
             endAll(player, data);
         }
         STATES.remove(player.getUUID());

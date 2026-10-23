@@ -1,9 +1,9 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -13,7 +13,6 @@ import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import com.kolodkingal.enhanced.thanos.ThanosState;
 import com.kolodkingal.enhanced.thanos.ThanosSwordEntity;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
@@ -24,8 +23,6 @@ import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashSet;
 import java.util.List;
@@ -45,8 +42,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The sword and the fist: the Sweep, the Smash, the Jab, the thrown sword, the Choke and the Leap. Each move is started
  * with {@code forceMove} and read as damage: a fighter has a thousand health, so what he lost is what he was hit for.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosMeleeTests {
 
     private static ThanosEntity boss(TestKit.Fixture f, ServerPlayer starter) {
@@ -60,7 +55,7 @@ public final class ThanosMeleeTests {
      * The Sweep hits what is inside the cone ahead of him for 30 (damage type thanos_sword), breaks a raised Shield for
      * five seconds and throws a rider off; the one behind him is untouched.
      */
-    @GameTest(template = ARENA, batch = "thanos_melee_sweep", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_sweep", timeoutTicks = 100)
     public static void theSweepHitsTheConeBreaksShieldsAndThrowsRiders(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -102,7 +97,7 @@ public final class ThanosMeleeTests {
     // The Smash
 
     /** The Smash hurts the spot ahead of him for 26 and sends a ring that only someone on the ground meets (12). */
-    @GameTest(template = ARENA, batch = "thanos_melee_smash", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_smash", timeoutTicks = 100)
     public static void theSmashStrikesTheSpotAndTheRingIsJumpable(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer under = fighter(f, 0, 4);
@@ -130,7 +125,7 @@ public final class ThanosMeleeTests {
     // The Jab
 
     /** The Jab is two blows, eight ticks apart, each for 18; it does not reach far. */
-    @GameTest(template = ARENA, batch = "thanos_melee_jab", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_jab", timeoutTicks = 100)
     public static void theJabHitsTwiceAndShortOfFarAway(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer close = fighter(f, 0, 2);
@@ -159,7 +154,7 @@ public final class ThanosMeleeTests {
      * The sword flies out and back, hits a creature once on each pass, and while it is away he has no Sweep and no Smash
      * (and nothing to throw).
      */
-    @GameTest(template = ARENA, batch = "thanos_melee_throw", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_throw", timeoutTicks = 260)
     public static void theSwordFliesHitsOncePerPassAndComesHome(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer target = fighter(f, 0, 6);
@@ -205,7 +200,7 @@ public final class ThanosMeleeTests {
     }
 
     /** A Chaos Shield turns the sword back toward him, as it does Mjolnir, and pays what the throw would have done. */
-    @GameTest(template = ARENA, batch = "thanos_melee_throw_shield", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_throw_shield", timeoutTicks = 260)
     public static void aChaosShieldTurnsTheSwordHome(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = fighter(f, 0, 6, Power.SCARLET_WITCH);
@@ -238,7 +233,7 @@ public final class ThanosMeleeTests {
      * The Choke takes one victim (a Loki or a Vision before the rest), holds him up for 40 ticks with 4 damage every 10, throws
      * him and hurts him where he lands; the Loki hears his line. The others near him are not touched.
      */
-    @GameTest(template = ARENA, batch = "thanos_melee_choke", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_choke", timeoutTicks = 200)
     public static void theChokeHoldsOneVictimLiftsThrowsAndHurts(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         // (3.5: Loki's body has armor; the numbers here are the choke's own, so his body wears none in this test.)
@@ -278,7 +273,7 @@ public final class ThanosMeleeTests {
     }
 
     /** 60 damage from another fighter makes him let go, and staggers him; a Creative or phased victim is never taken. */
-    @GameTest(template = ARENA, batch = "thanos_melee_choke_break", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_choke_break", timeoutTicks = 200)
     public static void anotherFighterCanBreakTheChokeAndTheUntouchableAreNeverTaken(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer victim = fighter(f, 0, 2);
@@ -307,7 +302,7 @@ public final class ThanosMeleeTests {
     }
 
     /** A Creative player and a phased Vision are not grabbed: both stand in the Choke's cone and nobody is lifted or hurt. */
-    @GameTest(template = ARENA, batch = "thanos_melee_choke_never", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_choke_never", timeoutTicks = 80)
     public static void theChokeNeverTakesTheUntouchable(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer creative = f.player(ThanosBossTests.CENTRE.x, FLOOR, ThanosBossTests.CENTRE.z + 2.0, net.minecraft.world.level.GameType.CREATIVE);
@@ -332,7 +327,7 @@ public final class ThanosMeleeTests {
     // The Leap
 
     /** The Leap crosses the arena to where the target stood and hurts the ground there for 20; those further off are spared. */
-    @GameTest(template = ARENA, batch = "thanos_melee_leap", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_melee_leap", timeoutTicks = 160)
     public static void theLeapLandsWhereHeAimedAndHurtsThere(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer target = fighter(f, 0, 8.5);

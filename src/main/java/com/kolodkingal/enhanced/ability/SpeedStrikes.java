@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpeedConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hex.HexManager;
@@ -28,7 +29,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -287,11 +287,11 @@ public final class SpeedStrikes {
     }
 
     /** A config number, or its default before the config has loaded (the game tests load it). */
-    public static int value(ModConfigSpec.IntValue option, int fallback) {
+    public static int value(ConfigSpec.IntValue option, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? option.get() : fallback;
     }
 
-    public static double value(ModConfigSpec.DoubleValue option, double fallback) {
+    public static double value(ConfigSpec.DoubleValue option, double fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? option.get() : fallback;
     }
 

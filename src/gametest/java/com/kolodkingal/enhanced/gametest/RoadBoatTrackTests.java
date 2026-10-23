@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadCanvas;
 import com.kolodkingal.enhanced.road.RoadCells;
 import com.kolodkingal.enhanced.road.RoadLayout;
@@ -13,12 +13,9 @@ import com.kolodkingal.enhanced.road.boat.IceTrack.Sample;
 import com.kolodkingal.enhanced.road.boat.IceTrackGenerator;
 import com.kolodkingal.enhanced.road.boat.IceTrackGenerator.Params;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -37,8 +34,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * ({@link IceBoatSim}, written out from the game's code and itself checked against the real entity in {@code RoadBoatPhysicsTests}) and
  * a driver ({@link IceBot}) that has to finish every course on it.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadBoatTrackTests {
     static final String BATCH = "road_boat_track";
 
@@ -61,7 +56,7 @@ public final class RoadBoatTrackTests {
 
     // ---- the physics numbers ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theModelUsesTheGamesOwnNumbers(GameTestHelper helper) {
         // The friction of the blocks the course is made of is the game's, read from the blocks.
         check(Blocks.PACKED_ICE.getFriction() == (float) IceBoatModel.PACKED_ICE_FRICTION, "packed ice: " + Blocks.PACKED_ICE.getFriction());
@@ -94,7 +89,7 @@ public final class RoadBoatTrackTests {
 
     // ---- the generator ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void coursesAreTheSameForTheSameSeedAndDifferentForOthers(GameTestHelper helper) {
         Params params = params(2, 800, 9, 1);
         IceTrack a = IceTrackGenerator.generate(1234L, params);
@@ -111,7 +106,7 @@ public final class RoadBoatTrackTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void everyCourseHasTheLengthAskedFor(GameTestHelper helper) {
         for (int length : new int[]{200, 400, 800, 1200, 1400}) {
             for (int difficulty = 1; difficulty <= 3; difficulty++) {
@@ -131,7 +126,7 @@ public final class RoadBoatTrackTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void theTrackIsNeverNarrowerThanThreeAndStaysInItsCell(GameTestHelper helper) {
         for (IceTrack track : courses(100, 36)) {
             check(track.narrowest() >= 3.0, "never narrower than three blocks: " + track.narrowest());
@@ -164,7 +159,7 @@ public final class RoadBoatTrackTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void everyCurveIsOneTheBoatCanDriveAndStraightsComeBetween(GameTestHelper helper) {
         double turnLimit = IceBoatModel.maxTurnRate(IceBoatModel.PACKED_ICE_FRICTION);
         int[] minRadius = {0, 30, 24, 20};
@@ -224,7 +219,7 @@ public final class RoadBoatTrackTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 1200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 1200)
     public static void everyPartOfEveryCourseIsReachableAndNothingTouchesAnythingElse(GameTestHelper helper) {
         for (IceTrack track : courses(300, 30)) {
             Raster r = track.raster();
@@ -296,7 +291,7 @@ public final class RoadBoatTrackTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void checkpointsAreOnStraightsAndSpacedOutAndTheCanvasTakesTheCourse(GameTestHelper helper) {
         SplittableRandom random = new SplittableRandom(11);
         int total = 0;
@@ -332,7 +327,7 @@ public final class RoadBoatTrackTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void aShortcutIsAJumpThatTheStraightBeforeItAllowsAndTheLongWayStaysOpen(GameTestHelper helper) {
         int loops = 0;
         for (long seed = 1; seed <= 60; seed++) {
@@ -407,22 +402,22 @@ public final class RoadBoatTrackTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
     public static void aDriverFinishesEveryEasyCourse(GameTestHelper helper) {
         driveAll(helper, 1, 1000, 24);
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
     public static void aDriverFinishesEveryNormalCourse(GameTestHelper helper) {
         driveAll(helper, 2, 2000, 24);
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
     public static void aDriverFinishesEveryHardCourse(GameTestHelper helper) {
         driveAll(helper, 3, 3000, 24);
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 1500)
     public static void aCarelessDriverWhoLateAndSometimesPressesTheWrongKeyStillFinishesTheLongWay(GameTestHelper helper) {
         int finished = 0;
         int runs = 0;

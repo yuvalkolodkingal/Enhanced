@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -10,6 +9,7 @@ import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -24,7 +24,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,8 +50,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -66,14 +63,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * The Scarlet Witch: the Mind Stone and Tesseract awakenings, Loki's Scepter in battle, her crown and her abilities
  * (the Hex has its own tests).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ScarletWitchTests {
 
     // ---- the Mind Stone ----
 
     /** Has its own batch: the Mind Stone's explosion shouldn't reach other tests. */
-    @GameTest(template = ARENA, batch = "mind_stone_death")
+    @EnhancedTest(template = ARENA, batch = "mind_stone_death")
     public static void mindStoneKillsPlayerWithoutGene(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -86,7 +81,7 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "mind_stone_death")
+    @EnhancedTest(template = ARENA, batch = "mind_stone_death")
     public static void mindStoneSparesCreativePlayers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5, net.minecraft.world.level.GameType.CREATIVE);
@@ -99,7 +94,7 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void mindStoneWithGeneAwakensScarletWitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -116,7 +111,7 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void mindStoneIsSafeForTheScarletWitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -129,7 +124,7 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void geneDoesNotBondToMagneto(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(10.5, FLOOR, 10.5, Power.MAGNETO);
@@ -147,7 +142,7 @@ public final class ScarletWitchTests {
 
     // ---- the Tesseract also makes the Scarlet Witch ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractWithGeneAwakensScarletWitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -172,7 +167,7 @@ public final class ScarletWitchTests {
     }
 
     /** The gene can be in either hand: the Tesseract just has to be in the other one. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractInTheOffHandWorksWithTheGeneInTheMainHand(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -189,7 +184,7 @@ public final class ScarletWitchTests {
     }
 
     /** Creative players keep their gene, exactly as with the scepter. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractAwakeningUsesTheGeneTheSameWayAsTheScepter(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer creative = f.player(5.5, FLOOR, 10.5, net.minecraft.world.level.GameType.CREATIVE);
@@ -209,7 +204,7 @@ public final class ScarletWitchTests {
     }
 
     /** Without the gene (or with something else in the other hand) the Tesseract keeps making Loki. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractWithoutTheGeneStillMakesLoki(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -226,7 +221,7 @@ public final class ScarletWitchTests {
     }
 
     /** A hero who uses the Tesseract is taken where they look, as before, whatever they hold in the other hand. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractStillJumpsAHeroHoldingAGene(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
@@ -258,12 +253,12 @@ public final class ScarletWitchTests {
      * A zombie that is after a player is hit by the scepter: it forgets the player, can't pick anyone (or the same
      * player) again for as long as the effect lasts, and stumbles about; then it goes back to hunting.
      */
-    @GameTest(template = ARENA, batch = "scepter_confusion", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "scepter_confusion", timeoutTicks = 200)
     public static void scepterMakesAZombieForgetItsTargetAndStumble(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SCEPTER_CONFUSION_TICKS, 60);
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         zombie.setTarget(attacker);
         check(zombie.getTarget() == attacker, "the zombie is after the player");
@@ -300,7 +295,7 @@ public final class ScarletWitchTests {
     }
 
     /** A hit player gets Nausea for 8 seconds and Slowness I for 3; Magneto's helmet turns the Nausea away. */
-    @GameTest(template = ARENA, batch = "solo_scepter_gives_a_player_nausea_and_slowness")
+    @EnhancedTest(template = ARENA, batch = "solo_scepter_gives_a_player_nausea_and_slowness")
     public static void scepterGivesAPlayerNauseaAndSlowness(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -327,7 +322,7 @@ public final class ScarletWitchTests {
     }
 
     /** Each of the three durations can be set to 0, which turns that effect off. */
-    @GameTest(template = ARENA, batch = "scepter_confusion_off")
+    @EnhancedTest(template = ARENA, batch = "scepter_confusion_off")
     public static void scepterConfusionCanBeTurnedOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -336,7 +331,7 @@ public final class ScarletWitchTests {
         f.config(EnhancedConfig.SCEPTER_SLOWNESS_TICKS, 0);
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
         ServerPlayer victim = f.player(11.5, FLOOR, 10.5);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         zombie.setNoAi(true);
         float health = zombie.getHealth();
 
@@ -350,11 +345,11 @@ public final class ScarletWitchTests {
     }
 
     /** A blow that kills leaves nothing behind: no effect on the corpse, no chime. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterLeavesAKilledCreatureAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setNoAi(true);
         zombie.setHealth(0.1F); // (the scepter's own damage only counts once the player has ticked with it in hand)
         TestKit.heardSounds(attacker);
@@ -368,7 +363,7 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterCannotConfuseTheBosses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (EntityType<?> boss : List.of(EntityType.ENDER_DRAGON, EntityType.WITHER, EntityType.WARDEN)) {
@@ -377,7 +372,7 @@ public final class ScarletWitchTests {
         check(!EntityType.ZOMBIE.is(ModTags.CONFUSED_IMMUNE) && !EntityType.VILLAGER.is(ModTags.CONFUSED_IMMUNE), "ordinary creatures are not");
 
         ServerPlayer attacker = withScepter(f, 10.5, 10.5);
-        Warden warden = helper.spawn(EntityType.WARDEN, new Vec3(11.5, FLOOR, 10.5));
+        Warden warden = TestKit.spawn(helper, EntityType.WARDEN, new Vec3(11.5, FLOOR, 10.5));
         warden.setNoAi(true);
         float health = warden.getHealth();
 
@@ -391,7 +386,7 @@ public final class ScarletWitchTests {
 
     // ---- Wanda's Crown ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void crownTransformsOnlyTheScarletWitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(5.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -422,11 +417,11 @@ public final class ScarletWitchTests {
 
     // ---- Ability 1: Chaos Energy Beam ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosBeamHurtsAndNauseates(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         lookAt(wanda, pig);
         float before = pig.getHealth();
 
@@ -438,11 +433,11 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosBeamIsBlockedByWalls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         for (int y = 2; y <= 6; y++) {
             for (int z = 8; z <= 12; z++) {
                 helper.setBlock(new BlockPos(8, y, z), Blocks.STONE);
@@ -463,12 +458,12 @@ public final class ScarletWitchTests {
 
     // ---- Ability 3: Telekinesis ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void wandaLiftsCreaturesAndBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         PowerData data = Powers.get(wanda);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 10.5));
 
         lookAt(wanda, pig);
         AbilityHandler.onKey(wanda, 3, true);
@@ -488,7 +483,7 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void wandaCannotLiftObsidianOrBedrock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -508,7 +503,7 @@ public final class ScarletWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void thrownBlockShattersAgainstWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -544,11 +539,11 @@ public final class ScarletWitchTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void thrownCreatureSlamsIntoWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
-        Pig pig = helper.spawn(EntityType.PIG, new Vec3(7.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawn(helper, EntityType.PIG, new Vec3(7.5, FLOOR, 10.5));
         buildWall(helper, 15);
         lookAt(wanda, pig);
         AbilityHandler.onKey(wanda, 3, true);
@@ -573,7 +568,7 @@ public final class ScarletWitchTests {
     private static final int LAUNCH_TICK = 6;
 
     /** The whole chain behind "Magneto takes Wanda's attacks in full": a block she hurls at him hits as if he had no armor. */
-    @GameTest(template = ARENA, batch = "solo_wanda_hurls_a_block_at_magneto")
+    @EnhancedTest(template = ARENA, batch = "solo_wanda_hurls_a_block_at_magneto")
     public static void wandaHurlsABlockAtMagneto(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -613,7 +608,7 @@ public final class ScarletWitchTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void heldBlockSetDownGentlyBecomesABlockAgain(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -695,7 +690,7 @@ public final class ScarletWitchTests {
     }
 
     private static Skeleton harmlessSkeleton(GameTestHelper helper, Vec3 at) {
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, at);
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, at);
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         skeleton.setNoAi(true); // only the arrow may hurt Wanda (equipping a skeleton re-adds its melee goal)
         return skeleton;
@@ -705,13 +700,13 @@ public final class ScarletWitchTests {
         return Powers.get(wanda).cooldownUntil(4) - helper.getLevel().getGameTime();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosShieldStopsArrows(GameTestHelper helper) {
         chaosShieldArrowTest(helper, 3.5, true);
     }
 
     /** Point-blank, without the shield's per-tick scan: the impact/damage hooks must still stop the arrow. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosShieldStopsPointBlankArrows(GameTestHelper helper) {
         chaosShieldArrowTest(helper, 10.0, false);
     }
@@ -749,7 +744,7 @@ public final class ScarletWitchTests {
      * that turned one to sparks would destroy it for good. It throws it back to Thor instead, and pays what the blow
      * would have cost.
      */
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void chaosShieldTurnsAThrownWeaponBackToThor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -788,7 +783,7 @@ public final class ScarletWitchTests {
 
     /** A husk (it does not burn in the sun) that takes damage as written: no armour to soften it. */
     private static Zombie bareHusk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return husk;
     }
@@ -809,7 +804,7 @@ public final class ScarletWitchTests {
      * Wanda is not touched, nothing beyond is hit and the shield pays the beam's damage (the weapon and the God of
      * Thunder make it more). A shield that is still forming stops nothing.
      */
-    @GameTest(template = ARENA, batch = "chaos_shield_beam_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_beam_pvp", timeoutTicks = 100)
     public static void chaosShieldStopsThorsLightningBeamAtItsSurfaceAndIsWornDownByIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -868,7 +863,7 @@ public final class ScarletWitchTests {
      * A beam from inside the sphere is not stopped at its surface, but what hits Wanda herself still never gets
      * through, and neither does the lightning that leaps on from what Thor strikes.
      */
-    @GameTest(template = ARENA, batch = "chaos_shield_point_blank_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_point_blank_pvp", timeoutTicks = 100)
     public static void chaosShieldStopsAPointBlankBeamFromInsideItToo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -896,7 +891,7 @@ public final class ScarletWitchTests {
     }
 
     /** The beam that breaks the shield is stopped too; then the shield is gone, and the next beam hurts her. */
-    @GameTest(template = ARENA, batch = "chaos_shield_strength_5_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_strength_5_pvp", timeoutTicks = 100)
     public static void aShatteredChaosShieldLetsThorsBeamThrough(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -923,7 +918,7 @@ public final class ScarletWitchTests {
      * does a thrown Mjolnir, and pays what its blow would have cost; it does not shred it. A fragment that is already
      * flying home is let by.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosShieldTurnsAnOutgoingFragmentRoundAndLetsAHomewardOneBy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -953,7 +948,7 @@ public final class ScarletWitchTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosShieldReducesExplosionDamage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer shielded = f.player(5.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -969,7 +964,7 @@ public final class ScarletWitchTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosShieldNeedsFood(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(5.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -995,7 +990,7 @@ public final class ScarletWitchTests {
     }
 
     /** Pressing B starts it; it grows for the wind-up and blocks nothing until then. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosShieldTakesTimeToFormAndBlocksNothingMeanwhile(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(5.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -1035,7 +1030,7 @@ public final class ScarletWitchTests {
     }
 
     /** What it stops wears it down by that much, and at 0 it shatters: shards, a glassy sound, a long wait. */
-    @GameTest(template = ARENA, batch = "chaos_shield_strength_12")
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_strength_12")
     public static void chaosShieldWearsDownAndShatters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, 12.0);
@@ -1074,7 +1069,7 @@ public final class ScarletWitchTests {
     }
 
     /** An explosion bigger than the strength that is left breaks the shield and lets the rest through. */
-    @GameTest(template = ARENA, batch = "chaos_shield_strength_10")
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_strength_10")
     public static void chaosShieldShatteringExplosionLetsTheRestThrough(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, 10.0);
@@ -1115,7 +1110,7 @@ public final class ScarletWitchTests {
      * costs the shield what it would have done to her, red sparks fly, the sphere rings, and the attacker (who stood
      * inside the dome) is thrown back out of it.
      */
-    @GameTest(template = ARENA, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, timeoutTicks = 120)
     public static void chaosShieldStopsACreaturesBlowAndThrowsItBackOutOfTheDome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         float damage = huskBlowDamage(helper, f);
@@ -1151,16 +1146,16 @@ public final class ScarletWitchTests {
     }
 
     /** Whatever the creature: its swipe is a blow, and the shield stops it. */
-    @GameTest(template = ARENA, batch = "chaos_shield_strength_1000", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_strength_1000", timeoutTicks = 100)
     public static void chaosShieldStopsASpidersARavagersAndAWardensBlows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, 1000.0);
         ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         List<Mob> attackers = List.of(
-                helper.spawnWithNoFreeWill(EntityType.SPIDER, new Vec3(8.9, FLOOR, 10.5)),
-                helper.spawnWithNoFreeWill(EntityType.RAVAGER, new Vec3(12.0, FLOOR, 12.5)),
-                helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(10.5, FLOOR, 7.9)),
-                helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(13.5, FLOOR, 8.5)));
+                TestKit.spawnWithNoFreeWill(helper, EntityType.SPIDER, new Vec3(8.9, FLOOR, 10.5)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.RAVAGER, new Vec3(12.0, FLOOR, 12.5)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(10.5, FLOOR, 7.9)),
+                TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(13.5, FLOOR, 8.5)));
         raiseShield(f, wanda, () -> {
             float before = Powers.get(wanda).shieldStrength();
             for (Mob attacker : attackers) {
@@ -1176,7 +1171,7 @@ public final class ScarletWitchTests {
     }
 
     /** A sword is stopped as a zombie's claw is, and its wielder is thrown back out of the dome. */
-    @GameTest(template = ARENA, batch = "chaos_shield_sword_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_sword_pvp", timeoutTicks = 100)
     public static void chaosShieldStopsAPlayersSwordAndThrowsHimBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1208,7 +1203,7 @@ public final class ScarletWitchTests {
     }
 
     /** With PvP off a player can't hurt her anyway: the blow costs the shield nothing and throws nobody back. */
-    @GameTest(template = ARENA, batch = "chaos_shield_pvp_off")
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_pvp_off")
     public static void aPlayersBlowCostsTheShieldNothingWhenPvpIsOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(false);
@@ -1226,7 +1221,7 @@ public final class ScarletWitchTests {
     }
 
     /** A shield that is still forming stops nothing: the blow hurts her in full and costs the shield nothing. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aFormingChaosShieldStopsNoBlows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         float damage = huskBlowDamage(helper, f);
@@ -1244,7 +1239,7 @@ public final class ScarletWitchTests {
     }
 
     /** The blow that breaks the shield is stopped too (as the last arrow is); the next one goes through. */
-    @GameTest(template = ARENA, batch = "chaos_shield_melee_shatter")
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_melee_shatter")
     public static void theBlowThatShattersTheChaosShieldIsStoppedAndTheNextGoesThrough(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         float damage = huskBlowDamage(helper, f);
@@ -1276,7 +1271,7 @@ public final class ScarletWitchTests {
      * Only a creature's or a player's own blow is stopped: what the world does to her, magic, thorns and a Warden's
      * sonic boom still hurt her through the shield, and cost it nothing.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theChaosShieldLetsEverythingButBlowsAndMissilesThrough(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -1308,12 +1303,12 @@ public final class ScarletWitchTests {
     }
 
     /** She can still strike out of her own dome, with her hands and with the beam. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void herOwnAttacksStillWorkFromInsideTheChaosShield(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(3.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         Zombie husk = bareHusk(helper, 3.5, 12.0); // beside her, not on the line to the pig
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 10.5));
         raiseShield(f, wanda, () -> {
             float huskHealth = husk.getHealth();
             lookAt(wanda, husk);
@@ -1335,7 +1330,7 @@ public final class ScarletWitchTests {
      * Thor's blow is stopped like anyone's, and the God of Thunder's lightning does not leap from it: it costs the
      * shield the blow's damage and no more, and nothing beside her is struck.
      */
-    @GameTest(template = ARENA, batch = "chaos_shield_thor_blow_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_thor_blow_pvp", timeoutTicks = 100)
     public static void aGodOfThunderBlowOnAChaosShieldArcsNoLightning(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1358,7 +1353,7 @@ public final class ScarletWitchTests {
     }
 
     /** It holds for at most 8 seconds, then drops by itself; held to its limit, it needs 15 seconds to come back. */
-    @GameTest(template = ARENA, batch = "chaos_shield_limit")
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_limit")
     public static void chaosShieldDropsAtItsLimitAndNeedsLongToRecharge(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EnhancedConfig.CHAOS_SHIELD_MAX_TICKS.get() == 160, "the limit is 8 seconds (160 ticks)");
@@ -1392,7 +1387,7 @@ public final class ScarletWitchTests {
     }
 
     /** B released: it drops at once, with the short cooldown; it can be raised again when that is over. */
-    @GameTest(template = ARENA, batch = "chaos_shield_cooldown")
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_cooldown")
     public static void chaosShieldDropsWhenReleasedAndRechargesBriefly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EnhancedConfig.CHAOS_SHIELD_COOLDOWN.get() == 120, "a dropped shield needs 6 seconds (120 ticks)");
@@ -1419,7 +1414,7 @@ public final class ScarletWitchTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void chaosShieldDefaultsAndItsStrengthIsSynced(GameTestHelper helper) {
         check(EnhancedConfig.CHAOS_SHIELD_STRENGTH.get() == 30.0, "30 points of strength");
         check(EnhancedConfig.CHAOS_SHIELD_BROKEN_COOLDOWN.get() == 300, "15 seconds after it shattered or was held to its limit");
@@ -1446,7 +1441,7 @@ public final class ScarletWitchTests {
     }
 
     /** What a client expects of its own key press is the wind-up in the config (and the default is the keyed 15). */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theClientKnowsTheWindUpOfAShieldItRaises(GameTestHelper helper) {
         check(WandaAbilities.windUpTicks() == EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get(), "it is the configured wind-up");
         check(EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.getDefault() == 15, "15 ticks by default");

@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.config.EternityConfig;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -23,7 +24,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +95,7 @@ public final class ThunderStrike {
         }
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y + 0.2, at.z, 30, 0.6, 0.3, 0.6, 0.4);
         level.playSound(null, at.x, at.y, at.z, ModSounds.LOVE_THUNDER_STRIKE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, 96,
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, 96,
                 new EternityFxPayload(EternityFxPayload.THUNDER_STRIKE, player.getId(), BlockPos.containing(at), 0));
         player.swing(net.minecraft.world.InteractionHand.MAIN_HAND, true);
         return true;

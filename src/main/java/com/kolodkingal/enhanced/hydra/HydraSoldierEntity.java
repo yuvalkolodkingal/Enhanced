@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.MindLink;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.config.HydraConfig;
 import com.kolodkingal.enhanced.network.HydraFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -47,7 +48,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -367,7 +367,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
 
     /** Whether he fights for someone else now (the Scepter, the Mind Stone). */
     public boolean isTurned() {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return entityData.get(DATA_TURNED);
         }
         return turnedById != null && turnedUntil > level().getGameTime();
@@ -412,7 +412,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
             outpost.runner = null;
         }
         level.playSound(null, getX(), getY(), getZ(), ModSounds.HYDRA_RADIO.get(), SoundSource.HOSTILE, 0.8F, 1.4F);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(HydraFxPayload.TURNED, getId(),
+        Net.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(HydraFxPayload.TURNED, getId(),
                 List.of(getEyePosition()), ticks));
         if (leader instanceof ServerPlayer player) {
             player.displayClientMessage(Component.translatable("message.enhanced.hydra.turned"), true);
@@ -425,7 +425,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
         turnedUntil = 0L;
         entityData.set(DATA_TURNED, false);
         setTarget(null);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(HydraFxPayload.TURNED, getId(),
+        Net.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(HydraFxPayload.TURNED, getId(),
                 List.of(getEyePosition()), 0));
     }
 
@@ -499,7 +499,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
     public void setTarget(@Nullable LivingEntity target) {
         LivingEntity old = getTarget();
         super.setTarget(target);
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         LivingEntity now = getTarget();
@@ -644,7 +644,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
                     0.95F + random.nextFloat() * 0.1F);
         }
         if (level() instanceof ServerLevel) {
-            PacketDistributor.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(HydraFxPayload.MUZZLE,
+            Net.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(HydraFxPayload.MUZZLE,
                     getId(), List.of(from), kind));
         }
         shots++;
@@ -744,7 +744,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
             level().playSound(null, getX(), getEyeY(), getZ(), ModSounds.HYDRA_SNIPER_AIM.get(), SoundSource.HOSTILE,
                     1.0F, 1.0F);
             if (level() instanceof ServerLevel) {
-                PacketDistributor.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(
+                Net.sendToPlayersTrackingEntityAndSelf(this, new HydraFxPayload(
                         HydraFxPayload.SNIPER_AIM, getId(), List.of(target.getEyePosition()), aimTicks()));
             }
         }
@@ -854,13 +854,13 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!level().isClientSide && blocksWithShield(source)) {
+        if (!level().isClientSide() && blocksWithShield(source)) {
             level().playSound(null, getX(), getY(), getZ(), ModSounds.HYDRA_SHIELD_BLOCK.get(), SoundSource.HOSTILE,
                     1.0F, 0.9F + random.nextFloat() * 0.2F);
             return false;
         }
         boolean hurt = super.hurt(source, amount);
-        if (hurt && !level().isClientSide && source.getEntity() instanceof LivingEntity attacker && isAlive()) {
+        if (hurt && !level().isClientSide() && source.getEntity() instanceof LivingEntity attacker && isAlive()) {
             HydraSenses.heard((ServerLevel) level(), position());
         }
         return hurt;
@@ -892,7 +892,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
 
     @Override
     public void remove(RemovalReason reason) {
-        if (!level().isClientSide && reason == RemovalReason.DISCARDED && level() instanceof ServerLevel level) {
+        if (!level().isClientSide() && reason == RemovalReason.DISCARDED && level() instanceof ServerLevel level) {
             HydraGarrison.discarded(level, this);
         }
         super.remove(reason);

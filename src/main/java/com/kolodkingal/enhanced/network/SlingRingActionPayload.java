@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.strange.SlingRingActions;
 import io.netty.buffer.ByteBuf;
@@ -8,7 +9,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server (3.6): a button on the Sling Ring's screen (the PlaceBook kind {@code SLING_RING}, lane L3), as the
@@ -33,7 +33,7 @@ public record SlingRingActionPayload(int action, int index, String name) impleme
         return TYPE;
     }
 
-    static void handle(SlingRingActionPayload payload, IPayloadContext context) {
+    static void handle(SlingRingActionPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player && player.isAlive()) {
             SlingRingActions.handle(player, payload.action(), payload.index(), payload.name());
         }

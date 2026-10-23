@@ -275,7 +275,7 @@ public final class SpellWheelScreen extends Screen {
         Power hero = BuildClient.hero(player);
         int rgb = hero.color;
         BuildGrammar grammar = BuildClient.grammar();
-        BuildData data = player.getData(ModAttachments.BUILD_DATA);
+        BuildData data = ModAttachments.BUILD_DATA.get(player);
         boolean calm = com.kolodkingal.enhanced.client.EnhancedClientConfig.REDUCED_MOTION.get();
 
         int sector = sectorAt(mx, my);
@@ -734,19 +734,19 @@ public final class SpellWheelScreen extends Screen {
         if (hit != null) {
             switch (hit.kind()) {
                 case UNDO -> {
-                    if (player.getData(ModAttachments.BUILD_DATA).undo() > 0) {
+                    if (ModAttachments.BUILD_DATA.get(player).undo() > 0) {
                         BuildFeedback.clicked(1.0F);
                         BuildClient.undo();
                     }
                 }
                 case REDO -> {
-                    if (player.getData(ModAttachments.BUILD_DATA).redo() > 0) {
+                    if (ModAttachments.BUILD_DATA.get(player).redo() > 0) {
                         BuildFeedback.clicked(1.0F);
                         BuildClient.redo();
                     }
                 }
                 case INSTANT -> {
-                    BuildFeedback.clicked(player.getData(ModAttachments.BUILD_DATA).instant() ? 0.8F : 1.4F);
+                    BuildFeedback.clicked(ModAttachments.BUILD_DATA.get(player).instant() ? 0.8F : 1.4F);
                     BuildClient.toggleInstant(player);
                 }
                 case MIX -> {

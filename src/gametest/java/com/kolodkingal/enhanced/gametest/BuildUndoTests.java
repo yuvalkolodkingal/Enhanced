@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
@@ -17,12 +16,12 @@ import com.kolodkingal.enhanced.build.UndoCaps;
 import com.kolodkingal.enhanced.build.UndoFiles;
 import com.kolodkingal.enhanced.build.UndoHistory;
 import com.kolodkingal.enhanced.build.UndoStep;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -39,8 +38,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,8 +67,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * pool, so a test waits for them with {@code UndoFiles.drain}. The files are server-wide state: every test has a batch
  * of its own ({@code build_undo_*}), and {@code TestKit.bossFixture} forgets the builders when it ends.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildUndoTests {
 
     /** A folder for the history, opened for the test's length and deleted when it ends. */
@@ -133,7 +128,7 @@ public final class BuildUndoTests {
      * Billy's cost) and reads it back equal; a state name that does not exist reads as "keep" (its cell is never touched);
      * a garbage {@code history.dat} is set aside as {@code .corrupt} and the history starts empty.
      */
-    @GameTest(template = ARENA, batch = "build_undo_disk", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_undo_disk", timeoutTicks = 200)
     public static void theHistoryRoundTripsThroughTheDisk(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -237,7 +232,7 @@ public final class BuildUndoTests {
      * in the step's file, and after a reload an undo of the interrupted step restores them all, the changed cell
      * excepted.
      */
-    @GameTest(template = ARENA, batch = "build_undo_ahead", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "build_undo_ahead", timeoutTicks = 400)
     public static void aCellIsNeverWrittenBeforeItsRecord(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -306,7 +301,7 @@ public final class BuildUndoTests {
      * the index lists the working step with its file, which holds the records of the cells the job wrote; once the
      * spell ends, the step is listed as done and its file is the step as it is.
      */
-    @GameTest(template = ARENA, batch = "build_undo_save", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "build_undo_save", timeoutTicks = 300)
     public static void aWorldSaveWritesTheIndexOfASpellAtWork(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -373,7 +368,7 @@ public final class BuildUndoTests {
      * forgotten, their files deleted, the newest kept; with the server's memory cap the steps of the player using the
      * most leave memory first (the other keeps his), and a step that left memory is still undone from disk.
      */
-    @GameTest(template = ARENA, batch = "build_undo_caps", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "build_undo_caps", timeoutTicks = 400)
     public static void capsForgetTheOldestFirst(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -476,7 +471,7 @@ public final class BuildUndoTests {
      * Billy's rank (rank 3: meter 2,048) and {@code meter} his meter, {@code forget} empties a player's history and pocket
      * and deletes the folder; the same commands from a player who is no operator do nothing.
      */
-    @GameTest(template = ARENA, batch = "build_undo_commands", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "build_undo_commands", timeoutTicks = 300)
     public static void operatorCommands(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -543,14 +538,14 @@ public final class BuildUndoTests {
 
         // rank and meter: Billy's.
         run(server, child, "enhanced build rank " + him + " 4");
-        check(BillyRanks.rank(billy.getData(ModAttachments.BUILD_DATA)) == 1, "a player who is no operator changes no rank");
+        check(BillyRanks.rank(ModAttachments.BUILD_DATA.get(billy)) == 1, "a player who is no operator changes no rank");
         run(server, operator, "enhanced build rank " + him + " 3");
-        BuildData data = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData data = ModAttachments.BUILD_DATA.get(billy);
         long now = server.overworld().getGameTime();
         check(BillyRanks.rank(data) == 3 && BillyMagic.meter(data, now) == 2048, "rank 3 and the meter full at 2,048: " + BillyRanks.rank(data) + ", "
                 + BillyMagic.meter(data, now));
         run(server, operator, "enhanced build meter " + him + " 10");
-        data = billy.getData(ModAttachments.BUILD_DATA);
+        data = ModAttachments.BUILD_DATA.get(billy);
         check(BillyMagic.meter(data, server.overworld().getGameTime()) == 10, "the meter is 10: " + BillyMagic.meter(data, server.overworld().getGameTime()));
         BuildTestSupport.Seen.of(op);
         run(server, operator, "enhanced build rank " + her + " 2");
@@ -576,7 +571,7 @@ public final class BuildUndoTests {
      * found, and his profile acts; a name nobody knows undoes nothing; what he did while
      * he was away comes back as safely as for an online player (a block someone changed since stays).
      */
-    @GameTest(template = ARENA, batch = "build_undo_offline", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "build_undo_offline", timeoutTicks = 300)
     public static void theOperatorUndoesThePlayerWhoIsAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -640,7 +635,7 @@ public final class BuildUndoTests {
      * A spell whose record would not fit in what its player may keep on disk (D-B 12.5, the estimate of 0.6 byte a cell and
      * 700 a section) asks for the long hold with {@code NO_UNDO_ROOM}; held for, it runs, and leaves no step.
      */
-    @GameTest(template = ARENA, batch = "build_undo_room", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_undo_room", timeoutTicks = 200)
     public static void aSpellTooBigToRememberAsksForTheLongHold(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         folder(f);
@@ -671,7 +666,7 @@ public final class BuildUndoTests {
      * The pocket (a Copy's take) is written to {@code pocket.bin} and read back equal, cell by cell and its chest's data
      * with it, after the memory is forgotten; a change of dimension keeps it.
      */
-    @GameTest(template = ARENA, batch = "build_undo_pocket", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_undo_pocket", timeoutTicks = 200)
     public static void thePocketSurvivesARestartAndADimensionChange(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();

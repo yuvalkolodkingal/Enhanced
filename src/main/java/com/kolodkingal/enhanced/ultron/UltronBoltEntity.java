@@ -164,11 +164,11 @@ public class UltronBoltEntity extends ThrowableProjectile implements ShieldCost 
 
     @Override
     public void tick() {
-        if (!level().isClientSide && !isRemoved() && overlapping()) {
+        if (!level().isClientSide() && !isRemoved() && overlapping()) {
             return;
         }
         super.tick();
-        if (level().isClientSide || isRemoved()) {
+        if (level().isClientSide() || isRemoved()) {
             return;
         }
         if (!isInWater()) {

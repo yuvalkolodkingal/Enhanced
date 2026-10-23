@@ -130,9 +130,9 @@ public final class BuildEvents {
     @SubscribeEvent
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            BuildView view = player.getExistingData(ModAttachments.BUILD_VIEW).orElse(null);
+            BuildView view = ModAttachments.BUILD_VIEW.getExisting(player).orElse(null);
             if (view != null && view.box().isPresent()) {
-                player.setData(ModAttachments.BUILD_VIEW, view.withSpell(view.spell(), Optional.empty()));
+                ModAttachments.BUILD_VIEW.set(player, view.withSpell(view.spell(), Optional.empty()));
             }
         }
     }

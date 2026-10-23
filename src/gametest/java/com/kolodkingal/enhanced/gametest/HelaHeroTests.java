@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MjolnirShatter;
 import com.kolodkingal.enhanced.config.HelaConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -17,6 +16,7 @@ import com.kolodkingal.enhanced.hela.HelaRules;
 import com.kolodkingal.enhanced.hela.NecroswordEntity;
 import com.kolodkingal.enhanced.item.HelaHeaddressItem;
 import com.kolodkingal.enhanced.asgard.AsgardProgress;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -25,7 +25,6 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,8 +37,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -55,8 +52,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * on her side and gone with her, the strength of Asgard, Death's Grasp against arrows, Mjolnir and Stormbreaker, and her
  * rows on a custom hero (R1: on another column, R3: the variant from Sneak, the body only with its row).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HelaHeroTests {
     private static final String BATCH = "hela";
 
@@ -74,7 +69,7 @@ public final class HelaHeroTests {
 
     // ---- becoming her ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHeadressMakesAPowerlessPlayerHela(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = f.player(5.5, FLOOR, 5.5);
@@ -84,21 +79,21 @@ public final class HelaHeroTests {
         headdress.getItem().inventoryTick(headdress, f.level(), p, 0, true);
         p.tickCount = 20;
         headdress.getItem().inventoryTick(headdress, f.level(), p, 0, true);
-        check(p.getData(ModAttachments.ASGARD).has(AsgardProgress.HELA_VICTOR), "the winner's headdress gives him the right to Gungnir");
+        check(ModAttachments.ASGARD.get(p).has(AsgardProgress.HELA_VICTOR), "the winner's headdress gives him the right to Gungnir");
         headdress.finishUsingItem(f.level(), p);
         check(Powers.is(p, Power.HELA), "held, it made her Hela");
         ServerPlayer other = f.player(8.5, FLOOR, 8.5);
         ItemStack theirs = HelaFight.headdressFor(p.getUUID());
         other.tickCount = 20;
         theirs.getItem().inventoryTick(theirs, f.level(), other, 0, true);
-        check(!other.getData(ModAttachments.ASGARD).has(AsgardProgress.HELA_VICTOR), "someone else's headdress gives no right");
+        check(!ModAttachments.ASGARD.get(other).has(AsgardProgress.HELA_VICTOR), "someone else's headdress gives no right");
         helper.succeed();
     }
 
     // ---- the keys ----
 
     /** Her V takes the Sneak the key was pressed with (the client's), not the server's crouch (3.5 integration). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herKeysTakeTheSneakTheyWerePressedWith(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 3.5);
@@ -118,7 +113,7 @@ public final class HelaHeroTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theVolleyThrowsThreeAndFiveWithTheForm(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 3.5);
@@ -143,7 +138,7 @@ public final class HelaHeroTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
     public static void theRainFallsWhereSheLooks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 3.5);
@@ -173,7 +168,7 @@ public final class HelaHeroTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theWallAndTheBurstRaiseSpikes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 3.5);
@@ -189,7 +184,7 @@ public final class HelaHeroTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDashCutsThroughCreatures(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 3.5);
@@ -207,7 +202,7 @@ public final class HelaHeroTests {
 
     // ---- her dead ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void herDeadServeHerAndCrumbleWithHer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 10.5);
@@ -232,7 +227,7 @@ public final class HelaHeroTests {
 
     // ---- Death's Grasp ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theGraspCrumblesArrowsAndCatchesMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 10.5);
@@ -264,7 +259,7 @@ public final class HelaHeroTests {
 
     // ---- her body ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herBodyAndTheStrengthOfAsgard(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 10.5);
@@ -284,7 +279,7 @@ public final class HelaHeroTests {
 
     // ---- a custom hero with her rows ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void herRowsWorkForACustomHero(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 10.5, 3.5, CustomKitSupport.def()
@@ -313,7 +308,7 @@ public final class HelaHeroTests {
     }
 
     /** PvP off: her blades and her dead spare another player; a teammate is spared even with PvP on. */
-    @GameTest(template = ARENA, batch = "hela_pvp")
+    @EnhancedTest(template = ARENA, batch = "hela_pvp")
     public static void herBladesSparePlayersWithoutPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hela(f, 10.5, 10.5);

@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.BeamPayload;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -25,7 +26,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +79,7 @@ public final class EyeLaser {
         ServerLevel level = player.serverLevel();
         level.playSound(null, player.getX(), player.getEyeY(), player.getZ(), ModSounds.LOVE_EYE_LASER_START.get(),
                 SoundSource.PLAYERS, 1.0F, 1.0F);
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 96,
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 96,
                 new EternityFxPayload(EternityFxPayload.EYES_ON, player.getId(), player.blockPosition(), 0));
         send(player, true);
         state.lastSent = now;
@@ -97,7 +97,7 @@ public final class EyeLaser {
                     LoveAbilities.cfg(EternityConfig.LOVE_EYE_LASER_COOLDOWN, 60));
         }
         send(player, false);
-        PacketDistributor.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(), 96,
+        Net.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(), 96,
                 new EternityFxPayload(EternityFxPayload.EYES_OFF, player.getId(), player.blockPosition(), 0));
     }
 
@@ -185,7 +185,7 @@ public final class EyeLaser {
     }
 
     private static void send(ServerPlayer player, boolean on) {
-        PacketDistributor.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(),
+        Net.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(),
                 96.0, new BeamPayload(player.getId(), AvengersBeams.LOVE_EYES.id(),
                         (float) LoveAbilities.cfg(EternityConfig.LOVE_EYE_LASER_RANGE, 24), on));
     }

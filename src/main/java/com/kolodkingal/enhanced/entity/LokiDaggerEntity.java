@@ -84,7 +84,7 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (tickCount > 1) {
                 level().addParticle(new EnergyParticleOptions(random.nextInt(3) == 0 ? magicGlow() : magicColor(), 0.55F),
                         xo + (random.nextDouble() - 0.5) * 0.08, yo + 0.12 + (random.nextDouble() - 0.5) * 0.08,
@@ -106,7 +106,7 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             result.getEntity().hurt(ModDamageTypes.source(level(), ModDamageTypes.LOKI_DAGGER, getOwner(), this), damage);
         }
     }
@@ -114,7 +114,7 @@ public class LokiDaggerEntity extends ThrowableItemProjectile {
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             vanish();
         }
     }

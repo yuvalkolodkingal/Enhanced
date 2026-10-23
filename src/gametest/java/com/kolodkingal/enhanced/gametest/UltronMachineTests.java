@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -12,6 +11,7 @@ import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -26,7 +26,6 @@ import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import com.kolodkingal.enhanced.ultron.UltronState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,8 +54,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,14 +83,12 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.tank;
  * beam and Thor's lightning on the bodies and the Sentries, what the Sentry does and in what order, how the waves come
  * and how the budget runs out, and that nothing he does ever breaks a block.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class UltronMachineTests {
 
     // ------------------------------------------------------------------------------------------------------------
     // Quicksilver
 
-    @GameTest(template = ARENA, batch = "ultron_slow")
+    @EnhancedTest(template = ARENA, batch = "ultron_slow")
     public static void quicksilverTimeSlowsSentriesNotUltron(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -107,7 +102,7 @@ public final class UltronMachineTests {
         UltronBoltEntity bolt = UltronBoltEntity.create(level, boss, f.helper().absoluteVec(new Vec3(8.5, FLOOR + 1.5, 12.5)), new Vec3(0.5, 0.0, 0.0), 4.0F,
                 UltronBoltEntity.Palette.PRIME);
         fight.spawn(bolt);
-        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        Zombie plain = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
 
         AbilityHandler.onKey(quicksilver, 1, true);
         AbilityHandler.onKey(quicksilver, 1, false);
@@ -141,7 +136,7 @@ public final class UltronMachineTests {
     // ------------------------------------------------------------------------------------------------------------
     // Wanda
 
-    @GameTest(template = ARENA, batch = "ultron_shield", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "ultron_shield", timeoutTicks = 400)
     public static void chaosShieldVersusUltron(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -235,7 +230,7 @@ public final class UltronMachineTests {
         return com.kolodkingal.enhanced.ability.WandaAbilities.hasShieldUp(wanda);
     }
 
-    @GameTest(template = ARENA, batch = "ultron_wanda")
+    @EnhancedTest(template = ARENA, batch = "ultron_wanda")
     public static void wandaAndTheMachines(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -305,7 +300,7 @@ public final class UltronMachineTests {
     // ------------------------------------------------------------------------------------------------------------
     // Magneto
 
-    @GameTest(template = ARENA, batch = "ultron_magneto", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "ultron_magneto", timeoutTicks = 400)
     public static void magnetoAndTheSentries(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -369,7 +364,7 @@ public final class UltronMachineTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Mind Stone and the lightning
 
-    @GameTest(template = ARENA, batch = "ultron_bonus")
+    @EnhancedTest(template = ARENA, batch = "ultron_bonus")
     public static void visionAndLightningBonuses(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -383,7 +378,7 @@ public final class UltronMachineTests {
         UltronSentryEntity sentry = sentryAt(f, fight, 14.5, 10.5);
         sentry.setHeld(true);
         sentry.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 6.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(6.5, FLOOR, 6.5));
         pig.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
         pig.setHealth(100.0F);
         ServerPlayer plain = f.player(4.5, FLOOR, 14.5);
@@ -449,7 +444,7 @@ public final class UltronMachineTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Hex
 
-    @GameTest(template = ARENA, batch = "ultron_hex")
+    @EnhancedTest(template = ARENA, batch = "ultron_hex")
     public static void hexAndTheMachines(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -490,7 +485,7 @@ public final class UltronMachineTests {
      * with the game rule that lets mobs grief set, and not one block of the arena changes, and nothing is dropped, set
      * alight or dropped as an entity.
      */
-    @GameTest(template = ARENA, batch = "ultron_blocks", timeoutTicks = 1400)
+    @EnhancedTest(template = ARENA, batch = "ultron_blocks", timeoutTicks = 1400)
     public static void nothingBreaksBlocks(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -564,7 +559,7 @@ public final class UltronMachineTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Sentry
 
-    @GameTest(template = ARENA, batch = "ultron_sentry", timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = "ultron_sentry", timeoutTicks = 600)
     public static void sentryEyesAndStun(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -658,7 +653,7 @@ public final class UltronMachineTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_waves", timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = "ultron_waves", timeoutTicks = 900)
     public static void sentryWavesAndBudget(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -772,7 +767,7 @@ public final class UltronMachineTests {
     // The shockwaves
 
     /** The Pull drags everyone it can see, the shockwaves of the Pull and the Dive hurt those on the ground and let the airborne pass. */
-    @GameTest(template = ARENA, batch = "ultron_shock", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "ultron_shock", timeoutTicks = 500)
     public static void shockwavesSpareTheAirborne(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -844,7 +839,7 @@ public final class UltronMachineTests {
     // ------------------------------------------------------------------------------------------------------------
     // The bolts
 
-    @GameTest(template = ARENA, batch = "ultron_bolts", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_bolts", timeoutTicks = 200)
     public static void boltsHitOnlyTheirEnemies(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -872,7 +867,7 @@ public final class UltronMachineTests {
         drone.setOwner(hero.getUUID());
         level.addFreshEntity(drone);
         drone.setHeld(true);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 11.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(6.5, FLOOR, 11.5));
         pig.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
         pig.setHealth(100.0F);
         ServerPlayer other = f.player(6.5, FLOOR, 16.5);
@@ -909,7 +904,7 @@ public final class UltronMachineTests {
      * (a projectile that struck one would knock the item out of the frame or break the stand), whether it is the boss's
      * bolt or a Sentry's, and a Sentry's fist.
      */
-    @GameTest(template = ARENA, batch = "ultron_bolts_spare", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_bolts_spare", timeoutTicks = 200)
     public static void theBossBoltsAndFistsSpareWhatHangsOrFloatsOrStands(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -921,9 +916,9 @@ public final class UltronMachineTests {
         UltronEntity boss = boss(fight);
         put(f, boss, 10.5, FLOOR + 1.0, 1.5);
         put(f, player, 19.5, FLOOR, 19.5);
-        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(3.5, FLOOR, 10.5));
-        Boat boat = helper.spawn(EntityType.BOAT, new Vec3(6.5, FLOOR, 10.5));
-        Minecart cart = helper.spawn(EntityType.MINECART, new Vec3(9.5, FLOOR, 10.5));
+        ArmorStand stand = TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(3.5, FLOOR, 10.5));
+        Boat boat = TestKit.spawn(helper, EntityType.BOAT, new Vec3(6.5, FLOOR, 10.5));
+        Minecart cart = TestKit.spawn(helper, EntityType.MINECART, new Vec3(9.5, FLOOR, 10.5));
         BlockPos wall = helper.absolutePos(new BlockPos(13, (int) FLOOR, 11));
         level.setBlock(wall, Blocks.STONE.defaultBlockState(), 3);
         f.onClose(() -> level.setBlock(wall, Blocks.AIR.defaultBlockState(), 3));
@@ -950,7 +945,7 @@ public final class UltronMachineTests {
     // ------------------------------------------------------------------------------------------------------------
     // Loki's Scepter and Wanda's Spellbound
 
-    @GameTest(template = ARENA, batch = "ultron_sentry2", timeoutTicks = 520)
+    @EnhancedTest(template = ARENA, batch = "ultron_sentry2", timeoutTicks = 520)
     public static void confusedAndSpellboundSentriesDoNotHunt(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);

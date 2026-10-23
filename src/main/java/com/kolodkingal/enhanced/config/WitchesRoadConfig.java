@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The numbers of the Witches' Road trials (3.2): the rules every trial shares, and the options of each trial (a trial
@@ -14,51 +14,51 @@ public final class WitchesRoadConfig {
     public static final String SECTION = "witches_road";
 
     // ---- the Road itself ----
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue MAX_PLAYERS;
-    public static ModConfigSpec.LongValue COURSE_SEED;
-    public static ModConfigSpec.BooleanValue RESUME_ON_LOGIN;
-    public static ModConfigSpec.BooleanValue RESUME_AT_CHECKPOINT;
-    public static ModConfigSpec.BooleanValue ANNOUNCE;
-    public static ModConfigSpec.BooleanValue VOICE;
-    public static ModConfigSpec.BooleanValue HEAL_AT_CHECKPOINT;
-    public static ModConfigSpec.IntValue FALL_DEPTH;
-    public static ModConfigSpec.IntValue LEAVE_CONFIRM_SECONDS;
-    public static ModConfigSpec.IntValue BUILD_BLOCKS_PER_TICK;
-    public static ModConfigSpec.IntValue REMOVE_BLOCKS_PER_TICK;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue MAX_PLAYERS;
+    public static ConfigSpec.LongValue COURSE_SEED;
+    public static ConfigSpec.BooleanValue RESUME_ON_LOGIN;
+    public static ConfigSpec.BooleanValue RESUME_AT_CHECKPOINT;
+    public static ConfigSpec.BooleanValue ANNOUNCE;
+    public static ConfigSpec.BooleanValue VOICE;
+    public static ConfigSpec.BooleanValue HEAL_AT_CHECKPOINT;
+    public static ConfigSpec.IntValue FALL_DEPTH;
+    public static ConfigSpec.IntValue LEAVE_CONFIRM_SECONDS;
+    public static ConfigSpec.IntValue BUILD_BLOCKS_PER_TICK;
+    public static ConfigSpec.IntValue REMOVE_BLOCKS_PER_TICK;
     // ---- the ending ----
-    public static ModConfigSpec.IntValue ENDING_FAREWELL_SECONDS;
+    public static ConfigSpec.IntValue ENDING_FAREWELL_SECONDS;
 
     // ---- trial 1: the Parkour ----
-    public static ModConfigSpec.IntValue PARKOUR_PADS;
-    public static ModConfigSpec.IntValue PARKOUR_DIFFICULTY;
-    public static ModConfigSpec.IntValue PARKOUR_CHECKPOINT_EVERY;
-    public static ModConfigSpec.IntValue PARKOUR_TIME_LIMIT_SECONDS;
+    public static ConfigSpec.IntValue PARKOUR_PADS;
+    public static ConfigSpec.IntValue PARKOUR_DIFFICULTY;
+    public static ConfigSpec.IntValue PARKOUR_CHECKPOINT_EVERY;
+    public static ConfigSpec.IntValue PARKOUR_TIME_LIMIT_SECONDS;
 
     // ---- trial 3: the Ice-Boat Race ----
-    public static ModConfigSpec.IntValue BOAT_RACE_LENGTH;
-    public static ModConfigSpec.IntValue BOAT_RACE_TRACK_WIDTH;
-    public static ModConfigSpec.IntValue BOAT_RACE_DIFFICULTY;
-    public static ModConfigSpec.IntValue BOAT_RACE_SHORTCUTS;
-    public static ModConfigSpec.BooleanValue BOAT_RACE_OBSTACLES;
-    public static ModConfigSpec.BooleanValue BOAT_RACE_BLUE_ICE;
-    public static ModConfigSpec.IntValue BOAT_RACE_CHECKPOINT_EVERY;
-    public static ModConfigSpec.IntValue BOAT_RACE_TIME_LIMIT_SECONDS;
-    public static ModConfigSpec.DoubleValue BOAT_RACE_FAIR_FACTOR;
-    public static ModConfigSpec.DoubleValue BOAT_RACE_PAR_FACTOR;
-    public static ModConfigSpec.IntValue BOAT_RACE_RESPAWN_COOLDOWN_SECONDS;
-    public static ModConfigSpec.IntValue BOAT_RACE_COUNTDOWN_SECONDS;
+    public static ConfigSpec.IntValue BOAT_RACE_LENGTH;
+    public static ConfigSpec.IntValue BOAT_RACE_TRACK_WIDTH;
+    public static ConfigSpec.IntValue BOAT_RACE_DIFFICULTY;
+    public static ConfigSpec.IntValue BOAT_RACE_SHORTCUTS;
+    public static ConfigSpec.BooleanValue BOAT_RACE_OBSTACLES;
+    public static ConfigSpec.BooleanValue BOAT_RACE_BLUE_ICE;
+    public static ConfigSpec.IntValue BOAT_RACE_CHECKPOINT_EVERY;
+    public static ConfigSpec.IntValue BOAT_RACE_TIME_LIMIT_SECONDS;
+    public static ConfigSpec.DoubleValue BOAT_RACE_FAIR_FACTOR;
+    public static ConfigSpec.DoubleValue BOAT_RACE_PAR_FACTOR;
+    public static ConfigSpec.IntValue BOAT_RACE_RESPAWN_COOLDOWN_SECONDS;
+    public static ConfigSpec.IntValue BOAT_RACE_COUNTDOWN_SECONDS;
     // ---- trial 2: Copy the Structure ----
-    public static ModConfigSpec.IntValue STRUCTURE_COPY_TIER;
-    public static ModConfigSpec.IntValue STRUCTURE_COPY_TIME_LIMIT_SECONDS;
-    public static ModConfigSpec.IntValue STRUCTURE_COPY_SUPPLY_PERCENT;
-    public static ModConfigSpec.BooleanValue STRUCTURE_COPY_AUTO_CHECK;
-    public static ModConfigSpec.BooleanValue STRUCTURE_COPY_HINTS;
-    public static ModConfigSpec.IntValue STRUCTURE_COPY_HINT_SECONDS;
-    public static ModConfigSpec.IntValue STRUCTURE_COPY_HINT_BLOCKS;
-    public static ModConfigSpec.IntValue STRUCTURE_COPY_MARKS;
+    public static ConfigSpec.IntValue STRUCTURE_COPY_TIER;
+    public static ConfigSpec.IntValue STRUCTURE_COPY_TIME_LIMIT_SECONDS;
+    public static ConfigSpec.IntValue STRUCTURE_COPY_SUPPLY_PERCENT;
+    public static ConfigSpec.BooleanValue STRUCTURE_COPY_AUTO_CHECK;
+    public static ConfigSpec.BooleanValue STRUCTURE_COPY_HINTS;
+    public static ConfigSpec.IntValue STRUCTURE_COPY_HINT_SECONDS;
+    public static ConfigSpec.IntValue STRUCTURE_COPY_HINT_BLOCKS;
+    public static ConfigSpec.IntValue STRUCTURE_COPY_MARKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Whether the Witches' Road has trials. On (the default): a player with no power who opens a Witches' Road",
                         "door with a Scarlet Witch Gene is asked to walk the Road (the trials), and chooses Billy or Tommy at the end.",
@@ -147,7 +147,7 @@ public final class WitchesRoadConfig {
     }
 
     /** The options of trial 2, Copy the Structure (inside the {@code witches_road} section). */
-    private static void defineStructureCopy(ModConfigSpec.Builder builder) {
+    private static void defineStructureCopy(ConfigSpec.Builder builder) {
         STRUCTURE_COPY_TIER = builder.comment("Trial 2, Copy the Structure: how big the model is. 1 = small (up to 5x5x5 blocks), 2 = medium (up to 9x9x7),",
                         "3 = large (up to 11x11x9). 0 = it depends on the player (each player gets the same size every time, but not the same for everyone).")
                 .defineInRange("structureCopyTier", 2, 0, 3);

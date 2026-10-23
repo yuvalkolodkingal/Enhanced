@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BuildJob;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildRules.Left;
@@ -20,11 +19,11 @@ import com.kolodkingal.enhanced.gametest.BuildTestSupport.Seen;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -40,8 +39,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.UUID;
@@ -68,8 +65,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * with its words, an unloaded valley is not walked cell by cell, the ripple of an undo and a redo, the VIEW's pace, and the
  * pairs of spell and op no client sends. Each test has a batch of its own ({@code build_review_*}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildReviewTests {
     private static final int GAP = 6;
 
@@ -84,7 +79,7 @@ public final class BuildReviewTests {
      * emptied, the undo brings the source chest back bare; and after an undo, if the restored chest is emptied, the redo
      * leaves both cells alone (the diamonds are in the player's hands only).
      */
-    @GameTest(template = ARENA, batch = "build_review_move_links", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "build_review_move_links", timeoutTicks = 300)
     public static void aMovedChestIsNeverInTwoPlacesAfterUndoOrRedo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -126,7 +121,7 @@ public final class BuildReviewTests {
     }
 
     /** A Move that lands on a chest with things inside leaves it standing (skip), and its block stays where it was. */
-    @GameTest(template = ARENA, batch = "build_review_move_onto_chest", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_review_move_onto_chest", timeoutTicks = 200)
     public static void aMoveNeverDestroysAFullChestItLandsOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -149,7 +144,7 @@ public final class BuildReviewTests {
     }
 
     /** With {@code fullContainers} spill, the same Move spills the chest's diamonds on the spot and puts its block down. */
-    @GameTest(template = ARENA, batch = "build_review_move_spill", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_review_move_spill", timeoutTicks = 200)
     public static void aMoveSpillsAFullChestItLandsOnWhenAsked(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.FULL_CONTAINERS, BuildConfig.FullContainers.SPILL);
@@ -174,7 +169,7 @@ public final class BuildReviewTests {
      * A Fill replaced an empty chest; its undo brings the empty chest back; someone puts diamonds in; the redo leaves the
      * chest standing with them (it does not wipe a container).
      */
-    @GameTest(template = ARENA, batch = "build_review_redo_chest", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_review_redo_chest", timeoutTicks = 200)
     public static void aRedoDoesNotWipeWhatWasPutInAChest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -198,7 +193,7 @@ public final class BuildReviewTests {
      * A step too big to hold in memory while it works (the cap at 60,000 bytes) is kept as bits and records: it weighs
      * almost nothing, is listed when its spell ends, and an undo reads it back from its records and puts every cell back.
      */
-    @GameTest(template = ARENA, batch = "build_review_lite", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "build_review_lite", timeoutTicks = 400)
     public static void aStepTooBigForMemoryLivesOnItsRecords(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         BuildUndoTests.folder(f);
@@ -235,7 +230,7 @@ public final class BuildReviewTests {
     }
 
     /** A claim mod's listener throws while a spell works: the spell stops as one undoable step, the tick goes on. */
-    @GameTest(template = ARENA, batch = "build_review_throws", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "build_review_throws", timeoutTicks = 100)
     public static void aJobThatThrowsStopsAloneAndStaysUndoable(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -265,7 +260,7 @@ public final class BuildReviewTests {
     }
 
     /** A Move whose blocks the claims refuse leaves the creatures where they stand. */
-    @GameTest(template = ARENA, batch = "build_review_riders", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_review_riders", timeoutTicks = 200)
     public static void creaturesGoAlongOnlyWithBlocksThatMoved(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -273,7 +268,7 @@ public final class BuildReviewTests {
         for (BlockPos pos : BlockPos.betweenClosed(abs(f, 3, 2, 3), abs(f, 5, 2, 5))) {
             level.setBlockAndUpdate(pos, Blocks.GOLD_BLOCK.defaultBlockState());
         }
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(4.5, 3, 4.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(4.5, 3, 4.5));
         Vec3 before = cow.position();
         BoundingBox everything = abs(f, new BoundingBox(0, 0, 0, 20, 12, 20));
         listen(f, BlockEvent.EntityPlaceEvent.class, event -> {
@@ -290,7 +285,7 @@ public final class BuildReviewTests {
     }
 
     /** A Copy of a chest in a claim keeps the bare block: the vault's diamonds are not in the pocket. */
-    @GameTest(template = ARENA, batch = "build_review_copy_claim", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_review_copy_claim", timeoutTicks = 200)
     public static void aCopyDoesNotReadAClaimedVault(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -320,7 +315,7 @@ public final class BuildReviewTests {
     }
 
     /** With PvP off, no lava, water or fire is made on another player either. */
-    @GameTest(template = ARENA, batch = "build_review_hazards", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_review_hazards", timeoutTicks = 200)
     public static void nobodyElseStandsInNewLavaWithPvpOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(false);
@@ -338,7 +333,7 @@ public final class BuildReviewTests {
     }
 
     /** A wall sign beside a wall that vanishes keeps its words (the settle pass leaves it to vanilla, with its drop). */
-    @GameTest(template = ARENA, batch = "build_review_sign", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_review_sign", timeoutTicks = 200)
     public static void aSignBesideAVanishedWallKeepsItsWords(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -359,7 +354,7 @@ public final class BuildReviewTests {
     }
 
     /** A fill across 80 x 80 blocks of which one chunk is loaded ends in one step: the unloaded columns are given up whole. */
-    @GameTest(template = ARENA, batch = "build_review_columns", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "build_review_columns", timeoutTicks = 100)
     public static void unloadedColumnsAreGivenUpWhole(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = f.player(0.5, FLOOR, 0.5, Power.SCARLET_WITCH);
@@ -380,7 +375,7 @@ public final class BuildReviewTests {
     }
 
     /** The ripple of an undo is the spell's, played backwards by the client; a redo's swaps rise and melt. */
-    @GameTest(template = ARENA, batch = "build_review_ripple", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "build_review_ripple", timeoutTicks = 100)
     public static void undoAndRedoSendTheOrderTheClientExpects(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -402,7 +397,7 @@ public final class BuildReviewTests {
      * The box the others see is shown at most every 4 ticks, but the last one is never lost, and its corners are clamped
      * to the world.
      */
-    @GameTest(template = ARENA, batch = "build_review_view", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "build_review_view", timeoutTicks = 100)
     public static void theViewKeepsTheLastBoxAndClampsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -412,10 +407,10 @@ public final class BuildReviewTests {
         BlockPos a2 = abs(f, 6, 2, 6);
         BlockPos b2 = new BlockPos(2_000_000_000, 2_000_000_000, 2_000_000_000);
         BuildMagic.action(wanda, BuildActionPayload.VIEW, a2, b2, Spell.FILL.id() + 1);
-        BuildView first = wanda.getData(ModAttachments.BUILD_VIEW);
+        BuildView first = ModAttachments.BUILD_VIEW.get(wanda);
         check(first.box().isPresent() && first.box().get().min().equals(a), "the first box is shown at once");
         helper.runAfterDelay(GAP, () -> {
-            BuildView later = wanda.getData(ModAttachments.BUILD_VIEW);
+            BuildView later = ModAttachments.BUILD_VIEW.get(wanda);
             check(later.box().isPresent() && later.box().get().min().equals(a2), "and the newest, held back, is shown after: " + later.box());
             BlockPos far = later.box().get().max();
             check(far.getX() <= 29_999_999 && far.getY() <= 319 && far.getZ() <= 29_999_999, "its far corner is clamped to the world: " + far);
@@ -424,7 +419,7 @@ public final class BuildReviewTests {
     }
 
     /** A pair of spell and op no client sends (a Fill's dabs, a Vanish's take) is dropped. */
-    @GameTest(template = ARENA, batch = "build_review_ops", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "build_review_ops", timeoutTicks = 100)
     public static void aSpellAndOpThatDoNotGoTogetherAreDropped(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);

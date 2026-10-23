@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.custom.CustomAnimRoutes;
 import com.kolodkingal.enhanced.client.custom.HeroAbilityAnims;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
@@ -14,13 +13,11 @@ import com.kolodkingal.enhanced.client.render.Stance;
 import com.kolodkingal.enhanced.client.render.StrangeGestures;
 import com.kolodkingal.enhanced.custom.AnimCatalog;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -33,12 +30,10 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * gestures' keys, what starts them, his flight on the Cloak (its profile, its take-off ending on the hover pose), his
  * walk, and the Cloak as a custom hero's flight style.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class StrangeAnimationTests {
     private static final String BATCH = "strange";
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyKeyAndSwitchOfHisIsActed(GameTestHelper helper) {
         Power p = Power.DOCTOR_STRANGE;
         check(GestureRoutes.acting(p, 1).startsWith("none: "), "R by the whip's payload");
@@ -70,7 +65,7 @@ public final class StrangeAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisRowsPlayHisGesturesForACustomHero(GameTestHelper helper) {
         check(HeroAbilityAnims.shown(HeroAbility.STRANGE_WHIP, false) == GestureId.STRANGE_WHIP_1
                 && HeroAbilityAnims.shown(HeroAbility.STRANGE_WHIP, true) == GestureId.STRANGE_GRAPPLE, "the whip and grapple");
@@ -81,7 +76,7 @@ public final class StrangeAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void heFliesOnTheCloakAndHisTakeOffEndsOnItsHover(GameTestHelper helper) {
         FlightProfile profile = FlightProfile.of(Power.DOCTOR_STRANGE, false);
         check(profile != null, "the Cloak has a flight profile");

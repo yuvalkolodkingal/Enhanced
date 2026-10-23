@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.block.StonePedestalBlock;
 import com.kolodkingal.enhanced.block.TesseractCradleBlock;
 import com.kolodkingal.enhanced.config.StoneSitesConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -23,7 +24,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
@@ -76,8 +76,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,8 +99,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * (the data and the templates), {@code stone_sites_gen} (building and generating) and {@code stone_sites_cfg} (a switch
  * turned off).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class StoneSiteTests {
     static final String BATCH = "stone_sites";
     static final String GEN = "stone_sites_gen";
@@ -293,7 +289,7 @@ public final class StoneSiteTests {
 
     // ------------------------------------------------------------------------------------------------ data
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFourSitesAndTheirSetsAreData(GameTestHelper helper) {
         var access = helper.getLevel().registryAccess();
         var structures = access.registryOrThrow(Registries.STRUCTURE);
@@ -348,7 +344,7 @@ public final class StoneSiteTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTemplatesHaveThePlansSizesAndStayInTheirBudget(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         record Sized(ResourceLocation template, Vec3i size) {
@@ -373,7 +369,7 @@ public final class StoneSiteTests {
     }
 
     /** Every palette entry of the four sites names a block of the game with properties it has (none dropped). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyBlockOfTheSitesIsARealBlock(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         for (ResourceLocation template : List.of(StoneSitePlans.Sanctum.TEMPLATE, StoneSitePlans.Tower.BASE,
@@ -396,7 +392,7 @@ public final class StoneSiteTests {
 
     // ------------------------------------------------------------------------------------------------ holes
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void everyDoorOfTheSitesHasAWholeFrame(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         int doors = 0;
@@ -410,7 +406,7 @@ public final class StoneSiteTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void noRoomOfTheSitesIsOpenToTheOutside(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         List<BlockPos> sanctum = List.of(new BlockPos(5, 4, 4), new BlockPos(11, 4, 5), new BlockPos(17, 4, 4),
@@ -456,7 +452,7 @@ public final class StoneSiteTests {
 
     // ------------------------------------------------------------------------------------------------ fixed points
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSanctumsPedestalHoldsTheTimeStone(GameTestHelper helper) {
         Raw t = raw(helper.getLevel().getServer(), StoneSitePlans.Sanctum.TEMPLATE);
         BlockState pedestal = t.at(StoneSitePlans.Sanctum.PEDESTAL);
@@ -489,7 +485,7 @@ public final class StoneSiteTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTowersCradleIsOnItsRoofAndItsPartsAlign(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         Raw top = raw(server, StoneSitePlans.Tower.TOP);
@@ -527,7 +523,7 @@ public final class StoneSiteTests {
      * 3.6.1: a room for each of the first six Avengers, its door with the hero's name over it, and Captain America's
      * is a closet: a bed and room to stand beside it, no more.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theTowerHasARoomForEachOfTheSixAndCapsIsTiny(GameTestHelper helper) {
         Raw whole = tower(helper.getLevel().getServer());
         Map<BlockPos, String> signs = new HashMap<>();
@@ -572,7 +568,7 @@ public final class StoneSiteTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEndVaultsChestIsOnItsDais(GameTestHelper helper) {
         Raw t = raw(helper.getLevel().getServer(), StoneSitePlans.EndTunnel.TEMPLATE);
         BlockPos chest = StoneSitePlans.EndTunnel.VAULT_CHEST;
@@ -592,7 +588,7 @@ public final class StoneSiteTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theVormirCliffsPointsHold(GameTestHelper helper) {
         Raw t = raw(helper.getLevel().getServer(), StoneSitePlans.Vormir.TEMPLATE);
         BoundingBox edge = StoneSitePlans.Vormir.EDGE_BOX;
@@ -657,7 +653,7 @@ public final class StoneSiteTests {
         return stacks.stream().filter(s -> s.is(item)).mapToInt(ItemStack::getCount).sum();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSitesLootIsThePlans(GameTestHelper helper) {
         RandomSource random = RandomSource.create(2016L);
         int rings = 0;
@@ -695,7 +691,7 @@ public final class StoneSiteTests {
     // ------------------------------------------------------------------------------------------------ finding a place
 
     /** The Nether site: the first floor with room over it, low enough for the whole cliff under the roof. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theNetherSiteStandsOnlyInATallCavern(GameTestHelper helper) {
         BlockState rack = Blocks.NETHERRACK.defaultBlockState();
         BlockState air = Blocks.AIR.defaultBlockState();
@@ -727,7 +723,7 @@ public final class StoneSiteTests {
     }
 
     /** The carved site: the island's edge, and the island under the vault. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCarvedSiteFindsTheEdgeAndRefusesATinyIsland(GameTestHelper helper) {
         check(CarvedSiteStructure.edge(d -> d <= 10 ? 70 : -1, 70, 24, 8).orElse(-1) == 10,
                 "the edge is the last column before the void");
@@ -752,7 +748,7 @@ public final class StoneSiteTests {
     }
 
     /** The cradle: an empty hand takes the Tesseract (once: the cradle is empty after), a Tesseract puts it back. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCradleGivesItsTesseractOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -777,7 +773,7 @@ public final class StoneSiteTests {
     }
 
     /** The seal: lava beside or over a template's air becomes stone; lava under it, or beside its rock, is left. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSealWallsTheWorldsLavaOffTheSitesAir(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos air = helper.absolutePos(new BlockPos(10, 4, 10));
@@ -871,7 +867,7 @@ public final class StoneSiteTests {
     }
 
     /** A Sanctum turned a quarter round: the pedestal where the turn puts it, the chests, the door. */
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 400)
     public static void aSanctumIsBuiltTurnedWithItsTimeStone(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         StructureTemplateManager manager = level.getStructureManager();
@@ -902,7 +898,7 @@ public final class StoneSiteTests {
     }
 
     /** A tower built for real: its three parts meet, the cradle is where the tower's frame says. */
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 400)
     public static void aTowerIsBuiltWithItsPartsAlignedAndItsTesseract(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         TowerSiteStructure tower = (TowerSiteStructure) level.registryAccess().registryOrThrow(Registries.STRUCTURE)
@@ -936,7 +932,7 @@ public final class StoneSiteTests {
      * "Block-attached entity at invalid position" in the log): every part is placed with {@link
      * HangingEntityProcessor}, which writes each frame's block into it, turned as the part is turned.
      */
-    @GameTest(template = ARENA, batch = "stone_sites_frames")
+    @EnhancedTest(template = ARENA, batch = "stone_sites_frames")
     public static void theTowersItemFramesHangWhereTheyArePut(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         TowerSiteStructure tower = (TowerSiteStructure) level.registryAccess().registryOrThrow(Registries.STRUCTURE)
@@ -984,7 +980,7 @@ public final class StoneSiteTests {
     }
 
     /** The Vormir Cliff, unturned: every fixed point is its piece's corner plus the plan's offset. */
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 400)
     public static void aVormirCliffIsBuiltAtThePlansOffsets(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         NetherSiteStructure cliff = (NetherSiteStructure) level.registryAccess().registryOrThrow(Registries.STRUCTURE)
@@ -1017,7 +1013,7 @@ public final class StoneSiteTests {
     }
 
     /** The End tunnel turned half round: the vault chest where the turn puts it, the shulker on guard. */
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 400)
     public static void anEndTunnelIsBuiltTurnedWithItsVault(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         CarvedSiteStructure tunnel = (CarvedSiteStructure) level.registryAccess().registryOrThrow(Registries.STRUCTURE)
@@ -1043,7 +1039,7 @@ public final class StoneSiteTests {
      * picks, the structure is asked where it stands (the overworld's two on the test world's flat ground; the Vormir
      * Cliff in the real Nether, the tunnel in the real End, at least one of many regions).
      */
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 1200)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 1200)
     public static void eachSiteFindsItsPlacesAsLocateDoes(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         record Kind(String structure, String set, ResourceKey<Level> dimension, int regions, int fromRegion) {
@@ -1088,7 +1084,7 @@ public final class StoneSiteTests {
     }
 
     /** {@code [stone_sites] sanctums = false}: a Sanctum finds no place in new chunks; true: it does again. */
-    @GameTest(template = ARENA, batch = CFG, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = CFG, timeoutTicks = 400)
     public static void aSiteSwitchedOffFindsNoPlace(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

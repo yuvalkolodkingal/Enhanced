@@ -78,7 +78,7 @@ public class ThanosMeteorEntity extends Projectile implements ShieldCost, BossHo
     public void tick() {
         super.tick();
         Vec3 from = position();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             setPos(from.add(getDeltaMovement()));
             level().addParticle(ParticleTypes.FLAME, getX(), getY() + 1.0, getZ(), 0, 0.2, 0);
             return;

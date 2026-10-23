@@ -1,12 +1,12 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.block.CerebroConsoleBlock;
 import com.kolodkingal.enhanced.finders.CerebroRoom;
 import com.kolodkingal.enhanced.finders.SiteSearch;
 import com.kolodkingal.enhanced.network.CerebroPayload;
 import com.kolodkingal.enhanced.network.LabFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -17,7 +17,6 @@ import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.world.SchoolLabPlan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -28,8 +27,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -44,8 +41,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * stone sites are listed (one of each kind, a stand-in Sanctum in the flat test world); the cooldown is shared; the
  * report reaches whoever stands in the sphere.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CerebroRoomTests {
     static final String BATCH = "cerebro_room";
 
@@ -66,7 +61,7 @@ public final class CerebroRoomTests {
         f.onClose(() -> CerebroRoom.forget(player));
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void atTheConsoleProfessorXFindsTheNether(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -113,7 +108,7 @@ public final class CerebroRoomTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void whoMayUseTheConsole(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos console = console(helper, 10, 10);
@@ -153,7 +148,7 @@ public final class CerebroRoomTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theSitesAreListedAndTheRoomSeesThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -192,7 +187,7 @@ public final class CerebroRoomTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theConsoleTellsThePlayersNear(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos console = console(helper, 4, 16);

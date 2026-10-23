@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.MindReadingOverlay;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -81,7 +81,7 @@ public record MindReadPayload(int entityId, String name, String species, int sta
     }
 
     /** The panel beside her crosshair shows it. */
-    static void handle(MindReadPayload payload, IPayloadContext context) {
+    static void handle(MindReadPayload payload, PacketContext context) {
         MindReadingOverlay.accept(payload);
     }
 }

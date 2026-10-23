@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.network.PhoenixBurstPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -19,7 +20,6 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,8 +48,6 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +71,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * a batch of its own (and a radius that fits in its arena, 9 blocks from the middle). The tests that only hurt one
  * creature with the Burst's damage type are in the quick batch of {@link PhoenixTests}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class PhoenixBurstTests {
     /** Where the Phoenix stands in the tests that spread a wave: the targets are placed along +X from here. */
     private static final double X = 5.5;
@@ -115,7 +111,7 @@ public final class PhoenixBurstTests {
     // ------------------------------------------------------------------------------------------------------------
     // The charge
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_charge")
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_charge")
     public static void burstChargesAndRisesAndHoldsHerStill(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -176,7 +172,7 @@ public final class PhoenixBurstTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_cost", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_cost", timeoutTicks = 60)
     public static void burstCostsHungerAndStartsTheCooldown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.BURST_CHARGE_TICKS, 10);
@@ -223,7 +219,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_cleanse", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_cleanse", timeoutTicks = 60)
     public static void burstCleansesSpellsOnJean(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -255,7 +251,7 @@ public final class PhoenixBurstTests {
     // ------------------------------------------------------------------------------------------------------------
     // The wave
 
-    @GameTest(template = ARENA, batch = "phoenix_burst", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst", timeoutTicks = 80)
     public static void burstScalesWithTheChargeAndSpreadsAtWaveSpeed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -324,7 +320,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_half", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_half", timeoutTicks = 80)
     public static void aHalfChargedBurstReachesLessFarHurtsLessAndBurnsLess(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -352,14 +348,14 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_allies", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_allies", timeoutTicks = 80)
     public static void burstSparesHerAlliesAndHurtsThePlayersItMayWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
         f.pvp(true);
         ServerLevel level = helper.getLevel();
         ServerPlayer jean = jean(f, X, Z);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(X + 3.0, FLOOR, Z));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(X + 3.0, FLOOR, Z));
         pet.tame(jean);
         ServerPlayer teammate = f.player(X + 3.0, FLOOR, Z + 3.0);
         ServerPlayer creative = f.player(X + 3.0, FLOOR, Z - 3.0, GameType.CREATIVE);
@@ -397,7 +393,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_passives", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_passives", timeoutTicks = 160)
     public static void burstSparesVillagersAndAnimalsByDefault(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -408,14 +404,14 @@ public final class PhoenixBurstTests {
         f.config(PhoenixConfig.BURST_MAX_DAMAGE, 5.0);
         ServerPlayer jean = jean(f, X, Z);
         ServerPlayer owner = f.player(2.5, FLOOR, 18.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(X + 3.0, FLOOR, Z + 2.0));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(X + 3.0, FLOOR, Z - 2.0));
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(X + 4.0, FLOOR, Z + 4.0));
-        Wolf strangers = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(X + 4.0, FLOOR, Z - 4.0));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(X + 3.0, FLOOR, Z + 2.0));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(X + 3.0, FLOOR, Z - 2.0));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(X + 4.0, FLOOR, Z + 4.0));
+        Wolf strangers = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(X + 4.0, FLOOR, Z - 4.0));
         strangers.tame(owner);
         Zombie zombie = sturdy(helper, X + 2.0, Z + 3.0);
-        Ghast ghast = helper.spawnWithNoFreeWill(EntityType.GHAST, new Vec3(X + 6.0, FLOOR + 1.0, Z));
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(X + 3.0, FLOOR, Z - 5.0));
+        Ghast ghast = TestKit.spawnWithNoFreeWill(helper, EntityType.GHAST, new Vec3(X + 6.0, FLOOR + 1.0, Z));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(X + 3.0, FLOOR, Z - 5.0));
         List<LivingEntity> passive = List.of(villager, golem, cow, strangers);
         List<LivingEntity> hostile = List.of(zombie, ghast, warden);
 
@@ -451,7 +447,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_knock", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_knock", timeoutTicks = 80)
     public static void burstKnockbackSkipsBosses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -460,7 +456,7 @@ public final class PhoenixBurstTests {
         Zombie zombie = sturdy(helper, X + 3.0, Z);
         // The Warden shrugs off a push anyway; take that away, so that only the tag keeps it still. Every hit still gives
         // a creature the small kick of vanilla damage (0.4), which the boss keeps; the Burst's own push (1.2 more) it does not get.
-        Warden boss = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(X, FLOOR, Z + 3.0));
+        Warden boss = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(X, FLOOR, Z + 3.0));
         boss.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.0);
         float bossHealth = boss.getHealth();
         Vec3 zombieStart = zombie.position();
@@ -480,7 +476,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_cover", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_cover", timeoutTicks = 80)
     public static void burstDoesNotGetThroughStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -518,7 +514,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_border", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_border", timeoutTicks = 100)
     public static void burstLightsNoFireWhereTheWorldWillNotLetHerBuild(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -568,7 +564,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_nopvp", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_nopvp", timeoutTicks = 80)
     public static void pvpOffProtectsPlayersFromAllHarmfulAbilities(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -610,7 +606,7 @@ public final class PhoenixBurstTests {
     // ------------------------------------------------------------------------------------------------------------
     // The ground
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_fire", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_fire", timeoutTicks = 260)
     public static void burstNeverBreaksBlocksAndSetsFireOnlyWithMobGriefing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         smallBursts(f);
@@ -665,7 +661,7 @@ public final class PhoenixBurstTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_burst_arena", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "phoenix_burst_arena", timeoutTicks = 100)
     public static void burstLightsNoFireInAProtectedBossArena(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         smallBursts(f);
@@ -730,7 +726,7 @@ public final class PhoenixBurstTests {
     // ------------------------------------------------------------------------------------------------------------
     // The damage, directly (quick)
 
-    @GameTest(template = ARENA, batch = "solo_burst_wears_wandas_shield_down")
+    @EnhancedTest(template = ARENA, batch = "solo_burst_wears_wandas_shield_down")
     public static void burstWearsWandasShieldDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -758,7 +754,7 @@ public final class PhoenixBurstTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_burst_does_not_bypass_a_phased_vision_but_passes_armour_and_fire")
+    @EnhancedTest(template = ARENA, batch = "solo_burst_does_not_bypass_a_phased_vision_but_passes_armour_and_fire")
     public static void burstDoesNotBypassAPhasedVisionButPassesArmourAndFire(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -781,7 +777,7 @@ public final class PhoenixBurstTests {
         check(armoured.hurt(burst, 10.0F), "armour does not stop it");
         assertNear(before - armoured.getHealth(), 10.0, 0.01, "all of it gets through netherite");
 
-        Blaze blaze = helper.spawnWithNoFreeWill(EntityType.BLAZE, new Vec3(14.5, FLOOR, 14.5));
+        Blaze blaze = TestKit.spawnWithNoFreeWill(helper, EntityType.BLAZE, new Vec3(14.5, FLOOR, 14.5));
         float blazeBefore = blaze.getHealth();
         check(!blaze.hurt(level.damageSources().inFire(), 6.0F), "(control: fire does nothing to a Blaze)");
         check(blaze.hurt(burst, 6.0F), "but the Burst is not fire");
@@ -789,7 +785,7 @@ public final class PhoenixBurstTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PhoenixTests.QUICK)
+    @EnhancedTest(template = ARENA, batch = PhoenixTests.QUICK)
     public static void aMobKilledByTheBurstLeavesGoldenAsh(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

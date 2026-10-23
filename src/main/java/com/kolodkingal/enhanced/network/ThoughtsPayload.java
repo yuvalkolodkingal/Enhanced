@@ -2,13 +2,13 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.ThoughtBubbles;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public record ThoughtsPayload(List<Thought> thoughts) implements CustomPacketPay
     }
 
     /** Only ever runs on a client. */
-    static void handle(ThoughtsPayload payload, IPayloadContext context) {
+    static void handle(ThoughtsPayload payload, PacketContext context) {
         ThoughtBubbles.accept(payload.thoughts());
     }
 }

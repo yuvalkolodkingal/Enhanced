@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.asgard.npc.DefendAsgardGoal;
 import com.kolodkingal.enhanced.asgard.npc.NpcState;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.config.AsgardConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -26,7 +27,6 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,8 +48,6 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -73,8 +71,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * EN and HE. Batches {@code asgard_npc}, {@code asgard_npc_fight}, {@code asgard_npc_closed} (config) and the two
  * command batches (Odin's command reaches 64 blocks).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AsgardianTests {
     static final String BATCH = "asgard_npc";
     static final String FIGHT = "asgard_npc_fight";
@@ -105,7 +101,7 @@ public final class AsgardianTests {
 
     // ---- never killed by a player; down and rising ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aPlayerNeverHurtsAnAsgardian(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
@@ -120,7 +116,7 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = FIGHT)
+    @EnhancedTest(template = ARENA, batch = FIGHT)
     public static void othersKnockThemDownAndTheyRise(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         AsgardianEntity einherjar = npc(fx, Role.EINHERJAR, 5.5, 5.5);
@@ -213,7 +209,7 @@ public final class AsgardianTests {
         return true;
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = AREA_WAIT + 20)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = AREA_WAIT + 20)
     public static void theKeeperMakesEachSlotOnceAndNeverTwice(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Map<String, UUID> table = records(fx);
@@ -250,7 +246,7 @@ public final class AsgardianTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theKeeperWaitsUntilAHomeIsLoaded(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Map<String, UUID> table = records(fx);
@@ -262,7 +258,7 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "asgard_npc_closed", timeoutTicks = AREA_WAIT + 20)
+    @EnhancedTest(template = ARENA, batch = "asgard_npc_closed", timeoutTicks = AREA_WAIT + 20)
     public static void withoutNpcsTheKeeperRemovesItsOwn(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Map<String, UUID> table = records(fx);
@@ -294,7 +290,7 @@ public final class AsgardianTests {
         return node == null ? null : node.key();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theNodeFollowsThePlayersStory(GameTestHelper helper) {
         TestKit.Fixture fx = AsgardTestSupport.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
@@ -314,7 +310,7 @@ public final class AsgardianTests {
         check("greeting_first".equals(picked(player, sif)), "Sif greets a newcomer: " + picked(player, sif));
         check(AsgardTalk.begin(player, sif), "the talk opens");
         check("greeting_first".equals(AsgardTalk.currentNode(player)), "with the first greeting");
-        check(player.getData(ModAttachments.ASGARD).has(AsgardProgress.TALKED_SIF), "and he has talked to Sif");
+        check(ModAttachments.ASGARD.get(player).has(AsgardProgress.TALKED_SIF), "and he has talked to Sif");
         check("greeting".equals(picked(player, sif)), "then the usual greeting");
         check(AsgardTalk.offered(player).containsAll(List.of("train", "trade", "ask_advice")), "training, trades, advice");
         AsgardTalk.end(player);
@@ -328,11 +324,11 @@ public final class AsgardianTests {
         check("greet".equals(picked(player, odin)), "awake, he greets: " + picked(player, odin));
         // Frigga: the first talk, then after Hela the hint to Gungnir.
         check("greeting_first".equals(picked(player, frigga)), "Frigga's first greeting");
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.TALKED_FRIGGA));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.TALKED_FRIGGA));
         check("greeting".equals(picked(player, frigga)), "her usual greeting");
         state.setHelaDefeats(1);
         check("after_hela".equals(picked(player, frigga)), "after Hela falls, the way to Gungnir");
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.GUNGNIR_TAKEN));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.GUNGNIR_TAKEN));
         check("greeting".equals(picked(player, frigga)), "not once Gungnir is his");
         // Hurt, Frigga offers healing.
         player.setHealth(10.0F);
@@ -342,7 +338,7 @@ public final class AsgardianTests {
     }
 
     /** A Bifrost opened beside them never carries the city's own Asgardians off; a summoned Einherjar goes with his master. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBifrostLeavesTheCitysAsgardiansAtTheirPosts(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer traveller = fx.player(5.5, FLOOR, 5.5);
@@ -356,7 +352,7 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theyAnswerTheHeroThePlayerIs(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5, Power.THOR);
@@ -377,12 +373,12 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyAnOfferedAnswerFromNearIsTaken(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
         AsgardianEntity hogun = npc(fx, Role.HOGUN, 7.5, 5.5);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.TALKED_WARRIORS));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.TALKED_WARRIORS));
         check(!AsgardTalk.tryChoose(player, hogun.getId(), "about_vault"), "no answer without a talk");
         check(AsgardTalk.begin(player, hogun), "the talk opens");
         check(hogun.state() == NpcState.TALKING && player.getUUID().equals(hogun.talkingWith()), "Hogun stops to talk");
@@ -400,7 +396,7 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyLineAndAnswerIsInEnglishAndHebrew(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
@@ -422,7 +418,7 @@ public final class AsgardianTests {
 
     // ---- trades ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTradersTradeAndRestock(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         for (Role role : Role.values()) {
@@ -448,7 +444,7 @@ public final class AsgardianTests {
 
     // ---- fighting beside the players ----
 
-    @GameTest(template = ARENA, batch = FIGHT)
+    @EnhancedTest(template = ARENA, batch = FIGHT)
     public static void theWarriorsChooseTheArmyFirstAndHelaLast(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(1.5, FLOOR, 1.5);
@@ -475,7 +471,7 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = FIGHT, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = FIGHT, timeoutTicks = 120)
     public static void summonedEinherjarFollowGuardAndLeave(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer owner = fx.player(5.5, FLOOR, 5.5);
@@ -507,7 +503,7 @@ public final class AsgardianTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "asgard_npc_command")
+    @EnhancedTest(template = ARENA, batch = "asgard_npc_command")
     public static void theAllfathersCommandAndTheBow(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer odin = fx.player(5.5, FLOOR, 5.5);
@@ -522,7 +518,7 @@ public final class AsgardianTests {
     }
 
     /** Odin's command reaches 64 blocks: each command test has a batch of its own (nothing else near). */
-    @GameTest(template = ARENA, batch = "asgard_npc_command_strike", timeoutTicks = 220)
+    @EnhancedTest(template = ARENA, batch = "asgard_npc_command_strike", timeoutTicks = 220)
     public static void theAllfathersCommandMakesTheEinherjarStrike(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer odin = fx.player(2.5, FLOOR, 2.5);
@@ -536,12 +532,12 @@ public final class AsgardianTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = FIGHT)
+    @EnhancedTest(template = ARENA, batch = FIGHT)
     public static void sifsTrainingCountsTouchesAndGivesHerToken(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
         AsgardianEntity sif = npc(fx, Role.SIF, 6.5, 5.5);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.TALKED_SIF));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.TALKED_SIF));
         check(AsgardTalk.begin(player, sif) && AsgardTalk.tryChoose(player, sif.getId(), "train"), "she offers training");
         check(AsgardTalk.tryChoose(player, sif.getId(), "ready"), "and it begins");
         check(sif.state() == NpcState.SPARRING, "she spars");
@@ -560,7 +556,7 @@ public final class AsgardianTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCitysPeopleNeverLeaveTheirRealm(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         AsgardianEntity frigga = npc(fx, Role.FRIGGA, 5.5, 5.5);
@@ -605,7 +601,7 @@ public final class AsgardianTests {
      * Volstagg goes to a free seat at the table (the others are taken), never over the table on his way; he sits on the
      * bench facing the table, a chicken leg in hand, eats, and keeps facing the table while a player walks round him.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void volstaggSitsAtTheTableFacingItAndEats(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         table(helper);
@@ -653,7 +649,7 @@ public final class AsgardianTests {
      * The feast at dusk: who comes, when, to which seat; where one from far off arrives; the guests' seats face the
      * hall.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWarriorsThreeAndSifComeToTheHighTableAtDusk(GameTestHelper helper) {
         check(!FeastHall.feastAt(10999) && FeastHall.feastAt(11000) && FeastHall.feastAt(13499)
                 && !FeastHall.feastAt(13500)
@@ -682,7 +678,7 @@ public final class AsgardianTests {
      * At dusk Sif and Fandral sit at the table with bread and an apple (no sparring at the feast), and get up when the
      * night comes.
      */
-    @GameTest(template = ARENA, batch = "asgard_npc_feast", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "asgard_npc_feast", timeoutTicks = 400)
     public static void atDuskSifDinesUntilTheNight(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerLevel level = fx.level();

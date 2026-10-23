@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.client.render.ApocalypseBossPoses;
 import com.kolodkingal.enhanced.client.render.ApocalypseHeroMath;
@@ -16,17 +15,15 @@ import com.kolodkingal.enhanced.client.render.ShieldStyle;
 import com.kolodkingal.enhanced.client.render.ShieldStyles;
 import com.kolodkingal.enhanced.client.render.Stance;
 import com.kolodkingal.enhanced.client.render.StancePoses;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Variants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.assertNear;
@@ -37,8 +34,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * changes in his data to them, his flight profile, the numbers behind his HUD lines and his shield's look. Pure (no screen,
  * no world), so they share a batch of their own with {@link ApocalypseClientTests}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public class ApocalypseAnimationTests {
     private static final String PURE = "apocalypse_client_pure";
     private static final GestureId[] CAST_GESTURES = {GestureId.APOC_SAND_WAVE, GestureId.APOC_ENTOMB, GestureId.APOC_PORTAL, GestureId.APOC_SHIELD_RAISE,
@@ -51,7 +46,7 @@ public class ApocalypseAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The gestures and the stances
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theEightGesturesHaveTheirEnvelopesAndKeys(GameTestHelper helper) {
         Object[][] table = {
                 // id, group, duration, attack, release, force
@@ -77,7 +72,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void everyGestureLeavesTheArmsWhereTheNextOneFindsThem(GameTestHelper helper) {
         // They all begin and end on the same relaxed pose, so one runs into the next with no pop (the take-off, the raise, the
         // drop and the storm hand over to the flight pose or to a stance instead, and are checked against those).
@@ -119,7 +114,7 @@ public class ApocalypseAnimationTests {
         assertNear(key.z, pose[2], 0.5, what + " (z)");
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theShieldRaiseIsPlayedAtTheSpeedOfItsWindUp(GameTestHelper helper) {
         check(GestureRoutes.SHIELD_KEYED_WIND_UP == GestureId.APOC_SHIELD_RAISE.dur, "the raise is keyed for the wind-up the keys are made for");
         assertNear(ApocalypseHeroMath.raiseRate(10), 1.5, 1.0E-6, "a wind-up of ten ticks plays the fifteen of the keys in ten");
@@ -135,7 +130,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theTwoStancesHoldTheArmsAndLeanTheBody(GameTestHelper helper) {
         check(Stance.APOC_SHIELD.aimed && Stance.APOC_STORM.aimed, "both hold the arms (the swing of an attack is muted)");
         assertNear(Stance.APOC_SHIELD.tauIn, 1.5, 1.0E-6, "the shield comes up quickly");
@@ -171,7 +166,7 @@ public class ApocalypseAnimationTests {
         return pair(new float[]{m.x, m.y, m.z}, new float[]{o.x, o.y, o.z}, what);
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theArmsPointWhereTheDesignSaysTheyDo(GameTestHelper helper) {
         // The numbers of a pose are raw angles whose signs are easy to get wrong (an arm raised above the shoulder is
         // tipped INWARD by a positive z): these say where the arms really go. {forward, up, outward}.
@@ -193,7 +188,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theBossLiftsHisArmsAsTheDesignSaysToo(GameTestHelper helper) {
         ApocalypseBossPoses.Out out = new ApocalypseBossPoses.Out();
         for (Object[] row : new Object[][]{
@@ -218,7 +213,7 @@ public class ApocalypseAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The routes
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theChangesInHisDataStandForTheirGestures(GameTestHelper helper) {
         Power p = Power.APOCALYPSE;
         check(GestureRoutes.cooldown(p, 1, 60) == GestureId.APOC_SAND_WAVE, "the short cooldown of R is the Wave");
@@ -251,7 +246,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void everyAbilityIsActedByTheWayTheTableSays(GameTestHelper helper) {
         Power p = Power.APOCALYPSE;
         check(GestureRoutes.acting(p, 1).equals("cooldown"), "R is acted by a cooldown");
@@ -264,7 +259,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void aKeyPressStartsItsGestureOnlyWhereTheAbilityWillWork(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.APOCALYPSE);
         PowerData data = new PowerData();
@@ -305,7 +300,7 @@ public class ApocalypseAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // Flight and run
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void heFliesCalmAndUprightWithTheArmsALittleOpen(GameTestHelper helper) {
         FlightProfile profile = FlightProfile.of(Power.APOCALYPSE, false);
         check(profile != null, "he flies with a profile of his own");
@@ -339,7 +334,7 @@ public class ApocalypseAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The HUD, the eyes and the shield
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theFiveLinesOfTheHudSayWhatTheyShould(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 5000L;
@@ -380,7 +375,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theStormTimerCountsDownFromTheCooldownOfItsKey(GameTestHelper helper) {
         // A storm of 120 ticks with a cooldown of 600: both begin together.
         check(ApocalypseHeroMath.stormLeft(600, 120, 600) == 120, "all of it at the start");
@@ -399,7 +394,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void hisShieldIsGoldOnTheGoldenWebWithTheRadiusOfTheConfig(GameTestHelper helper) {
         ShieldStyle style = ShieldStyles.of(Power.APOCALYPSE);
         check(style != null, "he has a shield style");
@@ -417,7 +412,7 @@ public class ApocalypseAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void hisEyesBelongToTheLookOfHisSuit(GameTestHelper helper) {
         boolean ancient = false;
         boolean modern = false;

@@ -128,7 +128,7 @@ public class StonePedestalBlockEntity extends BlockEntity {
 
     private void changed() {
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }

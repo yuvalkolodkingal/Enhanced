@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.DeathMeetingConfig;
 import com.kolodkingal.enhanced.network.DeathMeetingPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -26,7 +27,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerRespawnPositionEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -122,7 +122,7 @@ public final class DeathMeeting {
     static void tell(ServerPlayer player) {
         DeathMeetingPayload.Offer offer = offer(player);
         if (offer != null) {
-            PacketDistributor.sendToPlayer(player, offer);
+            Net.sendToPlayer(player, offer);
         }
     }
 

@@ -82,11 +82,11 @@ public class TesseractCradleBlock extends BaseEntityBlock {
         if (state.getValue(FULL) || !stack.is(ModItems.TESSERACT.get())) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             stack.consume(1, player);
             set(level, pos, state, true, player);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -95,10 +95,10 @@ public class TesseractCradleBlock extends BaseEntityBlock {
         if (!state.getValue(FULL)) {
             return InteractionResult.PASS;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             take(level, pos, state, player);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     /** Gives the cradle's Tesseract to {@code player} and empties it (false if it was empty). */

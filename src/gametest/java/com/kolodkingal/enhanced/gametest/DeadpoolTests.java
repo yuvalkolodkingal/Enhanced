@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.block.WeaponXPodBlock;
@@ -21,6 +20,7 @@ import com.kolodkingal.enhanced.deadpool.TeleportBelt;
 import com.kolodkingal.enhanced.healing.HealingBurst;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -31,7 +31,6 @@ import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -52,8 +51,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -78,8 +75,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the Chimichanga Break's test checks the refused path (nothing eaten, nothing waits) and the two healers' test the
  * blows; with L1 in, both check the whole rule.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class DeadpoolTests {
     private static final String BATCH = "deadpool";
     private static final String CFG = "deadpool_cfg";
@@ -99,8 +94,8 @@ public final class DeadpoolTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no AI, unless {@code free}). */
     static Husk husk(GameTestHelper helper, double x, double z, boolean free) {
-        Husk husk = free ? helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z))
-                : helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = free ? TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z))
+                : TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -117,7 +112,7 @@ public final class DeadpoolTests {
     }
 
     static DeadpoolState state(ServerPlayer player) {
-        return player.getData(ModAttachments.DEADPOOL);
+        return ModAttachments.DEADPOOL.get(player);
     }
 
     /** Key {@code ability} pressed and let go, with Sneak or not. */
@@ -174,7 +169,7 @@ public final class DeadpoolTests {
     // The body
 
     /** His body: 30 health, faster and stronger; Kidpool is a fifth smaller; a plain player has none of it. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisBodyAndKidpoolsSize(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 4.5);
@@ -195,7 +190,7 @@ public final class DeadpoolTests {
     // The katanas
 
     /** R three times: 5, 5, 8 on the husk before him; the X-cut sweeps three; after 30 quiet ticks it starts again. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theKatanaComboCutsFiveFiveEight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 10.5);
@@ -229,7 +224,7 @@ public final class DeadpoolTests {
     }
 
     /** The cuts keep their gap: a second R within 8 ticks does nothing. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCutsKeepTheirGap(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 4.5);
@@ -242,7 +237,7 @@ public final class DeadpoolTests {
     }
 
     /** The Parry, held: an arrow from the front bounces back his way and is his; it does not hurt him. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theParryBouncesAnArrowBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 10.5);
@@ -263,12 +258,12 @@ public final class DeadpoolTests {
     }
 
     /** A blow from the front loses 60 % while he parries (not from behind); the Parry ends at 80 ticks and R rests. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theParryCutsABlowFromTheFrontAndEndsAt80(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 6.5);
         ServerPlayer plain = deadpool(f, 4.5, 14.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 6.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 6.5));
         TestKit.look(wade, TestKit.EAST, 0.0F);
         TestKit.look(plain, TestKit.EAST, 0.0F);
         hold(wade, 1);
@@ -297,7 +292,7 @@ public final class DeadpoolTests {
     // The pistols
 
     /** Sixteen rounds of 4 (eight pairs), then the reload: nothing for 40 ticks, then a full magazine. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void sixteenRoundsThenAFortyTickReload(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 3.5, 10.5);
@@ -336,7 +331,7 @@ public final class DeadpoolTests {
     }
 
     /** The Trick Shot: off the wall he aims at, round the corner, into the husk he cannot see: 8. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theTrickShotBouncesRoundACorner(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (int z = 6; z <= 14; z++) {
@@ -367,7 +362,7 @@ public final class DeadpoolTests {
     // The Teleport Belt
 
     /** V: onto the floor he looks at; at a wall, before it, never in it. (The glitch off.) */
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void theBeltLandsOnASafeSpotNeverInAWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DeadpoolConfig.GLITCH_CHANCE, 0.0);
@@ -396,7 +391,7 @@ public final class DeadpoolTests {
     }
 
     /** At a glitch chance of 1 the belt lands him 3 to 6 blocks off the spot, still safe. */
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void aGlitchLandsHimThreeToSixOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DeadpoolConfig.GLITCH_CHANCE, 1.0);
@@ -412,7 +407,7 @@ public final class DeadpoolTests {
     }
 
     /** The belt does not take him through the wall of a Hex that keeps him out. */
-    @GameTest(template = ARENA, batch = CFG, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = CFG, timeoutTicks = 60)
     public static void theBeltNeverCrossesAHexWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DeadpoolConfig.GLITCH_CHANCE, 0.0);
@@ -430,7 +425,7 @@ public final class DeadpoolTests {
     }
 
     /** Sneak + V: above the husk he looks at, the plunge, 8 where he lands on it, no fall damage. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theDropInHitsForEightWithNoFallDamage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 3.5, 10.5);
@@ -453,18 +448,18 @@ public final class DeadpoolTests {
     // The Taunt, the Chimichanga Break, the smoke
 
     /** B: five zombies after a villager turn on him and keep at him; a boss is not taunted. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTauntTurnsFiveZombiesOffAVillagerNotABoss(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 3.5, 10.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(15.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(15.5, FLOOR, 10.5));
         List<Zombie> zombies = new java.util.ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 6.5 + 2 * i));
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 6.5 + 2 * i));
             zombie.setTarget(villager);
             zombies.add(zombie);
         }
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(7.5, FLOOR, 16.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(7.5, FLOOR, 16.5));
         press(wade, 4, false);
         for (Zombie zombie : zombies) {
             check(zombie.getTarget() == wade, "a zombie turned on him");
@@ -482,7 +477,7 @@ public final class DeadpoolTests {
      * Sneak + B: with a chimichanga, +100 % and Absorption II, the chimichanga eaten; without, +50 %. While the burst
      * is still lane L1's stub (it heals nobody), the refused path: nothing eaten, nothing waits.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theChimichangaBreak(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer probe = f.player(16.5, FLOOR, 16.5);
@@ -511,11 +506,11 @@ public final class DeadpoolTests {
     }
 
     /** Sneak + N: invisible, and a zombie after him loses him and does not find him again. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSmokeVanishLosesTheMonsters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 3.5, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         zombie.setTarget(wade);
         press(wade, 5, true);
         check(wade.hasEffect(MobEffects.INVISIBILITY), "invisible");
@@ -530,7 +525,7 @@ public final class DeadpoolTests {
     // Dogpool
 
     /** N: Dogpool beside him, his, 20 health; N again sends him home; then N waits (one at a time). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void dogpoolComesOneAtATime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 6.5, 10.5);
@@ -551,7 +546,7 @@ public final class DeadpoolTests {
     }
 
     /** Dogpool bites the husk he is set on; at 0 health he poofs (no death), and his owner's state forgets him. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void dogpoolBitesAndNapsAtZero(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 10.5);
@@ -576,7 +571,7 @@ public final class DeadpoolTests {
      * nearer than 10 blocks, a tame wolf does not come closer by himself. (A plain "within 4 blocks" failed about one
      * run in twenty: the corners.)
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void dogpoolFollows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 3.5, 3.5);
@@ -592,7 +587,7 @@ public final class DeadpoolTests {
     }
 
     /** Dogpool never bites a player while PvP is off. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void dogpoolNeverBitesAPlayerWithoutPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 10.5);
@@ -607,7 +602,7 @@ public final class DeadpoolTests {
     }
 
     /** Dogpool goes home when his time is up (10 seconds here). */
-    @GameTest(template = ARENA, batch = CFG, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = CFG, timeoutTicks = 300)
     public static void dogpoolGoesHomeWhenHisTimeIsUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DeadpoolConfig.DOGPOOL_SECONDS, 10);
@@ -628,7 +623,7 @@ public final class DeadpoolTests {
     // The chimichanga, the lines, the custom hero
 
     /** Bread, a cooked filling and a carrot make two chimichangas; a chimichanga feeds 8. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theChimichangaRecipe(GameTestHelper helper) {
         CraftingInput input = CraftingInput.of(3, 1, List.of(new ItemStack(Items.BREAD),
                 new ItemStack(Items.COOKED_CHICKEN), new ItemStack(Items.CARROT)));
@@ -641,7 +636,7 @@ public final class DeadpoolTests {
     }
 
     /** His lines keep their gap (the Taunt's does not), and every line has its key. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisLinesKeepTheirGap(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wade = deadpool(f, 4.5, 4.5);
@@ -660,7 +655,7 @@ public final class DeadpoolTests {
     }
 
     /** A custom hero with the pistols on R (not their key): a pair from the magazine; Sneak + R the Trick Shot. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomHerosPistolsOnR(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("deadpool.pistols", 3).key(1, "deadpool.pistols").build();
@@ -678,7 +673,7 @@ public final class DeadpoolTests {
     /**
      * His gestures' keys and routes, his run, his rows' moves, his lines' effects, and his preset (60 points at most).
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theAnimationTablesAndThePreset(GameTestHelper helper) throws java.io.IOException {
         int count = 0;
         for (com.kolodkingal.enhanced.client.render.GestureId id
@@ -722,7 +717,7 @@ public final class DeadpoolTests {
     // PvP
 
     /** His swords and rounds reach a player only with PvP on. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void hisBladesReachAPlayerOnlyWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(false);
@@ -743,7 +738,7 @@ public final class DeadpoolTests {
      * Two Deadpools fighting with PvP on: neither can finish the other (the healing factor's DOWN, lane L1); while its
      * stub stands, the blows land.
      */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 200)
     public static void twoHealersCannotFinishEachOther(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -794,7 +789,7 @@ public final class DeadpoolTests {
     }
 
     /** A powerless player in the pod is Deadpool after 100 ticks of treatment, not 99. */
-    @GameTest(template = ARENA, batch = POD, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = POD, timeoutTicks = 200)
     public static void thePodMakesDeadpoolAfterAHundredTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos pod = pod(helper);
@@ -825,7 +820,7 @@ public final class DeadpoolTests {
     }
 
     /** Sneaking out of the pod cancels the treatment; a hero is refused; one who stands outside is told to step in. */
-    @GameTest(template = ARENA, batch = POD, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = POD, timeoutTicks = 100)
     public static void thePodCancelsAndRefuses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos pod = pod(helper);

@@ -5,9 +5,11 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.config.CustomHeroConfig;
 import com.kolodkingal.enhanced.config.DeadpoolConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.DeadpoolFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -32,8 +34,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -130,15 +130,15 @@ public final class DeadpoolAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(ConfigSpec.DoubleValue value, double fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
@@ -422,7 +422,7 @@ public final class DeadpoolAbilities {
     static void send(ServerLevel level, net.minecraft.world.entity.Entity who, int kind, List<Vec3> points, int arg) {
         List<Vec3> list = points.size() > DeadpoolFxPayload.MAX_POINTS
                 ? points.subList(0, DeadpoolFxPayload.MAX_POINTS) : points;
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new DeadpoolFxPayload(kind, who.getId(), List.copyOf(list), arg));
     }
 
@@ -432,12 +432,12 @@ public final class DeadpoolAbilities {
 
     /** His magazine, reload and Dogpool (the attachment: saved, synced to him). */
     static DeadpoolState data(Player player) {
-        return player.getData(ModAttachments.DEADPOOL);
+        return ModAttachments.DEADPOOL.get(player);
     }
 
     static void setData(Player player, DeadpoolState state) {
         if (!state.equals(data(player))) {
-            player.setData(ModAttachments.DEADPOOL, state);
+            ModAttachments.DEADPOOL.set(player, state);
         }
     }
 

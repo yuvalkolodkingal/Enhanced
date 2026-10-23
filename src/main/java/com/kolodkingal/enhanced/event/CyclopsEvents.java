@@ -16,7 +16,7 @@ public final class CyclopsEvents {
     /** The fall that ends an Optic Leap does him no harm (a fall from higher than the leap took him still would not). */
     @SubscribeEvent
     public static void onFall(LivingFallEvent event) {
-        if (event.getEntity() instanceof Player player && !player.level().isClientSide && CyclopsAbilities.leaping(player)) {
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide() && CyclopsAbilities.leaping(player)) {
             event.setDamageMultiplier(0.0F);
         }
     }

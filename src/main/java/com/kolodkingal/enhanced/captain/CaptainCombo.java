@@ -40,11 +40,11 @@ public final class CaptainCombo {
         if (!data.has(HeroAbility.CAPTAIN_COMBO) || !data.isReady(HeroAbility.CAPTAIN_COMBO, now)) {
             return -1;
         }
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
         int reset = CaptainAbilities.cfg(CaptainConfig.COMBO_RESET, 30);
         int step = now - cs.comboAt() > reset || cs.comboStep() > 2 ? 0 : cs.comboStep();
         data.startCooldown(HeroAbility.CAPTAIN_COMBO, now, CaptainAbilities.cfg(CaptainConfig.COMBO_GAP, 8));
-        player.setData(ModAttachments.CAPTAIN, cs.withCombo((step + 1) % 3, now));
+        ModAttachments.CAPTAIN.set(player, cs.withCombo((step + 1) % 3, now));
         float damage = (float) switch (step) {
             case 0 -> CaptainAbilities.cfg(CaptainConfig.COMBO_DAMAGE_1, 4.0);
             case 1 -> CaptainAbilities.cfg(CaptainConfig.COMBO_DAMAGE_2, 4.0);

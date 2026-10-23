@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.AreaTargets;
@@ -15,6 +14,7 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexRuneLayout;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -33,7 +33,6 @@ import com.kolodkingal.enhanced.vishanti.Ward;
 import com.kolodkingal.enhanced.vishanti.WardManager;
 import com.kolodkingal.enhanced.vishanti.WardStore;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,8 +50,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -72,8 +69,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * <p>The Hex is raised by Wanda in the middle of the arena (10.5, 2, 10.5) with radius 8 ({@link HexTests#raiseHex}): z 1.5
  * is outside it, z 5.5 inside.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ProtTests {
     private static Vec3 abs(GameTestHelper helper, double x, double y, double z) {
         return helper.absoluteVec(new Vec3(x, y, z));
@@ -87,7 +82,7 @@ public final class ProtTests {
     // The Hex: who comes in
 
     /** Only those she lets in: a survivor of the wall is still thrown out; letting creatures in lets no boss in. */
-    @GameTest(template = ARENA, batch = "prot_hex_entry", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "prot_hex_entry", timeoutTicks = 40)
     public static void onlyThoseSheAllowsComeIn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 0.0);
@@ -96,7 +91,7 @@ public final class ProtTests {
         Hex hex = hexOf(f, wanda);
         HexManager.handleAction(wanda, HexAction.SET_CREATURES, Optional.empty(), 1);
         hex = hexOf(f, wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 3.0));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 3.0));
         check(HexManager.judge(hex, zombie) == HexManager.Verdict.PASS, "creatures allowed: a zombie may come in");
         net.minecraft.world.entity.LivingEntity boss = ModEntities.THANOS.get().create(helper.getLevel());
         check(boss != null && HexManager.judge(hex, boss) != HexManager.Verdict.PASS, "but never a boss");
@@ -115,7 +110,7 @@ public final class ProtTests {
     }
 
     /** However fast a player comes (a jump from far outside the box round the Hex to its middle), the wall sees it. */
-    @GameTest(template = ARENA, batch = "prot_hex_fast", timeoutTicks = 30)
+    @EnhancedTest(template = ARENA, batch = "prot_hex_fast", timeoutTicks = 30)
     public static void aFastFlierIsStillJudged(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 6);
@@ -135,7 +130,7 @@ public final class ProtTests {
     }
 
     /** A portal or a respawn into the Hex: whoever she did not let in is set down outside its wall. */
-    @GameTest(template = ARENA, batch = "prot_hex_arrive")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_arrive")
     public static void arrivingInsideFromElsewhereIsJudged(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
@@ -150,7 +145,7 @@ public final class ProtTests {
     }
 
     /** Ultron's island carries no one through a Hex: the lift is refused where a wall cuts its column. */
-    @GameTest(template = ARENA, batch = "prot_hex_sokovia")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_sokovia")
     public static void sokoviaDoesNotRiseThroughAHex(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
@@ -167,13 +162,13 @@ public final class ProtTests {
     // The Hex: what powers do from outside
 
     /** Category projectiles: a skeleton's arrow from outside stops at the wall; Wanda's own arrow goes on. */
-    @GameTest(template = ARENA, batch = "prot_hex_projectile", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "prot_hex_projectile", timeoutTicks = 60)
     public static void projectilesStopAtTheWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(10.5, FLOOR, 1.0));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(10.5, FLOOR, 1.0));
         skeleton.setNoAi(true);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
         Vec3 from = abs(helper, 10.5, FLOOR + 0.6, 1.5);
         arrow.setPos(from);
@@ -197,12 +192,12 @@ public final class ProtTests {
     }
 
     /** Category beams and rays: a beam's line ends at the wall; a player's aim does not reach in. */
-    @GameTest(template = ARENA, batch = "prot_hex_beam")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_beam")
     public static void beamsAndAimsStopAtTheWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
         ServerPlayer thor = f.player(10.5, FLOOR, 1.0, Power.THOR);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 6.0));
         TestKit.lookAt(thor, pig);
         WandaAbilities.ShieldStop stop = WandaAbilities.shieldAcross(helper.getLevel(), thor, thor.getEyePosition(), Shelters.middle(pig), 1.0F);
         check(stop != null && stop.wall() == Shelters.Wall.HEX, "Thor's beam ends at the wall: " + stop);
@@ -215,13 +210,13 @@ public final class ProtTests {
     }
 
     /** Category harm: a blow across the wall, and Thor's lightning beam's damage, do nothing inside. */
-    @GameTest(template = ARENA, batch = "prot_hex_harm")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_harm")
     public static void harmFromOutsideDoesNotReachIn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
         ServerPlayer friend = f.player(10.5, FLOOR, 3.5);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(friend.getUUID()), 1);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 1.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 1.5));
         ServerPlayer thor = f.player(1.5, FLOOR, 1.5, Power.THOR);
         f.pvp(true);
         check(!friend.hurt(helper.getLevel().damageSources().mobAttack(zombie), 4.0F), "the zombie's blow across the wall does nothing");
@@ -232,13 +227,13 @@ public final class ProtTests {
     }
 
     /** Category explosions: one outside breaks no block of the Hex and throws no one in it. */
-    @GameTest(template = ARENA, batch = "prot_hex_explosion")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_explosion")
     public static void explosionsOutsideDoNothingInside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
         BlockPos inside = BlockPos.containing(10.5, FLOOR, 4.5);
         helper.setBlock(inside, Blocks.STONE);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 4.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 4.0));
         Vec3 at = abs(helper, 10.5, FLOOR + 0.5, 1.5);
         helper.getLevel().explode(null, at.x, at.y, at.z, 4.0F, Level.ExplosionInteraction.TNT);
         helper.assertBlockPresent(Blocks.STONE, inside);
@@ -249,19 +244,19 @@ public final class ProtTests {
     }
 
     /** Category effects: Billy's Freeze from outside does not take on a creature inside; Wanda's would. */
-    @GameTest(template = ARENA, batch = "prot_hex_effect")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_effect")
     public static void effectsFromOutsideDoNotTake(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
         ServerPlayer billy = f.player(10.5, FLOOR, 1.0, Power.BILLY);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 5.0));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 5.0));
         check(!pig.addEffect(new MobEffectInstance(ModEffects.SPELLBOUND, 100), billy), "Billy's spell does not cross the wall");
         check(pig.addEffect(new MobEffectInstance(MobEffects.GLOWING, 100), wanda), "hers does");
         helper.succeed();
     }
 
     /** Category lightning: a bolt someone outside calls down inside the Hex does not come. */
-    @GameTest(template = ARENA, batch = "prot_hex_lightning")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_lightning")
     public static void lightningCalledFromOutsideDoesNotStrikeInside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HexTests.raiseHex(f);
@@ -275,12 +270,12 @@ public final class ProtTests {
     }
 
     /** Category area attacks (bosses' slams, waves, the Phoenix Burst): nothing behind the wall may be hurt. */
-    @GameTest(template = ARENA, batch = "prot_hex_area")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_area")
     public static void areaAttacksSpareWhatIsInside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HexTests.raiseHex(f);
-        Zombie inside = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 5.0));
-        Zombie outside = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 1.0));
+        Zombie inside = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 5.0));
+        Zombie outside = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.0, FLOOR, 1.0));
         ServerPlayer phoenix = f.player(10.5, FLOOR, 1.0, Power.PHOENIX);
         check(!AreaTargets.mayHurt(phoenix, inside, false), "the zombie inside is out of her reach");
         check(AreaTargets.mayHurt(phoenix, outside, false), "the one outside is not");
@@ -288,7 +283,7 @@ public final class ProtTests {
     }
 
     /** Category blocks: no power from outside changes a block of the Hex (Build Magic, lifting, pulling...). */
-    @GameTest(template = ARENA, batch = "prot_hex_blocks")
+    @EnhancedTest(template = ARENA, batch = "prot_hex_blocks")
     public static void blocksInsideAreNotChangedFromOutside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
@@ -314,7 +309,7 @@ public final class ProtTests {
     }
 
     /** Monsters and bosses are kept out; a creature someone keeps (named) and a player's pet are not. */
-    @GameTest(template = ARENA, batch = "prot_ward_kinds")
+    @EnhancedTest(template = ARENA, batch = "prot_ward_kinds")
     public static void theWardKeepsOutMonstersAndBosses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(WardManager.keepsOut(EntityType.ZOMBIE) && WardManager.keepsOut(ModEntities.THANOS.get()) && WardManager.keepsOut(EntityType.WITHER)
@@ -325,13 +320,13 @@ public final class ProtTests {
     }
 
     /** What a monster shoots stops at the edge; a player's arrow passes; harm from a monster outside does not reach in. */
-    @GameTest(template = ARENA, batch = "prot_ward_shots", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "prot_ward_shots", timeoutTicks = 60)
     public static void theWardStopsWhatMonstersShoot(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ward(f, 6);
         ServerPlayer player = f.player(10.5, FLOOR, 1.0);
         ServerPlayer inside = f.player(10.5, FLOOR, 10.5);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.0, FLOOR, 1.0));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(3.0, FLOOR, 1.0));
         skeleton.setNoAi(true);
         check(!inside.hurt(helper.getLevel().damageSources().mobAttack(skeleton), 3.0F), "a monster's harm from outside does not reach in");
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
@@ -355,7 +350,7 @@ public final class ProtTests {
     }
 
     /** Dark magic (the Darkhold's purple beam) stops at the edge; chaos magic and Thor's lightning pass. */
-    @GameTest(template = ARENA, batch = "prot_ward_dark")
+    @EnhancedTest(template = ARENA, batch = "prot_ward_dark")
     public static void theWardStopsDarkMagicOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ward(f, 6);
@@ -390,7 +385,7 @@ public final class ProtTests {
     }
 
     /** A beam from the front ends at the plate (3.3.1: Thor's does not wear it); one from behind reaches him. */
-    @GameTest(template = ARENA, batch = "prot_barrier_beam", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "prot_barrier_beam", timeoutTicks = 40)
     public static void theBarrierStopsBeamsFromTheFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 16.5, Power.THOR);
@@ -409,7 +404,7 @@ public final class ProtTests {
     }
 
     /** Grips and curses from the front are stopped; a power of the Scarlet Witch wears it down (3.3.1), until it shatters. */
-    @GameTest(template = ARENA, batch = "prot_barrier_chaos", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "prot_barrier_chaos", timeoutTicks = 40)
     public static void chaosMagicWearsTheBarrierDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(10.5, FLOOR, 14.5, Power.MAGNETO);
@@ -439,7 +434,7 @@ public final class ProtTests {
     // The Hex Runes
 
     /** Who is a sorcerer: Loki, Billy, a Scarlet Witch, and anyone holding a book of magic. */
-    @GameTest(template = ARENA, batch = "prot_runes_who")
+    @EnhancedTest(template = ARENA, batch = "prot_runes_who")
     public static void whoIsASorcerer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(2.5, FLOOR, 2.5, Power.LOKI);
@@ -453,7 +448,7 @@ public final class ProtTests {
     }
 
     /** The runes silence every other sorcerer inside: no key works, flight ends; Wanda keeps hers; wiping them frees them. */
-    @GameTest(template = ARENA, batch = "prot_runes", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "prot_runes", timeoutTicks = 40)
     public static void theRunesSilenceSorcerersInside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
@@ -486,7 +481,7 @@ public final class ProtTests {
     }
 
     /** The books are shut too: a Darkhold holder inside cannot use it. */
-    @GameTest(template = ARENA, batch = "prot_runes_books")
+    @EnhancedTest(template = ARENA, batch = "prot_runes_books")
     public static void theRunesShutTheBooks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
@@ -505,7 +500,7 @@ public final class ProtTests {
      * next); a bigger Hex has bigger runes, up to a cap, and past it more of them. While the wall eases to a new size the runes
      * are already the new Hex's, at the size of the wall drawn now.
      */
-    @GameTest(template = ARENA, batch = "prot_runes_layout")
+    @EnhancedTest(template = ARENA, batch = "prot_runes_layout")
     public static void theRunesCoverTheWallsAndGrowWithTheHex(GameTestHelper helper) {
         float[] out = new float[HexRuneLayout.MAX_PER_WALL * HexRuneLayout.FIELDS];
         Vec3[] spots = new Vec3[4 * HexRuneLayout.MAX_PER_WALL];
@@ -567,7 +562,7 @@ public final class ProtTests {
     }
 
     /** Resizing the Hex keeps its runes: grown over a sorcerer standing outside, they hold him; shrunk off him, he is free. */
-    @GameTest(template = ARENA, batch = "prot_runes_grow", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "prot_runes_grow", timeoutTicks = 40)
     public static void theRunesGrowWithTheHex(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);

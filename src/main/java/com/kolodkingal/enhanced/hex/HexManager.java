@@ -102,11 +102,11 @@ public final class HexManager {
     // Data access
 
     public static HexData data(Level level) {
-        return level.getData(ModAttachments.HEXES);
+        return ModAttachments.HEXES.get(level);
     }
 
     private static void save(ServerLevel level, HexData data) {
-        level.setData(ModAttachments.HEXES, data);
+        ModAttachments.HEXES.set(level, data);
     }
 
     public static Optional<Hex> ownedBy(Level level, UUID owner) {

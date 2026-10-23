@@ -283,15 +283,14 @@ public final class Scratchy {
             if (d > REWARD_RANGE * REWARD_RANGE || player.isSpectator()) {
                 continue;
             }
-            CottageProgress progress = player.getData(ModAttachments.COTTAGE);
+            CottageProgress progress = ModAttachments.COTTAGE.get(player);
             boolean helped = progress.has(CottageProgress.SCRATCHY_QUEST) || leader == player
                     || player.getMainHandItem().is(Items.CARROT) || player.getOffhandItem().is(Items.CARROT)
                     || player.getMainHandItem().is(Items.GOLDEN_CARROT);
             if (!helped || progress.scratchyRun() == run) {
                 continue;
             }
-            player.setData(ModAttachments.COTTAGE,
-                    progress.without(CottageProgress.SCRATCHY_QUEST).withScratchyRun(run));
+            ModAttachments.COTTAGE.set(player, progress.without(CottageProgress.SCRATCHY_QUEST).withScratchyRun(run));
             give(player, new ItemStack(Items.EMERALD, 3));
             give(player, PotionContents.createItemStack(Items.POTION, Potions.LUCK));
             if (thanker != null) {

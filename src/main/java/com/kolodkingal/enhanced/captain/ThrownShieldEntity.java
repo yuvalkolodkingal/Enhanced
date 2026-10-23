@@ -157,7 +157,7 @@ public class ThrownShieldEntity extends Projectile {
     public void tick() {
         super.tick();
         Vec3 from = position();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             // The server sends the real position every tick; meanwhile keep it moving smoothly, a faint trail behind.
             setPos(from.add(getDeltaMovement()));
             level().addParticle(new EnergyParticleOptions(tickCount % 2 == 0 ? 0xE8EEF5 : 0x6FA0FF, 0.45F),
@@ -280,9 +280,9 @@ public class ThrownShieldEntity extends Projectile {
         hasImpulse = true;
         CaptainAbilities.send(level, this, CaptainFxPayload.RICOCHET, List.of(at,
                 next.getBoundingBox().getCenter()), bouncesLeft + 1);
-        CaptainState cs = cap.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(cap);
         if (cs.shieldEntity() == getId()) {
-            cap.setData(ModAttachments.CAPTAIN, cs.withBouncesLeft(bouncesLeft));
+            ModAttachments.CAPTAIN.set(cap, cs.withBouncesLeft(bouncesLeft));
         }
     }
 
@@ -350,9 +350,9 @@ public class ThrownShieldEntity extends Projectile {
 
     /** He no longer has a shield in flight. */
     private void forget(ServerPlayer cap) {
-        CaptainState cs = cap.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(cap);
         if (cs.shieldEntity() == getId()) {
-            cap.setData(ModAttachments.CAPTAIN, cs.withShield(-1).with(CaptainState.OFF_HAND, false)
+            ModAttachments.CAPTAIN.set(cap, cs.withShield(-1).with(CaptainState.OFF_HAND, false)
                     .with(CaptainState.RICOCHET, false).withBouncesLeft(0));
         }
     }

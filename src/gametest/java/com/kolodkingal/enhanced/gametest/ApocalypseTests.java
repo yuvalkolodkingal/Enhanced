@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.ApocalypseAbilities;
@@ -20,6 +19,7 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -32,7 +32,6 @@ import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,8 +58,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,8 +77,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * and they to him. The boss he is won from has its own classes. A test that keeps server-wide state (the sand that rolls, the
  * storm, the shield's memory) has a batch of its own, and takes {@link TestKit#bossFixture} so that the next one starts clean.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ApocalypseTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -120,7 +115,7 @@ public final class ApocalypseTests {
 
     /** A husk with no armour and 200 health that stands where it is put: it takes damage as written, and a lot of it. */
     private static Husk bareHusk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -128,7 +123,7 @@ public final class ApocalypseTests {
     }
 
     private static Skeleton harmlessSkeleton(GameTestHelper helper, double x, double z) {
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(x, FLOOR, z));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(x, FLOOR, z));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         skeleton.setNoAi(true);
         return skeleton;
@@ -153,7 +148,7 @@ public final class ApocalypseTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Essence (test 43) and the looks (44, 45)
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_essence", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_essence", timeoutTicks = 100)
     public static void essenceAwakensAPowerlessPlayerAfterTheRitual(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -229,7 +224,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_command", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_command", timeoutTicks = 100)
     public static void commandSetsApocalypseInALook(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ServerLevel level = f.level();
@@ -259,7 +254,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void apocalypseLooksAreTwoAndYourOwn(GameTestHelper helper) {
         List<Variant> looks = Variants.of(Power.APOCALYPSE);
         check(looks.stream().map(Variant::id).toList().equals(List.of("apocalypse", "en_sabah_nur", "own")), "the three looks: " + looks.stream().map(Variant::id).toList());
@@ -276,7 +271,7 @@ public final class ApocalypseTests {
     // ------------------------------------------------------------------------------------------------------------
     // The body (46) and levitation (48)
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_body", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_body", timeoutTicks = 200)
     public static void bodyAndHealingFactor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -315,7 +310,7 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_fly", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_fly", timeoutTicks = 100)
     public static void levitationIsFlightAtItsSpeed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         check(Power.APOCALYPSE.canFly() && Power.APOCALYPSE.flightAbility() == 2, "he flies, on G");
@@ -336,7 +331,7 @@ public final class ApocalypseTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 1: the Sand Wave and the Entomb (47)
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_wave", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_wave", timeoutTicks = 120)
     public static void sandWaveRollsEighteenBlocksHitsEachOnceAndSparesTheRest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 1.5, 10.5);
@@ -346,7 +341,7 @@ public final class ApocalypseTests {
         Husk far = bareHusk(helper, 18.5, 10.5);
         Husk behind = bareHusk(helper, 0.5, 10.5);
         Husk aside = bareHusk(helper, 8.5, 14.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(8.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(8.5, FLOOR, 10.5));
         ServerPlayer bystander = f.player(14.5, FLOOR, 10.5);
         Log log = new Log(hero).drain();
         log.clear();
@@ -378,7 +373,7 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_wave_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_wave_pvp", timeoutTicks = 100)
     public static void sandWaveHurtsAPlayerOnlyWithPvpOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(true);
@@ -397,7 +392,7 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_wave_ground", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_wave_ground", timeoutTicks = 60)
     public static void sandWaveNeedsGroundWithinSixBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 3.5, 10.5);
@@ -418,7 +413,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_entomb", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_entomb", timeoutTicks = 100)
     public static void entombSwallowsWhomItShouldAndRefusesTheRest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -452,7 +447,7 @@ public final class ApocalypseTests {
         sneakPress(hero, 1);
         check(log.drain().toldOnActionBar("message.enhanced.entomb.nothing") && cooldownLeft(hero, 1) <= 0, "nobody in reach");
 
-        Warden boss = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(6.5, FLOOR, 16.5));
+        Warden boss = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(6.5, FLOOR, 16.5));
         lookAt(hero, boss);
         log.clear();
         sneakPress(hero, 1);
@@ -493,13 +488,13 @@ public final class ApocalypseTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 3: the Portal (49)
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_portal", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_portal", timeoutTicks = 100)
     public static void portalTakesPetsAndSneakingAlliesAlong(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 4.5, 4.5);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(5.5, FLOOR, 4.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(5.5, FLOOR, 4.5));
         pet.tame(hero);
-        Wolf stray = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(3.5, FLOOR, 4.5));
+        Wolf stray = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(3.5, FLOOR, 4.5));
         ServerPlayer sneaker = f.player(4.5, FLOOR, 6.0);
         sneaker.setShiftKeyDown(true);
         ServerPlayer stander = f.player(3.5, FLOOR, 6.0);
@@ -540,7 +535,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_portal_walls", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_portal_walls", timeoutTicks = 100)
     public static void portalRespectsTheHexAndPins(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(true);
@@ -581,7 +576,7 @@ public final class ApocalypseTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 4: the Shield (50, 57)
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_shield", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_shield", timeoutTicks = 200)
     public static void heroShieldStopsEverythingButMindPower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -590,7 +585,7 @@ public final class ApocalypseTests {
         ServerPlayer wanda = f.player(5.5, FLOOR, 5.5, Power.SCARLET_WITCH);
         ServerPlayer phoenix = f.player(15.5, FLOOR, 5.5, Power.PHOENIX);
         ServerPlayer plain = f.player(5.5, FLOOR, 15.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         Skeleton skeleton = harmlessSkeleton(helper, 15.5, 15.5);
         PowerData data = Powers.get(hero);
         int windUp = ApocalypseConfig.SHIELD_WIND_UP_TICKS.get();
@@ -673,7 +668,7 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_shield_hold", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_shield_hold", timeoutTicks = 200)
     public static void heroShieldIsHeldAtMostItsTimeAndNeedsFood(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(ApocalypseConfig.SHIELD_MAX_TICKS, 20);
@@ -730,7 +725,7 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_shield_arrows", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_shield_arrows", timeoutTicks = 200)
     public static void heroShieldTurnsAwayArrowsAndSendsAThrownWeaponHomeToThor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -786,7 +781,7 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_shield_wear", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_shield_wear", timeoutTicks = 100)
     public static void heroShieldOtherWearAndBossLiteralRule(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -821,7 +816,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_shield_boss", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_shield_boss", timeoutTicks = 100)
     public static void theBossShieldKeepsTheLiteralRuleWhateverTheOptionSays(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().config(ApocalypseConfig.SHIELD_OTHER_WEAR, 1.0);
@@ -850,17 +845,17 @@ public final class ApocalypseTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 5: Power Bestowal and the Sandstorm (51, 52)
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_bestow", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_bestow", timeoutTicks = 200)
     public static void bestowalEmpowersAlliesOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
         ServerPlayer hero = hero(f, 3.5, 10.5);
         ServerPlayer friend = f.player(10.5, FLOOR, 10.5);
-        Wolf wolf = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(7.5, FLOOR, 7.5));
+        Wolf wolf = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(7.5, FLOOR, 7.5));
         wolf.tame(hero);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 13.5));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(7.5, FLOOR, 13.5));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 5.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 13.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(7.5, FLOOR, 13.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 5.5));
         Log log = new Log(hero).drain();
         log.clear();
 
@@ -934,15 +929,15 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_storm", timeoutTicks = 250)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_storm", timeoutTicks = 250)
     public static void sandstormHurtsEnemiesOnlyAndSlowsThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
         ServerPlayer hero = hero(f, 10.5, 10.5);
         Husk enemy = bareHusk(helper, 13.5, 10.5);
         Husk distant = bareHusk(helper, 19.5, 17.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 14.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
         pet.tame(hero);
         ServerPlayer victim = f.player(10.5, FLOOR, 6.5);
         PowerData data = Powers.get(hero);
@@ -998,7 +993,7 @@ public final class ApocalypseTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_storm_arrows", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_storm_arrows", timeoutTicks = 100)
     public static void sandstormSlowsProjectilesToHalfOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1029,7 +1024,7 @@ public final class ApocalypseTests {
     // ------------------------------------------------------------------------------------------------------------
     // The other heroes (53) and the end of the power
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_others", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_others", timeoutTicks = 100)
     public static void heroInteractions(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(true);
@@ -1076,7 +1071,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_end", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_end", timeoutTicks = 100)
     public static void losingThePowerEndsWhatHeLeftInTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(true);
@@ -1112,7 +1107,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_death", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_death", timeoutTicks = 100)
     public static void aFallenHeroStopsHoldingWhatHeHeld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 10.5, 10.5);
@@ -1131,7 +1126,7 @@ public final class ApocalypseTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_hero_entombed", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_hero_entombed", timeoutTicks = 100)
     public static void anEntombedHeroLosesTheStormAndTheShield(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();

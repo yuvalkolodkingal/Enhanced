@@ -1,10 +1,10 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.network.SokoviaLiftPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -18,7 +18,6 @@ import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
@@ -40,8 +39,6 @@ import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.PistonEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -81,8 +78,6 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.tank;
  * each one by the velocity the server last gave them ({@link #client}), which is all a real client does while the lift
  * has them. Each fight test has a batch of its own: a fight is server-wide state.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SokoviaTests {
     // ------------------------------------------------------------------------------------------------------------
     // The whole lift
@@ -92,7 +87,7 @@ public final class SokoviaTests {
      * island is placed in slices that never exceed the budget, in exactly the blocks of the template, the ground is
      * never touched, the sky is clean again after the descent, and everybody is where they were.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_full", timeoutTicks = 900)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_full", timeoutTicks = 900)
     public static void theIslandRisesAndLandsExactly(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         f.config(UltronBossConfig.EDITS_PER_TICK, 500);
@@ -227,7 +222,7 @@ public final class SokoviaTests {
     /**
      * A survival player with no permission to fly hangs in the air for the 200 ticks of a slow rise and is not kicked.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_kick", timeoutTicks = 700)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_kick", timeoutTicks = 700)
     public static void aCarriedPlayerIsNotKickedForFloating(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         f.config(UltronBossConfig.LIFT_TICKS, 200);
@@ -279,7 +274,7 @@ public final class SokoviaTests {
      * rise each stands at the same place over the pad, 16 blocks up, unhurt and unlocked. A cow, a villager and an item
      * on the ground stay on the ground, as they were.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_carry", timeoutTicks = 500)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_carry", timeoutTicks = 500)
     public static void everythingOnItIsCarriedAndTheRestStays(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerLevel level = f.level();
@@ -297,7 +292,7 @@ public final class SokoviaTests {
         drone.setOwner(a.getUUID());
         drone.setHeld(true);
         level.addFreshEntity(drone);
-        Cow cow = helper.spawn(EntityType.COW, new Vec3(MIDDLE_X + 6.0, GROUND, MIDDLE_Z + 5.0));
+        Cow cow = TestKit.spawn(helper, EntityType.COW, new Vec3(MIDDLE_X + 6.0, GROUND, MIDDLE_Z + 5.0));
         cow.setNoAi(true);
         ItemEntity item = new ItemEntity(level, helper.absoluteVec(new Vec3(MIDDLE_X - 6.0, GROUND, MIDDLE_Z - 5.0)).x,
                 helper.absoluteVec(new Vec3(MIDDLE_X - 6.0, GROUND, MIDDLE_Z - 5.0)).y, helper.absoluteVec(new Vec3(MIDDLE_X - 6.0, GROUND, MIDDLE_Z - 5.0)).z,
@@ -359,7 +354,7 @@ public final class SokoviaTests {
      * Nobody is left inside a block: a player against a tree trunk and one under leaves are set down where they stood,
      * and one who would be inside a block that was put in the way is moved up to free space, at most three blocks.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_stuck", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stuck", timeoutTicks = 400)
     public static void nobodyIsSetDownInsideABlock(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerLevel level = f.level();
@@ -418,7 +413,7 @@ public final class SokoviaTests {
      * A fighter who is not on the island when it locks is brought in to the nearest point of the rim; a spectator is
      * not a fighter and is left alone.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_stray", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stray", timeoutTicks = 300)
     public static void aFighterOutsideTheRimIsBroughtIn(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
@@ -476,7 +471,7 @@ public final class SokoviaTests {
      * 85 above its top, each at the island's surface, three blocks inside the rim, with at most 2 damage and at least
      * half a heart left; and at most once every five seconds.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_field", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_field", timeoutTicks = 600)
     public static void theFieldKeepsEveryoneOnTheIsland(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
@@ -533,7 +528,7 @@ public final class SokoviaTests {
      * The arena's protection reaches the island in the sky: nothing in the cylinder can be broken, placed, flooded or
      * pushed there, nothing spawns, and nothing is protected beyond it.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_protect", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_protect", timeoutTicks = 400)
     public static void theIslandInTheSkyIsProtected(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerLevel level = f.level();
@@ -571,7 +566,7 @@ public final class SokoviaTests {
      * The pit's tractor: a fighter who comes to stand on the ground under the island for two seconds is carried up and
      * set down on it, at most {@code rejoinLimit} times.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_tractor", timeoutTicks = 900)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_tractor", timeoutTicks = 900)
     public static void aFighterWhoIsLeftBelowIsTakenUpAtMostTwice(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         f.config(UltronBossConfig.REJOIN_LIMIT, 2);
@@ -637,7 +632,7 @@ public final class SokoviaTests {
      * they fall again when they step off a block. (Had the tractor kept them, the island's lock would have been put on
      * top of the tractor's and taken its "no gravity" for their own, and they would have floated for good.)
      */
-    @GameTest(template = PAD, batch = "ultron_lift_tractor_descent", timeoutTicks = 700)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_tractor_descent", timeoutTicks = 700)
     public static void aFighterTheTractorCarriesWhenTheIslandGoesDownComesDownWithItAndIsFree(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         f.config(UltronBossConfig.EDITS_PER_TICK, 400);
@@ -700,7 +695,7 @@ public final class SokoviaTests {
      * A carried player is immune to everything but what bypasses invulnerability (the void's damage still reaches
      * them), and for 40 ticks after they are set down to the fight's creatures but not to another player.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_immune", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_immune", timeoutTicks = 400)
     public static void aCarriedPlayerCannotBeHurtExceptByTheVoid(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         f.pvp(true);
@@ -763,7 +758,7 @@ public final class SokoviaTests {
      * The clients are told in order: the rise, the end of the mesh (the island is real, the ground stays hidden), the
      * descent twice (first hanging, then falling), and the end that shows everything again; each says the same island.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_payloads", timeoutTicks = 800)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_payloads", timeoutTicks = 800)
     public static void theClientsAreToldTheLiftInOrder(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
@@ -822,7 +817,7 @@ public final class SokoviaTests {
      * A player who comes within sight of the island's key at any moment is told what the island is doing: the rise
      * while it rises, the end (ground hidden) while it is up, the descent while it comes down.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_tracking", timeoutTicks = 900)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_tracking", timeoutTicks = 900)
     public static void aPlayerWhoArrivesLateSeesTheMesh(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
@@ -867,7 +862,7 @@ public final class SokoviaTests {
      * The fight ends (an operator, a defeat) before the island is placed: nobody is left hanging; the island is not
      * placed; everyone is on the ground where they were taken from, in the next tick.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_abort", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_abort", timeoutTicks = 300)
     public static void aFightThatEndsWhileTheIslandRisesSetsEveryoneDown(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerLevel level = f.level();
@@ -918,7 +913,7 @@ public final class SokoviaTests {
      * not after the five minutes the framework would otherwise wait (the arena would hold its fighters all that time and
      * no other boss could be called).
      */
-    @GameTest(template = PAD, batch = "ultron_lift_warn_end", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_warn_end", timeoutTicks = 300)
     public static void aFightThatEndsDuringTheWarningIsOverWithItsEnding(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
@@ -944,7 +939,7 @@ public final class SokoviaTests {
      * A fighter who logs out while the island rises and logs in again a moment later is put back among it and carried
      * on; one who logs in after the island is up is where they were saved, on it.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_login", timeoutTicks = 500)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_login", timeoutTicks = 500)
     public static void aFighterWhoLogsBackInIsPutBackWithTheIsland(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
@@ -998,25 +993,25 @@ public final class SokoviaTests {
     // The Tremor: the fallback when the island cannot rise
 
     /** The lift is switched off. */
-    @GameTest(template = PAD, batch = "ultron_lift_tremor_off", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_tremor_off", timeoutTicks = 300)
     public static void withTheLiftOffTheGroundOnlyShakes(GameTestHelper helper) {
         tremor(helper, f -> f.config(UltronBossConfig.LIFT_ENABLED, false), 0);
     }
 
     /** The mode is Tremor. */
-    @GameTest(template = PAD, batch = "ultron_lift_tremor_mode", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_tremor_mode", timeoutTicks = 300)
     public static void inTremorModeTheGroundOnlyShakes(GameTestHelper helper) {
         tremor(helper, f -> f.config(UltronBossConfig.LIFT_MODE, UltronBossConfig.LiftMode.TREMOR), 0);
     }
 
     /** The cut-ground mode is not in this release. */
-    @GameTest(template = PAD, batch = "ultron_lift_tremor_cut", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_tremor_cut", timeoutTicks = 300)
     public static void theCutGroundModeIsNotThereAndTheGroundOnlyShakes(GameTestHelper helper) {
         tremor(helper, f -> f.config(UltronBossConfig.LIFT_MODE, UltronBossConfig.LiftMode.CUT_GROUND), 0);
     }
 
     /** The sky over the island is not empty when the warning begins. */
-    @GameTest(template = PAD, batch = "ultron_lift_tremor_sky", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_tremor_sky", timeoutTicks = 300)
     public static void withSomethingInTheSkyTheGroundOnlyShakes(GameTestHelper helper) {
         tremor(helper, f -> helper.setBlock(new BlockPos(21, SURFACE + LIFT + 3, 21), Blocks.STONE), 1);
     }

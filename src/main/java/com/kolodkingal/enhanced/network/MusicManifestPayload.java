@@ -2,11 +2,11 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.ServerMusicClient;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public record MusicManifestPayload(List<Track> tracks) implements CustomPacketPa
     }
 
     /** Only ever runs on a client, so the client class is only ever loaded there. */
-    static void handle(MusicManifestPayload payload, IPayloadContext context) {
+    static void handle(MusicManifestPayload payload, PacketContext context) {
         ServerMusicClient.onManifest(payload.tracks());
     }
 }

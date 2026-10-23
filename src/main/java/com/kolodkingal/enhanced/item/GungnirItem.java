@@ -90,7 +90,7 @@ public class GungnirItem extends SwordItem {
             return false;
         }
         ServerPlayer holder = level.getServer().getPlayerList().getPlayer(owner.id());
-        return holder != null && bond < holder.getData(ModAttachments.ASGARD).gungnirBond();
+        return holder != null && bond < ModAttachments.ASGARD.get(holder).gungnirBond();
     }
 
     /** Use: for its owner, the Bifrost screen (Sneak: the Bifrost to where he looks); for anyone else nothing. */

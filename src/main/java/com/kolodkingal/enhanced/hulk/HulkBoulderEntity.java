@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.hulk;
 
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.network.HulkFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.thanos.StonePowers;
@@ -27,7 +28,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -85,7 +85,7 @@ public class HulkBoulderEntity extends ThrowableProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide && tickCount > LIFETIME) {
+        if (!level().isClientSide() && tickCount > LIFETIME) {
             shatter(position());
         }
     }
@@ -113,7 +113,7 @@ public class HulkBoulderEntity extends ThrowableProjectile {
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!level().isClientSide && isAlive()) {
+        if (!level().isClientSide() && isAlive()) {
             Vec3 at = result.getLocation();
             if (result instanceof EntityHitResult hit) {
                 at = hit.getEntity().position().add(0, hit.getEntity().getBbHeight() * 0.5, 0);
@@ -144,7 +144,7 @@ public class HulkBoulderEntity extends ThrowableProjectile {
                 0.15);
         level.playSound(null, at.x, at.y, at.z, ModSounds.BOULDER_HIT.get(), getSoundSource(), 1.4F, 0.9F
                 + random.nextFloat() * 0.2F);
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, HulkAbilities.FX_RANGE,
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, HulkAbilities.FX_RANGE,
                 new HulkFxPayload(HulkFxPayload.BOULDER_HIT, getOwner() == null ? -1 : getOwner().getId(), List.of(at),
                         Block.getId(block())));
         discard();

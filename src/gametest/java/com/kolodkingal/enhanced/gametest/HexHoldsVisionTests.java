@@ -1,17 +1,16 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variants;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,8 +24,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,8 +46,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * <p>The Hex is Wanda's, in the middle of the arena (10.5, 2, 10.5), radius 8; the arena is 21 blocks across, so the
  * wall is in reach of its edge: a spot at z = 1.0 is outside the Hex, one at z = 5.0 inside.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HexHoldsVisionTests {
     private static final double CENTER = 10.5;
     /** Orange and yellow: what a Vision comes apart in at the wall (the Mind Stone's gold is not among these). */
@@ -72,7 +67,7 @@ public final class HexHoldsVisionTests {
         return sounds.stream().anyMatch(sound -> sound.id().equals(event.getLocation()));
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_walk")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_walk")
     public static void visionWalkingIntoTheWallIsThrownBackAndComesApart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -100,7 +95,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_crackle")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_crackle")
     public static void visionCracklesAtTheWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -116,7 +111,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_allowed")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_allowed")
     public static void anAllowedVisionIsHeldTooButEntersFreely(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -151,7 +146,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_white")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_white")
     public static void whiteVisionIsHeldTooButDoesNotComeApart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -177,7 +172,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_white_in")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_white_in")
     public static void whiteVisionGetsInOnlyIfWandaAllowsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -203,7 +198,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_release")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_release")
     public static void aBadlyHurtWandaCanNoLongerHoldVision(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -231,7 +226,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_release_kill")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_release_kill")
     public static void killingWandaFreesVision(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -253,7 +248,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_release_gone")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_release_gone")
     public static void withWandaGoneFromTheWorldNobodyHoldsVision(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -266,7 +261,7 @@ public final class HexHoldsVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_phase")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_phase")
     public static void aPhasingVisionCannotSlipThroughEither(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -290,7 +285,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_fly")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_fly")
     public static void aFlyingVisionIsHeldAtTheCeilingOfTheWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -312,7 +307,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_teleport")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_teleport")
     public static void noTeleportTakesVisionOutOfTheHex(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -348,7 +343,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_free_dissolve")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_free_dissolve")
     public static void visionIsFreeOnceTheHexIsGone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -370,7 +365,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_free_shrunk")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_free_shrunk")
     public static void visionIsFreeWhenWandaShrinksTheHexPastHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 16);
@@ -399,7 +394,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_creative")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_creative")
     public static void creativeAndSpectatorVisionsAreNotHeld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -423,7 +418,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_damage", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "hex_holds_damage", timeoutTicks = 160)
     public static void theWallHurtsMoreWhileHeKeepsPushingButNeverKills(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -461,7 +456,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_hold_on")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_hold_on")
     public static void leaningOnTheWallHurtsAtMostTwiceASecond(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -487,7 +482,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_rest", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "hex_holds_rest", timeoutTicks = 200)
     public static void theWallForgetsHisPushingWhenHeRests(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         raiseHex(f);
@@ -523,7 +518,7 @@ public final class HexHoldsVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_holds_floor")
+    @EnhancedTest(template = ARENA, batch = "hex_holds_floor")
     public static void leaningOnTheWallDoesNotSinkHimIntoTheFloor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);

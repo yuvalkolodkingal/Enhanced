@@ -111,7 +111,7 @@ public final class ModuleStats {
         }
     }
 
-    private static double opt(net.neoforged.neoforge.common.ModConfigSpec.DoubleValue value, double fallback) {
+    private static double opt(com.kolodkingal.enhanced.config.core.ConfigSpec.DoubleValue value, double fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 

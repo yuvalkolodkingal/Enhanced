@@ -23,6 +23,9 @@ import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.entity.SandLanceEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.platform.reg.RegEntry;
+import com.kolodkingal.enhanced.platform.reg.Registrar;
+import com.kolodkingal.enhanced.platform.reg.Registrars;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosMeteorEntity;
 import com.kolodkingal.enhanced.thanos.ThanosOrbEntity;
@@ -36,20 +39,18 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModEntities {
-    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, Enhanced.MODID);
+    public static final Registrar<EntityType<?>> ENTITIES = Registrars.create(Registries.ENTITY_TYPE, Enhanced.MODID);
 
-    public static final DeferredHolder<EntityType<?>, EntityType<IronShrapnelEntity>> IRON_SHRAPNEL = ENTITIES.register("iron_shrapnel",
+    public static final RegEntry<EntityType<?>, EntityType<IronShrapnelEntity>> IRON_SHRAPNEL = ENTITIES.register("iron_shrapnel",
             () -> EntityType.Builder.<IronShrapnelEntity>of(IronShrapnelEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .clientTrackingRange(4)
                     .updateInterval(10)
                     .build("iron_shrapnel"));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<TelekineticBlockEntity>> TELEKINETIC_BLOCK = ENTITIES.register("telekinetic_block",
+    public static final RegEntry<EntityType<?>, EntityType<TelekineticBlockEntity>> TELEKINETIC_BLOCK = ENTITIES.register("telekinetic_block",
             () -> EntityType.Builder.<TelekineticBlockEntity>of(TelekineticBlockEntity::new, MobCategory.MISC)
                     .sized(0.98F, 0.98F)
                     .clientTrackingRange(10)
@@ -57,7 +58,7 @@ public final class ModEntities {
                     .build("telekinetic_block"));
 
     /** Mjolnir or Stormbreaker, thrown by Thor. */
-    public static final DeferredHolder<EntityType<?>, EntityType<ThrownWeaponEntity>> THROWN_WEAPON = ENTITIES.register("thrown_weapon",
+    public static final RegEntry<EntityType<?>, EntityType<ThrownWeaponEntity>> THROWN_WEAPON = ENTITIES.register("thrown_weapon",
             () -> EntityType.Builder.<ThrownWeaponEntity>of(ThrownWeaponEntity::new, MobCategory.MISC)
                     .sized(0.6F, 0.6F)
                     .clientTrackingRange(8)
@@ -66,7 +67,7 @@ public final class ModEntities {
                     .build("thrown_weapon"));
 
     /** A fragment of a shattered Mjolnir. Never saved: the hammer is kept in Thor's own data while it is in pieces. */
-    public static final DeferredHolder<EntityType<?>, EntityType<MjolnirFragmentEntity>> MJOLNIR_FRAGMENT = ENTITIES.register("mjolnir_fragment",
+    public static final RegEntry<EntityType<?>, EntityType<MjolnirFragmentEntity>> MJOLNIR_FRAGMENT = ENTITIES.register("mjolnir_fragment",
             () -> EntityType.Builder.<MjolnirFragmentEntity>of(MjolnirFragmentEntity::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F)
                     .clientTrackingRange(8)
@@ -77,7 +78,7 @@ public final class ModEntities {
                     .build("mjolnir_fragment"));
 
     /** Mjolnir lying on someone it pins down. */
-    public static final DeferredHolder<EntityType<?>, EntityType<MjolnirPinEntity>> MJOLNIR_PIN = ENTITIES.register("mjolnir_pin",
+    public static final RegEntry<EntityType<?>, EntityType<MjolnirPinEntity>> MJOLNIR_PIN = ENTITIES.register("mjolnir_pin",
             () -> EntityType.Builder.<MjolnirPinEntity>of(MjolnirPinEntity::new, MobCategory.MISC)
                     .sized(0.4F, 0.4F)
                     .clientTrackingRange(8)
@@ -86,7 +87,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("mjolnir_pin"));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<LokiDaggerEntity>> LOKI_DAGGER = ENTITIES.register("loki_dagger",
+    public static final RegEntry<EntityType<?>, EntityType<LokiDaggerEntity>> LOKI_DAGGER = ENTITIES.register("loki_dagger",
             () -> EntityType.Builder.<LokiDaggerEntity>of(LokiDaggerEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .clientTrackingRange(4)
@@ -94,7 +95,7 @@ public final class ModEntities {
                     .build("loki_dagger"));
 
     /** Never saved: an illusion lasts seconds, and its caster may not be there when the world loads again. */
-    public static final DeferredHolder<EntityType<?>, EntityType<LokiIllusionEntity>> LOKI_ILLUSION = ENTITIES.register("loki_illusion",
+    public static final RegEntry<EntityType<?>, EntityType<LokiIllusionEntity>> LOKI_ILLUSION = ENTITIES.register("loki_illusion",
             () -> EntityType.Builder.<LokiIllusionEntity>of(LokiIllusionEntity::new, MobCategory.MISC)
                     .sized(0.6F, 1.8F)
                     .eyeHeight(1.62F)
@@ -104,7 +105,7 @@ public final class ModEntities {
                     .build("loki_illusion"));
 
     /** The Vision of Wanda's Hex. Never saved: the Hex that raised him makes him again when the world is loaded. */
-    public static final DeferredHolder<EntityType<?>, EntityType<HexVisionEntity>> HEX_VISION = ENTITIES.register("hex_vision",
+    public static final RegEntry<EntityType<?>, EntityType<HexVisionEntity>> HEX_VISION = ENTITIES.register("hex_vision",
             () -> EntityType.Builder.<HexVisionEntity>of(HexVisionEntity::new, MobCategory.MISC)
                     .sized(0.6F, 1.8F)
                     .eyeHeight(1.62F)
@@ -120,7 +121,7 @@ public final class ModEntities {
     // restart.
 
     // ===== thanos =====
-    public static final DeferredHolder<EntityType<?>, EntityType<ThanosEntity>> THANOS = ENTITIES.register("thanos",
+    public static final RegEntry<EntityType<?>, EntityType<ThanosEntity>> THANOS = ENTITIES.register("thanos",
             () -> EntityType.Builder.<ThanosEntity>of(ThanosEntity::new, MobCategory.MONSTER)
                     .sized(1.2F, 3.3F)
                     .eyeHeight(2.95F)
@@ -130,7 +131,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("thanos"));
-    public static final DeferredHolder<EntityType<?>, EntityType<ThanosSwordEntity>> THANOS_SWORD = ENTITIES.register("thanos_sword",
+    public static final RegEntry<EntityType<?>, EntityType<ThanosSwordEntity>> THANOS_SWORD = ENTITIES.register("thanos_sword",
             () -> EntityType.Builder.<ThanosSwordEntity>of(ThanosSwordEntity::new, MobCategory.MISC)
                     .sized(0.8F, 0.8F)
                     .fireImmune()
@@ -139,7 +140,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("thanos_sword"));
-    public static final DeferredHolder<EntityType<?>, EntityType<ThanosMeteorEntity>> THANOS_METEOR = ENTITIES.register("thanos_meteor",
+    public static final RegEntry<EntityType<?>, EntityType<ThanosMeteorEntity>> THANOS_METEOR = ENTITIES.register("thanos_meteor",
             () -> EntityType.Builder.<ThanosMeteorEntity>of(ThanosMeteorEntity::new, MobCategory.MISC)
                     .sized(2.0F, 2.0F)
                     .fireImmune()
@@ -148,7 +149,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("thanos_meteor"));
-    public static final DeferredHolder<EntityType<?>, EntityType<ThanosOrbEntity>> THANOS_ORB = ENTITIES.register("thanos_orb",
+    public static final RegEntry<EntityType<?>, EntityType<ThanosOrbEntity>> THANOS_ORB = ENTITIES.register("thanos_orb",
             () -> EntityType.Builder.<ThanosOrbEntity>of(ThanosOrbEntity::new, MobCategory.MISC)
                     .sized(0.9F, 0.9F)
                     .fireImmune()
@@ -157,7 +158,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("thanos_orb"));
-    public static final DeferredHolder<EntityType<?>, EntityType<ThanosPhantomEntity>> THANOS_PHANTOM = ENTITIES.register("thanos_phantom",
+    public static final RegEntry<EntityType<?>, EntityType<ThanosPhantomEntity>> THANOS_PHANTOM = ENTITIES.register("thanos_phantom",
             () -> EntityType.Builder.<ThanosPhantomEntity>of(ThanosPhantomEntity::new, MobCategory.MONSTER)
                     .sized(1.2F, 3.3F)
                     .eyeHeight(2.95F)
@@ -167,7 +168,7 @@ public final class ModEntities {
                     .build("thanos_phantom"));
 
     // ===== ultron =====
-    public static final DeferredHolder<EntityType<?>, EntityType<UltronEntity>> ULTRON = ENTITIES.register("ultron",
+    public static final RegEntry<EntityType<?>, EntityType<UltronEntity>> ULTRON = ENTITIES.register("ultron",
             () -> EntityType.Builder.<UltronEntity>of(UltronEntity::new, MobCategory.MONSTER)
                     .sized(1.3F, 3.4F)
                     .fireImmune()
@@ -176,7 +177,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("ultron"));
-    public static final DeferredHolder<EntityType<?>, EntityType<UltronSentryEntity>> ULTRON_SENTRY = ENTITIES.register("ultron_sentry",
+    public static final RegEntry<EntityType<?>, EntityType<UltronSentryEntity>> ULTRON_SENTRY = ENTITIES.register("ultron_sentry",
             () -> EntityType.Builder.<UltronSentryEntity>of(UltronSentryEntity::new, MobCategory.MONSTER)
                     .sized(0.7F, 1.7F)
                     .fireImmune()
@@ -184,7 +185,7 @@ public final class ModEntities {
                     .updateInterval(2)
                     .noSummon()
                     .build("ultron_sentry"));
-    public static final DeferredHolder<EntityType<?>, EntityType<VibraniumKeyEntity>> VIBRANIUM_KEY = ENTITIES.register("vibranium_key",
+    public static final RegEntry<EntityType<?>, EntityType<VibraniumKeyEntity>> VIBRANIUM_KEY = ENTITIES.register("vibranium_key",
             () -> EntityType.Builder.<VibraniumKeyEntity>of(VibraniumKeyEntity::new, MobCategory.MISC)
                     .sized(3.2F, 3.4F)
                     .fireImmune()
@@ -192,7 +193,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("vibranium_key"));
-    public static final DeferredHolder<EntityType<?>, EntityType<UltronBoltEntity>> ULTRON_BOLT = ENTITIES.register("ultron_bolt",
+    public static final RegEntry<EntityType<?>, EntityType<UltronBoltEntity>> ULTRON_BOLT = ENTITIES.register("ultron_bolt",
             () -> EntityType.Builder.<UltronBoltEntity>of(UltronBoltEntity::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F)
                     .clientTrackingRange(8)
@@ -202,7 +203,7 @@ public final class ModEntities {
                     .build("ultron_bolt"));
 
     // ===== apocalypse =====
-    public static final DeferredHolder<EntityType<?>, EntityType<ApocalypseEntity>> APOCALYPSE = ENTITIES.register("apocalypse",
+    public static final RegEntry<EntityType<?>, EntityType<ApocalypseEntity>> APOCALYPSE = ENTITIES.register("apocalypse",
             () -> EntityType.Builder.<ApocalypseEntity>of(ApocalypseEntity::new, MobCategory.MONSTER)
                     .sized(0.9F, 2.9F)
                     .eyeHeight(2.6F)
@@ -212,7 +213,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("apocalypse"));
-    public static final DeferredHolder<EntityType<?>, EntityType<SandLanceEntity>> SAND_LANCE = ENTITIES.register("sand_lance",
+    public static final RegEntry<EntityType<?>, EntityType<SandLanceEntity>> SAND_LANCE = ENTITIES.register("sand_lance",
             () -> EntityType.Builder.<SandLanceEntity>of(SandLanceEntity::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F)
                     .clientTrackingRange(8)
@@ -220,7 +221,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("sand_lance"));
-    public static final DeferredHolder<EntityType<?>, EntityType<SandBoulderEntity>> SAND_BOULDER = ENTITIES.register("sand_boulder",
+    public static final RegEntry<EntityType<?>, EntityType<SandBoulderEntity>> SAND_BOULDER = ENTITIES.register("sand_boulder",
             () -> EntityType.Builder.<SandBoulderEntity>of(SandBoulderEntity::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F)
                     .clientTrackingRange(8)
@@ -228,7 +229,7 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("sand_boulder"));
-    public static final DeferredHolder<EntityType<?>, EntityType<SandCocoonEntity>> SAND_COCOON = ENTITIES.register("sand_cocoon",
+    public static final RegEntry<EntityType<?>, EntityType<SandCocoonEntity>> SAND_COCOON = ENTITIES.register("sand_cocoon",
             () -> EntityType.Builder.<SandCocoonEntity>of(SandCocoonEntity::new, MobCategory.MISC)
                     .sized(0.9F, 2.0F)
                     .fireImmune()
@@ -240,7 +241,7 @@ public final class ModEntities {
     // ===== asgard (3.5) =====
     // (The skeleton registers the two entities another lane needs by name; each lane adds its own in its region below.)
     /** The invisible seat of the throne and the benches (lane L1; Asgardians sit on it too). Never saved. */
-    public static final DeferredHolder<EntityType<?>, EntityType<SeatEntity>> SEAT = ENTITIES.register("seat",
+    public static final RegEntry<EntityType<?>, EntityType<SeatEntity>> SEAT = ENTITIES.register("seat",
             () -> EntityType.Builder.<SeatEntity>of(SeatEntity::new, MobCategory.MISC)
                     .sized(0.01F, 0.01F)
                     .clientTrackingRange(10)
@@ -250,7 +251,7 @@ public final class ModEntities {
     // ===== heimdall (3.5) =====
     // ===== odin (3.5) =====
     /** Gungnir in flight: Odin's Gungnir Throw (it comes home to his hand). */
-    public static final DeferredHolder<EntityType<?>, EntityType<GungnirEntity>> GUNGNIR = ENTITIES.register("gungnir",
+    public static final RegEntry<EntityType<?>, EntityType<GungnirEntity>> GUNGNIR = ENTITIES.register("gungnir",
             () -> EntityType.Builder.<GungnirEntity>of(GungnirEntity::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .fireImmune()
@@ -259,7 +260,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("gungnir"));
     /** Huginn or Muninn, one of Odin's two ravens (never saved). */
-    public static final DeferredHolder<EntityType<?>, EntityType<RavenEntity>> RAVEN = ENTITIES.register("raven",
+    public static final RegEntry<EntityType<?>, EntityType<RavenEntity>> RAVEN = ENTITIES.register("raven",
             () -> EntityType.Builder.<RavenEntity>of(RavenEntity::new, MobCategory.MISC)
                     .sized(0.5F, 0.4F)
                     .clientTrackingRange(10)
@@ -269,7 +270,7 @@ public final class ModEntities {
                     .build("raven"));
     // ===== hela (3.5) =====
     /** A Shadow of Hela of the Guardian's Watch (lane L2 spawns them; lane L4 owns the entity). Never saved. */
-    public static final DeferredHolder<EntityType<?>, EntityType<HelaShadowEntity>> HELA_SHADOW = ENTITIES.register("hela_shadow",
+    public static final RegEntry<EntityType<?>, EntityType<HelaShadowEntity>> HELA_SHADOW = ENTITIES.register("hela_shadow",
             () -> EntityType.Builder.<HelaShadowEntity>of(HelaShadowEntity::new, MobCategory.MISC)
                     .sized(0.5F, 0.6F)
                     .fireImmune()
@@ -278,7 +279,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("hela_shadow"));
     /** Hela, the boss of the throne room (lane L4): made only by her fight. */
-    public static final DeferredHolder<EntityType<?>, EntityType<HelaEntity>> HELA = ENTITIES.register("hela",
+    public static final RegEntry<EntityType<?>, EntityType<HelaEntity>> HELA = ENTITIES.register("hela",
             () -> EntityType.Builder.<HelaEntity>of(HelaEntity::new, MobCategory.MONSTER)
                     .sized(0.7F, 2.1F)
                     .eyeHeight(1.85F)
@@ -289,7 +290,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("hela"));
     /** A berserker of her army (the boss's waves, the hero's Raise the Dead). Never saved. */
-    public static final DeferredHolder<EntityType<?>, EntityType<BerserkerEntity>> BERSERKER = ENTITIES.register("berserker",
+    public static final RegEntry<EntityType<?>, EntityType<BerserkerEntity>> BERSERKER = ENTITIES.register("berserker",
             () -> EntityType.Builder.<BerserkerEntity>of(BerserkerEntity::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.95F)
                     .clientTrackingRange(10)
@@ -297,7 +298,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("berserker"));
     /** Fenris, her giant wolf. Never saved. */
-    public static final DeferredHolder<EntityType<?>, EntityType<FenrisEntity>> FENRIS = ENTITIES.register("fenris",
+    public static final RegEntry<EntityType<?>, EntityType<FenrisEntity>> FENRIS = ENTITIES.register("fenris",
             () -> EntityType.Builder.<FenrisEntity>of(FenrisEntity::new, MobCategory.MONSTER)
                     .sized(1.6F, 2.4F)
                     .eyeHeight(2.0F)
@@ -306,7 +307,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("fenris"));
     /** A necrosword in flight, or hanging over a Blade Rain. */
-    public static final DeferredHolder<EntityType<?>, EntityType<NecroswordEntity>> NECROSWORD = ENTITIES.register("necrosword",
+    public static final RegEntry<EntityType<?>, EntityType<NecroswordEntity>> NECROSWORD = ENTITIES.register("necrosword",
             () -> EntityType.Builder.<NecroswordEntity>of(NecroswordEntity::new, MobCategory.MISC)
                     .sized(0.4F, 0.4F)
                     .clientTrackingRange(8)
@@ -315,7 +316,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("necrosword"));
     /** A spike of a Blade Wall or a Blade Burst: solid while it stands. */
-    public static final DeferredHolder<EntityType<?>, EntityType<BladeSpikeEntity>> BLADE_SPIKE = ENTITIES.register("blade_spike",
+    public static final RegEntry<EntityType<?>, EntityType<BladeSpikeEntity>> BLADE_SPIKE = ENTITIES.register("blade_spike",
             () -> EntityType.Builder.<BladeSpikeEntity>of(BladeSpikeEntity::new, MobCategory.MISC)
                     .sized(0.7F, 1.7F)
                     .clientTrackingRange(8)
@@ -325,7 +326,7 @@ public final class ModEntities {
                     .build("blade_spike"));
     // ===== asgardians (3.5) =====
     /** An Asgardian of any role (lane L5). Saved; the keeper makes and keeps them. */
-    public static final DeferredHolder<EntityType<?>, EntityType<AsgardianEntity>> ASGARDIAN = ENTITIES.register("asgardian",
+    public static final RegEntry<EntityType<?>, EntityType<AsgardianEntity>> ASGARDIAN = ENTITIES.register("asgardian",
             () -> EntityType.Builder.<AsgardianEntity>of(AsgardianEntity::new, MobCategory.MISC)
                     .sized(0.6F, 1.8F)
                     .clientTrackingRange(10)
@@ -334,7 +335,7 @@ public final class ModEntities {
     // ===== strange (3.6) =====
     // (The skeleton registers every entity of 3.6, drawn as nothing or as a placeholder; each lane owns its classes.)
     /** One ring of a pair of Sling-Ring portals (lane L3). Never saved. */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.strange.SlingPortalEntity>> SLING_PORTAL =
             ENTITIES.register("sling_portal",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.strange.SlingPortalEntity>of(
@@ -345,7 +346,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("sling_portal"));
     /** Doctor Strange's kneeling body while his spirit is out (lane L3). Never saved. */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.strange.AstralBodyEntity>> ASTRAL_BODY =
             ENTITIES.register("astral_body",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.strange.AstralBodyEntity>of(
@@ -357,7 +358,7 @@ public final class ModEntities {
                     .build("astral_body"));
     // ===== vormir (3.6) =====
     /** The Stonekeeper of the Vormir Cliff (lane L5). Saved (the cliff's template places him). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.vormir.StonekeeperEntity>> STONEKEEPER =
             ENTITIES.register("stonekeeper",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.vormir.StonekeeperEntity>of(
@@ -368,7 +369,7 @@ public final class ModEntities {
                     .build("stonekeeper"));
     // ===== hulk (3.6) =====
     /** The boulder the Hulk throws (lane L7). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.hulk.HulkBoulderEntity>> HULK_BOULDER =
             ENTITIES.register("hulk_boulder",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.hulk.HulkBoulderEntity>of(
@@ -380,7 +381,7 @@ public final class ModEntities {
                     .build("hulk_boulder"));
     // ===== hydra (3.6) =====
     /** A Hydra soldier: a rifleman, an enforcer or a sniper (lane L8). A monster; saved. */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.hydra.HydraSoldierEntity>> HYDRA_SOLDIER =
             ENTITIES.register("hydra_soldier",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.hydra.HydraSoldierEntity>of(
@@ -389,7 +390,7 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .build("hydra_soldier"));
     /** A Hydra officer (lane L8). A monster; saved. */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.hydra.HydraOfficerEntity>> HYDRA_OFFICER =
             ENTITIES.register("hydra_officer",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.hydra.HydraOfficerEntity>of(
@@ -398,7 +399,7 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .build("hydra_officer"));
     /** A Hydra energy bolt (lane L8). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.hydra.HydraBoltEntity>> HYDRA_BOLT =
             ENTITIES.register("hydra_bolt", () -> EntityType.Builder.<com.kolodkingal.enhanced.hydra.HydraBoltEntity>of(
                             com.kolodkingal.enhanced.hydra.HydraBoltEntity::new, MobCategory.MISC)
@@ -413,7 +414,7 @@ public final class ModEntities {
     // ===== deadpool (3.7) =====
     // (The skeleton registers every entity of 3.7, drawn as nothing or as a placeholder; each lane owns its classes.)
     /** One of Deadpool's bullets (lane L3). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.deadpool.DeadpoolBulletEntity>> DEADPOOL_BULLET =
             ENTITIES.register("deadpool_bullet",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.deadpool.DeadpoolBulletEntity>of(
@@ -424,7 +425,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("deadpool_bullet"));
     /** Dogpool, Deadpool's dog (lane L3). Not saved for long: he goes home after his time. */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.deadpool.DogpoolEntity>> DOGPOOL =
             ENTITIES.register("dogpool",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.deadpool.DogpoolEntity>of(
@@ -440,7 +441,7 @@ public final class ModEntities {
      * AGATHA, NICKY, RIO), so the cottage has their talk, trades, DOWN rule and voices. Saved; the cottage's keeper
      * makes and keeps them.
      */
-    public static final DeferredHolder<EntityType<?>, EntityType<AsgardianEntity>> COTTAGE_RESIDENT =
+    public static final RegEntry<EntityType<?>, EntityType<AsgardianEntity>> COTTAGE_RESIDENT =
             ENTITIES.register("cottage_resident",
                     () -> EntityType.Builder.<AsgardianEntity>of(AsgardianEntity::new, MobCategory.MISC)
                     .sized(0.6F, 1.8F)
@@ -451,7 +452,7 @@ public final class ModEntities {
     // (The skeleton registers every entity of 3.8, drawn as nothing or as a placeholder box; each lane owns its
     // classes.)
     /** Captain America's thrown shield (lane L1). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.captain.ThrownShieldEntity>> THROWN_SHIELD =
             ENTITIES.register("thrown_shield",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.captain.ThrownShieldEntity>of(
@@ -463,7 +464,7 @@ public final class ModEntities {
                     .build("thrown_shield"));
     // ===== iron_man (3.8) =====
     /** A rocket or mini-missile of Iron Man's suits (lane L3; the homing lane L4). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.ironman.IronMissileEntity>> IRON_MISSILE =
             ENTITIES.register("iron_missile",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.IronMissileEntity>of(
@@ -475,7 +476,7 @@ public final class ModEntities {
                     .build("iron_missile"));
     // ===== nanotech (3.8) =====
     /** A nanotech drone of the Mark 85 (lane L4). Not saved for long: it ends with its Iron Man. */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity>> NANO_DRONE =
             ENTITIES.register("nano_drone",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity>of(
@@ -486,7 +487,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("nano_drone"));
     /** The Hulkbuster's frame that Veronica drops (lane L4). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterFrameEntity>> HULKBUSTER_FRAME =
             ENTITIES.register("hulkbuster_frame",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterFrameEntity>of(
@@ -498,7 +499,7 @@ public final class ModEntities {
                     .build("hulkbuster_frame"));
     // ===== falcon (3.8) =====
     /** Falcon's Wrist Rocket (lane L5): the class of Iron Man's missiles, a type of its own. */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.ironman.IronMissileEntity>> FALCON_ROCKET =
             ENTITIES.register("falcon_rocket",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.ironman.IronMissileEntity>of(
@@ -509,7 +510,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("falcon_rocket"));
     /** One of Falcon's energy darts (lane L5). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.falcon.FalconDartEntity>> FALCON_DART =
             ENTITIES.register("falcon_dart",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.falcon.FalconDartEntity>of(
@@ -520,7 +521,7 @@ public final class ModEntities {
                     .noSummon()
                     .build("falcon_dart"));
     /** Redwing, Falcon's drone (lane L5). */
-    public static final DeferredHolder<EntityType<?>,
+    public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.falcon.RedwingEntity>> REDWING =
             ENTITIES.register("redwing",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.falcon.RedwingEntity>of(
@@ -530,7 +531,7 @@ public final class ModEntities {
                     .build("redwing"));
     // ===== eternity (3.8) =====
     /** Eternity, in his realm (lane L8): one per realm, kept by {@code EternityRealm}. */
-    public static final DeferredHolder<EntityType<?>, EntityType<com.kolodkingal.enhanced.eternity.EternityEntity>>
+    public static final RegEntry<EntityType<?>, EntityType<com.kolodkingal.enhanced.eternity.EternityEntity>>
             ETERNITY = ENTITIES.register("eternity",
                     () -> EntityType.Builder.<com.kolodkingal.enhanced.eternity.EternityEntity>of(
                             com.kolodkingal.enhanced.eternity.EternityEntity::new, MobCategory.MISC)

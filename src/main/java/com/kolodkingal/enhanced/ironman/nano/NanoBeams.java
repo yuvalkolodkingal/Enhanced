@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.ironman.SuitEnergy;
 import com.kolodkingal.enhanced.network.BeamPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -24,8 +25,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
-
 
 /**
  * The held beams of the nanotech suits and the Hulkbuster (3.8, lane L4): the Mark 50's Unibeam (the first creature
@@ -147,7 +146,7 @@ public final class NanoBeams {
         } else {
             data.set(Live.BEAMING, false);
             BeamStyle style = kind == CHEST_LASER ? AvengersBeams.CHEST_LASER : AvengersBeams.HULKBUSTER_UNIBEAM;
-            PacketDistributor.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(),
+            Net.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(),
                     player.getZ(), 96.0, new BeamPayload(player.getId(), style.id(), 0.0F, false));
         }
     }
@@ -167,7 +166,7 @@ public final class NanoBeams {
     }
 
     private static void payload(ServerPlayer player, Spec spec, boolean on) {
-        PacketDistributor.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(),
+        Net.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(),
                 96.0, new BeamPayload(player.getId(), spec.style().id(), (float) spec.range(), on));
     }
 

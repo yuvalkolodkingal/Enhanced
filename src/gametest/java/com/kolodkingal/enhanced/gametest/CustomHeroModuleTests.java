@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
@@ -16,13 +15,13 @@ import com.kolodkingal.enhanced.custom.ModuleStats;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.modules.MindPowers;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -39,8 +38,6 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -55,8 +52,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * test makes a hero of one power on key R, strength 10 unless it says otherwise, against creatures with no AI (so nothing
  * moves by itself).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomHeroModuleTests {
     private static final String BATCH = "custom_modules";
 
@@ -80,7 +75,7 @@ public final class CustomHeroModuleTests {
     }
 
     static Zombie zombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setNoAi(true);
         zombie.setPersistenceRequired();
         return zombie;
@@ -100,12 +95,12 @@ public final class CustomHeroModuleTests {
 
     // ---- the hero itself ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void becomingAHeroSavesTheDefinitionAndSyncsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.FLIGHT, "jet", 5);
         check(Powers.power(player) == Power.CUSTOM, "he is a custom hero");
-        CustomHero hero = player.getData(ModAttachments.CUSTOM_HERO);
+        CustomHero hero = ModAttachments.CUSTOM_HERO.get(player);
         check(hero.name().equals("Tester") && hero.has(PowerModule.FLIGHT), "his definition is on him");
         check(Powers.color(player) == 0x3FA9F5 && Powers.glow(player) == 0xE0F4FF, "his colours are his look's");
         check(player.mayFly(), "Flight lets him fly");
@@ -113,11 +108,11 @@ public final class CustomHeroModuleTests {
         press(player);
         check(player.getAbilities().flying, "R takes off");
         Powers.setPower(player, Power.NONE);
-        check(!player.mayFly() && player.getData(ModAttachments.CUSTOM_HERO).has(PowerModule.FLIGHT), "losing the power keeps the definition");
+        check(!player.mayFly() && ModAttachments.CUSTOM_HERO.get(player).has(PowerModule.FLIGHT), "losing the power keeps the definition");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aFreeKeyOrASuppressedHeroDoesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.SUPER_SPEED, "run", 5);
@@ -131,7 +126,7 @@ public final class CustomHeroModuleTests {
 
     // ---- the body ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void superStrengthPunchesSlamsAndLeaps(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.SUPER_STRENGTH, "punch", 10);
@@ -156,7 +151,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void durabilityArmoursOrAddsHealth(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.DURABILITY, "armor", 10);
@@ -168,7 +163,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHealingFactorHealsSteadilyOrAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.HEALING, "steady", 10);
@@ -184,7 +179,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void shapeshiftingGrowsShrinksAndTakesACreaturesShape(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.SHAPESHIFT, "grow", 4);
@@ -206,7 +201,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void invisibilityHidesHimFromEyesAndMonsters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.INVISIBILITY, "full", 10);
@@ -222,7 +217,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void phasingPassesThroughWallsOrLetsBlowsThrough(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.PHASING, "phase", 10);
@@ -240,7 +235,7 @@ public final class CustomHeroModuleTests {
 
     // ---- moving ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void superSpeedRunsAndBlitzes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, PowerModule.SUPER_SPEED, "run", 10);
@@ -261,7 +256,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void teleportationBlinksAndAppearsBehind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, PowerModule.TELEPORT, "blink", 2);
@@ -277,7 +272,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void wallCrawlingStartsOnAndForgivesTheFall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         helper.setBlock(new BlockPos(11, 2, 10), Blocks.STONE);
@@ -293,7 +288,7 @@ public final class CustomHeroModuleTests {
 
     // ---- energy ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void energyBlastBoltsBurstsAndBeams(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, PowerModule.ENERGY_BLAST, "bolts", 10);
@@ -313,7 +308,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theForceFieldTakesHitsAndBreaks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.FORCE_FIELD, "bubble", 1);
@@ -332,7 +327,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void magicBoltsWardsAndCurses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, PowerModule.MAGIC, "bolts", 10);
@@ -351,7 +346,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void absorptionStoresEnergyAndLetsItOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.ABSORPTION, "energy", 2);
@@ -369,7 +364,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "custom_modules_pvp")
+    @EnhancedTest(template = ARENA, batch = "custom_modules_pvp")
     public static void powerAbsorptionTakesAHerosPowers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -383,7 +378,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSonicScreamConeAndRing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.SONIC_SCREAM, "cone", 10);
@@ -401,7 +396,7 @@ public final class CustomHeroModuleTests {
 
     // ---- the elements ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void fireBurnsOthersAndNeverHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, PowerModule.FIRE, "fireball", 10);
@@ -423,7 +418,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void iceFreezesAndMakesAPath(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, PowerModule.ICE, "freeze_ray", 10);
@@ -443,7 +438,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void lightningStrikesAndChains(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, PowerModule.LIGHTNING, "chain", 10);
@@ -461,7 +456,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void waterPushesWavesAndBreathes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.WATER, "wave", 10);
@@ -481,7 +476,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void earthShakesAndThrowsSpikesWithoutChangingABlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.EARTH, "tremor", 10);
@@ -498,7 +493,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void windGustsLiftsAndSoftensFalls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.WIND, "gust", 10);
@@ -512,7 +507,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void weatherControlCallsAStormOnTheMonsters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.WEATHER, "storm", 10);
@@ -524,7 +519,7 @@ public final class CustomHeroModuleTests {
     }
 
     /** Weather "cycle" turns the world's weather (a batch of its own: it changes the whole world). */
-    @GameTest(template = ARENA, batch = "custom_modules_weather")
+    @EnhancedTest(template = ARENA, batch = "custom_modules_weather")
     public static void weatherControlCyclesTheWorldsWeather(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         net.minecraft.server.level.ServerLevel level = helper.getLevel();
@@ -545,7 +540,7 @@ public final class CustomHeroModuleTests {
 
     // ---- the mind ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void superSensesSeeInTheDarkAndThroughWalls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.SUPER_SENSES, "night", 10);
@@ -562,7 +557,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void telepathySensesAndReadsMinds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.TELEPATHY, "sense", 10);
@@ -576,7 +571,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "custom_modules_tk")
+    @EnhancedTest(template = ARENA, batch = "custom_modules_tk")
     public static void telekinesisIsTheSharedOneInHisColour(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -591,7 +586,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void mindControlMakesAllyAndCalmsMonsters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.MIND_CONTROL, "ally", 10);
@@ -612,11 +607,11 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void animalControlMakesAPack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.ANIMAL_CONTROL, "pack", 10);
-        Cow cow = helper.spawn(EntityType.COW, new Vec3(6.5, FLOOR, 12.5));
+        Cow cow = TestKit.spawn(helper, EntityType.COW, new Vec3(6.5, FLOOR, 12.5));
         Zombie z = zombie(helper, 10.5, 10.5);
         aim(player, z);
         press(player);
@@ -625,7 +620,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void duplicationConjuresCopiesThatFight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.DUPLICATION, "clones", 10);
@@ -638,7 +633,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void technopathyFlipsDoorsAndLeversAndCommandsGolems(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos door = new BlockPos(7, 2, 10);
@@ -652,13 +647,13 @@ public final class CustomHeroModuleTests {
         check(helper.getBlockState(door).getValue(BlockStateProperties.OPEN), "the door opened");
         check(helper.getBlockState(lever).getValue(BlockStateProperties.POWERED), "the lever flipped");
         become(player, PowerModule.TECHNOPATHY, "command", 10);
-        IronGolem golem = helper.spawn(EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, 12.5));
+        IronGolem golem = TestKit.spawn(helper, EntityType.IRON_GOLEM, new Vec3(12.5, FLOOR, 12.5));
         press(player);
         check(MindPowers.control(golem) != null && MindPowers.control(golem).kind() == MindPowers.Kind.ALLY, "the golem obeys");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void timeSlowsStopsAndRewinds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.TIME, "stop", 10);
@@ -685,7 +680,7 @@ public final class CustomHeroModuleTests {
 
     // ---- the creator's buttons ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyCreativePlayersAndOperatorsMayUseTheCreator(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer survivor = f.player(5.5, FLOOR, 5.5);
@@ -702,7 +697,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "custom_modules_config")
+    @EnhancedTest(template = ARENA, batch = "custom_modules_config")
     public static void theServerCanSwitchTheCreatorOffAndLimitIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(CustomHeroConfig.ENABLED, false);
@@ -723,7 +718,7 @@ public final class CustomHeroModuleTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void deathEndsHeldPowersAndLogoutForgetsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 5.5, 10.5, PowerModule.FORCE_FIELD, "reflect", 5);

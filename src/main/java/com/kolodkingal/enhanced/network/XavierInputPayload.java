@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MindLink;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server, from Professor X while his mind is in another body (3.3), once a tick: what his keys and his mouse
@@ -42,7 +42,7 @@ public record XavierInputPayload(float forward, float strafe, boolean jump, bool
         return TYPE;
     }
 
-    static void handle(XavierInputPayload payload, IPayloadContext context) {
+    static void handle(XavierInputPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             MindLink.input(player, payload);
         }

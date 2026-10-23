@@ -2,13 +2,13 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SpiderServer;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server (3.3): what the local Spider-Man's Web Assist did. His own client moves him and chooses the anchor
@@ -45,7 +45,7 @@ public record SpiderSwingPayload(int action, Vec3 anchor, int face, float rope, 
         return TYPE;
     }
 
-    static void handle(SpiderSwingPayload payload, IPayloadContext context) {
+    static void handle(SpiderSwingPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             SpiderServer.onAssist(player, payload.action(), payload.anchor(), payload.face(), payload.rope(), payload.sky());
         }

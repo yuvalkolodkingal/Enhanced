@@ -110,7 +110,7 @@ public class EternityAltarBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
                                                                   BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ModBlockEntities.ETERNITY_ALTAR.get(),
+        return level.isClientSide() ? null : createTickerHelper(type, ModBlockEntities.ETERNITY_ALTAR.get(),
                 EternityAltarBlockEntity::serverTick);
     }
 
@@ -145,7 +145,7 @@ public class EternityAltarBlock extends BaseEntityBlock {
         if (player instanceof ServerPlayer server) {
             use(server, (ServerLevel) level, pos);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -154,7 +154,7 @@ public class EternityAltarBlock extends BaseEntityBlock {
         if (player instanceof ServerPlayer server) {
             use(server, (ServerLevel) level, pos);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     /** The server's side of a click: the wishing stone's screen in the realm, else the way in. */

@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.RoadMusicPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.road.EndingHall;
@@ -15,25 +15,20 @@ import com.kolodkingal.enhanced.road.copy.StructureCopyChallenge;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** The music of the Witches' Road (3.3, lane WORLD): which stage plays where, and what the client is told. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadMusicTests {
 
-    @GameTest(template = ARENA, batch = WorldStructureTests.BATCH)
+    @EnhancedTest(template = ARENA, batch = WorldStructureTests.BATCH)
     public static void everyStageHasItsOwnLoop(GameTestHelper helper) {
         check(RoadMusic.soundOf(RoadMusic.NONE) == null, "no music off the Road");
         check(RoadMusic.soundOf(RoadMusic.ENTRANCE) == ModSounds.ROAD_MUSIC_ENTRANCE.get(), "the entrance");
@@ -52,7 +47,7 @@ public final class RoadMusicTests {
     }
 
     /** At the door the entrance plays, then the first trial's music, and nothing once he has left the Road. */
-    @GameTest(template = ARENA, batch = "road_door", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "road_door", timeoutTicks = 400)
     public static void theMusicFollowsTheSeekerDownTheRoad(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         BlockPos rel = new BlockPos(10, 2, 10);

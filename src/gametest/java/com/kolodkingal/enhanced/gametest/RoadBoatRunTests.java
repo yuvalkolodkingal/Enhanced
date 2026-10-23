@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadDimension;
 import com.kolodkingal.enhanced.road.RoadLayout;
 import com.kolodkingal.enhanced.road.RoadProgress;
@@ -10,7 +10,6 @@ import com.kolodkingal.enhanced.road.RoadTrials;
 import com.kolodkingal.enhanced.road.boat.IceBoatChallenge;
 import com.kolodkingal.enhanced.road.boat.IceTrack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,8 +17,6 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
@@ -29,8 +26,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * client of a player does, on the boat of the trial, with the real physics of the game ({@link RealBoat}), while the Road itself runs
  * as it does for a player (checkpoints, falls, the finish). The driver finishes the whole course on its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadBoatRunTests {
     static final String BATCH = "road_boat_run";
 
@@ -69,7 +64,7 @@ public final class RoadBoatRunTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 3200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 3200)
     public static void aDriverSailsTheWholeCourseOnTheRealBoatAndWinsTheTrial(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerLevel road = RoadDimension.level(helper.getLevel().getServer());
@@ -106,7 +101,7 @@ public final class RoadBoatRunTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_boat_gap", timeoutTicks = 1200)
+    @EnhancedTest(template = ARENA, batch = "road_boat_gap", timeoutTicks = 1200)
     public static void aBoatThatIsTooSlowForTheShortcutFallsIntoTheGapAndIsPutBackAtTheCheckpoint(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerLevel road = RoadDimension.level(helper.getLevel().getServer());

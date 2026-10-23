@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.Telekinesis;
@@ -11,6 +10,7 @@ import com.kolodkingal.enhanced.apocalypse.MindPower;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -18,7 +18,6 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -33,8 +32,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +54,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * breaker by the server, and the Apocalypse hero are not changed; and his health never mends, though his shield still
  * does. Every test has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ApocalypseCritTests {
     /** Ticks after which one attacker's critical hit is seen and heard again. */
     private static final int CRIT_GAP = ApocalypseEntity.CRIT_EFFECT_TICKS + 1;
@@ -69,13 +64,13 @@ public final class ApocalypseCritTests {
      * what is left); on a fresh shield her Mind Control removes 50 and her Psionic Field 120; a borrowed block of 10.4
      * removes {@code 10.4 x 0.5 x 2}.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_crit_shield", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_crit_shield", timeoutTicks = 80)
     public static void mindPowerIsCriticalToHisShield(GameTestHelper helper) {
         shieldWear(helper, true);
     }
 
     /** T63 with the three factors 1.0: the 3.0 numbers (5, 8, 25, 60, 5.2) and no crit effect. */
-    @GameTest(template = ARENA, batch = "apocalypse_crit_off", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_crit_off", timeoutTicks = 80)
     public static void mindPowerIsNotCriticalWithTheFactorsAtOne(GameTestHelper helper) {
         shieldWear(helper, false);
     }
@@ -156,7 +151,7 @@ public final class ApocalypseCritTests {
      * shows nothing more, a third 10 ticks after the first shows it again; Magneto's slam, on the shield or on his
      * body, shows none.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_crit_fx", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_crit_fx", timeoutTicks = 80)
     public static void aCritIsSeenAndHeard(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -245,7 +240,7 @@ public final class ApocalypseCritTests {
      * in the true form the same ratio, without the 1.25; the floor of the phase still stops both; the 12 % cap still
      * caps a Phoenix's Burst.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_crit_body", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_crit_body", timeoutTicks = 60)
     public static void theirHitsAreCriticalOnHisBodyAndOthersWeak(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -304,7 +299,7 @@ public final class ApocalypseCritTests {
      * player, his shield up) hit by Wanda's beam loses exactly {@link MindPower#shieldDamage} (as in 3.0), and she sees
      * no crit.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_crit_billy", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_crit_billy", timeoutTicks = 60)
     public static void billyAndTheHeroGetNoCrit(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.BILLY);
         d.f().onClose(Telekinesis::clear);
@@ -348,7 +343,7 @@ public final class ApocalypseCritTests {
      * (nor by the game's own healing, a potion's); in the true form at 30 %, 200 ticks after a blow, it does not
      * either; and his shield, worn to 30, still mends once it has had 160 ticks without mind power.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_no_regen", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_no_regen", timeoutTicks = 500)
     public static void heNeverHealsByDefault(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);

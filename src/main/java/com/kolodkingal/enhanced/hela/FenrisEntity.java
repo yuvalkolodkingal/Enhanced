@@ -125,7 +125,7 @@ public class FenrisEntity extends ArmyMob {
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide && action() != ACT_NONE) {
+        if (!level().isClientSide() && action() != ACT_NONE) {
             float t = actionTime(0.0F);
             int length = switch (action()) {
                 case ACT_POUNCE -> POUNCE_TICKS;

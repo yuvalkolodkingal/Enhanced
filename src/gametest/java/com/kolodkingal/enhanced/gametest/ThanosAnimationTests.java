@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
@@ -12,14 +11,12 @@ import com.kolodkingal.enhanced.client.render.Stance;
 import com.kolodkingal.enhanced.client.render.ThanosBossPoses;
 import com.kolodkingal.enhanced.client.render.ThanosGestures;
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -37,8 +34,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * and the fact that he has no flight profile. What the poses, the hands in first person and the flourishes look like
  * in the world is checked by eye in a real game (the {@code /enhanced_anim} tools freeze each pose).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosAnimationTests {
     private static final String BATCH = "thanos_anim";
 
@@ -78,7 +73,7 @@ public final class ThanosAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The gestures
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisElevenGesturesAreTimedAsDesigned(GameTestHelper helper) {
         // id, group, duration, attack, release, force (the table of the design, section 15.12)
         Object[][] table = {
@@ -111,7 +106,7 @@ public final class ThanosAnimationTests {
      * The Gauntlet is on the off arm, so every gesture of his drives it; the main arm only balances (the Blast, the
      * Pull), or joins in for the four that use both hands (the Slam, the Veil closing and opening, the Time Lock).
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGauntletArmDrivesEveryGestureAndTheMainArmOnlyBalancesOrJoinsIn(GameTestHelper helper) {
         for (GestureId id : HIS) {
             check(!Gestures.get(id).o.isEmpty(), id + " drives the arm the Gauntlet is on");
@@ -137,7 +132,7 @@ public final class ThanosAnimationTests {
     }
 
     /** No key throws an arm somewhere an arm cannot go (the model's arm turns from 190 degrees overhead to 60 behind). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void noKeyAsksAnArmForAnImpossibleAngle(GameTestHelper helper) {
         for (GestureId id : HIS) {
             Gestures.Def def = Gestures.get(id);
@@ -164,7 +159,7 @@ public final class ThanosAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBlastIsAThrustAtTheAimAndTheSlamIsRaisedOverheadAndDrivenDown(GameTestHelper helper) {
         Gestures.Def blast = Gestures.get(GestureId.THANOS_BLAST);
         Gestures.ArmKey thrust = keyAt(blast.o, 2);
@@ -188,7 +183,7 @@ public final class ThanosAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSpaceStoneDrawsACircleAndDragsBack(GameTestHelper helper) {
         Gestures.Def step = Gestures.get(GestureId.THANOS_STEP);
         float[] x = new float[5];
@@ -210,7 +205,7 @@ public final class ThanosAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFlickTheSightAndTheTimeStoneEachHaveTheirOwnMove(GameTestHelper helper) {
         Gestures.Def warp = Gestures.get(GestureId.THANOS_WARP);
         check(keyAt(warp.o, 2).mode == Gestures.Mode.AIM && keyAt(warp.o, 6).mode == Gestures.Mode.AIM, "the flick is aimed at the creature he looks at");
@@ -242,7 +237,7 @@ public final class ThanosAnimationTests {
      * The Veil's closing gesture ends on the pose of the stance that takes over: the Gauntlet arm held, the main arm
      * spread by the stance's own added angle, the head back as the stance has it; and the opening begins from it.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theVeilClosesIntoItsStanceAndOpensOutOfIt(GameTestHelper helper) {
         Gestures.Def on = Gestures.get(GestureId.THANOS_VEIL_ON);
         assertPose(pose(last(on.o)), ThanosGestures.VEIL_O, 1.0E-4, "the Veil closes with the Gauntlet hand where the stance holds it");
@@ -258,7 +253,7 @@ public final class ThanosAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDrainsChainLashesOutAndHandsOverToItsStance(GameTestHelper helper) {
         Gestures.Def cast = Gestures.get(GestureId.THANOS_DRAIN_CAST);
         Gestures.ArmKey end = last(cast.o);
@@ -274,7 +269,7 @@ public final class ThanosAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLeanOfTheDrainIsTheStancesAndGoesWithItsWeight(GameTestHelper helper) {
         HeroAnimState state = new HeroAnimState(UUID.randomUUID());
         assertNear(hero().lean(state), 0.0, 1.0E-6, "no stance, no lean");
@@ -289,7 +284,7 @@ public final class ThanosAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisStancesFollowTheVeilAndTheDrain(GameTestHelper helper) {
         PowerData data = new PowerData();
         boolean[] on = new boolean[Stance.COUNT];
@@ -313,7 +308,7 @@ public final class ThanosAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The routes
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisAbilitiesAreActedAndNoneIsPending(GameTestHelper helper) {
         String[] expected = {"cooldown", "cooldown", "cooldown", "live:SOUL_DRAINING", "cooldown"};
         for (int ability = 1; ability <= 5; ability++) {
@@ -351,7 +346,7 @@ public final class ThanosAnimationTests {
     }
 
     /** The two small probes of the completeness check (1 and 99 ticks left), and what each ability answers. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCooldownThatJustBeganIsTheFirstUseOfItsKey(GameTestHelper helper) {
         for (long left : new long[]{1, 99}) {
             check(GestureRoutes.cooldown(Power.THANOS, 1, left) == GestureId.THANOS_BLAST, "R with " + left + " left is the Blast");
@@ -367,7 +362,7 @@ public final class ThanosAnimationTests {
      * The two uses of R, G and N start cooldowns of different lengths; what is left when the data arrives (a few ticks
      * short of the whole) tells them apart, by whichever configured cooldown it is nearer to.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLengthOfACooldownTellsTheTwoUsesOfAKeyApart(GameTestHelper helper) {
         int blast = ThanosConfig.POWER_BLAST_COOLDOWN.get();
         int slam = ThanosConfig.SLAM_COOLDOWN.get();
@@ -405,7 +400,7 @@ public final class ThanosAnimationTests {
      * his states. (The completeness check probes two small cooldowns and so reaches only the first use of a key; the
      * second use of R, G and N is declared as started elsewhere, and this proves that it is.)
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyGestureOfHisIsStartedBySomething(GameTestHelper helper) {
         Set<GestureId> reached = EnumSet.noneOf(GestureId.class);
         int[] cooldowns = {ThanosConfig.POWER_BLAST_COOLDOWN.get(), ThanosConfig.SLAM_COOLDOWN.get(), ThanosConfig.SPACE_STEP_COOLDOWN.get(),
@@ -441,7 +436,7 @@ public final class ThanosAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The key presses
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisKeyPressesActBeforeTheServerAnswersOnlyWhereTheyWillWork(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000L;
@@ -498,7 +493,7 @@ public final class ThanosAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // Flight, the walk and the landing
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void heDoesNotFlyAndHasNoFlightProfile(GameTestHelper helper) {
         check(!Power.THANOS.canFly(), "Thanos does not fly");
         check(FlightProfile.of(Power.THANOS, false) == null, "so he has no flight profile: no take-off, banking or braking");
@@ -510,7 +505,7 @@ public final class ThanosAnimationTests {
      * A Titan's landing is for a fall of more than three blocks: just after nine ticks of falling, when the speed
      * first passes 0.6 blocks per tick. A drop from a fence or a stair is nothing, as it is for anyone.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aLandingIsATitansFromMoreThanThreeBlocks(GameTestHelper helper) {
         double speed = 0.0;
         double fallen = 0.0;
@@ -542,7 +537,7 @@ public final class ThanosAnimationTests {
      * sword where it was (the rate times the age of the entity jumped by the whole age whenever the rate changed), the
      * angle stays within a turn, and a stalled frame is not a spin.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBossSwordTurnsWithoutJumping(GameTestHelper helper) {
         float angle = 0.0F;
         for (int frame = 0; frame < 40; frame++) {

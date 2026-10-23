@@ -37,12 +37,12 @@ public class CapstoneItem extends Item {
             return InteractionResult.PASS;
         }
         if (!player.isShiftKeyDown()) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.displayClientMessage(Component.translatable("message.enhanced.apocalypse.capstone_use"), true);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.sidedSuccess(level.isClientSide());
         }
-        if (player instanceof ServerPlayer starter && !level.isClientSide) {
+        if (player instanceof ServerPlayer starter && !level.isClientSide()) {
             ApocalypseLane.startedBy(context.getClickedPos());
             try {
                 BossFights.start(BossKind.APOCALYPSE, starter, false);
@@ -50,12 +50,12 @@ public class CapstoneItem extends Item {
                 ApocalypseLane.startedBy(null);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             player.displayClientMessage(Component.translatable("message.enhanced.apocalypse.capstone_use"), true);
         }
         return InteractionResultHolder.pass(player.getItemInHand(hand));

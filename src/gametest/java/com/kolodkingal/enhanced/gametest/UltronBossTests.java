@@ -1,10 +1,10 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.gametest.UltronTestSupport.Log;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.ultron.UltronAttack;
@@ -13,7 +13,6 @@ import com.kolodkingal.enhanced.ultron.UltronBrain;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronState;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,8 +25,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -50,8 +47,6 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.tank;
  * six attacks (every one tells before it hurts, every aim is fixed at its moment), how the next attack is chosen, and
  * how the heroes' powers meet the machines.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class UltronBossTests {
     /** Tests that start no fight and keep no server-wide state share one batch. */
     private static final String QUICK = "ultron";
@@ -59,7 +54,7 @@ public final class UltronBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The bodies
 
-    @GameTest(template = ARENA, batch = "solo_body_stats")
+    @EnhancedTest(template = ARENA, batch = "solo_body_stats")
     public static void bodyStats(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -135,7 +130,7 @@ public final class UltronBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "ultron_hits")
+    @EnhancedTest(template = ARENA, batch = "ultron_hits")
     public static void hitCapAndExplosionsAndEffects(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -222,7 +217,7 @@ public final class UltronBossTests {
         return before - boss.getHealth();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void immunityTags(GameTestHelper helper) {
         // The body is a boss: nothing that works on people works on it. The villains' pulls pass him by; telekinesis holds
         // him as a boss (3.1), so he is no longer in telekinesis_immune.
@@ -263,7 +258,7 @@ public final class UltronBossTests {
      * target who cannot be killed, and the first tick on which the target is hurt (or the first Sentry emerges) must
      * not come before the attack's tell is over, and the tell's own effect must have been sent before it.
      */
-    @GameTest(template = ARENA, batch = "ultron_tells", timeoutTicks = 1200)
+    @EnhancedTest(template = ARENA, batch = "ultron_tells", timeoutTicks = 1200)
     public static void tellsComeBeforeDamage(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -328,7 +323,7 @@ public final class UltronBossTests {
      * ring that appeared at their feet, the Punch goes along the line it began with. A target who moves after that is not
      * followed, and so is not hurt.
      */
-    @GameTest(template = ARENA, batch = "ultron_aim", timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = "ultron_aim", timeoutTicks = 900)
     public static void aimIsFixedAfterTheTell(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -435,7 +430,7 @@ public final class UltronBossTests {
         check(p0.distanceTo(p2) > 0.0, "the spots differ");
     }
 
-    @GameTest(template = ARENA, batch = "ultron_stagger", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "ultron_stagger", timeoutTicks = 500)
     public static void staggerAfterTheDive(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -495,7 +490,7 @@ public final class UltronBossTests {
      * Left to himself he hovers over the ground inside the island, keeps his distance from the one he hunts, and attacks
      * by the rule: never the same twice, the Beams and the Dive apart, a Volley after the stagger, each from its range.
      */
-    @GameTest(template = ARENA, batch = "ultron_hover", timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = "ultron_hover", timeoutTicks = 900)
     public static void theBodyHoversAndHunts(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -561,7 +556,7 @@ public final class UltronBossTests {
     }
 
     /** The rule that picks the next attack, as pure numbers. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void attackChoice(GameTestHelper helper) {
         RandomSource random = RandomSource.create(20240611L);
         long now = 10_000L;

@@ -31,6 +31,7 @@ import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.ChangeLookPayload;
 import com.kolodkingal.enhanced.network.HexActionPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -56,7 +57,6 @@ import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Optional;
 
@@ -288,7 +288,7 @@ public final class ClientEvents {
             lookClicked = true;
         }
         if (lookClicked && power.hasPowers() && mc.screen == null && !player.isSpectator()) {
-            PacketDistributor.sendToServer(new ChangeLookPayload(player.isShiftKeyDown() ? -1 : 1));
+            Net.sendToServer(new ChangeLookPayload(player.isShiftKeyDown() ? -1 : 1));
         }
         boolean visionClicked = false;
         while (KeyBindings.VISION_COMMAND.consumeClick()) {
@@ -315,12 +315,12 @@ public final class ClientEvents {
                     continue;
                 }
                 if (BifrostKeys.opensScreen(player, i, sneak)) { mc.setScreen(new BifrostScreen()); continue; }
-                PacketDistributor.sendToServer(new AbilityKeyPayload(i, true, sneak));
+                Net.sendToServer(new AbilityKeyPayload(i, true, sneak));
                 SENT_DOWN[i] = true;
                 HeroAnimator.predict(player, i);
             }
             if (!down && SENT_DOWN[i]) {
-                PacketDistributor.sendToServer(new AbilityKeyPayload(i, false, mc.options.keyShift.isDown()));
+                Net.sendToServer(new AbilityKeyPayload(i, false, mc.options.keyShift.isDown()));
                 SENT_DOWN[i] = false;
             }
         }
@@ -331,14 +331,14 @@ public final class ClientEvents {
      * calls him back to her side); with Shift, he holds his post, or follows her again.
      */
     private static void sendVisionOrder(LocalPlayer player) {
-        Optional<Hex> hex = player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID());
+        Optional<Hex> hex = ModAttachments.HEXES.get(player.level()).byOwner(player.getUUID());
         if (hex.isEmpty()) {
             return;
         }
         if (player.isShiftKeyDown()) {
-            PacketDistributor.sendToServer(new HexActionPayload(HexAction.SET_VISION_STAYS, Optional.empty(), hex.get().visionStays() ? 0 : 1));
+            Net.sendToServer(new HexActionPayload(HexAction.SET_VISION_STAYS, Optional.empty(), hex.get().visionStays() ? 0 : 1));
         } else {
-            PacketDistributor.sendToServer(new HexActionPayload(HexAction.VISION_TARGET, Optional.empty(), 0));
+            Net.sendToServer(new HexActionPayload(HexAction.VISION_TARGET, Optional.empty(), 0));
         }
     }
 

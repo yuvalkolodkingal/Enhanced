@@ -23,6 +23,7 @@ import com.kolodkingal.enhanced.hydra.Post;
 import com.kolodkingal.enhanced.hydra.Rank;
 import com.kolodkingal.enhanced.network.ThoughtsPayload;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -36,7 +37,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -76,8 +76,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,8 +106,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * change a config or the difficulty ({@code hydra_cfg}, {@code hydra_respawn_never}, {@code hydra_respawn_always},
  * {@code hydra_cap}, {@code hydra_peaceful}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HydraTests {
     static final String BATCH = "hydra";
     static final String GARRISON = "hydra_garrison";
@@ -208,7 +204,7 @@ public final class HydraTests {
     // ------------------------------------------------------------------------------------------------------------
     // The soldiers
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRanksHaveThePlansNumbers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity rifleman = soldier(f, Rank.RIFLEMAN, 3.5, 3.5, 0.0F);
@@ -232,7 +228,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRankAndSkinAreSavedByName(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity sniper = soldier(f, Rank.SNIPER, 3.5, 3.5, 0.0F);
@@ -245,7 +241,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aSoldierSeesInFrontNotBehindNorASneakerFarOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // the rule's numbers: 24 in the light, half for a sneaker, three quarters in the dark
@@ -271,7 +267,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 40)
     public static void everySoldierSpotsAnIntruderInFrontOfHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // several in a row: their entity ids are odd and even (the sight check must reach both)
@@ -292,11 +288,11 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 140)
     public static void aRiflemanFiresBurstsOfThreeAndReloadsEverySix(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity rifleman = soldier(f, Rank.RIFLEMAN, 10.5, 2.5, 0.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 13.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 13.5));
         target.setInvulnerable(true);
         rifleman.setTarget(target);
         Map<UUID, Long> seen = new HashMap<>();
@@ -325,14 +321,14 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aBoltPassesThroughHydraAndHitsWhatIsBehind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity shooter = soldier(f, Rank.RIFLEMAN, 3.5, 10.5, -90.0F);
         HydraSoldierEntity friend = soldier(f, Rank.RIFLEMAN, 7.5, 10.5, -90.0F);
         shooter.setNoAi(true);
         friend.setNoAi(true);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         Vec3 from = helper.absoluteVec(new Vec3(5.0, FLOOR + 1.2, 10.5));
         HydraBoltEntity bolt = HydraBoltEntity.create(helper.getLevel(), shooter, from, new Vec3(1, 0, 0), 2.2, 4.0F,
                 20.0, HydraBoltEntity.RIFLE);
@@ -347,7 +343,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRiotShieldStopsABoltFromTheFrontNotFromBehind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // two enforcers facing west (yaw 90); a bolt comes from the west at one, from the east at the other
@@ -371,7 +367,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRealityStoneBubblesABolt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer holder = f.player(5.5, FLOOR, 5.5, Power.THANOS);
@@ -385,11 +381,11 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
     public static void theSnipersLaserWarnsThirtyTicksBeforeHisShot(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity sniper = soldier(f, Rank.SNIPER, 10.5, 1.5, 0.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.5, FLOOR, 18.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.5, FLOOR, 18.5));
         target.setInvulnerable(true);
         AtomicLong laserAt = new AtomicLong(-1);
         f.everyTick(75, tick -> {
@@ -410,11 +406,11 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
     public static void theEnforcersBatonHurtsAndSlows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity enforcer = soldier(f, Rank.ENFORCER, 8.5, 10.5, -90.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(10.0, FLOOR, 10.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(10.0, FLOOR, 10.5));
         f.everyTick(75, tick -> {
             enforcer.setTarget(target);
             if (target.getHealth() >= target.getMaxHealth()) {
@@ -427,7 +423,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hydraSpareHydraButNotATraitor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity a = soldier(f, Rank.RIFLEMAN, 3.5, 3.5, 0.0F);
@@ -443,7 +439,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBlasterFiresOneBoltOfFiveForAnyone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(3.5, FLOOR, 3.5);
@@ -462,7 +458,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theIntelMapLeadsToItsTargetAndTheTagToTheTower(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos tower = helper.absolutePos(new BlockPos(10, 2, 10)).offset(600, 0, -300);
@@ -482,7 +478,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theOutpostsChestsHoldCellsAndThePillagersStopped(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         MinecraftServer server = level.getServer();
@@ -506,7 +502,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theyHaveThoughtsOfTheirOwn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = f.player(3.5, FLOOR, 3.5, Power.PROFESSOR_X);
@@ -524,7 +520,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theOfficerSteadiesHisMenWithResistance(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraOfficerEntity officer = officer(f, 10.5, 10.5, 0.0F);
@@ -537,7 +533,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void aSoldierHearsABlockBrokenNearHimAndGoesToLook(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity soldier = soldier(f, Rank.RIFLEMAN, 5.5, 5.5, 0.0F);
@@ -552,7 +548,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void aTurnedSoldierIsHydraAgainWhenTheHoldFades(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(3.5, FLOOR, 3.5, Power.LOKI);
@@ -569,11 +565,11 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void aRiflemanButtStrikesWhoComesTooClose(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraSoldierEntity rifleman = soldier(f, Rank.RIFLEMAN, 10.5, 10.5, -90.0F);
-        Villager target = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.0, FLOOR, 10.5));
+        Villager target = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(12.0, FLOOR, 10.5));
         f.everyTick(50, tick -> {
             rifleman.setTarget(target);
             if (target.getHealth() >= target.getMaxHealth()) {
@@ -585,7 +581,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theOfficersPostIsTheCommandRoomByDayTheRadioRoomByNight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraOutposts.Outpost outpost = outpost(f);
@@ -602,7 +598,7 @@ public final class HydraTests {
     // ------------------------------------------------------------------------------------------------------------
     // The garrison
 
-    @GameTest(template = ARENA, batch = GARRISON)
+    @EnhancedTest(template = ARENA, batch = GARRISON)
     public static void theGarrisonFillsNinePostsAndNotTwice(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -622,7 +618,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GARRISON)
+    @EnhancedTest(template = ARENA, batch = GARRISON)
     public static void aDeadPostComesBackAfterThreeDaysOnlyWhileNobodyIsNear(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -647,7 +643,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GARRISON)
+    @EnhancedTest(template = ARENA, batch = GARRISON)
     public static void thePostsTurnWithTheOutpostEveryWay(GameTestHelper helper) throws IOException {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos origin = new BlockPos(5000, 70, -3000);
@@ -692,24 +688,24 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GARRISON)
+    @EnhancedTest(template = ARENA, batch = GARRISON)
     public static void theStandInPillagersAreSentAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraOutposts.Outpost outpost = outpost(f);
-        Pillager pillager = helper.spawn(EntityType.PILLAGER, new Vec3(10.5, FLOOR, 12.5));
+        Pillager pillager = TestKit.spawn(helper, EntityType.PILLAGER, new Vec3(10.5, FLOOR, 12.5));
         check(HydraGarrison.sendPillagersAway(helper.getLevel(), outpost) >= 1 && pillager.isRemoved(),
                 "the pillager is gone");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GARRISON)
+    @EnhancedTest(template = ARENA, batch = GARRISON)
     public static void aSoldierFarFromHisOutpostLetsGoAndGoesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // his outpost lies 60 blocks off: beyond the leash of 48
         HydraOutposts.Outpost outpost = outpost(f, new BlockPos(70, 2, 10), Rotation.NONE, SHRINK);
         HydraSoldierEntity soldier = posted(outpost, Post.GATE_WEST.ordinal(),
                 soldier(f, Rank.RIFLEMAN, 5.5, 5.5, 0.0F));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(5.5, FLOOR, 9.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(5.5, FLOOR, 9.5));
         soldier.setTarget(villager);
         f.everyTick(10, tick -> tick == 10 && soldier.getTarget() == null);
     }
@@ -746,7 +742,7 @@ public final class HydraTests {
         return true;
     }
 
-    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = ALARM, timeoutTicks = 60)
     public static void theOfficerRaisesTheAlarmTheMomentHeSeesAnIntruder(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HydraOutposts.Outpost outpost = outpost(f);
@@ -766,7 +762,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
     public static void aSoldierRaisesItAfterThreeSecondsOfFightingAtAConsole(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -794,7 +790,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
     public static void aSoldierWhoCannotReachAConsoleCallsOnHisOwnRadio(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -830,7 +826,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
     public static void fourReinforcementsComeAfterTwoHundredTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -865,7 +861,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = ALARM)
+    @EnhancedTest(template = ARENA, batch = ALARM)
     public static void atMostTwoWavesADay(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -881,7 +877,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = ALARM, timeoutTicks = 100)
     public static void holdingUseOnTheRadioConsoleSwitchesItOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -913,7 +909,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = ALARM, timeoutTicks = 260)
     public static void killingTheOfficerEarlyStopsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -936,7 +932,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = ALARM, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = ALARM, timeoutTicks = 60)
     public static void aFrozenOfficerRaisesNoAlarm(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -956,7 +952,7 @@ public final class HydraTests {
     // ------------------------------------------------------------------------------------------------------------
     // The minds
 
-    @GameTest(template = ARENA, batch = MINDS, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = MINDS, timeoutTicks = 100)
     public static void lokisScepterTurnsASoldierWhoThenFightsHydra(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(10.5, FLOOR, 4.5, Power.LOKI);
@@ -966,7 +962,7 @@ public final class HydraTests {
         officer.setNoAi(true);
         HydraSoldierEntity loyal = soldier(f, Rank.ENFORCER, 10.5, 16.5, 180.0F);
         loyal.setNoAi(true);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5));
         ItemStack scepter = new ItemStack(ModItems.LOKIS_SCEPTER.get());
         scepter.getItem().hurtEnemy(scepter, soldier, loki);
         check(soldier.isTurned() && soldier.turnedBy(loki), "the Scepter turned him");
@@ -986,7 +982,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = MINDS, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = MINDS, timeoutTicks = 60)
     public static void professorXTakesASoldierAndFiresHisRifle(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = f.player(10.5, FLOOR, 3.5, Power.PROFESSOR_X);
@@ -1010,7 +1006,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = MINDS)
+    @EnhancedTest(template = ARENA, batch = MINDS)
     public static void aPossessedOrCommandedSoldierIsATraitor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer phoenix = f.player(3.5, FLOOR, 3.5, Power.PHOENIX);
@@ -1020,14 +1016,15 @@ public final class HydraTests {
         b.setNoAi(true);
         a.addEffect(new MobEffectInstance(ModEffects.POSSESSED, 200, 0), phoenix);
         check(HydraLoyalty.isTraitor(a) && !HydraLoyalty.sameSide(a, b), "a possessed soldier is not their side");
-        check(!HydraLoyalty.turn(helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 3.5)), phoenix,
+        check(!HydraLoyalty.turn(TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 3.5)),
+                phoenix,
                 100), "the seam turns only Hydra");
         check(HydraLoyalty.turn(b, phoenix, 100) && b.turnedTicksLeft() == 100, "the Mind Stone's command turns him");
         helper.succeed();
     }
 
     /** The Mind Stone's own Command (lane L2's) turns a soldier for the command's time, as the seam above. */
-    @GameTest(template = ARENA, batch = MINDS)
+    @EnhancedTest(template = ARENA, batch = MINDS)
     public static void theMindStonesCommandTurnsASoldier(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = StonePowerTests.holder(f, 3.5, 10.5, Power.THOR, StoneKind.MIND);
@@ -1048,7 +1045,7 @@ public final class HydraTests {
     // ------------------------------------------------------------------------------------------------------------
     // Config and difficulty (each its own batch)
 
-    @GameTest(template = ARENA, batch = "hydra_cfg")
+    @EnhancedTest(template = ARENA, batch = "hydra_cfg")
     public static void anOfficerKilledByAPlayerLeavesTheRareDropsAndOnlyThen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HydraConfig.BLASTER_DROP, 1.0);
@@ -1077,7 +1074,7 @@ public final class HydraTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hydra_cfg")
+    @EnhancedTest(template = ARENA, batch = "hydra_cfg")
     public static void aSwitchedOffBlasterIsDeadMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HydraConfig.BLASTER_ENABLED, false);
@@ -1090,7 +1087,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hydra_respawn_never")
+    @EnhancedTest(template = ARENA, batch = "hydra_respawn_never")
     public static void withRespawnNeverAClearedPostStaysEmpty(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HydraConfig.RESPAWN, HydraConfig.Respawn.NEVER);
@@ -1105,7 +1102,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hydra_respawn_always")
+    @EnhancedTest(template = ARENA, batch = "hydra_respawn_always")
     public static void withRespawnAlwaysEveryCheckRefills(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HydraConfig.RESPAWN, HydraConfig.Respawn.ALWAYS);
@@ -1120,7 +1117,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hydra_cap")
+    @EnhancedTest(template = ARENA, batch = "hydra_cap")
     public static void theDimensionsCapStopsTheGarrison(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1132,7 +1129,7 @@ public final class HydraTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hydra_peaceful", timeoutTicks = 220)
+    @EnhancedTest(template = ARENA, batch = "hydra_peaceful", timeoutTicks = 220)
     public static void peacefulHasNoGarrison(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

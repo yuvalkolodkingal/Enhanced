@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -36,7 +37,6 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -75,8 +75,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +88,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /** Thor, Mjolnir, Stormbreaker and the Bifrost. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThorTests {
 
     private static void press(ServerPlayer player, int ability) {
@@ -159,7 +155,7 @@ public final class ThorTests {
         return near.level().getEntitiesOfClass(ItemEntity.class, near.getBoundingBox().inflate(2), e -> e.getItem().is(ModItems.MJOLNIR.get()));
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void mjolnirRecipeIsForgedFromUruAndAStar(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("mjolnir"));
@@ -175,7 +171,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void giveCommandsLookAlikeDropIsNotASecondWeapon(GameTestHelper helper) {
         // /give puts the weapon in the inventory and drops a look-alike at the player's feet only to show the pickup:
         // it must vanish as usual, not be kept forever or set down as a second Mjolnir.
@@ -198,7 +194,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theUnworthyCannotHoldMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -222,7 +218,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theWorthyLiftItAndBecomeThor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -251,7 +247,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = "solo_thrown_mjolnir_hits_and_comes_back")
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = "solo_thrown_mjolnir_hits_and_comes_back")
     public static void thrownMjolnirHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // Out and back inside this arena (21 wide, the thrower at x 3.5, the zombie at 12.5): the hammer overshoots its
@@ -259,7 +255,7 @@ public final class ThorTests {
         // stop ticking when that test finishes) freezes there and never comes home. 12 turns it at about x 17.
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
         ServerPlayer thor = thor(f, 3.5, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         lookAt(thor, zombie);
         float before = zombie.getHealth();
         press(thor, 1);
@@ -279,7 +275,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void thorCallsMjolnirBackFromWhereItRests(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
@@ -298,12 +294,12 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theGodOfThunderArcsLightningWithEveryBlow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 8.5, 10.5);
-        Zombie first = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.0, FLOOR, 10.5));
-        Zombie second = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.0, FLOOR, 10.5));
+        Zombie first = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.0, FLOOR, 10.5));
+        Zombie second = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.0, FLOOR, 10.5));
         press(thor, 4);
         PowerData data = Powers.get(thor);
         check(data.toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
@@ -316,7 +312,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, timeoutTicks = 120)
     public static void theBifrostTakesThorWhereHeLooks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 3.5, 10.5);
@@ -338,7 +334,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void stormbreakerIsForgedFromUruAStarAndGrootsArm(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("stormbreaker"));
@@ -355,7 +351,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void anyoneCanWieldStormbreaker(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(4.5, FLOOR, 10.5);
@@ -373,7 +369,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = "solo_thrown_stormbreaker_hits_and_comes_back")
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = "solo_thrown_stormbreaker_hits_and_comes_back")
     public static void thrownStormbreakerHitsAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
@@ -381,7 +377,7 @@ public final class ThorTests {
         thor.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         PowerTicker.tick(thor);
         check(thor.mayFly(), "Thor flies with Stormbreaker too");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         lookAt(thor, zombie);
         float before = zombie.getHealth();
         press(thor, 1);
@@ -400,11 +396,11 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void thorCallsHisWeaponOutOfACreaturesHands(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(15.5, FLOOR, 10.5));
         zombie.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         press(thor, 1);
         check(zombie.getMainHandItem().isEmpty(), "it tears out of the zombie's hand");
@@ -414,30 +410,30 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void theBifrostRemembersPlacesInEveryWorld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(4.5, FLOOR, 4.5);
         ServerLevel level = helper.getLevel();
         ThorAbilities.savePlace(player, "Camp");
-        check(player.getData(ModAttachments.BIFROST).places().isEmpty(), "nothing is saved without Mjolnir or Stormbreaker in hand");
+        check(ModAttachments.BIFROST.get(player).places().isEmpty(), "nothing is saved without Mjolnir or Stormbreaker in hand");
         ThorAbilities.bifrostHome(player);
         check(!Powers.get(player).is(Live.BIFROST), "and the Bifrost doesn't answer");
 
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         ThorAbilities.savePlace(player, "\u00a7cCamp\n");
-        BifrostData data = player.getData(ModAttachments.BIFROST);
+        BifrostData data = ModAttachments.BIFROST.get(player);
         check(data.places().size() == 1 && data.places().get(0).name().equals("Camp"), "saved as Camp (no formatting): " + data);
         check(data.places().get(0).dimension() == level.dimension(), "in this world");
         Vec3 moved = helper.absoluteVec(new Vec3(14.5, FLOOR, 14.5));
         player.moveTo(moved.x, moved.y, moved.z);
         ThorAbilities.savePlace(player, "camp");
-        data = player.getData(ModAttachments.BIFROST);
+        data = ModAttachments.BIFROST.get(player);
         check(data.places().size() == 1 && data.places().get(0).pos().distanceTo(moved) < 1.0E-6, "saving the name again moves it");
         check(data.places().get(0).name().equals("camp"), "under the name as typed this time");
 
         // A place saved earlier on the roof of the Nether.
-        player.setData(ModAttachments.BIFROST, data.with(new BifrostData.Place("Nether roof", Level.NETHER, new Vec3(0.5, 128.0, 0.5), 90.0F)));
+        ModAttachments.BIFROST.set(player, data.with(new BifrostData.Place("Nether roof", Level.NETHER, new Vec3(0.5, 128.0, 0.5), 90.0F)));
         ThorAbilities.bifrostToPlace(player, 1, "Somewhere else");
         check(!Powers.get(player).is(Live.BIFROST), "a place that isn't there any more (the list changed) is ignored");
         ThorAbilities.bifrostToPlace(player, 1, "Nether roof");
@@ -452,15 +448,15 @@ public final class ThorTests {
             check(player.getY() >= 128.0 - 1.0E-6, "standing on the roof of the Nether");
             ThorAbilities.bifrostHome(player);
             check(!Powers.get(player).is(Live.BIFROST), "not again until the Bifrost has gathered its strength");
-            check(player.getData(ModAttachments.BIFROST).cooldown(player.level().getGameTime()) > 0, "its cooldown is running");
+            check(ModAttachments.BIFROST.get(player).cooldown(player.level().getGameTime()) > 0, "its cooldown is running");
             ThorAbilities.forgetPlace(player, 0, "camp");
-            List<BifrostData.Place> left = player.getData(ModAttachments.BIFROST).places();
+            List<BifrostData.Place> left = ModAttachments.BIFROST.get(player).places();
             check(left.size() == 1 && left.get(0).name().equals("Nether roof"), "the camp is forgotten");
             return true;
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void bifrostNamesAreCleanedAndTheListIsBounded(GameTestHelper helper) {
         check(BifrostData.cleanName("  \u00a7lHome\u00a7r  ", "x").equals("Home"), "formatting and spaces are stripped");
         check(BifrostData.cleanName("\n\t", "1, 2, 3").equals("1, 2, 3"), "an empty name falls back to the coordinates");
@@ -476,7 +472,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void speedstersCantSnatchMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 12.5, 10.5);
@@ -510,7 +506,7 @@ public final class ThorTests {
 
     /** A zombie (a Husk, which does not burn in the sun) that takes damage as written: no armour to soften it. */
     private static Zombie bareZombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return zombie;
     }
@@ -524,7 +520,7 @@ public final class ThorTests {
         return target.getMaxHealth() - target.getHealth();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100)
     public static void theBeamHitsTheFirstCreatureInLineButNotOneBehindAWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // Bare-handed, with a zombie in line and another right behind it.
@@ -564,7 +560,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "solo_the_weapon_makes_the_beam_reach_farther_and_hit_harder")
+    @EnhancedTest(template = ARENA, batch = "solo_the_weapon_makes_the_beam_reach_farther_and_hit_harder")
     public static void theWeaponMakesTheBeamReachFartherAndHitHarder(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EnhancedConfig.THOR_BEAM_RANGE.getDefault() == 24 && EnhancedConfig.MJOLNIR_BEAM_RANGE.getDefault() == 48
@@ -623,7 +619,7 @@ public final class ThorTests {
      * throw, the lightning beam through it (its damage per hit and its reach). What only Mjolnir can do (shatter, pin,
      * the worthy) is not for Stormbreaker.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void stormbreakerIsAFifthStrongerThanMjolnirInEverythingTheyShare(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // In the hand: the attack damage of the main hand.
@@ -663,7 +659,7 @@ public final class ThorTests {
      * lanes of the arena at once. (A batch of its own: heroes throwing, and hostile husks standing about, must not meet
      * the tests of the shatter, which looks for enemies all around.)
      */
-    @GameTest(template = ARENA, batch = "thrown_weapon_damage", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thrown_weapon_damage", timeoutTicks = 200)
     public static void aThrownStormbreakerHitsAFifthHarderThanAThrownMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
@@ -703,11 +699,11 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theWeaponsBeamChargesCreepersTheFirstTimeItHitsThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(9.5, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(9.5, FLOOR, 10.5));
         lookAt(thor, creeper);
         hold(thor, 3);
         PowerTicker.tick(thor);
@@ -721,7 +717,7 @@ public final class ThorTests {
         check(creeper.getRemainingFireTicks() <= 0, "without setting it alight");
         letGo(thor, 3);
         // And a pig turns into a zombified piglin (unless the world is peaceful).
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(9.5, FLOOR, 13.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(9.5, FLOOR, 13.5));
         creeper.discard();
         lookAt(thor, pig);
         hold(thor, 3);
@@ -734,7 +730,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theGodOfThunderBeamArcsToTheNextTwoCreatures(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 3.5, 10.5);
@@ -755,7 +751,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theBeamBurnsHungerAndStopsWhenThorStarvesOrIsASpectator(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 3.5, 10.5);
@@ -778,11 +774,11 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theBeamSparesTheSteedThorRidesAndLettingGoDoesNotResetItsPace(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(3.5, FLOOR, 10.5, Power.THOR);
-        Pig steed = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(3.5, FLOOR, 10.5));
+        Pig steed = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(3.5, FLOOR, 10.5));
         check(thor.startRiding(steed, true), "Thor sits on the pig");
         Zombie zombie = bareZombie(helper, 9.5, 10.5);
         lookAt(thor, zombie);
@@ -815,7 +811,7 @@ public final class ThorTests {
         player.setShiftKeyDown(false);
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void mjolnirShattersStrikesEveryZombieAndReassemblesInThorsHand(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);
@@ -823,14 +819,14 @@ public final class ThorTests {
         check(ownedBy(thor.getMainHandItem(), thor), "sanity: Mjolnir is Thor's");
         List<Zombie> zombies = List.of(bareZombie(helper, 5.5, 10.5), bareZombie(helper, 15.5, 8.5), bareZombie(helper, 10.5, 16.5));
         // A friendly creature isn't an enemy.
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(12.5, FLOOR, 12.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(12.5, FLOOR, 12.5));
         sneakPress(thor, 1);
         PowerData data = Powers.get(thor);
         check(!holdsMjolnir(thor), "Mjolnir leaves his hand");
         check(fragments(helper).size() == 3, "one fragment for each of the three zombies, and none for the pig: " + fragments(helper).size());
         PowerTicker.tick(thor);
         check(data.hammerEntityId() != -1 && thor.mayFly(), "it counts as a weapon in flight: he keeps his wings");
-        ItemStack stored = thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).orElse(ItemStack.EMPTY);
+        ItemStack stored = ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).orElse(ItemStack.EMPTY);
         check(ownedBy(stored, thor), "the hammer is kept in his data, owner and all");
         f.everyTick(120, tick -> {
             PowerTicker.tick(thor);
@@ -843,7 +839,7 @@ public final class ThorTests {
             check(pig.getHealth() == pig.getMaxHealth(), "the pig was left alone");
             check(ownedBy(thor.getMainHandItem(), thor), "Mjolnir is back in his hand, and still his");
             check(fragments(helper).isEmpty() && data.hammerEntityId() == -1, "no fragment is left");
-            check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "nothing is kept in his data any more");
+            check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty(), "nothing is kept in his data any more");
             // The cooldown: not again for a while.
             sneakPress(thor, 1);
             check(holdsMjolnir(thor) && fragments(helper).isEmpty(), "it needs to gather itself before it can shatter again");
@@ -851,7 +847,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void withNobodyAroundTheFragmentsBurstOutInARingAndComeBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);
@@ -868,7 +864,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void aFullHandSendsTheReassembledMjolnirToTheInventory(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);
@@ -887,7 +883,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void stormbreakerDoesNotShatter(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
@@ -899,7 +895,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100)
     public static void aShatteredMjolnirFallsWhereThorDiesOrLogsOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -912,7 +908,7 @@ public final class ThorTests {
         check(fragments(helper).isEmpty(), "the fragments are gone");
         List<ItemEntity> fallen = mjolnirsOnTheGround(thor);
         check(fallen.size() == 1 && ownedBy(fallen.get(0).getItem(), thor), "Mjolnir lies where he stood, still his");
-        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "nothing is kept in his data");
+        check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty(), "nothing is kept in his data");
         fallen.get(0).discard();
 
         // And he dies.
@@ -931,7 +927,7 @@ public final class ThorTests {
      * (A batch of its own: it clears the memory of every shattered Mjolnir, as closing the world does, so no other test of
      * the shatter may be running beside it.)
      */
-    @GameTest(template = ARENA, batch = "shatter_world_closed")
+    @EnhancedTest(template = ARENA, batch = "shatter_world_closed")
     public static void aShatteredMjolnirKeptInHisDataComesBackIfTheWorldWasClosedMeanwhile(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);
@@ -942,11 +938,11 @@ public final class ThorTests {
         MjolnirShatter.clear();
         PowerTicker.tick(thor);
         check(holdsMjolnir(thor) && ownedBy(thor.getMainHandItem(), thor), "it is in his hand again, and his");
-        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "and no longer kept in pieces");
+        check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty(), "and no longer kept in pieces");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, timeoutTicks = 60)
     public static void aShatteredMjolnirFallsWhereThorWasWhenHeChangesDimension(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -961,12 +957,12 @@ public final class ThorTests {
         List<ItemEntity> fallen = level.getEntitiesOfClass(ItemEntity.class, new AABB(where, where).inflate(2),
                 e -> e.getItem().is(ModItems.MJOLNIR.get()));
         check(fallen.size() == 1 && ownedBy(fallen.get(0).getItem(), thor), "Mjolnir lies where he stood in the world he left, still his");
-        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty() && Powers.get(thor).hammerEntityId() == -1,
+        check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty() && Powers.get(thor).hammerEntityId() == -1,
                 "nothing is kept in his data, and no weapon is in flight");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100)
     public static void theGodOfThunderArcsFromEveryFragment(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);
@@ -975,7 +971,7 @@ public final class ThorTests {
         check(Powers.get(thor).toggle(Toggle.GOD_OF_THUNDER), "the God of Thunder is unleashed");
         Zombie enemy = bareZombie(helper, 5.5, 10.5);
         // Not an enemy, so no fragment is sent for it, but near enough for the lightning to leap to it.
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.5, FLOOR, 13.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(5.5, FLOOR, 13.5));
         sneakPress(thor, 1);
         check(fragments(helper).size() == 1, "one fragment, for the zombie");
         f.everyTick(60, t -> {
@@ -993,7 +989,7 @@ public final class ThorTests {
      * (it is what lets him keep flying, and what every client tells the shattering from a throw by); when the last one is
      * home nothing is in flight and Mjolnir is whole in his hand.
      */
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void theShatteredHammerIsALiveFragmentInFlightUntilItIsWholeInHisHandAgain(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);
@@ -1023,7 +1019,7 @@ public final class ThorTests {
     }
 
     /** R while it is in pieces turns every fragment home at once, before the ones sent far away reach their enemies. */
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void rWhileMjolnirIsInPiecesCallsEveryFragmentHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 3.5, 10.5);
@@ -1051,7 +1047,7 @@ public final class ThorTests {
      * The burst of sparks as Mjolnir shatters, and the one as it comes together again, are out in front of Thor, not at
      * his eyes: his own first-person screen would be full of them.
      */
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void theBurstsOfShatteringAndOfReassemblingAreInFrontOfThorNotInHisFace(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 10.5, 10.5);
@@ -1100,7 +1096,7 @@ public final class ThorTests {
         return entity.position().distanceTo(from);
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void mjolnirPinsAZombieInPlaceAndOnlyItsOwnerLiftsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1169,7 +1165,7 @@ public final class ThorTests {
      * Setting Mjolnir down on someone tells everyone nearby (and Thor himself) so that their screens show him bring it
      * down: a PIN effect that names the pinner and the place it lands. Nothing is sent when the click pins nobody.
      */
-    @GameTest(template = ARENA, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100)
     public static void pinningTellsEveryoneNearbyWhoBroughtTheHammerDownAndWhere(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1191,7 +1187,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = "solo_mjolnir_lets_go_by_itself_after_its_time")
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = "solo_mjolnir_lets_go_by_itself_after_its_time")
     public static void mjolnirLetsGoByItselfAfterItsTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EnhancedConfig.MJOLNIR_PIN_DURATION.getDefault() == 1200, "a minute by default");
@@ -1214,7 +1210,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100)
     public static void mjolnirLetsGoWhenItsOwnerDiesOrTheZombieDies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 6.5);
@@ -1241,7 +1237,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void mjolnirLetsGoWhenItsOwnerLogsOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1255,7 +1251,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, timeoutTicks = 60)
     public static void mjolnirLetsGoWhenItsOwnerChangesDimension(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1273,7 +1269,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void thorCallsMjolnirOffSomeoneItPins(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 3.5, 10.5);
@@ -1292,7 +1288,7 @@ public final class ThorTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theBossesCantBePinned(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EntityType.ENDER_DRAGON.is(ModTags.PIN_IMMUNE) && EntityType.WITHER.is(ModTags.PIN_IMMUNE)
@@ -1300,14 +1296,14 @@ public final class ThorTests {
         check(!EntityType.ZOMBIE.is(ModTags.PIN_IMMUNE), "a zombie is not");
         ServerPlayer thor = thor(f, 6.5, 10.5);
         PowerTicker.tick(thor);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(8.5, FLOOR, 10.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(8.5, FLOOR, 10.5));
         check(rightClick(thor, warden, true), "the click is taken (Mjolnir doesn't open the Bifrost), but ...");
         check(pinsNear(warden).isEmpty() && !MjolnirPin.isPinned(warden), "the Warden isn't pinned");
         check(holdsMjolnir(thor), "and Mjolnir stays in his hand");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100, batch = "solo_a_player_cant_be_pinned_with_pvp_off_but_is_held_with_it_on")
+    @EnhancedTest(template = ARENA, timeoutTicks = 100, batch = "solo_a_player_cant_be_pinned_with_pvp_off_but_is_held_with_it_on")
     public static void aPlayerCantBePinnedWithPvpOffButIsHeldWithItOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1349,7 +1345,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void killingTheHammerThatPinsSomeoneStillDropsMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1363,13 +1359,13 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, timeoutTicks = 60)
     public static void aPinnedCreatureCantRideTeleportOrTravel(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
         PowerTicker.tick(thor);
         Zombie zombie = bareZombie(helper, 8.5, 10.5);
-        Pig steed = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 12.5));
+        Pig steed = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 12.5));
         check(rightClick(thor, zombie, true) && pinsNear(zombie).size() == 1, "pinned");
         check(!zombie.startRiding(steed), "it can't climb onto a steed");
         Vec3 pinned = zombie.position();
@@ -1388,7 +1384,7 @@ public final class ThorTests {
      * A pinned player's dashes and jumps are teleports like any other: Quicksilver's Blitz, and Loki's escape with the
      * Tesseract.
      */
-    @GameTest(template = ARENA, timeoutTicks = 60, batch = "solo_a_pinned_player_cant_blitz_or_escape_with_the_tesseract")
+    @EnhancedTest(template = ARENA, timeoutTicks = 60, batch = "solo_a_pinned_player_cant_blitz_or_escape_with_the_tesseract")
     public static void aPinnedPlayerCantBlitzOrEscapeWithTheTesseract(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1426,7 +1422,7 @@ public final class ThorTests {
     }
 
     /** Mjolnir lies on them: no telekinesis picks them up (and one that already holds them lets go). */
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, timeoutTicks = 60)
     public static void telekinesisCantLiftSomeoneMjolnirPins(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 6.5);
@@ -1457,7 +1453,7 @@ public final class ThorTests {
      * The pin remembers where the hammer lay. If the world is closed with the hammer on someone and opened again, and
      * the pinned player is not there (they are offline), it falls where it was, not at the world's origin.
      */
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, timeoutTicks = 60)
     public static void aPinLoadedWithoutItsPinnedOneDropsMjolnirWhereItLay(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1488,7 +1484,7 @@ public final class ThorTests {
     }
 
     /** A pin that leaves the world without letting go (unloaded with its chunk) holds nobody any more. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aPinThatIsUnloadedIsForgotten(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = thor(f, 6.5, 10.5);
@@ -1505,7 +1501,7 @@ public final class ThorTests {
     // ------------------------------------------------------------------------------------------------------------
     // Mjolnir belongs to one player
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theFirstWorthyHandToLiftMjolnirClaimsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1570,7 +1566,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void onlyTheOwnerCanLiftTheirMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1635,7 +1631,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void creativePlayersCanMoveAnyMjolnirButNeverTakeItOver(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1676,7 +1672,7 @@ public final class ThorTests {
      * (A batch of its own, with a short reach: it counts on there being nothing he may call, and at the usual 64 blocks
      * his call would reach into the arenas around it, where other tests leave hammers that nobody owns.)
      */
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = "mjolnir_recall_alone")
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = "mjolnir_recall_alone")
     public static void thorCallsBackOnlyMjolnirsThatAreHis(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_RECALL_RANGE, 8);
@@ -1687,7 +1683,7 @@ public final class ThorTests {
         // next to Thor, and a fourth is in his own pocket.
         BlockPos odinsBlock = new BlockPos(6, 2, 10);
         check(MjolnirBlock.setDown(level, helper.absolutePos(odinsBlock), ownedMjolnir(odin)), "set Odin's Mjolnir down");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 8.5));
         zombie.setItemInHand(InteractionHand.MAIN_HAND, ownedMjolnir(odin));
         Vec3 beside = helper.absoluteVec(new Vec3(4.5, FLOOR, 10.5));
         ItemEntity lying = new ItemEntity(level, beside.x, beside.y, beside.z, ownedMjolnir(odin));
@@ -1724,7 +1720,7 @@ public final class ThorTests {
      * (A batch of its own: his call reaches every unclaimed Mjolnir and Stormbreaker within the recall range, and the
      * tests of a batch run side by side, so a neighbour's hammer could answer it.)
      */
-    @GameTest(template = ARENA, batch = "thor_calls_only_his")
+    @EnhancedTest(template = ARENA, batch = "thor_calls_only_his")
     public static void aCreativeThorCanMoveAnyMjolnirButStillCallsOnlyHis(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1743,7 +1739,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theOwnersNameOnTheHammerFollowsThemWhenTheyRename(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = thor(f, 4.5, 4.5);
@@ -1758,7 +1754,7 @@ public final class ThorTests {
      * (A batch of its own: it turns ownership off for the whole server while it runs, and the tests of a batch run side
      * by side, so a test that counts on ownership would see it off.)
      */
-    @GameTest(template = ARENA, batch = "mjolnir_ownership_off")
+    @EnhancedTest(template = ARENA, batch = "mjolnir_ownership_off")
     public static void withOwnershipOffAnyWorthyPlayerCanLiftAnyMjolnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_OWNER_ONLY, false);
@@ -1798,7 +1794,7 @@ public final class ThorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theOwnerIsSavedSentAndShownOnTheTooltip(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

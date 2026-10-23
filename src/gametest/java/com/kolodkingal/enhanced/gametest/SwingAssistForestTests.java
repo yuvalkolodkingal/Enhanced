@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.SpiderMath;
@@ -8,11 +7,11 @@ import com.kolodkingal.enhanced.ability.SpiderServer;
 import com.kolodkingal.enhanced.ability.SwingAssist;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSwingPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -23,8 +22,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +39,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * sky, an anchor pulled to his way) is not cut short by the server's check of the web's slack, even with its copy of him
  * a few ticks behind.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SwingAssistForestTests {
     private static final String BATCH = "spider_assist_forest";
     private static final SwingAssist.Params PARAMS = new SwingAssist.Params(30.0, 0.06, 1.8);
@@ -142,7 +137,7 @@ public final class SwingAssistForestTests {
 
     // ------------------------------------------------------------------------------------------------------------
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void fromAForestFloorHeLeapsUpThroughAGapAndSwingsOverTheTrees(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -182,7 +177,7 @@ public final class SwingAssistForestTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void inTheOpenThereIsNoLeap(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -194,7 +189,7 @@ public final class SwingAssistForestTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aStepOfTheForestFloorDoesNotStopTheFirstSwing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A tall tree ahead, and a step of the floor right in front of his feet.
@@ -215,7 +210,7 @@ public final class SwingAssistForestTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theServerTakesTheLeapAndTheKeyWithItStaysQuiet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -287,7 +282,7 @@ public final class SwingAssistForestTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theServerDoesNotCutAnAssistedSwingShort(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -320,7 +315,7 @@ public final class SwingAssistForestTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void aChainedSwingIsNotTakenForAJumpWhileTheServerCatchesUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);

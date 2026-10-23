@@ -66,7 +66,7 @@ public abstract class AbstractSandProjectile extends ThrowableProjectile impleme
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide || isRemoved()) {
+        if (level().isClientSide() || isRemoved()) {
             return;
         }
         double scale = SlowMotion.timeScale(this);
@@ -95,7 +95,7 @@ public abstract class AbstractSandProjectile extends ThrowableProjectile impleme
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (level().isClientSide || !(result.getEntity() instanceof LivingEntity victim)) {
+        if (level().isClientSide() || !(result.getEntity() instanceof LivingEntity victim)) {
             return;
         }
         LivingEntity owner = getOwner() instanceof LivingEntity living ? living : null;

@@ -59,12 +59,12 @@ public final class GungnirStand {
         if (player instanceof ServerPlayer server) {
             take(server, pos);
         }
-        return InteractionResult.sidedSuccess(player.level().isClientSide);
+        return InteractionResult.sidedSuccess(player.level().isClientSide());
     }
 
     /** The server's side of a click on the stand at {@code pos}. */
     public static Taken take(ServerPlayer player, BlockPos pos) {
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         if (!progress.has(AsgardProgress.HELA_VICTOR)) {
             player.displayClientMessage(Component.translatable("message.enhanced.odin.stand_unworthy").withStyle(ChatFormatting.GOLD), true);
             return Taken.UNWORTHY;
@@ -106,7 +106,7 @@ public final class GungnirStand {
             AsgardState.get(player.server).setGungnirOwner(player.getUUID());
         }
         int bond = OdinAbilities.nextBond(player);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.GUNGNIR_TAKEN));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.GUNGNIR_TAKEN));
         ItemStack spear = GungnirItem.bound(player, bond);
         OdinAbilities.give(player, spear);
         return bearer;

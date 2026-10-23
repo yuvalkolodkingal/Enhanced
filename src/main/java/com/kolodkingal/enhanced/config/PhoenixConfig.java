@@ -1,8 +1,8 @@
 package com.kolodkingal.enhanced.config;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 /**
  * The balance numbers of the Phoenix (Jean Grey). Its options are defined in {@link #define}, which {@code
  * EnhancedConfig} calls while it builds the server config (TOML section {@code [phoenix]}); they are read from the
@@ -20,55 +20,55 @@ public final class PhoenixConfig {
      * Assigned by {@link #define} when the config is built, which is at mod construction: before anything reads it (it
      * cannot be final because the options are defined in a method, not in a static block).
      */
-    public static ModConfigSpec.DoubleValue FLIGHT_SPEED;
-    public static ModConfigSpec.BooleanValue FIRE_IMMUNE;
+    public static ConfigSpec.DoubleValue FLIGHT_SPEED;
+    public static ConfigSpec.BooleanValue FIRE_IMMUNE;
 
     // ---- Mind Reading (R) and Mind Sense (Sneak + R) ----
-    public static ModConfigSpec.IntValue MIND_READ_RANGE;
-    public static ModConfigSpec.BooleanValue MIND_READ_PLAYERS;
-    public static ModConfigSpec.BooleanValue MIND_READ_INVENTORY;
-    public static ModConfigSpec.BooleanValue MIND_READ_NOTIFIES;
-    public static ModConfigSpec.DoubleValue MIND_READ_EXHAUSTION;
-    public static ModConfigSpec.IntValue MIND_SENSE_RANGE;
-    public static ModConfigSpec.IntValue MIND_SENSE_TICKS;
-    public static ModConfigSpec.IntValue MIND_SENSE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue MIND_SENSE_EXHAUSTION;
+    public static ConfigSpec.IntValue MIND_READ_RANGE;
+    public static ConfigSpec.BooleanValue MIND_READ_PLAYERS;
+    public static ConfigSpec.BooleanValue MIND_READ_INVENTORY;
+    public static ConfigSpec.BooleanValue MIND_READ_NOTIFIES;
+    public static ConfigSpec.DoubleValue MIND_READ_EXHAUSTION;
+    public static ConfigSpec.IntValue MIND_SENSE_RANGE;
+    public static ConfigSpec.IntValue MIND_SENSE_TICKS;
+    public static ConfigSpec.IntValue MIND_SENSE_COOLDOWN;
+    public static ConfigSpec.DoubleValue MIND_SENSE_EXHAUSTION;
 
     // ---- Mind Control (B) and the Psionic Field (Sneak + B) ----
-    public static ModConfigSpec.IntValue MIND_CONTROL_RANGE;
-    public static ModConfigSpec.IntValue MIND_CONTROL_TICKS;
-    public static ModConfigSpec.IntValue MIND_CONTROL_MAX;
-    public static ModConfigSpec.IntValue MIND_CONTROL_PLAYER_TICKS;
-    public static ModConfigSpec.IntValue MIND_CONTROL_COOLDOWN;
-    public static ModConfigSpec.DoubleValue MIND_CONTROL_EXHAUSTION;
-    public static ModConfigSpec.IntValue PSIONIC_RADIUS;
-    public static ModConfigSpec.IntValue PSIONIC_TICKS;
-    public static ModConfigSpec.IntValue PSIONIC_COOLDOWN;
-    public static ModConfigSpec.DoubleValue PSIONIC_EXHAUSTION;
+    public static ConfigSpec.IntValue MIND_CONTROL_RANGE;
+    public static ConfigSpec.IntValue MIND_CONTROL_TICKS;
+    public static ConfigSpec.IntValue MIND_CONTROL_MAX;
+    public static ConfigSpec.IntValue MIND_CONTROL_PLAYER_TICKS;
+    public static ConfigSpec.IntValue MIND_CONTROL_COOLDOWN;
+    public static ConfigSpec.DoubleValue MIND_CONTROL_EXHAUSTION;
+    public static ConfigSpec.IntValue PSIONIC_RADIUS;
+    public static ConfigSpec.IntValue PSIONIC_TICKS;
+    public static ConfigSpec.IntValue PSIONIC_COOLDOWN;
+    public static ConfigSpec.DoubleValue PSIONIC_EXHAUSTION;
 
     // ---- The Phoenix Burst (N, held) ----
-    public static ModConfigSpec.IntValue BURST_CHARGE_TICKS;
-    public static ModConfigSpec.IntValue BURST_MIN_CHARGE_TICKS;
-    public static ModConfigSpec.IntValue BURST_MIN_RADIUS;
-    public static ModConfigSpec.IntValue BURST_MAX_RADIUS;
-    public static ModConfigSpec.DoubleValue BURST_MIN_DAMAGE;
-    public static ModConfigSpec.DoubleValue BURST_MAX_DAMAGE;
-    public static ModConfigSpec.DoubleValue BURST_PLAYER_FACTOR;
-    public static ModConfigSpec.DoubleValue BURST_WAVE_SPEED;
-    public static ModConfigSpec.IntValue BURST_FIRE_SECONDS;
-    public static ModConfigSpec.DoubleValue BURST_KNOCKBACK;
-    public static ModConfigSpec.BooleanValue BURST_SETS_FIRE;
-    public static ModConfigSpec.BooleanValue BURST_HURTS_PASSIVES;
-    public static ModConfigSpec.IntValue BURST_MAX_FIRE_BLOCKS;
-    public static ModConfigSpec.IntValue BURST_FOOD_COST;
-    public static ModConfigSpec.IntValue BURST_COOLDOWN;
-    public static ModConfigSpec.IntValue BURST_CANCEL_COOLDOWN;
-    public static ModConfigSpec.IntValue BURST_DRAIN_TICKS;
+    public static ConfigSpec.IntValue BURST_CHARGE_TICKS;
+    public static ConfigSpec.IntValue BURST_MIN_CHARGE_TICKS;
+    public static ConfigSpec.IntValue BURST_MIN_RADIUS;
+    public static ConfigSpec.IntValue BURST_MAX_RADIUS;
+    public static ConfigSpec.DoubleValue BURST_MIN_DAMAGE;
+    public static ConfigSpec.DoubleValue BURST_MAX_DAMAGE;
+    public static ConfigSpec.DoubleValue BURST_PLAYER_FACTOR;
+    public static ConfigSpec.DoubleValue BURST_WAVE_SPEED;
+    public static ConfigSpec.IntValue BURST_FIRE_SECONDS;
+    public static ConfigSpec.DoubleValue BURST_KNOCKBACK;
+    public static ConfigSpec.BooleanValue BURST_SETS_FIRE;
+    public static ConfigSpec.BooleanValue BURST_HURTS_PASSIVES;
+    public static ConfigSpec.IntValue BURST_MAX_FIRE_BLOCKS;
+    public static ConfigSpec.IntValue BURST_FOOD_COST;
+    public static ConfigSpec.IntValue BURST_COOLDOWN;
+    public static ConfigSpec.IntValue BURST_CANCEL_COOLDOWN;
+    public static ConfigSpec.IntValue BURST_DRAIN_TICKS;
 
     // ---- The Phoenix Ember ----
-    public static ModConfigSpec.IntValue EMBER_RITUAL_TICKS;
+    public static ConfigSpec.IntValue EMBER_RITUAL_TICKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         FLIGHT_SPEED = builder.comment("The Phoenix's flying speed (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.09, 0.01, 0.5);

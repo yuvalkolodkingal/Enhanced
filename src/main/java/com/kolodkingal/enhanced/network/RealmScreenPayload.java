@@ -2,11 +2,11 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.screen.RealmScreen;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public record RealmScreenPayload(List<RealmOption> realms) implements CustomPack
         return TYPE;
     }
 
-    static void handle(RealmScreenPayload payload, IPayloadContext context) {
+    static void handle(RealmScreenPayload payload, PacketContext context) {
         RealmScreen.open(payload);
     }
 }

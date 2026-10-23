@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
@@ -11,7 +10,7 @@ import com.kolodkingal.enhanced.boss.BossRewards;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
-import net.minecraft.gametest.framework.GameTest;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,8 +23,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -41,15 +38,13 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Who a boss fight rewards, and how the reward, or a refund, reaches them: into the inventory, at the feet for them
  * alone, or as a gift that waits for the login, the respawn or the next dimension.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossRewardTests {
 
     private static boolean has(ServerPlayer player, net.minecraft.world.item.Item item) {
         return player.getInventory().contains(new ItemStack(item));
     }
 
-    @GameTest(template = ARENA, batch = "boss_reward_rule", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "boss_reward_rule", timeoutTicks = 160)
     public static void aParticipantIsRewardedForTimeAndDamageOrForTheLastBlowAndNeverForBeingCreative(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.REWARD_MIN_SECONDS, 1);
@@ -86,7 +81,7 @@ public final class BossRewardTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_reward_creative", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_reward_creative", timeoutTicks = 60)
     public static void creativePlayersAreRewardedIfTheServerSaysSo(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.REWARD_MIN_SECONDS, 0);
@@ -101,7 +96,7 @@ public final class BossRewardTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_reward_lane")
+    @EnhancedTest(template = ARENA, batch = "boss_reward_lane")
     public static void theLaneSetsTheDamageThatCountsAndTheLeastOfIt(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.REWARD_MIN_SECONDS, 0);
@@ -125,7 +120,7 @@ public final class BossRewardTests {
     // ------------------------------------------------------------------------------------------------------------
     // Delivery
 
-    @GameTest(template = ARENA, batch = "boss_reward_delivery", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_reward_delivery", timeoutTicks = 60)
     public static void aRewardGoesToTheInventoryOrToTheFeetOfItsOwnerOrWaitsForThem(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -176,7 +171,7 @@ public final class BossRewardTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_gifts")
+    @EnhancedTest(template = ARENA, batch = "boss_gifts")
     public static void aGiftWaitsForTheLoginTheRespawnOrTheDimensionChange(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -202,14 +197,14 @@ public final class BossRewardTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_gifts_saved")
+    @EnhancedTest(template = ARENA, batch = "boss_gifts_saved")
     public static void theGiftsAndTheRestAreSavedWithTheWorldNotWithTheFight(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
         BossGifts.add(server, player.getUUID(), new ItemStack(Items.NETHER_STAR, 1));
         BossFights.rest(server, BossKind.APOCALYPSE, 5000L);
-        var data = server.overworld().getData(com.kolodkingal.enhanced.registry.ModAttachments.BOSS_DATA);
+        var data = com.kolodkingal.enhanced.registry.ModAttachments.BOSS_DATA.get(server.overworld());
         check(data.giftsOf(player.getUUID()).size() == 1 && data.restUntil(BossKind.APOCALYPSE) == 5000L, "the overworld holds them");
         check(data.withoutGifts(player.getUUID()).giftsOf(player.getUUID()).isEmpty() && data.withoutGifts(player.getUUID()).restUntil(BossKind.APOCALYPSE) == 5000L,
                 "taking the gifts leaves the rest");

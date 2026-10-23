@@ -4,10 +4,12 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.config.WolverineConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingBurst;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -31,9 +33,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -127,15 +127,15 @@ public final class WolverineAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(ConfigSpec.DoubleValue value, double fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() && value != null ? value.get() : fallback;
     }
 
@@ -336,7 +336,7 @@ public final class WolverineAbilities {
     static void send(ServerLevel level, Entity who, int kind, List<Vec3> points, int arg) {
         List<Vec3> list = points.size() > WolverineFxPayload.MAX_POINTS ? points.subList(0,
                 WolverineFxPayload.MAX_POINTS) : points;
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new WolverineFxPayload(kind, who.getId(), List.copyOf(list), arg));
     }
 
@@ -357,7 +357,7 @@ public final class WolverineAbilities {
             state.raging = false;
         }
         if (Berserker.raging(player)) {
-            player.setData(ModAttachments.WOLVERINE, Berserker.get(player).withBerserkUntil(0L));
+            ModAttachments.WOLVERINE.set(player, Berserker.get(player).withBerserkUntil(0L));
         }
         Berserker.modifiers(player, false);
         data.set(Live.WOLVERINE_POUNCING, false);

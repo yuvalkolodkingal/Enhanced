@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SoulStoneConfig;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -40,7 +41,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -286,7 +286,7 @@ public final class Sacrifice {
         return switch (onePer()) {
             case UNLIMITED -> null;
             case WORLD -> ledger ? null : Outcome.TAKEN;
-            case PLAYER -> !ledger || seeker.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL)
+            case PLAYER -> !ledger || ModAttachments.STONES.get(seeker).hasTaken(StoneKind.SOUL)
                     || seeker.getInventory().contains(s -> s.is(ModItems.SOUL_STONE.get()))
                     ? Outcome.ALREADY_HAS : null;
         };
@@ -371,7 +371,7 @@ public final class Sacrifice {
         if (removePower() && Powers.power(friend).hasPowers()) {
             Powers.setPower(friend, Power.NONE);
         }
-        friend.setData(ModAttachments.STONES, friend.getData(ModAttachments.STONES).with(StoneProgress.WAS_SACRIFICED));
+        ModAttachments.STONES.set(friend, ModAttachments.STONES.get(friend).with(StoneProgress.WAS_SACRIFICED));
         GIVEN.add(friend.getUUID());
     }
 
@@ -453,9 +453,9 @@ public final class Sacrifice {
                 seeker.drop(stone, false);
             }
         }
-        StoneProgress progress = seeker.getData(ModAttachments.STONES).with(StoneProgress.SACRIFICED_FOR);
+        StoneProgress progress = ModAttachments.STONES.get(seeker).with(StoneProgress.SACRIFICED_FOR);
         // (The ledger's player mode keeps the same bit: set here too, so it holds whatever the ledger's state.)
-        seeker.setData(ModAttachments.STONES, onePer() == SoulStoneConfig.OnePer.PLAYER
+        ModAttachments.STONES.set(seeker, onePer() == SoulStoneConfig.OnePer.PLAYER
                 ? progress.withTaken(StoneKind.SOUL, true) : progress);
         StoneLedger.taken(seeker, StoneKind.SOUL);
         Stonekeeper.say(seeker, Outcome.SACRIFICE.line());
@@ -469,7 +469,7 @@ public final class Sacrifice {
                 Component.translatable("title.enhanced.vormir.soul_stone").withColor(ORANGE)));
         seeker.connection.send(new ClientboundSetSubtitleTextPacket(
                 Component.translatable("title.enhanced.vormir.soul_stone.subtitle").withColor(0xFFD6A0)));
-        PacketDistributor.sendToPlayer(seeker, new StoneFxPayload(StoneFxPayload.SOUL_GIVEN, seeker.getId(), List.of(),
+        Net.sendToPlayer(seeker, new StoneFxPayload(StoneFxPayload.SOUL_GIVEN, seeker.getId(), List.of(),
                 FADE_TICKS));
         ServerLevel at = seeker.serverLevel();
         at.playSound(null, seeker.getX(), seeker.getY(), seeker.getZ(), ModSounds.SOUL_SACRIFICE.get(),

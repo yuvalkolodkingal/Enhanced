@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The new structures of the stones (3.6): the Sanctum Sanctorum, Avengers Tower, the End tunnel and the Vormir Cliff.
@@ -13,12 +13,12 @@ public final class StoneSitesConfig {
     public static final String SECTION = "stone_sites";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue SANCTUMS;
-    public static ModConfigSpec.BooleanValue AVENGERS_TOWERS;
-    public static ModConfigSpec.BooleanValue END_TUNNELS;
-    public static ModConfigSpec.BooleanValue VORMIR_CLIFFS;
+    public static ConfigSpec.BooleanValue SANCTUMS;
+    public static ConfigSpec.BooleanValue AVENGERS_TOWERS;
+    public static ConfigSpec.BooleanValue END_TUNNELS;
+    public static ConfigSpec.BooleanValue VORMIR_CLIFFS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("stone_sites");
         SANCTUMS = builder.comment("Whether new Sanctums Sanctorum generate (the Time Stone's site).")
                 .define("sanctums", true);

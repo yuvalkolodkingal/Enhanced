@@ -79,7 +79,7 @@ public final class SpiderEvents {
     public static void onWebTorn(LivingDamageEvent.Post event) {
         LivingEntity victim = event.getEntity();
         MobEffectInstance web = victim.getEffect(ModEffects.WEBBED);
-        if (web == null || event.getNewDamage() < TEAR_DAMAGE || victim.level().isClientSide) {
+        if (web == null || event.getNewDamage() < TEAR_DAMAGE || victim.level().isClientSide()) {
             return;
         }
         int left = web.getDuration() - TEAR_TICKS;

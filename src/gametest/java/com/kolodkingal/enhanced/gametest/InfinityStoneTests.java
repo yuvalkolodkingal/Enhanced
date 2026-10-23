@@ -8,6 +8,8 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
+import com.kolodkingal.enhanced.platform.reg.RegEntry;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -15,7 +17,6 @@ import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -33,9 +34,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -57,8 +55,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Loki's Scepter, Vision's beam), always under the sound they come with. (The hum while someone holds the Tesseract or
  * the Scepter is client-side, and is checked in a running game.)
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class InfinityStoneTests {
 
     /** A sound the server sent: which, where and how loud. */
@@ -75,7 +71,7 @@ public final class InfinityStoneTests {
         return heard;
     }
 
-    private static List<Heard> only(List<Heard> all, DeferredHolder<SoundEvent, SoundEvent> sound) {
+    private static List<Heard> only(List<Heard> all, RegEntry<SoundEvent, SoundEvent> sound) {
         return all.stream().filter(h -> h.id().equals(sound.getId())).toList();
     }
 
@@ -137,7 +133,7 @@ public final class InfinityStoneTests {
      * subtitles in both languages; every file is a mono 44.1 kHz Ogg Vorbis like the mod's other sounds, the uses are
      * short and the hums are 2-second loops.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyStoneHasItsVoice(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject sounds = json(mod, "assets", Enhanced.MODID, "sounds.json");
@@ -177,7 +173,7 @@ public final class InfinityStoneTests {
     // ---- the Space Stone: the Tesseract ----
 
     /** Loki's escape: the Space Stone swells with the portal at both ends, quieter than it. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractEscapeHasTheSpaceStoneUnderThePortal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -196,7 +192,7 @@ public final class InfinityStoneTests {
     }
 
     /** A hero's jump: the same, at both ends. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractJumpHasTheSpaceStoneAtBothEnds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
@@ -215,7 +211,7 @@ public final class InfinityStoneTests {
     }
 
     /** Tesseract + gene: no portal, but the Space Stone answers the gene, under the awakening's own sound. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractWithGeneHasTheSpaceStoneButNoPortal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -236,7 +232,7 @@ public final class InfinityStoneTests {
     // ---- the Mind Stone: Loki's Scepter ----
 
     /** The scepter, gene in the other hand: the Mind Stone sings as the Scarlet Witch awakens, under the awakening. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterAwakeningOfTheScarletWitchHasTheMindStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -254,7 +250,7 @@ public final class InfinityStoneTests {
     }
 
     /** The scepter and a synthezoid core: the Mind Stone sings as it moves into the body, and Vision awakens. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterAwakeningOfVisionHasTheMindStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -272,7 +268,7 @@ public final class InfinityStoneTests {
     }
 
     /** It sings for Vision and the Scarlet Witch too, when they touch it: it knows them. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterRecognisingAHeroHasTheMindStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -291,7 +287,7 @@ public final class InfinityStoneTests {
      * Touching the stone with neither gene nor body tears an ordinary player apart, and it sings first. Own batch: it
      * explodes.
      */
-    @GameTest(template = ARENA, batch = "mind_stone_death")
+    @EnhancedTest(template = ARENA, batch = "mind_stone_death")
     public static void scepterTearingSomeoneApartHasTheMindStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5, GameType.CREATIVE);
@@ -305,7 +301,7 @@ public final class InfinityStoneTests {
     }
 
     /** A hero who already has powers gets only a message when the gene meets the stone: nothing happens, no singing. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterThatDoesNothingIsSilent(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(10.5, FLOOR, 10.5, Power.MAGNETO);
@@ -320,12 +316,12 @@ public final class InfinityStoneTests {
     }
 
     /** A hit that confuses someone: the Mind Stone's voice under the chime. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterHitHasTheMindStoneUnderItsChime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer attacker = f.player(10.5, FLOOR, 10.5);
         attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         zombie.setNoAi(true);
         heard(attacker);
@@ -340,12 +336,12 @@ public final class InfinityStoneTests {
     }
 
     /** A blow that kills leaves nothing behind: no confusion, no chime, no Mind Stone. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void scepterKillingBlowHasNoMindStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer attacker = f.player(10.5, FLOOR, 10.5);
         attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.LOKIS_SCEPTER.get()));
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setNoAi(true);
         zombie.setHealth(0.1F);
         heard(attacker);
@@ -360,7 +356,7 @@ public final class InfinityStoneTests {
     // ---- the Mind Stone: Vision ----
 
     /** The beam starting: the stone in his forehead sings once; holding R doesn't repeat it, letting go makes none. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void visionBeamStartHasTheMindStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = f.player(10.5, FLOOR, 10.5, Power.VISION);

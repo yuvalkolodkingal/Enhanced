@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SlowMotion;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client: a projectile entered Quicksilver Time (factor = how many times slower) or left it (factor 0), so the
@@ -26,7 +26,7 @@ public record SlowedProjectilePayload(int entityId, int factor) implements Custo
         return TYPE;
     }
 
-    static void handle(SlowedProjectilePayload payload, IPayloadContext context) {
+    static void handle(SlowedProjectilePayload payload, PacketContext context) {
         Entity entity = context.player().level().getEntity(payload.entityId());
         if (entity != null) {
             SlowMotion.onSlowedSync(entity, payload.factor());

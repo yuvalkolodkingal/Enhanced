@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The Hydra soldiers of the Hydra outposts (3.6). Every option of the plan is defined here by the 3.6 skeleton (lane
@@ -22,39 +22,39 @@ public final class HydraConfig {
     public static final String SECTION = "hydra";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue GARRISON_SIZE;
-    public static ModConfigSpec.EnumValue<Respawn> RESPAWN;
-    public static ModConfigSpec.IntValue RESPAWN_DAYS;
-    public static ModConfigSpec.IntValue ACTIVATE_RADIUS;
-    public static ModConfigSpec.IntValue LEASH_RADIUS;
-    public static ModConfigSpec.IntValue MAX_PER_OUTPOST;
-    public static ModConfigSpec.IntValue MAX_LOADED;
-    public static ModConfigSpec.BooleanValue ALARM;
-    public static ModConfigSpec.IntValue ALARM_TICKS;
-    public static ModConfigSpec.IntValue REINFORCEMENTS;
-    public static ModConfigSpec.IntValue MAX_ALARMS_PER_DAY;
-    public static ModConfigSpec.IntValue SIGHT_RANGE;
-    public static ModConfigSpec.DoubleValue SNEAK_FACTOR;
-    public static ModConfigSpec.DoubleValue RIFLE_DAMAGE;
-    public static ModConfigSpec.IntValue BURST_SHOTS;
-    public static ModConfigSpec.IntValue BURST_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SNIPER_DAMAGE;
-    public static ModConfigSpec.IntValue SNIPER_RANGE;
-    public static ModConfigSpec.IntValue SNIPER_AIM_TICKS;
-    public static ModConfigSpec.DoubleValue BATON_DAMAGE;
-    public static ModConfigSpec.DoubleValue PISTOL_DAMAGE;
-    public static ModConfigSpec.DoubleValue BOLT_SPEED;
-    public static ModConfigSpec.BooleanValue SCEPTER_TURNS;
-    public static ModConfigSpec.IntValue SCEPTER_TURN_TICKS;
-    public static ModConfigSpec.BooleanValue BLASTER_ENABLED;
-    public static ModConfigSpec.DoubleValue BLASTER_DAMAGE;
-    public static ModConfigSpec.IntValue BLASTER_COOLDOWN;
-    public static ModConfigSpec.DoubleValue BLASTER_DROP;
-    public static ModConfigSpec.DoubleValue INTEL_MAP_DROP;
-    public static ModConfigSpec.DoubleValue ENERGY_CELL_DROP;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue GARRISON_SIZE;
+    public static ConfigSpec.EnumValue<Respawn> RESPAWN;
+    public static ConfigSpec.IntValue RESPAWN_DAYS;
+    public static ConfigSpec.IntValue ACTIVATE_RADIUS;
+    public static ConfigSpec.IntValue LEASH_RADIUS;
+    public static ConfigSpec.IntValue MAX_PER_OUTPOST;
+    public static ConfigSpec.IntValue MAX_LOADED;
+    public static ConfigSpec.BooleanValue ALARM;
+    public static ConfigSpec.IntValue ALARM_TICKS;
+    public static ConfigSpec.IntValue REINFORCEMENTS;
+    public static ConfigSpec.IntValue MAX_ALARMS_PER_DAY;
+    public static ConfigSpec.IntValue SIGHT_RANGE;
+    public static ConfigSpec.DoubleValue SNEAK_FACTOR;
+    public static ConfigSpec.DoubleValue RIFLE_DAMAGE;
+    public static ConfigSpec.IntValue BURST_SHOTS;
+    public static ConfigSpec.IntValue BURST_COOLDOWN;
+    public static ConfigSpec.DoubleValue SNIPER_DAMAGE;
+    public static ConfigSpec.IntValue SNIPER_RANGE;
+    public static ConfigSpec.IntValue SNIPER_AIM_TICKS;
+    public static ConfigSpec.DoubleValue BATON_DAMAGE;
+    public static ConfigSpec.DoubleValue PISTOL_DAMAGE;
+    public static ConfigSpec.DoubleValue BOLT_SPEED;
+    public static ConfigSpec.BooleanValue SCEPTER_TURNS;
+    public static ConfigSpec.IntValue SCEPTER_TURN_TICKS;
+    public static ConfigSpec.BooleanValue BLASTER_ENABLED;
+    public static ConfigSpec.DoubleValue BLASTER_DAMAGE;
+    public static ConfigSpec.IntValue BLASTER_COOLDOWN;
+    public static ConfigSpec.DoubleValue BLASTER_DROP;
+    public static ConfigSpec.DoubleValue INTEL_MAP_DROP;
+    public static ConfigSpec.DoubleValue ENERGY_CELL_DROP;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("hydra");
         ENABLED = builder.comment("Whether Hydra soldiers guard the Hydra outposts (false stops new ones; those there",
                 "stay).")

@@ -137,7 +137,7 @@ public class BladeSpikeEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (tickCount < delay() && random.nextInt(3) == 0) {
                 level().addParticle(new EnergyParticleOptions(HelaRules.GREEN, 0.5F), getX() + (random.nextDouble() - 0.5) * 0.6, getY() + 0.05,
                         getZ() + (random.nextDouble() - 0.5) * 0.6, 0.0, 0.02, 0.0);

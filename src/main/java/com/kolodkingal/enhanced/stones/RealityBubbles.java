@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.custom.StoneRow;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -35,7 +36,6 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -174,7 +174,7 @@ public final class RealityBubbles {
     private static void tell(ServerPlayer player, List<Vec3> popped) {
         List<Vec3> points = popped.size() > StoneFxPayload.MAX_POINTS ? popped.subList(0, StoneFxPayload.MAX_POINTS)
                 : popped;
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(StoneFxPayload.BUBBLE,
+        Net.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(StoneFxPayload.BUBBLE,
                 player.getId(), List.copyOf(points), count(player)));
     }
 

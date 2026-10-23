@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -19,7 +20,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -50,8 +50,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -66,8 +64,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * School (the wheelchair and Cyclops' glasses): their data, their templates, their loot, and how they are built. The
  * structures are built far from the arenas (100,000 blocks out), where nothing else is.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class WorldStructureTests {
     static final String BATCH = "world";
     static final ResourceLocation WHEELCHAIR = ResourceLocation.fromNamespaceAndPath(Enhanced.MODID, "xavier_wheelchair");
@@ -99,7 +95,7 @@ public final class WorldStructureTests {
         return tables;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theThreeStructuresAndTheirSetsAreData(GameTestHelper helper) {
         var access = helper.getLevel().registryAccess();
         Registry<Structure> structures = access.registryOrThrow(Registries.STRUCTURE);
@@ -131,7 +127,7 @@ public final class WorldStructureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theScepterIsInEveryOutpostsVault(GameTestHelper helper) {
         List<String> tables = chestTables(helper, "hydra_outpost/base");
         check(tables.stream().filter("enhanced:chests/hydra_outpost/vault"::equals).count() == 1, "the outpost has one vault chest: " + tables);
@@ -153,7 +149,7 @@ public final class WorldStructureTests {
      * The wheelchair (lane XAVIER) and the glasses (lane CYCLOPS) are each in a table of their own that exists only when its
      * item does; with the item missing the chest still has its other loot and nothing fails to load.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSchoolHoldsTheWheelchairAndTheGlassesWhenTheyExist(GameTestHelper helper) {
         List<String> tables = chestTables(helper, "mutant_school/mansion");
         check(tables.stream().filter("enhanced:chests/mutant_school/study"::equals).count() == 1, "one chest in the Professor's study: " + tables);
@@ -177,7 +173,7 @@ public final class WorldStructureTests {
     }
 
     /** The outpost built for real (turned, with its processors) high in the air: its vault, and the footing under it. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void anOutpostIsBuiltWithItsVaultAndAFooting(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         StructureTemplate built = level.getStructureManager().getOrCreate(Enhanced.id("hydra_outpost/base"));
@@ -213,7 +209,7 @@ public final class WorldStructureTests {
     }
 
     /** A crater built on the flat ground: the bowl, the scorch, the campfires, and a Mjolnir nobody owns in the middle. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void aCraterHasAnUnclaimedMjolnirInItsMiddle(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         ChunkGenerator generator = level.getChunkSource().getGenerator();
@@ -257,7 +253,7 @@ public final class WorldStructureTests {
     }
 
     /** As it lies in a crater (the block with no hammer of its own): the first worthy hand claims it, the unworthy cannot. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCratersMjolnirIsClaimedByTheFirstWorthy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

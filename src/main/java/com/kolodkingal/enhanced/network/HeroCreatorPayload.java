@@ -3,13 +3,13 @@ package com.kolodkingal.enhanced.network;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.Power;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server (3.3): a button of the Hero Creator. {@link #CHOOSE}: become one of the mod's heroes in a look ({@code
@@ -49,7 +49,7 @@ public record HeroCreatorPayload(int action, String power, String look, CustomHe
         return TYPE;
     }
 
-    static void handle(HeroCreatorPayload payload, IPayloadContext context) {
+    static void handle(HeroCreatorPayload payload, PacketContext context) {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }

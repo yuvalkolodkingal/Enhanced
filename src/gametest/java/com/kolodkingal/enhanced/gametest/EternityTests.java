@@ -20,6 +20,8 @@ import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.network.EternityScreenPayload;
 import com.kolodkingal.enhanced.network.EternityWishPayload;
 import com.kolodkingal.enhanced.odin.GungnirStand;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -30,7 +32,6 @@ import com.kolodkingal.enhanced.stones.StoneLedger;
 import com.kolodkingal.enhanced.world.ShrinePlan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -50,9 +51,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,8 +81,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * bearer put back when it ends), {@code eternity_cfg} (the ledger's world mode, the wish's options) and {@code
  * eternity_boss} (a boss fight's stand-in).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class EternityTests {
     private static final String BATCH = "eternity";
     private static final String WISH = "eternity_wish";
@@ -114,7 +110,7 @@ public final class EternityTests {
 
     // ---- the shrine ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShrineHoldsItsPointsStatuesAndBook(GameTestHelper helper) throws IOException {
         MinecraftServer server = helper.getLevel().getServer();
         ResourceLocation file = Enhanced.id("structure/eternity_shrine/shrine.nbt");
@@ -179,7 +175,7 @@ public final class EternityTests {
 
     // ---- the way in ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void theAltarTakesTheKeyHolderToTheRealm(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel realm = EternityTestSupport.ensureRealm(helper.getLevel().getServer());
@@ -198,7 +194,7 @@ public final class EternityTests {
             assertNear(thor.position().distanceTo(EternityRealm.ARRIVAL), 0.0, 1.0E-6, "at the arrival");
             assertNear(thor.getYRot(), EternityRealm.ARRIVAL_YAW, 1.0E-3, "facing north, toward Eternity");
             check(!be.charging(), "the altar is quiet again");
-            EternityProgress progress = thor.getData(ModAttachments.ETERNITY);
+            EternityProgress progress = ModAttachments.ETERNITY.get(thor);
             check(progress.returnTo().isPresent() && progress.returnTo().get().dimension() == Level.OVERWORLD
                     && progress.visits() == 1, "his way home saved, one visit");
             check(realm.getBlockState(EternityRealm.WISHING_STONE).is(ModBlocks.ETERNITY_ALTAR.get()),
@@ -207,7 +203,7 @@ public final class EternityTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void withoutAKeyTheAltarWaits(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos altar = helper.absolutePos(new BlockPos(10, 2, 10));
@@ -228,7 +224,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void walkingAwayCancelsTheJourney(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         EternityTestSupport.ensureRealm(helper.getLevel().getServer());
@@ -250,7 +246,7 @@ public final class EternityTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BOSS)
+    @EnhancedTest(template = ARENA, batch = BOSS)
     public static void aBossFightersKeyOpensNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer thor = f.player(4.5, FLOOR, 4.5, Power.THOR);
@@ -270,7 +266,7 @@ public final class EternityTests {
 
     // ---- the realm ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theMirrorLiesAtSixtyThreeEverywhere(GameTestHelper helper) {
         ServerLevel realm = EternityTestSupport.ensureRealm(helper.getLevel().getServer());
         for (int[] xz : new int[][]{{0, 0}, {0, -48}, {37, 211}, {-500, 90}, {1234, -777}}) {
@@ -285,7 +281,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void eternityIsMadeOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer one = traveller(f, 4.5, 4.5, Power.NONE);
@@ -304,20 +300,20 @@ public final class EternityTests {
 
     // ---- the wish ----
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void aWishGivesAStackOfDiamonds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = traveller(f, 4.5, 4.5, Power.NONE);
         check(Wishes.mayWish(player), "a wish to make");
         EternityRealm.wish(player, EternityWishPayload.ITEM, BuiltInRegistries.ITEM.getKey(Items.DIAMOND));
         check(count(player, Items.DIAMOND) == 64, "64 diamonds: " + count(player, Items.DIAMOND));
-        check(!Wishes.mayWish(player) && player.getData(ModAttachments.ETERNITY).lastWish() == EternityProgress.ITEM,
+        check(!Wishes.mayWish(player) && ModAttachments.ETERNITY.get(player).lastWish() == EternityProgress.ITEM,
                 "his wish is spent");
         check(EternityRealm.goingHome(player), "he goes home in a moment");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void aCommandBlockIsNeverGranted(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = traveller(f, 4.5, 4.5, Power.NONE);
@@ -340,7 +336,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void aSiteStoneComesThroughTheLedger(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -371,7 +367,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void gungnirHasOneBearer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -395,7 +391,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void mjolnirOnlyForTheWorthy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer plain = traveller(f, 4.5, 4.5, Power.NONE);
@@ -412,7 +408,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void oneWishThenResetGivesItBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = traveller(f, 4.5, 4.5, Power.NONE);
@@ -422,14 +418,14 @@ public final class EternityTests {
         EternityRealm.wish(player, EternityWishPayload.ITEM, BuiltInRegistries.ITEM.getKey(Items.EMERALD));
         check(count(player, Items.EMERALD) == 0, "a second wish refused");
         EternityCommand.reset(player.createCommandSourceStack(), player);
-        check(Wishes.mayWish(player) && player.getData(ModAttachments.ETERNITY).visits() == 2,
+        check(Wishes.mayWish(player) && ModAttachments.ETERNITY.get(player).visits() == 2,
                 "reset gives it back (the visits kept)");
         EternityRealm.wish(player, EternityWishPayload.ITEM, BuiltInRegistries.ITEM.getKey(Items.EMERALD));
         check(count(player, Items.EMERALD) == 64, "and he wishes again");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void homeToTheExactSpotAndFacing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         EternityTestSupport.ensureRealm(helper.getLevel().getServer());
@@ -443,12 +439,12 @@ public final class EternityTests {
         assertNear(player.position().distanceTo(from), 0.0, 1.0E-6, "on the very spot");
         assertNear(player.getYRot(), 37.0, 1.0E-3, "facing the same way");
         assertNear(player.getXRot(), 12.0, 1.0E-3, "looking at the same height");
-        check(player.getData(ModAttachments.ETERNITY).returnTo().isEmpty() && Wishes.mayWish(player),
+        check(ModAttachments.ETERNITY.get(player).returnTo().isEmpty() && Wishes.mayWish(player),
                 "the way home forgotten; leaving costs no wish");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void aPlayerWhoLogsInThereIsSentHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = traveller(f, 5.5, 5.5, Power.NONE);
@@ -458,7 +454,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WISH)
+    @EnhancedTest(template = ARENA, batch = WISH)
     public static void loveIsAWish(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = traveller(f, 4.5, 4.5, Power.WOLVERINE);
@@ -466,7 +462,7 @@ public final class EternityTests {
         check(Powers.power(player) == Power.LOVE, "she is Love");
         assertNear(player.getMaxHealth(), 32.0, 1.0E-4, "32 health (16 hearts)");
         check(count(player, ModItems.STORMBREAKER.get()) == 1, "with a Stormbreaker");
-        check(player.getData(ModAttachments.ETERNITY).lastWish() == EternityProgress.LOVE, "her wish was Love");
+        check(ModAttachments.ETERNITY.get(player).lastWish() == EternityProgress.LOVE, "her wish was Love");
         // One who already carries the axe gets no second.
         ServerPlayer thor = traveller(f, 6.5, 4.5, Power.THOR);
         thor.getInventory().add(new ItemStack(ModItems.STORMBREAKER.get()));
@@ -475,7 +471,7 @@ public final class EternityTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void theWishesFollowTheConfig(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EternityConfig.WISH_FULL_STACK, false);
@@ -492,10 +488,10 @@ public final class EternityTests {
     private static void answer(EternityWishPayload payload, ServerPlayer player) {
         try {
             Method handle = EternityWishPayload.class.getDeclaredMethod("handle", EternityWishPayload.class,
-                    IPayloadContext.class);
+                    PacketContext.class);
             handle.setAccessible(true);
-            IPayloadContext context = (IPayloadContext) Proxy.newProxyInstance(IPayloadContext.class.getClassLoader(),
-                    new Class[]{IPayloadContext.class}, (proxy, method, args) -> method.getName().equals("player")
+            PacketContext context = (PacketContext) Proxy.newProxyInstance(PacketContext.class.getClassLoader(),
+                    new Class[]{PacketContext.class}, (proxy, method, args) -> method.getName().equals("player")
                             ? player : null);
             handle.invoke(null, payload, context);
         } catch (ReflectiveOperationException e) {

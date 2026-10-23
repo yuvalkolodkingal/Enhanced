@@ -36,7 +36,7 @@ public class FalconWingsItem extends ArmorItem {
     @Override
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         // As an elytra wears: a point every second of gliding.
-        if (!entity.level().isClientSide) {
+        if (!entity.level().isClientSide()) {
             int next = flightTicks + 1;
             if (next % 10 == 0) {
                 if (next % 20 == 0) {

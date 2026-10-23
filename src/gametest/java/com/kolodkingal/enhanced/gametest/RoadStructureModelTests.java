@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadCanvas;
 import com.kolodkingal.enhanced.road.RoadLayout;
 import com.kolodkingal.enhanced.road.copy.CopyGeometry;
@@ -11,7 +12,6 @@ import com.kolodkingal.enhanced.road.copy.StructureModel;
 import com.kolodkingal.enhanced.road.copy.StructureSupply;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -28,8 +28,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,8 +42,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * built by hand, in the sizes and with the kinds of block it promises), the comparison (what counts and what does not), the supply
  * (enough of everything) and the room's plan (model and plot alike and three blocks apart, the console, the way from the start).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadStructureModelTests {
     static final String BATCH = "road_structure_model";
 
@@ -94,7 +90,7 @@ public final class RoadStructureModelTests {
 
     // ---- the library ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void everyModelOfTheLibraryCanBeBuiltByHand(GameTestHelper helper) {
         Map<String, Set<Integer>> distinct = new HashMap<>();
         double[] blocks = new double[4];
@@ -152,7 +148,7 @@ public final class RoadStructureModelTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void theSeedPicksTheThemeAndAllFiveThemesAppear(GameTestHelper helper) {
         Set<String> themes = new HashSet<>();
         for (int seed = 0; seed < 200; seed++) {
@@ -211,7 +207,7 @@ public final class RoadStructureModelTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theComparisonSeesWrongOrientationsMissingAndExtraBlocks(GameTestHelper helper) {
         StructureModel hut = StructureLibrary.generate(11, 2, 0);
         Plot plot = new Plot(hut);
@@ -274,7 +270,7 @@ public final class RoadStructureModelTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void slabsLanternsAndFencesAreComparedByWhatYouSee(GameTestHelper helper) {
         // The temple has slabs on its roof; the altar hangs lanterns from its beams; the bridge has walls.
         StructureModel temple = StructureLibrary.generate(3, 2, 3);
@@ -309,7 +305,7 @@ public final class RoadStructureModelTests {
 
     // ---- the supply ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void theSupplyIsMoreThanTheModelNeedsOfEveryBlock(GameTestHelper helper) {
         for (int tier = 1; tier <= 3; tier++) {
             for (int seed = 0; seed < 60; seed++) {
@@ -334,7 +330,7 @@ public final class RoadStructureModelTests {
 
     // ---- the room ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void theRoomPutsTheModelAndThePlotSideBySideThreeBlocksApart(GameTestHelper helper) {
         for (int tier = 1; tier <= 3; tier++) {
             for (int theme = 0; theme < StructureLibrary.THEMES.size(); theme++) {
@@ -399,7 +395,7 @@ public final class RoadStructureModelTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBlockOfTheModelIsAlwaysSomethingHeldByHand(GameTestHelper helper) {
         Set<Block> blocks = new HashSet<>();
         for (int tier = 1; tier <= 3; tier++) {

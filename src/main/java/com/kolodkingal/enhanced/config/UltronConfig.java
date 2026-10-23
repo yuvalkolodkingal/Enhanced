@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The balance numbers of Ultron, the hero. Its options are defined in {@link #define}, which {@code EnhancedConfig}
@@ -15,47 +15,47 @@ public final class UltronConfig {
      * Assigned by {@link #define} when the config is built, which is at mod construction: before anything reads it (it
      * cannot be final because the options are defined in a method, not in a static block).
      */
-    public static ModConfigSpec.DoubleValue FLIGHT_SPEED;
-    public static ModConfigSpec.DoubleValue BODY_HEALTH;
-    public static ModConfigSpec.DoubleValue BODY_ARMOR;
-    public static ModConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
-    public static ModConfigSpec.DoubleValue LIGHTNING_FACTOR;
-    public static ModConfigSpec.IntValue VISION_CUT_RANGE;
-    public static ModConfigSpec.DoubleValue BOLT_DAMAGE;
-    public static ModConfigSpec.DoubleValue BOLT_SPLASH;
-    public static ModConfigSpec.IntValue BOLT_INTERVAL;
-    public static ModConfigSpec.IntValue BOLT_POOL;
-    public static ModConfigSpec.DoubleValue BOLT_REGEN_PER_SECOND;
-    public static ModConfigSpec.IntValue BOLT_RESTART;
-    public static ModConfigSpec.DoubleValue OVERCHARGE_DAMAGE;
-    public static ModConfigSpec.DoubleValue OVERCHARGE_SPLASH;
-    public static ModConfigSpec.DoubleValue OVERCHARGE_RADIUS;
-    public static ModConfigSpec.IntValue OVERCHARGE_COST;
-    public static ModConfigSpec.IntValue OVERCHARGE_CHARGE_TICKS;
-    public static ModConfigSpec.DoubleValue OVERCHARGE_SLOW;
-    public static ModConfigSpec.IntValue OVERCHARGE_COOLDOWN;
-    public static ModConfigSpec.IntValue PULL_RANGE;
-    public static ModConfigSpec.DoubleValue PULL_DAMAGE;
-    public static ModConfigSpec.IntValue PULL_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SLAM_RADIUS;
-    public static ModConfigSpec.DoubleValue SLAM_DAMAGE;
-    public static ModConfigSpec.IntValue SLAM_COOLDOWN;
-    public static ModConfigSpec.IntValue UPLOAD_RANGE;
-    public static ModConfigSpec.DoubleValue UPLOAD_HEAL;
-    public static ModConfigSpec.IntValue UPLOAD_COOLDOWN;
-    public static ModConfigSpec.IntValue SECOND_LIFE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SECOND_LIFE_HEALTH;
-    public static ModConfigSpec.IntValue SECOND_LIFE_RANGE;
-    public static ModConfigSpec.IntValue HACK_RANGE;
-    public static ModConfigSpec.IntValue HACK_MAX;
-    public static ModConfigSpec.IntValue DRONE_COUNT;
-    public static ModConfigSpec.IntValue DRONE_MAX;
-    public static ModConfigSpec.IntValue DRONE_LIFETIME;
-    public static ModConfigSpec.IntValue DRONE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue DRONE_HEALTH;
-    public static ModConfigSpec.DoubleValue DRONE_DAMAGE;
+    public static ConfigSpec.DoubleValue FLIGHT_SPEED;
+    public static ConfigSpec.DoubleValue BODY_HEALTH;
+    public static ConfigSpec.DoubleValue BODY_ARMOR;
+    public static ConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
+    public static ConfigSpec.DoubleValue LIGHTNING_FACTOR;
+    public static ConfigSpec.IntValue VISION_CUT_RANGE;
+    public static ConfigSpec.DoubleValue BOLT_DAMAGE;
+    public static ConfigSpec.DoubleValue BOLT_SPLASH;
+    public static ConfigSpec.IntValue BOLT_INTERVAL;
+    public static ConfigSpec.IntValue BOLT_POOL;
+    public static ConfigSpec.DoubleValue BOLT_REGEN_PER_SECOND;
+    public static ConfigSpec.IntValue BOLT_RESTART;
+    public static ConfigSpec.DoubleValue OVERCHARGE_DAMAGE;
+    public static ConfigSpec.DoubleValue OVERCHARGE_SPLASH;
+    public static ConfigSpec.DoubleValue OVERCHARGE_RADIUS;
+    public static ConfigSpec.IntValue OVERCHARGE_COST;
+    public static ConfigSpec.IntValue OVERCHARGE_CHARGE_TICKS;
+    public static ConfigSpec.DoubleValue OVERCHARGE_SLOW;
+    public static ConfigSpec.IntValue OVERCHARGE_COOLDOWN;
+    public static ConfigSpec.IntValue PULL_RANGE;
+    public static ConfigSpec.DoubleValue PULL_DAMAGE;
+    public static ConfigSpec.IntValue PULL_COOLDOWN;
+    public static ConfigSpec.DoubleValue SLAM_RADIUS;
+    public static ConfigSpec.DoubleValue SLAM_DAMAGE;
+    public static ConfigSpec.IntValue SLAM_COOLDOWN;
+    public static ConfigSpec.IntValue UPLOAD_RANGE;
+    public static ConfigSpec.DoubleValue UPLOAD_HEAL;
+    public static ConfigSpec.IntValue UPLOAD_COOLDOWN;
+    public static ConfigSpec.IntValue SECOND_LIFE_COOLDOWN;
+    public static ConfigSpec.DoubleValue SECOND_LIFE_HEALTH;
+    public static ConfigSpec.IntValue SECOND_LIFE_RANGE;
+    public static ConfigSpec.IntValue HACK_RANGE;
+    public static ConfigSpec.IntValue HACK_MAX;
+    public static ConfigSpec.IntValue DRONE_COUNT;
+    public static ConfigSpec.IntValue DRONE_MAX;
+    public static ConfigSpec.IntValue DRONE_LIFETIME;
+    public static ConfigSpec.IntValue DRONE_COOLDOWN;
+    public static ConfigSpec.DoubleValue DRONE_HEALTH;
+    public static ConfigSpec.DoubleValue DRONE_DAMAGE;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         FLIGHT_SPEED = builder.comment("Ultron's flying speed (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.10, 0.01, 0.5);

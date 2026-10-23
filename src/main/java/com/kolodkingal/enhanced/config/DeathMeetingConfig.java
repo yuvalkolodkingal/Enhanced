@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The meeting with Death (3.7, Eilon's request): a player who dies meets Rio Vidal, the Green Witch, who lets him start
@@ -13,11 +13,11 @@ public final class DeathMeetingConfig {
     public static final String SECTION = "death_meeting";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue ALLOW_NETHER;
-    public static ModConfigSpec.IntValue FIRE_RESISTANCE_SECONDS;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue ALLOW_NETHER;
+    public static ConfigSpec.IntValue FIRE_RESISTANCE_SECONDS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Whether a player who dies meets Death (Rio, the Green Witch) instead of the plain",
                 "death screen. Off: the vanilla screen. Hardcore worlds and doImmediateRespawn always keep vanilla's",

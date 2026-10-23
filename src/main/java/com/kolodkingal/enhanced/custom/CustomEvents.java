@@ -92,7 +92,7 @@ public final class CustomEvents {
     @SubscribeEvent
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
-        if (projectile.level().isClientSide || !(event.getRayTraceResult() instanceof EntityHitResult hit)
+        if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)
                 || !(hit.getEntity() instanceof ServerPlayer player) || projectile.getOwner() == player || !CustomHeroes.is(player)) {
             return;
         }
@@ -117,7 +117,7 @@ public final class CustomEvents {
 
     @SubscribeEvent
     public static void onChangeTarget(LivingChangeTargetEvent event) {
-        if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide) {
+        if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide()) {
             return;
         }
         LivingEntity target = event.getNewAboutToBeSetTarget();

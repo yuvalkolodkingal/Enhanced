@@ -42,7 +42,7 @@ public class HelaHeaddressItem extends AwakeningItem {
 
     @Override
     public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int remaining) {
-        if (!level.isClientSide && entity instanceof ServerPlayer player) {
+        if (!level.isClientSide() && entity instanceof ServerPlayer player) {
             int total = getUseDuration(stack, entity);
             HelaAbilities.holding(player, total - remaining, total);
         }
@@ -50,7 +50,7 @@ public class HelaHeaddressItem extends AwakeningItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
-        if (!level.isClientSide && entity instanceof ServerPlayer player) {
+        if (!level.isClientSide() && entity instanceof ServerPlayer player) {
             HelaAbilities.stopHolding(player);
         }
     }
@@ -58,7 +58,7 @@ public class HelaHeaddressItem extends AwakeningItem {
     /** A headdress of the reward that reaches its winner gives him the right to Gungnir (once; the mark stays). */
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (level.isClientSide || !(entity instanceof ServerPlayer player) || player.tickCount % 20 != 0) {
+        if (level.isClientSide() || !(entity instanceof ServerPlayer player) || player.tickCount % 20 != 0) {
             return;
         }
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);

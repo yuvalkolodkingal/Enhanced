@@ -19,6 +19,7 @@ import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -27,7 +28,6 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,8 +39,6 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -56,14 +54,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * player's Sneak), its upkeep only for the abilities picked (no Thor body with his lightning alone), its item rule (the
  * hammer needs the weapon in hand and makes him worthy; the Bifrost needs no weapon) and its end when the powers go.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomGodsTests {
     private static final String BATCH = "custom_gods";
 
     /** A husk that stands where it is, with no armour (so a damage reads as it is) and no burning in the sun. */
     private static Zombie husk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         return husk;
     }
@@ -83,7 +79,7 @@ public final class CustomGodsTests {
 
     // ---- Thor ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thorsLightningOnRIsBareHandedAndScalesWithItsStrength(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer weak = one(f, 3.5, 4.5, "thor.lightning", 2, 1);
@@ -109,7 +105,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thorsBodyComesWithItsRowByItsStrength(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer none = one(f, 3.5, 4.5, "thor.lightning", 5, 1);
@@ -128,7 +124,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGodOfThunderOnRHitsHarderAndArcs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 8.5, 10.5, "thor.thunder", 5, 1);
@@ -149,7 +145,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void theBifrostOnRNeedsNoWeaponAndItsMainOpensTheScreen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 3.5, 10.5, "thor.bifrost", 5, 1);
@@ -179,7 +175,7 @@ public final class CustomGodsTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "custom_gods_hammer", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "custom_gods_hammer", timeoutTicks = 200)
     public static void thorsHammerOnGNeedsTheWeaponAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
@@ -211,7 +207,7 @@ public final class CustomGodsTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "custom_gods_shatter", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "custom_gods_shatter", timeoutTicks = 200)
     public static void sneakAndThorsHammerShattersMjolnirAndItComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 10.5, 10.5, "thor.hammer", 5, 4);
@@ -230,7 +226,7 @@ public final class CustomGodsTests {
 
     // ---- Loki ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void lokisDaggersOnVAndTheFanOnSneakV(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer one = one(f, 3.5, 4.5, "loki.daggers", 5, 3);
@@ -251,7 +247,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFrostGiantOnRArmoursHimWithoutLokisBody(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 5.5, 10.5, "loki.frost_giant", 5, 1);
@@ -271,7 +267,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void lokisDuplicatesOnBStayWhileHeHasThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 10.5, 10.5, "loki.duplicates", 5, 4);
@@ -294,7 +290,7 @@ public final class CustomGodsTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void lokisShapeshiftOnGAndAnotherHerosPoseIsNotEnded(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 4.5, 10.5, CustomKitSupport.def()
@@ -315,7 +311,7 @@ public final class CustomGodsTests {
 
     // ---- the Phoenix ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void phoenixMindOnBAndMindSenseOnSneakB(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 10.5, 10.5, "phoenix.mind", 5, 4);
@@ -332,7 +328,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void phoenixControlOnGHoldsItsHost(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 4.5, 10.5, "phoenix.control", 5, 2);
@@ -359,7 +355,7 @@ public final class CustomGodsTests {
     }
 
     /** (Alone in its batch: the field reaches 16 blocks, further than its arena.) */
-    @GameTest(template = ARENA, batch = "custom_gods_field")
+    @EnhancedTest(template = ARENA, batch = "custom_gods_field")
     public static void thePsionicFieldIsSneakOnPhoenixControlsKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 4.5, 10.5, "phoenix.control", 5, 2);
@@ -373,7 +369,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePhoenixBodyKeepsFireOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer body = CustomKitSupport.hero(f, 5.5, 10.5, CustomKitSupport.def().pick("phoenix.body", 5).build());
@@ -384,7 +380,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "custom_gods_burst", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_gods_burst", timeoutTicks = 60)
     public static void thePhoenixBurstOnRChargesHoversAtHisFlightAndGoesOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.BURST_CHARGE_TICKS, 10);
@@ -414,7 +410,7 @@ public final class CustomGodsTests {
 
     // ---- Thanos ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePowerStoneOnGWithItsSlamOnSneakAndItsMainAloneOnASneakCell(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer both = one(f, 3.5, 4.5, "thanos.power", 5, 2);
@@ -443,7 +439,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTimeStoneOnRRewindsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 6.5, 6.5, "thanos.time", 5, 1);
@@ -460,7 +456,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSoulStoneOnVDrainsWhileHeldAndTheTitansBodyIsItsRow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = one(f, 4.5, 10.5, "thanos.soul", 5, 3);
@@ -481,7 +477,7 @@ public final class CustomGodsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void losingThePowersEndsEveryGodsState(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 10.5, 10.5, CustomKitSupport.def()
@@ -503,7 +499,7 @@ public final class CustomGodsTests {
 
     // ---- with PvP ----
 
-    @GameTest(template = ARENA, batch = "custom_gods_pvp")
+    @EnhancedTest(template = ARENA, batch = "custom_gods_pvp")
     public static void withPvpTheLightningHitsAPlayerAndTheMindHoldsOne(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);

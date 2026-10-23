@@ -104,7 +104,7 @@ public class WeaponXPodBlock extends BaseEntityBlock {
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             BlockPos other = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
             if (level.getBlockState(other).is(this)) {
                 level.setBlock(other, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
@@ -133,7 +133,7 @@ public class WeaponXPodBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (level.isClientSide || !(player instanceof ServerPlayer server)) {
+        if (level.isClientSide() || !(player instanceof ServerPlayer server)) {
             return InteractionResult.SUCCESS;
         }
         return PodTreatment.use(server, lower(state, pos));
@@ -149,7 +149,7 @@ public class WeaponXPodBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
                                                                   BlockEntityType<T> type) {
-        if (!level.isClientSide || state.getValue(HALF) != DoubleBlockHalf.LOWER) {
+        if (!level.isClientSide() || state.getValue(HALF) != DoubleBlockHalf.LOWER) {
             return null;
         }
         return createTickerHelper(type, ModBlockEntities.WEAPON_X_POD.get(),

@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
@@ -65,7 +66,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
@@ -183,7 +183,7 @@ public final class MagnetPull {
             return true;
         }
         // The field reaches out at once: the clients play its pulse before anything has come.
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new MagnetPullPayload(player.getId(), true, (float) job.radius, List.of()));
+        Net.sendToPlayersTrackingEntityAndSelf(player, new MagnetPullPayload(player.getId(), true, (float) job.radius, List.of()));
         job.sentFirst = true;
         return true;
     }
@@ -1145,7 +1145,7 @@ public final class MagnetPull {
             PiglinAi.angerNearbyPiglins(player, false); // as when gold they guard is broken by hand
         }
         if (!streams.isEmpty()) {
-            PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,
+            Net.sendToPlayersTrackingEntityAndSelf(player,
                     new MagnetPullPayload(player.getId(), !job.sentFirst, (float) job.radius, streams));
             job.sentFirst = true;
         }

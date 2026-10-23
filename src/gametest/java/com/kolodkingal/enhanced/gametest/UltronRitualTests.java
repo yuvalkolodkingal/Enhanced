@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.gametest.UltronTestSupport.Log;
 import com.kolodkingal.enhanced.item.ScepterRituals;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variants;
@@ -22,7 +23,6 @@ import com.kolodkingal.enhanced.ultron.VibraniumKeyEntity;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -50,8 +50,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,8 +73,6 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.fixture;
  * Scepter's Sneak + use on the ground that starts a fight (and every refusal that starts none and uses nothing up), the
  * Mind Stone's answer to the Program and the Core, that the boss cannot be summoned, and the operator's commands.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class UltronRitualTests {
     /** Quick tests that keep no server-wide state share one batch. */
     private static final String QUICK = "ultron";
@@ -84,7 +80,7 @@ public final class UltronRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // The items
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void programRecipe(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("ultron_program"));
@@ -108,7 +104,7 @@ public final class UltronRitualTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void noLootForTheProgramOrTheCore(GameTestHelper helper) throws IOException {
         MinecraftServer server = helper.getLevel().getServer();
         int scanned = 0;
@@ -138,7 +134,7 @@ public final class UltronRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // The ritual
 
-    @GameTest(template = ARENA, batch = "ultron_ritual", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "ultron_ritual", timeoutTicks = 400)
     public static void ritualStartsAFight(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -201,7 +197,7 @@ public final class UltronRitualTests {
         return UltronTestSupport.boss(fight);
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void ritualWithoutSneakOrWithoutTheProgramDoesNothingNew(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -235,7 +231,7 @@ public final class UltronRitualTests {
     }
 
     /** Each refusal answers with its own message, starts no fight and uses nothing up. */
-    @GameTest(template = ARENA, batch = "ultron_refusals")
+    @EnhancedTest(template = ARENA, batch = "ultron_refusals")
     public static void ritualRefusals(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -362,7 +358,7 @@ public final class UltronRitualTests {
         return refusal != null && refusal.getContents() instanceof TranslatableContents translatable ? translatable.getKey() : null;
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void relief(GameTestHelper helper) {
         // The Tremor's rule of the ground: a rise of maxRelief is fine, one more is not.
         TestKit.Fixture f = fixture(helper);
@@ -393,7 +389,7 @@ public final class UltronRitualTests {
      * a canopy eight blocks over the ground, taller than {@code maxRelief}) do not make the ground uneven, while a
      * pillar of stone as high as they are does.
      */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aGroveIsLevelGround(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -436,7 +432,7 @@ public final class UltronRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Mind Stone
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void programAndCoreProtectFromTheStone(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -498,7 +494,7 @@ public final class UltronRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // The boss cannot be summoned
 
-    @GameTest(template = ARENA, batch = "ultron_orphans")
+    @EnhancedTest(template = ARENA, batch = "ultron_orphans")
     public static void theBossCannotBeSummoned(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -533,7 +529,7 @@ public final class UltronRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // The operator
 
-    @GameTest(template = ARENA, batch = "ultron_commands")
+    @EnhancedTest(template = ARENA, batch = "ultron_commands")
     public static void operatorCommands(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();

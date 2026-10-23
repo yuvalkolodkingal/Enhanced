@@ -686,9 +686,9 @@ public final class HelaFight extends BossFight {
 
     /** Gives a player the right to Gungnir ({@code HELA_VICTOR}). */
     public static void makeVictor(ServerPlayer player) {
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         if (!progress.has(AsgardProgress.HELA_VICTOR)) {
-            player.setData(ModAttachments.ASGARD, progress.with(AsgardProgress.HELA_VICTOR));
+            ModAttachments.ASGARD.set(player, progress.with(AsgardProgress.HELA_VICTOR));
         }
     }
 

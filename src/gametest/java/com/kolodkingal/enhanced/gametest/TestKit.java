@@ -10,44 +10,39 @@ import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.BossLane;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildScheduler;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
 import net.minecraft.gametest.framework.GameTestListener;
 import net.minecraft.gametest.framework.GameTestRunner;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.network.registration.ChannelAttributes;
 
 import java.lang.reflect.Field;
-import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -94,7 +89,7 @@ public final class TestKit {
      * Magnetic Pulls): when the test ends, pass or fail, it lets every fight go, clears the heroes' statics, Build Magic
      * and the pulls, puts back the boss lanes and the Thanos summoning the mod registered and the rewards that were
      * waiting, so a fight left over from one test never reaches the next. A boss test also has a batch of its own
-     * ({@code @GameTest(batch = ...)}), so no other test runs while it does.
+     * ({@code @EnhancedTest(batch = ...)}), so no other test runs while it does.
      */
     public static Fixture bossFixture(GameTestHelper helper) {
         Fixture fixture = fixture(helper);
@@ -106,7 +101,7 @@ public final class TestKit {
                 lanes.put(kind, lane);
             }
         }
-        BossData data = server.overworld().getData(ModAttachments.BOSS_DATA);
+        BossData data = ModAttachments.BOSS_DATA.get(server.overworld());
         ScepterRituals.Hold summoning = ScepterRituals.thanosHold();
         fixture.onClose(() -> {
             ScepterRituals.registerThanosHold(summoning);
@@ -125,7 +120,7 @@ public final class TestKit {
                     BossFights.register(kind, lane);
                 }
             }
-            server.overworld().setData(ModAttachments.BOSS_DATA, data);
+            ModAttachments.BOSS_DATA.set(server.overworld(), data);
         });
         return fixture;
     }
@@ -211,16 +206,9 @@ public final class TestKit {
          */
         public ServerPlayer player(double x, double y, double z, GameType gameType, UUID uuid) {
             ServerLevel level = helper.getLevel();
-            MinecraftServer server = level.getServer();
             GameProfile profile = new GameProfile(uuid, "enh-test-" + (++playerCounter));
-            CommonListenerCookie cookie = new CommonListenerCookie(profile, 0, ClientInformation.createDefault(), false, ConnectionType.NEOFORGE);
-            ServerPlayer player = new ServerPlayer(server, level, profile, cookie.clientInformation());
-            Connection connection = new Connection(PacketFlow.SERVERBOUND);
-            new EmbeddedChannel(connection);
             // The fake client "supports" every channel, so synced attachments (powers, Hexes) can be sent to it.
-            connection.channel().attr(ChannelAttributes.ADHOC_CHANNELS).set(new AcceptAll());
-            ChannelAttributes.setConnectionType(connection, ConnectionType.NEOFORGE);
-            server.getPlayerList().placeNewPlayer(connection, player, cookie);
+            ServerPlayer player = TestHooks.get().mockPlayerWithConnection(level, profile);
             player.setGameMode(gameType);
             clearSpawnInvulnerability(player);
             Vec3 at = helper.absoluteVec(new Vec3(x, y, z));
@@ -231,7 +219,7 @@ public final class TestKit {
         }
 
         /** Temporarily changes a server config value; the old value comes back when the test ends. */
-        public <T> void config(ModConfigSpec.ConfigValue<T> value, T newValue) {
+        public <T> void config(ConfigSpec.ConfigValue<T> value, T newValue) {
             undo.add(hold(value, value.get(), value::set));
             value.set(newValue);
         }
@@ -394,6 +382,45 @@ public final class TestKit {
     public static final float EAST = -90.0F;
 
     // ------------------------------------------------------------------------------------------------------------
+    // Spawning (port P0: GameTestHelper's spawn methods, in one place for the versions that change them)
+
+    /** {@link GameTestHelper#spawn(EntityType, BlockPos)}: an entity at a position relative to the test. */
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, BlockPos pos) {
+        return helper.spawn(type, pos);
+    }
+
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, Vec3 pos) {
+        return helper.spawn(type, pos);
+    }
+
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, int x, int y, int z) {
+        return helper.spawn(type, x, y, z);
+    }
+
+    public static <E extends Entity> E spawn(GameTestHelper helper, EntityType<E> type, float x, float y, float z) {
+        return helper.spawn(type, x, y, z);
+    }
+
+    /** {@link GameTestHelper#spawnWithNoFreeWill(EntityType, BlockPos)}: a mob without AI, relative to the test. */
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, BlockPos pos) {
+        return helper.spawnWithNoFreeWill(type, pos);
+    }
+
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, Vec3 pos) {
+        return helper.spawnWithNoFreeWill(type, pos);
+    }
+
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, int x, int y,
+                                                        int z) {
+        return helper.spawnWithNoFreeWill(type, x, y, z);
+    }
+
+    public static <E extends Mob> E spawnWithNoFreeWill(GameTestHelper helper, EntityType<E> type, float x, float y,
+                                                        float z) {
+        return helper.spawnWithNoFreeWill(type, x, y, z);
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
     // Sounds
 
     /** A sound the server sent a player: which sound event, and where in the world it was played. */
@@ -459,29 +486,6 @@ public final class TestKit {
     }
 
     // ------------------------------------------------------------------------------------------------------------
-
-    /** A channel set that contains every channel, so the fake client accepts every payload. */
-    private static final class AcceptAll extends AbstractSet<ResourceLocation> {
-        @Override
-        public boolean contains(Object o) {
-            return true;
-        }
-
-        @Override
-        public boolean add(ResourceLocation resourceLocation) {
-            return false;
-        }
-
-        @Override
-        public Iterator<ResourceLocation> iterator() {
-            return Collections.emptyIterator();
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-    }
 
     private TestKit() {
     }

@@ -91,7 +91,7 @@ public class MutantCureItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             TARGETS.remove(player.getUUID());
         }
         if (!enabled()) {
@@ -127,11 +127,11 @@ public class MutantCureItem extends Item {
             }
             return InteractionResult.CONSUME;
         }
-        if (!level.isClientSide && !mayCure(player, patient)) {
+        if (!level.isClientSide() && !mayCure(player, patient)) {
             tell(level, player, Component.translatable("message.enhanced.mutant_cure.not_allowed"));
             return InteractionResult.CONSUME;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             TARGETS.put(player.getUUID(), patient.getUUID());
         }
         begin(level, player, hand);
@@ -140,7 +140,7 @@ public class MutantCureItem extends Item {
 
     private static void begin(Level level, Player player, InteractionHand hand) {
         player.startUsingItem(hand);
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BREWING_STAND_BREW, SoundSource.PLAYERS, 0.5F, 1.6F);
         }
     }
@@ -152,7 +152,7 @@ public class MutantCureItem extends Item {
     }
 
     private static void tell(Level level, Player player, Component message) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             player.displayClientMessage(message, true);
         }
     }
@@ -205,14 +205,14 @@ public class MutantCureItem extends Item {
     /** Let go early: nothing happens, nothing is used up. */
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             TARGETS.remove(entity.getUUID());
         }
     }
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (level.isClientSide || !(entity instanceof ServerPlayer user)) {
+        if (level.isClientSide() || !(entity instanceof ServerPlayer user)) {
             return stack;
         }
         boolean onAnother = TARGETS.containsKey(user.getUUID());

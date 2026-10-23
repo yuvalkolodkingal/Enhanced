@@ -30,6 +30,7 @@ import com.kolodkingal.enhanced.custom.StoneRow;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -41,7 +42,6 @@ import com.kolodkingal.enhanced.vishanti.WardStrength;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
@@ -52,8 +52,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -80,8 +78,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * layers, the budget with Sneak variants), the roles (Traits) of every hero and of kits, the key router (Sneak cells, the
  * release to the binding that went down, the cast marker) and the strength in the damage.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomV2Tests {
     private static final String BATCH = "custom_v2";
 
@@ -104,7 +100,7 @@ public final class CustomV2Tests {
 
     // ---- format 2 ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aV2HeroSurvivesItsJsonTheSaveAndTheWire(GameTestHelper helper) {
         CustomHero hero = sample();
         check(CustomHeroRules.sanitize(hero, CustomHeroRules.Limits.DEFAULT).notes().isEmpty(), "the sample is within the rules: "
@@ -135,7 +131,7 @@ public final class CustomV2Tests {
     }
 
     /** The example of 3.3's wiki page, a hand-written file with levels, and a hero saved with a player by 3.3. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void filesAndSavesOf33MigrateToV2(GameTestHelper helper) {
         String wiki = """
                 {
@@ -180,7 +176,7 @@ public final class CustomV2Tests {
     }
 
     /** What 3.3 reads of a 3.4 file: the fields of format 1 are where they were, with the meaning they had. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void a33ReaderFindsTheCoreOfAV2File(GameTestHelper helper) {
         JsonObject root = JsonParser.parseString(CustomHeroJson.write(sample())).getAsJsonObject();
         check(root.get("format").getAsString().equals(CustomHeroJson.FORMAT) && root.get("version").isJsonPrimitive(), "format, version");
@@ -205,7 +201,7 @@ public final class CustomV2Tests {
 
     // ---- the rows ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyKeyOfEveryHeroIsARowOrAFlightKey(GameTestHelper helper) {
         Set<String> ids = new HashSet<>();
         int lastHero = -1;
@@ -252,7 +248,7 @@ public final class CustomV2Tests {
 
     // ---- the kit ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void forABuiltInHeroTheKitApiAnswersAsBefore(GameTestHelper helper) {
         for (Power p : Power.values()) {
             PowerData data = CustomKitSupport.data(p);
@@ -277,7 +273,7 @@ public final class CustomV2Tests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomKitHasItsAbilitiesOnItsColumnsScaledByStrength(GameTestHelper helper) {
         CustomHero hero = CustomKitSupport.def().pick("thor.lightning", 10).pick("phoenix.burst", 1).pick("thor.body", 8)
                 .pick("flight", 3).pick("spider.crawl", 5, "main")
@@ -312,7 +308,7 @@ public final class CustomV2Tests {
     }
 
     /** Becoming a hero puts its kit on the power data (by identity), with the toggles it starts with. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void becomingInstallsTheKitAndItsToggles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 4, 4, CustomKitSupport.def().pick("tommy.speed", 5).key(2, "tommy.speed").build());
@@ -338,7 +334,7 @@ public final class CustomV2Tests {
         return r.notes().stream().map(CustomHeroRules.Note::key).toList();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRulesKeepOneOwnerPerResourceAndWhatAnAbilityNeeds(GameTestHelper helper) {
         CustomHeroRules.Result clash = judge(CustomKitSupport.def().pick("wanda.chaos_shield", 5).pick("agatha.shield", 5)
                 .pick("wanda.chaos_beam", 5).pick("telekinesis", 5).pick("magneto.metal", 5));
@@ -365,7 +361,7 @@ public final class CustomV2Tests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theServerSwitchesHeroAbilitiesWorldPowersAndHeroesOff(GameTestHelper helper) {
         CustomKitSupport.Def def = CustomKitSupport.def().pick("thor.bifrost", 5).pick("thor.lightning", 5).pick("loki.daggers", 5)
                 .pick("flight", 5);
@@ -391,7 +387,7 @@ public final class CustomV2Tests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sneakCellsFollowTheRules(GameTestHelper helper) {
         // A variant is forced onto the Sneak cell of its plain key.
         CustomHero h = judge(CustomKitSupport.def().pick("thanos.power", 5).key(3, "thanos.power").sneak(3, "flight")).hero();
@@ -430,7 +426,7 @@ public final class CustomV2Tests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void movesStancesAnimationAndLayersAreChecked(GameTestHelper helper) {
         CustomHero in = CustomKitSupport.def().pick("thor.lightning", 5).pick("thor.thunder", 5).pick("loki.daggers", 5)
                 .pick("energy_blast", 5, "beam")
@@ -464,7 +460,7 @@ public final class CustomV2Tests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCataloguesNameRealGesturesStancesAndLooks(GameTestHelper helper) {
         for (String g : AnimCatalog.GESTURES) {
             check(GestureId.valueOf(g.toUpperCase()) != null, "gesture " + g);
@@ -483,7 +479,7 @@ public final class CustomV2Tests {
 
     // ---- the roles ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRolesOfTheHeroesAreTheOldListsAndAKitsArePicked(GameTestHelper helper) {
         // (3.6: Doctor Strange is a sorcerer too.)
         Set<Power> sorcerers = EnumSet.of(Power.LOKI, Power.BILLY, Power.SCARLET_WITCH, Power.AGATHA,
@@ -524,7 +520,7 @@ public final class CustomV2Tests {
 
     // ---- the strength in the damage ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aHeroAbilitysDamageFollowsItsStrength(GameTestHelper helper) {
         for (int[] sf : new int[][]{{1, 60}, {5, 100}, {10, 150}}) {
             HeroKit kit = HeroKit.of(CustomKitSupport.def().pick("thor.lightning", sf[0]).build());
@@ -537,8 +533,8 @@ public final class CustomV2Tests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strong = CustomKitSupport.hero(f, 3, 3, CustomKitSupport.def().pick("thor.lightning", 10).build());
         ServerPlayer weak = CustomKitSupport.hero(f, 3, 9, CustomKitSupport.def().pick("thor.lightning", 1).build());
-        Zombie a = helper.spawn(EntityType.ZOMBIE, new Vec3(8, FLOOR, 3));
-        Zombie b = helper.spawn(EntityType.ZOMBIE, new Vec3(8, FLOOR, 9));
+        Zombie a = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(8, FLOOR, 3));
+        Zombie b = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(8, FLOOR, 9));
         a.setNoAi(true);
         b.setNoAi(true);
         a.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.LIGHTNING_BEAM, strong, strong), 6.0F);
@@ -559,7 +555,7 @@ public final class CustomV2Tests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theNewNotesHaveTheirWordsInBothLanguages(GameTestHelper helper) throws IOException {
         List<String> missing = new ArrayList<>();
         List<String> keys = new ArrayList<>();
@@ -608,7 +604,7 @@ public final class CustomV2Tests {
         }
     }
 
-    @GameTest(template = ARENA, batch = "custom_v2_router")
+    @EnhancedTest(template = ARENA, batch = "custom_v2_router")
     public static void theRouterTakesSneakCellsReleasesWhatWentDownAndMarksCasts(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Spy spy = new Spy();

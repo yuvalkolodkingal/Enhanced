@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.finders.SpentSites;
 import com.kolodkingal.enhanced.finders.StoneLocator;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -49,11 +50,8 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,8 +75,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Stone spins in the Overworld, the Power Stone points to a stronghold, the Reality Stone to a Bifrost site and, in
  * Asgard, to the vault's pedestal); the component written only on change; the spark trail's cooldown.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class LocatorTests {
     static final String BATCH = "locator";
     /** The searches (server-wide queue and probe source: alone). */
@@ -229,7 +225,7 @@ public final class LocatorTests {
     // ------------------------------------------------------------------------------------------------------------
     // The recipe
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRecipeGivesTheCoreBackAndTunesTheLocator(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         CraftingRecipe recipe = recipe(level);
@@ -261,7 +257,7 @@ public final class LocatorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aTitansGauntletOrAnEmptyOneIsNoCore(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         CraftingRecipe recipe = recipe(level);
@@ -279,7 +275,7 @@ public final class LocatorTests {
     // ------------------------------------------------------------------------------------------------------------
     // What he has
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void whatCountsAsGot(GameTestHelper helper) {
         StonesConfig.Uniqueness player = StonesConfig.Uniqueness.PLAYER;
         StonesConfig.Uniqueness world = StonesConfig.Uniqueness.WORLD;
@@ -316,7 +312,7 @@ public final class LocatorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WORLD)
+    @EnhancedTest(template = ARENA, batch = WORLD)
     public static void inWorldModeAnotherHoldersStoneIsSkipped(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -336,7 +332,7 @@ public final class LocatorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sneakUseCyclesTheFilter(GameTestHelper helper) {
         List<StoneKind> lacking = List.of(StoneKind.POWER, StoneKind.SOUL, StoneKind.MIND);
         check(StoneLocator.nextFilter(Optional.empty(), lacking).equals(Optional.of(StoneKind.POWER)), "All → Power");
@@ -369,7 +365,7 @@ public final class LocatorTests {
     // ------------------------------------------------------------------------------------------------------------
     // The stack and the spark trail
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theComponentIsWrittenOnlyWhenItChanges(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer eilon = f.player(5.5, FLOOR, 5.5);
@@ -385,7 +381,7 @@ public final class LocatorTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theSparkTrailFliesAndRests(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer eilon = f.player(5.5, FLOOR, 5.5);
@@ -411,7 +407,7 @@ public final class LocatorTests {
     // ------------------------------------------------------------------------------------------------------------
     // Spent sites
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theThreeSpentHooksMarkTheirSites(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -456,7 +452,7 @@ public final class LocatorTests {
     // ------------------------------------------------------------------------------------------------------------
     // The search
 
-    @GameTest(template = ARENA, batch = SEARCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = SEARCH, timeoutTicks = 400)
     public static void theSearchFindsAStartWithinTheBudget(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         FakeGrid grid = new FakeGrid(level, 8);
@@ -481,7 +477,7 @@ public final class LocatorTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = SEARCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = SEARCH, timeoutTicks = 400)
     public static void theSearchSkipsASpentSiteAndKnowsTooFar(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         FakeGrid grid = new FakeGrid(level, 8);
@@ -511,7 +507,7 @@ public final class LocatorTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = SEARCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = SEARCH, timeoutTicks = 200)
     public static void eachRealmHasItsAnswer(GameTestHelper helper) {
         LocatorRoutes.Realm over = LocatorRoutes.Realm.OVERWORLD;
         check(LocatorRoutes.route(over, StoneKind.SOUL, true).type() == LocatorRoutes.Type.SPIN

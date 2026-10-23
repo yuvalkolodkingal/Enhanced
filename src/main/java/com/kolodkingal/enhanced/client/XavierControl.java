@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.screen.XavierChoiceScreen;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
 import com.kolodkingal.enhanced.network.XavierPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.client.Minecraft;
@@ -19,7 +20,6 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -187,7 +187,7 @@ public final class XavierControl {
             mc.setCameraEntity(player);
             cameraTaken = false;
         }
-        PacketDistributor.sendToServer(new XavierInputPayload(forward, strafe, jump, sneak, player.getYRot(), player.getXRot(), attack));
+        Net.sendToServer(new XavierInputPayload(forward, strafe, jump, sneak, player.getYRot(), player.getXRot(), attack));
         attack = false;
     }
 

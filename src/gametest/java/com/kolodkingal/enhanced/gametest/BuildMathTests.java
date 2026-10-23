@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
@@ -24,13 +23,13 @@ import com.kolodkingal.enhanced.gametest.BuildTestSupport.Pocket;
 import com.kolodkingal.enhanced.gametest.BuildTestSupport.World;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -52,8 +51,6 @@ import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -73,8 +70,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * changes the level (one test stands players in the arena to read their limits), so the whole batch finishes in its
  * first tick.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildMathTests {
     private static final BlockState STONE = Blocks.STONE.defaultBlockState();
     private static final BlockState DIRT = Blocks.DIRT.defaultBlockState();
@@ -98,7 +93,7 @@ public final class BuildMathTests {
      * the Arch the same under the four turns (and those two turned as a whole); a row cut to a window is that window of
      * the row; and a ball of radius 50 has 540,113 cells.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void shapesHaveTheirExactCells(GameTestHelper helper) {
         List<Counted> table = new ArrayList<>();
         int[][] balls = {{2, 81, 54}, {3, 179, 98}, {4, 389, 186}, {5, 739, 278}, {6, 1189, 414}, {7, 1791, 530}};
@@ -187,7 +182,7 @@ public final class BuildMathTests {
      * The heart of radius 3, top to bottom, as Appendix A.2 draws it; a row it hands out is the caller's, so changing it
      * leaves every heart of that radius whole (their plane is remembered for all of them).
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void theHeartHasItsRows(GameTestHelper helper) {
         String[] rows = {".##.##.", "#######", "#######", "#######", ".#####.", "..###..", "...#..."};
         Shape heart = new Shape(ShapeKind.HEART, 3, 0, 1, false, 0);
@@ -216,7 +211,7 @@ public final class BuildMathTests {
      * Frame 40; 7 x 5 x 7 and 9 x 6 x 9 Rooms; a 16 x 1 x 16 floor), by their rows and through the planner: a Room over
      * stone leaves planks on the shell and air inside, and Only the empty keeps the stone it finds.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void fillStylesTakeTheirCells(GameTestHelper helper) {
         BoundingBox small = new BoundingBox(0, 64, 0, 4, 67, 4);
         int[][] counts = {{100, 64, 82, 25, 40}, {245, 120, 170, 49, 60}, {486, 192, 290, 81, 80}};
@@ -266,7 +261,7 @@ public final class BuildMathTests {
      * and bottoms; and every target cell's inverse lookup gives its source cell, for every turn and flip, also through
      * a planned stamp.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void turnAndFlipMovePositionsAndStates(GameTestHelper helper) {
         BlockState north = Blocks.OAK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.NORTH);
         Placement once = new Placement(3, 1, 2, 1, SpellRecipe.NO_FLIP);
@@ -350,7 +345,7 @@ public final class BuildMathTests {
      * spruce planks; with glass in hand oak planks become glass and oak stairs stay (glass has no stairs); and Change's
      * This kind aimed at glass with spruce planks changes only the glass.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void theFamilyRuleKeepsTheShape(GameTestHelper helper) {
         BlockState stairs = Blocks.OAK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST).setValue(StairBlock.HALF, Half.TOP)
                 .setValue(StairBlock.WATERLOGGED, true);
@@ -392,7 +387,7 @@ public final class BuildMathTests {
      * nothing but stone and glass appears; a planned Fill with the mix is the same plan twice, and another seed another
      * mix.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void theMixIsTheGhost(GameTestHelper helper) {
         SpellMath.Mix server = new SpellMath.Mix(List.of(new SpellMath.Mix.Part(STONE, 48), new SpellMath.Mix.Part(GLASS, 16)));
         SpellMath.Mix client = new SpellMath.Mix(List.of(new SpellMath.Mix.Part(STONE, 48), new SpellMath.Mix.Part(GLASS, 16)));
@@ -442,7 +437,7 @@ public final class BuildMathTests {
      * last tenth); a Move over itself moves every cell before it writes over it (top-down when it moves up, and its
      * ripple says so); and a 1000 x 300 x 1000 plan gives its first million cells at once, holding only its cursor.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void thePlannerWalksInItsOrder(GameTestHelper helper) {
         BoundingBox cube = new BoundingBox(0, 64, 0, 9, 73, 9);
         World world = new World();
@@ -646,7 +641,7 @@ public final class BuildMathTests {
      * floor; a Repeat of a pillar 3 times east with a gap of 1 puts pillars at +2, +4 and +6; a Paint dab turns the
      * stairs under it; a selected thing's Fill and a missing box, material or pocket.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void everySpellPlansItsCells(GameTestHelper helper) {
         BoundingBox five = new BoundingBox(0, 64, 0, 4, 68, 4);
         World cube = new World().fill(five, STONE);
@@ -745,7 +740,7 @@ public final class BuildMathTests {
      * knows its border. A Move's or a Repeat's source read live (a ghost's) reads no chunk that is not loaded, and
      * leaves the far chunk unloaded; its size is the selected thing's cells, not its box's.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void aPlanEndsWhereTheWorldEnds(GameTestHelper helper) {
         World world = new World();
         int top = world.getMaxBuildHeight() - 1;
@@ -828,7 +823,7 @@ public final class BuildMathTests {
      * same dab paints the fence too. A box limits a dab the same way, a dab that misses the thing paints nothing, and a
      * selected thing the planner was not handed is no box.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void aDabPaintsOnlyTheSelectedThing(GameTestHelper helper) {
         BlockState fence = Blocks.OAK_FENCE.defaultBlockState();
         BlockState spruceFence = Blocks.SPRUCE_FENCE.defaultBlockState();
@@ -885,7 +880,7 @@ public final class BuildMathTests {
      * server's slack), the biggest bounding box, a seed on air; the flood in slices gives the same cells; and the
      * planner fills exactly the selected thing.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void magicSelectFindsTheThingNotTheGround(GameTestHelper helper) {
         BlockState grass = Blocks.GRASS_BLOCK.defaultBlockState();
         BlockState log = Blocks.OAK_LOG.defaultBlockState();
@@ -998,7 +993,7 @@ public final class BuildMathTests {
      * outside the world comes inside it, every other number into its range; Billy's numbers at ranks 1 and 4 and the
      * Scarlet Witch's (no count in a Repeat, R39); a recipe in range is unchanged, and clamping twice is clamping once.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void aRecipeIsClamped(GameTestHelper helper) {
         BoundingBox world = Limits.world(helper.getLevel());
         check(world.minY() == helper.getLevel().getMinBuildHeight() && world.maxY() == helper.getLevel().getMaxBuildHeight() - 1
@@ -1094,7 +1089,7 @@ public final class BuildMathTests {
      * Spellcaster with his new top full and a side of 32, an undo takes the 20 back and the rank stays; a jump of two
      * ranks at once; an operator's rank; the pause after a spell; what he is told.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void billysMagicPaysRefillsAndLearns(GameTestHelper helper) {
         BuildData fresh = BuildData.EMPTY;
         check(BillyMagic.meter(fresh, 0L) == 512 && BillyMagic.top(fresh) == 512 && BillyMagic.verdict(fresh, 0L, 512) == SpellPlanner.NONE,
@@ -1154,7 +1149,7 @@ public final class BuildMathTests {
      * Creative too (with {@code limitsInCreative} on, the default), nobody else's; and Mom's help: the nearest Scarlet
      * Witch within 16 blocks, not a Spectator, not one 24 blocks away.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_pure")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_pure")
     public static void everyBuilderHasHerNumbers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(2.5, TestKit.FLOOR, 2.5, Power.BILLY);
@@ -1166,7 +1161,7 @@ public final class BuildMathTests {
         check(hers != null && hers.hero() == Power.SCARLET_WITCH && !hers.limited() && hers.reach() == 256, "the Scarlet Witch: no limit, reach 256");
         check(Limits.of(magneto) == null && Limits.of(f.player(12.5, TestKit.FLOOR, 12.5)) == null, "Magneto and a powerless player have none");
         check(hers.inWorld(new BlockPos(0, 5000, 0)).getY() == helper.getLevel().getMaxBuildHeight() - 1, "her world ends at the build height");
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(3));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank(3));
         Limits sorcerer = Limits.of(billy);
         check(sorcerer != null && sorcerer.side() == 40 && sorcerer.magicSelect() == 2048, "a Sorcerer: side 40, a double click of 2,048");
         billy.setGameMode(GameType.CREATIVE);

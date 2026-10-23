@@ -16,13 +16,13 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.heimdall.HeimdallPost;
 import com.kolodkingal.enhanced.heimdall.HeimdallTalk;
 import com.kolodkingal.enhanced.network.AsgardTalkPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -31,8 +31,6 @@ import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
@@ -60,8 +58,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * {@code asgard_one_each_lines} (a player who is Odin is seen server-wide: each of these tests has its batch) and
  * {@code heimdall_post} (one keeper at a time; config).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class OneOfEachTests {
     static final String BATCH = "asgard_one_each";
     static final String LINES = "asgard_one_each_lines";
@@ -77,7 +73,7 @@ public final class OneOfEachTests {
 
     // ---- one of each character: Odin ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = AsgardianTests.AREA_WAIT + 20)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = AsgardianTests.AREA_WAIT + 20)
     public static void theOdinOfTheCityIsAwayWhileAPlayerIsOdin(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Map<String, UUID> table = AsgardianTests.records(fx);
@@ -118,7 +114,7 @@ public final class OneOfEachTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = LINES)
+    @EnhancedTest(template = ARENA, batch = LINES)
     public static void theLinesOfTheAllfatherAsleepNameThePlayerWhoIsOdin(GameTestHelper helper) {
         TestKit.Fixture fx = AsgardTestSupport.fixture(helper);
         ServerPlayer talker = fx.player(5.5, FLOOR, 5.5);
@@ -150,7 +146,7 @@ public final class OneOfEachTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void helasHeaddressIsNoLongerThePineapple(GameTestHelper helper) throws IOException, NoSuchAlgorithmException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (Map.Entry<String, String> old : OLD_TEXTURES.entrySet()) {
@@ -221,7 +217,7 @@ public final class OneOfEachTests {
         return npc;
     }
 
-    @GameTest(template = ARENA, batch = POST, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = POST, timeoutTicks = 200)
     public static void theCitysHeimdallHandsHisPostToAPlayerWhoIsHeimdall(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerPlayer player = inAsgard(f, helper, Power.HEIMDALL);
@@ -248,7 +244,7 @@ public final class OneOfEachTests {
         check(HeimdallPost.touchSocket(player), "the socket answers to its keeper");
         // Others hear who keeps the Bifrost; he may give it back.
         check("greeting".equals(picked(traveller, npc)), "a newcomer is greeted first: " + picked(traveller, npc));
-        traveller.setData(ModAttachments.ASGARD, traveller.getData(ModAttachments.ASGARD).with(AsgardProgress.MET_HEIMDALL));
+        ModAttachments.ASGARD.set(traveller, ModAttachments.ASGARD.get(traveller).with(AsgardProgress.MET_HEIMDALL));
         check("keeper_away".equals(picked(traveller, npc)), "then hears who keeps the Bifrost: " + picked(traveller, npc));
         check(AsgardDialogue.offered(AsgardTalk.context(traveller, npc, Role.HEIMDALL), AsgardDialogue.find(Role.HEIMDALL, "keeper_away"))
                 .stream().anyMatch(o -> o.key().equals(HeimdallTalk.HOME)), "and may still be sent home");
@@ -276,7 +272,7 @@ public final class OneOfEachTests {
 
     // (A batch of its own: both tests stand their Heimdalls by the Observatory's socket, and the first meeting of the
     // other test would take whichever Heimdall the level lists first.)
-    @GameTest(template = ARENA, batch = POST + "_end", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = POST + "_end", timeoutTicks = 120)
     public static void thePostEndsWhenTheKeeperIsNoLongerHeimdall(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerPlayer player = inAsgard(f, helper, Power.HEIMDALL);

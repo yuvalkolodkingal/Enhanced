@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.config.DeadpoolConfig;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.healing.HealingHooks;
 import com.kolodkingal.enhanced.network.DeadpoolFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -11,7 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -160,11 +160,11 @@ public final class DeadpoolLines {
         ServerLevel level = player.serverLevel();
         if (enabled()) {
             SAID.computeIfAbsent(player.getUUID(), k -> new Said()).lastLine = level.getGameTime();
-            PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), BUBBLE_RANGE,
+            Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), BUBBLE_RANGE,
                     new DeadpoolFxPayload(DeadpoolFxPayload.TAUNT, player.getId(), List.of(player.position()), arg));
         } else if (group == Group.TAUNT) {
             // (no words, still the pose)
-            PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), BUBBLE_RANGE,
+            Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), BUBBLE_RANGE,
                     new DeadpoolFxPayload(DeadpoolFxPayload.TAUNT, player.getId(), List.of(player.position()),
                             pose * POSE + GROUP * Group.values().length));
         }

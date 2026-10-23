@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.MagnetPull;
@@ -10,6 +9,7 @@ import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.BossConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -18,7 +18,6 @@ import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,8 +38,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +53,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * a fight and to what is metal through and through. Every test uses {@link TestKit#bossFixture} and has a batch of its own
  * ({@code magneto_boss_*}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MagnetoBossTests {
     /**
      * How far a Sentry may drift by itself while a pull runs (it floats; a body pushes it): a tug moves it a quarter of a
@@ -69,7 +64,7 @@ public final class MagnetoBossTests {
      * M40a. When the metal is the body itself (a Sentry, an Iron Golem, a Vision player with PvP on), V has nothing to tear
      * off: it says to lift it with R ({@code disarm.metal_body}) and starts no cooldown.
      */
-    @GameTest(template = ARENA, batch = "magneto_boss_bodies")
+    @EnhancedTest(template = ARENA, batch = "magneto_boss_bodies")
     public static void aMetalBodyHasNothingToStrip(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(true);
@@ -80,7 +75,7 @@ public final class MagnetoBossTests {
                 ultron.getUUID(), false, false);
         sentry.setHeld(true);
         f.level().addFreshEntity(sentry);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(10.5, FLOOR, 10.5));
         ServerPlayer vision = f.player(10.5, FLOOR, 16.5, Power.VISION);
 
         for (LivingEntity body : List.<LivingEntity>of(sentry, golem, vision)) {
@@ -102,7 +97,7 @@ public final class MagnetoBossTests {
      * Magneto's inventory or lies anywhere. An iron ore in the arena's floor stays; Famine is left as he was. V at a fresh
      * War: the same, and nothing falls.
      */
-    @GameTest(template = ARENA, batch = "magneto_boss_apocalypse", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "magneto_boss_apocalypse", timeoutTicks = 100)
     public static void theHorsemenAreDisarmedButNeverFarmed(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.MAGNETO);
         ServerPlayer magneto = d.hero();
@@ -152,13 +147,13 @@ public final class MagnetoBossTests {
      * stays; on the island, its copy of that ore and the original in the ground below stay; he gets no raw iron, reads
      * {@code pull.protected}, and the fight's Sentry in reach is not tugged.
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "magneto_boss_ultron", timeoutTicks = 500)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "magneto_boss_ultron", timeoutTicks = 500)
     public static void thePullLeavesUltronsArenaAndIslandAlone(GameTestHelper helper) {
         islandAndArena(helper, true);
     }
 
     /** M39 with {@code boss.protectArena} off: the island and its ground stay all the same (every running arena is closed). */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "magneto_boss_ultron_open", timeoutTicks = 500)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "magneto_boss_ultron_open", timeoutTicks = 500)
     public static void thePullLeavesTheIslandAloneInAnOpenArena(GameTestHelper helper) {
         islandAndArena(helper, false);
     }
@@ -239,7 +234,7 @@ public final class MagnetoBossTests {
      * 4 blocks away, pulls: the ingot still lies where it fell (even with no pickup delay left), the arena's iron block
      * stands, and the Sentry in reach is not tugged.
      */
-    @GameTest(template = ARENA, batch = "magneto_boss_drops", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "magneto_boss_drops", timeoutTicks = 100)
     public static void aFightKeepsItsDropsFromThePull(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         ServerLevel level = f.level();
@@ -304,7 +299,7 @@ public final class MagnetoBossTests {
      * answered for the husk is not kept for the section, so the ingot is still asked the claim. He reads that the rest
      * is protected.
      */
-    @GameTest(template = ARENA, batch = "magneto_boss_claims", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "magneto_boss_claims", timeoutTicks = 60)
     public static void anArenasEdgeOpensNoClaim(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = f.level();
@@ -330,7 +325,7 @@ public final class MagnetoBossTests {
         arena.containAt(3.0).joinWithin(5.0).tractorDepth(0.0);
         BossFrameworkTests.start(f, BossKind.ULTRON, f.player(huskX, FLOOR, 8.5),
                 new BossTestSupport.TestFight(level, BossKind.ULTRON, arena));
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(huskX, FLOOR, 10.5));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(huskX, FLOOR, 10.5));
         husk.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         Vec3 at = helper.absoluteVec(new Vec3(huskX + 6.0, FLOOR, 10.5));
         ItemEntity ingot = new ItemEntity(level, at.x, at.y, at.z, new ItemStack(Items.IRON_INGOT), 0.0, 0.0, 0.0);

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
@@ -10,14 +9,12 @@ import com.kolodkingal.enhanced.client.render.HeroClient;
 import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.PhoenixGestures;
 import com.kolodkingal.enhanced.client.render.Stance;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,8 +29,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * them, the key presses that act before the server answers, and her flight profile. What the poses and the hands look
  * like in the world is checked by eye in a real game (the {@code /enhanced_anim} tools freeze each one).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class PhoenixAnimationTests {
     private static final String BATCH = PhoenixTests.QUICK;
 
@@ -85,7 +80,7 @@ public final class PhoenixAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The gestures
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herTenGesturesAreTimedAsDesigned(GameTestHelper helper) {
         // id, group, duration, attack, release, force (the table of the design, section 6.2)
         Object[][] table = {
@@ -115,7 +110,7 @@ public final class PhoenixAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herTwoArmedGesturesMirrorTheirArmsAndTheOthersUseOnlyOne(GameTestHelper helper) {
         for (GestureId id : new GestureId[]{GestureId.TAKEOFF_PHOENIX, GestureId.PHOENIX_SENSE, GestureId.PHOENIX_PSIONIC_CAST,
                 GestureId.PHOENIX_CHARGE_START, GestureId.PHOENIX_BURST}) {
@@ -145,7 +140,7 @@ public final class PhoenixAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herWingsUnfurlOverheadAndSweepOutToTheHover(GameTestHelper helper) {
         Gestures.Def def = Gestures.get(GestureId.TAKEOFF_PHOENIX);
         assertPose(arm(GestureId.TAKEOFF_PHOENIX, true, 6), new float[]{-168, 6, 16}, 1.0E-3, "at tick 6 the arms are thrown overhead");
@@ -158,7 +153,7 @@ public final class PhoenixAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herGraspAndThrowAreThoseOfTheWitchMadeGentler(GameTestHelper helper) {
         Gestures.Def grab = Gestures.get(GestureId.TK_GRAB_PHOENIX);
         check(last(grab.m).mode == Gestures.Mode.AIM && last(grab.m).target == Gestures.Target.HELD, "the grab ends with the palm aimed at the thing");
@@ -175,7 +170,7 @@ public final class PhoenixAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // Hand-overs
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theChargeGathersIntoTheVAndTheBurstThrowsItOpenAndLetsGo(GameTestHelper helper) {
         Gestures.Def start = Gestures.get(GestureId.PHOENIX_CHARGE_START);
         assertPose(pose(last(start.m)), PhoenixGestures.CHARGE_M, 1.0E-4, "the charge's gesture ends on the V, main arm");
@@ -207,7 +202,7 @@ public final class PhoenixAnimationTests {
      * than a hanging one, so the first numbers of the design (-150 and +52) crossed them above the head: this keeps
      * that out.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theVOfTheChargeThrowsHerArmsUpAndOutAndDoesNotCrossThem(GameTestHelper helper) {
         double[] m = tip(PhoenixGestures.CHARGE_M);
         double[] o = tip(PhoenixGestures.CHARGE_O);
@@ -226,7 +221,7 @@ public final class PhoenixAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGestureThatCarriesTheVTakesTheStancesHeadAndLeanFromIt(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.PHOENIX);
         HeroAnimState state = new HeroAnimState(UUID.randomUUID());
@@ -257,7 +252,7 @@ public final class PhoenixAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The routes
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herAbilitiesAreActedAndNoneIsPending(GameTestHelper helper) {
         String[] expected = {"toggle:MIND_READING", "flight", "held", "live:CASTING", "live:PHOENIX_CHARGING"};
         for (int ability = 1; ability <= 5; ability++) {
@@ -295,7 +290,7 @@ public final class PhoenixAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyGestureOfHersIsStartedBySomething(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.PHOENIX);
         check(hero.takeoffGesture() == GestureId.TAKEOFF_PHOENIX, "she takes off with her own gesture");
@@ -316,7 +311,7 @@ public final class PhoenixAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // The key presses
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herKeyPressesActBeforeTheServerAnswersOnlyWhereTheyWillWork(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000L;
@@ -344,7 +339,7 @@ public final class PhoenixAnimationTests {
     // ------------------------------------------------------------------------------------------------------------
     // Flight and the walk
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herFlightIsCalmWithArmsThatSpreadLikeWingsAsSheSpeedsUp(GameTestHelper helper) {
         FlightProfile p = FlightProfile.of(Power.PHOENIX, false);
         check(p != null && Power.PHOENIX.canFly(), "she flies with a profile of her own");

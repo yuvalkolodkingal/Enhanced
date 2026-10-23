@@ -26,11 +26,11 @@ import org.jetbrains.annotations.Nullable;
 public final class IronSuits {
     /** The state ({@code ModAttachments.IRON_MAN}). */
     public static IronManState state(Player player) {
-        return player.getData(ModAttachments.IRON_MAN);
+        return ModAttachments.IRON_MAN.get(player);
     }
 
     public static void setState(Player player, IronManState state) {
-        player.setData(ModAttachments.IRON_MAN, state);
+        ModAttachments.IRON_MAN.set(player, state);
     }
 
     /** The item of a suit (a classic suit, the Mark 5's suitcase, or a nanotech housing). */

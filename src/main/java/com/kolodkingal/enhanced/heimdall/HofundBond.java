@@ -27,9 +27,9 @@ public final class HofundBond {
 
     /** A new Hofund bound to {@code player}: his bond goes up by one, and every older copy of his will crumble. */
     public static ItemStack bind(ServerPlayer player) {
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         int bond = progress.hofundBond() + 1;
-        player.setData(ModAttachments.ASGARD, progress.withHofundBond(bond));
+        ModAttachments.ASGARD.set(player, progress.withHofundBond(bond));
         ItemStack stack = new ItemStack(ModItems.HOFUND.get());
         stack.set(ModDataComponents.OWNER.get(), MjolnirOwner.of(player));
         stack.set(ModDataComponents.BOND.get(), bond);
@@ -92,7 +92,7 @@ public final class HofundBond {
      */
     public static boolean shouldCrumble(MinecraftServer server, ItemStack stack) {
         ServerPlayer owner = owner(server, stack);
-        return owner != null && stale(stack, owner.getData(ModAttachments.ASGARD).hofundBond());
+        return owner != null && stale(stack, ModAttachments.ASGARD.get(owner).hofundBond());
     }
 
     /** The golden dust a crumbling copy leaves. */

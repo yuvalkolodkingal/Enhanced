@@ -1,11 +1,11 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.SpeedSurfaces;
 import com.kolodkingal.enhanced.ability.SurfaceRun;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -13,7 +13,6 @@ import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -21,8 +20,6 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +39,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * <p>A course is built of stone in the arena (the arena's own barrier ceiling is out of the way, 9 blocks up); each test
  * builds its own and has a batch of its own, so no other test's blocks are near.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SpeedsterSurfaceTests {
     /** The run speed the simulated client asks for (blocks per tick) and the minimum below which he drops. */
     private static final double SPEED = 0.8;
@@ -146,7 +141,7 @@ public final class SpeedsterSurfaceTests {
     // ------------------------------------------------------------------------------------------------------------
     // The rules
 
-    @GameTest(template = ARENA, batch = "speed_surface_wall_up")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_wall_up")
     public static void heRunsUpAWallAndOverItsTop(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A block of stone 5 high (its top at y 7) and 3 deep, its face to the west at x 12.
@@ -170,7 +165,7 @@ public final class SpeedsterSurfaceTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_overhang")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_overhang")
     public static void heRunsOntoACeilingAndRoundTheLipOfAnOverhang(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A wall at x 13 up to y 8, and an overhang at y 8 that sticks out west from it to x 8 (its lip), its top at y 9.
@@ -191,7 +186,7 @@ public final class SpeedsterSurfaceTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_tunnel")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_tunnel")
     public static void heRunsAlongACeilingAndDownTheFarWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A hall: walls at x 14 and x 4, a ceiling at y 7 between them.
@@ -211,7 +206,7 @@ public final class SpeedsterSurfaceTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_slow")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_slow")
     public static void slowingDownDropsHimOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A tall wall (to y 9) he will not reach the top of.
@@ -242,7 +237,7 @@ public final class SpeedsterSurfaceTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_tight")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_tight")
     public static void tightPlacesNeverPutHimInsideABlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A corridor two blocks high (its ceiling at y 4) ending in a wall at x 14, with a slab and a stair in the way, and a
@@ -264,7 +259,7 @@ public final class SpeedsterSurfaceTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_leap")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_leap")
     public static void spaceLeapsOffAWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         fill(helper, 12, 2, 6, 13, 9, 14, Blocks.STONE);
@@ -288,7 +283,7 @@ public final class SpeedsterSurfaceTests {
         SpeedSurfaces.onReport(player, kind, surface.normal().get3DDataValue());
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_server")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_server")
     public static void theServerBelievesOnlyARunItCanCheck(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         fill(helper, 12, 2, 8, 12, 8, 12, Blocks.STONE);
@@ -352,7 +347,7 @@ public final class SpeedsterSurfaceTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_fall")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_fall")
     public static void droppingOffNeverHurts(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         fill(helper, 12, 2, 8, 12, 9, 12, Blocks.STONE);
@@ -377,7 +372,7 @@ public final class SpeedsterSurfaceTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "speed_surface_speed")
+    @EnhancedTest(template = ARENA, batch = "speed_surface_speed")
     public static void theSpeedOnASurfaceComesFromHisRun(GameTestHelper helper) {
         check(Math.abs(SurfaceRun.targetSpeed(0.13, 1.0, 3.0) - 0.28) < 0.01, "a vanilla sprint is about 0.28 blocks a tick");
         check(SurfaceRun.targetSpeed(0.52, 0.8, 1.0) > 0.85 && SurfaceRun.targetSpeed(0.52, 0.8, 1.0) <= 1.0, "Quicksilver's run, four fifths, under the cap");

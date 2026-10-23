@@ -2,11 +2,11 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.SpiderSenseClient;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public record SpiderSensePayload(List<Integer> ids, boolean strong) implements C
     }
 
     /** Outlines the dangers and starts the ripples on his screen. */
-    static void handle(SpiderSensePayload payload, IPayloadContext context) {
+    static void handle(SpiderSensePayload payload, PacketContext context) {
         SpiderSenseClient.add(payload);
     }
 }

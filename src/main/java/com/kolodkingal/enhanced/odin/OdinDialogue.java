@@ -7,9 +7,9 @@ import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Node;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.Option;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.network.AsgardTalkPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -58,7 +58,7 @@ public final class OdinDialogue {
 
     /** Odin answers a question: a line of his own, with nothing more to choose (the screen is closed with Esc). */
     static void answer(Ctx ctx, String line) {
-        PacketDistributor.sendToPlayer(ctx.player(), new AsgardTalkPayload.Open(ctx.speaker().getId(), Role.ODIN.ordinal(),
+        Net.sendToPlayer(ctx.player(), new AsgardTalkPayload.Open(ctx.speaker().getId(), Role.ODIN.ordinal(),
                 "npc.enhanced.odin." + line, List.of(), List.of()));
     }
 

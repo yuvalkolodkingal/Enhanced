@@ -1,14 +1,13 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -20,8 +19,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.Optional;
 
@@ -37,8 +34,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * are left to the real server tick (the Hex is checked at the end of every level tick); players are moved the
  * way a client's movement packets move them.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HexTests {
     private static final double CENTER = 10.5;
     private static final int RADIUS = 8;
@@ -68,12 +63,12 @@ public final class HexTests {
         player.absMoveTo(pos.x, pos.y, pos.z);
     }
 
-    @GameTest(template = ARENA, batch = "hex_death")
+    @EnhancedTest(template = ARENA, batch = "hex_death")
     public static void hexWallKillsCreatures(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
         ServerPlayer wanda = raiseHex(f);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
         check(!inside(f, wanda, pig), "the pig starts outside");
 
         f.everyTick(10, tick -> {
@@ -85,13 +80,13 @@ public final class HexTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_creatures_allowed")
+    @EnhancedTest(template = ARENA, batch = "hex_creatures_allowed")
     public static void hexLetsCreaturesInWhenAllowed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
         ServerPlayer wanda = raiseHex(f);
         HexManager.handleAction(wanda, HexAction.SET_CREATURES, Optional.empty(), 1);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER, FLOOR, 1.5));
 
         f.everyTick(10, tick -> {
             if (tick == 2) {
@@ -103,7 +98,7 @@ public final class HexTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_survivor")
+    @EnhancedTest(template = ARENA, batch = "hex_survivor")
     public static void hexSurvivorSimplySurvives(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 0.0);
@@ -128,7 +123,7 @@ public final class HexTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_player_death")
+    @EnhancedTest(template = ARENA, batch = "hex_player_death")
     public static void hexWallKillsPowerlessPlayers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
@@ -143,7 +138,7 @@ public final class HexTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_bounce")
+    @EnhancedTest(template = ARENA, batch = "hex_bounce")
     public static void hexBouncesPoweredIntruders(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
@@ -165,7 +160,7 @@ public final class HexTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_allowed")
+    @EnhancedTest(template = ARENA, batch = "hex_allowed")
     public static void hexLetsAllowedPlayersIn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
@@ -174,9 +169,9 @@ public final class HexTests {
         ServerPlayer magneto = f.player(2.0, FLOOR, CENTER, Power.MAGNETO);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(friend.getUUID()), 1);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(magneto.getUUID()), 1);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(19.0, FLOOR, CENTER));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(19.0, FLOOR, CENTER));
         pet.tame(friend);
-        Pig stranger = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER, FLOOR, 19.5));
+        Pig stranger = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER, FLOOR, 19.5));
 
         f.everyTick(10, tick -> {
             if (tick == 2) {
@@ -199,7 +194,7 @@ public final class HexTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_teleport")
+    @EnhancedTest(template = ARENA, batch = "hex_teleport")
     public static void hexStopsEnderPearls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
@@ -224,7 +219,7 @@ public final class HexTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_dissolve")
+    @EnhancedTest(template = ARENA, batch = "hex_dissolve")
     public static void hexCollapsesWhenWandaDies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -234,7 +229,7 @@ public final class HexTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_dissolve")
+    @EnhancedTest(template = ARENA, batch = "hex_dissolve")
     public static void sneakNDissolvesTheHex(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);

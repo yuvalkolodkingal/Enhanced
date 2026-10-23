@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.network.CyclopsFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -36,7 +37,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -549,7 +549,7 @@ public final class CyclopsAbilities {
     // ---- what everyone near sees ----
 
     static void send(ServerPlayer player, byte kind, List<Vec3> points, int param) {
-        PacketDistributor.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(), FX_RANGE,
                 new CyclopsFxPayload(kind, player.getId(), List.copyOf(points), param));
     }
 

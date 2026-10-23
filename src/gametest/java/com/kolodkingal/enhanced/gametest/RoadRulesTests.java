@@ -1,8 +1,8 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -16,7 +16,6 @@ import com.kolodkingal.enhanced.road.RoadTrial;
 import com.kolodkingal.enhanced.road.RoadTrials;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -37,8 +36,6 @@ import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -50,12 +47,10 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * or floats, the Gene cannot be dropped, no power works and one who is given a power is taken out. The players of the tests are in
  * a trial; the same actions outside the Road are shown to be untouched.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadRulesTests {
     static final String BATCH = "road_rules";
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void nothingIsBuiltOrBrokenInTheRoadExceptWhereATrialOpensAPlot(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         RoadChallenge added = new RoadTestSupport.PlotParkour("test_plot");
@@ -96,7 +91,7 @@ public final class RoadRulesTests {
                 "in the world he breaks blocks as ever");
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void teleportsFliersAndFloatersAreStopped(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -145,7 +140,7 @@ public final class RoadRulesTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theGeneCannotBeDroppedInTheRoad(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -165,7 +160,7 @@ public final class RoadRulesTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void aPowerGivenInsideTakesThePlayerOutWithHisGene(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -189,7 +184,7 @@ public final class RoadRulesTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyAMortalWithoutPowersIsLetIn(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -212,7 +207,7 @@ public final class RoadRulesTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void whatATrialSpawnsIsRemovedWithIt(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();

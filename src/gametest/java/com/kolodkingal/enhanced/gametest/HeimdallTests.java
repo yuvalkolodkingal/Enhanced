@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PlaceBook;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -25,6 +24,7 @@ import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
 import com.kolodkingal.enhanced.network.BifrostActionPayload;
 import com.kolodkingal.enhanced.network.HeimdallSightPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -39,7 +39,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -56,8 +55,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -81,8 +78,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * menu and his dialogue nodes. Quick tests share the batch {@code heimdall}; the Watch (server-wide state, Asgard) has
  * {@code heimdall_watch}; the tests that hurt players {@code heimdall_pvp}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HeimdallTests {
     private static final String BATCH = "heimdall";
     private static final String WATCH = "heimdall_watch";
@@ -97,7 +92,7 @@ public final class HeimdallTests {
 
     /** A husk that stands still with plenty of health (the blows are counted on it). */
     private static Zombie husk(GameTestHelper helper, double x, double z) {
-        Zombie husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
         return husk;
@@ -124,13 +119,13 @@ public final class HeimdallTests {
     }
 
     private static void won(ServerPlayer player) {
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.WATCH_WON));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.WATCH_WON));
     }
 
     // ------------------------------------------------------------------------------------------------------------
     // Becoming Heimdall, Hofund
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWinnerOfTheWatchHoldingHisOwnHofundBecomesHeimdall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer winner = f.player(3.5, FLOOR, 3.5);
@@ -159,7 +154,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hofundOpensTheBifrostForAnyoneWhoHoldsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer anyone = f.player(10.5, FLOOR, 10.5);
@@ -177,15 +172,15 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aStaleHofundCrumblesAndANewOneComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(10.5, FLOOR, 10.5);
         ItemStack first = HofundBond.give(owner);
-        check(!HofundBond.stale(first, owner.getData(ModAttachments.ASGARD).hofundBond()), "the newest copy is not stale");
+        check(!HofundBond.stale(first, ModAttachments.ASGARD.get(owner).hofundBond()), "the newest copy is not stale");
         ItemStack old = owner.getMainHandItem();
         HofundBond.bind(owner);
-        check(HofundBond.stale(old, owner.getData(ModAttachments.ASGARD).hofundBond()), "a newer bond makes the old copy stale");
+        check(HofundBond.stale(old, ModAttachments.ASGARD.get(owner).hofundBond()), "a newer bond makes the old copy stale");
         owner.tickCount = 10;
         old.inventoryTick(owner.level(), owner, 0, true);
         check(old.isEmpty(), "the stale copy crumbles when it ticks");
@@ -208,7 +203,7 @@ public final class HeimdallTests {
     // ------------------------------------------------------------------------------------------------------------
     // R: the combo and the lunge
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theThreeBlowsOfTheComboAndItsReset(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 10.5, 8.5);
@@ -238,7 +233,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void withoutHofundHeimdallStrikesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = f.player(10.5, FLOOR, 8.5, Power.HEIMDALL);
@@ -252,7 +247,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLungeStopsAtAWallAndThrustsTheFirstCreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 10.5, 4.5);
@@ -277,7 +272,7 @@ public final class HeimdallTests {
     // ------------------------------------------------------------------------------------------------------------
     // G: the Sight
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSightTogglesAndIsSentToHimAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 4.5, 4.5);
@@ -298,7 +293,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void farSightIsHeldAndTheFarPlayersAreListed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 4.5, 4.5);
@@ -323,7 +318,7 @@ public final class HeimdallTests {
     // ------------------------------------------------------------------------------------------------------------
     // B: the Ward and the Call
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWardStopsAnArrowAndPushesAMonsterOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 10.5, 10.5);
@@ -349,7 +344,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCallSummonsThreeEinherjar(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HeimdallAbilities.Summoner real = HeimdallAbilities.summoner;
@@ -369,13 +364,13 @@ public final class HeimdallTests {
     // ------------------------------------------------------------------------------------------------------------
     // N: the Strike and the Bifrost for a friend
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theStrikeHurtsWhatIsInItsRadius(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 3.5, 3.5);
         Zombie inside = husk(helper, 12.5, 12.5);
         Zombie outside = husk(helper, 17.5, 12.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(11.5, FLOOR, 12.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(11.5, FLOOR, 12.5));
         HeimdallAbilities.strikeAt(heimdall, helper.absoluteVec(new Vec3(12.5, FLOOR, 12.5)));
         float struck = 200.0F - inside.getHealth();
         check(struck > 12.0F && struck <= 14.0F, "14 to what is in its radius (less its armour): " + struck);
@@ -386,7 +381,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void heimdallSendsAFriendHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 4.5, 4.5);
@@ -406,7 +401,7 @@ public final class HeimdallTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aSneakingFriendRefusesTheSend(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 4.5, 4.5);
@@ -441,7 +436,7 @@ public final class HeimdallTests {
      * client's Sneak at the press: it decides the variant whatever the server's (lagging) crouch says, and the crouch is
      * left as it was.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theKeyCarriesTheSneakItWasPressedWith(GameTestHelper helper) {
         ByteBuf buf = Unpooled.buffer();
         AbilityKeyPayload sent = new AbilityKeyPayload(5, true, true);
@@ -473,7 +468,7 @@ public final class HeimdallTests {
     // ------------------------------------------------------------------------------------------------------------
     // The custom hero's rows (3.4 R1-R7)
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomHeroSlashesWithAnySwordOnHisOwnKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer custom = CustomKitSupport.hero(f, 10.5, 8.5, CustomKitSupport.def().pick("heimdall.hofund", 5).key(3, "heimdall.hofund").build());
@@ -495,7 +490,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBodyComesOnlyWithItsRow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer with = CustomKitSupport.hero(f, 4.5, 4.5, CustomKitSupport.def().pick("heimdall.body", 5).pick("heimdall.sight", 3)
@@ -516,7 +511,7 @@ public final class HeimdallTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Bifrost screen's menu, Heimdall's words
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBifrostMenuOffersTheRealmsThenThePlaces(GameTestHelper helper) {
         List<BifrostData.Place> places = List.of(new BifrostData.Place("Base", Level.OVERWORLD, Vec3.ZERO, 0.0F, false),
                 new BifrostData.Place("Hall", AsgardDimension.KEY, Vec3.ZERO, 0.0F, false));
@@ -534,7 +529,7 @@ public final class HeimdallTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void heimdallsWordsHaveAtMostThreeAnswersInBothLanguages(GameTestHelper helper) throws IOException {
         HeimdallTalk.register();
         JsonObject en = lang("en_us");
@@ -567,7 +562,7 @@ public final class HeimdallTests {
     // ------------------------------------------------------------------------------------------------------------
     // PvP
 
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void theBlowsHurtPlayersOnlyWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer heimdall = heimdall(f, 10.5, 8.5);
@@ -609,20 +604,20 @@ public final class HeimdallTests {
     }
 
     /** At integration (L5's talk, L2's table): the Heimdall of the city offers the Guardian's Watch, first and after. */
-    @GameTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
     public static void theHeimdallOfTheCityOffersTheWatch(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerPlayer player = inAsgard(f, helper);
         List<String> node = new ArrayList<>();
         List<String> first = heimdallOffers(player, node);
         check("greeting".equals(node.get(0)) && first.contains(HeimdallTalk.WATCH), "his greeting offers the Watch: " + node + first);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.MET_HEIMDALL));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.MET_HEIMDALL));
         List<String> later = heimdallOffers(player, node);
         check("watch_offer".equals(node.get(1)) && later.contains(HeimdallTalk.WATCH), "and later too: " + node + later);
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
     public static void theWatchIsWonByStrikingTheSevenShadows(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         check(GuardiansWatch.pick(UUID.nameUUIDFromBytes(new byte[]{1}), 0, CityPlan.hidingSpots(), 7)
@@ -649,7 +644,7 @@ public final class HeimdallTests {
             for (Entity shadow : shadows) {
                 shadow.hurt(watcher.damageSources().playerAttack(watcher), 1.0F);
             }
-            AsgardProgress progress = watcher.getData(ModAttachments.ASGARD);
+            AsgardProgress progress = ModAttachments.ASGARD.get(watcher);
             check(!GuardiansWatch.watching(watcher) && progress.has(AsgardProgress.WATCH_WON), "all seven struck: the Watch is won");
             check(HofundBond.hasOwn(watcher), "Heimdall gives him Hofund");
             check(GuardiansWatch.refusal(watcher) != null, "it is not taken twice");
@@ -657,7 +652,7 @@ public final class HeimdallTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
     public static void aLostWatchCleansUpAndMustRest(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerPlayer watcher = inAsgard(f, helper);
@@ -673,9 +668,9 @@ public final class HeimdallTests {
             for (Entity shadow : shadows) {
                 check(shadow.isRemoved(), "its shadows are gone");
             }
-            check(!watcher.getData(ModAttachments.ASGARD).has(AsgardProgress.WATCH_WON), "nothing won");
+            check(!ModAttachments.ASGARD.get(watcher).has(AsgardProgress.WATCH_WON), "nothing won");
             check("message.enhanced.watch.rest".equals(GuardiansWatch.refusal(watcher)), "he must rest before he tries again");
-            watcher.setData(ModAttachments.ASGARD, watcher.getData(ModAttachments.ASGARD).withWatchReadyAt(0));
+            ModAttachments.ASGARD.set(watcher, ModAttachments.ASGARD.get(watcher).withWatchReadyAt(0));
             f.config(com.kolodkingal.enhanced.config.HeimdallConfig.WATCH_SECONDS, 30);
             check(GuardiansWatch.start(watcher), "rested, he may try again");
             long left = GuardiansWatch.ticksLeft(watcher, watcher.server.overworld().getGameTime());
@@ -686,7 +681,7 @@ public final class HeimdallTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = WATCH, timeoutTicks = 200)
     public static void theCallIsFourInAsgard(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerPlayer player = inAsgard(f, helper);

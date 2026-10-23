@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.config.CustomHeroConfig;
 import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * The Hero Creator's first screen (3.3): three big buttons. <i>Choose a hero</i> (any hero of the mod and a look, at
@@ -73,7 +73,7 @@ public class HeroCreatorScreen extends Screen {
         boolean hero = mc.player != null && Powers.power(mc.player).hasPowers();
         CreatorUi.BigButton stop = new CreatorUi.BigButton(x + w / 4, y + 92, w / 2, 24, Component.translatable("screen.enhanced.hero_creator.stop"),
                 null, 0x9E9E9E, () -> {
-                    PacketDistributor.sendToServer(HeroCreatorPayload.choose(Power.NONE, ""));
+                    Net.sendToServer(HeroCreatorPayload.choose(Power.NONE, ""));
                     onClose();
                 });
         stop.active = on && hero;

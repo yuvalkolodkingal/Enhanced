@@ -128,7 +128,7 @@ public final class AnimDebugCommands {
         if (!read.ok()) {
             return say(source, "cannot read " + path + ": " + read.notes());
         }
-        net.neoforged.neoforge.network.PacketDistributor.sendToServer(com.kolodkingal.enhanced.network.HeroCreatorPayload.apply(read.hero()));
+        com.kolodkingal.enhanced.platform.net.Net.sendToServer(com.kolodkingal.enhanced.network.HeroCreatorPayload.apply(read.hero()));
         return say(source, "becoming " + read.hero().name());
     }
 

@@ -43,7 +43,7 @@ public class BifrostRuneStoneBlock extends BaseEntityBlock {
         if (player instanceof ServerPlayer server) {
             RuneStones.use(server, pos);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override

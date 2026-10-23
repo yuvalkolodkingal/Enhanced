@@ -3,10 +3,10 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.client.build.BuildKeys;
 import com.kolodkingal.enhanced.custom.HeroKeys;
 import com.kolodkingal.enhanced.network.AbilityKeyPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * 3.6, the Y-row generalisation on the client: for a player whose Y row is not Build Magic (Doctor Strange's Eye, a
@@ -23,11 +23,11 @@ public final class YRowKey {
         boolean down = usable && BuildKeys.MAGIC.isDown();
         boolean sneak = mc.options.keyShift.isDown();
         if (usable && (down || clicked) && !sentDown) {
-            PacketDistributor.sendToServer(new AbilityKeyPayload(HeroKeys.Y, true, sneak));
+            Net.sendToServer(new AbilityKeyPayload(HeroKeys.Y, true, sneak));
             sentDown = true;
         }
         if (!down && sentDown) {
-            PacketDistributor.sendToServer(new AbilityKeyPayload(HeroKeys.Y, false, sneak));
+            Net.sendToServer(new AbilityKeyPayload(HeroKeys.Y, false, sneak));
             sentDown = false;
         }
     }

@@ -66,14 +66,14 @@ public class IronShrapnelEntity extends ThrowableItemProjectile {
     public void tick() {
         super.tick();
         // 3.5: a custom hero's shards trail the colour his pick of the Shrapnel chose.
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             int tint = AbilityColors.chosen(getOwner(), HeroAbility.MAGNETO_SHRAPNEL);
             if (tint >= 0) {
                 level().addParticle(new EnergyParticleOptions(tint, 0.5F), getX(), getY(), getZ(), 0, 0, 0);
             }
         }
         // Counted in the shard's own time, so Quicksilver Time doesn't cut its flight short.
-        if (!level().isClientSide && (life += SlowMotion.timeScale(this)) > MAX_LIFE) {
+        if (!level().isClientSide() && (life += SlowMotion.timeScale(this)) > MAX_LIFE) {
             discard();
         }
     }
@@ -86,7 +86,7 @@ public class IronShrapnelEntity extends ThrowableItemProjectile {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         Entity target = result.getEntity();

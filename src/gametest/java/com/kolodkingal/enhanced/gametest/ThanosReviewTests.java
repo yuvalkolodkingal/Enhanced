@@ -6,17 +6,15 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosFight;
 import com.kolodkingal.enhanced.thanos.ThanosState;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -34,8 +32,6 @@ import static com.kolodkingal.enhanced.gametest.ThanosMoveSupport.fixture;
  * even when the stuck rule would take him through its wall, a Titan who never lands, and the titles that were wider than
  * a screen. (The target that he held for sixty idle ticks instead of sixty ticks is in {@link ThanosFightTests}.)
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosReviewTests {
 
     private static boolean inside(Hex hex, ThanosEntity boss) {
@@ -47,7 +43,7 @@ public final class ThanosReviewTests {
      * the one he hunts, must ask the wall like any teleport of his, so a hunted fighter outside the Hex does not get him
      * out.
      */
-    @GameTest(template = ARENA, batch = "thanos_review_hex_in", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_review_hex_in", timeoutTicks = 40)
     public static void theStuckRuleDoesNotTakeHimOutOfAHex(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -63,7 +59,7 @@ public final class ThanosReviewTests {
     }
 
     /** And one outside a Hex is not put inside it by the same rule. */
-    @GameTest(template = ARENA, batch = "thanos_review_hex_out", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_review_hex_out", timeoutTicks = 40)
     public static void theStuckRuleDoesNotTakeHimIntoAHex(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -79,7 +75,7 @@ public final class ThanosReviewTests {
     }
 
     /** Where there is no wall the same rule still frees him beside the one he hunts. */
-    @GameTest(template = ARENA, batch = "thanos_review_unstick", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_review_unstick", timeoutTicks = 40)
     public static void withNoWallTheStuckRuleStillFreesHim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer hunted = fighter(f, 8, 8);
@@ -96,7 +92,7 @@ public final class ThanosReviewTests {
      * during the countdown can) counts as landed after {@link ThanosEntity#LAND_TIMEOUT_TICKS}, so that his arrival
      * (invulnerable) does not last until the fight times out.
      */
-    @GameTest(template = ARENA, batch = "thanos_review_land", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "thanos_review_land", timeoutTicks = 140)
     public static void aThanosWhoNeverLandsCountsAsLandedAfterTheDeadline(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer starter = fighter(f, 6, 6);
@@ -126,7 +122,7 @@ public final class ThanosReviewTests {
     }
 
     /** A Titan who falls into water (where he floats or sinks, but is not on the ground) has landed too. */
-    @GameTest(template = ARENA, batch = "thanos_review_water", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_review_water", timeoutTicks = 60)
     public static void aThanosWhoFallsIntoWaterHasLanded(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer starter = fighter(f, 6, 6);
@@ -173,7 +169,7 @@ public final class ThanosReviewTests {
      * and the awakening's. The longest text that fits every screen is a dozen or so characters of title and about thirty
      * of subtitle; this holds the lane's texts to that, in both languages.
      */
-    @GameTest(template = ARENA, batch = "thanos_review_data")
+    @EnhancedTest(template = ARENA, batch = "thanos_review_data")
     public static void theTitlesFitTheScreenAtEveryScale(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String language : new String[]{"en_us", "he_il"}) {

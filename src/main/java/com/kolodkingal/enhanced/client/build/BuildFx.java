@@ -432,7 +432,7 @@ public final class BuildFx {
                 continue;
             }
             Power power = BuildClient.hero(player);
-            BuildView view = player.getExistingData(ModAttachments.BUILD_VIEW).orElse(BuildView.EMPTY);
+            BuildView view = ModAttachments.BUILD_VIEW.getExisting(player).orElse(BuildView.EMPTY);
             if (!BuildClient.isBuilder(power) || !view.active() || player.isSpectator() || player.isInvisible()) {
                 continue;
             }
@@ -552,7 +552,7 @@ public final class BuildFx {
 
     private static boolean anyBilly(ClientLevel level) {
         for (AbstractClientPlayer player : level.players()) {
-            if (BuildClient.hero(player) == Power.BILLY && player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false)) {
+            if (BuildClient.hero(player) == Power.BILLY && ModAttachments.BUILD_VIEW.getExisting(player).map(BuildView::active).orElse(false)) {
                 return true;
             }
         }
@@ -849,7 +849,7 @@ public final class BuildFx {
         for (AbstractClientPlayer player : level.players()) {
             if (BuildClient.hero(player) != Power.BILLY || player.isInvisible() || player.isSpectator()
                     || player.distanceToSqr(camera) > HAND_RANGE * HAND_RANGE
-                    || !player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false)) {
+                    || !ModAttachments.BUILD_VIEW.getExisting(player).map(BuildView::active).orElse(false)) {
                 continue;
             }
             float phase = (time + player.getId() * 7) % 20.0F;

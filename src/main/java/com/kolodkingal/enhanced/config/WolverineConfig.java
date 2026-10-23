@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Wolverine and the Adamantium Injection (3.7). Every option of the plan is defined here by the 3.7 skeleton (lane L2
@@ -13,53 +13,53 @@ public final class WolverineConfig {
     public static final String SECTION_ADAMANTIUM_INJECTION = "adamantium_injection";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.DoubleValue HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue ARMOR_BONUS;
-    public static ModConfigSpec.DoubleValue TOUGHNESS_BONUS;
-    public static ModConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
-    public static ModConfigSpec.DoubleValue SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue ATTACK_BONUS;
-    public static ModConfigSpec.DoubleValue ATTACK_SPEED_BONUS;
-    public static ModConfigSpec.DoubleValue JUMP_BONUS;
-    public static ModConfigSpec.DoubleValue SAFE_FALL;
-    public static ModConfigSpec.DoubleValue CLAW_BONUS;
-    public static ModConfigSpec.BooleanValue HEAVY;
-    public static ModConfigSpec.DoubleValue SINK_SPEED;
-    public static ModConfigSpec.DoubleValue MAX_SWIM_UP;
-    public static ModConfigSpec.DoubleValue SLASH_DAMAGE_1;
-    public static ModConfigSpec.DoubleValue SLASH_DAMAGE_2;
-    public static ModConfigSpec.DoubleValue SLASH_DAMAGE_3;
-    public static ModConfigSpec.DoubleValue SLASH_REACH;
-    public static ModConfigSpec.IntValue SLASH_GAP;
-    public static ModConfigSpec.IntValue COMBO_RESET;
-    public static ModConfigSpec.DoubleValue SPIN_DAMAGE;
-    public static ModConfigSpec.DoubleValue SPIN_RADIUS;
-    public static ModConfigSpec.IntValue SPIN_COOLDOWN;
-    public static ModConfigSpec.IntValue POUNCE_RANGE;
-    public static ModConfigSpec.DoubleValue POUNCE_DAMAGE;
-    public static ModConfigSpec.IntValue POUNCE_PIN_TICKS;
-    public static ModConfigSpec.IntValue POUNCE_COOLDOWN;
-    public static ModConfigSpec.IntValue FERAL_LEAP_COOLDOWN;
-    public static ModConfigSpec.IntValue BERSERK_TICKS;
-    public static ModConfigSpec.DoubleValue BERSERK_DAMAGE;
-    public static ModConfigSpec.DoubleValue BERSERK_SPEED;
-    public static ModConfigSpec.DoubleValue BERSERK_REGEN_FACTOR;
-    public static ModConfigSpec.IntValue BERSERK_TIRED_TICKS;
-    public static ModConfigSpec.IntValue BERSERK_COOLDOWN;
-    public static ModConfigSpec.IntValue SNIFF_RADIUS;
-    public static ModConfigSpec.IntValue SNIFF_TICKS;
-    public static ModConfigSpec.IntValue SNIFF_COOLDOWN;
-    public static ModConfigSpec.IntValue TRAIL_SECONDS;
-    public static ModConfigSpec.IntValue TRACK_RANGE;
-    public static ModConfigSpec.IntValue TRACK_TICKS;
-    public static ModConfigSpec.IntValue TRACK_COOLDOWN;
-    public static ModConfigSpec.BooleanValue TRACK_TELLS_TARGET;
-    public static ModConfigSpec.DoubleValue CLIMB_SPEED;
-    public static ModConfigSpec.IntValue INJECTION_HOLD_TICKS;
-    public static ModConfigSpec.BooleanValue INJECTION_HEROES_REFUSED;
-    public static ModConfigSpec.BooleanValue INJECTION_CRAFTABLE;
+    public static ConfigSpec.DoubleValue HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue ARMOR_BONUS;
+    public static ConfigSpec.DoubleValue TOUGHNESS_BONUS;
+    public static ConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
+    public static ConfigSpec.DoubleValue SPEED_BONUS;
+    public static ConfigSpec.DoubleValue ATTACK_BONUS;
+    public static ConfigSpec.DoubleValue ATTACK_SPEED_BONUS;
+    public static ConfigSpec.DoubleValue JUMP_BONUS;
+    public static ConfigSpec.DoubleValue SAFE_FALL;
+    public static ConfigSpec.DoubleValue CLAW_BONUS;
+    public static ConfigSpec.BooleanValue HEAVY;
+    public static ConfigSpec.DoubleValue SINK_SPEED;
+    public static ConfigSpec.DoubleValue MAX_SWIM_UP;
+    public static ConfigSpec.DoubleValue SLASH_DAMAGE_1;
+    public static ConfigSpec.DoubleValue SLASH_DAMAGE_2;
+    public static ConfigSpec.DoubleValue SLASH_DAMAGE_3;
+    public static ConfigSpec.DoubleValue SLASH_REACH;
+    public static ConfigSpec.IntValue SLASH_GAP;
+    public static ConfigSpec.IntValue COMBO_RESET;
+    public static ConfigSpec.DoubleValue SPIN_DAMAGE;
+    public static ConfigSpec.DoubleValue SPIN_RADIUS;
+    public static ConfigSpec.IntValue SPIN_COOLDOWN;
+    public static ConfigSpec.IntValue POUNCE_RANGE;
+    public static ConfigSpec.DoubleValue POUNCE_DAMAGE;
+    public static ConfigSpec.IntValue POUNCE_PIN_TICKS;
+    public static ConfigSpec.IntValue POUNCE_COOLDOWN;
+    public static ConfigSpec.IntValue FERAL_LEAP_COOLDOWN;
+    public static ConfigSpec.IntValue BERSERK_TICKS;
+    public static ConfigSpec.DoubleValue BERSERK_DAMAGE;
+    public static ConfigSpec.DoubleValue BERSERK_SPEED;
+    public static ConfigSpec.DoubleValue BERSERK_REGEN_FACTOR;
+    public static ConfigSpec.IntValue BERSERK_TIRED_TICKS;
+    public static ConfigSpec.IntValue BERSERK_COOLDOWN;
+    public static ConfigSpec.IntValue SNIFF_RADIUS;
+    public static ConfigSpec.IntValue SNIFF_TICKS;
+    public static ConfigSpec.IntValue SNIFF_COOLDOWN;
+    public static ConfigSpec.IntValue TRAIL_SECONDS;
+    public static ConfigSpec.IntValue TRACK_RANGE;
+    public static ConfigSpec.IntValue TRACK_TICKS;
+    public static ConfigSpec.IntValue TRACK_COOLDOWN;
+    public static ConfigSpec.BooleanValue TRACK_TELLS_TARGET;
+    public static ConfigSpec.DoubleValue CLIMB_SPEED;
+    public static ConfigSpec.IntValue INJECTION_HOLD_TICKS;
+    public static ConfigSpec.BooleanValue INJECTION_HEROES_REFUSED;
+    public static ConfigSpec.BooleanValue INJECTION_CRAFTABLE;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("wolverine");
         HEALTH_BONUS = builder.comment("Max health added to his 20.")
                 .defineInRange("healthBonus", 10.0, 0.0, 100.0);

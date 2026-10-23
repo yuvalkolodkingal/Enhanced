@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.screen;
 
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import com.kolodkingal.enhanced.network.RoadChoicePayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.road.RoadDimension;
 import com.kolodkingal.enhanced.road.WitchesRoad;
@@ -15,7 +16,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * "Seekest thou the Road?": a Witches' Road door opened for a seeker holding a Scarlet Witch Gene. Either he is asked to walk the
@@ -80,7 +80,7 @@ public class WitchesRoadScreen extends Screen {
     }
 
     private void choose(Power power) {
-        PacketDistributor.sendToServer(new RoadChoicePayload(door, power));
+        Net.sendToServer(new RoadChoicePayload(door, power));
         onClose();
     }
 

@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The balance numbers of the Ultron boss fight (the rules all bosses share are in {@link BossConfig}). Its options are
@@ -24,54 +24,54 @@ public final class UltronBossConfig {
         TREMOR
     }
 
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.DoubleValue BODY_HEALTH;
-    public static ModConfigSpec.DoubleValue BODY_HEALTH_DECAY;
-    public static ModConfigSpec.DoubleValue BODY_HEALTH_FLOOR;
-    public static ModConfigSpec.DoubleValue HEALTH_PER_EXTRA_PLAYER;
-    public static ModConfigSpec.DoubleValue BODY_ARMOR;
-    public static ModConfigSpec.DoubleValue BODY_TOUGHNESS;
-    public static ModConfigSpec.DoubleValue MAX_HIT_FRACTION;
-    public static ModConfigSpec.DoubleValue EXPLOSION_DAMAGE_FACTOR;
-    public static ModConfigSpec.DoubleValue LIFT_AT;
-    public static ModConfigSpec.DoubleValue HEART_RIP_THRESHOLD;
-    public static ModConfigSpec.DoubleValue VOLLEY_BOLT_DAMAGE;
-    public static ModConfigSpec.DoubleValue FINGER_BEAM_DAMAGE;
-    public static ModConfigSpec.DoubleValue DIVE_DAMAGE;
-    public static ModConfigSpec.DoubleValue PULL_DAMAGE;
-    public static ModConfigSpec.DoubleValue PUNCH_DAMAGE;
-    public static ModConfigSpec.DoubleValue DEBRIS_DAMAGE;
-    public static ModConfigSpec.IntValue DEBRIS_INTERVAL;
-    public static ModConfigSpec.DoubleValue SENTRY_HEALTH;
-    public static ModConfigSpec.DoubleValue SENTRY_BOLT_DAMAGE;
-    public static ModConfigSpec.DoubleValue SENTRY_MELEE_DAMAGE;
-    public static ModConfigSpec.IntValue SENTRY_STUN_TICKS;
-    public static ModConfigSpec.IntValue SENTRY_BUDGET_BASE;
-    public static ModConfigSpec.IntValue SENTRY_BUDGET_PER_PLAYER;
-    public static ModConfigSpec.IntValue SENTRIES_AT_START;
-    public static ModConfigSpec.IntValue SENTRY_WAVE_SIZE;
-    public static ModConfigSpec.IntValue SENTRY_WAVE_INTERVAL;
-    public static ModConfigSpec.IntValue SENTRY_MAX_ALIVE;
-    public static ModConfigSpec.IntValue SENTRY_MAX_ALIVE_PER_PLAYER;
-    public static ModConfigSpec.IntValue MAX_UPLOADS;
-    public static ModConfigSpec.BooleanValue LIFT_ENABLED;
-    public static ModConfigSpec.EnumValue<LiftMode> LIFT_MODE;
-    public static ModConfigSpec.BooleanValue HIDE_GROUND;
-    public static ModConfigSpec.BooleanValue LIFT_REQUIRES_MOB_GRIEFING;
-    public static ModConfigSpec.IntValue ISLAND_RADIUS;
-    public static ModConfigSpec.IntValue LIFT_HEIGHT;
-    public static ModConfigSpec.IntValue LIFT_TICKS;
-    public static ModConfigSpec.IntValue SKIN_DEPTH;
-    public static ModConfigSpec.IntValue COVER_HEIGHT;
-    public static ModConfigSpec.IntValue CONE_DEPTH;
-    public static ModConfigSpec.IntValue MAX_RELIEF;
-    public static ModConfigSpec.IntValue EDITS_PER_TICK;
-    public static ModConfigSpec.DoubleValue RESCUE_DAMAGE;
-    public static ModConfigSpec.IntValue REJOIN_LIMIT;
-    public static ModConfigSpec.DoubleValue VISION_BEAM_BONUS;
-    public static ModConfigSpec.IntValue HOLD_TICKS;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.DoubleValue BODY_HEALTH;
+    public static ConfigSpec.DoubleValue BODY_HEALTH_DECAY;
+    public static ConfigSpec.DoubleValue BODY_HEALTH_FLOOR;
+    public static ConfigSpec.DoubleValue HEALTH_PER_EXTRA_PLAYER;
+    public static ConfigSpec.DoubleValue BODY_ARMOR;
+    public static ConfigSpec.DoubleValue BODY_TOUGHNESS;
+    public static ConfigSpec.DoubleValue MAX_HIT_FRACTION;
+    public static ConfigSpec.DoubleValue EXPLOSION_DAMAGE_FACTOR;
+    public static ConfigSpec.DoubleValue LIFT_AT;
+    public static ConfigSpec.DoubleValue HEART_RIP_THRESHOLD;
+    public static ConfigSpec.DoubleValue VOLLEY_BOLT_DAMAGE;
+    public static ConfigSpec.DoubleValue FINGER_BEAM_DAMAGE;
+    public static ConfigSpec.DoubleValue DIVE_DAMAGE;
+    public static ConfigSpec.DoubleValue PULL_DAMAGE;
+    public static ConfigSpec.DoubleValue PUNCH_DAMAGE;
+    public static ConfigSpec.DoubleValue DEBRIS_DAMAGE;
+    public static ConfigSpec.IntValue DEBRIS_INTERVAL;
+    public static ConfigSpec.DoubleValue SENTRY_HEALTH;
+    public static ConfigSpec.DoubleValue SENTRY_BOLT_DAMAGE;
+    public static ConfigSpec.DoubleValue SENTRY_MELEE_DAMAGE;
+    public static ConfigSpec.IntValue SENTRY_STUN_TICKS;
+    public static ConfigSpec.IntValue SENTRY_BUDGET_BASE;
+    public static ConfigSpec.IntValue SENTRY_BUDGET_PER_PLAYER;
+    public static ConfigSpec.IntValue SENTRIES_AT_START;
+    public static ConfigSpec.IntValue SENTRY_WAVE_SIZE;
+    public static ConfigSpec.IntValue SENTRY_WAVE_INTERVAL;
+    public static ConfigSpec.IntValue SENTRY_MAX_ALIVE;
+    public static ConfigSpec.IntValue SENTRY_MAX_ALIVE_PER_PLAYER;
+    public static ConfigSpec.IntValue MAX_UPLOADS;
+    public static ConfigSpec.BooleanValue LIFT_ENABLED;
+    public static ConfigSpec.EnumValue<LiftMode> LIFT_MODE;
+    public static ConfigSpec.BooleanValue HIDE_GROUND;
+    public static ConfigSpec.BooleanValue LIFT_REQUIRES_MOB_GRIEFING;
+    public static ConfigSpec.IntValue ISLAND_RADIUS;
+    public static ConfigSpec.IntValue LIFT_HEIGHT;
+    public static ConfigSpec.IntValue LIFT_TICKS;
+    public static ConfigSpec.IntValue SKIN_DEPTH;
+    public static ConfigSpec.IntValue COVER_HEIGHT;
+    public static ConfigSpec.IntValue CONE_DEPTH;
+    public static ConfigSpec.IntValue MAX_RELIEF;
+    public static ConfigSpec.IntValue EDITS_PER_TICK;
+    public static ConfigSpec.DoubleValue RESCUE_DAMAGE;
+    public static ConfigSpec.IntValue REJOIN_LIMIT;
+    public static ConfigSpec.DoubleValue VISION_BEAM_BONUS;
+    public static ConfigSpec.IntValue HOLD_TICKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Whether the Ultron ritual works at all.")
                 .define("enabled", true);

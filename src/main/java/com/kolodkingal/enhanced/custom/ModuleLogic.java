@@ -190,7 +190,7 @@ public interface ModuleLogic {
     }
 
     /** A server option, or its default when the config is not loaded (a client's own copy before it joins). */
-    static double scale(net.neoforged.neoforge.common.ModConfigSpec.DoubleValue value, double fallback) {
+    static double scale(com.kolodkingal.enhanced.config.core.ConfigSpec.DoubleValue value, double fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 

@@ -2,9 +2,9 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.road.RoadCanvas;
@@ -26,7 +26,6 @@ import com.kolodkingal.enhanced.road.boat.IceTrackGenerator;
 import com.kolodkingal.enhanced.road.copy.StructureCopyChallenge;
 import com.kolodkingal.enhanced.road.copy.StructureSupply;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -48,8 +47,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -68,8 +65,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * rest, the Road's world border, entities removed late, the put-aside backpack saved with the player, courses that cannot be drawn
  * for a seed, and the small things.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadReviewTests {
     static final String BATCH = "road_review";
 
@@ -85,7 +80,7 @@ public final class RoadReviewTests {
 
     // ---- R1: the Gene is not destroyed by trying to drop it ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theGeneIsGivenBackWhenHeTriesToThrowItAwayWithTheKeyOrByClicking(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -120,7 +115,7 @@ public final class RoadReviewTests {
 
     // ---- R7 and R8: nobody travels into the Road, a refused way out keeps the trial ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void noOneOutsideTheTrialsTravelsIntoTheRoadButOperatorsAndTheRoadItself(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -154,7 +149,7 @@ public final class RoadReviewTests {
         return listener;
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void aWayOutThatIsRefusedKeepsTheTrialAndNothingIsTakenDown(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -183,7 +178,7 @@ public final class RoadReviewTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void anArrivalThatIsRefusedLeavesHimAsHeWasWithAMessage(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -241,7 +236,7 @@ public final class RoadReviewTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = "road_review_swap", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_review_swap", timeoutTicks = 500)
     public static void aTrialThatThrowsIsGivenUpAndTheServerGoesOn(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -263,7 +258,7 @@ public final class RoadReviewTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_review_swap2", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_review_swap2", timeoutTicks = 500)
     public static void aCourseThatCannotBeDrawnForASeedIsDrawnWithTheNextOneTheSameEveryTime(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         Flaky flaky = new Flaky("flaky_seed");
@@ -294,7 +289,7 @@ public final class RoadReviewTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_review_swap3", timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = "road_review_swap3", timeoutTicks = 600)
     public static void aGateThatCannotDrawTheNextTrialDoesNotTryEveryTick(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -338,7 +333,7 @@ public final class RoadReviewTests {
         return cell;
     }
 
-    @GameTest(template = ARENA, batch = "road_review_sweep", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "road_review_sweep", timeoutTicks = 300)
     public static void aChunkThatCannotBeClearedDoesNotStopTheRestAndIsTriedAgain(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -382,7 +377,7 @@ public final class RoadReviewTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "road_review_sweep2", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "road_review_sweep2", timeoutTicks = 400)
     public static void theEntitiesOfACellAreRemovedAMomentAfterItsBlocksWithTheChunksHeld(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -413,7 +408,7 @@ public final class RoadReviewTests {
 
     // ---- R2: the border ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theRoadsWorldBorderIsAlwaysAsBigAsTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerLevel road = RoadTestSupport.road(helper);
@@ -436,7 +431,7 @@ public final class RoadReviewTests {
 
     // ---- R6: the put-aside backpack is saved with the player ----
 
-    @GameTest(template = ARENA, batch = "road_review_stash", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_review_stash", timeoutTicks = 500)
     public static void thePutAsideBackpackIsSavedInThePlayersOwnDataNotTheWorlds(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -452,10 +447,10 @@ public final class RoadReviewTests {
                     check(saved.toString().contains("enhanced:road_stash") && saved.toString().contains("minecraft:diamond"), "the stash is in the player's own save");
                     RoadProgress progress = RoadSave.get(server).progress(player.getUUID());
                     check(progress.data(StructureCopyChallenge.ID).isEmpty(), "and not in the world's save of the Road");
-                    check(!player.getData(ModAttachments.ROAD_STASH).isEmpty(), "(the attachment)");
+                    check(!ModAttachments.ROAD_STASH.get(player).isEmpty(), "(the attachment)");
                     RoadTrials.leave(player, RoadChallenge.End.LEFT);
                     check(player.getInventory().getItem(5).is(Items.DIAMOND) && player.getInventory().getItem(5).getCount() == 7, "he has his diamonds back");
-                    check(player.getData(ModAttachments.ROAD_STASH).isEmpty() && !player.saveWithoutId(new CompoundTag()).toString().contains("enhanced:road_stash"),
+                    check(ModAttachments.ROAD_STASH.get(player).isEmpty() && !player.saveWithoutId(new CompoundTag()).toString().contains("enhanced:road_stash"),
                             "and the stash goes in the same moment, so the two can never be saved apart");
                 })
                 .thenSucceed();
@@ -463,7 +458,7 @@ public final class RoadReviewTests {
 
     // ---- R12, R14, R15, R18 and the small ones ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void aPlayerWhoseTrialIsStillBeingBuiltDoesNotDie(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -474,7 +469,7 @@ public final class RoadReviewTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void whatHeCraftsFromTheTrialsBlocksIsTheTrialsToo(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -494,7 +489,7 @@ public final class RoadReviewTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "road_review_limit", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "road_review_limit", timeoutTicks = 300)
     public static void theBoatRacesTimeLimitIsNeverShorterThanThreeTimesThePar(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         IceTrack track = IceTrackGenerator.generate(5L, IceBoatChallenge.params());
@@ -512,7 +507,7 @@ public final class RoadReviewTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void theParkoursCheckpointCountsOnTheWholePadAndTheDiscardedBoatIsForgotten(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -538,7 +533,7 @@ public final class RoadReviewTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRoadBansWhatPutsAnEntityInHisCellAndHisHebrewIsInThePlural(GameTestHelper helper) throws IOException {
         for (ItemStack stack : new ItemStack[]{new ItemStack(Items.ARMOR_STAND), new ItemStack(Items.OAK_BOAT), new ItemStack(Items.MINECART), new ItemStack(Items.PAINTING),
                 new ItemStack(Items.ITEM_FRAME), new ItemStack(Items.ZOMBIE_SPAWN_EGG), new ItemStack(Items.ENDER_PEARL)}) {
@@ -560,7 +555,7 @@ public final class RoadReviewTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyTrialsTitleFitsTheScreenInBothLanguages(GameTestHelper helper) throws IOException {
         JsonObject en;
         JsonObject he;
@@ -584,7 +579,7 @@ public final class RoadReviewTests {
      * side and share the ledger. When another test's sweep (RoadSweeper.drain is global) has cleared a cell, the lowest free number goes to the
      * next trial at once, so "the cell number is not in the ledger" or "is not being cleared" says nothing about THIS player's cell: judge by owner.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCellThatIsFreeAgainIsGivenToTheNextTrialAtOnceSoTestsJudgeByOwner(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         RoadSave save = RoadSave.get(server);
@@ -607,7 +602,7 @@ public final class RoadReviewTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aWorldOfThreeDotOneWithNothingOfTheRoadLoads(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         // A save with no Road in it at all (a 3.1 world): empty, no player, no cell.
@@ -616,7 +611,7 @@ public final class RoadReviewTests {
         check(empty.progress(UUID.randomUUID()).isBlank() && empty.allocate(UUID.randomUUID(), "parkour", 8) == 0, "and the first cell is cell 0");
         // The attachments a 3.1 player has not got read as empty.
         ServerPlayer player = TestKit.fixture(helper).player(10.5, TestKit.FLOOR, 10.5);
-        check(player.getData(ModAttachments.ROAD_STASH).isEmpty(), "a player without the stash reads as empty");
+        check(ModAttachments.ROAD_STASH.get(player).isEmpty(), "a player without the stash reads as empty");
         check(RoadChallenges.count() >= 1 && new ChunkPos(0, 0).x == 0, "(the trials are there)");
         helper.succeed();
     }

@@ -1,11 +1,11 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.UltronAbilities;
 import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.item.ScepterRituals;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -16,7 +16,6 @@ import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.ultron.UltronBoltEntity;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,8 +38,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -61,8 +58,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Life, the Sentry Army, Command) are {@code UltronNetworkTests}. Tests that fire bolts keep them inside the arena: its
  * barrier walls spend them.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class UltronTests {
     /** Quick tests that keep no creature alive between ticks share one batch. */
     private static final String QUICK = "ultron_hero";
@@ -86,7 +81,7 @@ public final class UltronTests {
 
     /** A zombie that stands still, takes its damage plainly (no armour) and does not die of it. */
     private static Zombie dummy(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(400.0);
         zombie.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
@@ -118,7 +113,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // The body
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void bodyAndPassives(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -172,7 +167,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 1: Repulsor Fire
 
-    @GameTest(template = ARENA, batch = "ultron_fire", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_fire", timeoutTicks = 200)
     public static void repulsorFire(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -246,7 +241,7 @@ public final class UltronTests {
      * The game looks for what a projectile hits along its next step, and a creature that moved into the margin round the
      * bolt (a zombie walking at it, one knocked back into it) is no longer entered by that line: plasma still hits it.
      */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void plasmaHitsWhatItStartsInside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -263,7 +258,7 @@ public final class UltronTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_pool", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_pool", timeoutTicks = 200)
     public static void thePoolRunsDryAndNeedsAFewChargesToRestart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -298,7 +293,7 @@ public final class UltronTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void creativeHasAnEndlessPoolAndHisLookColoursTheBolt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -334,7 +329,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // Sneak + R: the Overcharge
 
-    @GameTest(template = ARENA, batch = "ultron_overcharge", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_overcharge", timeoutTicks = 200)
     public static void overcharge(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -399,7 +394,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 2: Anti-Gravity Flight
 
-    @GameTest(template = ARENA, batch = "solo_flight")
+    @EnhancedTest(template = ARENA, batch = "solo_flight")
     public static void flight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = hero(f, 10.5, 10.5);
@@ -436,7 +431,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 3: Gravity Pull
 
-    @GameTest(template = ARENA, batch = "ultron_pull", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_pull", timeoutTicks = 200)
     public static void gravityPull(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -471,7 +466,7 @@ public final class UltronTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_pull_targets", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_pull_targets", timeoutTicks = 200)
     public static void gravityPullTargets(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -543,7 +538,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // Sneak + V: Gravity Slam
 
-    @GameTest(template = ARENA, batch = "ultron_slam", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_slam", timeoutTicks = 200)
     public static void gravitySlam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -556,7 +551,7 @@ public final class UltronTests {
         Zombie flier = dummy(helper, 7.5, 10.5);
         flier.setNoGravity(true);
         flier.setPos(flier.getX(), flier.getY() + 3.0, flier.getZ());
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(10.5, FLOOR, 7.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(10.5, FLOOR, 7.5));
         pig.setHealth(pig.getMaxHealth());
         ServerPlayer creative = f.player(10.5, FLOOR, 8.5, GameType.CREATIVE);
         ServerPlayer player = f.player(8.5, FLOOR, 12.5);
@@ -598,7 +593,7 @@ public final class UltronTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Scepter
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theStoneKnowsItsCreation(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = hero(f, 10.5, 10.5);

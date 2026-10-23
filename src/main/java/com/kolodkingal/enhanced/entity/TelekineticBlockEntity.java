@@ -159,7 +159,7 @@ public class TelekineticBlockEntity extends Entity {
 
     /** Server: decided by the holder refreshing us every tick. Client: synced flag. */
     private boolean isHeld() {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return entityData.get(DATA_HELD);
         }
         boolean held = ticksSinceHeld <= 1;
@@ -179,14 +179,14 @@ public class TelekineticBlockEntity extends Entity {
             discard();
             return;
         }
-        if (!level().isClientSide && isBorrowed() && BossFights.fightOf(this) == null) {
+        if (!level().isClientSide() && isBorrowed() && BossFights.fightOf(this) == null) {
             discard(); // its fight is gone (a crash, a forced stop): what was borrowed was never this world's to keep
             return;
         }
         ticksSinceHeld++;
         if (isHeld()) {
             // Telekinesis moves us; nothing to simulate.
-            if (level().isClientSide && tickCount % 3 == 0) {
+            if (level().isClientSide() && tickCount % 3 == 0) {
                 level().addParticle(new EnergyParticleOptions(getColor(), 1.0F),
                         getX() + (random.nextDouble() - 0.5), getY() + random.nextDouble(), getZ() + (random.nextDouble() - 0.5), 0, 0.02, 0);
             }
@@ -197,7 +197,7 @@ public class TelekineticBlockEntity extends Entity {
         applyGravity();
         Vec3 motion = getDeltaMovement();
 
-        if (!level().isClientSide && launched) {
+        if (!level().isClientSide() && launched) {
             // A borrowed block thrown across the field or the wall of its arena stops there (D-T 4.5).
             Vec3 edge = BossFights.edgeStop(this, start.add(motion));
             Vec3 center = start.add(0, getBbHeight() * 0.5, 0);
@@ -219,7 +219,7 @@ public class TelekineticBlockEntity extends Entity {
         move(MoverType.SELF, motion);
         setDeltaMovement(getDeltaMovement().scale(0.98));
 
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (launched) {
                 level().addParticle(new EnergyParticleOptions(getColor(), 1.2F), getX(), getY() + 0.5, getZ(), 0, 0, 0);
             }

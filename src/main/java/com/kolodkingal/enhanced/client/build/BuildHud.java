@@ -166,7 +166,7 @@ public final class BuildHud implements LayeredDraw.Layer {
         seenSpell = g.spell();
         seenStage = stage;
 
-        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        BuildData data = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);
         int rank = BillyRanks.rank(data);
         if (player != seenPlayer) {
             seenPlayer = player;
@@ -289,7 +289,7 @@ public final class BuildHud implements LayeredDraw.Layer {
         boolean calm = EnhancedClientConfig.reducedMotion();
         boolean building = BuildClient.buildMode();
         boolean screen = mc.screen != null && !(mc.screen instanceof ChatScreen);
-        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        BuildData data = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);
         int width = graphics.guiWidth();
         int height = graphics.guiHeight();
         // Vanilla's crosshair is 15 pixels with its top left at ((w - 15) / 2, (h - 15) / 2).

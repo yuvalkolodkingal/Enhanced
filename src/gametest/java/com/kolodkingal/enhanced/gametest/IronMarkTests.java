@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.ironman.IronManState;
@@ -9,10 +8,10 @@ import com.kolodkingal.enhanced.ironman.Mark1Moves;
 import com.kolodkingal.enhanced.ironman.Mark3Moves;
 import com.kolodkingal.enhanced.ironman.SuitEnergy;
 import com.kolodkingal.enhanced.ironman.SuitKind;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -26,8 +25,6 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.IronCoreTests.data;
 import static com.kolodkingal.enhanced.gametest.IronCoreTests.state;
@@ -48,16 +45,14 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * costs; wear, never breaking (offline), and the anvil's repair items. Batches {@code iron_marks} and {@code
  * iron_marks_cfg}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class IronMarkTests {
     private static final String BATCH = "iron_marks";
     private static final String CFG = "iron_marks_cfg";
 
     /** A husk with no armour and 200 health that stands where it is put (no AI unless {@code free}). */
     static Husk husk(GameTestHelper helper, double x, double z, boolean free) {
-        Husk husk = free ? helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z))
-                : helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = free ? TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z))
+                : TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -88,7 +83,7 @@ public final class IronMarkTests {
     // Mark 1
 
     /** The flamethrower: the husk before him is hurt and burns; no block catches fire by default. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theFlamethrowerBurnsButNotTheBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_1);
@@ -108,7 +103,7 @@ public final class IronMarkTests {
     }
 
     /** With {@code mark1FlameSetsBlocks} and mobGriefing, the flame sets the floor before him alight. */
-    @GameTest(template = ARENA, batch = CFG, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = CFG, timeoutTicks = 100)
     public static void theFlameSetsBlocksOnlyWhenAllowed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(IronManConfig.MARK1_FLAME_SETS_BLOCKS, true);
@@ -147,7 +142,7 @@ public final class IronMarkTests {
     }
 
     /** The Rocket Boost: up, forward, a fall and a crash landing that hurts him nothing and costs the suit 30. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theBoostEndsInASoftCrash(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 3.5, 10.5, SuitKind.MARK_1);
@@ -167,7 +162,7 @@ public final class IronMarkTests {
     }
 
     /** The Arm Rocket: 8 to the husk it strikes, a small boom, no block broken. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theArmRocketDoesEight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 3.5, 5.5, SuitKind.MARK_1);
@@ -183,7 +178,7 @@ public final class IronMarkTests {
     }
 
     /** The Brace: a blow loses 60 %; he does not move. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBraceCutsSixtyPercent(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_1);
@@ -202,7 +197,7 @@ public final class IronMarkTests {
     }
 
     /** The Heavy Punch: 10 to the husk before him. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHeavyPunchDoesTen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_1);
@@ -217,7 +212,7 @@ public final class IronMarkTests {
     // Mark 3
 
     /** The repulsor: the husk 19 blocks off is hit the same tick for 6, the one beside it splashed for 2; 4 energy. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRepulsorHitsAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 0.5, 10.5, SuitKind.MARK_3);
@@ -235,7 +230,7 @@ public final class IronMarkTests {
     }
 
     /** Sneak + R: the Double-Hand Blast, 10. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDoubleBlastDoesTen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 3.5, 5.5, SuitKind.MARK_3);
@@ -247,7 +242,7 @@ public final class IronMarkTests {
     }
 
     /** The Unibeam: 4 every 10 ticks to the husk in its path while V is held. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theUnibeamDoesFourEveryTenTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 3.5, 5.5, SuitKind.MARK_3);
@@ -264,7 +259,7 @@ public final class IronMarkTests {
     }
 
     /** The flares: three husks after him lose him, and cannot take him back for a while. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFlaresShakeOffThreeHusks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 10.5, 10.5, SuitKind.MARK_3);
@@ -283,7 +278,7 @@ public final class IronMarkTests {
     }
 
     /** N: four straight missiles of 3 each into the husk he aims at. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void fourMissilesOfThree(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 3.5, 5.5, SuitKind.MARK_3);
@@ -302,7 +297,7 @@ public final class IronMarkTests {
     // Mark 5
 
     /** B: the Dash Punch throws him forward and the husk in his way takes 8. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theDashPunchDoesEight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 3.5, 5.5, SuitKind.MARK_5);
@@ -317,7 +312,7 @@ public final class IronMarkTests {
     }
 
     /** N: the Laser Burst cuts the four husks round him for 6 each. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLaserBurstHitsAllRound(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 10.5, 10.5, SuitKind.MARK_5);
@@ -338,7 +333,7 @@ public final class IronMarkTests {
     /**
      * Blows wear the suit; it never breaks (at its last point it is offline: armour on, moves off); the anvil's items.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void suitsWearButNeverBreak(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_3);
@@ -367,7 +362,7 @@ public final class IronMarkTests {
     }
 
     /** Every suit's armour on the chest is the server's ({@code [mark_*] armor}): the whole set in one item. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theClassicSuitsArmour(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         double[][] expected = {{18, 3}, {16, 2}, {12, 1}};

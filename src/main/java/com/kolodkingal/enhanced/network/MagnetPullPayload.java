@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.MagnetStreams;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -9,7 +10,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -64,7 +64,7 @@ public record MagnetPullPayload(int magneto, boolean first, float radius, List<S
     }
 
     /** The pulse and the streams are drawn here (the client class is loaded only when this runs, on a client). */
-    static void handle(MagnetPullPayload payload, IPayloadContext context) {
+    static void handle(MagnetPullPayload payload, PacketContext context) {
         MagnetStreams.accept(payload);
     }
 }

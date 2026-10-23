@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.PhoenixBurstPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -51,7 +52,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -961,7 +961,7 @@ public final class PhoenixAbilities {
         Vec3 centre = player.position().add(0, player.getBbHeight() * 0.5, 0);
         float radius = PhoenixBurst.radius(f);
         PhoenixBurst.start(player, centre, f);
-        PacketDistributor.sendToPlayersNear(level, null, centre.x, centre.y, centre.z, Math.max(64.0, radius + 32.0),
+        Net.sendToPlayersNear(level, null, centre.x, centre.y, centre.z, Math.max(64.0, radius + 32.0),
                 new PhoenixBurstPayload(player.getId(), centre, player.getYRot(), f, radius, now));
         level.playSound(null, centre.x, centre.y, centre.z, ModSounds.PHOENIX_BURST.get(), SoundSource.PLAYERS, Math.max(1.0F, radius / 8.0F), 1.0F);
         sparksForOthers(level, player, new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.PHOENIX_BURST, FIRE_CORE), 2.0F), centre.x, centre.y, centre.z, 40, 0.4, 0.4, 0.4, 0.3);

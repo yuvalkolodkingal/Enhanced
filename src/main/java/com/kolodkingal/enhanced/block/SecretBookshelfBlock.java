@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.block;
 
 import com.kolodkingal.enhanced.network.LabFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.school.SecretEntrance;
 import com.mojang.serialization.MapCodec;
@@ -32,7 +33,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class SecretBookshelfBlock extends Block {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
         if (!SecretEntrance.mayOpen(player)) {
@@ -138,7 +138,7 @@ public class SecretBookshelfBlock extends Block {
         }
         level.playSound(null, pos, open ? ModSounds.SECRET_SHELF_OPEN.get() : ModSounds.SECRET_SHELF_CLOSE.get(),
                 SoundSource.BLOCKS, 1.0F, 1.0F);
-        PacketDistributor.sendToPlayersNear(level, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 32,
+        Net.sendToPlayersNear(level, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 32,
                 new LabFxPayload(open ? LabFxPayload.SHELF_OPEN : LabFxPayload.SHELF_CLOSE, pos));
     }
 

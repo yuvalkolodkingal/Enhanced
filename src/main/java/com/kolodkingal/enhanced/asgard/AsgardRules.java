@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.block.asgard.BifrostMechanismBlockEntity;
 import com.kolodkingal.enhanced.config.AsgardConfig;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -57,7 +58,6 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -308,7 +308,7 @@ public final class AsgardRules {
         player.hurtMarked = true;
         player.displayClientMessage(Component.translatable("message.enhanced.asgard.rescued").withStyle(ChatFormatting.GOLD), true);
         level.playSound(null, at.x, at.y, at.z, ModSounds.BIFROST_ARRIVE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, 128,
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_ARRIVAL, player.getId(), List.of(player.position())));
         Bifrost.mark(level, player.position());
         spinNear(level, player.position());
@@ -427,8 +427,8 @@ public final class AsgardRules {
                 || AsgardDimension.in(player)) {
             return;
         }
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
-        player.setData(ModAttachments.ASGARD, progress.with(AsgardProgress.VISITED)
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
+        ModAttachments.ASGARD.set(player, progress.with(AsgardProgress.VISITED)
                 .withCameFrom(GlobalPos.of(player.level().dimension(), player.blockPosition())));
     }
 

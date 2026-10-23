@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.hulk;
 
 import com.kolodkingal.enhanced.config.HulkConfig;
 import com.kolodkingal.enhanced.network.HulkFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -12,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,7 +89,7 @@ public final class GammaExposure {
         Powers.awaken(player, Power.HULK, HulkAbilities.BANNER);
         ServerLevel level = player.serverLevel();
         HulkAbilities.sound(level, player.position(), ModSounds.GAMMA_EXPOSURE.get(), 1.5F, 1.0F);
-        PacketDistributor.sendToPlayer(player, new HulkFxPayload(HulkFxPayload.GAMMA_BEAM, player.getId(),
+        Net.sendToPlayer(player, new HulkFxPayload(HulkFxPayload.GAMMA_BEAM, player.getId(),
                 List.of(player.position()), 1));
         HulkForms.accident(player);
     }

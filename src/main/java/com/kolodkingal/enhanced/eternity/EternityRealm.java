@@ -4,9 +4,11 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.block.EternityAltarBlock;
 import com.kolodkingal.enhanced.config.EternityConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
 import com.kolodkingal.enhanced.network.EternityScreenPayload;
 import com.kolodkingal.enhanced.network.EternityWishPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -34,8 +36,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -95,11 +95,11 @@ public final class EternityRealm {
     }
 
     public static EternityProgress progress(ServerPlayer player) {
-        return player.getData(ModAttachments.ETERNITY);
+        return ModAttachments.ETERNITY.get(player);
     }
 
     static void setProgress(ServerPlayer player, EternityProgress progress) {
-        player.setData(ModAttachments.ETERNITY, progress);
+        ModAttachments.ETERNITY.set(player, progress);
     }
 
     // ---- the way in ----
@@ -126,7 +126,7 @@ public final class EternityRealm {
         setProgress(player, progress(player).withReturnTo(Optional.of(back)).withVisit());
         from.playSound(null, origin.x, origin.y, origin.z, ModSounds.ETERNITY_LEAVE.get(), SoundSource.PLAYERS, 1.0F,
                 1.0F);
-        PacketDistributor.sendToPlayersNear(from, null, origin.x, origin.y, origin.z, 64,
+        Net.sendToPlayersNear(from, null, origin.x, origin.y, origin.z, 64,
                 new EternityFxPayload(EternityFxPayload.ALTAR_GO, player.getId(), altar, 0));
         player.stopRiding();
         player.ejectPassengers();
@@ -145,7 +145,7 @@ public final class EternityRealm {
         VISITS.put(player.getUUID(), visit);
         realm.playSound(null, ARRIVAL.x, ARRIVAL.y, ARRIVAL.z, ModSounds.ETERNITY_ARRIVE.get(), SoundSource.PLAYERS,
                 1.0F, 1.0F);
-        PacketDistributor.sendToPlayer(player,
+        Net.sendToPlayer(player,
                 new EternityFxPayload(EternityFxPayload.ARRIVE, player.getId(), BlockPos.containing(ARRIVAL), 0));
         return true;
     }
@@ -208,7 +208,7 @@ public final class EternityRealm {
         boolean may = Wishes.mayWish(player);
         // (His line is the screen's own: only his voice is heard.)
         voice(player);
-        PacketDistributor.sendToPlayer(player, new EternityScreenPayload(may, may && Wishes.loveOffered(),
+        Net.sendToPlayer(player, new EternityScreenPayload(may, may && Wishes.loveOffered(),
                 Wishes.locks(player)));
     }
 
@@ -270,7 +270,7 @@ public final class EternityRealm {
         ServerLevel level = player.serverLevel();
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.WISH_GRANTED.get(),
                 SoundSource.PLAYERS, 1.0F, 1.0F);
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64,
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64,
                 new EternityFxPayload(EternityFxPayload.WISH_GRANTED, player.getId(), player.blockPosition(), what));
         say(player, "eternity.enhanced.line.done");
         award(player, "careful_what_you_wish_for");
@@ -296,7 +296,7 @@ public final class EternityRealm {
             ServerLevel from = player.serverLevel();
             from.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ETERNITY_LEAVE.get(),
                     SoundSource.PLAYERS, 1.0F, 1.0F);
-            PacketDistributor.sendToPlayer(player,
+            Net.sendToPlayer(player,
                     new EternityFxPayload(EternityFxPayload.LEAVE, player.getId(), player.blockPosition(), 0));
         }
         player.stopRiding();
@@ -438,11 +438,11 @@ public final class EternityRealm {
         }
     }
 
-    static int cfg(ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() && value != null ? value.get() : fallback;
     }
 
-    static boolean cfg(ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(ConfigSpec.BooleanValue value, boolean fallback) {
         return EnhancedConfig.SPEC.isLoaded() && value != null ? value.get() : fallback;
     }
 

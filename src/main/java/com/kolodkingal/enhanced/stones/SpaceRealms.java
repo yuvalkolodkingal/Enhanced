@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.item.TesseractItem;
 import com.kolodkingal.enhanced.network.RealmScreenPayload;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.road.RoadTrials;
 import com.kolodkingal.enhanced.thanos.StoneKind;
@@ -43,7 +44,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -143,7 +143,7 @@ public final class SpaceRealms {
         }
         PENDING.put(player.getUUID(), new Pending(cast, cast.now() + PICKER_TICKS));
         StoneKind.SPACE.voice().use(player.serverLevel(), player.position(), 0.5F, 1.2F);
-        PacketDistributor.sendToPlayer(player, new RealmScreenPayload(options(player)));
+        Net.sendToPlayer(player, new RealmScreenPayload(options(player)));
     }
 
     /** Whether a picker is open for the player (the tests ask). */
@@ -270,7 +270,7 @@ public final class SpaceRealms {
         from.playSound(null, origin.x, origin.y, origin.z, ModSounds.SPACE_REALM_DEPART.get(), SoundSource.PLAYERS,
                 1.0F, 1.0F);
         StoneKind.SPACE.voice().use(from, origin, 0.6F, 1.0F);
-        PacketDistributor.sendToPlayersNear(from, null, origin.x, origin.y, origin.z, 64,
+        Net.sendToPlayersNear(from, null, origin.x, origin.y, origin.z, 64,
                 new StoneFxPayload(StoneFxPayload.REALM_DEPART, player.getId(), List.of(origin), realm));
         player.stopRiding();
         ServerLevel to = arrival.level();
@@ -291,7 +291,7 @@ public final class SpaceRealms {
                 StonesConfig.SPACE_ARRIVAL_RESISTANCE_TICKS.get(), 4, false, false, true));
         swirl(to, spot);
         to.playSound(null, spot.x, spot.y, spot.z, ModSounds.SPACE_REALM_ARRIVE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-        PacketDistributor.sendToPlayersNear(to, null, spot.x, spot.y, spot.z, 64,
+        Net.sendToPlayersNear(to, null, spot.x, spot.y, spot.z, 64,
                 new StoneFxPayload(StoneFxPayload.REALM_ARRIVE, player.getId(), List.of(spot), realm));
         return true;
     }

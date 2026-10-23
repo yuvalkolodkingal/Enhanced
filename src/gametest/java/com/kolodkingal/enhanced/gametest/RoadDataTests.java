@@ -2,10 +2,10 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import com.kolodkingal.enhanced.network.OpenRoadPayload;
 import com.kolodkingal.enhanced.network.RoadChoicePayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.road.RoadChallenge;
@@ -14,10 +14,7 @@ import com.kolodkingal.enhanced.road.RoadVoice;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,8 +27,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** The Road's text, messages and options: everything that is said is said in English and Hebrew, and the two screens' messages travel intact. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadDataTests {
     static final String BATCH = "road_parkour";
 
@@ -41,7 +36,7 @@ public final class RoadDataTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everythingTheRoadSaysIsSaidInEnglishAndHebrew(GameTestHelper helper) throws IOException {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");
@@ -91,7 +86,7 @@ public final class RoadDataTests {
         return n;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theScreensMessagesTravelIntact(GameTestHelper helper) {
         for (boolean trials : new boolean[]{true, false}) {
             OpenRoadPayload open = new OpenRoadPayload(new BlockPos(-5, 70, 12), trials, 2, 3, !trials);
@@ -108,7 +103,7 @@ public final class RoadDataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRoadsOptionsAreInTheServerConfigWithTheirDefaults(GameTestHelper helper) {
         check(WitchesRoadConfig.ENABLED.get() && WitchesRoadConfig.RESUME_ON_LOGIN.get() && WitchesRoadConfig.RESUME_AT_CHECKPOINT.get(), "the trials are on, and resume");
         check(WitchesRoadConfig.MAX_PLAYERS.get() == 32 && WitchesRoadConfig.FALL_DEPTH.get() == 12 && WitchesRoadConfig.LEAVE_CONFIRM_SECONDS.get() == 5, "numbers");

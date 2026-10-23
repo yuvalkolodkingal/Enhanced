@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
@@ -11,6 +10,7 @@ import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.gametest.UltronTestSupport.Log;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.ultron.LiftHook;
@@ -26,7 +26,6 @@ import com.kolodkingal.enhanced.ultron.UltronSounds;
 import com.kolodkingal.enhanced.ultron.UltronState;
 import com.kolodkingal.enhanced.ultron.VibraniumKeyEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -44,8 +43,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,14 +68,12 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.tank;
  * at fifty-five percent and the seam it leaves for the Sokovia stage, who counts and who is rewarded, every way the
  * fight ends, the two boss bars, and what a fighter drops when they fall.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class UltronFightTests {
 
     // ------------------------------------------------------------------------------------------------------------
     // The awakening
 
-    @GameTest(template = ARENA, batch = "ultron_awakening", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "ultron_awakening", timeoutTicks = 260)
     public static void awakeningTimeline(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -164,7 +159,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // An upload
 
-    @GameTest(template = ARENA, batch = "solo_upload_moves_the_boss", timeoutTicks = 360)
+    @EnhancedTest(template = ARENA, batch = "solo_upload_moves_the_boss", timeoutTicks = 360)
     public static void uploadMovesTheBoss(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -270,7 +265,7 @@ public final class UltronFightTests {
      * none and no budget, or after {@code maxUploads}, he dies; and a Vision near him cuts the network. Each case is
      * its own fight, played to the instant of the blow; all of the cases are tried and all that fail are reported.
      */
-    @GameTest(template = ARENA, batch = "ultron_finish")
+    @EnhancedTest(template = ARENA, batch = "ultron_finish")
     public static void theFinishRule(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -449,7 +444,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The lift
 
-    @GameTest(template = ARENA, batch = "ultron_liftstart", timeoutTicks = 520)
+    @EnhancedTest(template = ARENA, batch = "ultron_liftstart", timeoutTicks = 520)
     public static void liftStartsAtFiftyFivePercent(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -537,7 +532,7 @@ public final class UltronFightTests {
     }
 
     /** What the Sokovia stage will plug into: every call, in order, with its arguments, and the config that turns it off. */
-    @GameTest(template = ARENA, batch = "ultron_hook", timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = "ultron_hook", timeoutTicks = 700)
     public static void theLiftHookIsCalledInOrder(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -684,7 +679,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // Who counts, who is rewarded
 
-    @GameTest(template = ARENA, batch = "ultron_rewards", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "ultron_rewards", timeoutTicks = 120)
     public static void participantsAndRewards(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -733,7 +728,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // How it ends
 
-    @GameTest(template = ARENA, batch = "ultron_victory", timeoutTicks = 360)
+    @EnhancedTest(template = ARENA, batch = "ultron_victory", timeoutTicks = 360)
     public static void theLastBodyFallsAndTheFightIsWon(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -788,7 +783,7 @@ public final class UltronFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_wipe", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "ultron_wipe", timeoutTicks = 300)
     public static void aWipeSendsHimAwayWithoutAReward(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.WIPE_SECONDS, 1);
@@ -831,7 +826,7 @@ public final class UltronFightTests {
      * height over the ground beneath them), and the fight on the island went on without them. Now a fighter who is not
      * on the island is not hunted, and a body or Sentry that ends up under the island is brought back onto it.
      */
-    @GameTest(template = ARENA, batch = "ultron_tether", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "ultron_tether", timeoutTicks = 120)
     public static void theArmyStaysOnTheIsland(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -873,7 +868,7 @@ public final class UltronFightTests {
      * removed, {@code LivingEntity.tickDeath}), and with it the boss bars; a wipe comes fifteen seconds after the last one
      * fell, so it must still reach them on their death screens.
      */
-    @GameTest(template = ARENA, batch = "ultron_wipe_told", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_wipe_told", timeoutTicks = 200)
     public static void aWipeIsToldToTheFallen(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.WIPE_SECONDS, 3);
@@ -899,7 +894,7 @@ public final class UltronFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_stop", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "ultron_stop", timeoutTicks = 300)
     public static void anOperatorStopsItAndTheProgramComesBack(GameTestHelper helper) throws Exception {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -922,7 +917,7 @@ public final class UltronFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_abort", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "ultron_abort", timeoutTicks = 300)
     public static void killingTheBodyEndsTheFightWithoutAReward(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -949,7 +944,7 @@ public final class UltronFightTests {
      * body to arrive, and without it would wait for ever, holding its fighters. It ends as an abort, like any other loss
      * of the body.
      */
-    @GameTest(template = ARENA, batch = "ultron_abort_upload", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "ultron_abort_upload", timeoutTicks = 300)
     public static void killingTheBodyInTheMiddleOfAnUploadEndsTheFight(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -978,7 +973,7 @@ public final class UltronFightTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_server_stop")
+    @EnhancedTest(template = ARENA, batch = "ultron_server_stop")
     public static void theServerStoppingPutsEverythingBackAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -1000,7 +995,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The bars
 
-    @GameTest(template = ARENA, batch = "ultron_bars", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "ultron_bars", timeoutTicks = 400)
     public static void bossBars(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -1109,7 +1104,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // The arena
 
-    @GameTest(template = ARENA, batch = "ultron_arena")
+    @EnhancedTest(template = ARENA, batch = "ultron_arena")
     public static void theArenaIsTheGroundAndMore(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -1138,7 +1133,7 @@ public final class UltronFightTests {
     // ------------------------------------------------------------------------------------------------------------
     // Drops
 
-    @GameTest(template = ARENA, batch = "ultron_drops", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "ultron_drops", timeoutTicks = 60)
     public static void droppedItemsDontDespawn(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);

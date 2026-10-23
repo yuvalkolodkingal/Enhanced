@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.strange;
 
 import com.kolodkingal.enhanced.ability.PlaceBook;
 import com.kolodkingal.enhanced.network.SlingRingActionPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.strange.SlingRingActions;
 import com.kolodkingal.enhanced.strange.StrangeAbilities;
@@ -20,7 +21,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -150,7 +150,7 @@ public class SlingRingScreen extends Screen {
     }
 
     private static void send(int action, int index, String name) {
-        PacketDistributor.sendToServer(new SlingRingActionPayload(action, index, name));
+        Net.sendToServer(new SlingRingActionPayload(action, index, name));
     }
 
     @Override

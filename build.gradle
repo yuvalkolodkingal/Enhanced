@@ -80,6 +80,10 @@ neoForge {
             type = "gameTestServer"
             sourceSet = sourceSets.gametest
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // Port P0: the parity report (build/gametest/<mc>-neoforge.json) and the test filter
+            // (./gradlew runGameTestServer -Penhanced.tests=Captain*,FalconTests.redwing*).
+            systemProperty 'enhanced.testReport', file('build/gametest').absolutePath
+            systemProperty 'enhanced.tests', providers.gradleProperty('enhanced.tests').getOrElse('')
         }
 
         data {

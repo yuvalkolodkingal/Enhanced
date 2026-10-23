@@ -150,9 +150,9 @@ public final class HeimdallTalk {
 
     /** He has met Heimdall (the greeting is said once). */
     private static void met(ServerPlayer player) {
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         if (!progress.has(AsgardProgress.MET_HEIMDALL)) {
-            player.setData(ModAttachments.ASGARD, progress.with(AsgardProgress.MET_HEIMDALL));
+            ModAttachments.ASGARD.set(player, progress.with(AsgardProgress.MET_HEIMDALL));
         }
     }
 

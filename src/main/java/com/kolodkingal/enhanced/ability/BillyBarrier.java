@@ -92,7 +92,7 @@ public final class BillyBarrier {
 
     /** The health of a whole barrier of this Billy (his rank's). */
     public static float maxHealth(Player billy) {
-        return maxStrength(billy.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY));
+        return maxStrength(ModAttachments.BUILD_DATA.getExisting(billy).orElse(BuildData.EMPTY));
     }
 
     /**

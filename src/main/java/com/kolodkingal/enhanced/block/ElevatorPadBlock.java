@@ -60,9 +60,9 @@ public class ElevatorPadBlock extends Block {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             player.displayClientMessage(Component.translatable("message.enhanced.school_lab.pad_hint"), true);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 }

@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The balance numbers of Thanos, the hero (the five stones the boss held, made playable). Its options are defined in
@@ -12,69 +12,69 @@ public final class ThanosConfig {
     public static final String SECTION = "thanos";
 
     // ---- the body ----
-    public static ModConfigSpec.DoubleValue HEALTH_BONUS;
-    public static ModConfigSpec.DoubleValue ARMOR_BONUS;
-    public static ModConfigSpec.DoubleValue TOUGHNESS_BONUS;
-    public static ModConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
-    public static ModConfigSpec.DoubleValue ATTACK_BONUS;
-    public static ModConfigSpec.DoubleValue SCALE;
-    public static ModConfigSpec.DoubleValue REACH_BONUS;
-    public static ModConfigSpec.DoubleValue STEP_BONUS;
-    public static ModConfigSpec.DoubleValue REGEN_PER_SECOND;
-    public static ModConfigSpec.IntValue REGEN_DELAY_TICKS;
+    public static ConfigSpec.DoubleValue HEALTH_BONUS;
+    public static ConfigSpec.DoubleValue ARMOR_BONUS;
+    public static ConfigSpec.DoubleValue TOUGHNESS_BONUS;
+    public static ConfigSpec.DoubleValue KNOCKBACK_RESISTANCE;
+    public static ConfigSpec.DoubleValue ATTACK_BONUS;
+    public static ConfigSpec.DoubleValue SCALE;
+    public static ConfigSpec.DoubleValue REACH_BONUS;
+    public static ConfigSpec.DoubleValue STEP_BONUS;
+    public static ConfigSpec.DoubleValue REGEN_PER_SECOND;
+    public static ConfigSpec.IntValue REGEN_DELAY_TICKS;
 
     // ---- the Power Stone ----
-    public static ModConfigSpec.DoubleValue POWER_BLAST_DAMAGE;
-    public static ModConfigSpec.DoubleValue POWER_BLAST_SPLASH;
-    public static ModConfigSpec.DoubleValue POWER_BLAST_RANGE;
-    public static ModConfigSpec.IntValue POWER_BLAST_COOLDOWN;
-    public static ModConfigSpec.DoubleValue POWER_BLAST_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue SLAM_DAMAGE;
-    public static ModConfigSpec.DoubleValue SLAM_RADIUS;
-    public static ModConfigSpec.IntValue SLAM_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SLAM_EXHAUSTION;
+    public static ConfigSpec.DoubleValue POWER_BLAST_DAMAGE;
+    public static ConfigSpec.DoubleValue POWER_BLAST_SPLASH;
+    public static ConfigSpec.DoubleValue POWER_BLAST_RANGE;
+    public static ConfigSpec.IntValue POWER_BLAST_COOLDOWN;
+    public static ConfigSpec.DoubleValue POWER_BLAST_EXHAUSTION;
+    public static ConfigSpec.DoubleValue SLAM_DAMAGE;
+    public static ConfigSpec.DoubleValue SLAM_RADIUS;
+    public static ConfigSpec.IntValue SLAM_COOLDOWN;
+    public static ConfigSpec.DoubleValue SLAM_EXHAUSTION;
 
     // ---- the Space Stone ----
-    public static ModConfigSpec.DoubleValue SPACE_STEP_RANGE;
-    public static ModConfigSpec.IntValue SPACE_STEP_COOLDOWN;
-    public static ModConfigSpec.DoubleValue STEP_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue PULL_RANGE;
-    public static ModConfigSpec.IntValue PULL_COOLDOWN;
-    public static ModConfigSpec.DoubleValue PULL_EXHAUSTION;
+    public static ConfigSpec.DoubleValue SPACE_STEP_RANGE;
+    public static ConfigSpec.IntValue SPACE_STEP_COOLDOWN;
+    public static ConfigSpec.DoubleValue STEP_EXHAUSTION;
+    public static ConfigSpec.DoubleValue PULL_RANGE;
+    public static ConfigSpec.IntValue PULL_COOLDOWN;
+    public static ConfigSpec.DoubleValue PULL_EXHAUSTION;
 
     // ---- the Reality Stone ----
-    public static ModConfigSpec.DoubleValue TRANSMUTE_RANGE;
-    public static ModConfigSpec.IntValue TRANSMUTE_TICKS;
-    public static ModConfigSpec.IntValue TRANSMUTE_COOLDOWN;
-    public static ModConfigSpec.DoubleValue TRANSMUTE_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue PETRIFY_DAMAGE_FACTOR;
-    public static ModConfigSpec.DoubleValue VEIL_RADIUS;
-    public static ModConfigSpec.DoubleValue VEIL_EXHAUSTION;
+    public static ConfigSpec.DoubleValue TRANSMUTE_RANGE;
+    public static ConfigSpec.IntValue TRANSMUTE_TICKS;
+    public static ConfigSpec.IntValue TRANSMUTE_COOLDOWN;
+    public static ConfigSpec.DoubleValue TRANSMUTE_EXHAUSTION;
+    public static ConfigSpec.DoubleValue PETRIFY_DAMAGE_FACTOR;
+    public static ConfigSpec.DoubleValue VEIL_RADIUS;
+    public static ConfigSpec.DoubleValue VEIL_EXHAUSTION;
 
     // ---- the Soul Stone ----
-    public static ModConfigSpec.DoubleValue DRAIN_RANGE;
-    public static ModConfigSpec.DoubleValue DRAIN_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.DoubleValue DRAIN_HEAL_FRACTION;
-    public static ModConfigSpec.DoubleValue DRAIN_EXHAUSTION;
-    public static ModConfigSpec.IntValue DRAIN_COOLDOWN;
-    public static ModConfigSpec.DoubleValue SIGHT_RANGE;
-    public static ModConfigSpec.IntValue SIGHT_TICKS;
-    public static ModConfigSpec.IntValue SIGHT_COOLDOWN;
-    public static ModConfigSpec.BooleanValue SIGHT_BREAKS_ILLUSIONS;
-    public static ModConfigSpec.DoubleValue SIGHT_EXHAUSTION;
+    public static ConfigSpec.DoubleValue DRAIN_RANGE;
+    public static ConfigSpec.DoubleValue DRAIN_DAMAGE_PER_SECOND;
+    public static ConfigSpec.DoubleValue DRAIN_HEAL_FRACTION;
+    public static ConfigSpec.DoubleValue DRAIN_EXHAUSTION;
+    public static ConfigSpec.IntValue DRAIN_COOLDOWN;
+    public static ConfigSpec.DoubleValue SIGHT_RANGE;
+    public static ConfigSpec.IntValue SIGHT_TICKS;
+    public static ConfigSpec.IntValue SIGHT_COOLDOWN;
+    public static ConfigSpec.BooleanValue SIGHT_BREAKS_ILLUSIONS;
+    public static ConfigSpec.DoubleValue SIGHT_EXHAUSTION;
 
     // ---- the Time Stone ----
-    public static ModConfigSpec.IntValue REWIND_SECONDS;
-    public static ModConfigSpec.DoubleValue REWIND_MAX_HEAL;
-    public static ModConfigSpec.IntValue REWIND_COOLDOWN;
-    public static ModConfigSpec.DoubleValue REWIND_EXHAUSTION;
-    public static ModConfigSpec.DoubleValue TIME_LOCK_RADIUS;
-    public static ModConfigSpec.IntValue TIME_LOCK_TICKS;
-    public static ModConfigSpec.IntValue TIME_LOCK_COOLDOWN;
-    public static ModConfigSpec.DoubleValue TIME_LOCK_PROJECTILE_DRAG;
-    public static ModConfigSpec.DoubleValue TIME_LOCK_EXHAUSTION;
+    public static ConfigSpec.IntValue REWIND_SECONDS;
+    public static ConfigSpec.DoubleValue REWIND_MAX_HEAL;
+    public static ConfigSpec.IntValue REWIND_COOLDOWN;
+    public static ConfigSpec.DoubleValue REWIND_EXHAUSTION;
+    public static ConfigSpec.DoubleValue TIME_LOCK_RADIUS;
+    public static ConfigSpec.IntValue TIME_LOCK_TICKS;
+    public static ConfigSpec.IntValue TIME_LOCK_COOLDOWN;
+    public static ConfigSpec.DoubleValue TIME_LOCK_PROJECTILE_DRAG;
+    public static ConfigSpec.DoubleValue TIME_LOCK_EXHAUSTION;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
 
         HEALTH_BONUS = builder.comment("Extra health Thanos has (20 = 10 hearts).").defineInRange("healthBonus", 20.0, 0.0, 100.0);

@@ -1,26 +1,21 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadSave;
 import com.kolodkingal.enhanced.road.RoadSweeper;
 import com.kolodkingal.enhanced.road.RoadTrial;
 import com.kolodkingal.enhanced.road.RoadTrials;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** A server that stops while players are in the Road takes every trial down first (a batch of its own: it stops every trial there is). */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadStopTests {
 
-    @GameTest(template = ARENA, batch = "road_stop", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_stop", timeoutTicks = 500)
     public static void aStoppingServerTakesEveryTrialDownAndKeepsTheProgress(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();

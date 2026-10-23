@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.item.InfinityStoneItem;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.thanos.StoneKind;
@@ -30,7 +31,6 @@ import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -222,7 +222,7 @@ public final class StoneTouch {
         kind.voice().use(level, hand, InfinityStone.UNDER, 0.6F);
         level.sendParticles(new EnergyParticleOptions(kind.color(), 1.2F), hand.x, hand.y, hand.z, 24, 0.3, 0.3,
                 0.3, 0.12);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,
+        Net.sendToPlayersTrackingEntityAndSelf(player,
                 new StoneFxPayload(StoneFxPayload.REJECT, player.getId(), List.of(hand), kind.ordinal()));
         player.displayClientMessage(Component.translatable("message.enhanced.stones.too_strong", kind.displayName())
                 .withStyle(ChatFormatting.RED), true);
@@ -306,7 +306,7 @@ public final class StoneTouch {
                 item.getZ(), 10, 0.15, 0.15, 0.15, 0.08);
         level.playSound(null, item.getX(), item.getY(), item.getZ(), ModSounds.STONE_SLIP.get(), SoundSource.PLAYERS,
                 0.8F, 1.0F);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,
+        Net.sendToPlayersTrackingEntityAndSelf(player,
                 new StoneFxPayload(StoneFxPayload.SLIP, item.getId(), List.of(item.position()), kind.ordinal()));
         player.displayClientMessage(Component.translatable("message.enhanced.stones.slips", kind.displayName())
                 .withStyle(ChatFormatting.GOLD), true);

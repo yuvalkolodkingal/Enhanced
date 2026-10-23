@@ -39,7 +39,7 @@ public class GungnirStandBlockEntity extends BlockEntity {
 
     /** The world's owner has changed (server): the clients are told. */
     public void ownerChanged() {
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }

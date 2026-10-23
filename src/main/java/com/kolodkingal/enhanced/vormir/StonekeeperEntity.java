@@ -100,7 +100,7 @@ public class StonekeeperEntity extends PathfinderMob {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         if (home == null) {
@@ -124,11 +124,11 @@ public class StonekeeperEntity extends PathfinderMob {
         }
         if (player instanceof ServerPlayer server && !speeches.containsKey(server.getUUID())) {
             speeches.put(server.getUUID(), new Speech(Stonekeeper.lines(server), level().getGameTime()));
-            server.setData(ModAttachments.STONES, server.getData(ModAttachments.STONES)
+            ModAttachments.STONES.set(server, ModAttachments.STONES.get(server)
                     .with(StoneProgress.MET_STONEKEEPER));
             getLookControl().setLookAt(player);
         }
-        return InteractionResult.sidedSuccess(level().isClientSide);
+        return InteractionResult.sidedSuccess(level().isClientSide());
     }
 
     /** Each line of each speech when it is due; a listener who has left ends his. */

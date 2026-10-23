@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadCanvas;
 import com.kolodkingal.enhanced.road.RoadCells;
 import com.kolodkingal.enhanced.road.RoadLayout;
@@ -11,11 +11,8 @@ import com.kolodkingal.enhanced.road.parkour.ParkourGenerator.Kind;
 import com.kolodkingal.enhanced.road.parkour.ParkourGenerator.Pad;
 import com.kolodkingal.enhanced.road.parkour.ParkourGenerator.Params;
 import com.kolodkingal.enhanced.road.parkour.ParkourGenerator.Plan;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +27,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * second, separate simulation of the game's physics), no step is too high, the stones never run into each other, the course stays
  * inside its cell, and it gets harder.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadParkourTests {
     static final String BATCH = "road_parkour";
 
@@ -87,7 +82,7 @@ public final class RoadParkourTests {
         return plans;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theJumpModelAgreesWithAnIndependentSimulation(GameTestHelper helper) {
         for (int dy = -1; dy <= 1; dy++) {
             for (int runUp = 0; runUp <= 10; runUp += 2) {
@@ -102,7 +97,7 @@ public final class RoadParkourTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void everyJumpOfEveryCourseIsWithinWhatAPlayerCanDo(GameTestHelper helper) {
         List<Plan> plans = manyCourses();
         int jumps = 0;
@@ -130,7 +125,7 @@ public final class RoadParkourTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void courseStonesNeverRunIntoEachOtherAndStayInTheCell(GameTestHelper helper) {
         for (Plan plan : manyCourses()) {
             List<Pad> pads = plan.pads();
@@ -150,7 +145,7 @@ public final class RoadParkourTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void coursesAreDeterministicAndDifferentForDifferentSeeds(GameTestHelper helper) {
         Params params = new Params(40, 2, 6);
         Plan a = ParkourGenerator.generate(1234L, params);
@@ -166,7 +161,7 @@ public final class RoadParkourTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void aCourseHasItsCheckpointsAndFinishAndGetsHarder(GameTestHelper helper) {
         for (int every : new int[]{2, 5, 6, 9}) {
             Plan plan = ParkourGenerator.generate(99L, new Params(40, 2, every));
@@ -216,7 +211,7 @@ public final class RoadParkourTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void aDrawnCourseHasEverythingTheFrameworkNeeds(GameTestHelper helper) {
         SplittableRandom seeds = new SplittableRandom(5);
         for (int n = 0; n < 30; n++) {

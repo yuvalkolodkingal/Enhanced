@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
@@ -9,10 +8,10 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -21,8 +20,6 @@ import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,8 +37,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * The Vision of the Hex: raised with the Hex, bound to it, fighting for Wanda. The Hex is hers, in the middle of the
  * arena (10.5, 2, 10.5), radius 8.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HexVisionTests {
     private static final double CENTER = 10.5;
 
@@ -58,7 +53,7 @@ public final class HexVisionTests {
                 e -> true);
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_raise")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_raise")
     public static void raisingTheHexRaisesVisionBesideWandaAndDissolvingItTakesHimAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -79,7 +74,7 @@ public final class HexVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_off")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_off")
     public static void aServerCanTurnTheVisionOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_VISION_ENABLED, false);
@@ -90,7 +85,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_one")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_one")
     public static void thereIsOnePerHex(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -108,7 +103,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_two")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_two")
     public static void eachWandaHasHerOwn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -123,7 +118,7 @@ public final class HexVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_wall")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_wall")
     public static void visionCanNeverLeaveTheWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -147,7 +142,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_other_wall")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_other_wall")
     public static void anotherWandasHexBouncesHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -162,12 +157,12 @@ public final class HexVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_defend")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_defend")
     public static void visionGoesForWhateverAttacksWanda(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 4.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 4.0, FLOOR, CENTER));
         check(vision.getTarget() == null, "Vision has nothing to fight");
         float health = zombie.getHealth();
 
@@ -183,25 +178,25 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_join")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_join")
     public static void visionJoinsInWhenWandaStrikes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(CENTER - 4.0, FLOOR, CENTER));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(CENTER - 4.0, FLOOR, CENTER));
 
         pig.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.CHAOS_BEAM, wanda, wanda), 1.0F);
         check(vision.getTarget() == pig, "what Wanda attacks, Vision attacks");
         f.everyTick(100, tick -> !pig.isAlive());
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_point")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_point")
     public static void visionAttacksTheCreatureWandaPointsAt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
-        Zombie behind = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER - 5.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
+        Zombie behind = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER - 5.0, FLOOR, CENTER));
         float health = zombie.getHealth();
         check(vision.getTarget() == null, "Vision has nothing to fight");
 
@@ -220,12 +215,12 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_recall")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_recall")
     public static void lookingAtNothingCallsVisionBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 5.0, FLOOR, CENTER));
 
         lookAt(wanda, zombie);
         HexManager.handleAction(wanda, HexAction.VISION_TARGET, Optional.empty(), 0);
@@ -236,7 +231,7 @@ public final class HexVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_friends")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_friends")
     public static void visionNeverHurtsWandaHerAlliesOrHerPets(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -244,9 +239,10 @@ public final class HexVisionTests {
         Hex hex = HexManager.ownedBy(helper.getLevel(), wanda.getUUID()).orElseThrow();
         ServerPlayer friend = f.player(CENTER + 2.5, FLOOR, CENTER + 2.5);
         HexManager.handleAction(wanda, HexAction.SET_PLAYER, Optional.of(friend.getUUID()), 1);
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(CENTER - 2.5, FLOOR, CENTER - 2.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(CENTER - 2.5, FLOOR, CENTER - 2.5));
         pet.tame(wanda);
-        Wolf friendsPet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(CENTER - 2.5, FLOOR, CENTER + 2.5));
+        Wolf friendsPet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF,
+                new Vec3(CENTER - 2.5, FLOOR, CENTER + 2.5));
         friendsPet.tame(friend);
         f.pvp(true);
 
@@ -272,7 +268,7 @@ public final class HexVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_pvp_off")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_pvp_off")
     public static void visionRespectsPvpOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -295,12 +291,12 @@ public final class HexVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_punch")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_punch")
     public static void hisPunchIsDense(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 2.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 2.0, FLOOR, CENTER));
         vision.setTarget(zombie);
         float before = zombie.getHealth();
         check(vision.doHurtTarget(zombie), "the punch lands");
@@ -309,14 +305,14 @@ public final class HexVisionTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_beam")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_beam")
     public static void aMindStoneBeamReachesWhatFistsCant(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
         HexVisionEntity vision = visionOf(wanda);
         // Stays put (so the target stays out of reach of his fists); the zombie is six blocks off.
         HexManager.handleAction(wanda, HexAction.SET_VISION_STAYS, Optional.empty(), 1);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 6.5, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 6.5, FLOOR, CENTER));
         float before = zombie.getHealth();
         vision.defend(zombie);
 
@@ -330,7 +326,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_fall", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "hex_vision_fall", timeoutTicks = 160)
     public static void aFallenVisionIsRebuiltAfterTheDelay(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_VISION_REBUILD_TICKS, 60);
@@ -353,7 +349,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_leave")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_leave")
     public static void visionGoesWhenWandaLeavesTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -367,7 +363,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_orders")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_orders")
     public static void aVisionWhoHoldsHisPostStaysWhereHeIs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -389,7 +385,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_follow", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "hex_vision_follow", timeoutTicks = 200)
     public static void visionFollowsWanda(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -408,7 +404,7 @@ public final class HexVisionTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "hex_vision_friendly")
+    @EnhancedTest(template = ARENA, batch = "hex_vision_friendly")
     public static void wandasOwnBeamAndBlowsDoNotHurtHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -417,7 +413,7 @@ public final class HexVisionTests {
         check(!vision.hurt(ModDamageTypes.source(helper.getLevel(), ModDamageTypes.CHAOS_BEAM, wanda, wanda), 5.0F), "her Chaos Beam does nothing to him");
         check(!vision.hurt(helper.getLevel().damageSources().playerAttack(wanda), 5.0F), "nor do her blows");
         check(vision.getHealth() == health, "he is unhurt");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(CENTER + 3.0, FLOOR, CENTER));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(CENTER + 3.0, FLOOR, CENTER));
         check(!WandaAbilities.beamTargets(wanda).test(vision), "her beam passes through him");
         check(WandaAbilities.beamTargets(wanda).test(zombie), "(and still strikes a zombie)");
         check(vision.hurt(helper.getLevel().damageSources().mobAttack(zombie), 5.0F), "(a zombie's does)");

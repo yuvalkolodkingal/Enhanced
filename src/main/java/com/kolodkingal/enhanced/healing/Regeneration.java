@@ -50,7 +50,7 @@ public final class Regeneration {
 
     /** Whether he has been out of harm long enough for the faster healing at game time {@code now}. */
     public static boolean outOfHarm(Player player, long now) {
-        HealingState state = player.getData(ModAttachments.HEALING);
+        HealingState state = ModAttachments.HEALING.get(player);
         return now - state.lastHarm() >= outOfCombatTicks();
     }
 

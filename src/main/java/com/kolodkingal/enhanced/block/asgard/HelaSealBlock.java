@@ -25,6 +25,6 @@ public class HelaSealBlock extends Block {
         if (player instanceof ServerPlayer server) {
             HelaLane.onSeal(server, pos);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 }

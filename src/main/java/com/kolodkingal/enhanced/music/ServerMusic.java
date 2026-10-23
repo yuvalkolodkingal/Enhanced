@@ -4,13 +4,13 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.MusicConfig;
 import com.kolodkingal.enhanced.network.MusicChunkPayload;
 import com.kolodkingal.enhanced.network.MusicManifestPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.road.RoadChallenge;
 import com.kolodkingal.enhanced.road.RoadChallenges;
 import com.kolodkingal.enhanced.road.RoadMusic;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -245,7 +245,7 @@ public final class ServerMusic {
     /** Tells the player what songs the world has (nothing for a client without the channel). */
     public static void sendManifest(ServerPlayer player) {
         if (canHear(player)) {
-            PacketDistributor.sendToPlayer(player, new MusicManifestPayload(current.manifest()));
+            Net.sendToPlayer(player, new MusicManifestPayload(current.manifest()));
         }
     }
 
@@ -283,7 +283,7 @@ public final class ServerMusic {
                     Transfer t = queue.peek();
                     byte[] data = t.song.data();
                     int total = MusicFiles.chunkCount(data.length);
-                    PacketDistributor.sendToPlayer(player, new MusicChunkPayload(t.song.hash(), t.next, total, data.length, MusicFiles.chunk(data, t.next)));
+                    Net.sendToPlayer(player, new MusicChunkPayload(t.song.hash(), t.next, total, data.length, MusicFiles.chunk(data, t.next)));
                     if (++t.next >= total) {
                         queue.poll();
                         Enhanced.LOGGER.debug("The world's music: sent {} to {}", t.song.name(), player.getGameProfile().getName());

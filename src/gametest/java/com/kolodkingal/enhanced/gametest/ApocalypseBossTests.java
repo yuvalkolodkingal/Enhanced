@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
@@ -18,6 +17,7 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -27,7 +27,6 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,8 +43,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -71,8 +68,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * rules. The attacks are forced one at a time ({@code brain().force}) with the boss otherwise calm, except for the one test
  * that lets him fight on his own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ApocalypseBossTests {
 
     /** The ticks the fight needs to look round before an attack can be forced (it learns who its foes are). */
@@ -92,7 +87,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // Lances
 
-    @GameTest(template = ARENA, batch = "apocalypse_lances", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_lances", timeoutTicks = 160)
     public static void lancesFanFiveWithATellAndTheAimLocks(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -156,7 +151,7 @@ public final class ApocalypseBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_sand_damage", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_sand_damage", timeoutTicks = 120)
     public static void aLanceDoesSixAndABoulderElevenAndShattersOnABlockWithoutTouchingIt(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -204,7 +199,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The wave and the spikes
 
-    @GameTest(template = ARENA, batch = "apocalypse_wave", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_wave", timeoutTicks = 200)
     public static void waveHitsOnceAndCanBeJumpedAndBreaksOnAStep(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -218,14 +213,14 @@ public final class ApocalypseBossTests {
         ApocalypseTestSupport.tank(flier);
         flier.getAbilities().mayfly = true;
         flier.getAbilities().flying = true;
-        IronGolem zombie = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(7.5, FLOOR, 10.5));
+        IronGolem zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(7.5, FLOOR, 10.5));
         // A step of three blocks across the way, and a zombie behind it.
         for (int z = 4; z <= 17; z++) {
             for (int y = 2; y <= 4; y++) {
                 helper.setBlock(new BlockPos(2, y, z), Blocks.STONE);
             }
         }
-        IronGolem behind = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(0.9, FLOOR, 10.5));
+        IronGolem behind = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(0.9, FLOOR, 10.5));
         float jumperHealth = jumper.getHealth();
         float flierHealth = flier.getHealth();
 
@@ -248,7 +243,7 @@ public final class ApocalypseBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_spikes", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_spikes", timeoutTicks = 120)
     public static void spikesHitInsideTheRingOnly(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -273,7 +268,7 @@ public final class ApocalypseBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_spikes_n", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_spikes_n", timeoutTicks = 160)
     public static void spikesSitUnderUpToOnePlusNPlayersAtMostFour(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ApocalypseEntity boss = d.boss();
@@ -311,7 +306,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // Boulders
 
-    @GameTest(template = ARENA, batch = "apocalypse_boulders", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_boulders", timeoutTicks = 160)
     public static void boulderBarrageAimsAtDifferentPlayers(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ApocalypseEntity boss = d.boss();
@@ -358,7 +353,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Entomb
 
-    @GameTest(template = ARENA, batch = "apocalypse_entomb", timeoutTicks = 420)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_entomb", timeoutTicks = 420)
     public static void entombLocksThenTheCocoonHoldsAndNeverKills(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -415,7 +410,7 @@ public final class ApocalypseBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_cocoon", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_cocoon", timeoutTicks = 120)
     public static void threeSwordHitsBreakACocoonAndAFriendCanFreeItWithTelekinesis(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
@@ -436,7 +431,7 @@ public final class ApocalypseBossTests {
         check(cocoon.isRemoved() && !victim.hasEffect(ModEffects.ENTOMBED), "three hits of 7 break a cocoon of 20, and the effect goes with it");
 
         // A creature of the fight's side cannot be freed by hitting the cocoon of someone else... but Wanda lifting a friend can.
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, FLOOR, 10.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(6.5, FLOOR, 10.5));
         SandCocoonEntity pigCocoon = SandControl.entomb(level, boss, pig, 100, 0.0F, 20.0F, d.fight());
         check(pigCocoon != null && SandCocoonEntity.cocoonOf(pig) == pigCocoon, "a pig in a cocoon");
         put(d.f(), d.hero(), 3.5, FLOOR, 10.5);
@@ -447,7 +442,7 @@ public final class ApocalypseBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_entombed_hero", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_entombed_hero", timeoutTicks = 120)
     public static void anEntombedHeroCannotUseAbilitiesAndAHeldBeamStops(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ServerPlayer wanda = d.hero();
@@ -475,7 +470,7 @@ public final class ApocalypseBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_entomb_skips", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_entomb_skips", timeoutTicks = 120)
     public static void theGraspSkipsWhomTheSandCannotHold(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.SCARLET_WITCH);
         ServerPlayer wanda = d.hero();
@@ -490,7 +485,7 @@ public final class ApocalypseBossTests {
         check("message.enhanced.entomb.slips".equals(SandControl.entombRefusal(creative)), "a Creative player slips out");
         check("message.enhanced.entomb.slips".equals(SandControl.entombRefusal(spectator)), "and a Spectator");
         check("message.enhanced.entomb.slips".equals(SandControl.entombRefusal(boss)), "and he himself, whose type is entomb_immune");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
         check(SandControl.entombRefusal(zombie) == null, "a Zombie can be held");
         SandCocoonEntity cocoon = SandControl.entomb(level, boss, zombie, 100, 0.0F, 20.0F, d.fight());
         check(cocoon != null && SandControl.entombRefusal(zombie) != null, "and only once");
@@ -515,7 +510,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Mind Crush
 
-    @GameTest(template = ARENA, batch = "apocalypse_crush", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_crush", timeoutTicks = 160)
     public static void mindCrushHitsEveryoneButMagnetosHelmet(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
@@ -549,7 +544,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Portal Step
 
-    @GameTest(template = ARENA, batch = "apocalypse_portal", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_portal", timeoutTicks = 200)
     public static void portalStepAppearsBehindAndRespectsTheHex(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -587,7 +582,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Backhand
 
-    @GameTest(template = ARENA, batch = "apocalypse_backhand", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_backhand", timeoutTicks = 100)
     public static void backhandIsHisFistAndOnlyWithinReach(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -616,7 +611,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // Tornadoes
 
-    @GameTest(template = ARENA, batch = "apocalypse_tornado", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_tornado", timeoutTicks = 160)
     public static void tornadoesDriftLiftAndHurt(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -649,7 +644,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Chaos Shield and the sand
 
-    @GameTest(template = ARENA, batch = "apocalypse_shield_sand", timeoutTicks = 240)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_shield_sand", timeoutTicks = 240)
     public static void chaosShieldStopsSandAndChargesItsDamage(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ServerPlayer wanda = d.hero();
@@ -718,7 +713,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // What the sand is
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void sandProjectilesCanBeCaughtButTheCocoonCannot(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -750,7 +745,7 @@ public final class ApocalypseBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // Choosing
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void attackSelectionRules(GameTestHelper helper) {
         long now = 10_000;
         RandomSource random = RandomSource.create(7L);
@@ -825,7 +820,7 @@ public final class ApocalypseBossTests {
         return new ApocalypseAttack.Choice(phase, nearest, inWindow, afterStagger, last, now, lastEntomb, lastMindCrush, sight, portal, ready);
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_brain", timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_brain", timeoutTicks = 700)
     public static void theBrainFightsByTheRulesWithAllHisAttacks(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.NONE);
         ServerPlayer hero = d.hero();

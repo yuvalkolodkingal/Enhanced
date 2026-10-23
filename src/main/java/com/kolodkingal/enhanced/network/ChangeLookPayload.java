@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.Powers;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
@@ -8,7 +9,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: the Change Look key was pressed (step +1 for the next look, -1 for the previous one: Sneak). 3.8:
@@ -27,7 +27,7 @@ public record ChangeLookPayload(int step) implements CustomPacketPayload {
         return TYPE;
     }
 
-    static void handle(ChangeLookPayload payload, IPayloadContext context) {
+    static void handle(ChangeLookPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player && player.isAlive() && !player.isSpectator()) {
             if (Powers.power(player) == com.kolodkingal.enhanced.power.Power.IRON_MAN) {
                 com.kolodkingal.enhanced.ironman.IronSuits.onSuitKey(player, payload.step() < 0 ? -1 : 1);

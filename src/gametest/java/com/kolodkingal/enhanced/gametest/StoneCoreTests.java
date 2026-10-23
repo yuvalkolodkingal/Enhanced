@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.config.StonesConfig.Uniqueness;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.item.TheOrbItem;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -54,10 +55,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,8 +73,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Wheel) and the Snap. Batches {@code stones_core}, {@code stones_ledger}, {@code stones_gauntlet}; the tests that
  * change the config or reach far (the world and unlimited modes, the Snap, the arena) have batches of their own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class StoneCoreTests {
     static final String CORE = "stones_core";
     static final String CORE_CFG = "stones_core_cfg";
@@ -154,7 +150,7 @@ public final class StoneCoreTests {
 
     // ---- the slip, the grace, the rejection ----
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void aStoneSlipsFromAPowerlessHandButNotFromThors(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -178,7 +174,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void aPowerlessPlayerIsZappedAfterTenSecondsAndTheStoneThrownOut(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nobody = f.player(10.5, FLOOR, 10.5);
@@ -199,7 +195,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void inAHandTheGraceRunsThreeTimesFasterAndNeverKills(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nobody = f.player(10.5, FLOOR, 10.5);
@@ -220,7 +216,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void aGauntletAShulkerBoxAndTheOrbAreSafeABundleIsNot(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nobody = f.player(10.5, FLOOR, 10.5);
@@ -243,7 +239,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void aBearerWhoLosesHisPowerGetsTheGrace(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
@@ -262,7 +258,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void thorHoldsTheTimeStoneButItStaysQuiet(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
@@ -275,7 +271,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void aStoneOnTheGroundIsProofAndNeverDespawns(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -303,7 +299,7 @@ public final class StoneCoreTests {
         return CraftingInput.of(3, 3, List.of(nine));
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void theStonesComeOutOfTheirVesselsAndGoBack(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         MinecraftServer server = level.getServer();
@@ -349,7 +345,7 @@ public final class StoneCoreTests {
         return grid(g, new ItemStack(Items.NETHERITE_INGOT), g, g, new ItemStack(Items.NETHER_STAR), g, g, g, g);
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void theEmptyGauntletIsCrafted(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         CraftingRecipe recipe = recipe(level.getServer(), "infinity_gauntlet");
@@ -362,7 +358,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE_CFG)
+    @EnhancedTest(template = ARENA, batch = CORE_CFG)
     public static void theGauntletCanBeMadeUncraftable(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(StonesConfig.GAUNTLET_CRAFTABLE, false);
@@ -372,7 +368,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void theOrbOpensForLokiNotForAPowerlessPlayer(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nobody = f.player(4.5, FLOOR, 4.5);
@@ -408,14 +404,14 @@ public final class StoneCoreTests {
         return StonePedestalBlock.take(player, helper.getLevel(), pos, state, StonePedestalBlock.kind(state));
     }
 
-    @GameTest(template = ARENA, batch = LEDGER)
+    @EnhancedTest(template = ARENA, batch = LEDGER)
     public static void eachPlayerTakesEachSiteStoneOnce(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         BlockPos pos = pedestal(helper, 10, 10, StoneKind.TIME);
         ServerPlayer thor = f.player(9.5, FLOOR, 9.5, Power.THOR);
         ServerPlayer loki = f.player(11.5, FLOOR, 11.5, Power.LOKI);
         check(take(helper, thor, pos) && carries(thor, StoneKind.TIME), "Thor takes the Time Stone");
-        check(thor.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "the ledger marks him");
+        check(ModAttachments.STONES.get(thor).hasTaken(StoneKind.TIME), "the ledger marks him");
         check(thor.getUUID().equals(StoneLedger.taker(thor.getMainHandItem())), "the stone carries his name");
         StonePedestalBlockEntity be = (StonePedestalBlockEntity) helper.getLevel().getBlockEntity(pos);
         check(be != null && !be.shows(thor.getUUID(), StoneKind.TIME) && be.shows(loki.getUUID(), StoneKind.TIME),
@@ -437,7 +433,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = LEDGER)
+    @EnhancedTest(template = ARENA, batch = LEDGER)
     public static void aStoneLostInTheVoidOrKilledFreesItsKind(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -452,19 +448,19 @@ public final class StoneCoreTests {
         level.addFreshEntity(falling);
         falling.tick();
         check(falling.isRemoved(), "the stone fell out of the world");
-        check(!thor.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "Thor may take the Time Stone again");
+        check(!ModAttachments.STONES.get(thor).hasTaken(StoneKind.TIME), "Thor may take the Time Stone again");
         ItemStack soulStone = stone(StoneKind.SOUL);
         StoneLedger.stamp(soulStone, thor.getUUID());
         ItemEntity killed = new ItemEntity(level, at.x, at.y, at.z, soulStone);
         level.addFreshEntity(killed);
-        check(thor.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL), "the Soul Stone still counts");
+        check(ModAttachments.STONES.get(thor).hasTaken(StoneKind.SOUL), "the Soul Stone still counts");
         killed.kill();
-        check(!thor.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL), "killed: it is free again");
+        check(!ModAttachments.STONES.get(thor).hasTaken(StoneKind.SOUL), "killed: it is free again");
         check(take(helper, thor, time), "and he takes the Time Stone once more");
         ItemStack gauntlet = gauntletWith(StoneKind.TIME);
         StoneLedger.putInGauntletOf(gauntlet, StoneKind.TIME, thor.getUUID());
         StoneLedger.destroyed(gauntlet);
-        check(!thor.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "a destroyed Gauntlet frees its stones");
+        check(!ModAttachments.STONES.get(thor).hasTaken(StoneKind.TIME), "a destroyed Gauntlet frees its stones");
         helper.succeed();
     }
 
@@ -473,7 +469,7 @@ public final class StoneCoreTests {
      * it back to the stone taken out of it); a destroyed Eye (a sacrificed Doctor Strange's) frees the Time Stone, an
      * Eye that never held a site's stone frees nothing.
      */
-    @GameTest(template = ARENA, batch = LEDGER)
+    @EnhancedTest(template = ARENA, batch = LEDGER)
     public static void theEyeOfAgamottoCarriesItsTimeStonesTaker(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -493,13 +489,13 @@ public final class StoneCoreTests {
         check(loki.getUUID().equals(StoneLedger.taker(back)), "so does the stone taken back out of it");
         loki.inventoryMenu.getCraftSlots().clearContent();
         StoneLedger.destroyed(new ItemStack(ModItems.EYE_OF_AGAMOTTO.get()));
-        check(loki.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "an Eye that held no site stone: nothing");
+        check(ModAttachments.STONES.get(loki).hasTaken(StoneKind.TIME), "an Eye that held no site stone: nothing");
         StoneLedger.destroyed(eye);
-        check(!loki.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "the destroyed Eye frees the Time Stone");
+        check(!ModAttachments.STONES.get(loki).hasTaken(StoneKind.TIME), "the destroyed Eye frees the Time Stone");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = LEDGER)
+    @EnhancedTest(template = ARENA, batch = LEDGER)
     public static void theVaultChestGivesTheOrbOncePerPlayer(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -508,7 +504,7 @@ public final class StoneCoreTests {
         SiteStoneLootFunction function = new SiteStoneLootFunction(List.of(), StoneKind.POWER);
         check(function.apply(new ItemStack(ModItems.THE_ORB.get()), opener(helper, thor)).is(ModItems.THE_ORB.get()),
                 "the first chest gives Thor the Orb");
-        check(thor.getData(ModAttachments.STONES).hasTaken(StoneKind.POWER), "the ledger counts it");
+        check(ModAttachments.STONES.get(thor).hasTaken(StoneKind.POWER), "the ledger counts it");
         ItemStack second = function.apply(new ItemStack(ModItems.THE_ORB.get()), opener(helper, thor));
         check(second.is(Items.PAPER), "a second chest gives him a note");
         check(second.getHoverName().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
@@ -531,7 +527,7 @@ public final class StoneCoreTests {
         return new LootContext.Builder(params).create(Optional.empty());
     }
 
-    @GameTest(template = ARENA, batch = LEDGER_WORLD)
+    @EnhancedTest(template = ARENA, batch = LEDGER_WORLD)
     public static void inWorldModeOneOfEachAndALostStoneRefills(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(StonesConfig.UNIQUENESS, Uniqueness.WORLD);
@@ -554,7 +550,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = LEDGER_UNLIMITED)
+    @EnhancedTest(template = ARENA, batch = LEDGER_UNLIMITED)
     public static void inUnlimitedModeEverySiteGivesEveryTime(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(StonesConfig.UNIQUENESS, Uniqueness.UNLIMITED);
@@ -567,7 +563,7 @@ public final class StoneCoreTests {
 
     // ---- the Gauntlet ----
 
-    @GameTest(template = ARENA, batch = GAUNTLET)
+    @EnhancedTest(template = ARENA, batch = GAUNTLET)
     public static void stonesGoInForAnyoneAndOutOnlyForAHolder(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nobody = f.player(4.5, FLOOR, 4.5);
@@ -603,7 +599,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GAUNTLET)
+    @EnhancedTest(template = ARENA, batch = GAUNTLET)
     public static void thanossGauntletTakesNoStoneAndStillAwakensThanos(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nobody = f.player(10.5, FLOOR, 10.5);
@@ -623,7 +619,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GAUNTLET)
+    @EnhancedTest(template = ARENA, batch = GAUNTLET)
     public static void onlyABearerOrThanosWieldsAFilledGauntlet(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nobody = f.player(4.5, FLOOR, 4.5);
@@ -644,7 +640,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GAUNTLET)
+    @EnhancedTest(template = ARENA, batch = GAUNTLET)
     public static void theStoneWheelCyclesThroughTheStonesInIt(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
@@ -669,7 +665,7 @@ public final class StoneCoreTests {
 
     // ---- the Snap ----
 
-    @GameTest(template = ARENA, batch = SNAP)
+    @EnhancedTest(template = ARENA, batch = SNAP)
     public static void theSnapDustsHalfOfTenZombiesAndNothingElse(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -677,16 +673,16 @@ public final class StoneCoreTests {
         ServerPlayer friend = f.player(12.5, FLOOR, 12.5);
         List<Zombie> zombies = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(3.5 + i * 1.5, FLOOR, 3.5));
+            Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5 + i * 1.5, FLOOR, 3.5));
             zombie.setNoAi(true);
             zombies.add(zombie);
         }
-        Zombie named = helper.spawn(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 17.5));
+        Zombie named = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 17.5));
         named.setNoAi(true);
         named.setCustomName(Component.literal("Bob"));
-        Villager villager = helper.spawn(EntityType.VILLAGER, new Vec3(17.5, FLOOR, 17.5));
+        Villager villager = TestKit.spawn(helper, EntityType.VILLAGER, new Vec3(17.5, FLOOR, 17.5));
         villager.setNoAi(true);
-        Wolf wolf = helper.spawn(EntityType.WOLF, new Vec3(15.5, FLOOR, 8.5));
+        Wolf wolf = TestKit.spawn(helper, EntityType.WOLF, new Vec3(15.5, FLOOR, 8.5));
         wolf.setNoAi(true);
         wolf.tame(thor);
         f.onClose(() -> {
@@ -709,7 +705,7 @@ public final class StoneCoreTests {
         TestKit.assertNear(thor.getHealth(), 2.0, 0.01, "the cost: Thor at 2 health");
         check(thor.hasEffect(MobEffects.WEAKNESS) && thor.getEffect(MobEffects.WEAKNESS).getAmplifier() == 1,
                 "and Weakness II");
-        StoneProgress progress = thor.getData(ModAttachments.STONES);
+        StoneProgress progress = ModAttachments.STONES.get(thor);
         check(progress.has(StoneProgress.SNAPPED), "the flag of the first Snap");
         check(progress.snapReadyAt() == level.getGameTime() + 24000, "a day before the next");
         check(!Snap.mayCharge(thor, InfinityGauntletItem.contents(gauntlet)), "so it may not charge again");
@@ -719,13 +715,13 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SNAP_ARENA)
+    @EnhancedTest(template = ARENA, batch = SNAP_ARENA)
     public static void theSnapIsRefusedInABossArena(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
         BossFrameworkTests.start(f, thor, Containment.FIELD, false);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 12.5));
-        Zombie other = helper.spawn(EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 12.5));
+        Zombie other = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(13.5, FLOOR, 12.5));
         f.onClose(() -> {
             zombie.discard();
             other.discard();
@@ -739,7 +735,7 @@ public final class StoneCoreTests {
 
     // ---- Asgard's pedestal ----
 
-    @GameTest(template = ARENA, batch = CORE)
+    @EnhancedTest(template = ARENA, batch = CORE)
     public static void thePedestalItemIsEmptyAndTheStoneIsShownToWhoMayTakeIt(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         BlockPos pos = pedestal(helper, 10, 10, StoneKind.MIND);
@@ -755,7 +751,7 @@ public final class StoneCoreTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = ASGARD, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = ASGARD, timeoutTicks = 400)
     public static void asgardsVaultGetsTheRealityStonesPedestalOnce(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerLevel asgard = AsgardTestSupport.ensureAsgard(helper.getLevel().getServer());

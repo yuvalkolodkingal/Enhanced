@@ -138,7 +138,7 @@ public class HulkbusterFrameEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             Vec3 at = position();
             boolean lifting = stage() == LIFTING && stageAge(0.0F) > 4.0F;
             if (stage() == FALLING || lifting) {

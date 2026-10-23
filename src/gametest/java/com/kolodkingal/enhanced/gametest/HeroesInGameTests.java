@@ -3,17 +3,15 @@ package com.kolodkingal.enhanced.gametest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -30,8 +28,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Spider-Man that the other tests did not, each pinned by a test that fails on the code it was found in. (A third finding,
  * a held Spider-Man's hand thrusting a web the server never shoots, is the client's alone and was checked in the game.)
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HeroesInGameTests {
 
     /** The longest title, in characters, that fits a 854-pixel-wide window at the default GUI scale (bold, four times the text). */
@@ -52,7 +48,7 @@ public final class HeroesInGameTests {
      * the screen and cut at both ends ("ean Grey (Phoenix"). Every hero's awakening title fits, in both languages, and the
      * Phoenix's awakening really shows the shorter one.
      */
-    @GameTest(template = ARENA, batch = "heroes_ingame_titles")
+    @EnhancedTest(template = ARENA, batch = "heroes_ingame_titles")
     public static void everyAwakeningTitleFitsTheScreen(GameTestHelper helper) throws IOException {
         List<JsonObject> languages = List.of(lang("en_us"), lang("he_il"));
         for (Power power : Power.values()) {
@@ -78,7 +74,7 @@ public final class HeroesInGameTests {
     }
 
     /** Mind Sense once said "Minds nearby: 3 (1 players, 1 hostile)": the counts read right for one as for many. */
-    @GameTest(template = ARENA, batch = "heroes_ingame_words")
+    @EnhancedTest(template = ARENA, batch = "heroes_ingame_words")
     public static void mindSenseCountsReadRightForOne(GameTestHelper helper) throws IOException {
         for (String language : List.of("en_us", "he_il")) {
             String line = String.format(lang(language).get("message.enhanced.mind_sense.result").getAsString(), 3, 1, 1);

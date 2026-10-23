@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.config.FalconConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.FalconFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -27,7 +28,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -272,7 +272,7 @@ public final class Redwing {
         for (LivingEntity e : player.serverLevel().getEntitiesOfClass(LivingEntity.class, round, e -> e != player
                 && hostile(player, e) && e.distanceTo(player) <= radius)) {
             state.marks.put(e.getId(), now + MARK_TICKS);
-            PacketDistributor.sendToPlayer(player, new FalconFxPayload(FalconFxPayload.MARK, e.getId(), List.of(),
+            Net.sendToPlayer(player, new FalconFxPayload(FalconFxPayload.MARK, e.getId(), List.of(),
                     MARK_TICKS));
         }
     }

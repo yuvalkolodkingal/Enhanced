@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.bifrost.BifrostMenu;
 import com.kolodkingal.enhanced.config.HeimdallConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.BifrostActionPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
@@ -29,7 +30,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -87,7 +87,7 @@ public class BifrostScreen extends Screen {
 
     private static BifrostData data() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return player == null ? BifrostData.EMPTY : player.getData(ModAttachments.BIFROST);
+        return player == null ? BifrostData.EMPTY : ModAttachments.BIFROST.get(player);
     }
 
     /**
@@ -233,7 +233,7 @@ public class BifrostScreen extends Screen {
     }
 
     private static void send(BifrostActionPayload payload) {
-        PacketDistributor.sendToServer(payload);
+        Net.sendToServer(payload);
     }
 
     @Override

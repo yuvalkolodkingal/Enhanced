@@ -18,18 +18,16 @@ import com.kolodkingal.enhanced.build.ShapeKind;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -47,8 +45,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * spell and state. Nothing here touches the level (the hero's numbers are read for a world as big as the test's), so
  * the batch finishes in its first tick; no client class is named.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildGrammarTests {
     private static final Vec3 EYES = new Vec3(0.5, 70.62, 0.5);
     private static final Vec3 DOWN = new Vec3(0.0, -1.0, 0.0);
@@ -66,7 +62,7 @@ public final class BuildGrammarTests {
      * ahead; a shape follows, is planted by a click, takes its height from the look, keeps it once a second click fixes
      * it, and a click on the sky then lets it follow again; each state casts the recipe it shows.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_grammar")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_grammar")
     public static void theMouseGrammar(GameTestHelper helper) {
         BoundingBox world = Limits.world(helper.getLevel());
         Limits wanda = Limits.wanda(world);
@@ -247,7 +243,7 @@ public final class BuildGrammarTests {
      * face; the arrow's face (pushFace) is the same; a look that moved more than a few degrees, or a pause of more than
      * 20 ticks, or another box, finds the face again.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_grammar")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_grammar")
     public static void aScrollKeepsTheFaceItPushed(GameTestHelper helper) {
         BoundingBox world = Limits.world(helper.getLevel());
         BlockPos p = new BlockPos(0, 64, 0);
@@ -284,7 +280,7 @@ public final class BuildGrammarTests {
      * Witch's other rows stay); nothing selected the corner, the whole thing, the spells and undo only when there is
      * one; the brushes have no corner line; and every row's words are in both languages.
      */
-    @GameTest(template = TestKit.ARENA, batch = "build_grammar")
+    @EnhancedTest(template = TestKit.ARENA, batch = "build_grammar")
     public static void theHintsMatchTheSpellAndState(GameTestHelper helper) throws IOException {
         List<Row> fill = BuildHints.lines(Spell.FILL, FillStyle.ROOM.ordinal(), Stage.BOX, Power.BILLY, false, true);
         check(keys(fill).equals(List.of("fill", "push_side", "style", "undo")) && fill.get(0).input() == Input.RIGHT

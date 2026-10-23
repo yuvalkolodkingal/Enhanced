@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.item.InfinityStoneItem;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModBlockEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -45,7 +46,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -142,7 +142,7 @@ public class StonePedestalBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
                                                                   BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ModBlockEntities.STONE_PEDESTAL.get(),
+        return level.isClientSide() ? null : createTickerHelper(type, ModBlockEntities.STONE_PEDESTAL.get(),
                 StonePedestalBlockEntity::serverTick);
     }
 
@@ -154,10 +154,10 @@ public class StonePedestalBlock extends BaseEntityBlock {
                 || !player.isCreative()) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.setBlock(pos, state.setValue(STONE, Stone.of(stone.kind)), Block.UPDATE_ALL);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -167,7 +167,7 @@ public class StonePedestalBlock extends BaseEntityBlock {
         if (kind == null) {
             return InteractionResult.PASS;
         }
-        if (level.isClientSide || !(player instanceof ServerPlayer server)) {
+        if (level.isClientSide() || !(player instanceof ServerPlayer server)) {
             return InteractionResult.SUCCESS;
         }
         take(server, (ServerLevel) level, pos, state, kind);
@@ -221,7 +221,7 @@ public class StonePedestalBlock extends BaseEntityBlock {
         level.playSound(null, at.x, at.y, at.z, ModSounds.PEDESTAL_TAKE.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         kind.voice().use(level, at, InfinityStone.UNDER, 1.0F);
         level.sendParticles(new EnergyParticleOptions(kind.color(), 1.2F), at.x, at.y, at.z, 30, 0.3, 0.3, 0.3, 0.08);
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, 48.0,
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, 48.0,
                 new StoneFxPayload(StoneFxPayload.PEDESTAL_TAKE, player.getId(), List.of(at), kind.ordinal()));
         player.displayClientMessage(Component.translatable("message.enhanced.stones.taken", kind.displayName())
                 .withStyle(s -> s.withColor(kind.color())), true);

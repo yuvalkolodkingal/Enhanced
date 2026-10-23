@@ -39,6 +39,7 @@ import com.kolodkingal.enhanced.network.ModNetwork;
 import com.kolodkingal.enhanced.network.ScentPayload;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -64,7 +65,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -90,8 +90,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.language.IModFileInfo;
 
 import java.io.IOException;
@@ -119,8 +117,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Asgardians', the fixed points of the two placeholder templates, the data and the configs' defaults. Batch {@code
  * mutant_skel}; a test that changes the config has the batch {@code mutant_skel_cfg}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MutantSkeletonTests {
     static final String BATCH = "mutant_skel";
     static final String CFG = "mutant_skel_cfg";
@@ -136,7 +132,7 @@ public final class MutantSkeletonTests {
 
     // ---- the heroes, the bits, the protocol ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void wolverineAndDeadpoolComeAfterTheHulk(GameTestHelper helper) {
         Power[] all = Power.values();
         check(all[Power.HULK.ordinal() + 1] == Power.WOLVERINE && all[Power.HULK.ordinal() + 2] == Power.DEADPOOL
@@ -170,7 +166,7 @@ public final class MutantSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsEleven(GameTestHelper helper) {
         // (3.8: at least 3.7's numbers; AvengersSkeletonTests pins 3.8's.)
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 11, "protocol 11 or later");
@@ -184,7 +180,7 @@ public final class MutantSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePayloadsOfThreeSevenRoundTrip(GameTestHelper helper) {
         List<Vec3> points = List.of(Vec3.ZERO, new Vec3(1, 2, 3));
         roundTrip(HealingFxPayload.STREAM_CODEC, new HealingFxPayload(HealingFxPayload.CUT, 7, 3), "a healing moment");
@@ -240,7 +236,7 @@ public final class MutantSkeletonTests {
 
     // ---- the Hero Creator ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsAre176(GameTestHelper helper) throws IOException {
         check(HeroAbility.values().length >= 176, "154 + 12 + 10 rows or more: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.WOLVERINE_SLASH.ordinal() - 1] == HeroAbility.HULK_BODY,
@@ -301,7 +297,7 @@ public final class MutantSkeletonTests {
 
     // ---- the healing factor ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theKillerTagsLoadAndNameRealTypes(GameTestHelper helper) {
         Registry<DamageType> types = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         Map<Defeat, TagKey<DamageType>> tags = Map.of(Defeat.STONES, ModTags.DEFEATS_HEALING_STONES, Defeat.CHAOS,
@@ -333,7 +329,7 @@ public final class MutantSkeletonTests {
      * with each group switched: the void and {@code /kill} always kill, poison lets anything through, each group's tag
      * kills while its option is on, and nothing else does.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLethalForHealerTruthTable(GameTestHelper helper) {
         Registry<DamageType> types = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         List<HealingFactor.Rules> rules = new ArrayList<>(List.of(HealingFactor.Rules.DEFAULTS,
@@ -377,7 +373,7 @@ public final class MutantSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHealersAreTheHealers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = f.player(3.5, FLOOR, 3.5, Power.WOLVERINE);
@@ -410,7 +406,7 @@ public final class MutantSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void theHealingOptionsSwitchItsRules(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = f.player(3.5, FLOOR, 3.5, Power.WOLVERINE);
@@ -434,7 +430,7 @@ public final class MutantSkeletonTests {
 
     // ---- the cottage's family, the seams ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCottageRolesAreAppended(GameTestHelper helper) {
         Role[] all = Role.values();
         List<Role> asgard = List.of(Role.HEIMDALL, Role.ODIN, Role.FRIGGA, Role.SIF, Role.VALKYRIE, Role.VOLSTAGG,
@@ -464,7 +460,7 @@ public final class MutantSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSeamsAreNeutralUntilTheLanes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer xavier = f.player(3.5, FLOOR, 3.5, Power.PROFESSOR_X);
@@ -485,7 +481,7 @@ public final class MutantSkeletonTests {
 
     // ---- the placeholder templates' fixed points ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLabsFixedPointsHoldTheirBlocks(GameTestHelper helper) throws IOException {
         Map<BlockPos, String> blocks = template(helper, SchoolLabPlan.TEMPLATE);
         check(size(helper, SchoolLabPlan.TEMPLATE).equals(List.of(45, 28, 42)), "the lab is 45 x 28 x 42");
@@ -519,7 +515,7 @@ public final class MutantSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCottagesFixedPointsHoldTheirBlocks(GameTestHelper helper) throws IOException {
         Map<BlockPos, String> blocks = template(helper, CottagePlan.TEMPLATE);
         check(size(helper, CottagePlan.TEMPLATE).equals(List.of(27, 18, 25)), "the cottage is 27 x 18 x 25");
@@ -569,7 +565,7 @@ public final class MutantSkeletonTests {
 
     // ---- the data ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDataOfThreeSevenLoads(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         for (String id : List.of("stone_locator", "chimichanga")) {
@@ -606,7 +602,7 @@ public final class MutantSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theConfigsHaveThePlansDefaults(GameTestHelper helper) {
         check(HealingConfig.ENABLED.getDefault() && HealingConfig.CUSTOM_HEROES.getDefault()
                 && HealingConfig.DOWN_TICKS.getDefault() == 100 && HealingConfig.STONES_DEFEAT.getDefault()

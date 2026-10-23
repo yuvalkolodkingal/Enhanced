@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.sokovia.SokoviaClient;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client: Sokovia begins to rise, or to come down, or its move is over. No block data travels in it (about 70
@@ -82,7 +82,7 @@ public record SokoviaLiftPayload(int phase, int bossId, BlockPos centre, int rad
     }
 
     /** The island is drawn here (the client class is loaded only when this runs, on a client). */
-    static void handle(SokoviaLiftPayload payload, IPayloadContext context) {
+    static void handle(SokoviaLiftPayload payload, PacketContext context) {
         SokoviaClient.receive(payload);
     }
 }

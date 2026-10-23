@@ -44,6 +44,7 @@ import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -70,7 +71,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -110,8 +110,6 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 
@@ -141,8 +139,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * and break nothing; the shared pieces the lanes build on (the plug-in registries, the tags, the melee rule, the
  * Scepter and Tesseract table, the awakening items, the area rule, the boss facade, the payloads) work as designed.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SkeletonTests {
     /**
      * The batch of the tests that need nothing but themselves. They all finish in their first tick, and a finished test
@@ -173,7 +169,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The five powers
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theFiveNewHeroesComeLastInEilonsOrder(GameTestHelper helper) {
         Power[] all = Power.values();
         // (The heroes of 3.3 are appended after them: Apocalypse is no longer the last.)
@@ -187,7 +183,7 @@ public final class SkeletonTests {
     }
 
     /** A name for everything, a look to choose, and flight rules that agree with each other. */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void everyNewHeroHasNamesLooksAndConsistentFlightRules(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject en = lang(mod, "en_us");
@@ -220,7 +216,7 @@ public final class SkeletonTests {
     }
 
     /** {@code /enhanced power set <player> <hero>} makes each of them, with and without a look. */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void thePowerCommandMakesEveryNewHero(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -244,7 +240,7 @@ public final class SkeletonTests {
     }
 
     /** The power exists and does nothing: no key does anything, nothing ticks into a state, nobody is hurt. */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void aNewHeroDoesNothingYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
@@ -278,7 +274,7 @@ public final class SkeletonTests {
      * endAll when the power is taken away (while the data still say whose it was), and one call per session event for
      * every player, from the real events.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void aHeroPlugInIsCalledForTheRightPlayersAndOncePerSessionEvent(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -447,7 +443,7 @@ public final class SkeletonTests {
      * The routes from what the data show to the gesture to act (GestureRoutes) ask a hero of 3.0 what it means, so a lane
      * routes its own abilities without editing the arms of the others, and the heroes before it answer as ever.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theGestureRoutesAskTheClientOfAHeroOf3AndLeaveTheOlderHeroesAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         HeroClient previous = HeroClients.register(new RoutingClient());
@@ -473,7 +469,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theFliersFlyAndTheOthersDoNot(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power hero : NEW_HEROES) {
@@ -492,7 +488,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void spiderManStartsWithHisWallAndHisSenseOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer spider = f.player(5.5, FLOOR, 5.5, Power.SPIDER_MAN);
@@ -509,7 +505,7 @@ public final class SkeletonTests {
     /**
      * The momentary states are a long since 3.0: 26 bits are used, there is room for 64, and the sync keeps them all.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theLiveStatesFitInALongAndSurviveTheSync(GameTestHelper helper) {
         // (3.8: two words of states, room for 128.)
         check(Live.values().length >= 26 && Live.values().length <= 127, "26 states or more, and room to grow: "
@@ -534,7 +530,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void shiftingCooldownsMovesOnlyWhatIsRunning(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000;
@@ -554,7 +550,7 @@ public final class SkeletonTests {
     }
 
     /** A world saved with a new hero loads with it; one saved without any loads without. */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void aSavedNewHeroLoadsBackAndAnOldSaveLoadsWithout(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5, Power.SPIDER_MAN);
@@ -580,7 +576,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The registries
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theHeroesAreAllRegisteredAsPlugIns(GameTestHelper helper) {
         for (Power hero : NEW_HEROES) {
             check(HeroServers.of(hero) != null && HeroServers.of(hero).power() == hero, hero + " has a server plug-in");
@@ -599,7 +595,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theEntitiesAreRegisteredAndCannotBeSummoned(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         List<EntityType<?>> types = List.of(ModEntities.THANOS.get(), ModEntities.THANOS_SWORD.get(), ModEntities.THANOS_METEOR.get(),
@@ -618,11 +614,12 @@ public final class SkeletonTests {
             }
             entity.discard();
         }
-        check(!BossFights.isFightEntity(helper.spawn(EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5))), "a zombie is not");
+        check(!BossFights.isFightEntity(TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(3.5, FLOOR, 3.5))),
+                "a zombie is not");
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theEffectsAreRegisteredAndHold(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -636,10 +633,10 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theBossDataStartsEmptyAndTheCodecRoundTrips(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BossData fresh = level.getServer().overworld().getData(ModAttachments.BOSS_DATA);
+        BossData fresh = ModAttachments.BOSS_DATA.get(level.getServer().overworld());
         check(fresh.gifts().isEmpty() && fresh.rest().isEmpty(), "no gift and no rest at the start");
         RegistryOps<Tag> ops = level.registryAccess().createSerializationContext(NbtOps.INSTANCE);
         UUID who = UUID.randomUUID();
@@ -656,7 +653,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Chaos Shield's melee rule reads a tag, and the tag holds exactly what the rule held before
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theMeleeBlowsTagHoldsExactlyTodaysListPlusTheNewBlows(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
@@ -669,7 +666,7 @@ public final class SkeletonTests {
                 "enhanced:red_hulk_smash", "enhanced:iron_blade", "enhanced:hulkbuster_punch",
                 // (3.8.1: Captain America's combo and flip kick.)
                 "enhanced:cap_combo");
-        Zombie attacker = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
+        Zombie attacker = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
         Set<String> inTag = new LinkedHashSet<>();
         for (Holder.Reference<DamageType> holder : registry.holders().toList()) {
             String id = holder.key().location().toString();
@@ -685,7 +682,7 @@ public final class SkeletonTests {
                 check(melee, id + " is a melee blow of 3.0");
             }
             // A blow that is thrown or cast (nobody's own hand) is never melee, whatever its type.
-            check(!WandaAbilities.isMeleeHit(new DamageSource(holder, helper.spawn(EntityType.ARROW, new Vec3(3.5, FLOOR + 3, 3.5)), attacker)),
+            check(!WandaAbilities.isMeleeHit(new DamageSource(holder, TestKit.spawn(helper, EntityType.ARROW, new Vec3(3.5, FLOOR + 3, 3.5)), attacker)),
                     id + ": a projectile of it is not a blow");
         }
         Set<String> expected = new LinkedHashSet<>(before);
@@ -694,7 +691,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void mindPowerIsTheBeamTheSlamAndTheBurst(GameTestHelper helper) {
         Registry<DamageType> registry = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         Set<String> inTag = new LinkedHashSet<>();
@@ -710,14 +707,14 @@ public final class SkeletonTests {
      * builds against the real thing: mind power is the tag with a Phoenix as the causing entity, and the listeners are
      * told of every touch.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void phoenixPowerIsTheMindPowerTagWithAPhoenixCauseAndTellsItsListeners(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer phoenix = f.player(5.5, FLOOR, 5.5, Power.PHOENIX);
         ServerPlayer wanda = f.player(9.5, FLOOR, 5.5, Power.SCARLET_WITCH);
         ServerPlayer nobody = f.player(13.5, FLOOR, 5.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 9.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 9.5));
 
         check(PhoenixPower.isPhoenix(phoenix) && !PhoenixPower.isPhoenix(wanda) && !PhoenixPower.isPhoenix(zombie), "who is a Phoenix");
         check(PhoenixPower.isPhoenixMindPower(ModDamageTypes.source(level, ModDamageTypes.PHOENIX_BURST, phoenix, phoenix)),
@@ -749,7 +746,7 @@ public final class SkeletonTests {
      * {@code {"id": ..., "required": false}} is skipped: it names what another mod may add (other mods' metal ores), and
      * the game loads the tag without it when that mod is not installed. The twelve tag files of 3.1 are among those read.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void everyTagFileNamesRealThings(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         ServerLevel level = helper.getLevel();
@@ -814,7 +811,7 @@ public final class SkeletonTests {
     // Loki's Scepter and the Tesseract: one table for both
 
     /** The table of integration.md 3.2, row by row. */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theScepterAndTesseractTableIsReadRowByRow(GameTestHelper helper) {
         ItemStack gene = new ItemStack(ModItems.SCARLET_WITCH_GENE.get());
         ItemStack core = new ItemStack(ModItems.SYNTHEZOID_CORE.get());
@@ -861,7 +858,7 @@ public final class SkeletonTests {
         check(expected == actual, what + ": expected " + expected + " but was " + actual);
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theScepterWakesUltronFromHisCoreForAPowerlessPlayerOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -881,7 +878,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theScepterWithTheProgramNeverHurtsAndUsesNothingUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -901,7 +898,7 @@ public final class SkeletonTests {
     }
 
     /** Until the summoning is built the Mad Titan's rows are declined and the Scepter does what it always did. */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theScepterAndTheTesseractDoWhatTheyDidWhileTheSummoningIsNotBuilt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(5.5, FLOOR, 5.5, Power.SCARLET_WITCH);
@@ -924,7 +921,7 @@ public final class SkeletonTests {
      * refuses (it has told the player why) must not leave the Scepter to explode in the player's hand, nor the Tesseract
      * to take them a hundred blocks away as Loki. One that begins holds the item for five seconds.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void aRefusedSummoningNeitherExplodesTheScepterNorSendsTheTesseractAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -997,7 +994,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The awakening items
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void anAwakeningItemIsHeldThenUsedUpAndAwakens(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1023,7 +1020,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void anAwakeningItemTurnsAHeroAwayBeforeTheHoldAndCreativeKeepsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1046,18 +1043,18 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // Area attacks, the hero is held, the boss facade
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void anAreaAttackSparesWhatItShouldAndHurtsTheRest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(10.5, FLOOR, 10.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(12.5, FLOOR, 12.5));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 12.5));
-        Cow cow = helper.spawnWithNoFreeWill(EntityType.COW, new Vec3(14.5, FLOOR, 10.5));
-        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 12.5));
-        Wolf pet = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(12.5, FLOOR, 12.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(14.5, FLOOR, 12.5));
+        Cow cow = TestKit.spawnWithNoFreeWill(helper, EntityType.COW, new Vec3(14.5, FLOOR, 10.5));
+        ArmorStand stand = TestKit.spawn(helper, EntityType.ARMOR_STAND, new Vec3(8.5, FLOOR, 12.5));
+        Wolf pet = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(8.5, FLOOR, 8.5));
         pet.tame(owner);
-        Wolf stray = helper.spawnWithNoFreeWill(EntityType.WOLF, new Vec3(14.5, FLOOR, 8.5));
+        Wolf stray = TestKit.spawnWithNoFreeWill(helper, EntityType.WOLF, new Vec3(14.5, FLOOR, 8.5));
 
         check(AreaTargets.mayHurt(owner, zombie, false), "a hostile creature is hurt");
         check(!AreaTargets.mayHurt(owner, owner, true), "the caster never is");
@@ -1072,7 +1069,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "area_targets_players")
+    @EnhancedTest(template = ARENA, batch = "area_targets_players")
     public static void anAreaAttackHurtsPlayersOnlyWithPvpAndNeverCreativeOnes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(10.5, FLOOR, 10.5);
@@ -1085,13 +1082,13 @@ public final class SkeletonTests {
         check(AreaTargets.mayHurt(owner, other, false), "with PvP on another player is hurt");
         check(!AreaTargets.mayHurt(owner, creative, true) && !AreaTargets.mayHurt(owner, spectator, true),
                 "a Creative or Spectator player never is");
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 5.5));
         check(AreaTargets.mayHurt(zombie, other, false), "a monster may hurt a player whatever PvP says");
         helper.succeed();
     }
 
     /** The cocoon covers the hands: a key press does nothing while entombed, a release still goes through. */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void anEntombedHeroCannotPressAKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(5.5, FLOOR, 5.5, Power.SCARLET_WITCH);
@@ -1105,12 +1102,12 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theBossFacadeAnswersAsIfThereWereNoBossYet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 8.5));
         check(BossFights.active(level) == null && !BossFights.anyActive(level.getServer()), "no fight runs");
         check(!BossFights.isMember(player) && !BossFights.isMinion(zombie) && !BossFights.isHexExempt(player), "nobody is in one");
         check(BossFights.allowsTeleport(level, player, new Vec3(1, 2, 3)), "a teleport is allowed anywhere");
@@ -1140,7 +1137,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_framework")
+    @EnhancedTest(template = ARENA, batch = "boss_framework")
     public static void theBossCommandsStartStopListAndCleanUp(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1171,7 +1168,7 @@ public final class SkeletonTests {
         fight.spawn(thanos);
         fight.spawn(sentry);
         fight.spawn(far);
-        Zombie bystander = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 12.5));
+        Zombie bystander = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 12.5));
         check(run(player, String.format(Locale.ROOT, "enhanced boss cleanup %f %f %f 8", here.x, here.y, here.z)) == 2,
                 "two boss entities were near");
         check(thanos.isRemoved() && sentry.isRemoved(), "they are gone");
@@ -1183,7 +1180,7 @@ public final class SkeletonTests {
     // ------------------------------------------------------------------------------------------------------------
     // The network
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void theProtocolIsTen(GameTestHelper helper) {
         // (3.7: at least 10; MutantSkeletonTests pins 3.7's "11".)
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10, "3.6 bumps the protocol from 9 to 10, once: "
@@ -1191,7 +1188,7 @@ public final class SkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void everyPayloadOf3RoundTrips(GameTestHelper helper) {
         var access = helper.getLevel().registryAccess();
         Vec3 a = new Vec3(1.5, 64.0, -2.25);
@@ -1253,7 +1250,7 @@ public final class SkeletonTests {
      * 31 KiB (a 24 x 24 x 24 pocket of 20 kinds of block in at most two parts; a pocket of 3,000 different states, and
      * one whose palette is every state there is, read back whole), a pull of 64 streams 2 KiB.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void everyPayloadOf31RoundTrips(GameTestHelper helper) {
         var access = helper.getLevel().registryAccess();
         BlockPos far = new BlockPos(-29_999_999, -64, 29_999_999);
@@ -1408,7 +1405,7 @@ public final class SkeletonTests {
      * scaffolding that kept the lanes' blocks apart while 3.0 was built in parallel, and are gone now that the lanes are
      * merged.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void noLangSentinelsRemain(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         check(sentinels(lang(mod, "en_us")).isEmpty() && sentinels(lang(mod, "he_il")).isEmpty(),
@@ -1424,7 +1421,7 @@ public final class SkeletonTests {
      * The release gate for the animation tables: every ability, toggle and state of the five heroes is acted by a
      * gesture of its own or explained, not pending. Passes while the version is older than 3.0.0.
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void noAnimationIsPendingAtTheRelease(GameTestHelper helper) {
         List<String> pending = pendingAnimation();
         if (isReleaseOf3()) {
@@ -1462,7 +1459,7 @@ public final class SkeletonTests {
      * {@code AnimationMathTests.everyAbilityIsActedOrExplained}, which checks the heroes before them); until a lane
      * builds the hero, the reason is "pending lane".
      */
-    @GameTest(template = ARENA, batch = SKELETON)
+    @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void everyAbilityOfTheNewHeroesIsActedOrExplained(GameTestHelper helper) {
         for (Power hero : NEW_HEROES) {
             for (int ability = 1; ability <= PowerData.ABILITIES; ability++) {

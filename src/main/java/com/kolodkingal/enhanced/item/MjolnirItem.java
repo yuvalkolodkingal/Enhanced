@@ -75,13 +75,13 @@ public class MjolnirItem extends Item {
             }
             context.getItemInHand().shrink(1);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     /** Whoever forges it, if worthy, claims it at once. */
     @Override
     public void onCraftedBy(ItemStack stack, Level level, Player player) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             Worthiness.claim(player, stack);
         }
     }

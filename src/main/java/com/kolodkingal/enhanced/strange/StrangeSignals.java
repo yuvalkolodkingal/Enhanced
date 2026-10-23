@@ -1,10 +1,10 @@
 package com.kolodkingal.enhanced.strange;
 
 import com.kolodkingal.enhanced.network.StrangeFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public final class StrangeSignals {
     public static void near(ServerLevel level, Vec3 at, int kind, Entity who, List<Vec3> points, int arg) {
         List<Vec3> capped = points.size() <= StrangeFxPayload.MAX_POINTS ? points
                 : List.copyOf(points.subList(0, StrangeFxPayload.MAX_POINTS));
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE,
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE,
                 new StrangeFxPayload(kind, who == null ? -1 : who.getId(), capped, arg));
     }
 

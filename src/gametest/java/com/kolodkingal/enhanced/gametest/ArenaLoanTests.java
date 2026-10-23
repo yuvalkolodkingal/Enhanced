@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.BlockLifting;
@@ -20,12 +19,12 @@ import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -54,8 +53,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -84,8 +81,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * <p>The arenas are protected {@link TestFight}s round the middle of the floor (radius 8; the field, when there is one, at
  * 6). Every test has a batch of its own: a fight is server-wide state, and most change a config value.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ArenaLoanTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -175,7 +170,7 @@ public final class ArenaLoanTests {
 
     /** A zombie that stands still and does not burn in the sun (the tests run by day). */
     private static Zombie stillZombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         return zombie;
     }
@@ -225,7 +220,7 @@ public final class ArenaLoanTests {
      * (the fight's), and she is told so; 20 ticks later the hole has mended though she still holds the block; thrown at a
      * zombie it hurts him and turns to dust, no item; a second one held when the fight is stopped is gone, its cell dirt.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_mend", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_mend", timeoutTicks = 140)
     public static void aBlockBorrowedFromAnArenaComesBack(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -297,7 +292,7 @@ public final class ArenaLoanTests {
      * ({@code borrowedBlockTicks}) its cell is air and nothing dropped. A second one set down is removed at once when the
      * fight is stopped before its time.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_stand", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_stand", timeoutTicks = 100)
     public static void aBorrowedBlockStandsThenCrumbles(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.BORROWED_BLOCK_TICKS, 40);
@@ -345,7 +340,7 @@ public final class ArenaLoanTests {
      * T26 (D-T 5.5): a hole is never deeper than one block. With a surface block borrowed, the block under its open home says
      * {@code arena_mending} and stays; once the hole has mended it is lent.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_dig", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_dig", timeoutTicks = 100)
     public static void theArenaLendsNoDeeperThanOneBlock(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 40);
@@ -376,7 +371,7 @@ public final class ArenaLoanTests {
      * T27 (D-T 5.5): with a cap of 2, one block standing and one held, the Phoenix's press says {@code arena_full}; once the
      * standing one crumbles, the arena lends again.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_cap", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_cap", timeoutTicks = 100)
     public static void theArenaLendsAtMostItsLimit(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.MAX_BORROWED_BLOCKS, 2);
@@ -424,7 +419,7 @@ public final class ArenaLoanTests {
      * containRadius - 2} from the centre (and reaches at least {@code containRadius - 2.5}); thrown straight outward from 4
      * blocks inside the field it turns to dust at the field's edge, no item, and is gone the next tick.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_edge", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_edge", timeoutTicks = 100)
     public static void aBorrowedBlockStaysInTheArena(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -482,7 +477,7 @@ public final class ArenaLoanTests {
      * protected}; without the claim the same cell is lent (the arena's own listener lets the lent cell through); an
      * Adventure Wanda is refused; with {@code boss.lendArenaBlocks} off nothing is lent (3.0).
      */
-    @GameTest(template = ARENA, batch = "arena_loans_rights", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_rights", timeoutTicks = 40)
     public static void loansAskClaimsAdventureAndTheSwitch(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -525,7 +520,7 @@ public final class ArenaLoanTests {
      * poppy stay; after the mends every one of the nine cells (the three supports, what they hold, the floor under them) is
      * exactly as before.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_quiet", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_quiet", timeoutTicks = 100)
     public static void neighboursNeverNoticeABorrowedBlock(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -581,7 +576,7 @@ public final class ArenaLoanTests {
      * after the wind-down every home has mended, the standing cell is air, no borrowed block is left and nothing dropped.
      * The journal is still on disk once everything handed over is written; two saves of the dimension later it is gone.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_end", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_end", timeoutTicks = 60)
     public static void nothingBorrowedIsAwayWhenTheFightEnds(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -634,7 +629,7 @@ public final class ArenaLoanTests {
      * to air, and keeps the journal; recovering it again changes nothing (a block a player put on the standing cell
      * meanwhile stays); two saves later the journal is gone. The copy home stays empty: the island's own recovery clears it.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_crash", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_crash", timeoutTicks = 60)
     public static void theLedgerIsRestoredAfterACrash(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -708,7 +703,7 @@ public final class ArenaLoanTests {
      * is over (with nothing left) its journal is deleted. A fight that ended with a repair still waiting: when the server
      * has stopped (the stop is simulated) everything left is retired, and the journal deleted.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_journal", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_journal", timeoutTicks = 80)
     public static void aMendIsJournaledUntilTheWorldSavedIt(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -766,7 +761,7 @@ public final class ArenaLoanTests {
      * (d) a stone under a standing borrowed block is not lent ({@code arena_mending}); (e) a sand home over the air pocket
      * mends and the sand stays put for 60 ticks, the pocket empty.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_gravity", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_gravity", timeoutTicks = 200)
     public static void mendedSandNeverFalls(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -806,7 +801,7 @@ public final class ArenaLoanTests {
                 check(helper.getBlockState(hanging).is(Blocks.SAND), "(b) it stays");
                 // (c)
                 dropDust(wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, lowGravel));
-                zombie[0] = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(lowGravel.getX() + 0.5, FLOOR, lowGravel.getZ() + 0.5));
+                zombie[0] = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(lowGravel.getX() + 0.5, FLOOR, lowGravel.getZ() + 0.5));
                 zombie[0].setBaby(true);
                 check(borrow(helper, wanda, Telekinesis.Mode.WANDA, highGravel) == null && ArenaLoans.HANGING.equals(lastActionBarKey(wanda)),
                         "(c) the gravel over the open home hangs: not lent");
@@ -868,7 +863,7 @@ public final class ArenaLoanTests {
      * next to a zombie crumble too; when one of hers has crumbled (its time was short) a set-down stands again; Billy can
      * still stand his own three.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_no_fort", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_no_fort", timeoutTicks = 120)
     public static void borrowedBlocksBuildNoFort(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.BORROWED_BLOCK_TICKS, 30);
@@ -961,13 +956,13 @@ public final class ArenaLoanTests {
      * x slamFactor x 0.5}; a zombie she throws as fast 20 ticks later wears it by the full slam, {@code 6 x slamFactor}.
      * Both are her mind power, so both are critical on top ({@code critShieldFactor} 2: spec 8a.2 doubles the numbers).
      */
-    @GameTest(template = ARENA, batch = "arena_loans_shield", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_shield", timeoutTicks = 60)
     public static void borrowedBlocksWearHisShieldByHalf(GameTestHelper helper) {
         shieldWear(helper, 0.5, true);
     }
 
     /** T54, with {@code apocalypse_shield.borrowedSlamFactor} 1.0: the borrowed block wears the shield by 10.4 (x2). */
-    @GameTest(template = ARENA, batch = "arena_loans_shield_full", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_shield_full", timeoutTicks = 60)
     public static void borrowedBlocksWearHisShieldInFullAtFactorOne(GameTestHelper helper) {
         shieldWear(helper, 1.0, false);
     }
@@ -1010,7 +1005,7 @@ public final class ArenaLoanTests {
                 return false;
             }
             if (tick == 25) {
-                Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 13.5));
+                Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(5.5, FLOOR, 13.5));
                 lookAt(wanda, zombie);
                 pressV(wanda, false);
                 check(Telekinesis.holds(wanda, zombie), "she takes hold of a zombie");
@@ -1034,7 +1029,7 @@ public final class ArenaLoanTests {
      * home B is lent: B mends when it is due (20 ticks after its loan), while A waits; A mends within 20 ticks of the
      * zombie's leaving.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_queue", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_queue", timeoutTicks = 100)
     public static void aBlockedHomeDoesNotHoldUpTheOthers(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -1094,7 +1089,7 @@ public final class ArenaLoanTests {
      * the ice are mended over when they are due; the poppy is not a hole any more, so its home waits, and the end of the
      * fight mends it too, with nothing dropped. After a crash the recovery puts back a hole the snow fell into.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_weather", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_weather", timeoutTicks = 100)
     public static void aHoleTheWorldFillsStillMends(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -1169,7 +1164,7 @@ public final class ArenaLoanTests {
      * second home once and the standing cell once. (A real autosave between them would change nothing of it: a newer repair
      * replaces an older one, and only two saves retire one.)
      */
-    @GameTest(template = ARENA, batch = "arena_loans_repairs", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_repairs", timeoutTicks = 160)
     public static void aCellLentAgainAndAgainIsJournaledOnce(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 10);
@@ -1219,7 +1214,7 @@ public final class ArenaLoanTests {
      * their homes, and the mends put the grass, the poppy and both halves of the rose bush back. A stone with an item frame
      * on its side is not lent ({@code protected}) and the frame stays.
      */
-    @GameTest(template = ARENA, batch = "arena_loans_propped", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "arena_loans_propped", timeoutTicks = 140)
     public static void whatLeansOnAHoleIsNeverLost(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 40);

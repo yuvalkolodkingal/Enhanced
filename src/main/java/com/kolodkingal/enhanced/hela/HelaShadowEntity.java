@@ -54,7 +54,7 @@ public class HelaShadowEntity extends PathfinderMob {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (random.nextInt(2) == 0) {
                 level().addParticle(ParticleTypes.SMOKE, getRandomX(0.4), getY() + random.nextDouble() * 0.6, getRandomZ(0.4), 0.0, 0.01, 0.0);
             }

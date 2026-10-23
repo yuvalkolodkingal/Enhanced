@@ -12,6 +12,7 @@ import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -35,7 +36,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -52,8 +52,6 @@ import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +71,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * when she loses the power, and her effects' payload. Quick tests share the batch {@code agatha}; a test that changes a
  * setting (PvP, a config option) or walks the Road has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AgathaTests {
     private static final String BATCH = "agatha";
 
@@ -113,11 +109,11 @@ public final class AgathaTests {
 
     /** A hostile creature that stands still (a husk: it does not burn in the sun, which would hurt it in the tests' place). */
     private static Zombie zombie(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
     }
 
     private static Pig pig(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(x, FLOOR, z));
+        return TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(x, FLOOR, z));
     }
 
     private static List<AgathaFxPayload> payloads(ServerPlayer player) {
@@ -133,7 +129,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // Becoming Agatha: the Darkhold
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aPlayerWithNoPowerWhoReadsTheDarkholdBecomesAgatha(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer reader = reader(f, 10.5, 10.5, Power.NONE);
@@ -151,7 +147,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aReadingCutShortChangesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer reader = reader(f, 10.5, 10.5, Power.NONE);
@@ -163,7 +159,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aHeroWhoReadsItDoesNotBecomeAgatha(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power power : new Power[]{Power.TOMMY, Power.THOR, Power.PHOENIX}) {
@@ -179,7 +175,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "agatha_no_awakening")
+    @EnhancedTest(template = ARENA, batch = "agatha_no_awakening")
     public static void withTheOptionOffTheBookOnlyRefuses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(AgathaConfig.DARKHOLD_AWAKENS, false);
@@ -194,7 +190,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // Who she is
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herNamesLooksAndKeys(GameTestHelper helper) {
         check(Power.AGATHA.ordinal() == Power.APOCALYPSE.ordinal() + 1, "Agatha comes right after Apocalypse");
         check(Power.byName("agatha") == Power.AGATHA && Power.AGATHA.hasPowers(), "she is a power, found by her name");
@@ -208,7 +204,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sheHasFortyHealthAndFlies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 10.5);
@@ -222,7 +218,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sheIsASorcerer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 10.5);
@@ -237,7 +233,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // R: the Purple Beam, and Sneak + R
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herBeamIsTheDarkholdsPurpleBeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 4.5);
@@ -257,7 +253,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sneakRIsTheDarkholdsHexMark(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 4.5);
@@ -275,7 +271,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // The poison
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void magicUsedOnHerPoisonsWhoeverUsedIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 10.5);
@@ -293,7 +289,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // V: the Power Drain
 
-    @GameTest(template = ARENA, batch = "agatha_pvp")
+    @EnhancedTest(template = ARENA, batch = "agatha_pvp")
     public static void theDrainTakesAHerosPowerForAWhile(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -330,7 +326,7 @@ public final class AgathaTests {
      * Witch, Billy, another Agatha, and a custom hero with an ability of any of them. Tommy, Thor, a custom hero with only
      * Tommy's speed, and Tommy holding the Darkhold are refused (with the reason), and the refusal costs nothing.
      */
-    @GameTest(template = ARENA, batch = "agatha_pvp")
+    @EnhancedTest(template = ARENA, batch = "agatha_pvp")
     public static void theDrainTakesOnlyAWitchsOrSorcerersPower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -375,7 +371,7 @@ public final class AgathaTests {
     }
 
     /** 3.5: with {@code agatha.drainOnlySorcerers} off, the drain takes any hero's power again (the rule of 3.3). */
-    @GameTest(template = ARENA, batch = "agatha_drain_any")
+    @EnhancedTest(template = ARENA, batch = "agatha_drain_any")
     public static void withDrainOnlySorcerersOffAnyHeroIsDrained(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -392,7 +388,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "agatha_pvp")
+    @EnhancedTest(template = ARENA, batch = "agatha_pvp")
     public static void theDrainNeedsAPowerToTake(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -407,7 +403,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "agatha_no_pvp")
+    @EnhancedTest(template = ARENA, batch = "agatha_no_pvp")
     public static void withPvpOffSheCannotDrainAPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(false);
@@ -421,7 +417,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDrainDrinksACreaturesLife(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 4.5);
@@ -441,7 +437,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // B: the Witch's Shield
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theShieldTakesTheBlowsAndShatters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 10.5);
@@ -477,7 +473,7 @@ public final class AgathaTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void lettingGoOfBDropsTheShield(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 10.5);
@@ -494,7 +490,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // N: the Rune Trap
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRunesGoWhereSheLooks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 10.5);
@@ -513,7 +509,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 160)
     public static void theRunesBindAndBurnTheHostileOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 2.5);
@@ -545,7 +541,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // Dark magic, and the ward of the Vishanti
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herMagicIsDarkMagic(GameTestHelper helper) {
         var registry = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         for (var key : List.of(ModDamageTypes.DARKHOLD_BEAM, ModDamageTypes.AGATHA_DRAIN, ModDamageTypes.AGATHA_RUNES)) {
@@ -558,7 +554,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "agatha_ward")
+    @EnhancedTest(template = ARENA, batch = "agatha_ward")
     public static void aWardOfTheVishantiKeepsHerMagicOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(VishantiConfig.WARD_RADIUS_LOKI, 6);
@@ -588,11 +584,11 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Witches' Road
 
-    @GameTest(template = ARENA, batch = "witches_road_walk_agatha")
+    @EnhancedTest(template = ARENA, batch = "witches_road_walk_agatha")
     public static void agathaWalksTheRoadFromDoorToDoor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
-        level.setData(ModAttachments.ROAD_DOORS, RoadDoors.EMPTY);
+        ModAttachments.ROAD_DOORS.set(level, RoadDoors.EMPTY);
         BlockPos a = new BlockPos(3, 2, 3);
         BlockPos b = new BlockPos(17, 2, 3);
         helper.setBlock(a, ModBlocks.WITCHES_ROAD_DOOR.get());
@@ -611,7 +607,7 @@ public final class AgathaTests {
     // ------------------------------------------------------------------------------------------------------------
     // The end of the power, and the payload
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void losingThePowerPutsEverythingOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = agatha(f, 10.5, 4.5);
@@ -628,7 +624,7 @@ public final class AgathaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herEffectsPayloadRoundTrips(GameTestHelper helper) {
         AgathaFxPayload sent = new AgathaFxPayload(AgathaFxPayload.RUNES, 42, new Vec3(1.5, 64.0, -3.25), 7, 100, 40);
         ByteBuf buf = Unpooled.buffer();

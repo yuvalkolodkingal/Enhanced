@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
@@ -13,16 +12,14 @@ import com.kolodkingal.enhanced.client.render.UltronCubes;
 import com.kolodkingal.enhanced.client.render.UltronGestures;
 import com.kolodkingal.enhanced.client.render.UltronPose;
 import com.kolodkingal.enhanced.client.render.UltronPoses;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.ultron.UltronAttack;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import com.kolodkingal.enhanced.ultron.UltronState;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -45,8 +42,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * <p>Pure checks only: no client class appears in a test method, and the plug-in is reached through its interface (it
  * is built on a server too, so that these tests can read it).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class UltronClientTests {
     private static final String BATCH = "ultron_client_pure";
 
@@ -72,7 +67,7 @@ public final class UltronClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The gestures
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisTenGesturesAreTimedAsDesigned(GameTestHelper helper) {
         // id, group, duration, attack, release, force
         Object[][] table = {
@@ -102,7 +97,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisTwoArmedGesturesMirrorTheirArmsAndTheOthersUseOnlyOne(GameTestHelper helper) {
         for (GestureId id : new GestureId[]{GestureId.TAKEOFF_ULTRON, GestureId.ULTRON_SLAM, GestureId.ULTRON_UPLOAD, GestureId.ULTRON_ARMY}) {
             Gestures.Def def = Gestures.get(id);
@@ -125,7 +120,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTakeOffPushesTheAirDownAndOutAndEndsOnTheHover(GameTestHelper helper) {
         Gestures.Def def = Gestures.get(GestureId.TAKEOFF_ULTRON);
         // The palms push the air down and out (a negative x swings an arm forward, a positive z spreads it) before they settle.
@@ -142,7 +137,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theUploadGlitchesHisHeadBeforeTheArmsAreThrownWide(GameTestHelper helper) {
         Gestures.Def def = Gestures.get(GestureId.ULTRON_UPLOAD);
         // The head jerks one way, then the other, then settles, while the arms are held drawn in.
@@ -169,7 +164,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePlasmaGesturesHandOverToTheStancesAndTheBlastBeginsWhereTheChargeEnds(GameTestHelper helper) {
         // R held: both palms along the look, as the stance has them.
         Gestures.Def fire = Gestures.get(GestureId.ULTRON_FIRE_START);
@@ -201,7 +196,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGestureThatCarriesTheChargeTakesTheStancesLean(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.ULTRON);
         HeroAnimState state = new HeroAnimState(UUID.randomUUID());
@@ -234,7 +229,7 @@ public final class UltronClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The routes
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisAbilitiesAreActedAndNoneIsPending(GameTestHelper helper) {
         String[] expected = {"flag:BEAM", "flight", null, "cooldown", "cooldown"};
         for (int ability = 1; ability <= 5; ability++) {
@@ -268,7 +263,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyGestureOfHisIsStartedBySomething(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.ULTRON);
         check(hero.takeoffGesture() == GestureId.TAKEOFF_ULTRON, "he takes off with his own gesture");
@@ -289,7 +284,7 @@ public final class UltronClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The key presses and the stances
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisKeyPressesActBeforeTheServerAnswersOnlyWhereTheyWillWork(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000L;
@@ -332,7 +327,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisStancesComeFromHisData(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.ULTRON);
         HeroAnimState state = new HeroAnimState(UUID.randomUUID());
@@ -354,7 +349,7 @@ public final class UltronClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // Flight
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisFlightIsUprightAndStiff(GameTestHelper helper) {
         FlightProfile profile = FlightProfile.of(Power.ULTRON, false);
         check(profile != null && !profile.spring && !profile.mWorld, "he has a plain profile of his own");
@@ -392,7 +387,7 @@ public final class UltronClientTests {
         return image.getRGB(x, y) >>> 24;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisEyesGlowOnTheEyesOfTheSkinInEachLook(GameTestHelper helper) {
         for (String look : new String[]{"prime", "sentry", "human"}) {
             BufferedImage idle = image("ultron_eyes_" + look);
@@ -427,7 +422,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTexturesOfTheBodyAreThereAtTheSizeTheModelReadsThemAt(GameTestHelper helper) {
         // The model reads a 64 x 64 skin and is drawn on 128 x 128 (twice the texel density); the lights are masks of the same size.
         for (String name : new String[]{"ultron", "ultron_form1", "ultron_form2", "ultron_sentry", "ultron_eyes", "ultron_torso", "ultron_fingers",
@@ -444,7 +439,7 @@ public final class UltronClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The boss's body
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTableOfTheBodyHangsEveryBoxOnAPartAndFitsTheSkin(GameTestHelper helper) {
         java.util.Set<String> seen = new java.util.HashSet<>();
         seen.add("root");
@@ -493,7 +488,7 @@ public final class UltronClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyStateOfEveryBodyHasAFinitePoseThatKeepsTheJointsInTheirRange(GameTestHelper helper) {
         UltronPose pose = new UltronPose();
         for (UltronState state : UltronState.values()) {
@@ -542,7 +537,7 @@ public final class UltronClientTests {
     }
 
     /** The rule of the fight: every blow has a tell, in the body, before it lands. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyAttackShowsItsTellInTheBodyBeforeTheBlowLands(GameTestHelper helper) {
         UltronPose rest = new UltronPose();
         UltronPose tell = new UltronPose();

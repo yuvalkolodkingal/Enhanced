@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.network.HexActionPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -23,7 +24,6 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -72,7 +72,7 @@ public class HexScreen extends Screen {
     }
 
     private static boolean ownsHex(Player player) {
-        return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
+        return ModAttachments.HEXES.get(player.level()).byOwner(player.getUUID()).isPresent();
     }
 
     private Optional<Hex> hex() {
@@ -80,7 +80,7 @@ public class HexScreen extends Screen {
         if (mc.level == null || mc.player == null) {
             return Optional.empty();
         }
-        return mc.level.getData(ModAttachments.HEXES).byOwner(mc.player.getUUID());
+        return ModAttachments.HEXES.get(mc.level).byOwner(mc.player.getUUID());
     }
 
     private List<PlayerInfo> otherPlayers() {
@@ -185,7 +185,7 @@ public class HexScreen extends Screen {
     }
 
     private void send(HexAction action, UUID target, int value) {
-        PacketDistributor.sendToServer(new HexActionPayload(action, Optional.ofNullable(target), value));
+        Net.sendToServer(new HexActionPayload(action, Optional.ofNullable(target), value));
     }
 
     private int stateHash(Hex hex) {

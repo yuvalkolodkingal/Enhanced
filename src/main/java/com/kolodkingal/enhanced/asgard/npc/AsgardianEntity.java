@@ -188,7 +188,7 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
             setCustomName(Component.translatable(role.nameKey()));
             setCustomNameVisible(false);
         }
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             makeGoals();
         }
     }
@@ -337,7 +337,7 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
-        if (STATE.equals(key) && level().isClientSide) {
+        if (STATE.equals(key) && level().isClientSide()) {
             clientPreviousState = NpcState.byOrdinal(clientPreviousStateOrdinal);
             clientPreviousStateOrdinal = entityData.get(STATE);
             clientStateStart = tickCount;
@@ -573,7 +573,7 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return false;
         }
         boolean lethal = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
@@ -615,11 +615,11 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
 
     @Override
     public void die(DamageSource source) {
-        if (!level().isClientSide && !summoned() && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+        if (!level().isClientSide() && !summoned() && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             goDown();
             return;
         }
-        if (summoned() && !level().isClientSide) {
+        if (summoned() && !level().isClientSide()) {
             vanish();
             return;
         }
@@ -733,7 +733,7 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
         if (hand != InteractionHand.MAIN_HAND) {
             return InteractionResult.PASS;
         }
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return state().still() || state() == NpcState.FIGHTING ? InteractionResult.PASS : InteractionResult.SUCCESS;
         }
         if (player instanceof ServerPlayer server && AsgardTalk.begin(server, this)) {
@@ -891,7 +891,7 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
 
     @Override
     public boolean isClientSide() {
-        return level().isClientSide;
+        return level().isClientSide();
     }
 
     /** Opens his trades for {@code player} (Sif, Valkyrie, Volstagg). */

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.boss.BossEnd;
@@ -8,6 +7,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGifts;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -18,7 +18,6 @@ import com.kolodkingal.enhanced.ultron.SokoviaRelocations;
 import com.kolodkingal.enhanced.ultron.SokoviaTemplate;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -30,8 +29,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -67,33 +64,31 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.tank;
  * <p>A crash is played by throwing the fight and its lift away with no clean-up (as the dead process would), and the
  * recovery of the next start by calling it on the journals the "dead" fight left. Each fight has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SokoviaRecoveryTests {
 
     // ------------------------------------------------------------------------------------------------------------
     // A clean stop
 
     /** The server stops with the island rising: nothing was placed, everyone is set down where they were. */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_rising", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_rising", timeoutTicks = 300)
     public static void stoppingTheServerWhileTheIslandRisesSetsEveryoneDown(GameTestHelper helper) {
         stopWhen(helper, fight -> in(fight, SokoviaLift.Step.RISING) && SokoviaLift.of(fight).altitude() > 6.0, false);
     }
 
     /** ... half placed: what was placed is cleared. */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_placing", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_placing", timeoutTicks = 300)
     public static void stoppingTheServerWhileTheIslandIsBeingPlacedClearsWhatWasPlaced(GameTestHelper helper) {
         stopWhen(helper, fight -> in(fight, SokoviaLift.Step.PLACING) && SokoviaLift.of(fight).job() != null && SokoviaLift.of(fight).job().edits() > 200, false);
     }
 
     /** ... up: it comes down at once, with everyone on it. */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_placed", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_placed", timeoutTicks = 300)
     public static void stoppingTheServerWhileTheIslandIsUpBringsEveryoneDown(GameTestHelper helper) {
         stopWhen(helper, fight -> fight.phase() == UltronFight.Phase.ISLAND && in(fight, SokoviaLift.Step.PLACED), false);
     }
 
     /** ... coming down: everyone is put on the ground at once. */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_falling", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_falling", timeoutTicks = 600)
     public static void stoppingTheServerWhileTheIslandComesDownPutsEveryoneOnTheGround(GameTestHelper helper) {
         stopWhen(helper, fight -> in(fight, SokoviaLift.Step.FALLING) && SokoviaLift.of(fight).altitude() < LIFT - 6.0, true);
     }
@@ -104,7 +99,7 @@ public final class SokoviaRecoveryTests {
      * block on the ground two over where they stand, which one let down from as high as the knock left them would stop
      * on.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_knocked", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_knocked", timeoutTicks = 600)
     public static void stoppingTheServerWhileTheIslandComesDownPutsAKnockedUpPlayerOnTheGround(GameTestHelper helper) {
         stopWhen(helper, fight -> in(fight, SokoviaLift.Step.FALLING) && SokoviaLift.of(fight).altitude() < LIFT - 6.0, true, 4.5);
     }
@@ -196,17 +191,17 @@ public final class SokoviaRecoveryTests {
      * (the lift carried them down that high), by a stop while it is up (they stand on nothing), and when it lands. A hero
      * who is flying flies on at his height.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_air_falling", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_air_falling", timeoutTicks = 600)
     public static void stoppingTheServerWhileTheIslandComesDownPutsAFighterInTheAirOnTheGround(GameTestHelper helper) {
         inTheAir(helper, true, true);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_air_placed", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_air_placed", timeoutTicks = 400)
     public static void stoppingTheServerWhileTheIslandIsUpPutsAFighterInTheAirOnTheGround(GameTestHelper helper) {
         inTheAir(helper, false, true);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_air_landing", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_air_landing", timeoutTicks = 600)
     public static void theIslandLandsAFighterWhoWasInTheAirOnTheGround(GameTestHelper helper) {
         inTheAir(helper, true, false);
     }
@@ -297,17 +292,17 @@ public final class SokoviaRecoveryTests {
      * server stops while it is up, and when the rise is cut short (where a fighter who was in the air at the lock is put
      * on the ground, as one in the air is at the other two).
      */
-    @GameTest(template = PAD, batch = "ultron_lift_ledge_landing", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_ledge_landing", timeoutTicks = 600)
     public static void theIslandLandsOneWhoStandsOnALedgeOnTheLedge(GameTestHelper helper) {
         onALedge(helper, Ledge.LANDING);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_ledge_placed", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_ledge_placed", timeoutTicks = 400)
     public static void stoppingTheServerWhileTheIslandIsUpLeavesOneWhoStandsOnALedgeOnTheLedge(GameTestHelper helper) {
         onALedge(helper, Ledge.STOP_UP);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_ledge_rising", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_ledge_rising", timeoutTicks = 400)
     public static void aRiseCutShortLeavesOneWhoStandsOnALedgeOnTheLedgeAndPutsOneWhoJumpedOnTheGround(GameTestHelper helper) {
         onALedge(helper, Ledge.RISE_CUT);
     }
@@ -417,7 +412,7 @@ public final class SokoviaRecoveryTests {
      * five blocks of the fall where they stand is in the region of what stands on it: they are left where they stand
      * (the island does not carry them), not set as far under it as the island is still up (into the ground).
      */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_settling", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_settling", timeoutTicks = 600)
     public static void stoppingTheServerAsTheIslandSettlesLeavesWhoeverStandsUnderItWhereTheyStand(GameTestHelper helper) {
         underTheSettlingIsland(helper, false);
     }
@@ -426,7 +421,7 @@ public final class SokoviaRecoveryTests {
      * ... and one who is in the air there (a jump, a glide: the island never had them) is left as they are, in the air
      * and moving as they were, not set down on the ground.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_settling_air", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_settling_air", timeoutTicks = 600)
     public static void stoppingTheServerAsTheIslandSettlesLeavesWhoeverIsInTheAirUnderItAsTheyAre(GameTestHelper helper) {
         underTheSettlingIsland(helper, true);
     }
@@ -492,12 +487,12 @@ public final class SokoviaRecoveryTests {
      * under the island, where nothing that is on the island is; and from among its underside, where what is on the island
      * is (they are not set as far under where they are as the island is up: into the ground).
      */
-    @GameTest(template = PAD, batch = "ultron_lift_stop_tractor_low", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_tractor_low", timeoutTicks = 600)
     public static void stoppingTheServerWhileThePitsTractorCarriesAFighterUpPutsThemOnTheGround(GameTestHelper helper) {
         onTheTractor(helper, false);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_stop_tractor_high", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_stop_tractor_high", timeoutTicks = 600)
     public static void stoppingTheServerAsThePitsTractorBringsAFighterToTheIslandPutsThemOnTheGround(GameTestHelper helper) {
         onTheTractor(helper, true);
     }
@@ -563,23 +558,23 @@ public final class SokoviaRecoveryTests {
     // ------------------------------------------------------------------------------------------------------------
     // A crash
 
-    @GameTest(template = PAD, batch = "ultron_lift_crash_rising", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_crash_rising", timeoutTicks = 400)
     public static void aCrashWhileTheIslandRisesLeavesNothingToClear(GameTestHelper helper) {
         crash(helper, fight -> in(fight, SokoviaLift.Step.RISING) && SokoviaLift.of(fight).altitude() > 8.0, false, SokoviaJournal.RITUAL);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_crash_placing", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_crash_placing", timeoutTicks = 400)
     public static void aCrashWhileTheIslandIsBeingPlacedLeavesAHalfIslandThatIsCleared(GameTestHelper helper) {
         crash(helper, fight -> in(fight, SokoviaLift.Step.PLACING) && SokoviaLift.of(fight).job() != null && SokoviaLift.of(fight).job().edits() > 600,
                 true, SokoviaJournal.PASTED);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_crash_placed", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_crash_placed", timeoutTicks = 400)
     public static void aCrashWhileTheIslandIsUpLeavesAnIslandThatIsCleared(GameTestHelper helper) {
         crash(helper, fight -> in(fight, SokoviaLift.Step.PLACED) && fight.phase() == UltronFight.Phase.ISLAND, true, SokoviaJournal.PASTED);
     }
 
-    @GameTest(template = PAD, batch = "ultron_lift_crash_clearing", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_crash_clearing", timeoutTicks = 600)
     public static void aCrashWhileTheIslandIsTakenDownLeavesWhatIsLeftToBeCleared(GameTestHelper helper) {
         crash(helper, fight -> in(fight, SokoviaLift.Step.CLEARING) && SokoviaLift.of(fight).job() != null && SokoviaLift.of(fight).job().edits() > 300,
                 true, SokoviaJournal.CLEARING);
@@ -675,7 +670,7 @@ public final class SokoviaRecoveryTests {
      * written at the ritual says who is owed it, a crash leaves it, and the next start gives the Program back and
      * deletes the note. A fight that ends by itself leaves no note.
      */
-    @GameTest(template = PAD, batch = "ultron_crash_ground", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_crash_ground", timeoutTicks = 300)
     public static void aCrashOnTheGroundGivesTheProgramBackAndAnEndedFightLeavesNoNote(GameTestHelper helper) throws java.io.IOException {
         TestKit.Fixture f = pad(helper);
         MinecraftServer server = f.level().getServer();
@@ -717,7 +712,7 @@ public final class SokoviaRecoveryTests {
      * in the sky, they are set down on the ground; one who logs in somewhere else is left where they are. A record is
      * used up either way.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_away", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_away", timeoutTicks = 600)
     public static void aFighterWhoWasOfflineIsSetDownWhenTheyLogIn(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerLevel level = f.level();
@@ -773,7 +768,7 @@ public final class SokoviaRecoveryTests {
      * login itself (a client that takes a few seconds to load the terrain is kicked by the game for "flying" if it is
      * left hanging in the air; the real game did exactly that to a player in the soak test).
      */
-    @GameTest(template = PAD, batch = "ultron_lift_away_rise_gone", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_away_rise_gone", timeoutTicks = 600)
     public static void aFighterWhoLeftDuringTheRiseIsSetDownWhenTheyLogInAfterTheFight(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         MinecraftServer server = f.level().getServer();
@@ -823,7 +818,7 @@ public final class SokoviaRecoveryTests {
     /**
      * The same fighter, logging in while the island is up: they are put on it, not left hanging under it.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_away_rise_up", timeoutTicks = 600)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_away_rise_up", timeoutTicks = 600)
     public static void aFighterWhoLeftDuringTheRiseIsPutOnTheIslandWhenTheyLogInWhileItIsUp(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerPlayer starter = f.player(MIDDLE_X, GROUND, MIDDLE_Z);
@@ -869,7 +864,7 @@ public final class SokoviaRecoveryTests {
      * block, a block placed by hand) is not lost when the island is taken down: Mjolnir is lifted with its owner and
      * dropped, the other block drops what it would, and the island's own blocks vanish.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_foreign", timeoutTicks = 700)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_foreign", timeoutTicks = 700)
     public static void blocksThatAreNotTheIslandsAreDroppedAsItemsWhenItComesDown(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerLevel level = f.level();

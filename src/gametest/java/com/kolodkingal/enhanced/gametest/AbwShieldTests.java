@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -9,10 +8,10 @@ import com.kolodkingal.enhanced.apocalypse.ApocalypseAttack;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.client.render.ShieldStyles;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -26,8 +25,6 @@ import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.put;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -41,8 +38,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the old rules apply. It still stops exactly the damage it stops today. (All the other shield tests run with the option
  * off: {@link TestKit#fixture} switches it off.) Every test has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AbwShieldTests {
     /** Presses B and runs {@code then} when the shield is complete. */
     private static void raise(TestKit.Fixture f, ServerPlayer wanda, Runnable then) {
@@ -61,7 +56,7 @@ public final class AbwShieldTests {
     }
 
     private static Skeleton harmlessSkeleton(GameTestHelper helper) {
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(15.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(15.5, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         skeleton.setNoAi(true);
         return skeleton;
@@ -72,7 +67,7 @@ public final class AbwShieldTests {
     }
 
     /** No food needed, no exhaustion, no time limit, no recharge after it drops. */
-    @GameTest(template = ARENA, batch = "abw_shield_unlimited_cost", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "abw_shield_unlimited_cost", timeoutTicks = 260)
     public static void unlimitedShieldCostsNothingAndNeverRunsOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, true);
@@ -103,14 +98,14 @@ public final class AbwShieldTests {
     }
 
     /** It stops what it stops today and is never worn: arrows, a creature's blow, a hundred points of them. */
-    @GameTest(template = ARENA, batch = "abw_shield_unlimited_stops", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_shield_unlimited_stops", timeoutTicks = 100)
     public static void unlimitedShieldStopsArrowsAndBlowsWithoutWearing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, true);
         ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
         PowerData data = Powers.get(wanda);
         Skeleton skeleton = harmlessSkeleton(helper);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(13.3, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(13.3, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         zombie.setNoAi(true);
         raise(f, wanda, () -> {
@@ -139,7 +134,7 @@ public final class AbwShieldTests {
     }
 
     /** The HUD says it is unlimited. */
-    @GameTest(template = ARENA, batch = "abw_shield_unlimited_hud")
+    @EnhancedTest(template = ARENA, batch = "abw_shield_unlimited_hud")
     public static void unlimitedShieldShowsInfinityOnTheHud(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, true);
@@ -156,7 +151,7 @@ public final class AbwShieldTests {
     }
 
     /** With the option off the old rules apply: hunger is needed, strength wears down, it shatters and has to recharge. */
-    @GameTest(template = ARENA, batch = "abw_shield_limited", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_shield_limited", timeoutTicks = 100)
     public static void withTheOptionOffTheOldRulesApply(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, false);
@@ -180,7 +175,7 @@ public final class AbwShieldTests {
     }
 
     /** The boss keeps its rules: the Mind Crush is not stopped by the Chaos Shield, unlimited or not. */
-    @GameTest(template = ARENA, batch = "abw_shield_unlimited_boss", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_shield_unlimited_boss", timeoutTicks = 100)
     public static void unlimitedShieldDoesNotStopTheMindCrush(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 2, Power.SCARLET_WITCH);
         d.f().config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, true);

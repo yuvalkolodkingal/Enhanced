@@ -1,8 +1,8 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import com.kolodkingal.enhanced.network.OpenRoadPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModBlocks;
@@ -12,7 +12,6 @@ import com.kolodkingal.enhanced.road.RoadTrials;
 import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.MinecraftServer;
@@ -23,8 +22,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -35,8 +32,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The Witches' Road door with the trials on (3.2): the Gene and the ritual are as in 3.1, but the door asks to walk the Road, not to
  * choose; the choice comes only to someone who has walked it. (With the trials off the door is the 3.1 door: {@code BillyTests}.)
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadDoorTests {
     static final String BATCH = "road_door";
 
@@ -62,7 +57,7 @@ public final class RoadDoorTests {
                 .map(p -> (OpenRoadPayload) ((ClientboundCustomPayloadPacket) p).payload()).toList();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void aSeekerWithAGeneIsAskedToWalkTheRoadAndTheChoiceCannotBeSkipped(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -92,7 +87,7 @@ public final class RoadDoorTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void whoHasWalkedTheRoadIsOfferedTheChoiceAtTheDoor(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -115,7 +110,7 @@ public final class RoadDoorTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theDoorTurnsAwayWhoCannotWalkTheRoad(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerLevel level = helper.getLevel();

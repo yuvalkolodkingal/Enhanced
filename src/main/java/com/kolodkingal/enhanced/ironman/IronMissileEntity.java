@@ -128,7 +128,7 @@ public class IronMissileEntity extends Projectile {
     public void tick() {
         super.tick();
         Vec3 motion = getDeltaMovement();
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             if (decoy != null) {
                 Vec3 to = decoy.subtract(position());
                 if (to.lengthSqr() < 1.0) {
@@ -142,7 +142,7 @@ public class IronMissileEntity extends Projectile {
             setDeltaMovement(motion);
         }
         HitResult hit = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
-        if (hit.getType() != HitResult.Type.MISS && !level().isClientSide) {
+        if (hit.getType() != HitResult.Type.MISS && !level().isClientSide()) {
             hitTargetOrDeflectSelf(hit);
             if (isRemoved()) {
                 return;
@@ -150,7 +150,7 @@ public class IronMissileEntity extends Projectile {
         }
         setPos(position().add(motion));
         updateRotation();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             level().addParticle(kind() == FALCON ? ParticleTypes.SMALL_FLAME : ParticleTypes.FLAME,
                     getX() - motion.x * 0.5, getY() - motion.y * 0.5, getZ() - motion.z * 0.5, 0, 0, 0);
             level().addParticle(ParticleTypes.SMOKE, getX() - motion.x, getY() - motion.y, getZ() - motion.z, 0, 0.01,

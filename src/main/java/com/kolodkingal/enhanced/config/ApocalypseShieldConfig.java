@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import java.util.List;
 
 /**
@@ -22,24 +22,24 @@ public final class ApocalypseShieldConfig {
     /** The TOML section of these options. */
     public static final String SECTION = "apocalypse_shield";
 
-    public static ModConfigSpec.ConfigValue<List<? extends String>> MIND_POWER_HEROES;
-    public static ModConfigSpec.DoubleValue CHAOS_BEAM_FACTOR;
-    public static ModConfigSpec.DoubleValue SLAM_FACTOR;
-    public static ModConfigSpec.DoubleValue BORROWED_SLAM_FACTOR;
-    public static ModConfigSpec.DoubleValue PHOENIX_BURST_FACTOR;
-    public static ModConfigSpec.DoubleValue OTHER_MIND_FACTOR;
-    public static ModConfigSpec.DoubleValue PHOENIX_MIND_CONTROL_STRAIN;
-    public static ModConfigSpec.DoubleValue PHOENIX_PSIONIC_STRAIN;
-    public static ModConfigSpec.IntValue SHIELD_REGEN_DELAY_TICKS;
-    public static ModConfigSpec.DoubleValue SHIELD_REGEN_FRACTION;
-    public static ModConfigSpec.IntValue MIND_HIT_COOLDOWN_TICKS;
+    public static ConfigSpec.ConfigValue<List<? extends String>> MIND_POWER_HEROES;
+    public static ConfigSpec.DoubleValue CHAOS_BEAM_FACTOR;
+    public static ConfigSpec.DoubleValue SLAM_FACTOR;
+    public static ConfigSpec.DoubleValue BORROWED_SLAM_FACTOR;
+    public static ConfigSpec.DoubleValue PHOENIX_BURST_FACTOR;
+    public static ConfigSpec.DoubleValue OTHER_MIND_FACTOR;
+    public static ConfigSpec.DoubleValue PHOENIX_MIND_CONTROL_STRAIN;
+    public static ConfigSpec.DoubleValue PHOENIX_PSIONIC_STRAIN;
+    public static ConfigSpec.IntValue SHIELD_REGEN_DELAY_TICKS;
+    public static ConfigSpec.DoubleValue SHIELD_REGEN_FRACTION;
+    public static ConfigSpec.IntValue MIND_HIT_COOLDOWN_TICKS;
     // 3.1: critical hits on the boss
-    public static ModConfigSpec.ConfigValue<List<? extends String>> CRIT_HEROES;
-    public static ModConfigSpec.DoubleValue CRIT_SHIELD_FACTOR;
-    public static ModConfigSpec.DoubleValue CRIT_BODY_FACTOR;
-    public static ModConfigSpec.DoubleValue OTHERS_BODY_FACTOR;
+    public static ConfigSpec.ConfigValue<List<? extends String>> CRIT_HEROES;
+    public static ConfigSpec.DoubleValue CRIT_SHIELD_FACTOR;
+    public static ConfigSpec.DoubleValue CRIT_BODY_FACTOR;
+    public static ConfigSpec.DoubleValue OTHERS_BODY_FACTOR;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         MIND_POWER_HEROES = builder.comment("Heroes whose mind power can wear down Apocalypse's shield (the boss's and the hero's).",
                         "Add \"billy\" or \"vision\" to count theirs (and add their damage types to the datapack tag enhanced:mind_power).")

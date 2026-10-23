@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.build.BuildClient;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
@@ -9,7 +10,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Arrays;
 
@@ -201,7 +201,7 @@ public record BuildVerdictPayload(int token, int code, int changed, int cost, in
     }
 
     /** The builder's client keeps it (the client class is loaded only when this runs, on a client). */
-    static void handle(BuildVerdictPayload payload, IPayloadContext context) {
+    static void handle(BuildVerdictPayload payload, PacketContext context) {
         BuildClient.onVerdict(payload);
     }
 }

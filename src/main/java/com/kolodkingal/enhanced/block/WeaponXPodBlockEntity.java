@@ -47,7 +47,7 @@ public class WeaponXPodBlockEntity extends BlockEntity {
         this.running = running;
         this.since = level == null ? 0 : level.getGameTime();
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }

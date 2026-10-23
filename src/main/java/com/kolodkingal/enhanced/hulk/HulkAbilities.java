@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.custom.CustomHeroServer;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.HulkFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -48,7 +49,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -182,15 +182,15 @@ public final class HulkAbilities {
         return EnhancedConfig.SPEC.isLoaded();
     }
 
-    static double cfg(net.neoforged.neoforge.common.ModConfigSpec.DoubleValue value, double fallback) {
+    static double cfg(com.kolodkingal.enhanced.config.core.ConfigSpec.DoubleValue value, double fallback) {
         return loaded() ? value.get() : fallback;
     }
 
-    static int cfg(net.neoforged.neoforge.common.ModConfigSpec.IntValue value, int fallback) {
+    static int cfg(com.kolodkingal.enhanced.config.core.ConfigSpec.IntValue value, int fallback) {
         return loaded() ? value.get() : fallback;
     }
 
-    static boolean cfg(net.neoforged.neoforge.common.ModConfigSpec.BooleanValue value, boolean fallback) {
+    static boolean cfg(com.kolodkingal.enhanced.config.core.ConfigSpec.BooleanValue value, boolean fallback) {
         return loaded() ? value.get() : fallback;
     }
 
@@ -904,7 +904,7 @@ public final class HulkAbilities {
     static void send(ServerLevel level, Entity who, int kind, List<Vec3> points, int arg) {
         List<Vec3> list = points.size() > HulkFxPayload.MAX_POINTS ? points.subList(0, HulkFxPayload.MAX_POINTS)
                 : points;
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new HulkFxPayload(kind, who.getId(), List.copyOf(list), arg));
     }
 

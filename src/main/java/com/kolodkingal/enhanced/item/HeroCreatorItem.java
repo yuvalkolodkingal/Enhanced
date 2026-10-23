@@ -42,7 +42,7 @@ public class HeroCreatorItem extends Item {
             // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
             HeroCreatorScreen.open();
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     @Override

@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.eternity.EternityFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client (3.8): a moment of Eternity and Love (lane L8's): the altar charging and the journey, the arrival, a
@@ -44,7 +44,7 @@ public record EternityFxPayload(int kind, int entityId, BlockPos pos, int arg) i
         return TYPE;
     }
 
-    static void handle(EternityFxPayload payload, IPayloadContext context) {
+    static void handle(EternityFxPayload payload, PacketContext context) {
         EternityFx.receive(payload);
     }
 }

@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public record HexBoltPayload(int caster, Vec3 from, Vec3 to, List<Vec3> forks, l
     }
 
     /** Only ever runs on a client, so the renderer class is only ever loaded there. */
-    static void handle(HexBoltPayload payload, IPayloadContext context) {
+    static void handle(HexBoltPayload payload, PacketContext context) {
         WorldEffectsRenderer.addHexBolt(payload);
     }
 }

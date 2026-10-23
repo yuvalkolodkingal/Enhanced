@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.vishanti.VishantiBook;
 import io.netty.buffer.ByteBuf;
@@ -8,7 +9,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: a button on the screen of the Book of the Vishanti. As the Bifrost's, {@code index} and {@code name} name
@@ -35,7 +35,7 @@ public record VishantiActionPayload(int action, int index, String name) implemen
         return TYPE;
     }
 
-    static void handle(VishantiActionPayload payload, IPayloadContext context) {
+    static void handle(VishantiActionPayload payload, PacketContext context) {
         if (!(context.player() instanceof ServerPlayer player) || !player.isAlive()) {
             return;
         }

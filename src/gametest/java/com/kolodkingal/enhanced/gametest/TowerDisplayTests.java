@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.block.TechCaseBlock;
 import com.kolodkingal.enhanced.block.TechCaseBlockEntity;
 import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -24,7 +25,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -58,8 +58,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,8 +77,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the takers kept, a 3.6.0-like tower left alone, the player's tick finding a tower by its start and recording it,
  * the command's answers, and the refit's time.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class TowerDisplayTests {
     static final String BATCH = "tower_displays";
     static final String REFIT = "tower_refit";
@@ -91,7 +87,7 @@ public final class TowerDisplayTests {
     // ------------------------------------------------------------------------------------------------ the templates
 
     /** Every point of the plan holds its block in the templates (the whole tower's frame is the model's). */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void everyArmouryPointHoldsItsBlockInTheTemplates(GameTestHelper helper) {
         StoneSiteTests.Raw whole = StoneSiteTests.tower(helper.getLevel().getServer());
         for (Map.Entry<SuitKind, BlockPos> e : TowerPlan.SUIT_DISPLAYS.entrySet()) {
@@ -142,7 +138,7 @@ public final class TowerDisplayTests {
     }
 
     /** However the tower is turned, every part of it lies in the 3 x 3 chunks round its start's chunk. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTowerStaysInItsNineChunks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         TowerSiteStructure tower = (TowerSiteStructure) level.registryAccess().registryOrThrow(Registries.STRUCTURE)
@@ -200,7 +196,7 @@ public final class TowerDisplayTests {
     }
 
     /** A display gives its suit once to each player: into the empty hand, else the inventory; the upper half too. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aDisplayGivesItsSuitOncePerPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -229,7 +225,7 @@ public final class TowerDisplayTests {
     }
 
     /** Cap's case refuses a powerless player and gives Captain America his shield, once. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void capsCaseGivesOnlyCaptainAmerica(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -257,7 +253,7 @@ public final class TowerDisplayTests {
     }
 
     /** The tower's displays and cases do not break in Survival; a builder's do; Creative breaks both. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGeneratedDisplaysAndCasesDoNotBreakInSurvival(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -321,7 +317,7 @@ public final class TowerDisplayTests {
      * player's spot too and keeps the takers; done a step a tick, as the game does it, each step takes at most 2 ms
      * (its code warm: another tower refitted first).
      */
-    @GameTest(template = ARENA, batch = REFIT, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = REFIT, timeoutTicks = 600)
     public static void theRefitSetsTheArmouryDownInA361Tower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -423,7 +419,7 @@ public final class TowerDisplayTests {
     }
 
     /** Where the 3.6.1 tower is not (an old design, or nothing), the refit changes nothing. */
-    @GameTest(template = ARENA, batch = REFIT)
+    @EnhancedTest(template = ARENA, batch = REFIT)
     public static void theRefitLeavesAnotherTowerAlone(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         TowerSiteStructure tower = (TowerSiteStructure) level.registryAccess().registryOrThrow(Registries.STRUCTURE)
@@ -445,7 +441,7 @@ public final class TowerDisplayTests {
      * The player's tick finds a 3.6.1 tower by its structure start, refits it once and records it; the command tells
      * the record, finds nothing more to do, and finds no tower where there is none.
      */
-    @GameTest(template = ARENA, batch = REFIT, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = REFIT, timeoutTicks = 600)
     public static void theTickRefitsATowerOnceAndTheCommandTellsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

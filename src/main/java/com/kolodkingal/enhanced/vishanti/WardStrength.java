@@ -43,7 +43,7 @@ public final class WardStrength {
         if (max <= BillyRanks.MIN_RANK) {
             return 1.0;
         }
-        int rank = BillyRanks.rank(billy.getData(ModAttachments.BUILD_DATA));
+        int rank = BillyRanks.rank(ModAttachments.BUILD_DATA.get(billy));
         return Mth.clamp((rank - BillyRanks.MIN_RANK) / (double) (max - BillyRanks.MIN_RANK), 0.0, 1.0);
     }
 

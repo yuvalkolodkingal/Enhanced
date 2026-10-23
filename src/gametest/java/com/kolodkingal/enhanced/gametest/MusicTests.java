@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.music.MusicFiles;
@@ -10,6 +9,7 @@ import com.kolodkingal.enhanced.music.SpeedsterTracks;
 import com.kolodkingal.enhanced.network.MusicChunkPayload;
 import com.kolodkingal.enhanced.network.MusicManifestPayload;
 import com.kolodkingal.enhanced.network.MusicRequestPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -21,15 +21,12 @@ import com.kolodkingal.enhanced.road.RoadChallenge;
 import com.kolodkingal.enhanced.road.RoadChallenges;
 import com.kolodkingal.enhanced.road.RoadMusic;
 import io.netty.buffer.Unpooled;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.storage.LevelResource;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,8 +52,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * files it leaves out, the hashes), sending a song in pieces and putting it back together, the messages, the player's own
  * folder's names, and when a speedster's Walkman plays (which the server sees as the clients do).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MusicTests {
     private static final String BATCH = "music";
 
@@ -100,7 +95,7 @@ public final class MusicTests {
     // ------------------------------------------------------------------------------------------------------------
 
     /** The server made its world's music folder when it started, with a README that names every file it takes. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWorldHasAMusicFolderWithAReadme(GameTestHelper helper) throws IOException {
         MinecraftServer server = helper.getLevel().getServer();
         Path folder = ServerMusic.folder(server);
@@ -130,7 +125,7 @@ public final class MusicTests {
     }
 
     /** Every piece of music has a name, and falls back to the Road's song for a version of it, then to music.ogg. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void namesFallBackToTheRoadThenToMusic(GameTestHelper helper) {
         check(MusicTracks.chain(MusicTracks.QUICKSILVER).equals(List.of("quicksilver", "music")), "Quicksilver: his, then music");
         check(MusicTracks.chain(MusicTracks.SPEED).equals(List.of("speed", "music")), "Speed: his, then music");
@@ -168,7 +163,7 @@ public final class MusicTests {
     }
 
     /** A player's own folder: a file per piece of music; any other song is Quicksilver's, as before 3.5. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aPlayersOwnSongsByName(GameTestHelper helper) {
         List<String> legacy = List.of("README.txt", "my song.mp3");
         check(MusicTracks.resolvePersonal("quicksilver", legacy).equals(Optional.of("my song.mp3")), "an old single song is Quicksilver's");
@@ -189,7 +184,7 @@ public final class MusicTests {
     }
 
     /** What is an Ogg Vorbis file and what is not. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyOggVorbisPasses(GameTestHelper helper) {
         byte[] real = ogg("sfx/road_travel");
         check(MusicFiles.isOggVorbis(real), "the mod's own Ogg Vorbis");
@@ -208,7 +203,7 @@ public final class MusicTests {
     }
 
     /** The folder: what is sent (with its hash and size), and what is left out and why: the size cap, bad files, names. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFolderIsReadCheckedAndHashed(GameTestHelper helper) {
         Path folder = scratch(helper.getLevel().getServer(), "scan");
         byte[] small = ogg("sfx/road_travel");     // about 12 KB
@@ -246,7 +241,7 @@ public final class MusicTests {
     }
 
     /** A song goes in pieces of at most 30 KB and comes back whole, in any order; a wrong piece or a wrong hash is refused. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aSongGoesInPiecesAndComesBackWhole(GameTestHelper helper) {
         byte[] song = new byte[100_000];
         new Random(35).nextBytes(song);
@@ -288,7 +283,7 @@ public final class MusicTests {
     }
 
     /** The three messages go to the other side and back. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theMusicMessagesRoundTrip(GameTestHelper helper) {
         byte[] piece = new byte[MusicFiles.CHUNK_BYTES];
         new Random(5).nextBytes(piece);
@@ -316,7 +311,7 @@ public final class MusicTests {
      * put back together are the song. (A client without the mod's music channel, an older one, is sent nothing: {@link
      * ServerMusic#canHear}; the test's fake connection has every channel.)
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void requestsAreQueuedOnceAndSentInPieces(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(3.5, TestKit.FLOOR, 3.5);
@@ -375,7 +370,7 @@ public final class MusicTests {
     }
 
     /** Speed's Walkman: while he runs with his Super Speed, or in his slow time; never with the Walkman off. Quicksilver's as before. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void whenTheSpeedstersWalkmanPlays(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(3.5, TestKit.FLOOR, 3.5, Power.TOMMY);

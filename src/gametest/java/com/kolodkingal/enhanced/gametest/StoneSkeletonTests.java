@@ -25,6 +25,7 @@ import com.kolodkingal.enhanced.network.SlingRingActionPayload;
 import com.kolodkingal.enhanced.network.StoneActionPayload;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.network.StrangeFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -42,7 +43,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -64,8 +64,6 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,15 +86,13 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * two new rituals, the Gauntlet's default, the recipes, the gate's Space Stone exception, the fixed points of the Hydra
  * outpost and the configs' defaults. Batch {@code stones_skel}; a test that changes the config has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class StoneSkeletonTests {
     static final String BATCH = "stones_skel";
     static final String CFG = "stones_skel_cfg";
 
     // ---- the heroes, the bits, the protocol ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void strangeAndTheHulkComeAfterHela(GameTestHelper helper) {
         Power[] all = Power.values();
         check(all[Power.HELA.ordinal() + 1] == Power.DOCTOR_STRANGE && all[Power.HELA.ordinal() + 2] == Power.HULK
@@ -121,7 +117,7 @@ public final class StoneSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTen(GameTestHelper helper) {
         // (3.7: at least 3.6's numbers; MutantSkeletonTests pins 3.7's.)
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10, "protocol 10 or later");
@@ -140,7 +136,7 @@ public final class StoneSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePayloadsOfThreeSixRoundTrip(GameTestHelper helper) {
         List<Vec3> points = List.of(Vec3.ZERO, new Vec3(1, 2, 3));
         roundTrip(StoneActionPayload.STREAM_CODEC, new StoneActionPayload(StoneActionPayload.REALM, 3),
@@ -171,7 +167,7 @@ public final class StoneSkeletonTests {
 
     // ---- the Hero Creator ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsAre154AndTheStoneRowsSix(GameTestHelper helper) {
         check(HeroAbility.values().length >= 154, "133 + 12 + 9 rows or more: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.STRANGE_WHIP.ordinal() - 1] == HeroAbility.HELA_BODY,
@@ -220,7 +216,7 @@ public final class StoneSkeletonTests {
 
     // ---- the holding rule ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHoldingRule(GameTestHelper helper) {
         Predicate<Trait> none = t -> false;
         Predicate<Trait> sorcerer = t -> t == Trait.SORCERER;
@@ -253,7 +249,7 @@ public final class StoneSkeletonTests {
         return Traits.of(power)::contains;
     }
 
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void theCustomBearersOptionTurnsTheTraitOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StonesConfig.CUSTOM_BEARERS, false);
@@ -267,7 +263,7 @@ public final class StoneSkeletonTests {
 
     // ---- the rituals, the Gauntlet, the recipes ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theScepterAndTheTesseractAreTheStonesVessels(GameTestHelper helper) {
         ItemStack empty = ItemStack.EMPTY;
         ItemStack tesseract = new ItemStack(ModItems.TESSERACT.get());
@@ -296,7 +292,7 @@ public final class StoneSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGauntletIsTheTitansAndTheRecipesLoad(GameTestHelper helper) {
         ItemStack gauntlet = new ItemStack(ModItems.INFINITY_GAUNTLET.get());
         check(GauntletContents.TITAN.equals(gauntlet.get(ModDataComponents.GAUNTLET.get())),
@@ -349,7 +345,7 @@ public final class StoneSkeletonTests {
 
     // ---- the gate of Asgard ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSpaceStoneIsTheGatesOneException(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -363,7 +359,7 @@ public final class StoneSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "stones_skel_gate")
+    @EnhancedTest(template = ARENA, batch = "stones_skel_gate")
     public static void theSpaceStoneStopsAtTheGateWhenTheOptionIsOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StonesConfig.SPACE_REACHES_ASGARD, false);
@@ -377,7 +373,7 @@ public final class StoneSkeletonTests {
 
     // ---- the Hydra outpost ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theOutpostsFixedPointsAreInsideItsTemplateInEveryTurn(GameTestHelper helper) {
         Optional<StructureTemplate> found = helper.getLevel().getStructureManager().get(HydraOutpostPlan.TEMPLATE);
         check(found.isPresent(), "the outpost's template");
@@ -416,7 +412,7 @@ public final class StoneSkeletonTests {
      * four lamps, the tower's planks, the cover; air or nothing at the posts), and the template turned four ways puts
      * those blocks where {@link HydraOutpostPlan#toWorld} says.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theOutpostsFixedPointsHoldTheirBlocksInEveryTurn(GameTestHelper helper) throws IOException {
         MinecraftServer server = helper.getLevel().getServer();
         ResourceLocation file = Enhanced.id("structure/hydra_outpost/base.nbt");
@@ -473,7 +469,7 @@ public final class StoneSkeletonTests {
 
     // ---- the configs ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theConfigsHaveThePlansDefaults(GameTestHelper helper) {
         check(StonesConfig.UNIQUENESS.getDefault() == StonesConfig.Uniqueness.PLAYER, "one of each stone per player");
         check(StonesConfig.GRACE_SECONDS.getDefault() == 10 && StonesConfig.CUSTOM_BEARERS.getDefault()

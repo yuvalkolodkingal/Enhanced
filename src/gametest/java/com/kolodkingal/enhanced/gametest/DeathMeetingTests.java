@@ -5,9 +5,9 @@ import com.kolodkingal.enhanced.config.DeathMeetingConfig;
 import com.kolodkingal.enhanced.death.DeathMeeting;
 import com.kolodkingal.enhanced.death.NetherLanding;
 import com.kolodkingal.enhanced.network.DeathMeetingPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
@@ -21,8 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -42,8 +40,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Nether) and the choice starts him at home; the Fire Resistance follows the config. Batches: {@code death_meeting},
  * and one per changed config or game rule ({@code death_meeting_cfg*}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class DeathMeetingTests {
     private static final String BATCH = "death_meeting";
     private static final String CFG = "death_meeting_cfg";
@@ -114,7 +110,7 @@ public final class DeathMeetingTests {
     // The offer, and who is heard
 
     /** A death is offered the meeting (with the Nether and 10 s of Fire Resistance), before vanilla's death packet. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aDeathIsOfferedTheMeetingBeforeVanillasDeathPacket(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -132,7 +128,7 @@ public final class DeathMeetingTests {
     }
 
     /** A living player's choice is refused: nothing happens to him. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aLivingPlayersChoiceIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -148,7 +144,7 @@ public final class DeathMeetingTests {
 
     /** "Start again" respawns him as vanilla does (the Overworld), even after his body's fall (removed from the
      * level, as in a real game), and the old body's second answer is refused. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void startAgainRespawnsHimAsVanillaAndASecondAnswerIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -170,7 +166,7 @@ public final class DeathMeetingTests {
     }
 
     /** A healer whose healing factor saves him (DOWN) never dies, so Death is never offered. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aHealerSavedByHisFactorNeverMeetsDeath(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wolverine = f.player(5.5, FLOOR, 5.5, Power.WOLVERINE);
@@ -188,7 +184,7 @@ public final class DeathMeetingTests {
     // The Nether
 
     /** "Start again in the Nether": the real Nether, a safe spot near the spawn ÷ 8, Fire Resistance, Rio's line. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theNetherChoicePutsHimOnASafeSpotInTheNether(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -217,7 +213,7 @@ public final class DeathMeetingTests {
      * The search in a fake Nether (netherrack in the arena, the feet's height limited to the arena's): a pocket by
      * lava, one on bedrock, one by fire and one over the "roof" are refused; the one safe pocket further out is found.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSearchRefusesLavaFireBedrockAndTheRoofAndFindsTheSafePocket(GameTestHelper helper) {
         TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -253,7 +249,7 @@ public final class DeathMeetingTests {
     }
 
     /** Nothing safe (solid netherrack, lava about): the platform is built, safe, of obsidian and netherrack. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFallbackPlatformIsBuiltWhenNothingIsSafe(GameTestHelper helper) {
         TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -286,7 +282,7 @@ public final class DeathMeetingTests {
     // The config and the game rule
 
     /** Death off: no offer (vanilla's screen), and a Nether answer starts him at home. */
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void withDeathOffThereIsNoOfferAndHeStartsAtHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DeathMeetingConfig.ENABLED, false);
@@ -299,7 +295,7 @@ public final class DeathMeetingTests {
     }
 
     /** The Nether not allowed: Death is offered without it, and a Nether answer starts him at home. */
-    @GameTest(template = ARENA, batch = CFG + "_nether")
+    @EnhancedTest(template = ARENA, batch = CFG + "_nether")
     public static void withTheNetherNotAllowedSheOffersOnlyHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DeathMeetingConfig.ALLOW_NETHER, false);
@@ -312,7 +308,7 @@ public final class DeathMeetingTests {
     }
 
     /** {@code doImmediateRespawn}: vanilla's way (no offer, no Nether), the answer starts him at home. */
-    @GameTest(template = ARENA, batch = CFG + "_immediate")
+    @EnhancedTest(template = ARENA, batch = CFG + "_immediate")
     public static void doImmediateRespawnKeepsVanillasWay(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -329,7 +325,7 @@ public final class DeathMeetingTests {
     }
 
     /** {@code fireResistanceSeconds} 3: the Nether start gives 3 seconds; the offer says so. */
-    @GameTest(template = ARENA, batch = CFG + "_fire", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = CFG + "_fire", timeoutTicks = 400)
     public static void theFireResistanceFollowsTheConfig(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(DeathMeetingConfig.FIRE_RESISTANCE_SECONDS, 3);
@@ -361,7 +357,7 @@ public final class DeathMeetingTests {
      * there in both, each its own, and none still sends the roads "back to the garden". Rio wears her Death look only
      * on Death's screen: its skin (64 x 64) and crown are there, and differ from her cottage skin.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void deathsLinesAndRiosDeathLook(GameTestHelper helper) throws java.io.IOException {
         net.neoforged.neoforgespi.locating.IModFile mod =
                 net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile();
@@ -427,7 +423,7 @@ public final class DeathMeetingTests {
      * pale face is light), and the grass drawn at her feet on Death's screen has no flowers (the rest of the clearing
      * keeps its own).
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void riosDeathLookHasNoFlowers(GameTestHelper helper) throws java.io.IOException {
         net.neoforged.neoforgespi.locating.IModFile mod =
                 net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile();

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.ironman.IronSuits;
@@ -8,12 +7,12 @@ import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.ironman.hulkbuster.Hulkbuster;
 import com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterFrameEntity;
 import com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterMoves;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,8 +26,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -48,8 +45,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * Veronica's arm (+50 %, only under the sky), H takes it off (his size, the item in the inventory), and a death shrinks
  * him at once. Batch {@code hulkbuster}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HulkbusterTests {
     private static final String BATCH = "hulkbuster";
 
@@ -104,7 +99,7 @@ public final class HulkbusterTests {
 
     /** A husk with no armour and 200 health that stands where it is put. */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -156,7 +151,7 @@ public final class HulkbusterTests {
     /**
      * Used under the open sky: the frame falls and lands; after 80 ticks the suit is on and he is 3.5 times his size.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void veronicaDropsTheFrameUnderTheOpenSky(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -191,7 +186,7 @@ public final class HulkbusterTests {
     }
 
     /** Under a roof Veronica cannot reach him: nothing begins, the suit stays in his hand. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void underARoofVeronicaCannotReachHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -210,7 +205,7 @@ public final class HulkbusterTests {
     }
 
     /** Put on the chest slot by hand (under the arena's roof): the 40-tick version. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void byHandTheShortVersion(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = ironMan(f, 10.5, 10.5);
@@ -227,7 +222,7 @@ public final class HulkbusterTests {
     }
 
     /** A block appears over him during the growth: the suit-up is aborted, he is his size, the suit comes off. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void noRoomAbortsTheGrowth(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -254,7 +249,7 @@ public final class HulkbusterTests {
     }
 
     /** H takes it off: after the 40-tick take-off he is his size and the suit is in his inventory. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void hTakesItOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         hulkbuster(helper, f, 10.5, 10.5, tony -> {
@@ -273,7 +268,7 @@ public final class HulkbusterTests {
     }
 
     /** He dies in it: his own size at once. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void deathShrinksHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         hulkbuster(helper, f, 10.5, 10.5, tony -> {
@@ -289,12 +284,12 @@ public final class HulkbusterTests {
     // The body
 
     /** Worn: a creeper's blast does nothing; knockback resistance is full. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void explosionImmuneAndUnmovable(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         hulkbuster(helper, f, 10.5, 10.5, tony -> {
             assertNear(tony.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 1.0, 0.01, "full knockback resistance");
-            var creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(13.5, FLOOR, 10.5));
+            var creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(13.5, FLOOR, 10.5));
             Vec3 at = creeper.position();
             helper.getLevel().explode(creeper, at.x, at.y, at.z, 3.0F, Level.ExplosionInteraction.NONE);
             check(tony.getHealth() == tony.getMaxHealth(), "the blast did nothing: " + tony.getHealth());
@@ -306,7 +301,7 @@ public final class HulkbusterTests {
     // The moves
 
     /** R: five punches at the creature in front, 6 four times and a last 10. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void thePunchesSixFourTimesAndTen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         hulkbuster(helper, f, 6.5, 10.5, tony -> {
@@ -322,7 +317,7 @@ public final class HulkbusterTests {
     }
 
     /** B grabs the creature in front, B again throws it; it takes 10 when it lands. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 140)
     public static void grabAndThrowLandsTen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         hulkbuster(helper, f, 4.5, 10.5, tony -> {
@@ -344,7 +339,7 @@ public final class HulkbusterTests {
     }
 
     /** N under the sky: Veronica's arm repairs half the suit; under the roof she cannot reach him. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void veronicasArmRepairsHalfAndNeedsTheSky(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         hulkbuster(helper, f, 4.5, 4.5, roofed -> {

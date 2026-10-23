@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.SpiderMath;
@@ -9,13 +8,13 @@ import com.kolodkingal.enhanced.ability.SwingAssist;
 import com.kolodkingal.enhanced.config.SpiderConfig;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSwingPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -29,8 +28,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +44,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * {@link SwingAssist#choose}, the same code the client runs; it is kept to the test's own arena by its bounds, under the
  * arena's barrier ceiling (at relative y = 11; the flat land takes the ceiling away, so that the sky is open).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SwingAssistTests {
     private static final String BATCH = "spider_assist";
     /** The numbers of a plain swing: the default range of the assist, the swing's gravity and top speed. */
@@ -186,7 +181,7 @@ public final class SwingAssistTests {
     // ------------------------------------------------------------------------------------------------------------
     // Choosing the anchor
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void inAForestTheTallTreeAheadIsTaken(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A low oak (its leaves four blocks up: too low to swing under) and a tall tree further on, beside his way.
@@ -207,7 +202,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void underALowCanopyNothingSnags(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A canopy of leaves four blocks over the floor, over the whole way ahead: whatever is taken flies clear.
@@ -231,7 +226,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void inAStreetAWallAheadIsTaken(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         street(helper);
@@ -245,7 +240,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aTreeBehindHimOrBelowHisEyesIsNoAnchor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         tree(helper, 10, 5, 9, 7, 2);
@@ -257,7 +252,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onFlatLandTheSkyHoldsTheWeb(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -278,7 +273,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCrosshairWinsAmongGoodAnchors(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         street(helper);
@@ -297,7 +292,7 @@ public final class SwingAssistTests {
     // ------------------------------------------------------------------------------------------------------------
     // While he swings
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRopeIsReeledInAboveTheGround(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Vec3 anchor = helper.absoluteVec(new Vec3(10.5, 9.0, 10.5));
@@ -320,7 +315,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theReleaseComesPastTheBottomAndTheSteeringIsGentle(GameTestHelper helper) {
         Vec3 anchor = new Vec3(0, 20, 0);
         check(!SwingAssist.releaseNow(anchor, new Vec3(0, 10, -5), new Vec3(0, -0.5, 0.8), 20), "on the way down: no");
@@ -348,7 +343,7 @@ public final class SwingAssistTests {
     // ------------------------------------------------------------------------------------------------------------
     // The server checks it
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theServerTakesAnAssistedSwingAndItsRelease(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         street(helper);
@@ -381,7 +376,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theServerRefusesABadAnchor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         street(helper);
@@ -416,7 +411,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aSkySwingNeedsNoBlockAndAZipAtNothingStaysQuiet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -442,7 +437,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_assist_skyless", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_assist_skyless", timeoutTicks = 100)
     public static void theServerSaysWhichFallbackThereIs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -472,7 +467,7 @@ public final class SwingAssistTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theMessageRoundTrips(GameTestHelper helper) {
         SpiderSwingPayload payload = new SpiderSwingPayload(SpiderSwingPayload.ATTACH, new Vec3(1.5, 70.25, -3.0), 2, 9.5F, true);
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());

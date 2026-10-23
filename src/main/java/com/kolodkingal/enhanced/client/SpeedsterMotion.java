@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SpeedSurfaces;
 import com.kolodkingal.enhanced.ability.SurfaceRun;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -16,7 +17,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * A speedster's own run up walls and along ceilings (3.3), done by the player's own client like Spider-Man's cling,
@@ -157,7 +157,7 @@ public final class SpeedsterMotion {
                 toldNormal = normal;
                 return;
             }
-            PacketDistributor.sendToServer(new SurfaceRunPayload(kind, normal));
+            Net.sendToServer(new SurfaceRunPayload(kind, normal));
             toldKind = kind;
             toldNormal = normal;
             toldAt = player.tickCount;

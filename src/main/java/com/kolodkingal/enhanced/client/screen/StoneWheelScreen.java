@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.screen;
 import com.kolodkingal.enhanced.client.KeyBindings;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.network.StoneActionPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.stones.GauntletContents;
 import com.kolodkingal.enhanced.stones.StoneWheel;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -73,12 +73,12 @@ public class StoneWheelScreen extends Screen {
                             stones.add(kind);
                         }
                     }
-                    PacketDistributor.sendToServer(new StoneActionPayload(StoneActionPayload.WHEEL_OPEN, 0));
+                    Net.sendToServer(new StoneActionPayload(StoneActionPayload.WHEEL_OPEN, 0));
                     mc.setScreen(new StoneWheelScreen(stones, InfinityGauntletItem.selectedOrFirst(contents)));
                 }
             }
         } else if (wasDown && !opened && StoneWheel.gauntletInHand(mc.player) != null) {
-            PacketDistributor.sendToServer(new StoneActionPayload(StoneActionPayload.SELECT, -1));
+            Net.sendToServer(new StoneActionPayload(StoneActionPayload.SELECT, -1));
         }
         wasDown = down;
     }
@@ -125,7 +125,7 @@ public class StoneWheelScreen extends Screen {
         }
         chosen = true;
         if (hovered != null && hovered != selected) {
-            PacketDistributor.sendToServer(new StoneActionPayload(StoneActionPayload.SELECT, hovered.ordinal()));
+            Net.sendToServer(new StoneActionPayload(StoneActionPayload.SELECT, hovered.ordinal()));
         }
         onClose();
     }

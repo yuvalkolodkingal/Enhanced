@@ -1,11 +1,12 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -20,7 +21,6 @@ import com.kolodkingal.enhanced.registry.ModSounds;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -50,10 +50,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforgespi.locating.IModFile;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -74,15 +71,13 @@ import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** Data-driven content: loot modifiers and recipes, and what old saves still hold. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class DataTests {
 
     /**
      * The Scarlet Witch Gene is still in End City treasure; Loki's Scepter is not any more (3.3: it is found in the Hydra
      * outposts, see WorldStructureTests), nor in any other chest it was in before.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void endCityLootHasGeneButNoScepter(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         LootTable table = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.END_CITY_TREASURE);
@@ -120,7 +115,7 @@ public final class DataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void endCityLootHasTesseract(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         LootTable table = level.getServer().reloadableRegistries().getLootTable(BuiltInLootTables.END_CITY_TREASURE);
@@ -143,12 +138,12 @@ public final class DataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void witchDropsGeneOnlyWhenKilledByAPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer player = f.player(5.5, 2, 10.5);
-        Witch witch = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(10.5, 2, 10.5));
+        Witch witch = TestKit.spawnWithNoFreeWill(helper, EntityType.WITCH, new Vec3(10.5, 2, 10.5));
         LootTable table = level.getServer().reloadableRegistries().getLootTable(EntityType.WITCH.getDefaultLootTable());
         LootParams byPlayer = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, witch)
@@ -186,7 +181,7 @@ public final class DataTests {
         return genes;
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void magnetoHelmetRecipeNeedsFiveNetheriteBlocks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("magneto_helmet"));
@@ -216,7 +211,7 @@ public final class DataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void wandaCrownRecipe(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("wanda_crown"));
@@ -229,7 +224,7 @@ public final class DataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void quicksilverGogglesRecipe(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("quicksilver_goggles"));
@@ -244,7 +239,7 @@ public final class DataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void synthezoidCoreRecipe(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("synthezoid_core"));
@@ -262,7 +257,7 @@ public final class DataTests {
      * Every sound the mod defines, Quicksilver's song included, is a registered sound event backed by a real Ogg file
      * in the mod (not missing, renamed or an LFS pointer).
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everySoundHasItsFile(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         Path soundsJson = mod.findResource("assets", Enhanced.MODID, "sounds.json");
@@ -294,7 +289,7 @@ public final class DataTests {
      * Every look of every hero has its skin (64x64) and cape (64x32) in the mod, and every hero, ability and look has
      * a name in both English and Hebrew.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyLookHasItsSkinAndEveryNameItsTranslation(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject en = lang(mod, "en_us");
@@ -334,7 +329,7 @@ public final class DataTests {
     }
 
     /** Every entity the mod adds has a name, and every damage type its death messages, in English and in Hebrew. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyEntityHasANameAndEveryDamageTypeItsDeathMessages(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
@@ -371,7 +366,7 @@ public final class DataTests {
      * Hebrew line takes the same placeholders as its English one (a translation that loses its "%s" would show the wrong
      * message).
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyItemBlockEffectSubtitleAndOptionHasANameInBothLanguages(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject sounds = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "sounds.json"),
@@ -392,7 +387,7 @@ public final class DataTests {
                 "build_cast_billy", "build_hum", "build_fizzle", "build_undo", "build_rank_up")) {
             keys.add("subtitles." + Enhanced.MODID + "." + sound);
         }
-        for (var option : List.<ModConfigSpec.ConfigValue<?>>of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION,
+        for (var option : List.<ConfigSpec.ConfigValue<?>>of(EnhancedClientConfig.ANIMATIONS, EnhancedClientConfig.REDUCED_MOTION,
                 EnhancedClientConfig.FLIGHT_EFFECTS, EnhancedClientConfig.BUILD_HINTS, EnhancedClientConfig.BUILD_TIPS,
                 EnhancedClientConfig.BUILD_GHOST_DETAIL, EnhancedClientConfig.BUILD_SEE_THROUGH, EnhancedClientConfig.BUILD_SHOW_OTHERS)) {
             String key = option.getSpec().getTranslationKey();
@@ -404,15 +399,13 @@ public final class DataTests {
         // else by "enhanced.configuration.<section>", and shows the bare key when the lang files lack it; the row also has
         // a tooltip and the text of its button.
         List<String> sections = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : EnhancedClientConfig.SPEC.getSpec().valueMap().entrySet()) {
-            if (entry.getValue() instanceof UnmodifiableConfig) {
-                sections.add(entry.getKey());
-                String key = Optional.ofNullable(EnhancedClientConfig.SPEC.getLevelTranslationKey(List.of(entry.getKey())))
-                        .orElse(Enhanced.MODID + ".configuration." + entry.getKey());
-                keys.add(key);
-                keys.add(key + ".tooltip");
-                keys.add(key + ".button");
-            }
+        for (String section : EnhancedClientConfig.SPEC.sections()) {
+            sections.add(section);
+            String key = Optional.ofNullable(EnhancedClientConfig.SPEC.getLevelTranslationKey(List.of(section)))
+                    .orElse(Enhanced.MODID + ".configuration." + section);
+            keys.add(key);
+            keys.add(key + ".tooltip");
+            keys.add(key + ".button");
         }
         check(sections.containsAll(List.of("animation", "appearance", "thanos", "build_magic")),
                 "the sections of the client options are read from its spec (" + sections + ")");
@@ -449,7 +442,7 @@ public final class DataTests {
      * as NONE instead of failing (NeoForge throws away an attachment whose codec fails), and whatever else was saved
      * with it comes along.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void savedPhotonLoadsAsNoPower(GameTestHelper helper) {
         RegistryOps<Tag> ops = helper.getLevel().registryAccess().createSerializationContext(NbtOps.INSTANCE);
         CompoundTag saved = new CompoundTag();
@@ -482,7 +475,7 @@ public final class DataTests {
      * The same through the real load path (what a login does): the player file of a Photon, with the fields Photon
      * kept in the power attachment, loads as a player without powers, and the attachment is not thrown away.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void savedPhotonPlayerLoadsWithoutPowers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(2.5, FLOOR, 2.5, Power.QUICKSILVER);
@@ -511,7 +504,7 @@ public final class DataTests {
      * pixels clear where the glowing eyes of the God of Thunder shine through, and the helmet look is the same suit
      * with a different head.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void thorsLoveAndThunderLooksFollowTheSkinRules(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> ids = Variants.of(Power.THOR).stream().map(Variant::id).toList();
@@ -613,7 +606,7 @@ public final class DataTests {
      * Every awakening line is seen whole: a subtitle is drawn at twice the size of text and never wrapped, so a short line
      * goes under the title and a long one in the action bar; a Hebrew line shown under the title fits there too.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyAwakeningLineIsSeenWhole(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject en = lang(mod, "en_us");
@@ -663,7 +656,7 @@ public final class DataTests {
     private static final int BUILD_SAMPLE_CHARS = 6;
 
     /** Every line Build Magic says (message.enhanced.build.*) is short enough to be read whole at the default window. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyBuildMagicLineIsShortEnoughToReadWhole(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> tooLong = new ArrayList<>();

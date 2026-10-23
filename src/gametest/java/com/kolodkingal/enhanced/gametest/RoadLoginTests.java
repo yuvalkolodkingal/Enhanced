@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadCanvas;
 import com.kolodkingal.enhanced.road.RoadCells;
 import com.kolodkingal.enhanced.road.RoadDimension;
@@ -10,7 +10,6 @@ import com.kolodkingal.enhanced.road.RoadSweeper;
 import com.kolodkingal.enhanced.road.RoadTrial;
 import com.kolodkingal.enhanced.road.RoadTrials;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -19,8 +18,6 @@ import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.UUID;
 
@@ -32,12 +29,10 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * taken out by an operator, who comes back from the dead somewhere else; a server that starts with cells in its ledger and one that
  * stops with trials running. (A test player cannot really log out; the tests call what the logout and login events call.)
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadLoginTests {
     static final String BATCH = "road_login";
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void loggingOutTakesTheTrialDownAndLoggingInResumesItAtTheCheckpoint(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -82,7 +77,7 @@ public final class RoadLoginTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void aPlayerInTheRoadWithNoTrialIsSentHome(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -110,7 +105,7 @@ public final class RoadLoginTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aSaveThatSaysInsideForAPlayerOutsideIsCorrected(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -125,7 +120,7 @@ public final class RoadLoginTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void aServerStartClearsEveryCellItFindsButNoLiveTrial(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -164,7 +159,7 @@ public final class RoadLoginTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void anOperatorTakingThePlayerOutOfTheRoadEndsHisTrial(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -191,7 +186,7 @@ public final class RoadLoginTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void aPlayerBroughtBackFromTheDeadElsewhereIsPutBackInHisTrial(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.WardFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -9,7 +10,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public record WardSyncPayload(ResourceKey<Level> dimension, List<Dome> domes) im
     }
 
     /** Only ever runs on a client, so the client class is only ever loaded there. */
-    static void handle(WardSyncPayload payload, IPayloadContext context) {
+    static void handle(WardSyncPayload payload, PacketContext context) {
         WardFx.accept(payload);
     }
 }

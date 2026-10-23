@@ -157,8 +157,8 @@ public final class ShelterEvents {
     /** Billy's raised barrier stops the push of an explosion in front of him as it stops its harm. */
     @SubscribeEvent
     public static void onExplosionKnockback(ExplosionKnockbackEvent event) {
-        if (event.getAffectedEntity() instanceof Player billy && !billy.level().isClientSide && BillyBarrier.isUp(billy)
-                && BillyBarrier.covers(billy, event.getExplosion().center())) {
+        if (event.getAffectedEntity() instanceof Player billy && !billy.level().isClientSide()
+                && BillyBarrier.isUp(billy) && BillyBarrier.covers(billy, event.getExplosion().center())) {
             event.setKnockbackVelocity(Vec3.ZERO);
         }
     }
@@ -174,7 +174,7 @@ public final class ShelterEvents {
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
         Entity source = event.getEffectSource();
         LivingEntity target = event.getEntity();
-        if (source == null || source == target || target.level().isClientSide) {
+        if (source == null || source == target || target.level().isClientSide()) {
             return;
         }
         if (Shelters.stops(source, Shelters.middle(source), target, 2.0F)) {
@@ -292,7 +292,7 @@ public final class ShelterEvents {
 
     @SubscribeEvent
     public static void onTravel(EntityTravelToDimensionEvent event) {
-        if (!event.isCanceled() && event.getEntity() instanceof LivingEntity living && !(living instanceof Player) && !living.level().isClientSide) {
+        if (!event.isCanceled() && event.getEntity() instanceof LivingEntity living && !(living instanceof Player) && !living.level().isClientSide()) {
             TRAVELLING.add(living.getUUID());
         }
     }

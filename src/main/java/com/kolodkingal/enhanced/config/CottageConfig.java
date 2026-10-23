@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Agatha's Cottage (3.7): the structure, its three residents (Agatha, Nicky and Rio), Senor Scratchy and the cellar's
@@ -13,16 +13,16 @@ public final class CottageConfig {
     public static final String SECTION = "agatha_cottage";
 
     /** Assigned by {@link #define} when the config is built, at mod construction: before anything reads them. */
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue RESIDENTS;
-    public static ModConfigSpec.BooleanValue AGATHA_YIELDS;
-    public static ModConfigSpec.DoubleValue SCRATCHY_RUNS_OFF;
-    public static ModConfigSpec.IntValue GIFTS_PER_DAY;
-    public static ModConfigSpec.IntValue BLESSING_TICKS;
-    public static ModConfigSpec.BooleanValue TRADES;
-    public static ModConfigSpec.BooleanValue ROAD_DOOR;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue RESIDENTS;
+    public static ConfigSpec.BooleanValue AGATHA_YIELDS;
+    public static ConfigSpec.DoubleValue SCRATCHY_RUNS_OFF;
+    public static ConfigSpec.IntValue GIFTS_PER_DAY;
+    public static ConfigSpec.IntValue BLESSING_TICKS;
+    public static ConfigSpec.BooleanValue TRADES;
+    public static ConfigSpec.BooleanValue ROAD_DOOR;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push("agatha_cottage");
         ENABLED = builder.comment("Whether Agatha's Cottage generates in new chunks (existing cottages stay).")
                 .define("enabled", true);

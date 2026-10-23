@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
@@ -9,6 +8,7 @@ import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -19,7 +19,6 @@ import com.kolodkingal.enhanced.thanos.ThanosLane;
 import com.kolodkingal.enhanced.thanos.ThanosState;
 import com.kolodkingal.enhanced.thanos.ThanosSummon;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -34,8 +33,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,8 +48,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The test arena has a barrier roof, which no real site would pass, so the tests that start a fight switch the site check
  * off ({@link ThanosLane#checkSite}) and the check of the site itself is tested on a fake world.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosSummonTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -119,7 +114,7 @@ public final class ThanosSummonTests {
     // The hold
 
     /** Either item in the main hand and the other in the off hand, used: a hold begins and nothing else of the old uses runs. */
-    @GameTest(template = ARENA, batch = "thanos_summon_start")
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_start")
     public static void bothItemsAndAHoldStartTheRitual(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer tess = f.player(6.5, FLOOR, 6.5);
@@ -141,7 +136,7 @@ public final class ThanosSummonTests {
     }
 
     /** The old uses are unchanged by the new row: the Scepter and the Gene, the Scepter alone in Creative and in Survival. */
-    @GameTest(template = ARENA, batch = "thanos_summon_old_uses")
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_old_uses")
     public static void theOldUsesAreUnchanged(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = f.player(6.5, FLOOR, 6.5);
@@ -162,7 +157,7 @@ public final class ThanosSummonTests {
     }
 
     /** Letting go before the end, or swapping an item out of a hand, cancels: no fight is pending and no rest begins. */
-    @GameTest(template = ARENA, batch = "thanos_summon_cancel", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_cancel", timeoutTicks = 200)
     public static void releasingOrSwappingCancels(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer letGo = f.player(6.5, FLOOR, 6.5);
@@ -261,7 +256,7 @@ public final class ThanosSummonTests {
     }
 
     /** The pure verdicts: open ground and sky, a roof, water underfoot, a closed ring, the world border. */
-    @GameTest(template = ARENA, batch = "thanos_summon_site")
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_site")
     public static void arenaCheckVerdicts(GameTestHelper helper) {
         BlockPos feet = new BlockPos(0, 64, 0);
         check(verdict(new FakeWorld(), feet) == ArenaCheck.Verdict.OK, "open ground and sky is fine");
@@ -295,7 +290,7 @@ public final class ThanosSummonTests {
     }
 
     /** He arrives 14 to 20 blocks from the summoner, where there is standing room, and never outside the world border. */
-    @GameTest(template = ARENA, batch = "thanos_summon_site")
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_site")
     public static void theArrivalSpotIsFourteenToTwentyBlocksAway(GameTestHelper helper) {
         BlockPos summoner = new BlockPos(0, 64, 0);
         BlockPos spot = ArenaCheck.arrivalSpot(new FakeWorld(), summoner);
@@ -322,7 +317,7 @@ public final class ThanosSummonTests {
      * Each way the call is turned down: the message the player reads, no fight, and the Scepter does not explode and the
      * Tesseract does not take the player away.
      */
-    @GameTest(template = ARENA, batch = "thanos_summon_refusals", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_refusals", timeoutTicks = 80)
     public static void theRefusals(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -403,7 +398,7 @@ public final class ThanosSummonTests {
      * arriving and invulnerable for 60 ticks, and then the fight. Neither item is used up, the arena is round the summoner,
      * and a second call is turned down.
      */
-    @GameTest(template = ARENA, batch = "thanos_summon_arrival", timeoutTicks = 420)
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_arrival", timeoutTicks = 420)
     public static void theCountdownThenTheArrival(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer summoner = f.player(10.5, FLOOR, 10.5);
@@ -471,7 +466,7 @@ public final class ThanosSummonTests {
      * not told "He is already here" over the portal's own line; once he lets go and presses again, he is, and anyone
      * else is at once.
      */
-    @GameTest(template = ARENA, batch = "thanos_summon_held", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_held", timeoutTicks = 200)
     public static void theSummonersHeldKeyIsNotToldHeIsAlreadyHere(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.SUMMON_CHARGE_TICKS, 40);
@@ -516,7 +511,7 @@ public final class ThanosSummonTests {
     }
 
     /** Held ten ticks short of the end, nothing has happened; the last tick starts it. */
-    @GameTest(template = ARENA, batch = "thanos_summon_charge", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_summon_charge", timeoutTicks = 200)
     public static void aShortChargeCallsHimBeforeTheItemsRunOut(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.SUMMON_CHARGE_TICKS, 40);

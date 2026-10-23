@@ -123,7 +123,7 @@ public final class MjolnirShatter {
             }
         }
         thor.setItemInHand(hand, ItemStack.EMPTY);
-        thor.setData(ModAttachments.SHATTERED_MJOLNIR, hammer);
+        ModAttachments.SHATTERED_MJOLNIR.set(thor, hammer);
         ACTIVE.put(id, new Shattered(hammer, hand, fragments, now, level.dimension(), thor.position()));
         READY.put(id, now + EnhancedConfig.MJOLNIR_SHATTER_COOLDOWN.get());
         // Counted as a weapon in flight: Thor keeps flying while it is in the air.
@@ -170,7 +170,7 @@ public final class MjolnirShatter {
                 first = fragment.getId();
             }
         }
-        thor.setData(ModAttachments.SHATTERED_MJOLNIR, whole);
+        ModAttachments.SHATTERED_MJOLNIR.set(thor, whole);
         ACTIVE.put(id, new Shattered(whole, InteractionHand.MAIN_HAND, fragments, now, level.dimension(), thor.position()));
         Powers.get(thor).setHammerEntityId(first);
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 40, 0.3, 0.3, 0.3, 0.5);
@@ -242,9 +242,9 @@ public final class MjolnirShatter {
         if (shattered == null) {
             // A hammer still in pieces in the player's data, but with no fragments to bring it together (the world was
             // closed or crashed meanwhile): it simply comes back.
-            ItemStack stored = player.getExistingData(ModAttachments.SHATTERED_MJOLNIR).orElse(ItemStack.EMPTY);
+            ItemStack stored = ModAttachments.SHATTERED_MJOLNIR.getExisting(player).orElse(ItemStack.EMPTY);
             if (!stored.isEmpty()) {
-                player.removeData(ModAttachments.SHATTERED_MJOLNIR);
+                ModAttachments.SHATTERED_MJOLNIR.remove(player);
                 giveBack(player, stored.copy(), InteractionHand.MAIN_HAND);
             }
             return;
@@ -275,7 +275,7 @@ public final class MjolnirShatter {
         ServerLevel level = thor.serverLevel();
         discardFragments(thor.server, shattered);
         ACTIVE.remove(thor.getUUID());
-        thor.removeData(ModAttachments.SHATTERED_MJOLNIR);
+        ModAttachments.SHATTERED_MJOLNIR.remove(thor);
         if (data.hammerEntityId() != -1) {
             data.setHammerEntityId(-1);
         }
@@ -306,9 +306,9 @@ public final class MjolnirShatter {
             scatter(thor.server, thor.getUUID(), shattered, thor);
             return;
         }
-        ItemStack stored = thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).orElse(ItemStack.EMPTY);
+        ItemStack stored = ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).orElse(ItemStack.EMPTY);
         if (!stored.isEmpty()) {
-            thor.removeData(ModAttachments.SHATTERED_MJOLNIR);
+            ModAttachments.SHATTERED_MJOLNIR.remove(thor);
             ThorAbilities.dropAt(thor.serverLevel(), thor.position(), stored.copy());
         }
     }
@@ -318,7 +318,7 @@ public final class MjolnirShatter {
         discardFragments(server, shattered);
         ACTIVE.remove(id);
         if (thor != null) {
-            thor.removeData(ModAttachments.SHATTERED_MJOLNIR);
+            ModAttachments.SHATTERED_MJOLNIR.remove(thor);
             Powers.get(thor).setHammerEntityId(-1);
         }
         ServerLevel level = server.getLevel(shattered.dimension);

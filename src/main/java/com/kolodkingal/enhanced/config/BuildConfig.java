@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import java.util.List;
 
 /**
@@ -34,74 +34,74 @@ public final class BuildConfig {
     }
 
     // ---- [build_magic]: the server ----
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.BooleanValue OPERATORS_ONLY;
-    public static ModConfigSpec.BooleanValue REQUIRE_MATERIALS;
-    public static ModConfigSpec.IntValue MILLIS_PER_TICK;
-    public static ModConfigSpec.IntValue BLOCKS_PER_TICK;
-    public static ModConfigSpec.IntValue SECTIONS_PER_TICK;
-    public static ModConfigSpec.IntValue MIN_SPELL_TICKS;
-    public static ModConfigSpec.IntValue MAX_QUEUED;
-    public static ModConfigSpec.IntValue MAX_SPELLS_TOTAL;
-    public static ModConfigSpec.IntValue HOLD_TO_CONFIRM_BLOCKS;
-    public static ModConfigSpec.IntValue HOLD_TO_CONFIRM_TICKS;
-    public static ModConfigSpec.IntValue HUGE_SPELL_BLOCKS;
-    public static ModConfigSpec.IntValue HUGE_HOLD_TICKS;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.BooleanValue OPERATORS_ONLY;
+    public static ConfigSpec.BooleanValue REQUIRE_MATERIALS;
+    public static ConfigSpec.IntValue MILLIS_PER_TICK;
+    public static ConfigSpec.IntValue BLOCKS_PER_TICK;
+    public static ConfigSpec.IntValue SECTIONS_PER_TICK;
+    public static ConfigSpec.IntValue MIN_SPELL_TICKS;
+    public static ConfigSpec.IntValue MAX_QUEUED;
+    public static ConfigSpec.IntValue MAX_SPELLS_TOTAL;
+    public static ConfigSpec.IntValue HOLD_TO_CONFIRM_BLOCKS;
+    public static ConfigSpec.IntValue HOLD_TO_CONFIRM_TICKS;
+    public static ConfigSpec.IntValue HUGE_SPELL_BLOCKS;
+    public static ConfigSpec.IntValue HUGE_HOLD_TICKS;
     // ---- [build_magic]: where and on what ----
-    public static ModConfigSpec.BooleanValue ALL_ARENAS_PROTECTED;
-    public static ModConfigSpec.BooleanValue HEX_IS_A_CLAIM;
-    public static ModConfigSpec.EnumValue<FullContainers> FULL_CONTAINERS;
-    public static ModConfigSpec.BooleanValue LIFT_CREATURES;
-    public static ModConfigSpec.BooleanValue MOVE_CARRIES_CREATURES;
-    public static ModConfigSpec.BooleanValue HOLD_GRAVITY_BLOCKS;
-    public static ModConfigSpec.BooleanValue POST_EVENTS_PER_BLOCK;
-    public static ModConfigSpec.IntValue PREVIEW_CHECKS;
+    public static ConfigSpec.BooleanValue ALL_ARENAS_PROTECTED;
+    public static ConfigSpec.BooleanValue HEX_IS_A_CLAIM;
+    public static ConfigSpec.EnumValue<FullContainers> FULL_CONTAINERS;
+    public static ConfigSpec.BooleanValue LIFT_CREATURES;
+    public static ConfigSpec.BooleanValue MOVE_CARRIES_CREATURES;
+    public static ConfigSpec.BooleanValue HOLD_GRAVITY_BLOCKS;
+    public static ConfigSpec.BooleanValue POST_EVENTS_PER_BLOCK;
+    public static ConfigSpec.IntValue PREVIEW_CHECKS;
     // ---- [build_magic]: undo, the pocket, memory and disk ----
-    public static ModConfigSpec.BooleanValue UNDO_SURVIVES_RESTART;
-    public static ModConfigSpec.IntValue UNDO_MEMORY_MB;
-    public static ModConfigSpec.IntValue UNDO_DISK_MB;
-    public static ModConfigSpec.IntValue SERVER_UNDO_MEMORY_MB;
-    public static ModConfigSpec.IntValue SERVER_UNDO_DISK_MB;
-    public static ModConfigSpec.IntValue POCKET_MAX_MB;
-    public static ModConfigSpec.IntValue FINISH_ON_STOP_BLOCKS;
-    public static ModConfigSpec.IntValue MAX_TICKET_CHUNKS;
-    public static ModConfigSpec.IntValue MAX_REQUESTS_PER_SECOND;
-    public static ModConfigSpec.ConfigValue<List<? extends String>> DENIED_DIMENSIONS;
+    public static ConfigSpec.BooleanValue UNDO_SURVIVES_RESTART;
+    public static ConfigSpec.IntValue UNDO_MEMORY_MB;
+    public static ConfigSpec.IntValue UNDO_DISK_MB;
+    public static ConfigSpec.IntValue SERVER_UNDO_MEMORY_MB;
+    public static ConfigSpec.IntValue SERVER_UNDO_DISK_MB;
+    public static ConfigSpec.IntValue POCKET_MAX_MB;
+    public static ConfigSpec.IntValue FINISH_ON_STOP_BLOCKS;
+    public static ConfigSpec.IntValue MAX_TICKET_CHUNKS;
+    public static ConfigSpec.IntValue MAX_REQUESTS_PER_SECOND;
+    public static ConfigSpec.ConfigValue<List<? extends String>> DENIED_DIMENSIONS;
 
     // ---- [build_magic_wanda] ----
-    public static ModConfigSpec.BooleanValue WANDA_ENABLED;
-    public static ModConfigSpec.IntValue WANDA_REACH;
-    public static ModConfigSpec.IntValue WANDA_UNDO_STEPS;
-    public static ModConfigSpec.IntValue WANDA_MAX_BLOCKS;
-    public static ModConfigSpec.BooleanValue WANDA_COPIES_CONTENTS;
-    public static ModConfigSpec.IntValue WANDA_VOLATILE_PER_SPELL;
-    public static ModConfigSpec.DoubleValue WANDA_HEX_BOOST;
-    public static ModConfigSpec.IntValue WANDA_MAGIC_SELECT_MAX;
-    public static ModConfigSpec.IntValue WANDA_BRUSH_MAX;
-    public static ModConfigSpec.IntValue WANDA_SHAPE_MAX_RADIUS;
-    public static ModConfigSpec.IntValue WANDA_REPEAT_MAX;
-    public static ModConfigSpec.IntValue WANDA_INSTANT_MAX_BLOCKS;
-        public static ModConfigSpec.IntValue WANDA_INSTANT_MAX_MILLIS;
-    public static ModConfigSpec.IntValue WANDA_INSTANT_TICK_MILLIS;
+    public static ConfigSpec.BooleanValue WANDA_ENABLED;
+    public static ConfigSpec.IntValue WANDA_REACH;
+    public static ConfigSpec.IntValue WANDA_UNDO_STEPS;
+    public static ConfigSpec.IntValue WANDA_MAX_BLOCKS;
+    public static ConfigSpec.BooleanValue WANDA_COPIES_CONTENTS;
+    public static ConfigSpec.IntValue WANDA_VOLATILE_PER_SPELL;
+    public static ConfigSpec.DoubleValue WANDA_HEX_BOOST;
+    public static ConfigSpec.IntValue WANDA_MAGIC_SELECT_MAX;
+    public static ConfigSpec.IntValue WANDA_BRUSH_MAX;
+    public static ConfigSpec.IntValue WANDA_SHAPE_MAX_RADIUS;
+    public static ConfigSpec.IntValue WANDA_REPEAT_MAX;
+    public static ConfigSpec.IntValue WANDA_INSTANT_MAX_BLOCKS;
+        public static ConfigSpec.IntValue WANDA_INSTANT_MAX_MILLIS;
+    public static ConfigSpec.IntValue WANDA_INSTANT_TICK_MILLIS;
 
     // ---- [build_magic_billy]: his numbers as an Apprentice, and how he grows ----
-    public static ModConfigSpec.BooleanValue BILLY_ENABLED;
-    public static ModConfigSpec.IntValue BILLY_METER;
-    public static ModConfigSpec.DoubleValue BILLY_REFILL;
-    public static ModConfigSpec.IntValue BILLY_MAX_SIDE;
-    public static ModConfigSpec.IntValue BILLY_REACH;
-    public static ModConfigSpec.IntValue BILLY_UNDO_STEPS;
-    public static ModConfigSpec.IntValue BILLY_REPEAT_MAX;
+    public static ConfigSpec.BooleanValue BILLY_ENABLED;
+    public static ConfigSpec.IntValue BILLY_METER;
+    public static ConfigSpec.DoubleValue BILLY_REFILL;
+    public static ConfigSpec.IntValue BILLY_MAX_SIDE;
+    public static ConfigSpec.IntValue BILLY_REACH;
+    public static ConfigSpec.IntValue BILLY_UNDO_STEPS;
+    public static ConfigSpec.IntValue BILLY_REPEAT_MAX;
     /** The practice each rank needs ({@code rank2Practice} to {@code rank10Practice}), by rank - 1; the first is unused (null). */
-    public static final ModConfigSpec.IntValue[] BILLY_PRACTICE = new ModConfigSpec.IntValue[10];
-    public static ModConfigSpec.IntValue BILLY_MAX_RANK;
-    public static ModConfigSpec.IntValue BILLY_CAST_PAUSE;
-    public static ModConfigSpec.IntValue BILLY_MOM_RANGE;
-    public static ModConfigSpec.DoubleValue BILLY_MOM_COST_FACTOR;
-    public static ModConfigSpec.BooleanValue BILLY_COPIES_CONTENTS;
-    public static ModConfigSpec.BooleanValue BILLY_LIMITS_IN_CREATIVE;
+    public static final ConfigSpec.IntValue[] BILLY_PRACTICE = new ConfigSpec.IntValue[10];
+    public static ConfigSpec.IntValue BILLY_MAX_RANK;
+    public static ConfigSpec.IntValue BILLY_CAST_PAUSE;
+    public static ConfigSpec.IntValue BILLY_MOM_RANGE;
+    public static ConfigSpec.DoubleValue BILLY_MOM_COST_FACTOR;
+    public static ConfigSpec.BooleanValue BILLY_COPIES_CONTENTS;
+    public static ConfigSpec.BooleanValue BILLY_LIMITS_IN_CREATIVE;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Build Magic exists on this server.")
                 .define("enabled", true);

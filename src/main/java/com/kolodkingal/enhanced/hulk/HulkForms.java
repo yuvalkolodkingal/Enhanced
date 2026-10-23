@@ -127,7 +127,7 @@ public final class HulkForms {
         data.set(Live.HULK_TRANSFORMING, true);
         if (!human) {
             Powers.setVariant(player, Variants.get(Power.HULK, to));
-            player.setData(ModAttachments.HULK, HulkRage.get(player).withLastHulk(to));
+            ModAttachments.HULK.set(player, HulkRage.get(player).withLastHulk(to));
         } else {
             HulkRage.calm(player);
         }

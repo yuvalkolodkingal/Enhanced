@@ -146,7 +146,7 @@ public final class NanoEvents {
 
     @SubscribeEvent
     public static void onHurt(LivingDamageEvent.Post event) {
-        if (event.getEntity() instanceof Player player && !player.level().isClientSide) {
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide()) {
             NanoHousings.onHurt(player, event.getSource(), event.getOriginalDamage());
         }
     }

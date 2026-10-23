@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.ApocalypseAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -18,11 +17,11 @@ import com.kolodkingal.enhanced.entity.SandLanceEntity;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,8 +29,6 @@ import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashSet;
 import java.util.List;
@@ -53,11 +50,9 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Time slows his tells and his Horsemen's tricks (not only their walk) until he adapts, and a tornado keeps to the arena.
  * Each has a batch of its own, as every test of server-wide state does.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ApocalypseReviewTests {
 
-    @GameTest(template = ARENA, batch = "apocalypse_review_off", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_review_off", timeoutTicks = 100)
     public static void theEndOfTheArenaIsToldToEveryoneInTheDimension(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ServerLevel level = f.level();
@@ -88,7 +83,7 @@ public final class ApocalypseReviewTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_review_count", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_review_count", timeoutTicks = 100)
     public static void aCreativePlayerIsInTheLedgerButNotInTheNumbers(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ServerPlayer starter = f.player(MIDDLE.x, FLOOR, MIDDLE.z);
@@ -108,7 +103,7 @@ public final class ApocalypseReviewTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_review_storm", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_review_storm", timeoutTicks = 100)
     public static void aSandstormSlowsALanceToHalfAndItStaysSlow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -142,7 +137,7 @@ public final class ApocalypseReviewTests {
         return lance;
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_review_slow", timeoutTicks = 150)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_review_slow", timeoutTicks = 150)
     public static void quicksilverTimeSlowsHisTellsAndTheTricksOfHisHorsemen(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.QUICKSILVER);
         ServerPlayer speedster = d.hero();
@@ -185,7 +180,7 @@ public final class ApocalypseReviewTests {
         return level.getEntitiesOfClass(IronShrapnelEntity.class, new AABB(husk.blockPosition()).inflate(40.0), shard -> shard.getOwner() == husk);
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_review_tornado", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_review_tornado", timeoutTicks = 120)
     public static void aTornadoFollowsAVictimOnlyAsFarAsTheArena(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.NONE);
         ServerLevel level = d.level();

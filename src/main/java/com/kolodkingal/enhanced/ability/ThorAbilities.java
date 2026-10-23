@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -68,7 +69,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -783,7 +783,7 @@ public final class ThorAbilities {
                     .min(Comparator.comparingDouble(e -> e.distanceToSqr(from2))).orElse(null);
         }
         level.playSound(null, first.getX(), first.getY(), first.getZ(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 0.5F, 1.6F);
-        PacketDistributor.sendToPlayersNear(level, null, from.x, from.y, from.z, 64,
+        Net.sendToPlayersNear(level, null, from.x, from.y, from.z, 64,
                 new ThorFxPayload(ThorFxPayload.ARC, thor.getId(), points));
     }
 

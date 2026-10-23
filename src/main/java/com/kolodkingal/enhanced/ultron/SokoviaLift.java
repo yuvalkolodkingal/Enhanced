@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.network.SokoviaLiftPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal.Header;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
 import net.minecraft.ChatFormatting;
@@ -25,7 +26,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -248,7 +248,7 @@ public final class SokoviaLift implements LiftHook {
             if (lift.level == player.level() && lift.fight.key() == key) {
                 SokoviaLiftPayload payload = lift.currentPayload();
                 if (payload != null) {
-                    PacketDistributor.sendToPlayer(player, payload);
+                    Net.sendToPlayer(player, payload);
                 }
             }
         }
@@ -1196,7 +1196,7 @@ public final class SokoviaLift implements LiftHook {
 
         /** Tells every player in the dimension (the payload is about 70 bytes). */
         private void send(int phase, long start, boolean hide) {
-            PacketDistributor.sendToPlayersInDimension(level, payload(phase, start, hide));
+            Net.sendToPlayersInDimension(level, payload(phase, start, hide));
         }
 
         private SokoviaLiftPayload payload(int phase, long start, boolean hide) {

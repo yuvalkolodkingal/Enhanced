@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.hulk.HulkHooks;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -32,7 +33,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -107,12 +107,12 @@ public final class Snap {
 
     /** Whether the player's wait after his last Snap is over. */
     public static boolean ready(ServerPlayer player) {
-        return player.level().getGameTime() >= player.getData(ModAttachments.STONES).snapReadyAt();
+        return player.level().getGameTime() >= ModAttachments.STONES.get(player).snapReadyAt();
     }
 
     /** Game ticks before the player may snap again (0: ready). */
     public static long waitLeft(net.minecraft.world.entity.player.Player player) {
-        return Math.max(0L, player.getData(ModAttachments.STONES).snapReadyAt() - player.level().getGameTime());
+        return Math.max(0L, ModAttachments.STONES.get(player).snapReadyAt() - player.level().getGameTime());
     }
 
     public static void begin(ServerPlayer player) {
@@ -192,10 +192,10 @@ public final class Snap {
         Vec3 hand = hand(player);
         level.playSound(null, hand.x, hand.y, hand.z, ModSounds.SNAP.get(), SoundSource.PLAYERS, 2.0F, 1.0F);
         level.sendParticles(ParticleTypes.FLASH, hand.x, hand.y, hand.z, 1, 0.0, 0.0, 0.0, 0.0);
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), radius + 32.0,
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), radius + 32.0,
                 new StoneFxPayload(StoneFxPayload.SNAP, player.getId(), List.of(hand), dust.size()));
         cost(player);
-        player.setData(ModAttachments.STONES, player.getData(ModAttachments.STONES).with(StoneProgress.SNAPPED)
+        ModAttachments.STONES.set(player, ModAttachments.STONES.get(player).with(StoneProgress.SNAPPED)
                 .withSnapReadyAt(level.getGameTime() + cooldownTicks()));
         award(player);
         player.displayClientMessage(Component.translatable("message.enhanced.gauntlet.snapped", dust.size())

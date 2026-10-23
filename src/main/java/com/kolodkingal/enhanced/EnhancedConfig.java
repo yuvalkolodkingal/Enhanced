@@ -19,158 +19,158 @@ import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import com.kolodkingal.enhanced.config.XavierConfig;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 /**
  * Server-side balance numbers. Lives in world/serverconfig/enhanced-server.toml and is synced to clients.
  */
 public final class EnhancedConfig {
-    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    private static final ConfigSpec.Builder BUILDER = new ConfigSpec.Builder();
 
     // ---- Magneto ----
-    public static final ModConfigSpec.DoubleValue MAGNETO_FLIGHT_SPEED;
-    public static final ModConfigSpec.IntValue TELEKINESIS_RANGE;
-    public static final ModConfigSpec.DoubleValue THROW_SPEED;
-    public static final ModConfigSpec.DoubleValue SHRAPNEL_DAMAGE;
-    public static final ModConfigSpec.IntValue SHRAPNEL_PIERCE;
-    public static final ModConfigSpec.IntValue SHRAPNEL_FIRE_INTERVAL;
-    public static final ModConfigSpec.IntValue DISARM_RANGE;
-    public static final ModConfigSpec.IntValue DISARM_COOLDOWN;
-    public static final ModConfigSpec.DoubleValue SHIELD_REFLECT_CHANCE;
+    public static final ConfigSpec.DoubleValue MAGNETO_FLIGHT_SPEED;
+    public static final ConfigSpec.IntValue TELEKINESIS_RANGE;
+    public static final ConfigSpec.DoubleValue THROW_SPEED;
+    public static final ConfigSpec.DoubleValue SHRAPNEL_DAMAGE;
+    public static final ConfigSpec.IntValue SHRAPNEL_PIERCE;
+    public static final ConfigSpec.IntValue SHRAPNEL_FIRE_INTERVAL;
+    public static final ConfigSpec.IntValue DISARM_RANGE;
+    public static final ConfigSpec.IntValue DISARM_COOLDOWN;
+    public static final ConfigSpec.DoubleValue SHIELD_REFLECT_CHANCE;
     // 3.1: metal blocks with R, the Magnetic Pull (Sneak + R holding nothing), and what every telekinesis shares
-    public static final ModConfigSpec.IntValue MAGNETO_BLOCK_LIFT_RANGE;
-    public static final ModConfigSpec.DoubleValue MAGNETO_BLOCK_LIFT_MAX_HARDNESS;
-    public static final ModConfigSpec.IntValue PULL_RADIUS;
-    public static final ModConfigSpec.IntValue PULL_MAX_TARGETS;
-    public static final ModConfigSpec.IntValue PULL_PER_TICK;
-    public static final ModConfigSpec.IntValue PULL_SCAN_PER_TICK;
-    public static final ModConfigSpec.IntValue PULL_COOLDOWN;
-    public static final ModConfigSpec.DoubleValue PULL_EXHAUSTION;
-    public static final ModConfigSpec.BooleanValue PULL_TAKES_BUILT_METAL;
-    public static final ModConfigSpec.BooleanValue PULL_BUILT_NEEDS_SIGHT;
-    public static final ModConfigSpec.IntValue PULL_BUILT_CONE;
-    public static final ModConfigSpec.BooleanValue PULL_FROM_STORAGE;
-    public static final ModConfigSpec.BooleanValue PULL_TAKES_GEAR;
-    public static final ModConfigSpec.BooleanValue PULL_TAKES_PLAYER_GEAR;
-    public static final ModConfigSpec.BooleanValue PULL_PLAYER_GEAR_TO_FEET;
-    public static final ModConfigSpec.IntValue PULL_PLAYER_GRACE_TICKS;
-    public static final ModConfigSpec.IntValue TELEKINESIS_SNEAK_GRACE_TICKS;
-    public static final ModConfigSpec.IntValue PULL_RETRY_TICKS;
-    public static final ModConfigSpec.BooleanValue PULL_ANCIENT_DEBRIS;
-    public static final ModConfigSpec.DoubleValue PULL_TUG;
-    public static final ModConfigSpec.BooleanValue TELEKINESIS_SPARES_FRIENDS;
-    public static final ModConfigSpec.IntValue TELEKINESIS_PLAYER_REGRIP_TICKS;
+    public static final ConfigSpec.IntValue MAGNETO_BLOCK_LIFT_RANGE;
+    public static final ConfigSpec.DoubleValue MAGNETO_BLOCK_LIFT_MAX_HARDNESS;
+    public static final ConfigSpec.IntValue PULL_RADIUS;
+    public static final ConfigSpec.IntValue PULL_MAX_TARGETS;
+    public static final ConfigSpec.IntValue PULL_PER_TICK;
+    public static final ConfigSpec.IntValue PULL_SCAN_PER_TICK;
+    public static final ConfigSpec.IntValue PULL_COOLDOWN;
+    public static final ConfigSpec.DoubleValue PULL_EXHAUSTION;
+    public static final ConfigSpec.BooleanValue PULL_TAKES_BUILT_METAL;
+    public static final ConfigSpec.BooleanValue PULL_BUILT_NEEDS_SIGHT;
+    public static final ConfigSpec.IntValue PULL_BUILT_CONE;
+    public static final ConfigSpec.BooleanValue PULL_FROM_STORAGE;
+    public static final ConfigSpec.BooleanValue PULL_TAKES_GEAR;
+    public static final ConfigSpec.BooleanValue PULL_TAKES_PLAYER_GEAR;
+    public static final ConfigSpec.BooleanValue PULL_PLAYER_GEAR_TO_FEET;
+    public static final ConfigSpec.IntValue PULL_PLAYER_GRACE_TICKS;
+    public static final ConfigSpec.IntValue TELEKINESIS_SNEAK_GRACE_TICKS;
+    public static final ConfigSpec.IntValue PULL_RETRY_TICKS;
+    public static final ConfigSpec.BooleanValue PULL_ANCIENT_DEBRIS;
+    public static final ConfigSpec.DoubleValue PULL_TUG;
+    public static final ConfigSpec.BooleanValue TELEKINESIS_SPARES_FRIENDS;
+    public static final ConfigSpec.IntValue TELEKINESIS_PLAYER_REGRIP_TICKS;
 
     // ---- Scarlet Witch ----
-    public static final ModConfigSpec.DoubleValue WANDA_FLIGHT_SPEED;
-    public static final ModConfigSpec.DoubleValue CHAOS_BEAM_DAMAGE;
-    public static final ModConfigSpec.IntValue CHAOS_BEAM_RANGE;
-    public static final ModConfigSpec.IntValue CHAOS_BEAM_NAUSEA_TICKS;
-    public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_EXHAUSTION;
-    public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_EXPLOSION_FACTOR;
-    public static final ModConfigSpec.IntValue CHAOS_SHIELD_WIND_UP_TICKS;
-    public static final ModConfigSpec.IntValue CHAOS_SHIELD_MAX_TICKS;
-    public static final ModConfigSpec.DoubleValue CHAOS_SHIELD_STRENGTH;
-    public static final ModConfigSpec.IntValue CHAOS_SHIELD_COOLDOWN;
-    public static final ModConfigSpec.IntValue CHAOS_SHIELD_BROKEN_COOLDOWN;
-    public static final ModConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED;
-    public static final ModConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED_VS_BOSSES;
-    public static final ModConfigSpec.IntValue BLOCK_LIFT_RANGE;
-    public static final ModConfigSpec.DoubleValue BLOCK_LIFT_MAX_HARDNESS;
-    public static final ModConfigSpec.IntValue HEX_DEFAULT_RADIUS;
-    public static final ModConfigSpec.IntValue HEX_MIN_RADIUS;
-    public static final ModConfigSpec.IntValue HEX_MAX_RADIUS;
-    public static final ModConfigSpec.DoubleValue HEX_DEATH_CHANCE;
-    public static final ModConfigSpec.DoubleValue HEX_HOLD_DAMAGE;
-    public static final ModConfigSpec.DoubleValue HEX_HOLD_DAMAGE_MAX;
-    public static final ModConfigSpec.DoubleValue HEX_HOLD_RELEASE_HEALTH;
+    public static final ConfigSpec.DoubleValue WANDA_FLIGHT_SPEED;
+    public static final ConfigSpec.DoubleValue CHAOS_BEAM_DAMAGE;
+    public static final ConfigSpec.IntValue CHAOS_BEAM_RANGE;
+    public static final ConfigSpec.IntValue CHAOS_BEAM_NAUSEA_TICKS;
+    public static final ConfigSpec.DoubleValue CHAOS_SHIELD_EXHAUSTION;
+    public static final ConfigSpec.DoubleValue CHAOS_SHIELD_EXPLOSION_FACTOR;
+    public static final ConfigSpec.IntValue CHAOS_SHIELD_WIND_UP_TICKS;
+    public static final ConfigSpec.IntValue CHAOS_SHIELD_MAX_TICKS;
+    public static final ConfigSpec.DoubleValue CHAOS_SHIELD_STRENGTH;
+    public static final ConfigSpec.IntValue CHAOS_SHIELD_COOLDOWN;
+    public static final ConfigSpec.IntValue CHAOS_SHIELD_BROKEN_COOLDOWN;
+    public static final ConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED;
+    public static final ConfigSpec.BooleanValue WANDA_SHIELD_UNLIMITED_VS_BOSSES;
+    public static final ConfigSpec.IntValue BLOCK_LIFT_RANGE;
+    public static final ConfigSpec.DoubleValue BLOCK_LIFT_MAX_HARDNESS;
+    public static final ConfigSpec.IntValue HEX_DEFAULT_RADIUS;
+    public static final ConfigSpec.IntValue HEX_MIN_RADIUS;
+    public static final ConfigSpec.IntValue HEX_MAX_RADIUS;
+    public static final ConfigSpec.DoubleValue HEX_DEATH_CHANCE;
+    public static final ConfigSpec.DoubleValue HEX_HOLD_DAMAGE;
+    public static final ConfigSpec.DoubleValue HEX_HOLD_DAMAGE_MAX;
+    public static final ConfigSpec.DoubleValue HEX_HOLD_RELEASE_HEALTH;
 
     // ---- The Vision of the Hex ----
-    public static final ModConfigSpec.BooleanValue HEX_VISION_ENABLED;
-    public static final ModConfigSpec.DoubleValue HEX_VISION_HEALTH;
-    public static final ModConfigSpec.DoubleValue HEX_VISION_PUNCH_DAMAGE;
-    public static final ModConfigSpec.DoubleValue HEX_VISION_BEAM_DAMAGE;
-    public static final ModConfigSpec.IntValue HEX_VISION_BEAM_RANGE;
-    public static final ModConfigSpec.IntValue HEX_VISION_REBUILD_TICKS;
+    public static final ConfigSpec.BooleanValue HEX_VISION_ENABLED;
+    public static final ConfigSpec.DoubleValue HEX_VISION_HEALTH;
+    public static final ConfigSpec.DoubleValue HEX_VISION_PUNCH_DAMAGE;
+    public static final ConfigSpec.DoubleValue HEX_VISION_BEAM_DAMAGE;
+    public static final ConfigSpec.IntValue HEX_VISION_BEAM_RANGE;
+    public static final ConfigSpec.IntValue HEX_VISION_REBUILD_TICKS;
 
     // ---- Vision ----
-    public static final ModConfigSpec.DoubleValue VISION_FLIGHT_SPEED;
-    public static final ModConfigSpec.DoubleValue MIND_STONE_BEAM_DAMAGE;
+    public static final ConfigSpec.DoubleValue VISION_FLIGHT_SPEED;
+    public static final ConfigSpec.DoubleValue MIND_STONE_BEAM_DAMAGE;
 
     // ---- Quicksilver ----
-    public static final ModConfigSpec.IntValue SLOW_MOTION_FACTOR;
-    public static final ModConfigSpec.IntValue SLOW_MOTION_RADIUS;
-    public static final ModConfigSpec.DoubleValue QUICKSILVER_SPEED_BONUS;
-    public static final ModConfigSpec.DoubleValue QUICKSILVER_EXHAUSTION;
-    public static final ModConfigSpec.DoubleValue QUICKSILVER_ACTION_SPEED;
+    public static final ConfigSpec.IntValue SLOW_MOTION_FACTOR;
+    public static final ConfigSpec.IntValue SLOW_MOTION_RADIUS;
+    public static final ConfigSpec.DoubleValue QUICKSILVER_SPEED_BONUS;
+    public static final ConfigSpec.DoubleValue QUICKSILVER_EXHAUSTION;
+    public static final ConfigSpec.DoubleValue QUICKSILVER_ACTION_SPEED;
 
     // ---- Billy (Wiccan) ----
-    public static final ModConfigSpec.DoubleValue BILLY_FLIGHT_SPEED;
-    public static final ModConfigSpec.DoubleValue HEX_BOLT_DAMAGE;
-    public static final ModConfigSpec.IntValue FREEZE_DURATION;
-    public static final ModConfigSpec.IntValue NOISE_RANGE;
+    public static final ConfigSpec.DoubleValue BILLY_FLIGHT_SPEED;
+    public static final ConfigSpec.DoubleValue HEX_BOLT_DAMAGE;
+    public static final ConfigSpec.IntValue FREEZE_DURATION;
+    public static final ConfigSpec.IntValue NOISE_RANGE;
     // 3.1: his telekinesis tears blocks out of the ground
-    public static final ModConfigSpec.BooleanValue BILLY_BLOCK_LIFTING;
-    public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_RANGE;
-    public static final ModConfigSpec.DoubleValue BILLY_BLOCK_LIFT_MAX_HARDNESS;
-    public static final ModConfigSpec.IntValue BILLY_BLOCK_LIFT_COOLDOWN;
+    public static final ConfigSpec.BooleanValue BILLY_BLOCK_LIFTING;
+    public static final ConfigSpec.IntValue BILLY_BLOCK_LIFT_RANGE;
+    public static final ConfigSpec.DoubleValue BILLY_BLOCK_LIFT_MAX_HARDNESS;
+    public static final ConfigSpec.IntValue BILLY_BLOCK_LIFT_COOLDOWN;
     // 3.2: Billy's continuous Hex Beam
-    public static final ModConfigSpec.BooleanValue BILLY_BEAM;
-    public static final ModConfigSpec.DoubleValue BILLY_BEAM_DAMAGE_PER_SECOND;
-    public static final ModConfigSpec.IntValue BILLY_BEAM_RANGE;
-    public static final ModConfigSpec.IntValue BILLY_BEAM_INTERVAL;
-    public static final ModConfigSpec.DoubleValue BILLY_BEAM_EXHAUSTION_PER_SECOND;
-    public static final ModConfigSpec.DoubleValue BILLY_BEAM_RANK_DAMAGE_BONUS;
-    public static final ModConfigSpec.DoubleValue BILLY_BEAM_RANK_RANGE_BONUS;
+    public static final ConfigSpec.BooleanValue BILLY_BEAM;
+    public static final ConfigSpec.DoubleValue BILLY_BEAM_DAMAGE_PER_SECOND;
+    public static final ConfigSpec.IntValue BILLY_BEAM_RANGE;
+    public static final ConfigSpec.IntValue BILLY_BEAM_INTERVAL;
+    public static final ConfigSpec.DoubleValue BILLY_BEAM_EXHAUSTION_PER_SECOND;
+    public static final ConfigSpec.DoubleValue BILLY_BEAM_RANK_DAMAGE_BONUS;
+    public static final ConfigSpec.DoubleValue BILLY_BEAM_RANK_RANGE_BONUS;
     // 3.2: Billy's Hex Barrier (Sneak + B held)
-    public static final ModConfigSpec.BooleanValue BILLY_BARRIER;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_HEALTH;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_RANK_STRENGTH_BONUS;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_REGEN;
-    public static final ModConfigSpec.IntValue BILLY_BARRIER_WIND_UP;
-    public static final ModConfigSpec.IntValue BILLY_BARRIER_COOLDOWN;
-    public static final ModConfigSpec.IntValue BILLY_BARRIER_SHATTER_COOLDOWN;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_ARC;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_WIDTH;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_HEIGHT;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_DISTANCE;
-    public static final ModConfigSpec.DoubleValue BILLY_BARRIER_SPEED_FACTOR;
+    public static final ConfigSpec.BooleanValue BILLY_BARRIER;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_HEALTH;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_RANK_STRENGTH_BONUS;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_REGEN;
+    public static final ConfigSpec.IntValue BILLY_BARRIER_WIND_UP;
+    public static final ConfigSpec.IntValue BILLY_BARRIER_COOLDOWN;
+    public static final ConfigSpec.IntValue BILLY_BARRIER_SHATTER_COOLDOWN;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_ARC;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_WIDTH;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_HEIGHT;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_DISTANCE;
+    public static final ConfigSpec.DoubleValue BILLY_BARRIER_SPEED_FACTOR;
 
     // ---- Tommy (Speed) ----
-    public static final ModConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
-    public static final ModConfigSpec.DoubleValue TOMMY_EXHAUSTION;
+    public static final ConfigSpec.DoubleValue TOMMY_SPEED_BONUS;
+    public static final ConfigSpec.DoubleValue TOMMY_EXHAUSTION;
 
     // ---- Loki ----
-    public static final ModConfigSpec.DoubleValue LOKI_DAGGER_DAMAGE;
-    public static final ModConfigSpec.DoubleValue LOKI_BODY_HEALTH;
-    public static final ModConfigSpec.DoubleValue LOKI_BODY_ARMOR;
-    public static final ModConfigSpec.DoubleValue LOKI_BODY_TOUGHNESS;
-    public static final ModConfigSpec.IntValue SCEPTER_CONFUSION_TICKS;
-    public static final ModConfigSpec.IntValue SCEPTER_NAUSEA_TICKS;
-    public static final ModConfigSpec.IntValue SCEPTER_SLOWNESS_TICKS;
+    public static final ConfigSpec.DoubleValue LOKI_DAGGER_DAMAGE;
+    public static final ConfigSpec.DoubleValue LOKI_BODY_HEALTH;
+    public static final ConfigSpec.DoubleValue LOKI_BODY_ARMOR;
+    public static final ConfigSpec.DoubleValue LOKI_BODY_TOUGHNESS;
+    public static final ConfigSpec.IntValue SCEPTER_CONFUSION_TICKS;
+    public static final ConfigSpec.IntValue SCEPTER_NAUSEA_TICKS;
+    public static final ConfigSpec.IntValue SCEPTER_SLOWNESS_TICKS;
 
     // ---- Thor ----
-    public static final ModConfigSpec.DoubleValue THOR_FLIGHT_SPEED;
-    public static final ModConfigSpec.BooleanValue MJOLNIR_ANYONE_WORTHY;
-    public static final ModConfigSpec.BooleanValue MJOLNIR_OWNER_ONLY;
-    public static final ModConfigSpec.DoubleValue MJOLNIR_THROW_DAMAGE;
-    public static final ModConfigSpec.DoubleValue STORMBREAKER_THROW_DAMAGE;
-    public static final ModConfigSpec.IntValue MJOLNIR_THROW_RANGE;
-    public static final ModConfigSpec.IntValue MJOLNIR_RECALL_RANGE;
-    public static final ModConfigSpec.DoubleValue THOR_BEAM_DAMAGE;
-    public static final ModConfigSpec.IntValue THOR_BEAM_INTERVAL;
-    public static final ModConfigSpec.IntValue THOR_BEAM_RANGE;
-    public static final ModConfigSpec.IntValue MJOLNIR_BEAM_RANGE;
-    public static final ModConfigSpec.IntValue STORMBREAKER_BEAM_RANGE;
-    public static final ModConfigSpec.DoubleValue MJOLNIR_BEAM_MULTIPLIER;
-    public static final ModConfigSpec.DoubleValue STORMBREAKER_BEAM_MULTIPLIER;
-    public static final ModConfigSpec.DoubleValue THOR_BEAM_THUNDER_MULTIPLIER;
-    public static final ModConfigSpec.DoubleValue THOR_BEAM_EXHAUSTION;
-    public static final ModConfigSpec.DoubleValue GOD_OF_THUNDER_EXHAUSTION;
-    public static final ModConfigSpec.IntValue BIFROST_COOLDOWN;
-    public static final ModConfigSpec.IntValue MJOLNIR_SHATTER_COOLDOWN;
-    public static final ModConfigSpec.DoubleValue MJOLNIR_SHATTER_DAMAGE;
-    public static final ModConfigSpec.IntValue MJOLNIR_PIN_DURATION;
+    public static final ConfigSpec.DoubleValue THOR_FLIGHT_SPEED;
+    public static final ConfigSpec.BooleanValue MJOLNIR_ANYONE_WORTHY;
+    public static final ConfigSpec.BooleanValue MJOLNIR_OWNER_ONLY;
+    public static final ConfigSpec.DoubleValue MJOLNIR_THROW_DAMAGE;
+    public static final ConfigSpec.DoubleValue STORMBREAKER_THROW_DAMAGE;
+    public static final ConfigSpec.IntValue MJOLNIR_THROW_RANGE;
+    public static final ConfigSpec.IntValue MJOLNIR_RECALL_RANGE;
+    public static final ConfigSpec.DoubleValue THOR_BEAM_DAMAGE;
+    public static final ConfigSpec.IntValue THOR_BEAM_INTERVAL;
+    public static final ConfigSpec.IntValue THOR_BEAM_RANGE;
+    public static final ConfigSpec.IntValue MJOLNIR_BEAM_RANGE;
+    public static final ConfigSpec.IntValue STORMBREAKER_BEAM_RANGE;
+    public static final ConfigSpec.DoubleValue MJOLNIR_BEAM_MULTIPLIER;
+    public static final ConfigSpec.DoubleValue STORMBREAKER_BEAM_MULTIPLIER;
+    public static final ConfigSpec.DoubleValue THOR_BEAM_THUNDER_MULTIPLIER;
+    public static final ConfigSpec.DoubleValue THOR_BEAM_EXHAUSTION;
+    public static final ConfigSpec.DoubleValue GOD_OF_THUNDER_EXHAUSTION;
+    public static final ConfigSpec.IntValue BIFROST_COOLDOWN;
+    public static final ConfigSpec.IntValue MJOLNIR_SHATTER_COOLDOWN;
+    public static final ConfigSpec.DoubleValue MJOLNIR_SHATTER_DAMAGE;
+    public static final ConfigSpec.IntValue MJOLNIR_PIN_DURATION;
 
     static {
         BUILDER.push("magneto");
@@ -572,7 +572,7 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }
 
-    public static final ModConfigSpec SPEC = BUILDER.build();
+    public static final ConfigSpec SPEC = BUILDER.build();
 
     private EnhancedConfig() {
     }

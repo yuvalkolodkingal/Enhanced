@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.school.LabFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client (3.7): a moment of the X-Men lower lab (lane L4's; the pod's lane L3's, the console's lane L5's): the
@@ -43,7 +43,7 @@ public record LabFxPayload(int kind, BlockPos pos) implements CustomPacketPayloa
         return TYPE;
     }
 
-    static void handle(LabFxPayload payload, IPayloadContext context) {
+    static void handle(LabFxPayload payload, PacketContext context) {
         LabFx.receive(payload);
     }
 }

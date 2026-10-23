@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.serum.SerumScreen;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.InteractionHand;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client (3.8): the player used a Super Soldier Serum; open its choice screen (lane L1's). The server checks
@@ -34,7 +34,7 @@ public record SerumScreenPayload(InteractionHand hand, boolean falconUnlocked) i
     }
 
     /** Only ever runs on a client, so the screen class is only ever loaded there. */
-    static void handle(SerumScreenPayload payload, IPayloadContext context) {
+    static void handle(SerumScreenPayload payload, PacketContext context) {
         SerumScreen.open(payload);
     }
 }

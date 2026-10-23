@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.road;
 
 import com.kolodkingal.enhanced.network.RoadMusicPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.road.boat.IceBoatChallenge;
 import com.kolodkingal.enhanced.road.copy.StructureCopyChallenge;
@@ -10,7 +11,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -109,7 +109,7 @@ public final class RoadMusic {
             String stage = stageOf(player);
             if (!stage.equals(SENT.getOrDefault(player.getUUID(), NONE))) {
                 SENT.put(player.getUUID(), stage);
-                PacketDistributor.sendToPlayer(player, new RoadMusicPayload(stage));
+                Net.sendToPlayer(player, new RoadMusicPayload(stage));
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
 
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 import java.util.List;
 
 /**
@@ -15,69 +15,69 @@ public final class ApocalypseBossConfig {
     public static final String SECTION = "apocalypse_boss";
 
     // 3.2: the master factor
-    public static ModConfigSpec.DoubleValue POWER_FACTOR;
+    public static ConfigSpec.DoubleValue POWER_FACTOR;
     // the ritual
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.ConfigValue<List<? extends String>> RITUAL_DIMENSIONS;
-    public static ModConfigSpec.BooleanValue RITUAL_NEEDS_SAND;
-    public static ModConfigSpec.BooleanValue RITUAL_DAYLIGHT_ONLY;
-    public static ModConfigSpec.BooleanValue REQUIRE_BREAKER;
-    public static ModConfigSpec.IntValue BREAKER_RANGE;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.ConfigValue<List<? extends String>> RITUAL_DIMENSIONS;
+    public static ConfigSpec.BooleanValue RITUAL_NEEDS_SAND;
+    public static ConfigSpec.BooleanValue RITUAL_DAYLIGHT_ONLY;
+    public static ConfigSpec.BooleanValue REQUIRE_BREAKER;
+    public static ConfigSpec.IntValue BREAKER_RANGE;
     // the arena
-    public static ModConfigSpec.IntValue ARENA_RADIUS;
-    public static ModConfigSpec.IntValue ARENA_HEIGHT;
-    public static ModConfigSpec.DoubleValue FIELD_DAMAGE;
+    public static ConfigSpec.IntValue ARENA_RADIUS;
+    public static ConfigSpec.IntValue ARENA_HEIGHT;
+    public static ConfigSpec.DoubleValue FIELD_DAMAGE;
     // his body
-    public static ModConfigSpec.DoubleValue BODY_HEALTH;
-    public static ModConfigSpec.DoubleValue HEALTH_PER_EXTRA_PLAYER;
-    public static ModConfigSpec.DoubleValue ARMOR;
-    public static ModConfigSpec.DoubleValue ARMOR_TOUGHNESS;
-    public static ModConfigSpec.DoubleValue MAX_HIT_FRACTION;
-    public static ModConfigSpec.DoubleValue EXPLOSION_DAMAGE_FACTOR;
+    public static ConfigSpec.DoubleValue BODY_HEALTH;
+    public static ConfigSpec.DoubleValue HEALTH_PER_EXTRA_PLAYER;
+    public static ConfigSpec.DoubleValue ARMOR;
+    public static ConfigSpec.DoubleValue ARMOR_TOUGHNESS;
+    public static ConfigSpec.DoubleValue MAX_HIT_FRACTION;
+    public static ConfigSpec.DoubleValue EXPLOSION_DAMAGE_FACTOR;
     // his shield and its windows
-    public static ModConfigSpec.DoubleValue SHIELD_STRENGTH;
-    public static ModConfigSpec.DoubleValue SHIELD_GROWTH;
-    public static ModConfigSpec.DoubleValue SHIELD_PER_EXTRA_PLAYER;
-    public static ModConfigSpec.IntValue WINDOW_TICKS;
-    public static ModConfigSpec.IntValue STAGGER_TICKS;
-    public static ModConfigSpec.DoubleValue WINDOW_DAMAGE_FACTOR;
-    public static ModConfigSpec.DoubleValue REGEN_PER_SECOND;
-    public static ModConfigSpec.DoubleValue TRUE_FORM_REGEN_PER_SECOND;
+    public static ConfigSpec.DoubleValue SHIELD_STRENGTH;
+    public static ConfigSpec.DoubleValue SHIELD_GROWTH;
+    public static ConfigSpec.DoubleValue SHIELD_PER_EXTRA_PLAYER;
+    public static ConfigSpec.IntValue WINDOW_TICKS;
+    public static ConfigSpec.IntValue STAGGER_TICKS;
+    public static ConfigSpec.DoubleValue WINDOW_DAMAGE_FACTOR;
+    public static ConfigSpec.DoubleValue REGEN_PER_SECOND;
+    public static ConfigSpec.DoubleValue TRUE_FORM_REGEN_PER_SECOND;
     // the escape and the end
-    public static ModConfigSpec.IntValue ESCAPE_CHANNEL_TICKS;
-    public static ModConfigSpec.DoubleValue ESCAPE_INTERRUPT_FRACTION;
-    public static ModConfigSpec.DoubleValue ESCAPE_HEAL_TO;
-    public static ModConfigSpec.IntValue PHOENIX_FINISH_SECONDS;
+    public static ConfigSpec.IntValue ESCAPE_CHANNEL_TICKS;
+    public static ConfigSpec.DoubleValue ESCAPE_INTERRUPT_FRACTION;
+    public static ConfigSpec.DoubleValue ESCAPE_HEAL_TO;
+    public static ConfigSpec.IntValue PHOENIX_FINISH_SECONDS;
     // his attacks
-    public static ModConfigSpec.DoubleValue LANCE_DAMAGE;
-    public static ModConfigSpec.IntValue LANCE_COUNT;
-    public static ModConfigSpec.DoubleValue WAVE_DAMAGE;
-    public static ModConfigSpec.DoubleValue SPIKE_DAMAGE;
-    public static ModConfigSpec.DoubleValue BOULDER_DAMAGE;
-    public static ModConfigSpec.DoubleValue BACKHAND_DAMAGE;
-    public static ModConfigSpec.DoubleValue PORTAL_SHOCK_DAMAGE;
-    public static ModConfigSpec.DoubleValue STORM_DAMAGE;
-    public static ModConfigSpec.IntValue TORNADO_TICKS;
-    public static ModConfigSpec.DoubleValue RING_DAMAGE;
-    public static ModConfigSpec.IntValue ENTOMB_TICKS;
-    public static ModConfigSpec.DoubleValue ENTOMB_DAMAGE_PER_SECOND;
-    public static ModConfigSpec.DoubleValue COCOON_HEALTH;
-    public static ModConfigSpec.IntValue MIND_CRUSH_RANGE;
-    public static ModConfigSpec.IntValue MIND_CRUSH_NAUSEA_TICKS;
+    public static ConfigSpec.DoubleValue LANCE_DAMAGE;
+    public static ConfigSpec.IntValue LANCE_COUNT;
+    public static ConfigSpec.DoubleValue WAVE_DAMAGE;
+    public static ConfigSpec.DoubleValue SPIKE_DAMAGE;
+    public static ConfigSpec.DoubleValue BOULDER_DAMAGE;
+    public static ConfigSpec.DoubleValue BACKHAND_DAMAGE;
+    public static ConfigSpec.DoubleValue PORTAL_SHOCK_DAMAGE;
+    public static ConfigSpec.DoubleValue STORM_DAMAGE;
+    public static ConfigSpec.IntValue TORNADO_TICKS;
+    public static ConfigSpec.DoubleValue RING_DAMAGE;
+    public static ConfigSpec.IntValue ENTOMB_TICKS;
+    public static ConfigSpec.DoubleValue ENTOMB_DAMAGE_PER_SECOND;
+    public static ConfigSpec.DoubleValue COCOON_HEALTH;
+    public static ConfigSpec.IntValue MIND_CRUSH_RANGE;
+    public static ConfigSpec.IntValue MIND_CRUSH_NAUSEA_TICKS;
     // the Horsemen
-    public static ModConfigSpec.BooleanValue HORSEMEN;
-    public static ModConfigSpec.IntValue HORSEMEN_MAX;
-    public static ModConfigSpec.DoubleValue HORSEMAN_HEALTH_FACTOR;
-    public static ModConfigSpec.DoubleValue HORSEMAN_DAMAGE_BONUS;
+    public static ConfigSpec.BooleanValue HORSEMEN;
+    public static ConfigSpec.IntValue HORSEMEN_MAX;
+    public static ConfigSpec.DoubleValue HORSEMAN_HEALTH_FACTOR;
+    public static ConfigSpec.DoubleValue HORSEMAN_DAMAGE_BONUS;
     // the heroes against him
-    public static ModConfigSpec.IntValue ADAPT_TICKS;
-    public static ModConfigSpec.IntValue ADAPTED_TICKS;
-    public static ModConfigSpec.IntValue MAGNETO_STRIP_EXTEND_TICKS;
-    public static ModConfigSpec.IntValue NO_BREAKER_SECONDS;
-    public static ModConfigSpec.BooleanValue DROPS_PHOENIX_EMBER;
-    public static ModConfigSpec.IntValue HOLD_TICKS;
+    public static ConfigSpec.IntValue ADAPT_TICKS;
+    public static ConfigSpec.IntValue ADAPTED_TICKS;
+    public static ConfigSpec.IntValue MAGNETO_STRIP_EXTEND_TICKS;
+    public static ConfigSpec.IntValue NO_BREAKER_SECONDS;
+    public static ConfigSpec.BooleanValue DROPS_PHOENIX_EMBER;
+    public static ConfigSpec.IntValue HOLD_TICKS;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         POWER_FACTOR = builder.comment("3.2: how strong the boss fights, one master knob (1.0 = the 3.1 numbers). It multiplies every damage he and his",
                         "Horsemen deal, the number of his lances, Horsemen and tornadoes, and it slows his attacks: the pause between two",

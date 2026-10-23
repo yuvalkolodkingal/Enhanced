@@ -4,12 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -34,8 +32,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * second, Ogg Vorbis, mono at 44.1 kHz. The format is read from the Vorbis identification header and the length from
  * the last page's granule position, as {@code ThanosAssetsTests} does. Nothing here names a client class.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SoundAssetTests {
     private static final String BATCH = "sound_assets";
     /** The md5 of the placeholder file the 3.5 skeleton gave every new sound event. */
@@ -254,7 +250,7 @@ public final class SoundAssetTests {
         return files;
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void everySoundOf35IsARealMonoSoundLongerThanHalfASecond(GameTestHelper helper) throws IOException {
         check(ASGARD_EVENTS.size() == 72, "Appendix C has 72 sound events: " + ASGARD_EVENTS.size());
         JsonObject sounds = json("sounds.json");
@@ -286,7 +282,7 @@ public final class SoundAssetTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void everySoundOf36IsARealMonoSoundWithItsSubtitles(GameTestHelper helper) throws IOException {
         check(INFINITY_EVENTS.size() == 83 && Set.copyOf(INFINITY_EVENTS).size() == 83,
                 "3.6 has 83 sound events: " + INFINITY_EVENTS.size());
@@ -320,7 +316,7 @@ public final class SoundAssetTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void everySoundOf37IsARealMonoSoundWithItsSubtitles(GameTestHelper helper) throws IOException {
         check(MUTANT_EVENTS.size() == 63 && Set.copyOf(MUTANT_EVENTS).size() == 63,
                 "3.7 has 63 sound events: " + MUTANT_EVENTS.size());
@@ -361,7 +357,7 @@ public final class SoundAssetTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void everySoundOf38IsARealMonoSoundWithItsSubtitles(GameTestHelper helper) throws IOException {
         check(AVENGERS_EVENTS.size() == 109 && Set.copyOf(AVENGERS_EVENTS).size() == 109,
                 "3.8 has 109 sound events: " + AVENGERS_EVENTS.size());
@@ -401,7 +397,7 @@ public final class SoundAssetTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void noSoundFileOfTheModIsThePlaceholder(GameTestHelper helper) throws IOException {
         Path root = mod().findResource("assets", Enhanced.MODID, "sounds");
         check(Files.isDirectory(root), "the mod has its sounds folder");

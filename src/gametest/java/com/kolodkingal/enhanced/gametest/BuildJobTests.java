@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildEvents;
 import com.kolodkingal.enhanced.build.BuildJob;
@@ -18,13 +17,13 @@ import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.gametest.BuildTestSupport.Seen;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -37,8 +36,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +66,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * every test has a batch of its own ({@code build_jobs_*}). Each builder's jobs are kept out of the server's ticks
  * ({@code BuildScheduler.manual}) and stepped by the test with a budget of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildJobTests {
 
     // B68
@@ -81,7 +76,7 @@ public final class BuildJobTests {
      * vanish of a 19 x 1 x 19 layer with a budget of 2 sections changes at most 2 sections a step (and spans 4); with
      * the clock reporting 60 ms ticks, a step of a 200-write budget writes 100.
      */
-    @GameTest(template = ARENA, batch = "build_jobs_sliced", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_jobs_sliced", timeoutTicks = 200)
     public static void spellsAreSlicedByWritesSectionsAndTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -128,7 +123,7 @@ public final class BuildJobTests {
     // B69
 
     /** 27 cells with the pace of 10 ticks are not done after 8 ticks, and are done by the tenth. */
-    @GameTest(template = ARENA, batch = "build_jobs_pace")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_pace")
     public static void smallSpellsStillTakeMinSpellTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -153,7 +148,7 @@ public final class BuildJobTests {
      * not at the middle of the box, so that a fill whose middle is far from the corner she stands at is heard by her; the
      * hum of the working spell is heard at her too (every 20 ticks, the front being within 16 of her), and so is her undo.
      */
-    @GameTest(template = ARENA, batch = "build_jobs_sounds")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_sounds")
     public static void theCastAndTheHumAreHeardAtTheCaster(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -188,7 +183,7 @@ public final class BuildJobTests {
      * builder's 50-cell spell (pace 1) joins and finishes in its first step; a Scarlet Witch inside her own Hex gets 200
      * to the other's 100 under 300.
      */
-    @GameTest(template = ARENA, batch = "build_jobs_fair")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_fair")
     public static void twoBuildersShareFairly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer first = builder(f, Power.SCARLET_WITCH, 0.5, 20.5, Blocks.STONE);
@@ -228,7 +223,7 @@ public final class BuildJobTests {
      * With the "loaded" predicate false for one chunk at the cast, the cells of that chunk are untouched and counted
      * {@code left.unloaded}, no ticket is ever added for it, and the job's tickets are all gone when it ends.
      */
-    @GameTest(template = ARENA, batch = "build_jobs_chunks")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_chunks")
     public static void aSpellTouchesOnlyTheChunksLoadedAtCast(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -271,7 +266,7 @@ public final class BuildJobTests {
      * waiting one, which never happens. Then her 1,000-cell fill stepped at 256 writes for 2 steps, and Ctrl + Z: it
      * stops, every cell is back, the job is gone, and "Spell stopped and taken back" is said.
      */
-    @GameTest(template = ARENA, batch = "build_jobs_ctrl_z")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_ctrl_z")
     public static void ctrlZDropsTheWaitingThenStopsAndRewinds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 20.5, 20.5, Blocks.STONE);
@@ -281,13 +276,13 @@ public final class BuildJobTests {
         cast(wanda, boxSpell(f, Spell.FILL, first));
         cast(wanda, boxSpell(f, Spell.FILL, second));
         cast(wanda, boxSpell(f, Spell.FILL, dropped));
-        check(BuildScheduler.jobs(wanda.getUUID()).size() == 3 && wanda.getData(ModAttachments.BUILD_DATA).queued() == 2,
-                "one at work, two waiting: " + wanda.getData(ModAttachments.BUILD_DATA).queued());
+        check(BuildScheduler.jobs(wanda.getUUID()).size() == 3 && ModAttachments.BUILD_DATA.get(wanda).queued() == 2,
+                "one at work, two waiting: " + ModAttachments.BUILD_DATA.get(wanda).queued());
         Seen.of(wanda);
         BuildMagic.undo(wanda);
         Seen seen = Seen.of(wanda);
         check(seen.code() == BuildVerdictPayload.DROPPED && seen.said("message.enhanced.build.dropped")
-                && wanda.getData(ModAttachments.BUILD_DATA).queued() == 1, "Ctrl + Z drops the newest waiting spell: " + seen);
+                && ModAttachments.BUILD_DATA.get(wanda).queued() == 1, "Ctrl + Z drops the newest waiting spell: " + seen);
         finish(wanda);
         check(count(f, first, Blocks.STONE) == 9 && count(f, second, Blocks.STONE) == 9, "the other two are done");
         check(count(f, dropped, Blocks.AIR) == 9, "nothing of the dropped spell ever happened");
@@ -318,7 +313,7 @@ public final class BuildJobTests {
      * A Scarlet Witch casts and logs out: her spell finishes with a fake player of her profile, the step is in her
      * history, and her next login says "While you were away, your spell finished".
      */
-    @GameTest(template = ARENA, batch = "build_jobs_away")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_away")
     public static void aSpellOutlivesItsCaster(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -347,7 +342,7 @@ public final class BuildJobTests {
      * A Scarlet Witch switched to Adventure (and another to Spectator) in the middle of her spell: build mode ends, the
      * spell stops at its next step, and what it did is one undoable step.
      */
-    @GameTest(template = ARENA, batch = "build_jobs_mode")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_mode")
     public static void adventureOrSpectatorMidSpellStopsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         for (GameType mode : List.of(GameType.ADVENTURE, GameType.SPECTATOR)) {
@@ -358,7 +353,7 @@ public final class BuildJobTests {
             BuildJob job = working(wanda);
             BuildScheduler.step(List.of(wanda.getUUID()), Budget.of(50, 4096, 1));
             wanda.setGameMode(mode);
-            check(!BuildSession.of(wanda.getUUID()).mode() && !wanda.getData(ModAttachments.BUILD_VIEW).active(), mode + ": build mode ends");
+            check(!BuildSession.of(wanda.getUUID()).mode() && !ModAttachments.BUILD_VIEW.get(wanda).active(), mode + ": build mode ends");
             BuildScheduler.step(List.of(wanda.getUUID()), Budget.of(50, 4096, 1));
             check(job.finished() && job.endCode() == BuildVerdictPayload.STOPPED && job.written() == 50,
                     mode + ": the spell stops at its next step: " + job.endCode() + ", " + job.written());
@@ -380,7 +375,7 @@ public final class BuildJobTests {
      * 1,000 cells left, the 50 is finished, the 1,000 interrupted and undoable; with three of 300 left, one is
      * finished and two interrupted, the total finished within the cap (R55).
      */
-    @GameTest(template = ARENA, batch = "build_stop")
+    @EnhancedTest(template = ARENA, batch = "build_stop")
     public static void serverStopFinishesSmallSpellsAndInterruptsBigOnes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.FINISH_ON_STOP_BLOCKS, 500);
@@ -431,7 +426,7 @@ public final class BuildJobTests {
      * {@code kept_changed} 1. A chest she stamped and someone then filled is left standing by her undo, with what it
      * holds.
      */
-    @GameTest(template = ARENA, batch = "build_jobs_safe_undo")
+    @EnhancedTest(template = ARENA, batch = "build_jobs_safe_undo")
     public static void undoLeavesLaterChangesAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();

@@ -70,7 +70,7 @@ public class SeatEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         if (tickCount > 2 && !isVehicle() || seatOf != null && level().getBlockState(seatOf).isAir()) {

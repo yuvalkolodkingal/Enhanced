@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.ultron.SokoviaJob;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal;
 import com.kolodkingal.enhanced.ultron.SokoviaShape;
@@ -8,7 +8,6 @@ import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
 import com.kolodkingal.enhanced.ultron.SokoviaTemplate;
 import com.kolodkingal.enhanced.ultron.SokoviaValidator;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -30,8 +29,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -58,8 +55,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The pieces of the Sky Island that do not need a fight: the shape (the same on the server and every client), the
  * template copied from the ground, the journal on disk, the slices of block edits, and the rules of the site.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SokoviaShapeTests {
 
     /** Flat natural ground at one height, as far as anyone looks: stone below, a layer of grass on top, air above. */
@@ -100,7 +95,7 @@ public final class SokoviaShapeTests {
      * cone has no block that falls, flows or holds an inventory. At the real size the island has about 15,000 blocks of
      * ground and cone.
      */
-    @GameTest(template = TestKit.ARENA, batch = "ultron_lift_shape")
+    @EnhancedTest(template = TestKit.ARENA, batch = "ultron_lift_shape")
     public static void theShapeIsTheSameOnBothSides(GameTestHelper helper) {
         Spec server = new Spec(20, 40, 5, 16, 14, 0x5EEDL);
         Spec client = new Spec(20, 40, 5, 16, 14, 0x5EEDL);
@@ -151,7 +146,7 @@ public final class SokoviaShapeTests {
     }
 
     /** The ease: 0 at the start, 1 at the end, no speed at either, never going back. */
-    @GameTest(template = TestKit.ARENA, batch = "ultron_lift_shape")
+    @EnhancedTest(template = TestKit.ARENA, batch = "ultron_lift_shape")
     public static void theRiseIsAnEase(GameTestHelper helper) {
         check(SokoviaShape.offset(40, 160, 0) == 0.0 && SokoviaShape.offset(40, 160, 160) == 40.0, "from 0 to the height");
         check(SokoviaShape.offset(40, 160, -5) == 0.0 && SokoviaShape.offset(40, 160, 999) == 40.0, "and no further");
@@ -177,7 +172,7 @@ public final class SokoviaShapeTests {
      * chest, a torch, a wall of somebody's house, a pond) is left behind and the island has its own rock or air there;
      * nothing in it is a block entity or a fluid; and the ground the template read is not changed at all.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_template")
+    @EnhancedTest(template = PAD, batch = "ultron_lift_template")
     public static void theTemplateCarriesTheGroundAndLeavesWhatWasBuiltBehind(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // On the grass: a chest, a torch beside it, a wall of planks three high, a pond and a flower.
@@ -235,7 +230,7 @@ public final class SokoviaShapeTests {
      * file left by a crash is ignored, a truncated file or one of another version is set aside without anything being
      * done on its account, and writing it again replaces it whole.
      */
-    @GameTest(template = TestKit.ARENA, batch = "ultron_lift_journal")
+    @EnhancedTest(template = TestKit.ARENA, batch = "ultron_lift_journal")
     public static void theJournalIsWrittenWholeAndReadBackOrRefused(GameTestHelper helper) throws IOException {
         TestKit.Fixture f = TestKit.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -285,7 +280,7 @@ public final class SokoviaShapeTests {
      * The island is placed bottom-up and taken down top-down, never more than the budget in a tick, and a slice that
      * meets a chunk that is not loaded waits and goes on when it is.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_slices", timeoutTicks = 300)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_slices", timeoutTicks = 300)
     public static void theSlicesKeepTheBudgetTheOrderAndWaitForChunks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Spec spec = new Spec(9, 20, 4, 8, 6, 5L);
@@ -363,7 +358,7 @@ public final class SokoviaShapeTests {
      * room the island needs (above the island, and in the margin round it), an armour stand in the cylinder, and a
      * claim that forbids building up there are each refused with their message; nothing built on the ground itself is.
      */
-    @GameTest(template = PAD, batch = "ultron_lift_site", timeoutTicks = 100)
+    @EnhancedTest(template = PAD, batch = "ultron_lift_site", timeoutTicks = 100)
     public static void eachRuleOfTheSiteRefusesWhatBreaksIt(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper);
         ServerLevel level = f.level();

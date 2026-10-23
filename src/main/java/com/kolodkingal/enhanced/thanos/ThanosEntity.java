@@ -1426,7 +1426,7 @@ public class ThanosEntity extends Monster implements BossHooks {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide || !isAlive()) {
+        if (level().isClientSide() || !isAlive()) {
             return false;
         }
         boolean bypass = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);

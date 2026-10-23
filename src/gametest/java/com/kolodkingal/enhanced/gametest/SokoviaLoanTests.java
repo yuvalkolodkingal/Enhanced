@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.BlockLifting;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -14,6 +13,7 @@ import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -27,7 +27,6 @@ import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -54,8 +53,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -101,8 +98,6 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.tank;
  * each within two blocks of the hero who takes it, so that the hero's eye ray meets it and not the ground before it. The
  * fighters are moved off the middle, where Ultron floats during the lift.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SokoviaLoanTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -283,7 +278,7 @@ public final class SokoviaLoanTests {
      * it turns to dust, nothing drops; its home mends to the state the lift copied; the ore in the ground below, which it
      * was copied from, was never touched.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_island", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_island", timeoutTicks = 400)
     public static void theIslandLendsItsBlocksAndStaysWhole(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -325,7 +320,7 @@ public final class SokoviaLoanTests {
      * it was, the sky is empty and nothing dropped (the clearing never met the ring's block). Both journals, the arena's
      * and the island's note, are still on disk, and gone after two saves of the world.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_ground", timeoutTicks = 700)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_ground", timeoutTicks = 700)
     public static void aRingBlockSetDownOnTheIslandIsGoneByTheDescent(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.BORROWED_BLOCK_TICKS, 2400);
@@ -402,7 +397,7 @@ public final class SokoviaLoanTests {
      * on a copy cell. A copy of the island, by contrast, is kept within that reach wherever it is, even beside the island
      * and under its surface.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_rise", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_rise", timeoutTicks = 400)
     public static void aRingBlockIsCarriedUpPastTheRim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.BORROWED_BLOCK_TICKS, 2400);
@@ -495,7 +490,7 @@ public final class SokoviaLoanTests {
      * block is gone; a press at the ground then says it is about to rise ({@code arena_moving}); at the lock the island
      * copies the cell as it was.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_warn", timeoutTicks = 200)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_warn", timeoutTicks = 200)
     public static void theGroundLendsNothingWhileItIsAboutToRise(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -533,7 +528,7 @@ public final class SokoviaLoanTests {
      * T36 (D-T 4.2, 6.1.1): at the lock, the island carries Wanda, and her press says so ({@code carried}); a player the
      * lift does not carry (Creative, come after the lock, out on the ring) cannot take a Sentry the lift carries.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_carry", timeoutTicks = 100)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_carry", timeoutTicks = 100)
     public static void theCarriedCanNeitherGrabNorBeGrabbed(GameTestHelper helper) {
         TestKit.Fixture f = pad(helper); // (with the two Sentries of the start)
         f.onClose(Telekinesis::clear);
@@ -569,7 +564,7 @@ public final class SokoviaLoanTests {
      * nothing, no block falls to the ground and nothing drops; a press at the ring's ground then says the island is coming
      * down ({@code arena_descending}).
      */
-    @GameTest(template = PAD, batch = "ultron_loans_descent", timeoutTicks = 500)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_descent", timeoutTicks = 500)
     public static void theDescentCrumblesWhatIsBorrowed(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -620,7 +615,7 @@ public final class SokoviaLoanTests {
      * T56 (D-T 5.2): a sand copy on the island, resting on the island's own dirt, is borrowed and mended: it is back as the
      * lift copied it, with no tick scheduled at its cell, and it never falls.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_gravity", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_gravity", timeoutTicks = 400)
     public static void theIslandsSandStaysPut(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -660,7 +655,7 @@ public final class SokoviaLoanTests {
      * event on the island is cancelled and on the ring it is not; the ground hidden under the island still gives nothing; a
      * ring block Wanda lifts is the real one, not borrowed.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_unprotected", timeoutTicks = 400)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_unprotected", timeoutTicks = 400)
     public static void theIslandLendsWhateverTheArenaConfigSays(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.PROTECT_ARENA, false);
@@ -683,7 +678,7 @@ public final class SokoviaLoanTests {
             BlockEvent.BreakEvent onTheRing = new BlockEvent.BreakEvent(level, ringAt, level.getBlockState(ringAt), wanda);
             NeoForge.EVENT_BUS.post(onTheRing);
             check(onTheIsland.isCanceled() && !onTheRing.isCanceled(), "breaking on the island is refused, on the ring it is not");
-            zombie[0] = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(MIDDLE_X + 2.0, GROUND + LIFT, MIDDLE_Z + 2.0));
+            zombie[0] = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(MIDDLE_X + 2.0, GROUND + LIFT, MIDDLE_Z + 2.0));
             zombie[0].setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
             block[0] = borrowed(helper, wanda, copy);
             // The copy a step and a half before the zombie, at its chest, and thrown straight at it.
@@ -726,7 +721,7 @@ public final class SokoviaLoanTests {
      * was sent the poppy's chunk; the check that his log would see an update of such a cell: the test changes one at the
      * end, and the update is there.)
      */
-    @GameTest(template = PAD, batch = "ultron_loans_hidden", timeoutTicks = 500)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_hidden", timeoutTicks = 500)
     public static void nothingLandsOnTheHiddenGround(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -804,7 +799,7 @@ public final class SokoviaLoanTests {
      * once; its note says so until the first save, owes nothing after it, and is gone at the second. The ritual's note,
      * which clears nothing, is still deleted at once.
      */
-    @GameTest(template = PAD, batch = "ultron_loans_note", timeoutTicks = 700)
+    @EnhancedTest(template = PAD, batch = "ultron_loans_note", timeoutTicks = 700)
     public static void aLandedIslandsNoteWaitsForTheSave(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();

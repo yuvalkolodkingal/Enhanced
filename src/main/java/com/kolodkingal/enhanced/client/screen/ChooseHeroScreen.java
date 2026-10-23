@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.client.screen;
 import com.kolodkingal.enhanced.client.custom.CreatorUi;
 import com.kolodkingal.enhanced.custom.HeroLooks;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
@@ -13,7 +14,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -94,7 +94,7 @@ public class ChooseHeroScreen extends Screen {
         Power power = chosen;
         addRenderableWidget(new CreatorUi.BigButton(width - 8 - becomeW, bottom, becomeW, 36, Component.translatable("screen.enhanced.hero_creator.become"),
                 null, power.titleColor(), () -> {
-                    PacketDistributor.sendToServer(HeroCreatorPayload.choose(power, look));
+                    Net.sendToServer(HeroCreatorPayload.choose(power, look));
                     onClose();
                 }).face(face(power, look)));
     }

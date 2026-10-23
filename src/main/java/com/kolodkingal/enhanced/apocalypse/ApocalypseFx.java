@@ -1,10 +1,10 @@
 package com.kolodkingal.enhanced.apocalypse;
 
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * The server's end of {@link ApocalypseFxPayload}: sends one effect to the players who can see it. Everything the
@@ -17,12 +17,12 @@ public final class ApocalypseFx {
 
     /** Sends the effect to everyone within {@link #RADIUS} of {@code near}. */
     public static void send(ServerLevel level, Vec3 near, byte kind, int id, Vec3 a, Vec3 b, int c, int d) {
-        PacketDistributor.sendToPlayersNear(level, null, near.x, near.y, near.z, RADIUS, new ApocalypseFxPayload(kind, id, a, b, c, d));
+        Net.sendToPlayersNear(level, null, near.x, near.y, near.z, RADIUS, new ApocalypseFxPayload(kind, id, a, b, c, d));
     }
 
     /** Sends the effect to everyone within {@code radius} of {@code near}. */
     public static void send(ServerLevel level, Vec3 near, double radius, byte kind, int id, Vec3 a, Vec3 b, int c, int d) {
-        PacketDistributor.sendToPlayersNear(level, null, near.x, near.y, near.z, radius, new ApocalypseFxPayload(kind, id, a, b, c, d));
+        Net.sendToPlayersNear(level, null, near.x, near.y, near.z, radius, new ApocalypseFxPayload(kind, id, a, b, c, d));
     }
 
     /**
@@ -31,12 +31,12 @@ public final class ApocalypseFx {
      * that is over.
      */
     public static void sendToLevel(ServerLevel level, byte kind, int id, Vec3 a, Vec3 b, int c, int d) {
-        PacketDistributor.sendToPlayersInDimension(level, new ApocalypseFxPayload(kind, id, a, b, c, d));
+        Net.sendToPlayersInDimension(level, new ApocalypseFxPayload(kind, id, a, b, c, d));
     }
 
     /** Sends the effect to one player (a late joiner who starts tracking the boss is told where the arena is). */
     public static void sendTo(ServerPlayer player, byte kind, int id, Vec3 a, Vec3 b, int c, int d) {
-        PacketDistributor.sendToPlayer(player, new ApocalypseFxPayload(kind, id, a, b, c, d));
+        Net.sendToPlayer(player, new ApocalypseFxPayload(kind, id, a, b, c, d));
     }
 
     /** The effect that has a place and nothing else: its position is both the origin and where it is sent from. */

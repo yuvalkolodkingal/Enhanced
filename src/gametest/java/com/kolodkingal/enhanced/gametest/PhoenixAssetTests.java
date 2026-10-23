@@ -2,15 +2,12 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -30,8 +27,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * sounds are mono 44.1 kHz Ogg Vorbis of the length their recipe makes, and the Hebrew of her lang block is Hebrew.
  * Nothing here loads a client class.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class PhoenixAssetTests {
     private static final String BATCH = PhoenixTests.QUICK;
 
@@ -54,7 +49,7 @@ public final class PhoenixAssetTests {
     // ------------------------------------------------------------------------------------------------------------
     // Skins
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void bothSkinsFollowTheSkinRulesAndLeaveTheGlowingEyesFree(GameTestHelper helper) throws IOException {
         Map<String, BufferedImage> skins = new LinkedHashMap<>();
         for (String id : List.of("apocalypse", "brand_new_day")) {
@@ -127,7 +122,7 @@ public final class PhoenixAssetTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHeroLooksAreRedAndOliveWhereTheFilmsAreRedAndOlive(GameTestHelper helper) throws IOException {
         // A cheap guard against a swapped or redrawn-by-mistake skin: the Apocalypse look is red hair and a blue body,
         // the Brand New Day look an olive hood and a dark jacket with a mustard centre.
@@ -145,7 +140,7 @@ public final class PhoenixAssetTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Ember and the icon
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEmberIsAnAnimatedStripOfFourFramesAndTheEffectIconIsAnEffectIcon(GameTestHelper helper) throws IOException {
         BufferedImage ember = image("textures/item/phoenix_ember.png");
         check(ember.getWidth() == 16 && ember.getHeight() == 64, "the Ember is a strip of four 16 by 16 frames: " + ember.getWidth() + "x" + ember.getHeight());
@@ -185,7 +180,7 @@ public final class PhoenixAssetTests {
     // ------------------------------------------------------------------------------------------------------------
     // Sounds
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSevenSoundsAreMonoOggVorbisOfTheRightLengthWithEnglishAndHebrewSubtitles(GameTestHelper helper) throws IOException {
         // name -> seconds (the spec's table)
         Map<String, Double> sounds = new LinkedHashMap<>();
@@ -237,7 +232,7 @@ public final class PhoenixAssetTests {
     // ------------------------------------------------------------------------------------------------------------
     // Words
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHebrewOfHerLangBlockIsHebrewAndNotAnEnglishCopy(GameTestHelper helper) throws IOException {
         List<String> lines = List.of(text("lang/he_il.json").split("\n"));
         List<String> englishLines = List.of(text("lang/en_us.json").split("\n"));

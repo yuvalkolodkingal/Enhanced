@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.tower.TowerFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client (3.8): a moment of the Avengers Tower's armoury (lane L6's; the gantry's arms lane L7's): a suit
@@ -38,7 +38,7 @@ public record TowerFxPayload(int kind, BlockPos pos, int arg) implements CustomP
         return TYPE;
     }
 
-    static void handle(TowerFxPayload payload, IPayloadContext context) {
+    static void handle(TowerFxPayload payload, PacketContext context) {
         TowerFx.receive(payload);
     }
 }

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.HeimdallSightView;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -9,7 +10,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +49,7 @@ public record HeimdallSightPayload(List<Far> players) implements CustomPacketPay
         return TYPE;
     }
 
-    static void handle(HeimdallSightPayload payload, IPayloadContext context) {
+    static void handle(HeimdallSightPayload payload, PacketContext context) {
         HeimdallSightView.receive(payload);
     }
 }

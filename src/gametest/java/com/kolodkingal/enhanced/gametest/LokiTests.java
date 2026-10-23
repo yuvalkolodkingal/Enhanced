@@ -1,7 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonObject;
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
@@ -9,6 +8,8 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.item.TesseractItem;
+import com.kolodkingal.enhanced.platform.reg.RegEntry;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
@@ -22,7 +23,6 @@ import com.kolodkingal.enhanced.registry.ModSounds;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,9 +42,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 
@@ -57,8 +54,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /** Loki: the Tesseract, his shared tricks and his Frost Giant form. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class LokiTests {
 
     private static void press(ServerPlayer player, int ability) {
@@ -72,13 +67,13 @@ public final class LokiTests {
     }
 
     /** How many times {@code listener} heard {@code sound} played inside {@code where} since it last asked. */
-    private static long heard(ServerPlayer listener, AABB where, DeferredHolder<SoundEvent, SoundEvent> sound) {
+    private static long heard(ServerPlayer listener, AABB where, RegEntry<SoundEvent, SoundEvent> sound) {
         return TestKit.heardSounds(listener).stream().filter(s -> s.id().equals(sound.getId()) && where.contains(s.at())).count();
     }
 
     // ---- the Tesseract ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractMakesYouLokiFarAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -105,7 +100,7 @@ public final class LokiTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void tesseractTakesAHeroWhereTheyLook(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -130,12 +125,12 @@ public final class LokiTests {
 
     // ---- Ability 1: Daggers ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void daggerHurtsAndVanishes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer loki = f.player(4.5, FLOOR, 10.5, Power.LOKI);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         // Out in the daylight it would burn, and a point of fire damage would look like the dagger's.
         zombie.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1200));
         lookAt(loki, zombie);
@@ -156,7 +151,7 @@ public final class LokiTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void sneakingThrowsAFanOfThree(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -172,13 +167,13 @@ public final class LokiTests {
 
     // ---- Ability 2: Duplicates ----
 
-    @GameTest(template = ARENA, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, timeoutTicks = 260)
     public static void duplicatesDrawEnemiesAwayAndFade(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
         ServerPlayer loki = f.player(10.5, FLOOR, 10.5, Power.LOKI);
         PowerData data = Powers.get(loki);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(17.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(17.5, FLOOR, 10.5));
         skeleton.setTarget(loki);
         check(skeleton.getTarget() == loki, "the skeleton is after Loki");
 
@@ -211,12 +206,12 @@ public final class LokiTests {
 
     // ---- Ability 3: Shapeshift ----
 
-    @GameTest(template = ARENA, timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, timeoutTicks = 160)
     public static void shapeshiftIntoAZombieAndBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(4.5, FLOOR, 10.5, Power.LOKI);
         PowerData data = Powers.get(loki);
-        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie model = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         lookAt(loki, model);
         press(loki, 3);
         check(LokiForm.of(data).map(LokiForm::type).orElse(null) == EntityType.ZOMBIE, "Loki takes the zombie's shape: " + data.form());
@@ -225,8 +220,8 @@ public final class LokiTests {
         check(model.getTarget() == null, "a zombie never goes after one of its own");
 
         // Real target selection: a zombie leaves him alone, while a husk (another kind) comes for him.
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 15.5));
-        Husk husk = helper.spawn(EntityType.HUSK, new Vec3(4.5, FLOOR, 5.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 15.5));
+        Husk husk = TestKit.spawn(helper, EntityType.HUSK, new Vec3(4.5, FLOOR, 5.5));
         f.everyTick(120, tick -> {
             check(zombie.getTarget() != loki, "the zombie doesn't pick Loki as its target");
             if (husk.getTarget() != loki) {
@@ -241,7 +236,7 @@ public final class LokiTests {
 
             zombie.discard();
             husk.discard();
-            ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR + 3.0, 14.5));
+            ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR + 3.0, 14.5));
             lookAt(loki, boss);
             press(loki, 3);
             check(data.form().isEmpty(), "a boss can't be copied");
@@ -251,11 +246,11 @@ public final class LokiTests {
 
     // ---- Ability 4: Vanish ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void vanishPutsLokiBehindACreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(3.5, FLOOR, 10.5, Power.LOKI);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         // The zombie faces Loki, to the west.
         zombie.setYRot(90.0F);
         zombie.setYBodyRot(90.0F);
@@ -283,7 +278,7 @@ public final class LokiTests {
 
     // ---- Ability 5: Frost Giant ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void frostGiantIsColdAndHard(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(5.5, FLOOR, 10.5, Power.LOKI);
@@ -305,7 +300,7 @@ public final class LokiTests {
         PowerTicker.tick(loki);
         check(loki.getTicksFrozen() == 0, "and he never freezes");
 
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
         loki.attack(zombie);
         MobEffectInstance slowness = zombie.getEffect(MobEffects.MOVEMENT_SLOWDOWN);
         check(slowness != null && slowness.getAmplifier() == 1 && slowness.getDuration() >= LokiAbilities.FREEZE_TICKS - 1,
@@ -331,7 +326,7 @@ public final class LokiTests {
      * tough as Thor's body, below the crowned Scarlet Witch; the Frost Giant's +4 armor comes on top. A change of the
      * config takes hold on the next tick, and his health never stays above the new maximum.
      */
-    @GameTest(template = ARENA, batch = "loki_body")
+    @EnhancedTest(template = ARENA, batch = "loki_body")
     public static void lokisBodyFollowsTheConfig(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(EnhancedConfig.LOKI_BODY_HEALTH.getDefault() == 10.0 && EnhancedConfig.LOKI_BODY_ARMOR.getDefault() == 6.0
@@ -362,7 +357,7 @@ public final class LokiTests {
     }
 
     /** No look has an ability of its own: ability 5 is the Frost Giant form whichever outfit Loki wears. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void frostGiantIsAbilityFiveInEveryLook(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(5.5, FLOOR, 10.5, Power.LOKI);
@@ -378,7 +373,7 @@ public final class LokiTests {
             check(data.toggle(Toggle.FROST_GIANT), "N reveals the Frost Giant in the " + id + " look");
             assertNear(loki.getAttributeValue(Attributes.ARMOR) - armor, LokiAbilities.FROST_ARMOR_BONUS, 1.0E-6,
                     "with its armor in the " + id + " look");
-            Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(7.0, FLOOR, 10.5));
             loki.attack(zombie);
             check(zombie.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "and its blow slows in the " + id + " look");
             zombie.discard();
@@ -394,7 +389,7 @@ public final class LokiTests {
     // ---- Looks ----
 
     /** Only the main MCU Loki: his Asgardian look, the TVA's, the God of Stories' and the player's own skin. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void lokiHasOnlyTheMainLokisLooks(GameTestHelper helper) {
         List<String> ids = Variants.of(Power.LOKI).stream().map(Variant::id).toList();
         check(ids.equals(List.of("loki", "tva", "god_of_stories", "own")), "Loki's looks are the main Loki's, not " + ids);
@@ -422,7 +417,7 @@ public final class LokiTests {
     // ---- Sounds ----
 
     /** Every trick has Loki's own sound (not a vanilla stand-in), played where it happens. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyTrickHasItsOwnSound(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -434,7 +429,7 @@ public final class LokiTests {
         press(loki, 1);
         check(heard(loki, arena, ModSounds.LOKI_DAGGER) == 1, "throwing a dagger plays loki_dagger");
 
-        Zombie model = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie model = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
         lookAt(loki, model);
         press(loki, 3);
         check(heard(loki, arena, ModSounds.LOKI_SHAPESHIFT) == 1, "taking a shape plays loki_shapeshift");
@@ -464,7 +459,7 @@ public final class LokiTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void losingThePowerEndsEveryTrick(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

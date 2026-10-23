@@ -104,7 +104,7 @@ public class MjolnirPinEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             // A crackle of lightning round the hammer, now and then.
             if (random.nextInt(8) == 0 && level().getEntity(targetEntityId()) != null) {
                 level().addParticle(ParticleTypes.ELECTRIC_SPARK, getX() + (random.nextDouble() - 0.5) * 0.8, getY() + (random.nextDouble() - 0.5) * 0.4,
@@ -137,11 +137,11 @@ public class MjolnirPinEntity extends Entity {
      */
     @Override
     public void remove(RemovalReason reason) {
-        if (!spent && !level().isClientSide && reason.shouldDestroy() && level() instanceof ServerLevel level) {
+        if (!spent && !level().isClientSide() && reason.shouldDestroy() && level() instanceof ServerLevel level) {
             MjolnirPin.release(level, this);
             return;
         }
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             // (Unloaded with its chunk: nothing else would ever clear the entry for whoever it pinned.)
             MjolnirPin.forget(this);
         }

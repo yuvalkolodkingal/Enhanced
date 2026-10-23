@@ -64,7 +64,7 @@ public class ThanosPhantomEntity extends Monster {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (!level().isClientSide && ++life > LIFETIME) {
+        if (!level().isClientSide() && ++life > LIFETIME) {
             dissolve();
         }
     }
@@ -72,7 +72,7 @@ public class ThanosPhantomEntity extends Monster {
     /** One touch is enough. */
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide || !isAlive()) {
+        if (level().isClientSide() || !isAlive()) {
             return false;
         }
         dissolve();

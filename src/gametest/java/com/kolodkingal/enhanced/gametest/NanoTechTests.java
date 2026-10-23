@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.custom.HeroAbility;
@@ -16,12 +15,12 @@ import com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity;
 import com.kolodkingal.enhanced.ironman.nano.NanoDrones;
 import com.kolodkingal.enhanced.ironman.nano.NanoHousings;
 import com.kolodkingal.enhanced.ironman.nano.WingFormation;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,8 +35,6 @@ import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashSet;
 import java.util.List;
@@ -62,8 +59,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * Mark 50's nano blade (9), nano shield (−80 %) and its cannon released early (refused, half the energy back). Batch
  * {@code nano}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class NanoTechTests {
     private static final String BATCH = "nano";
 
@@ -99,7 +94,7 @@ public final class NanoTechTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no blow moves it). */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
@@ -177,7 +172,7 @@ public final class NanoTechTests {
     // The framework: H, the armour, the housings
 
     /** H deploys the selected housing (the Mark 85), Sneak + H switches to the Mark 50 he carries. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void hDeploysTheSelectedSuitAndSneakSwitches(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = ironMan(f, 5.5, 5.5);
@@ -199,7 +194,7 @@ public final class NanoTechTests {
     }
 
     /** The suit's armour while it is out (the Mark 85's 20), none after it went back in. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theArmourIsOnWhileOutAndOffAfter(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 5.5, 5.5, SuitKind.MARK_85);
@@ -214,7 +209,7 @@ public final class NanoTechTests {
     }
 
     /** A blow wears the deployed suit's housing (a quarter of it), never the Nano Arc Reactor. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void damageWearsTheHousingNotTheReactor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 5.5, 5.5, SuitKind.MARK_85);
@@ -229,7 +224,7 @@ public final class NanoTechTests {
     }
 
     /** A stowed housing rebuilds a point every 40 ticks; the deployed one does not. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void aStowedHousingRebuilds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 5.5, 5.5, SuitKind.MARK_85);
@@ -247,7 +242,7 @@ public final class NanoTechTests {
     }
 
     /** The Nano Arc Reactor taken off the chest: the suit goes back at once. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theReactorTakenOffRetractsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 5.5, 5.5, SuitKind.MARK_85);
@@ -262,7 +257,7 @@ public final class NanoTechTests {
     // The Mark 85
 
     /** Sneak + R: the blades out; R slashes 10, 10, then 14; the empty hand hits 12. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theEnergyBladesComboAndTheEmptyHand(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 5.5, 5.5, SuitKind.MARK_85);
@@ -289,7 +284,7 @@ public final class NanoTechTests {
     }
 
     /** V: the giant chest laser goes through three creatures in a line (7 each). */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theChestLaserHitsThreeInALine(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 3.5, 10.5, SuitKind.MARK_85);
@@ -308,14 +303,14 @@ public final class NanoTechTests {
     }
 
     /** B: the energy shield takes a creeper's blast from the front whole; from behind it does not. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theEnergyShieldStopsACreeperFromTheFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer front = deployed(f, 8.5, 10.5, SuitKind.MARK_85);
         ServerPlayer back = deployed(f, 12.5, 10.5, SuitKind.MARK_85);
         look(front, EAST, 0.0F);
         look(back, EAST, 0.0F);
-        Creeper creeper = helper.spawnWithNoFreeWill(EntityType.CREEPER, new Vec3(10.5, FLOOR, 10.5));
+        Creeper creeper = TestKit.spawnWithNoFreeWill(helper, EntityType.CREEPER, new Vec3(10.5, FLOOR, 10.5));
         hold(front, 4, false);
         hold(back, 4, false);
         check(EnergyShield.up(front) && EnergyShield.up(back), "both shields up");
@@ -329,7 +324,7 @@ public final class NanoTechTests {
     }
 
     /** Sneak + B: the Lightning Refocuser chains through five creatures, 10 / 8 / 6 / 5 / 4; charged: free, × 1.5. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theRefocuserChainsAndLightningChargesIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 2.5, 10.5, SuitKind.MARK_85);
@@ -363,7 +358,7 @@ public final class NanoTechTests {
     }
 
     /** N: six missiles lock six different creatures and each homes on its own; a moving one is hit. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 260)
     public static void homingMissilesLockSixAndHitAMovingOne(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 2.5, 10.5, SuitKind.MARK_85);
@@ -397,7 +392,7 @@ public final class NanoTechTests {
     }
 
     /** A missile whose target dies picks the nearest other; one with no lock flies 32 blocks and pops. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void aMissileRetargetsWhenItsTargetDies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 2.5, 10.5, SuitKind.MARK_85);
@@ -427,7 +422,7 @@ public final class NanoTechTests {
     }
 
     /** Sneak + N: two drones shoot a creature (6 a shot), never a player without PvP, and go at 400 ticks. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 480)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 480)
     public static void theDronesShootCreaturesNotPlayersAndGo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 10.5, 10.5, SuitKind.MARK_85);
@@ -454,7 +449,7 @@ public final class NanoTechTests {
      * formation turns with his body and grows with his size; the bob is small; the inner blade grows first and folds
      * last. Live: the two drones fly to their side's place and their lasers leave from a blade beside him.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void theWingBladesFanOutBesideHim(GameTestHelper helper) {
         for (double t : new double[] {0.0, 7.3, 41.0, 133.5, 977.0}) {
             Vec3 rightIn = WingFormation.local(0, 0, t);
@@ -515,7 +510,7 @@ public final class NanoTechTests {
     // The Mark 50
 
     /** Sneak + R: the nano blade (the empty hand hits 9); B: the nano shield cuts a blow from the front by 80 %. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theNanoBladeAndTheNanoShield(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 5.5, 5.5, SuitKind.MARK_50);
@@ -539,7 +534,7 @@ public final class NanoTechTests {
     }
 
     /** N held and let go too soon: the cannon is refused and half its energy comes back. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theCannonReleasedEarlyIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = deployed(f, 5.5, 10.5, SuitKind.MARK_50);

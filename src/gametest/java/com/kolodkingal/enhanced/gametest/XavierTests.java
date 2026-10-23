@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.network.ThoughtsPayload;
 import com.kolodkingal.enhanced.network.XavierChoicePayload;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
 import com.kolodkingal.enhanced.network.XavierPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -29,7 +30,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -47,8 +47,6 @@ import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -81,8 +79,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * <p>Batches: {@code xavier} (PvP off, nothing server-wide), {@code xavier_pvp} (every test there switches PvP on), and a
  * {@code xavier_solo_*} batch for each test that changes a config value or ends every link.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class XavierTests {
     static final String QUICK = "xavier";
     static final String PVP = "xavier_pvp";
@@ -93,7 +89,7 @@ public final class XavierTests {
 
     /** A husk with its own will (it walks when steered and does not burn in the sun). */
     static Husk husk(GameTestHelper helper, double x, double z) {
-        Husk husk = helper.spawn(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Husk husk = TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         husk.setPersistenceRequired();
         return husk;
     }
@@ -118,7 +114,7 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // The rule book
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theTelepathyRanksAreEilonsList(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(Telepathy.rank(Power.PROFESSOR_X) == Telepathy.Rank.TELEPATH, "Professor X is a telepath");
@@ -148,7 +144,7 @@ public final class XavierTests {
         check(Telepathy.isStronger(wanda, charles) && !Telepathy.isStronger(charles, wanda), "who is stronger");
         plain.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
         check(Telepathy.reach(charles, plain) == Telepathy.Verdict.SHIELDED && Telepathy.isShielded(plain), "Magneto's helmet shuts a mind");
-        var warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(14.5, FLOOR, 14.5));
+        var warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(14.5, FLOOR, 14.5));
         check(Telepathy.reach(charles, warden) == Telepathy.Verdict.SHIELDED, "and a boss's mind is too vast");
         warden.discard();
         helper.succeed();
@@ -157,7 +153,7 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // The wheelchair and the two versions
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theWheelchairAwakensHimAndHeChoosesHisVersion(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -194,7 +190,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theWheelchairIsCrafted(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("xavier_wheelchair"));
@@ -214,7 +210,7 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // R: the Mental Blast
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theMentalBlastHurtsAnOpenMindOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 4.5, 10.5);
@@ -245,7 +241,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void theMentalBlastHurtsAPlayerWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -267,7 +263,7 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // G: Hear Thoughts
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void hearThoughtsSendsTheThoughtsAround(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 4.5, 4.5);
@@ -275,7 +271,7 @@ public final class XavierTests {
         press(charles, 2);
         check(data.toggle(Toggle.HEAR_THOUGHTS) && Thoughts.listens(charles, data), "G: he hears thoughts");
         Zombie husk = PhoenixTests.zombie(helper, 8.5, 4.5);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 8.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 8.5));
         ServerPlayer wanda = f.player(4.5, FLOOR, 8.5, Power.SCARLET_WITCH);
         ServerPlayer hurt = f.player(12.5, FLOOR, 4.5);
         hurt.setHealth(4.0F);
@@ -306,7 +302,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void everyThoughtHasItsWordsInBothLanguages(GameTestHelper helper) throws IOException {
         var mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String lang : List.of("en_us", "he_il")) {
@@ -340,7 +336,7 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // V: Take Over a Body (creatures)
 
-    @GameTest(template = ARENA, batch = "xavier_link", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "xavier_link", timeoutTicks = 80)
     public static void heTakesACreatureAndSteersIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 3.5, 10.5);
@@ -374,13 +370,13 @@ public final class XavierTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "xavier_link")
+    @EnhancedTest(template = ARENA, batch = "xavier_link")
     public static void aSteeredCreatureStrikesWhatHeLooksAt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 3.5, 4.5);
         releaseOnClose(f, charles);
         Husk husk = husk(helper, 6.5, 4.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(8.0, FLOOR, 4.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(8.0, FLOOR, 4.5));
         lookAt(charles, husk);
         press(charles, 3);
         check(MindLink.isHost(husk), "in the husk");
@@ -395,7 +391,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "xavier_link")
+    @EnhancedTest(template = ARENA, batch = "xavier_link")
     public static void aLinkEndsWhenTheBodyDiesOrHeIsHurtOrGone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // The body dies.
@@ -446,7 +442,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "xavier_link", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "xavier_link", timeoutTicks = 60)
     public static void aLinkEndsWhenTheBodyGoesTooFar(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 3.5, 10.5);
@@ -462,7 +458,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "xavier_solo_link_time", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "xavier_solo_link_time", timeoutTicks = 80)
     public static void aLinkEndsWithItsTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(XavierConfig.LINK_CREATURE_TICKS, 20);
@@ -482,7 +478,7 @@ public final class XavierTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "xavier_solo_server_stop")
+    @EnhancedTest(template = ARENA, batch = "xavier_solo_server_stop")
     public static void aStoppingServerEndsEveryLink(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 3.5, 10.5);
@@ -496,7 +492,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void someMindsCannotBeTaken(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 3.5, 3.5);
@@ -525,7 +521,7 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // V: Take Over a Body (players), and the stronger telepaths
 
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void heSteersAPlayerWhoNeverStaysStuck(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -559,7 +555,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void aSteeredPlayerLogsOutOrDiesAndIsFree(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -583,7 +579,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void aStrongerTelepathThrowsHimOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -612,13 +608,13 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // B: Freeze Minds, N: Cerebro
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void freezeMindsHoldsOpenMindsAround(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 10.5, 10.5);
         Zombie husk = PhoenixTests.zombie(helper, 13.5, 10.5);
-        Villager villager = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(7.5, FLOOR, 10.5));
-        Zombie helmet = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(10.5, FLOOR, 14.5));
+        Villager villager = TestKit.spawnWithNoFreeWill(helper, EntityType.VILLAGER, new Vec3(7.5, FLOOR, 10.5));
+        Zombie helmet = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(10.5, FLOOR, 14.5));
         helmet.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.MAGNETO_HELMET.get()));
         ServerPlayer plain = f.player(10.5, FLOOR, 6.5);
         press(charles, 4);
@@ -630,7 +626,7 @@ public final class XavierTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void cerebroFindsTheMindsOfPlayers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer charles = xavier(f, 3.5, 3.5);
@@ -656,7 +652,7 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // The network
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theMessagesOfProfessorXRoundTrip(GameTestHelper helper) {
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10,
                 "3.6 bumps the protocol to 10 (3.3 had 7, 3.4 8, 3.5 9; 3.7 11, pinned by MutantSkeletonTests)");

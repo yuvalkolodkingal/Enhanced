@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.config.LocatorConfig;
 import com.kolodkingal.enhanced.config.StonesConfig.Uniqueness;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -332,7 +332,7 @@ public final class StoneLocator {
         Vec3 from = player.getEyePosition().add(0.0, -0.4, 0.0);
         List<Vec3> points = trail(from, state.target()
                 .filter(t -> t.dimension() == player.level().dimension()).map(GlobalPos::pos).orElse(null));
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(StoneFxPayload.LOCATOR_TRAIL,
+        Net.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(StoneFxPayload.LOCATOR_TRAIL,
                 player.getId(), points, kind.ordinal()));
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.LOCATOR_PULSE.get(),
                 SoundSource.PLAYERS, 0.9F, 1.0F);
@@ -403,7 +403,7 @@ public final class StoneLocator {
         return !EnhancedConfig.SPEC.isLoaded() || LocatorConfig.POINTS_TO_GATEWAYS.get();
     }
 
-    private static int config(net.neoforged.neoforge.common.ModConfigSpec.IntValue value, int fallback) {
+    private static int config(com.kolodkingal.enhanced.config.core.ConfigSpec.IntValue value, int fallback) {
         return EnhancedConfig.SPEC.isLoaded() ? value.get() : fallback;
     }
 

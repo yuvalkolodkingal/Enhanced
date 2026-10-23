@@ -1,19 +1,18 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.ability.SpeedStrikes;
 import com.kolodkingal.enhanced.config.SpeedConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -21,8 +20,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.EAST;
@@ -36,8 +33,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * {@link QuicksilverTests}), and the speed strikes (H4): the Dash Strike (both), Quicksilver's Pebble Barrage and
  * Tommy's Sonic Boom, as modules ({@link SpeedStrikes}) and on their keys.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SpeedStrikeTests {
 
     private static void press(ServerPlayer player, int ability) {
@@ -53,7 +48,7 @@ public final class SpeedStrikeTests {
 
     /** A zombie (a Husk: no burning in the sun) with no armour and plenty of health, so the numbers are as written. */
     private static Zombie target(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, FLOOR, z));
         zombie.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100.0);
         zombie.setHealth(100.0F);
@@ -63,7 +58,7 @@ public final class SpeedStrikeTests {
     // ------------------------------------------------------------------------------------------------------------
     // H3: Tommy's slow time
 
-    @GameTest(template = ARENA, batch = "speed_tommy_time", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "speed_tommy_time", timeoutTicks = 100)
     public static void tommysSlowTimeIsAKeyOfItsOwn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -123,7 +118,7 @@ public final class SpeedStrikeTests {
     // ------------------------------------------------------------------------------------------------------------
     // H4: the Dash Strike
 
-    @GameTest(template = ARENA, batch = "speed_dash")
+    @EnhancedTest(template = ARENA, batch = "speed_dash")
     public static void theDashStrikeHitsWhatIsInItsPathAndStopsAtAWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(3.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -155,7 +150,7 @@ public final class SpeedStrikeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "speed_dash_pvp")
+    @EnhancedTest(template = ARENA, batch = "speed_dash_pvp")
     public static void theStrikesSparePlayersWithPvpOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(3.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -174,7 +169,7 @@ public final class SpeedStrikeTests {
     // ------------------------------------------------------------------------------------------------------------
     // H4: the Pebble Barrage
 
-    @GameTest(template = ARENA, batch = "speed_barrage")
+    @EnhancedTest(template = ARENA, batch = "speed_barrage")
     public static void thePebbleBarrageRiddlesWhatHeLooksAt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(3.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -202,7 +197,7 @@ public final class SpeedStrikeTests {
     // ------------------------------------------------------------------------------------------------------------
     // H4: the Sonic Boom
 
-    @GameTest(template = ARENA, batch = "speed_boom", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "speed_boom", timeoutTicks = 40)
     public static void theSonicBoomThrowsEverythingAround(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(10.5, FLOOR, 10.5, Power.TOMMY);

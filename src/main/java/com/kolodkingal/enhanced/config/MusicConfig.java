@@ -1,6 +1,6 @@
 package com.kolodkingal.enhanced.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * The world's own music (3.5): the songs a server owner puts in {@code <world>/serverconfig/enhanced/music/} to replace the
@@ -10,11 +10,11 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public final class MusicConfig {
     public static final String SECTION = "music";
 
-    public static ModConfigSpec.BooleanValue ENABLED;
-    public static ModConfigSpec.IntValue MAX_FILE_KB;
-    public static ModConfigSpec.IntValue CHUNKS_PER_TICK;
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.IntValue MAX_FILE_KB;
+    public static ConfigSpec.IntValue CHUNKS_PER_TICK;
 
-    public static void define(ModConfigSpec.Builder builder) {
+    public static void define(ConfigSpec.Builder builder) {
         builder.push(SECTION);
         ENABLED = builder.comment("Send the songs in <world>/serverconfig/enhanced/music/ to the players (see the README.txt there).",
                         "Off: every player hears the built-in music (or his own).")

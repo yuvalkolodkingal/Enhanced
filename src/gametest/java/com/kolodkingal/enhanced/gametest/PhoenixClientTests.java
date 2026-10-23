@@ -1,21 +1,18 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.Firebird;
 import com.kolodkingal.enhanced.client.render.HeroAnimState;
 import com.kolodkingal.enhanced.client.render.HeroClient;
 import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.PhoenixMath;
 import com.kolodkingal.enhanced.client.render.Stance;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -36,15 +33,13 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * stances, and the art her layers read. Nothing here names a client class that a server cannot load (the drawing and
  * the panel are checked by eye in a real game); the plug-in is reached through {@link HeroClients}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class PhoenixClientTests {
     private static final String BATCH = PhoenixTests.QUICK;
 
     // ------------------------------------------------------------------------------------------------------------
     // The Burst
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void inFirstPersonHerHandsLetNoEmberGo(GameTestHelper helper) {
         check(!PhoenixMath.handsEmit(true), "a spark half a block from the camera is a blob over the screen: none from the hands");
         check(PhoenixMath.handsEmit(false), "but everyone else sees her hands burn");
@@ -53,7 +48,7 @@ public final class PhoenixClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBurstsShellSpreadsAtTheWavesSpeedAndFadesInItsLastTenTicks(GameTestHelper helper) {
         // The same radius the server's wave has at each tick: speed * (age + 1), at most the radius.
         assertNear(PhoenixMath.shellRadius(24.0F, 1.0F, 0.0F), 1.0, 1.0E-6, "a block at the first tick");
@@ -73,7 +68,7 @@ public final class PhoenixClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFirebirdOfABurstGrowsFliesOutAndDissolves(GameTestHelper helper) {
         assertNear(PhoenixMath.burstBirdScale(24.0F, 0.0F), 1.0, 1.0E-6, "it starts at scale one");
         assertNear(PhoenixMath.burstBirdScale(24.0F, 24.0F), 4.0, 1.0E-6, "and ends at a sixth of the radius");
@@ -100,7 +95,7 @@ public final class PhoenixClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The charge
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theChargeFillsFromZeroToOneAndTheHudSaysItInWholePercents(GameTestHelper helper) {
         assertNear(PhoenixMath.charge(0.0F, 60), 0.0, 1.0E-6, "empty at the start");
         assertNear(PhoenixMath.charge(30.0F, 60), 0.5, 1.0E-6, "half at half the ticks");
@@ -124,7 +119,7 @@ public final class PhoenixClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The firebird
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFirebirdHasTheSkeletonOfTheDesign(GameTestHelper helper) {
         Vec3 chest = new Vec3(5, 70, -3);
         Vec3 forward = new Vec3(0, 0, 1);
@@ -180,7 +175,7 @@ public final class PhoenixClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFirebirdScalesWithOneNumberAndHasNoWingsUntilToldTo(GameTestHelper helper) {
         Vec3 chest = new Vec3(0, 10, 0);
         Vec3 forward = new Vec3(1, 0, 0);
@@ -246,7 +241,7 @@ public final class PhoenixClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The dome, the ring and the panel
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDomeGrowsHoldsAndFadesAndTheSenseRingSpreadsTwoBlocksATick(GameTestHelper helper) {
         assertNear(PhoenixMath.domeRadius(16.0F, 0.0F), 0.0, 1.0E-6, "the dome starts at her");
         assertNear(PhoenixMath.domeRadius(16.0F, 8.0F), 16.0, 1.0E-6, "and has its full radius after eight ticks");
@@ -268,7 +263,7 @@ public final class PhoenixClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theMindReadingPanelSitsRightOfTheCrosshairStaysOnScreenAndTimesOut(GameTestHelper helper) {
         // A 427 x 240 screen (a 854 x 480 window at GUI scale 2), the crosshair in the middle, a 150 x 120 panel.
         int[] at = PhoenixMath.panelOrigin(427, 240, 150, 120, 213, 120);
@@ -292,7 +287,7 @@ public final class PhoenixClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFireGoesFromWhiteHotToEmberRedAndTheMixerMixes(GameTestHelper helper) {
         check(PhoenixMath.fireGradient(0.0F) == PhoenixMath.FIRE_CORE, "a ribbon starts white-hot");
         check(PhoenixMath.fireGradient(1.0F / 3.0F) == PhoenixMath.FIRE_GOLD, "goes gold a third of the way");
@@ -309,7 +304,7 @@ public final class PhoenixClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The plug-in
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePhoenixHasAClientThatSwitchesItsStancesOnFromHerData(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.PHOENIX);
         check(hero != null && hero.power() == Power.PHOENIX, "Jean has a client plug-in");
@@ -349,7 +344,7 @@ public final class PhoenixClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The art
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEyeMasksPaintTheEightEyePixelsAndTheFlameTextureTiles(GameTestHelper helper) throws IOException {
         BufferedImage fire = texture("phoenix_eyes");
         BufferedImage psychic = texture("phoenix_eyes_psychic");

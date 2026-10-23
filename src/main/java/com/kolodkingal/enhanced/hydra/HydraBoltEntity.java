@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.network.HydraFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -29,7 +30,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -107,11 +107,11 @@ public class HydraBoltEntity extends ThrowableProjectile implements ShieldCost {
 
     @Override
     public void tick() {
-        if (!level().isClientSide && !isRemoved() && overlapping()) {
+        if (!level().isClientSide() && !isRemoved() && overlapping()) {
             return;
         }
         super.tick();
-        if (level().isClientSide || isRemoved()) {
+        if (level().isClientSide() || isRemoved()) {
             return;
         }
         if (!isInWater()) {
@@ -218,7 +218,7 @@ public class HydraBoltEntity extends ThrowableProjectile implements ShieldCost {
             server.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 3, 0.1, 0.1, 0.1, 0.2);
             server.playSound(null, at.x, at.y, at.z, ModSounds.HYDRA_BOLT_HIT.get(), SoundSource.HOSTILE, 0.6F,
                     1.0F + server.random.nextFloat() * 0.2F);
-            PacketDistributor.sendToPlayersNear(server, null, at.x, at.y, at.z, 48.0,
+            Net.sendToPlayersNear(server, null, at.x, at.y, at.z, 48.0,
                     new HydraFxPayload(HydraFxPayload.BOLT_HIT, getId(), List.of(at), kind()));
         }
     }

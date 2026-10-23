@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -17,12 +16,12 @@ import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
 import com.kolodkingal.enhanced.entity.SandLanceEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -39,8 +38,6 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,14 +61,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * shield and not his health, a broken shield is a window with its own numbers, the floors of the phases stop his health,
  * a window nobody uses is lost. Every test that touches a fight has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ApocalypseShieldTests {
 
     // ------------------------------------------------------------------------------------------------------------
     // Pure: the rule, the numbers, the machine
 
-    @GameTest(template = ARENA, batch = "apocalypse_mind")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_mind")
     public static void mindPowerIsExactlyWandaAndThePhoenix(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -80,7 +75,7 @@ public final class ApocalypseShieldTests {
         ServerPlayer magneto = f.player(7.5, FLOOR, 3.5, Power.MAGNETO);
         ServerPlayer billy = f.player(9.5, FLOOR, 3.5, Power.BILLY);
         ServerPlayer plain = f.player(11.5, FLOOR, 3.5);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
 
         // The Chaos Beam: Wanda's counts in full, no one else's does.
         assertNear(MindPower.shieldDamage(by(level, ModDamageTypes.CHAOS_BEAM, wanda), 5.0F), 5.0, 1.0E-6, "a beam by a Scarlet Witch counts in full");
@@ -135,7 +130,7 @@ public final class ApocalypseShieldTests {
         return ModDamageTypes.source(level, type, player, player);
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void theMindPowerTagIsSharedWithThePhoenix(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -159,7 +154,7 @@ public final class ApocalypseShieldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void shieldStrengthScalesWithPlayersAndPhase(GameTestHelper helper) {
         check(Math.round(ApocalypseShield.strengthFor(1, 1)) == 100, "shield 1, one fighter: 100 (3.2: was 150)");
         check(Math.round(ApocalypseShield.strengthFor(2, 1)) == 120, "shield 2: 120 (was 188): " + ApocalypseShield.strengthFor(2, 1));
@@ -178,7 +173,7 @@ public final class ApocalypseShieldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void theShieldMachineKnitsWearsBreaksAndRegeneratesOnlyAfterTheDelay(GameTestHelper helper) {
         ApocalypseShield s = new ApocalypseShield();
         check(s.state() == ApocalypseShield.State.GONE && s.isVulnerable() && !s.isUp(), "before it forms there is no shield, and he is open");
@@ -265,7 +260,7 @@ public final class ApocalypseShieldTests {
     // ------------------------------------------------------------------------------------------------------------
     // The boss that wears it
 
-    @GameTest(template = ARENA, batch = "apocalypse_deflect", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_deflect", timeoutTicks = 160)
     public static void aShieldThatIsUpDeflectsEverythingElse(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ServerLevel level = d.level();
@@ -273,7 +268,7 @@ public final class ApocalypseShieldTests {
         ServerPlayer thor = d.f().player(5.5, FLOOR, 16.5, Power.THOR);
         ServerPlayer magneto = d.f().player(5.5, FLOOR, 18.5, Power.MAGNETO);
         ServerPlayer speedster = d.f().player(7.5, FLOOR, 18.5, Power.QUICKSILVER);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
         float health = boss.getHealth();
         float strength = boss.shield().strength();
         Vec3 motion = boss.getDeltaMovement();
@@ -354,7 +349,7 @@ public final class ApocalypseShieldTests {
      * {@code hurt}, so only a later sword blow made him say it): "You can fire your arrows from the Tower of Babel, but you
      * can never strike God!", once.
      */
-    @GameTest(template = ARENA, batch = "apocalypse_babel", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_babel", timeoutTicks = 60)
     public static void theFirstArrowEarnsHisLineAboutBabel(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.NONE);
         ServerLevel level = d.level();
@@ -377,7 +372,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_beam", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_beam", timeoutTicks = 120)
     public static void chaosBeamWearsTheShieldNotTheHealth(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
@@ -409,7 +404,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_burst", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_burst", timeoutTicks = 80)
     public static void phoenixBurstBreaksShieldOneInOneGo(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.PHOENIX);
         ApocalypseEntity boss = d.boss();
@@ -428,12 +423,12 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_slam", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_slam", timeoutTicks = 100)
     public static void telekineticThrowsWearTheShield(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
         ServerPlayer magneto = d.f().player(5.5, FLOOR, 17.5, Power.MAGNETO);
-        Zombie golem = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
+        Zombie golem = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(14.5, FLOOR, 14.5));
         float health = boss.getHealth();
         float max = boss.shield().strength();
 
@@ -444,7 +439,7 @@ public final class ApocalypseShieldTests {
 
         // Wanda's wears it: the whole chain. She lifts a Zombie (a block borrowed from his floor would do too, at half the
         // slam: ArenaLoanTests), throws it, and it is the shield that takes the blow, not his health.
-        Zombie thrown = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 10.5));
+        Zombie thrown = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(6.5, FLOOR, 10.5));
         lookAt(d.hero(), thrown);
         AbilityHandler.onKey(d.hero(), 3, true);
         check(Telekinesis.isHolding(d.hero()), "she holds the Zombie");
@@ -470,7 +465,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_phoenix_touch", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_phoenix_touch", timeoutTicks = 200)
     public static void phoenixTouchesStrainTheShieldAndInterruptTheMindCrush(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.PHOENIX);
         ApocalypseEntity boss = d.boss();
@@ -517,7 +512,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_phoenix_not_breaker", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_phoenix_not_breaker", timeoutTicks = 60)
     public static void aPhoenixTheServerDoesNotListStrainsNothingButStillInterrupts(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.PHOENIX);
         d.f().config(ApocalypseShieldConfig.MIND_POWER_HEROES, List.of("scarlet_witch"));
@@ -529,7 +524,7 @@ public final class ApocalypseShieldTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_window", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_window", timeoutTicks = 200)
     public static void aBrokenShieldIsAWindowWithItsOwnNumbers(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         noCrits(d.f()); // the window's own numbers, the blows counted as in 3.0 (8a.2)
@@ -544,7 +539,7 @@ public final class ApocalypseShieldTests {
         check(boss.floorFraction() > 0.66 && boss.floorFraction() < 0.67, "the floor of the window is two thirds");
 
         // The numbers of a window, with his armour out of the way: a quarter more, a fraction at most, half of a blast.
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 18.5));
         DamageSource blow = level.damageSources().mobAttack(zombie);
         boss.setArmourCut(true);
         float h0 = boss.getHealth();
@@ -589,7 +584,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_floors", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_floors", timeoutTicks = 200)
     public static void floorsStopTheHealthAndStartTheTransition(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
@@ -614,7 +609,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_floors2", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_floors2", timeoutTicks = 200)
     public static void theSecondWindowEndsAtOneThird(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
@@ -637,7 +632,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_reform", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_reform", timeoutTicks = 260)
     public static void aFailedWindowReformsAtFullStrength(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         d.f().config(ApocalypseBossConfig.WINDOW_TICKS, 60);
@@ -666,7 +661,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_heal", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_heal", timeoutTicks = 200)
     public static void heHealsWhileAShieldIsUpNeverAboveTheCeilingOfThePhase(GameTestHelper helper) {
         Duel d = duel(helper, 2, Power.SCARLET_WITCH);
         d.f().config(ApocalypseBossConfig.REGEN_PER_SECOND, 4.0); // 3.0's healing: since 3.1 his health never heals
@@ -687,7 +682,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_heal1", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_heal1", timeoutTicks = 100)
     public static void heMendsFourASecondBehindShieldOne(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         d.f().config(ApocalypseBossConfig.REGEN_PER_SECOND, 4.0); // 3.0's healing: since 3.1 his health never heals
@@ -703,7 +698,7 @@ public final class ApocalypseShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_immune", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_immune", timeoutTicks = 60)
     public static void bossIsImmuneToEffectsAndHasEveryTag(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();

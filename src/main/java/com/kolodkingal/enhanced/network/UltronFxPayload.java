@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.UltronEffects;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client: one effect of Ultron (the boss or the hero) that everyone nearby should see: a tell decal on the
@@ -116,7 +116,7 @@ public record UltronFxPayload(int kind, int entityId, Vec3 at, Vec3 to, float ra
     }
 
     /** The effect is drawn here (the client class is loaded only when this runs, on a client). */
-    static void handle(UltronFxPayload payload, IPayloadContext context) {
+    static void handle(UltronFxPayload payload, PacketContext context) {
         UltronEffects.receive(payload);
     }
 }

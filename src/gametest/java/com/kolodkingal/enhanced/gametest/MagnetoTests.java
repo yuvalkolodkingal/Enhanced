@@ -1,11 +1,11 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -13,7 +13,6 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -32,8 +31,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -42,13 +39,11 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /** Magneto: the helmet, his suit's protection and his five abilities. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MagnetoTests {
 
     // ---- the helmet ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void helmetAwakensMagnetoAndProtects(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -79,7 +74,7 @@ public final class MagnetoTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_chaos_beam_still_hurts_magneto_but_no_nausea")
+    @EnhancedTest(template = ARENA, batch = "solo_chaos_beam_still_hurts_magneto_but_no_nausea")
     public static void chaosBeamStillHurtsMagnetoButNoNausea(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true); // the GameTest server has PvP off; real servers have it on
@@ -105,7 +100,7 @@ public final class MagnetoTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_telekinetic_slam_from_wanda_ignores_magnetos_armor")
+    @EnhancedTest(template = ARENA, batch = "solo_telekinetic_slam_from_wanda_ignores_magnetos_armor")
     public static void telekineticSlamFromWandaIgnoresMagnetosArmor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -131,11 +126,11 @@ public final class MagnetoTests {
 
     // ---- Ability 3: Armor & Weapon Strip ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void disarmRipsMetalOffAZombie(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(4.5, FLOOR, 10.5, Power.MAGNETO);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
@@ -152,11 +147,11 @@ public final class MagnetoTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void disarmIgnoresCreaturesWithoutMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(4.5, FLOOR, 10.5, Power.MAGNETO);
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         lookAt(magneto, zombie);
@@ -172,7 +167,7 @@ public final class MagnetoTests {
 
     // ---- Ability 2: Iron Shrapnel Storm ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void shrapnelMeltsIronIntoShards(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
@@ -207,12 +202,12 @@ public final class MagnetoTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void shrapnelStormHurtsTarget(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
         magneto.getInventory().setItem(0, new ItemStack(Items.IRON_BLOCK));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         lookAt(magneto, zombie);
         AbilityHandler.onKey(magneto, 2, true);
@@ -245,14 +240,14 @@ public final class MagnetoTests {
 
     // ---- Ability 1: Metal Telekinesis ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void metalTelekinesisOnlyLiftsMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(2.5, FLOOR, 10.5, Power.MAGNETO);
-        Zombie plain = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
-        Zombie armored = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 17.5));
+        Zombie plain = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 10.5));
+        Zombie armored = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(9.5, FLOOR, 17.5));
         armored.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(9.5, FLOOR, 3.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(9.5, FLOOR, 3.5));
         PowerData data = Powers.get(magneto);
 
         lookAt(magneto, plain);
@@ -274,11 +269,11 @@ public final class MagnetoTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void heldGolemFollowsMagnetosGaze(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(2.5, FLOOR, 10.5, Power.MAGNETO);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(8.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(8.5, FLOOR, 10.5));
         lookAt(magneto, golem);
         AbilityHandler.onKey(magneto, 1, true);
         check(Telekinesis.isHolding(magneto), "grabbed the golem");
@@ -291,12 +286,12 @@ public final class MagnetoTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void thrownGolemIsAWreckingBall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(2.5, FLOOR, 10.5, Power.MAGNETO);
-        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, FLOOR, 10.5));
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
+        IronGolem golem = TestKit.spawnWithNoFreeWill(helper, EntityType.IRON_GOLEM, new Vec3(6.5, FLOOR, 10.5));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 10.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         lookAt(magneto, golem);
         AbilityHandler.onKey(magneto, 1, true);
@@ -320,13 +315,13 @@ public final class MagnetoTests {
     // ---- Ability 4: Magnetic Shield ----
 
     /** Has its own batch: it forces the (server-wide) reflect chance to 100%. */
-    @GameTest(template = ARENA, batch = "shield_reflect")
+    @EnhancedTest(template = ARENA, batch = "shield_reflect")
     public static void magneticShieldThrowsArrowsBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SHIELD_REFLECT_CHANCE, 1.0);
         ServerPlayer magneto = f.player(14.5, FLOOR, 10.5, Power.MAGNETO);
         AbilityHandler.onKey(magneto, 4, true);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         skeleton.setNoAi(true);
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
@@ -344,13 +339,13 @@ public final class MagnetoTests {
     }
 
     /** Like the bullets in the films: a caught arrow hangs still in mid-air, then drops or flies back. */
-    @GameTest(template = ARENA, timeoutTicks = 60, batch = "solo_magnetic_shield_holds_arrows_in_mid_air")
+    @EnhancedTest(template = ARENA, timeoutTicks = 60, batch = "solo_magnetic_shield_holds_arrows_in_mid_air")
     public static void magneticShieldHoldsArrowsInMidAir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SHIELD_REFLECT_CHANCE, 0.0);
         ServerPlayer magneto = f.player(14.5, FLOOR, 10.5, Power.MAGNETO);
         AbilityHandler.onKey(magneto, 4, true);
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(3.5, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         skeleton.setNoAi(true);
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
@@ -387,7 +382,7 @@ public final class MagnetoTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void magneticShieldIgnoresNonMetalProjectiles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(12.5, FLOOR, 10.5, Power.MAGNETO);
@@ -407,7 +402,7 @@ public final class MagnetoTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void magneticShieldStopsArrows(GameTestHelper helper) {
         shieldArrowTest(helper, true, 3.5, true);
     }
@@ -416,13 +411,13 @@ public final class MagnetoTests {
      * An arrow shot from point-blank range (and with the shield's per-tick field scan not running) must still be
      * stopped when it hits: the impact and damage hooks are the shield's last line of defence.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void magneticShieldStopsPointBlankArrows(GameTestHelper helper) {
         shieldArrowTest(helper, true, 10.0, false);
     }
 
     /** Control for the tests above: the same arrow does hurt Magneto when his shield is off. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void arrowHurtsMagnetoWithoutShield(GameTestHelper helper) {
         shieldArrowTest(helper, false, 3.5, true);
     }
@@ -434,7 +429,7 @@ public final class MagnetoTests {
             AbilityHandler.onKey(magneto, 4, true);
             check(Powers.get(magneto).magneticShield(), "B turns the shield on");
         }
-        Skeleton skeleton = helper.spawnWithNoFreeWill(EntityType.SKELETON, new Vec3(shooterX, FLOOR, 10.5));
+        Skeleton skeleton = TestKit.spawnWithNoFreeWill(helper, EntityType.SKELETON, new Vec3(shooterX, FLOOR, 10.5));
         skeleton.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET)); // no sunburn
         skeleton.setNoAi(true); // only the arrow may hurt Magneto (equipping a skeleton re-adds its melee goal)
         Arrow arrow = new Arrow(helper.getLevel(), skeleton, new ItemStack(Items.ARROW), null);
@@ -463,7 +458,7 @@ public final class MagnetoTests {
 
     // ---- Ability 5: Magnetic Flight ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void flightSpeedsAndKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer nobody = f.player(2.5, FLOOR, 2.5);

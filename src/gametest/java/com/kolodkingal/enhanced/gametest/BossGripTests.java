@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
@@ -29,6 +28,7 @@ import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -48,7 +48,6 @@ import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -86,8 +85,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,8 +104,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * A boss in the grip of telekinesis (3.1, D-T 4), and what every telekinesis press says when it may not take what it is
  * aimed at (spec 5.2): one ray, nearest first, so a refused thing answers the press and nothing behind it is taken.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossGripTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -135,7 +130,7 @@ public final class BossGripTests {
 
     /** A zombie that stands still and does not burn in the sun (the tests run by day). */
     private static Zombie stillZombie(GameTestHelper helper, double x, double z) {
-        Zombie zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(x, FLOOR, z));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         return zombie;
     }
@@ -150,7 +145,7 @@ public final class BossGripTests {
      * form; a Wither gathering his strength or a Warden emerging cannot be held now ({@code boss_untouchable}), and the
      * press at the Wither takes nothing behind him. Magneto's R tears out a metal block and only a metal one.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_refusals", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_refusals", timeoutTicks = 40)
     public static void thePressSaysWhyItTakesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -219,7 +214,7 @@ public final class BossGripTests {
 
         // The vanilla bosses in their untouchable states.
         ServerPlayer phoenix = f.player(8.5, FLOOR, 19.5, Power.PHOENIX);
-        WitherBoss wither = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(14.5, FLOOR, 19.5));
+        WitherBoss wither = TestKit.spawnWithNoFreeWill(helper, EntityType.WITHER, new Vec3(14.5, FLOOR, 19.5));
         wither.setInvulnerableTicks(100);
         Zombie past = stillZombie(helper, 18.5, 19.5);
         lookAt(phoenix, wither);
@@ -270,7 +265,7 @@ public final class BossGripTests {
      * {@code telekinesis.carried} and do nothing else; Billy's V at a carried zombie says {@code boss_untouchable} and takes
      * nothing; let go by the fight, the zombie is held.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_locked", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_locked", timeoutTicks = 40)
     public static void whatAFightHoldsIsNeitherTakenNorTakes(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -322,7 +317,7 @@ public final class BossGripTests {
      * Billy's presses say so, the last one 39 ticks after the break; 40 ticks after it Billy holds him, and loses him after
      * his own hold of 30 ticks.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_free", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_free", timeoutTicks = 200)
     public static void aHeldBossBreaksFreeAndNobodyTakesHimAgainAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -391,7 +386,7 @@ public final class BossGripTests {
      * broke free. Wanda holds Ultron on the ground; the lift's warning begins (he is shielded): the next tick she holds
      * nothing.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_slip", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_slip", timeoutTicks = 40)
     public static void aHeldBossSlipsWhenHeBecomesUntouchable(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -430,7 +425,7 @@ public final class BossGripTests {
      * re-forms: Billy holds nothing at most one tick after the shield first reads {@code REFORMING}, and was not told he
      * broke free.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_slip_window", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_slip_window", timeoutTicks = 80)
     public static void aHeldApocalypseSlipsWhenHisShieldReforms(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         d.f().onClose(Telekinesis::clear);
@@ -478,7 +473,7 @@ public final class BossGripTests {
      * Phoenix's press says someone else holds him; he breaks free after Wanda's 40 ticks, and the Phoenix's press at once
      * says he is still shaking it off: two holders cannot chain him.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_two", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_two", timeoutTicks = 80)
     public static void twoHoldersCannotChainABoss(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -515,7 +510,7 @@ public final class BossGripTests {
      * free. Over 1,200 ticks his brain runs at least 800 of them (the arithmetic of D-T 4.3 gives 820), he is grabbed at
      * least 4 times, and never less than {@code boss.regripTicks} (240) after the still of the last throw ended.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_duty", timeoutTicks = 1300)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_duty", timeoutTicks = 1300)
     public static void aBossIsStillAtMostAThirdOfTheTime(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -607,7 +602,7 @@ public final class BossGripTests {
      * he changes bodies (or dies); on the ground and on the island in between, every form does (Magneto too: vibranium is
      * metal).
      */
-    @GameTest(template = ARENA, batch = "boss_grip_states", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_states", timeoutTicks = 160)
     public static void nobodyHoldsABossInHisInvulnerableStates(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -640,7 +635,7 @@ public final class BossGripTests {
      * T9, Thanos's part (D-T 6.2.1): no form holds Thanos while he arrives, behind his Space Barrier, nor while he dies;
      * arrived and in between, every form does (Magneto too: his gold armour and the Gauntlet are metal).
      */
-    @GameTest(template = ARENA, batch = "boss_grip_states_thanos", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_states_thanos", timeoutTicks = 200)
     public static void nobodyHoldsThanosInHisInvulnerableStates(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -679,7 +674,7 @@ public final class BossGripTests {
      * T9, Apocalypse's part (D-T 6.3.1): no form holds Apocalypse in a set piece (the first transition) nor while his
      * shield forms or re-forms; with his shield up, Wanda (mind power) does.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_states_apocalypse", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_states_apocalypse", timeoutTicks = 40)
     public static void nobodyHoldsApocalypseInHisInvulnerableStates(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -702,7 +697,7 @@ public final class BossGripTests {
      * Billy takes hold of him on the first tick of the stagger and lets go 20 ticks later: he is still staggered, 20 ticks
      * of it have passed, and it ends on the tick it would have ended without the grip.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_stagger", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_stagger", timeoutTicks = 300)
     public static void aGripKeepsUltronsStagger(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -760,7 +755,7 @@ public final class BossGripTests {
      * and no move begins while she holds him, though he chooses again (he is no longer passive). He breaks free after her
      * 40 ticks and acts again within 100: a move against the player beside him.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_still", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_still", timeoutTicks = 260)
     public static void aHeldBossDoesNothing(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -813,7 +808,7 @@ public final class BossGripTests {
      * him: his brain drops the attack, and begins none while she holds him, though it chooses again. Once he broke free
      * he acts again within 100 ticks. (The window opens with no stagger here, so his brain runs at once.)
      */
-    @GameTest(template = ARENA, batch = "boss_grip_still_apocalypse", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_still_apocalypse", timeoutTicks = 200)
     public static void aHeldApocalypseDoesNothing(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -858,7 +853,7 @@ public final class BossGripTests {
      * is dropped, no bolt of his is fired while she holds him, and none begins, though his brain chooses again. Once he
      * broke free he attacks again within 100 ticks.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_still_ultron", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_still_ultron", timeoutTicks = 200)
     public static void aHeldUltronDoesNothing(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -905,7 +900,7 @@ public final class BossGripTests {
      * behind him on Billy's line is not taken through him. Wanda and the Phoenix hold him. In a window Billy holds him; in
      * his true form there is no metal on him for Magneto, and Billy holds him.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_shield", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_shield", timeoutTicks = 60)
     public static void onlyMindPowerTakesApocalypseThroughHisShield(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         d.f().onClose(Telekinesis::clear);
@@ -998,7 +993,7 @@ public final class BossGripTests {
      * T10, the config's part (D-T 6.3.1): a server that names Billy in {@code apocalypse_shield.mindPowerHeroes} makes his
      * telekinesis mind power: he holds Apocalypse through his shield, and no ripple shows.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_shield_billy", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_shield_billy", timeoutTicks = 40)
     public static void billyNamedMindPowerHoldsApocalypseThroughHisShield(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         d.f().onClose(Telekinesis::clear);
@@ -1025,7 +1020,7 @@ public final class BossGripTests {
      * him (a block his arena lends) and begins no upload (it never asks his fight). Billy at 14 percent holds him and throws
      * him: no rip.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_rip", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_rip", timeoutTicks = 300)
     public static void theHeartRipStaysWandasAndWorksOnAHeldBody(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1113,7 +1108,7 @@ public final class BossGripTests {
      * the snap of a chain, what was left of it his. Thrown by Billy or the Phoenix it flies and lives. Magneto's throw of a
      * body at 14 percent on the island tears no heart out (the rip is Wanda's alone).
      */
-    @GameTest(template = ARENA, batch = "boss_grip_crush", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_crush", timeoutTicks = 80)
     public static void theSentryCrushIsWandasAndMagnetos(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1203,7 +1198,7 @@ public final class BossGripTests {
      * T19 (D-T 6.3): taking hold of someone Apocalypse's sand entombed breaks the cocoon and frees them, whatever the form
      * that does it: Billy's grip frees a pig, Magneto's a zombie in an iron chestplate.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_cocoon", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_cocoon", timeoutTicks = 40)
     public static void anyFormFreesAnEntombedFriend(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1212,7 +1207,7 @@ public final class BossGripTests {
         ServerPlayer magneto = f.player(3.5, FLOOR, 14.5, Power.MAGNETO);
         // The Apocalypse hero's sand: a hero's cocoon, which no fight owns and no sweep takes away.
         ServerPlayer caster = f.player(17.5, FLOOR, 10.5, Power.APOCALYPSE);
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, FLOOR, 6.5));
+        Pig pig = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new Vec3(8.5, FLOOR, 6.5));
         Zombie zombie = stillZombie(helper, 8.5, 14.5);
         zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
         SandCocoonEntity pigCocoon = SandControl.entomb(level, caster, pig, 100, 0.0F, 20.0F, null);
@@ -1241,14 +1236,14 @@ public final class BossGripTests {
      * press does nothing. The Phoenix holds a zombie and is given the effect directly (as {@code /effect} would): the next
      * tick she holds nothing.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_entomb", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_entomb", timeoutTicks = 80)
     public static void anEntombedHeroLetsGo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
         ServerLevel level = helper.getLevel();
         ServerPlayer wanda = f.player(3.5, FLOOR, 6.5, Power.SCARLET_WITCH);
         ServerPlayer phoenix = f.player(3.5, FLOOR, 14.5, Power.PHOENIX);
-        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 6.5));
+        Zombie zombie = TestKit.spawn(helper, EntityType.ZOMBIE, new Vec3(8.5, FLOOR, 6.5));
         zombie.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LEATHER_HELMET));
         Zombie other = stillZombie(helper, 8.5, 14.5);
         Zombie spare = stillZombie(helper, 8.5, 10.5);
@@ -1361,7 +1356,7 @@ public final class BossGripTests {
      * from the centre (30 by default; 19 with the tests' island of 9), and it is carried right up to that limit; the same for
      * a Sentry of the fight. The holds are 600 ticks here, so nothing breaks free on the way.
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_carry", timeoutTicks = 300)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_carry", timeoutTicks = 300)
     public static void aBossIsNeverCarriedOutOfHisArena(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1401,7 +1396,7 @@ public final class BossGripTests {
      * default; 7 with the tests' radius of 9), inside the leash of his own, and a Horseman never more than {@code
      * containRadius - 2} (26 by default; 11 here), inside the wall.
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_carry_apocalypse", timeoutTicks = 300)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_carry_apocalypse", timeoutTicks = 300)
     public static void apocalypseAndHisHorsemenAreNeverCarriedOutOfHisArena(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1437,7 +1432,7 @@ public final class BossGripTests {
      * T12, Thanos's part (D-T 6.2.1): his arena is open (no field, no wall), and he is never carried more than {@code
      * radius - 2} from its centre (38 by default; 14 with the tests' radius of 16).
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_carry_thanos", timeoutTicks = 200)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_carry_thanos", timeoutTicks = 200)
     public static void thanosIsNeverCarriedOutOfHisArena(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1465,7 +1460,7 @@ public final class BossGripTests {
      * T45 (D-T 4.5): a Horseman thrown straight at Apocalypse's wall is stopped dead inside it: it is never beyond {@code
      * containRadius}, crashes there, and is brought back two blocks inside the wall, on the sand, at once.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_minion_edge", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_minion_edge", timeoutTicks = 60)
     public static void aThrownMinionStopsAtTheWallAndComesBack(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1528,7 +1523,7 @@ public final class BossGripTests {
      * on the ground ({@code ultron_boss.liftAt} 0.1 here, so the lift waits), thrown by Wanda into a wall: his floor of a
      * tenth holds (before the island is up he cannot fall), and the blow is hers in the fight's ledger.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_throw", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_throw", timeoutTicks = 60)
     public static void aThrownBossTakesItThroughHisOwnCaps(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1565,7 +1560,7 @@ public final class BossGripTests {
      * ticks after the throw, with {@code boss.regripTicks} 0: his still) and throws him into another wall, both blows within
      * 6 seconds: both reach his hurt as telekinetic slams, and exactly one plate is torn (once in 6 seconds).
      */
-    @GameTest(template = ARENA, batch = "boss_grip_throw_thanos", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_throw_thanos", timeoutTicks = 120)
     public static void aThrownThanosTakesItThroughHisOwnCaps(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1629,7 +1624,7 @@ public final class BossGripTests {
      * T13, Apocalypse's part (D-T 4.5, 6.3): thrown by Wanda (mind power) with his shield up, he crashes into a zombie in
      * his path, which takes 15, and then into a wall: the blow wears his shield, not his health.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_throw_apocalypse", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_throw_apocalypse", timeoutTicks = 60)
     public static void aThrownApocalypseTakesItThroughHisOwnCaps(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -1668,7 +1663,7 @@ public final class BossGripTests {
      * blow of hers that he takes through his own caps. Then he skids on into the line and knocks every zombie down. In all
      * he loses at most 15 percent of his health. (A wall past the line keeps him in the arena.)
      */
-    @GameTest(template = ARENA, batch = "boss_grip_throw_down", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_throw_down", timeoutTicks = 80)
     public static void aThrownBossCrashesWhereHeComesDown(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1737,7 +1732,7 @@ public final class BossGripTests {
      * T14, Ultron's part (D-T 4.5, 6.1.2): Ultron thrown out toward his field is stopped dead at it, and flashed back to the
      * ground three blocks inside it.
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_home", timeoutTicks = 60)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "boss_grip_home", timeoutTicks = 60)
     public static void aThrownBossComesBackInsideHisArena(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1775,7 +1770,7 @@ public final class BossGripTests {
      * T14, Thanos's part (D-T 4.5, 6.2.1): his arena is open (no field, no wall): Thanos thrown against a wall past his
      * carry limit steps back through a Space portal, onto the ground 4 blocks inside his radius (8 here).
      */
-    @GameTest(template = ARENA, batch = "boss_grip_home_thanos", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_home_thanos", timeoutTicks = 60)
     public static void aThrownThanosComesBackInsideHisArena(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1811,7 +1806,7 @@ public final class BossGripTests {
      * T14, Apocalypse's part (D-T 4.5, 6.3.1): thrown out toward his wall, he is stopped dead at it and comes back to the
      * middle of his arena, as his leash puts him.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_home_apocalypse", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_home_apocalypse", timeoutTicks = 60)
     public static void aThrownApocalypseComesBackToTheMiddle(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1848,7 +1843,7 @@ public final class BossGripTests {
      * nothing out of the ground behind him; Thanos's sword cannot be caught; a boss bolt Billy catches and throws at a
      * Sentry keeps the fight's mark, so it spares the Sentry (3.0).
      */
-    @GameTest(template = ARENA, batch = "boss_grip_switch", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_switch", timeoutTicks = 60)
     public static void theBossGripsHaveSwitches(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1902,7 +1897,7 @@ public final class BossGripTests {
      * never become blocks (D-T 2.3 rule 1). (The meteor of D-T 14.2 needs a Thanos fight, and only one fight runs at a time:
      * {@link #aThrownMeteorSparesPlayersWithoutPvP}.)
      */
-    @GameTest(template = ARENA, batch = "boss_grip_pvp", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_pvp", timeoutTicks = 160)
     public static void thrownBossesSparePlayersWithoutPvP(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2019,7 +2014,7 @@ public final class BossGripTests {
      * Ultron, his cooldowns reset and a target in reach, starts no attack and his brain does not tick; once the still is
      * over he attacks again within 60 ticks.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_flight", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_flight", timeoutTicks = 120)
     public static void aThrownBossActsOnlyWhenHisFlightIsOver(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2068,7 +2063,7 @@ public final class BossGripTests {
      * tick he is not held, his regrip is 39 or 40 of {@code boss.regripTicks} (40 here), nothing keeps him still, and his
      * brain runs again: he begins an attack within 100 ticks.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_logout", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_logout", timeoutTicks = 140)
     public static void aHolderWhoLeavesLetsTheBossGo(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -2111,7 +2106,7 @@ public final class BossGripTests {
      * died he is not held, his regrip runs from then, nothing keeps him still, and within 100 ticks he begins a move at the
      * fighter beside him.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_death", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_death", timeoutTicks = 140)
     public static void aHolderWhoDiesLetsTheBossGo(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2145,7 +2140,7 @@ public final class BossGripTests {
      * outside any arena does as any entity. A block a protected arena lent her stays in its dimension too: held in a nether
      * portal for 100 ticks, it is still in the overworld.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_dimension", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_dimension", timeoutTicks = 140)
     public static void bossesAndBorrowedBlocksStayInTheirDimension(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2198,7 +2193,7 @@ public final class BossGripTests {
      * T49 (D-T 4.5, 6.2.1): Thanos is never carried below his centre minus 8, and thrown off the edge of the world's ground
      * (moved 30 blocks under his centre) he steps back onto it within his radius at the next tick of his fight, unhurt.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_void", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_void", timeoutTicks = 40)
     public static void thanosNeverFallsOutOfTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2228,7 +2223,7 @@ public final class BossGripTests {
      * carry floor), and stays there: no portal on the 20 ticks after. Moved into a cave 27 blocks under his centre, with
      * the hill's rock over him where the look for ground begins, he steps onto his landing too, never into the rock.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_valley", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_valley", timeoutTicks = 80)
     public static void thanosFarDownAValleyStepsBackOnce(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2276,7 +2271,7 @@ public final class BossGripTests {
      * (the scene is above the test's barrier ceiling); Thanos comes down through the portal onto it, and stays there: he is
      * never brought back, the one portal is the one he arrives through.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_valley_air", timeoutTicks = 220)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_valley_air", timeoutTicks = 220)
     public static void aForcedStartInTheAirFightsOnTheGroundUnderIt(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2323,7 +2318,7 @@ public final class BossGripTests {
      * Review r3 (D-T 6.2.1): Ultron's body never even begins to go through a portal, so it never makes the game look for an
      * exit portal in another dimension (and build one there) as a portal does before it asks whether he may go.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_portal_ultron", timeoutTicks = 20)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_portal_ultron", timeoutTicks = 20)
     public static void ultronNeverStepsIntoAPortal(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2335,7 +2330,7 @@ public final class BossGripTests {
     }
 
     /** Review r3 (D-T 6.2.1): nor does Apocalypse. */
-    @GameTest(template = ARENA, batch = "boss_grip_portal_apocalypse", timeoutTicks = 20)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_portal_apocalypse", timeoutTicks = 20)
     public static void apocalypseNeverStepsIntoAPortal(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().onClose(Telekinesis::clear);
@@ -2343,7 +2338,7 @@ public final class BossGripTests {
     }
 
     /** Review r3 (D-T 6.2.1): nor does Thanos. */
-    @GameTest(template = ARENA, batch = "boss_grip_portal_thanos", timeoutTicks = 20)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_portal_thanos", timeoutTicks = 20)
     public static void thanosNeverStepsIntoAPortal(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2382,7 +2377,7 @@ public final class BossGripTests {
      * Billy's, Wanda's and the Phoenix's Sneak + V each borrow the sand behind him from his arena, hold not him, and show no
      * ripple.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_sneak_boss", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_sneak_boss", timeoutTicks = 40)
     public static void sneakTakesTheGroundEvenPastABoss(GameTestHelper helper) {
         ApocalypseTestSupport.Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         d.f().onClose(Telekinesis::clear);
@@ -2423,7 +2418,7 @@ public final class BossGripTests {
      * Survival player bursts on him and leaves him whole, while the zombie beside him takes the burst, her telekinetic
      * slam.
      */
-    @GameTest(template = ARENA, batch = "boss_grip_pvp_meteor", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_grip_pvp_meteor", timeoutTicks = 40)
     public static void aThrownMeteorSparesPlayersWithoutPvP(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2469,7 +2464,7 @@ public final class BossGripTests {
 
     /** A Wither standing on the floor, his spawn invulnerability over. */
     private static WitherBoss wither(GameTestHelper helper, double x, double z) {
-        WitherBoss wither = helper.spawnWithNoFreeWill(EntityType.WITHER, new Vec3(x, FLOOR, z));
+        WitherBoss wither = TestKit.spawnWithNoFreeWill(helper, EntityType.WITHER, new Vec3(x, FLOOR, z));
         wither.setInvulnerableTicks(0);
         return wither;
     }
@@ -2489,7 +2484,7 @@ public final class BossGripTests {
      * one with {@code NoAI} and no mark keeps it. The Ender Dragon and his parts are too vast for every form. The heroes
      * are in Creative, so that no boss whose will is back goes for them, and each boss is gone right after its part.
      */
-    @GameTest(template = ARENA, batch = "vanilla_boss_grip", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "vanilla_boss_grip", timeoutTicks = 200)
     public static void vanillaBossesAreHeldAsBosses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2562,7 +2557,7 @@ public final class BossGripTests {
                     gathering.discard();
 
                     // A Warden, held by Billy for half as long.
-                    Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
+                    Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
                     lookAt(billy, warden);
                     press(billy, 3, false);
                     check(Telekinesis.holds(billy, warden) && BossGrip.GRABBED.equals(lastActionBarKey(billy)) && warden.isNoAi(),
@@ -2587,7 +2582,7 @@ public final class BossGripTests {
                     warden.discard();
 
                     // An Elder Guardian, held by the Phoenix.
-                    ElderGuardian guardian = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 15.5));
+                    ElderGuardian guardian = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 15.5));
                     lookAt(phoenix, guardian);
                     press(phoenix, 3, false);
                     check(Telekinesis.holds(phoenix, guardian) && BossGrip.GRABBED.equals(lastActionBarKey(phoenix)) && guardian.isNoAi(),
@@ -2659,14 +2654,14 @@ public final class BossGripTests {
      * chunk there held loaded as a portal holds it: {@link Entity#changeDimension}): the body that arrives has no {@code
      * NoAI} and no mark, his will his own again (nothing in the level he left could give it back to him there).
      */
-    @GameTest(template = ARENA, batch = "vanilla_boss_grip_portal", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "vanilla_boss_grip_portal", timeoutTicks = 40)
     public static void aVanillaBossThrownThroughAPortalGetsHisWillBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
         ServerLevel nether = helper.getLevel().getServer().getLevel(Level.NETHER);
         check(nether != null, "the server has a Nether");
         ServerPlayer wanda = creative(f, 3.5, 10.5, Power.SCARLET_WITCH);
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 10.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(9.5, FLOOR, 10.5));
         lookAt(wanda, warden);
         press(wanda, 3, false);
         check(Telekinesis.holds(wanda, warden) && warden.isNoAi() && marked(warden), "Wanda holds a Warden without his will");
@@ -2693,7 +2688,7 @@ public final class BossGripTests {
      * T62, with {@code boss.telekinesisHoldsVanillaBosses} off (R37): the Wither, the Warden and the Elder Guardian are too
      * powerful to lift, for Wanda, Billy and the Phoenix, as in 3.0; nothing is held and none loses his will.
      */
-    @GameTest(template = ARENA, batch = "vanilla_boss_grip_off", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "vanilla_boss_grip_off", timeoutTicks = 40)
     public static void vanillaBossesAreTooPowerfulWithTheSwitchOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -2708,13 +2703,14 @@ public final class BossGripTests {
                 "the Wither is too powerful to lift");
         check(!Telekinesis.canLift(wanda, wither, Mode.WANDA), "and cannot be lifted");
         wither.discard();
-        Warden warden = helper.spawnWithNoFreeWill(EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
+        Warden warden = TestKit.spawnWithNoFreeWill(helper, EntityType.WARDEN, new Vec3(9.5, FLOOR, 6.5));
         lookAt(billy, warden);
         press(billy, 3, false);
         check(!Telekinesis.isHolding(billy) && BossGrip.TOO_POWERFUL.equals(lastActionBarKey(billy)) && !warden.isNoAi(),
                 "so is the Warden");
         warden.discard();
-        ElderGuardian guardian = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(9.5, FLOOR, 14.5));
+        ElderGuardian guardian = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN,
+                new Vec3(9.5, FLOOR, 14.5));
         lookAt(phoenix, guardian);
         press(phoenix, 3, false);
         check(!Telekinesis.isHolding(phoenix) && BossGrip.TOO_POWERFUL.equals(lastActionBarKey(phoenix)) && !guardian.isNoAi(),

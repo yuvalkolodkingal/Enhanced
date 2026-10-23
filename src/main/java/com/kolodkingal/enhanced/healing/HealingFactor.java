@@ -201,7 +201,7 @@ public final class HealingFactor {
     public static boolean isSacrificeFall(LivingEntity victim, DamageSource source) {
         boolean fall = source.is(DamageTypes.FALL) || source.is(DamageTypes.FLY_INTO_WALL)
                 || source.is(ModDamageTypes.VORMIR_FALL);
-        if (!fall || victim.level().isClientSide) {
+        if (!fall || victim.level().isClientSide()) {
             return false;
         }
         VormirTracker.Departure gone = VormirTracker.departure(victim);

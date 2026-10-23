@@ -3,11 +3,11 @@ package com.kolodkingal.enhanced.network;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.music.ServerMusicClient;
 import com.kolodkingal.enhanced.music.MusicFiles;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client (3.5, optional): one piece of a song the client asked for: the song's SHA-256, the piece's number, how many
@@ -30,7 +30,7 @@ public record MusicChunkPayload(String hash, int index, int total, int size, byt
         return TYPE;
     }
 
-    static void handle(MusicChunkPayload payload, IPayloadContext context) {
+    static void handle(MusicChunkPayload payload, PacketContext context) {
         ServerMusicClient.onChunk(payload.hash(), payload.index(), payload.total(), payload.size(), payload.data());
     }
 }

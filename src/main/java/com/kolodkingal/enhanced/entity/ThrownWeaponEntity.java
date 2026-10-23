@@ -115,7 +115,7 @@ public class ThrownWeaponEntity extends Projectile {
     public void tick() {
         super.tick();
         Vec3 from = position();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             // The server sends the real position every tick; meanwhile keep it moving smoothly and crackling.
             setPos(from.add(getDeltaMovement()));
             if (random.nextInt(3) == 0) {

@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.captain.CaptainState;
 import com.kolodkingal.enhanced.client.custom.PreviewPuppet;
 import com.kolodkingal.enhanced.network.SerumChoicePayload;
 import com.kolodkingal.enhanced.network.SerumScreenPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -21,7 +22,6 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -110,9 +110,9 @@ public class SerumScreen extends Screen {
         JsonObject json = new JsonObject();
         json.addProperty("power", HEROES[card].getSerializedName());
         json.addProperty("variant", LOOKS[card]);
-        puppet.setData(ModAttachments.POWER, PowerData.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
+        ModAttachments.POWER.set(puppet, PowerData.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
         if (HEROES[card] == Power.CAPTAIN_AMERICA) {
-            puppet.setData(ModAttachments.CAPTAIN, CaptainState.EMPTY.with(CaptainState.BACK, true));
+            ModAttachments.CAPTAIN.set(puppet, CaptainState.EMPTY.with(CaptainState.BACK, true));
         } else if (HEROES[card] == Power.FALCON) {
             puppet.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ModItems.FALCON_EXO_WINGS.get()));
         }
@@ -128,7 +128,7 @@ public class SerumScreen extends Screen {
         if (!open(card)) {
             return;
         }
-        PacketDistributor.sendToServer(new SerumChoicePayload(HEROES[card]));
+        Net.sendToServer(new SerumChoicePayload(HEROES[card]));
         onClose();
     }
 

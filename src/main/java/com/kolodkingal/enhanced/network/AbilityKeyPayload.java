@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: an ability key went down or came up, with the client's Sneak at that moment (3.5: the server's crouch
@@ -27,7 +27,7 @@ public record AbilityKeyPayload(int ability, boolean down, boolean sneak) implem
         return TYPE;
     }
 
-    static void handle(AbilityKeyPayload payload, IPayloadContext context) {
+    static void handle(AbilityKeyPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             AbilityHandler.onKey(player, payload.ability(), payload.down(), payload.sneak());
         }

@@ -521,7 +521,7 @@ public final class MindLink {
      * his keys say at its own speed (half when he sneaks), jump, look where he looks.
      */
     public static void steerMob(Mob mob) {
-        if (BY_HOST.isEmpty() || mob.level().isClientSide) {
+        if (BY_HOST.isEmpty() || mob.level().isClientSide()) {
             return;
         }
         Link link = BY_HOST.get(mob.getUUID());

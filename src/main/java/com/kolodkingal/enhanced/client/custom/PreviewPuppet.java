@@ -53,7 +53,7 @@ public final class PreviewPuppet extends RemotePlayer {
         entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0x7F);
         JsonObject power = new JsonObject();
         power.addProperty("power", "custom");
-        setData(ModAttachments.POWER, PowerData.CODEC.parse(JsonOps.INSTANCE, power).getOrThrow());
+        ModAttachments.POWER.set(this, PowerData.CODEC.parse(JsonOps.INSTANCE, power).getOrThrow());
         noPhysics = true;
     }
 
@@ -104,7 +104,7 @@ public final class PreviewPuppet extends RemotePlayer {
         CustomHero ruled = CustomHeroRules.sanitize(draft, limits).hero();
         if (!ruled.equals(hero)) {
             hero = ruled;
-            setData(ModAttachments.CUSTOM_HERO, ruled);
+            ModAttachments.CUSTOM_HERO.set(this, ruled);
         }
     }
 

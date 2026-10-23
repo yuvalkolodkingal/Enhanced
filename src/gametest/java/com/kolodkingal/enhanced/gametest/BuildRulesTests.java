@@ -20,6 +20,7 @@ import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal;
@@ -28,7 +29,6 @@ import com.kolodkingal.enhanced.ultron.SokoviaRelocations;
 import com.kolodkingal.enhanced.ultron.SokoviaShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -47,8 +47,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
@@ -90,8 +88,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the events, as in {@code UltronRitualTests}; it refuses whole 16-block sections of x where a test needs a section
  * refused, because claims are probed once per section (P9) and GameTest arenas do not sit on section lines.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildRulesTests {
     /** The middle of the test floor: every test fight's arena is a circle of radius 8 round it. */
     private static final Vec3 CENTRE = new Vec3(10.5, FLOOR, 10.5);
@@ -125,7 +121,7 @@ public final class BuildRulesTests {
      * the refused cells as they were and empties the rest; the claim was asked exactly once for each section of the
      * refused cells; {@code left.protected} counts them.
      */
-    @GameTest(template = ARENA, batch = "build_rules_claims")
+    @EnhancedTest(template = ARENA, batch = "build_rules_claims")
     public static void claimsAreAskedOncePerRefusedSection(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -171,7 +167,7 @@ public final class BuildRulesTests {
      * A counting listener sees 27 place events and no break event for a 27-cell fill over air, and 27 of each over
      * stone; a place listener reading the cell sees the old block (air), so every event comes before its write.
      */
-    @GameTest(template = ARENA, batch = "build_rules_events")
+    @EnhancedTest(template = ARENA, batch = "build_rules_events")
     public static void everyCellAsksTheClaimEventsBeforeTheWrite(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -214,7 +210,7 @@ public final class BuildRulesTests {
      * player standing there: counting listeners see no event, the world and his meter are as before, and the marks
      * name the chest (keeps), the player (a body) and the arena's cells (protected).
      */
-    @GameTest(template = ARENA, batch = "build_rules_preview")
+    @EnhancedTest(template = ARENA, batch = "build_rules_preview")
     public static void aPreflightPostsNothingAndChangesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -235,7 +231,7 @@ public final class BuildRulesTests {
         for (BlockPos pos : BlockPos.betweenClosed(world.minX(), world.minY(), world.minZ(), world.maxX(), world.maxY(), world.maxZ())) {
             before.put(pos.immutable(), level.getBlockState(pos));
         }
-        BuildData meter = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData meter = ModAttachments.BUILD_DATA.get(billy);
         BuildMagic.useClock(() -> 0L); // (its 2 ms are not this test's: a busy test server must not cut it short)
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, box), BuildCastPayload.PREFLIGHT);
@@ -244,7 +240,7 @@ public final class BuildRulesTests {
         check(verdict != null && verdict.code() == BuildVerdictPayload.READY_PARTLY, "a verdict, ready in part: " + seen);
         check(events[0] == 0, "no event was posted: " + events[0]);
         check(before.entrySet().stream().allMatch(entry -> level.getBlockState(entry.getKey()) == entry.getValue()), "the world is as it was");
-        check(billy.getData(ModAttachments.BUILD_DATA).meter() == meter.meter(), "his meter is untouched");
+        check(ModAttachments.BUILD_DATA.get(billy).meter() == meter.meter(), "his meter is untouched");
         check(seen.bar.isEmpty(), "and nothing is said");
         boolean keeps = false;
         boolean body = false;
@@ -273,7 +269,7 @@ public final class BuildRulesTests {
      * line of what was left and the fizzle, before any job, cast sound, effect, charge on Billy's meter or history step;
      * a box half in the arena is still cast in part.
      */
-    @GameTest(template = ARENA, batch = "build_rules_nothing_can_change")
+    @EnhancedTest(template = ARENA, batch = "build_rules_nothing_can_change")
     public static void aSpellWhoseEveryCellIsProtectedFizzlesBeforeItIsCast(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -284,7 +280,7 @@ public final class BuildRulesTests {
         for (BlockPos pos : BlockPos.betweenClosed(abs(f, 9, 2, 9), abs(f, 11, 2, 11))) {
             check(BossFights.inAnyArena(f.level(), pos), "the box lies in the arena: " + pos);
         }
-        BuildData before = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData before = ModAttachments.BUILD_DATA.get(billy);
         BuildMagic.useClock(() -> 0L);
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, inside), BuildCastPayload.PREFLIGHT);
@@ -302,7 +298,7 @@ public final class BuildRulesTests {
         check(seen.heard("build_fizzle") && !seen.heard("build_cast_billy") && seen.fx.isEmpty(), "it fizzles, with no cast sound and no effect: "
                 + seen.sounds + ", " + seen.fx);
         check(working(billy) == null && steps(billy).isEmpty() && count(f, inside, Blocks.STONE) == 0, "no job, no step, no block");
-        BuildData after = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData after = ModAttachments.BUILD_DATA.get(billy);
         check(after.meter() == before.meter() && after.practice() == before.practice(), "his meter and practice are as they were: " + after);
 
         BoundingBox across = new BoundingBox(0, 3, 0, 20, 3, 4);
@@ -317,7 +313,7 @@ public final class BuildRulesTests {
      * spell is then queued like any other and still ends with its own verdict (what was left, counted), never with
      * none; with a steady clock the same fill is refused before it is cast.
      */
-    @GameTest(template = ARENA, batch = "build_rules_cut_off")
+    @EnhancedTest(template = ARENA, batch = "build_rules_cut_off")
     public static void aPreviewCutOffByItsClockStillEndsInTheSpellsVerdict(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -349,7 +345,7 @@ public final class BuildRulesTests {
         check(working(billy) == null && count(f, inside, Blocks.STONE) == 0 && steps(billy).isEmpty(), "and it built nothing");
 
         BuildMagic.useClock(() -> 0L);
-        billy.setData(ModAttachments.BUILD_DATA, billy.getData(ModAttachments.BUILD_DATA).withPauseUntil(0L)); // (the pause after his spell)
+        ModAttachments.BUILD_DATA.set(billy, ModAttachments.BUILD_DATA.get(billy).withPauseUntil(0L)); // (the pause after his spell)
         cast(billy, boxSpell(f, Spell.FILL, inside));
         seen = Seen.of(billy);
         check(working(billy) == null && seen.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE, "with a steady clock it is refused up front: " + seen);
@@ -363,7 +359,7 @@ public final class BuildRulesTests {
      * {@code boss.protected} line is sent; an unprotected (Thanos-like) arena is left alone too; once the fight stops,
      * the same fill changes them.
      */
-    @GameTest(template = ARENA, batch = "build_rules_arenas")
+    @EnhancedTest(template = ARENA, batch = "build_rules_arenas")
     public static void spellsLeaveBossArenasAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -412,7 +408,7 @@ public final class BuildRulesTests {
     // B59
 
     /** With {@code allArenasProtected} off, the unprotected arena is built in; the protected one still is not. */
-    @GameTest(template = ARENA, batch = "build_arenas")
+    @EnhancedTest(template = ARENA, batch = "build_arenas")
     public static void unprotectedArenasOpenWhenAsked(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -437,7 +433,7 @@ public final class BuildRulesTests {
      * A 2,888-cell fill stepped at 200 writes; after three steps a protected fight starts over its box: the next step
      * stops the spell with {@code stopped_fight}; the 600 cells written stay; after the fight, an undo puts them back.
      */
-    @GameTest(template = ARENA, batch = "build_rules_fight")
+    @EnhancedTest(template = ARENA, batch = "build_rules_fight")
     public static void aFightThatStartsStopsTheSpell(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -473,7 +469,7 @@ public final class BuildRulesTests {
      * A claim refusing 9 of 27 filled cells (the bottom layer) during the undo: 18 are put back and the step stays on
      * top, partly undone; with the claim gone, Ctrl + Z puts back the 9.
      */
-    @GameTest(template = ARENA, batch = "build_rules_partly")
+    @EnhancedTest(template = ARENA, batch = "build_rules_partly")
     public static void undoIntoAProtectedPlaceIsPartlyUndoneAndRetried(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -510,7 +506,7 @@ public final class BuildRulesTests {
      * With a Sokovia recovery clearing an island over part of the arena, a spell that touches the island's box is
      * {@code SOKOVIA}; one beside it is cast.
      */
-    @GameTest(template = ARENA, batch = "build_rules_sokovia")
+    @EnhancedTest(template = ARENA, batch = "build_rules_sokovia")
     public static void theSokoviaRecoveryIsOffLimits(GameTestHelper helper) throws IOException {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -543,7 +539,7 @@ public final class BuildRulesTests {
      * moves nobody, and its empty column stays as it was, with the ground under it; a note of an island that was left
      * up there still warns.
      */
-    @GameTest(template = ARENA, batch = "build_rules_sokovia_landed")
+    @EnhancedTest(template = ARENA, batch = "build_rules_sokovia_landed")
     public static void aLandedIslandsNoteIsRecoveredQuietly(GameTestHelper helper) throws IOException {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -599,7 +595,7 @@ public final class BuildRulesTests {
      * cells inside it are built; the cells a NORMAL place-event canceller refuses (the stand-in for spawn protection,
      * which the GameTest server never has, R51) are left and counted. (Its own batch: the border is the level's.)
      */
-    @GameTest(template = ARENA, batch = "build_border")
+    @EnhancedTest(template = ARENA, batch = "build_border")
     public static void adventureSpawnProtectionAndTheBorder(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -669,7 +665,7 @@ public final class BuildRulesTests {
     // B64
 
     /** With PvP off, another Survival player's two cells stay air and he does not move. */
-    @GameTest(template = ARENA, batch = "build_pvp_off")
+    @EnhancedTest(template = ARENA, batch = "build_pvp_off")
     public static void nobodyElseIsBuriedWithPvpOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(false);
@@ -687,7 +683,7 @@ public final class BuildRulesTests {
     }
 
     /** With PvP on, the other player is lifted onto the fill. */
-    @GameTest(template = ARENA, batch = "build_pvp_on")
+    @EnhancedTest(template = ARENA, batch = "build_pvp_on")
     public static void withPvpOnHeIsLiftedOntoTheFill(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(true);
@@ -708,7 +704,7 @@ public final class BuildRulesTests {
      * With {@code fullContainers} spill, the Scarlet Witch's Vanish removes both chests and the 3 diamonds lie on the
      * spot; her undo puts both chests back, empty; the world holds 3 diamonds in all.
      */
-    @GameTest(template = ARENA, batch = "build_spill")
+    @EnhancedTest(template = ARENA, batch = "build_spill")
     public static void fullChestsSpillWhenAsked(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.FULL_CONTAINERS, BuildConfig.FullContainers.SPILL);
@@ -749,7 +745,7 @@ public final class BuildRulesTests {
      * With {@code hexIsAClaim}, a Scarlet Witch raises a Hex over the arena: Billy's fill inside leaves every cell;
      * once she allows him, his fill is cast.
      */
-    @GameTest(template = ARENA, batch = "build_hex")
+    @EnhancedTest(template = ARENA, batch = "build_hex")
     public static void aHexIsAClaimWhenAsked(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.HEX_IS_A_CLAIM, true);
@@ -777,7 +773,7 @@ public final class BuildRulesTests {
     // B67
 
     /** With the overworld in {@code deniedDimensions}, a cast is {@code DIMENSION}. */
-    @GameTest(template = ARENA, batch = "build_dimension")
+    @EnhancedTest(template = ARENA, batch = "build_dimension")
     public static void deniedDimensions(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.DENIED_DIMENSIONS, List.of("minecraft:overworld"));

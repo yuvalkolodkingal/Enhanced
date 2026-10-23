@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.block.WeaponXPodBlock;
 import com.kolodkingal.enhanced.block.WeaponXPodBlockEntity;
 import com.kolodkingal.enhanced.config.DeadpoolConfig;
 import com.kolodkingal.enhanced.network.LabFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -24,7 +25,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
@@ -90,7 +90,7 @@ public final class PodTreatment {
         long now = level.getGameTime();
         UNDER_WAY.put(player.getUUID(), new Treatment(pod.immutable(), now));
         hold(player, true);
-        PacketDistributor.sendToPlayersNear(level, null, pod.getX() + 0.5, pod.getY(), pod.getZ() + 0.5, 64.0,
+        Net.sendToPlayersNear(level, null, pod.getX() + 0.5, pod.getY(), pod.getZ() + 0.5, 64.0,
                 new LabFxPayload(LabFxPayload.POD_START, pod));
         running(level, pod, true);
         tell(player, "message.enhanced.deadpool.pod_start");
@@ -162,7 +162,7 @@ public final class PodTreatment {
         ServerLevel level = player.serverLevel();
         BlockPos pod = treatment.pod();
         Powers.awaken(player, Power.DEADPOOL, DeadpoolAbilities.CLASSIC);
-        PacketDistributor.sendToPlayersNear(level, null, pod.getX() + 0.5, pod.getY(), pod.getZ() + 0.5, 64.0,
+        Net.sendToPlayersNear(level, null, pod.getX() + 0.5, pod.getY(), pod.getZ() + 0.5, 64.0,
                 new LabFxPayload(LabFxPayload.POD_DONE, pod));
         running(level, pod, false);
         Vec3 at = player.position();
@@ -181,7 +181,7 @@ public final class PodTreatment {
             return;
         }
         ServerLevel level = player.serverLevel();
-        PacketDistributor.sendToPlayersNear(level, null, treatment.pod().getX() + 0.5, treatment.pod().getY(),
+        Net.sendToPlayersNear(level, null, treatment.pod().getX() + 0.5, treatment.pod().getY(),
                 treatment.pod().getZ() + 0.5, 64.0, new LabFxPayload(LabFxPayload.POD_DONE, treatment.pod()));
         running(level, treatment.pod(), false);
         if (tell && player.isAlive()) {

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.block.GammaEmitterBlock;
@@ -29,6 +28,7 @@ import com.kolodkingal.enhanced.hulk.HulkTerrain;
 import com.kolodkingal.enhanced.hulk.SuperLeap;
 import com.kolodkingal.enhanced.hulk.ThunderClap;
 import com.kolodkingal.enhanced.network.HulkFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -42,7 +42,6 @@ import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.stones.StoneRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -61,8 +60,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -87,8 +84,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * hulk}, {@code hulk_forms}, {@code hulk_pvp}, {@code gamma}, and one per terrain mode ({@code hulk_terrain*}: a config
  * or a gamerule).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HulkTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -154,8 +149,8 @@ public final class HulkTests {
 
     /** A husk with no armour and 200 health that stands where it is put (no AI, unless {@code free}). */
     static Husk husk(GameTestHelper helper, double x, double y, double z, boolean free) {
-        Husk husk = free ? helper.spawn(EntityType.HUSK, new Vec3(x, y, z))
-                : helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, y, z));
+        Husk husk = free ? TestKit.spawn(helper, EntityType.HUSK, new Vec3(x, y, z))
+                : TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(x, y, z));
         husk.getAttribute(Attributes.ARMOR).setBaseValue(0.0);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0);
         husk.setHealth(200.0F);
@@ -179,7 +174,7 @@ public final class HulkTests {
     }
 
     static void rage(ServerPlayer player, int rage) {
-        player.setData(ModAttachments.HULK, HulkRage.get(player).withRage(rage));
+        ModAttachments.HULK.set(player, HulkRage.get(player).withRage(rage));
     }
 
     /** Cancels every block break in {@code cells} while the test runs (a claim, as another mod would). */
@@ -214,7 +209,7 @@ public final class HulkTests {
     /**
      * A powerless player in the beam becomes the Hulk after exactly 60 ticks in it (not 59); the first change follows.
      */
-    @GameTest(template = ARENA, batch = "gamma", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "gamma", timeoutTicks = 260)
     public static void theBeamMakesAPowerlessPlayerTheHulkAfterSixtyTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         GammaEmitterBlockEntity emitter = emitter(helper);
@@ -240,7 +235,7 @@ public final class HulkTests {
     }
 
     /** Another hero in the beam stays himself; a Hulk in it is healed; a redstone signal starts it; it rests after. */
-    @GameTest(template = ARENA, batch = "gamma", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "gamma", timeoutTicks = 200)
     public static void theBeamRefusesAHeroHealsAHulkAndAnswersRedstone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         GammaEmitterBlockEntity emitter = emitter(helper);
@@ -265,7 +260,7 @@ public final class HulkTests {
     // Banner and the transformation
 
     /** Bruce Banner: every key refused (no cooldown), no body, his armour drawn (human); only N answers. */
-    @GameTest(template = ARENA, batch = "hulk_forms")
+    @EnhancedTest(template = ARENA, batch = "hulk_forms")
     public static void bannerHasNoPowersButN(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer bruce = hulk(f, 5.5, 5.5, "banner");
@@ -285,7 +280,7 @@ public final class HulkTests {
     }
 
     /** N: Banner grows into the Hulk over 40 ticks (health 40 at the end), and N calms him back. */
-    @GameTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 300)
     public static void nGrowsAndShrinks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer bruce = hulk(f, 10.5, 10.5, "banner");
@@ -313,7 +308,7 @@ public final class HulkTests {
     }
 
     /** Sneak + N: Ragnarok into Brand New Day (bigger) and back; the Change Look key's step plays the change too. */
-    @GameTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 200)
     public static void sneakNSwitchesTheHulks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 10.5, 10.5, "ragnarok");
@@ -337,7 +332,7 @@ public final class HulkTests {
     }
 
     /** Under a two-high ceiling there is no room to grow: N is refused, and anger waits; with room, it happens. */
-    @GameTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 200)
     public static void noRoomNoHulk(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer bruce = hulk(f, 10.5, 10.5, "banner");
@@ -349,7 +344,7 @@ public final class HulkTests {
         }
         press(bruce, 5, false);
         check(!HulkForms.changing(bruce) && HulkForms.isHuman(bruce), "no room to Hulk out");
-        bruce.setData(ModAttachments.HULK, HulkRage.get(bruce).withAnger(100));
+        ModAttachments.HULK.set(bruce, HulkRage.get(bruce).withAnger(100));
         step(helper, 10, () -> {
             check(!HulkForms.changing(bruce) && HulkForms.isHuman(bruce), "his anger waits");
             for (int dx = -1; dx <= 1; dx++) {
@@ -357,7 +352,7 @@ public final class HulkTests {
                     helper.setBlock(roof.offset(dx, 0, dz), Blocks.AIR);
                 }
             }
-            bruce.setData(ModAttachments.HULK, HulkRage.get(bruce).withAnger(100));
+            ModAttachments.HULK.set(bruce, HulkRage.get(bruce).withAnger(100));
             step(helper, 6, () -> {
                 check(HulkForms.changing(bruce) || !HulkForms.isHuman(bruce), "with room, his anger Hulks him out");
                 helper.succeed();
@@ -366,7 +361,7 @@ public final class HulkTests {
     }
 
     /** Banner's anger rises when he is hurt, and at 100 he Hulks out by himself; with a Gamma Inhibitor he does not. */
-    @GameTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 200)
     public static void angerHulksOutUnlessInhibited(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer bruce = hulk(f, 5.5, 5.5, "banner");
@@ -376,8 +371,8 @@ public final class HulkTests {
                 "his heart rate runs 70 to 200");
         ServerPlayer calm = hulk(f, 14.5, 14.5, "banner");
         calm.getInventory().add(new ItemStack(ModItems.GAMMA_INHIBITOR.get()));
-        bruce.setData(ModAttachments.HULK, HulkRage.get(bruce).withAnger(100));
-        calm.setData(ModAttachments.HULK, HulkRage.get(calm).withAnger(100));
+        ModAttachments.HULK.set(bruce, HulkRage.get(bruce).withAnger(100));
+        ModAttachments.HULK.set(calm, HulkRage.get(calm).withAnger(100));
         step(helper, 6, () -> {
             check(HulkForms.changing(bruce), "at 100 he Hulks out by himself");
             check(!HulkForms.changing(calm) && HulkForms.isHuman(calm), "the inhibitor keeps him human");
@@ -389,7 +384,7 @@ public final class HulkTests {
     // The keys
 
     /** Hulk Smash: 7 to three creatures on the ground; nothing to a bat in the air nor to one in mid-jump. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
     public static void smashHurtsEveryoneOnTheGround(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 10.5, 10.5, "ragnarok");
@@ -398,7 +393,7 @@ public final class HulkTests {
         Husk c = husk(helper, 6.0, 10.5);
         Husk jumper = husk(helper, 10.5, FLOOR + 1.3, 7.5, false);
         jumper.setNoGravity(true);
-        Bat bat = helper.spawnWithNoFreeWill(EntityType.BAT, new Vec3(13.5, FLOOR + 2.0, 12.5));
+        Bat bat = TestKit.spawnWithNoFreeWill(helper, EntityType.BAT, new Vec3(13.5, FLOOR + 2.0, 12.5));
         ServerPlayer friend = f.player(8.5, FLOOR, 12.5);
         press(hulk, 1, false);
         step(helper, 16, () -> {
@@ -415,7 +410,7 @@ public final class HulkTests {
     }
 
     /** The Brand New Day Hulk hits harder: Smash 7 x 1.15 = 8.05; and rage adds up to 30 %. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
     public static void brandNewDayAndRageHitHarder(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer bnd = hulk(f, 5.5, 5.5, "brand_new_day");
@@ -433,7 +428,7 @@ public final class HulkTests {
     }
 
     /** Rage falls out of a fight; at 50 he is enraged and Nausea slides off him. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
     public static void rageFallsAndEnragedIgnoresNausea(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 5.5, 5.5, "ragnarok");
@@ -455,7 +450,7 @@ public final class HulkTests {
     }
 
     /** Grab Smash: a husk slammed left, right, left (4 + 4 + 6); a boss takes one heavy punch (8) instead. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
     public static void grabSmashSlamsThriceAndPunchesABoss(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 5.5, 5.5, "ragnarok");
@@ -467,7 +462,8 @@ public final class HulkTests {
             step(helper, 32, () -> {
                 assertNear(lost(victim), 14.0, 0.02, "4 + 4 + 6");
                 ServerPlayer other = hulk(f, 14.5, 14.5, "ragnarok");
-                ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(14.5, FLOOR, 17.5));
+                ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN,
+                        new Vec3(14.5, FLOOR, 17.5));
                 lookAt(other, boss);
                 LivingEntity punched = GrabSmash.start(other, data(other));
                 check(punched == boss && !data(other).is(Live.HULK_GRABBING), "a boss is punched, not grabbed");
@@ -478,7 +474,7 @@ public final class HulkTests {
     }
 
     /** The Thunder Clap: 6 and a throw of 8 blocks or more; fire is put out; an arrow in the wave is turned back. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
     public static void thunderClapThrowsFarDousesAndTurnsArrows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 2.5, 10.5, "ragnarok");
@@ -508,12 +504,12 @@ public final class HulkTests {
     }
 
     /** The Roar frightens a monster (it runs from him) and weakens it; a boss is not frightened; rage +20. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 120)
     public static void roarFrightensButNotABoss(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 6.5, 10.5, "ragnarok");
         Husk husk = husk(helper, 9.5, FLOOR, 10.5, true);
-        ElderGuardian boss = helper.spawnWithNoFreeWill(EntityType.ELDER_GUARDIAN, new Vec3(6.5, FLOOR, 14.5));
+        ElderGuardian boss = TestKit.spawnWithNoFreeWill(helper, EntityType.ELDER_GUARDIAN, new Vec3(6.5, FLOOR, 14.5));
         double before = husk.distanceTo(hulk);
         HulkAbilities.roar(hulk, data(hulk));
         check(husk.hasEffect(ModEffects.FRIGHTENED) && husk.hasEffect(MobEffects.WEAKNESS),
@@ -527,7 +523,7 @@ public final class HulkTests {
     }
 
     /** The Super Leap lands within 2 of where it was aimed, hurts round the landing (6 in radius 4), no fall damage. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 200)
     public static void superLeapLandsOnTarget(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 3.5, 3.5, "ragnarok");
@@ -554,7 +550,7 @@ public final class HulkTests {
     }
 
     /** The Bound: a long low leap forward. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 120)
     public static void boundGoesFarAndLow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 2.5, 2.5, "ragnarok");
@@ -576,7 +572,7 @@ public final class HulkTests {
     }
 
     /** The Boulder Throw: 8 to the creature hit, 4 splash beside it. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 120)
     public static void boulderHitsAndSplashes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 3.5, 10.5, "ragnarok");
@@ -592,7 +588,7 @@ public final class HulkTests {
     }
 
     /** The Gamma Charge: 6 to a creature in his path; a stone wall stops him. */
-    @GameTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk", timeoutTicks = 100)
     public static void gammaChargeHitsAndAWallStopsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 3.5, 10.5, "ragnarok");
@@ -618,7 +614,7 @@ public final class HulkTests {
     // PvP
 
     /** With PvP on, the Smash hurts a player on the ground. */
-    @GameTest(template = ARENA, batch = "hulk_pvp", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "hulk_pvp", timeoutTicks = 60)
     public static void smashHurtsAPlayerWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -637,7 +633,7 @@ public final class HulkTests {
     /**
      * {@code soft} (the default): the Smash breaks glass near him, never stone; the charge goes through a glass wall.
      */
-    @GameTest(template = ARENA, batch = "hulk_terrain", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk_terrain", timeoutTicks = 100)
     public static void softBreaksGlassNotStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 5.5, 5.5, "ragnarok");
@@ -661,7 +657,7 @@ public final class HulkTests {
     }
 
     /** {@code none}: nothing breaks. */
-    @GameTest(template = ARENA, batch = "hulk_terrain_none", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "hulk_terrain_none", timeoutTicks = 60)
     public static void noneBreaksNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HulkConfig.BLOCK_BREAKING, HulkConfig.BlockBreaking.NONE);
@@ -675,7 +671,7 @@ public final class HulkTests {
     }
 
     /** {@code all}: the Smash makes a small crater in stone. */
-    @GameTest(template = ARENA, batch = "hulk_terrain_all", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "hulk_terrain_all", timeoutTicks = 60)
     public static void allMakesACrater(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HulkConfig.BLOCK_BREAKING, HulkConfig.BlockBreaking.ALL);
@@ -698,7 +694,7 @@ public final class HulkTests {
     }
 
     /** With mobGriefing off nothing breaks; with it on, a protected cell (a claim) still does not. */
-    @GameTest(template = ARENA, batch = "hulk_terrain_grief", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk_terrain_grief", timeoutTicks = 100)
     public static void mobGriefingAndProtectionStopHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         mobGriefing(f, false);
@@ -724,7 +720,7 @@ public final class HulkTests {
     // The Gauntlet's cost, the custom hero
 
     /** His Snap burns his arm (Weakness II, the arm's timer). */
-    @GameTest(template = ARENA, batch = "hulk")
+    @EnhancedTest(template = ARENA, batch = "hulk")
     public static void theSnapBurnsHisArm(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hulk = hulk(f, 5.5, 5.5, "ragnarok");
@@ -734,7 +730,7 @@ public final class HulkTests {
     }
 
     /** A custom hero's Human Form: N turns every module off (its armour goes) and back. */
-    @GameTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "hulk_forms", timeoutTicks = 100)
     public static void customHumanFormTurnsHisPowersOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("hulk.transform", 3).key(5, "hulk.transform")
@@ -758,7 +754,7 @@ public final class HulkTests {
     }
 
     /** {@code hulk.body} scales by its strength; it and a Shapeshift (grow) both want the scale: the rules keep one. */
-    @GameTest(template = ARENA, batch = "hulk_forms")
+    @EnhancedTest(template = ARENA, batch = "hulk_forms")
     public static void customBodyScalesAndTheScaleIsOnes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer weak = CustomKitSupport.hero(f, 4.5, 4.5, CustomKitSupport.def().pick("hulk.body", 1).build());
@@ -780,7 +776,7 @@ public final class HulkTests {
     // The pure tables
 
     /** His rows' moves, his routes, his gestures' keys, his run, his preset. */
-    @GameTest(template = ARENA, batch = "hulk")
+    @EnhancedTest(template = ARENA, batch = "hulk")
     public static void theAnimationTablesAndThePreset(GameTestHelper helper) {
         for (GestureId id : GestureId.values()) {
             if (id.name().startsWith("HULK_")) {

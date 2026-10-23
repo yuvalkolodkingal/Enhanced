@@ -1,16 +1,17 @@
 package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.reg.RegEntry;
+import com.kolodkingal.enhanced.platform.reg.Registrar;
+import com.kolodkingal.enhanced.platform.reg.Registrars;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModCreativeTab {
-    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Enhanced.MODID);
+    public static final Registrar<CreativeModeTab> TABS = Registrars.create(Registries.CREATIVE_MODE_TAB, Enhanced.MODID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ENHANCED = TABS.register("enhanced",
+    public static final RegEntry<CreativeModeTab, CreativeModeTab> ENHANCED = TABS.register("enhanced",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.enhanced"))
                     .icon(() -> ModItems.MAGNETO_HELMET.get().getDefaultInstance())
