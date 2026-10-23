@@ -35,11 +35,13 @@ import com.kolodkingal.enhanced.ultron.UltronBoltEntity;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import com.kolodkingal.enhanced.ultron.VibraniumKeyEntity;
+import java.util.function.Supplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 public final class ModEntities {
     public static final Registrar<EntityType<?>> ENTITIES = Registrars.create(Registries.ENTITY_TYPE, Enhanced.MODID);
 
@@ -542,33 +544,42 @@ public final class ModEntities {
                     .build("eternity"));
     // ===== love (3.8) =====
 
-    /** Mod bus: attributes of the mod's living entities. */
-    public static void registerAttributes(EntityAttributeCreationEvent event) {
-        event.put(LOKI_ILLUSION.get(), LokiIllusionEntity.createAttributes().build());
-        event.put(HEX_VISION.get(), HexVisionEntity.createAttributes().build());
-        event.put(THANOS.get(), ThanosEntity.createAttributes().build());
-        event.put(THANOS_PHANTOM.get(), ThanosPhantomEntity.createAttributes().build());
-        event.put(ULTRON.get(), UltronEntity.createAttributes().build());
-        event.put(ULTRON_SENTRY.get(), UltronSentryEntity.createAttributes().build());
-        event.put(APOCALYPSE.get(), ApocalypseEntity.createAttributes().build());
+    /**
+     * The attributes of the mod's living entities, given to the loader through {@link Registrars#entityAttributes} (it
+     * builds each when it asks for them: NeoForge's {@code EntityAttributeCreationEvent}). Called once by the entry
+     * point.
+     */
+    public static void registerAttributes() {
+        attributes(LOKI_ILLUSION, () -> LokiIllusionEntity.createAttributes().build());
+        attributes(HEX_VISION, () -> HexVisionEntity.createAttributes().build());
+        attributes(THANOS, () -> ThanosEntity.createAttributes().build());
+        attributes(THANOS_PHANTOM, () -> ThanosPhantomEntity.createAttributes().build());
+        attributes(ULTRON, () -> UltronEntity.createAttributes().build());
+        attributes(ULTRON_SENTRY, () -> UltronSentryEntity.createAttributes().build());
+        attributes(APOCALYPSE, () -> ApocalypseEntity.createAttributes().build());
         // 3.5
-        event.put(HELA_SHADOW.get(), HelaShadowEntity.createAttributes().build());
+        attributes(HELA_SHADOW, () -> HelaShadowEntity.createAttributes().build());
         // ===== odin (3.5) =====
-        event.put(RAVEN.get(), RavenEntity.createAttributes().build());
-        event.put(HELA.get(), HelaEntity.createAttributes().build());
-        event.put(BERSERKER.get(), BerserkerEntity.createAttributes().build());
-        event.put(FENRIS.get(), FenrisEntity.createAttributes().build());
-        event.put(ASGARDIAN.get(), AsgardianEntity.createAttributes().build());
+        attributes(RAVEN, () -> RavenEntity.createAttributes().build());
+        attributes(HELA, () -> HelaEntity.createAttributes().build());
+        attributes(BERSERKER, () -> BerserkerEntity.createAttributes().build());
+        attributes(FENRIS, () -> FenrisEntity.createAttributes().build());
+        attributes(ASGARDIAN, () -> AsgardianEntity.createAttributes().build());
         // 3.6
-        event.put(ASTRAL_BODY.get(), com.kolodkingal.enhanced.strange.AstralBodyEntity.createAttributes().build());
-        event.put(STONEKEEPER.get(), com.kolodkingal.enhanced.vormir.StonekeeperEntity.createAttributes().build());
-        event.put(HYDRA_SOLDIER.get(), com.kolodkingal.enhanced.hydra.HydraSoldierEntity.createAttributes().build());
-        event.put(HYDRA_OFFICER.get(), com.kolodkingal.enhanced.hydra.HydraOfficerEntity.createAttributes().build());
+        attributes(ASTRAL_BODY, () -> com.kolodkingal.enhanced.strange.AstralBodyEntity.createAttributes().build());
+        attributes(STONEKEEPER, () -> com.kolodkingal.enhanced.vormir.StonekeeperEntity.createAttributes().build());
+        attributes(HYDRA_SOLDIER, () -> com.kolodkingal.enhanced.hydra.HydraSoldierEntity.createAttributes().build());
+        attributes(HYDRA_OFFICER, () -> com.kolodkingal.enhanced.hydra.HydraOfficerEntity.createAttributes().build());
         // 3.7
-        event.put(DOGPOOL.get(), com.kolodkingal.enhanced.deadpool.DogpoolEntity.createAttributes().build());
-        event.put(COTTAGE_RESIDENT.get(), AsgardianEntity.createAttributes().build());
+        attributes(DOGPOOL, () -> com.kolodkingal.enhanced.deadpool.DogpoolEntity.createAttributes().build());
+        attributes(COTTAGE_RESIDENT, () -> AsgardianEntity.createAttributes().build());
         // 3.8
-        event.put(REDWING.get(), com.kolodkingal.enhanced.falcon.RedwingEntity.createAttributes().build());
+        attributes(REDWING, () -> com.kolodkingal.enhanced.falcon.RedwingEntity.createAttributes().build());
+    }
+
+    private static <E extends LivingEntity> void attributes(Supplier<EntityType<E>> type,
+                                                            Supplier<AttributeSupplier> attributes) {
+        Registrars.entityAttributes(type, attributes);
     }
 
     private ModEntities() {

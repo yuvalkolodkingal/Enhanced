@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -530,7 +531,8 @@ public final class UltronAbilities {
     }
 
     private static boolean inFlight(Projectile projectile) {
-        if (projectile instanceof AbstractArrow arrow && (arrow.inGround || arrow.isNoPhysics())) {
+        if (projectile instanceof AbstractArrow arrow && (((AbstractArrowAccessor) arrow).enhanced$isInGround()
+                || arrow.isNoPhysics())) {
             return false;
         }
         return !(projectile instanceof FishingHook);

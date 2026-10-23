@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SpeedConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -156,7 +157,7 @@ public final class SpeedSurfaces {
         if (on) {
             state.safeUntil = now + SAFE_FALL_TICKS;
             if (player.connection != null) {
-                player.connection.aboveGroundTickCount = 0;
+                ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
             }
             // His client moves him: the server's copy must not gather a fall of its own between two positions.
             Vec3 motion = player.getDeltaMovement();

@@ -19,6 +19,7 @@ import com.kolodkingal.enhanced.gametest.UltronTestSupport.Log;
 import com.kolodkingal.enhanced.item.AwakeningItem;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.item.ScepterRituals.Ritual;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -1057,7 +1058,8 @@ public final class CrossHeroTests {
                 SokoviaTestSupport.client(rider);
                 if (up) {
                     carried.merge(rider, 1, Integer::sum);
-                    highest.merge(rider, rider.connection.aboveGroundTickCount, Math::max);
+                    int kick = ((ServerGamePacketListenerImplAccessor) rider.connection).enhanced$getAboveGroundTickCount();
+                    highest.merge(rider, kick, Math::max);
                     // (The lift holds them without gravity, so the server allows them any time in the air; their own hero's
                     // tick must not give it back.)
                     check(rider.isNoGravity(), Powers.power(rider) + " was given back gravity while the lift carried them");

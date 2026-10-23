@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.platform.net.Net;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Client → server messages (ability keys, Change Look, Hex Control, the Bifrost screen, the Witches' Road choice, Build
@@ -124,6 +125,14 @@ public final class ModNetwork {
         music.clientbound(MusicManifestPayload.TYPE, MusicManifestPayload.STREAM_CODEC, MusicManifestPayload::handle);
         music.serverbound(MusicRequestPayload.TYPE, MusicRequestPayload.STREAM_CODEC, MusicRequestPayload::handle);
         music.clientbound(MusicChunkPayload.TYPE, MusicChunkPayload.STREAM_CODEC, MusicChunkPayload::handle);
+    }
+
+    /**
+     * Whether the player's client has the optional music channel (a client of an older version of the mod has not): the
+     * server sends the music messages only to a client that has it.
+     */
+    public static boolean hasMusic(ServerPlayer player) {
+        return Net.hasChannel(player, MusicManifestPayload.TYPE);
     }
 
     private ModNetwork() {

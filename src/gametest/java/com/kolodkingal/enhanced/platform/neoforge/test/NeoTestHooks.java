@@ -22,6 +22,7 @@ import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.attachment.AttachmentSync;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.connection.ConnectionType;
@@ -103,6 +104,16 @@ public final class NeoTestHooks implements TestHooks {
                 && custom.payload() instanceof SyncAttachmentsPayload sync
                 && sync.types().contains(NeoAttach.typeOf(key))
                 && sync.target() instanceof SyncAttachmentsPayload.EntityTarget(int id) && id == entityId;
+    }
+
+    @Override
+    public String attachmentsKey() {
+        return AttachmentHolder.ATTACHMENTS_NBT_KEY;
+    }
+
+    @Override
+    public String modVersion() {
+        return ModList.get().getModContainerById(Enhanced.MODID).orElseThrow().getModInfo().getVersion().toString();
     }
 
     @Override

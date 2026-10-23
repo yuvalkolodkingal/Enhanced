@@ -15,6 +15,9 @@ import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
+import com.kolodkingal.enhanced.mixin.ArmorStandAccessor;
+import com.kolodkingal.enhanced.mixin.ItemFrameAccessor;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
 import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.event.EventHub;
@@ -1313,9 +1316,10 @@ public final class MagnetPullTests {
         }
         BlockPos claimedChest = new BlockPos(12, 2, 5);
         ItemFrame fixedFrame = frame(helper, new BlockPos(14, 3, 7), new ItemStack(Items.IRON_SWORD));
-        fixedFrame.fixed = true;
+        ((ItemFrameAccessor) fixedFrame).enhanced$setFixed(true);
         ArmorStand lockedStand = stand(helper, new Vec3(12.5, FLOOR, 6.5), Items.IRON_CHESTPLATE);
-        lockedStand.disabledSlots = 1 << EquipmentSlot.CHEST.getFilterFlag() + 8; // its chestplate cannot be taken out
+        // its chestplate cannot be taken out
+        ((ArmorStandAccessor) lockedStand).enhanced$setDisabledSlots(1 << EquipmentSlot.CHEST.getFilterFlag() + 8);
         ServerPlayer[] adventurer = new ServerPlayer[1];
         ItemEntity[] loose = new ItemEntity[1];
         List<EventHub.Registration> claims = new ArrayList<>();
@@ -1461,7 +1465,8 @@ public final class MagnetPullTests {
             check(!anyones.isAlive() && count(magneto, Items.ARROW) == 1, "one arrow is his: the one anyone may pick up");
             check(nobodys.isAlive(), "the arrow nobody may pick up stays stuck");
             check(!his.isAlive() && count(magneto, Items.TRIDENT) == 1, "his own stuck trident is his again");
-            check(others.isAlive() && others.inGround, "another player's stuck trident stays where it is");
+            check(others.isAlive() && ((AbstractArrowAccessor) others).enhanced$isInGround(),
+                    "another player's stuck trident stays where it is");
             check(count(magneto, Items.IRON_HELMET) == 1 && count(magneto, Items.IRON_SWORD) == 1, "the zombie's helmet and sword are his");
             check(zombie.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && zombie.getMainHandItem().isEmpty()
                     && zombie.getItemBySlot(EquipmentSlot.FEET).is(Items.LEATHER_BOOTS), "it keeps only its leather boots");
@@ -2022,7 +2027,7 @@ public final class MagnetPullTests {
         Vec3 at = helper.absoluteVec(relative.subtract(0, 0.05, 0));
         Arrow arrow = new Arrow(helper.getLevel(), at.x, at.y, at.z, new ItemStack(Items.ARROW), null);
         arrow.setDeltaMovement(Vec3.ZERO);
-        arrow.inGround = true;
+        ((AbstractArrowAccessor) arrow).enhanced$setInGround(true);
         arrow.pickup = pickup;
         helper.getLevel().addFreshEntity(arrow);
         return arrow;
@@ -2034,7 +2039,7 @@ public final class MagnetPullTests {
         ThrownTrident trident = new ThrownTrident(helper.getLevel(), thrower, new ItemStack(Items.TRIDENT));
         trident.moveTo(at.x, at.y, at.z);
         trident.setDeltaMovement(Vec3.ZERO);
-        trident.inGround = true;
+        ((AbstractArrowAccessor) trident).enhanced$setInGround(true);
         helper.getLevel().addFreshEntity(trident);
         return trident;
     }

@@ -1,0 +1,30 @@
+# Port P0 lint allow-list of lane L5-heroes: the files it still has to migrate (net.neoforged, @SubscribeEvent,
+# getPersistentData()/hasChannel outside platform/neoforge/**). Remove a line when its file is clean; delete
+# this file when the lane is done. build.gradle portLint (region "port P0 L8") reads it.
+src/gametest/java/com/kolodkingal/enhanced/gametest/CaptainTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/FalconTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/HealingTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/HulkTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/IronCoreTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/RedHulkTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/SuitArtTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/WolverineTests.java
+src/main/java/com/kolodkingal/enhanced/captain/CaptainEvents.java
+src/main/java/com/kolodkingal/enhanced/captain/ShieldRules.java
+src/main/java/com/kolodkingal/enhanced/deadpool/DeadpoolEvents.java
+src/main/java/com/kolodkingal/enhanced/falcon/FalconEvents.java
+src/main/java/com/kolodkingal/enhanced/healing/Rescue.java
+src/main/java/com/kolodkingal/enhanced/healing/Suppression.java
+src/main/java/com/kolodkingal/enhanced/hulk/HulkEvents.java
+src/main/java/com/kolodkingal/enhanced/hulk/HulkTerrain.java
+src/main/java/com/kolodkingal/enhanced/hydra/HydraBoltEntity.java
+src/main/java/com/kolodkingal/enhanced/hydra/HydraEvents.java
+src/main/java/com/kolodkingal/enhanced/ironman/IronEvents.java
+src/main/java/com/kolodkingal/enhanced/ironman/hulkbuster/HulkbusterEvents.java
+src/main/java/com/kolodkingal/enhanced/ironman/nano/NanoEvents.java
+src/main/java/com/kolodkingal/enhanced/ironman/nano/NanoTech.java
+src/main/java/com/kolodkingal/enhanced/redhulk/RedHulkEvents.java
+src/main/java/com/kolodkingal/enhanced/serum/SerumEvents.java
+src/main/java/com/kolodkingal/enhanced/tower/TowerEvents.java
+src/main/java/com/kolodkingal/enhanced/wolverine/WolverineAbilities.java
+src/main/java/com/kolodkingal/enhanced/wolverine/WolverineEvents.java

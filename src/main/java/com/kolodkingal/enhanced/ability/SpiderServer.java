@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
@@ -1121,7 +1122,7 @@ public final class SpiderServer implements HeroServer {
     private static void keepAloft(ServerPlayer player) {
         player.resetFallDistance();
         if (player.connection != null) {
-            player.connection.aboveGroundTickCount = 0;
+            ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
         }
     }
 

@@ -241,3 +241,166 @@ neoForge.runs.configureEach {
     }
 }
 // ===== end port P0 S-A =====
+
+// ===== port P0 L8 =====
+// The port lint (PLAN2 4.2, gate P0): loader API only where the loader is. It fails the build on
+//   neoforge  - a reference to net.neoforged.* in code (imports, qualified names, strings; comments do not count),
+//   subscribe - @SubscribeEvent / @EventBusSubscriber (the mod's listeners are @Subscribe on the common events),
+//   hidden    - NeoForge extension calls no import shows: getPersistentData() (-> ModAttachments.PERSISTENT_DATA) and
+//               connection.hasChannel( (-> Net.hasChannel),
+//   impl      - the platform's NeoForge implementation (com.kolodkingal.enhanced.platform.neoforge, P1's neoforge/)
+//               outside platform/**,
+// outside platform/neoforge/** (main and gametest: the bridge, the platform implementation and the GameTest adapter)
+// and, for neoforge and impl, the two @Mod entries (Enhanced, client/EnhancedClient). While P0's lanes are in
+// progress the files each lane has still to migrate are listed in docs/port/lint/<lane>.txt (one path or glob per
+// line, # comments); a lane removes its lines as it goes and deletes its file when it is done, so the P0 gate has no
+// list left. A listed file that is clean already is reported, so lists only shrink. `./gradlew portLint` alone;
+// `check` (and so `build`) runs it.
+abstract class PortLint extends DefaultTask {
+    @InputFiles @PathSensitive(PathSensitivity.RELATIVE)
+    abstract ConfigurableFileCollection getSources()
+
+    @InputFiles @PathSensitive(PathSensitivity.RELATIVE)
+    abstract ConfigurableFileCollection getAllowLists()
+
+    @Internal
+    abstract DirectoryProperty getRoot()
+
+    @OutputFile
+    abstract RegularFileProperty getReport()
+
+    private static final String MOD = 'com/kolodkingal/enhanced/'
+    private static final List<String> LOADER_DIRS = ["src/main/java/${MOD}platform/neoforge/".toString(),
+                                                     "src/gametest/java/${MOD}platform/neoforge/".toString()]
+    private static final List<String> MOD_ENTRIES = ["src/main/java/${MOD}Enhanced.java".toString(),
+                                                     "src/main/java/${MOD}client/EnhancedClient.java".toString()]
+    private static final Map<String, java.util.regex.Pattern> RULES = [
+            neoforge : ~/\bnet\.neoforged\./,
+            subscribe: ~/@(SubscribeEvent|EventBusSubscriber)\b/,
+            hidden   : ~/\bgetPersistentData\(\s*\)|\bconnection\.hasChannel\(/,
+            impl     : ~/\bcom\.kolodkingal\.enhanced\.platform\.neoforge\b/,
+    ]
+
+    /** The code of a Java file without its comments (string and char literals kept). */
+    static String code(String text) {
+        StringBuilder out = new StringBuilder(text.length())
+        int i = 0
+        int n = text.length()
+        while (i < n) {
+            char c = text.charAt(i)
+            char next = i + 1 < n ? text.charAt(i + 1) : (char) 0
+            if (c == '/' && next == '/') {
+                while (i < n && text.charAt(i) != '\n') i++
+            } else if (c == '/' && next == '*') {
+                i += 2
+                while (i < n && !(text.charAt(i) == '*' && i + 1 < n && text.charAt(i + 1) == '/')) {
+                    if (text.charAt(i) == '\n') out.append('\n')
+                    i++
+                }
+                i += 2
+            } else if (c == '"' || c == '\'') {
+                char quote = c
+                out.append(c)
+                i++
+                while (i < n && text.charAt(i) != quote && text.charAt(i) != '\n') {
+                    if (text.charAt(i) == '\\' && i + 1 < n) {
+                        out.append(text.charAt(i))
+                        i++
+                    }
+                    out.append(text.charAt(i))
+                    i++
+                }
+                if (i < n) {
+                    out.append(text.charAt(i))
+                    i++
+                }
+            } else {
+                out.append(c)
+                i++
+            }
+        }
+        return out.toString()
+    }
+
+    @TaskAction
+    void lint() {
+        File base = root.get().asFile
+        Map<String, List<String>> allowed = new TreeMap<>()     // lane -> its globs
+        allowLists.files.findAll { it.isFile() }.sort { it.name }.each { File list ->
+            String lane = list.name.replaceFirst(/\.txt$/, '')
+            allowed[lane] = list.readLines('UTF-8').collect { it.replaceFirst(/#.*/, '').trim() }.findAll { it }
+        }
+        Map<String, java.nio.file.PathMatcher> matchers = [:]
+        allowed.each { lane, globs ->
+            globs.each { matchers[it] = java.nio.file.FileSystems.default.getPathMatcher("glob:" + it) }
+        }
+
+        List<String> errors = []
+        Map<String, Integer> waived = new TreeMap<>()
+        Set<String> usedGlobs = new HashSet<>()
+        int scanned = 0
+        sources.files.sort { it.path }.each { File file ->
+            String rel = base.toPath().relativize(file.toPath()).toString().replace('\\', '/')
+            if (LOADER_DIRS.any { rel.startsWith(it) }) {
+                return
+            }
+            scanned++
+            String text = code(file.getText('UTF-8'))
+            List<String> hits = []
+            RULES.each { rule, pattern ->
+                if ((rule == 'neoforge' || rule == 'impl') && MOD_ENTRIES.contains(rel)
+                        || rule == 'impl' && rel.contains('/enhanced/platform/')) {
+                    return
+                }
+                def lines = text.readLines()
+                for (int k = 0; k < lines.size(); k++) {
+                    if (pattern.matcher(lines[k]).find()) {
+                        hits << "${rule} ${rel}:${k + 1}: ${lines[k].trim()}".toString()
+                    }
+                }
+            }
+            if (hits.isEmpty()) {
+                return
+            }
+            String glob = matchers.find { g, m -> m.matches(java.nio.file.Paths.get(rel)) }?.key
+            if (glob != null) {
+                usedGlobs << glob
+                String lane = allowed.find { l, gs -> gs.contains(glob) }.key
+                waived[lane] = (waived[lane] ?: 0) + 1
+            } else {
+                errors.addAll(hits)
+            }
+        }
+        List<String> stale = []
+        allowed.each { lane, globs ->
+            globs.findAll { !usedGlobs.contains(it) }.each { stale << "${lane}: ${it}".toString() }
+        }
+
+        StringBuilder out = new StringBuilder()
+        out.append("Port lint: ${scanned} files outside platform/neoforge; ${errors.size()} new coupling(s); ")
+        String lanes = waived.isEmpty() ? 'none' : waived.collect { l, c -> "$l $c" }.join(', ')
+        out.append("allow-listed files still to migrate: ${lanes}\n")
+        if (!stale.isEmpty()) {
+            out.append("Clean already, remove from docs/port/lint/ (${stale.size()}):\n")
+            stale.each { out.append("  ").append(it).append('\n') }
+        }
+        errors.each { out.append("  ").append(it).append('\n') }
+        report.get().asFile.text = out.toString()
+        logger.lifecycle(out.toString().trim())
+        if (!errors.isEmpty()) {
+            throw new GradleException("Port lint: ${errors.size()} reference(s) to the loader outside "
+                    + "platform/neoforge/** (see above; the platform API replaces them, PLAN2 3.3). Report: ${report.get().asFile}")
+        }
+    }
+}
+def portLint = tasks.register('portLint', PortLint) {
+    group = 'verification'
+    description = 'Fails on NeoForge API outside platform/neoforge/** and the @Mod entries (port P0).'
+    root = layout.projectDirectory
+    sources.from(fileTree('src/main/java') { include '**/*.java' },
+            fileTree('src/gametest/java') { include '**/*.java' })
+    allowLists.from(fileTree('docs/port/lint') { include '*.txt' })
+    report = layout.buildDirectory.file('reports/portLint.txt')
+}
+tasks.named('check') { dependsOn portLint }
+// ===== end port P0 L8 =====

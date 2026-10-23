@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.boss.BossGifts;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.mixin.ServerGamePacketListenerImplAccessor;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -335,7 +336,7 @@ public final class SokoviaRecovery {
         }
         SokoviaCarry.teleport(player, spot);
         player.resetFallDistance();
-        player.connection.aboveGroundTickCount = 0;
+        ((ServerGamePacketListenerImplAccessor) player.connection).enhanced$setAboveGroundTickCount(0);
         player.displayClientMessage(Component.translatable("message.enhanced.ultron.lift.relocated").withStyle(ChatFormatting.YELLOW), true);
     }
 

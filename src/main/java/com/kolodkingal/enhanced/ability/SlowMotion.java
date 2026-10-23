@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
 import com.kolodkingal.enhanced.network.SlowedProjectilePayload;
 import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
@@ -309,7 +310,8 @@ public final class SlowMotion {
             return;
         }
         int n = data.getCompound(SLOWED_TAG).getInt("Factor");
-        if (n <= 1 || returning(projectile) || projectile.isInWater() || projectile instanceof AbstractArrow arrow && arrow.inGround) {
+        if (n <= 1 || returning(projectile) || projectile.isInWater() || projectile instanceof AbstractArrow arrow
+                && ((AbstractArrowAccessor) arrow).enhanced$isInGround()) {
             return;
         }
         projectile.setDeltaMovement(projectile.getDeltaMovement().scale(Math.pow(0.99, 1.0 / n - 1.0)));

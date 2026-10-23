@@ -106,12 +106,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforgespi.locating.IModFile;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -185,7 +181,7 @@ public final class SkeletonTests {
     /** A name for everything, a look to choose, and flight rules that agree with each other. */
     @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void everyNewHeroHasNamesLooksAndConsistentFlightRules(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        TestKit.ModFiles mod = TestKit.modFiles();
         JsonObject en = lang(mod, "en_us");
         JsonObject he = lang(mod, "he_il");
         for (Power power : NEW_HEROES) {
@@ -557,7 +553,7 @@ public final class SkeletonTests {
         Powers.setVariant(player, Variants.get(Power.SPIDER_MAN, "iron_spider"));
         Powers.get(player).set(Live.BLACK_EYES, true);
         CompoundTag file = player.saveWithoutId(new CompoundTag());
-        CompoundTag attachment = file.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY).getCompound(Enhanced.id("power").toString());
+        CompoundTag attachment = file.getCompound(TestKit.attachmentsKey()).getCompound(Enhanced.id("power").toString());
         check(attachment.getString("power").equals("spider_man"), "saved by name: " + attachment);
         check(!attachment.contains("live"), "the momentary states are not saved");
 
@@ -748,7 +744,7 @@ public final class SkeletonTests {
      */
     @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void everyTagFileNamesRealThings(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        TestKit.ModFiles mod = TestKit.modFiles();
         ServerLevel level = helper.getLevel();
         List<String> problems = new ArrayList<>();
         Set<String> read = new HashSet<>();
@@ -1407,7 +1403,7 @@ public final class SkeletonTests {
      */
     @EnhancedTest(template = ARENA, batch = SKELETON)
     public static void noLangSentinelsRemain(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        TestKit.ModFiles mod = TestKit.modFiles();
         check(sentinels(lang(mod, "en_us")).isEmpty() && sentinels(lang(mod, "he_il")).isEmpty(),
                 "the lanes' sentinel lines are still in the lang files");
         helper.succeed();
@@ -1505,11 +1501,10 @@ public final class SkeletonTests {
 
     /** Whether the mod is a release of 3.0 or later (not a 2.x version, which is what the work in progress carries). */
     private static boolean isReleaseOf3() {
-        ArtifactVersion version = ModList.get().getModContainerById(Enhanced.MODID).orElseThrow().getModInfo().getVersion();
-        return version.getMajorVersion() >= 3;
+        return Integer.parseInt(TestKit.modVersion().split("\\.")[0]) >= 3;
     }
 
-    private static JsonObject lang(IModFile mod, String name) throws IOException {
+    private static JsonObject lang(TestKit.ModFiles mod, String name) throws IOException {
         Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
         return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
     }

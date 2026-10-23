@@ -1,4 +1,4 @@
-package com.kolodkingal.enhanced.gametest;
+package com.kolodkingal.enhanced.platform.neoforge.test.bridge;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.platform.event.EventHub;

@@ -89,8 +89,6 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.language.IModFileInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -637,8 +635,8 @@ public final class MutantSkeletonTests {
     }
 
     private static JsonObject lang(String name) throws IOException {
-        IModFileInfo mod = ModList.get().getModFileById(Enhanced.MODID);
-        return JsonParser.parseString(Files.readString(mod.getFile().findResource("assets", Enhanced.MODID, "lang",
+        TestKit.ModFiles mod = TestKit.modFiles();
+        return JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang",
                 name + ".json"), StandardCharsets.UTF_8)).getAsJsonObject();
     }
 

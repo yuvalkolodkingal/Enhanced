@@ -64,8 +64,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -99,7 +97,7 @@ public final class AsgardSkeletonTests {
                 && all[Power.CUSTOM.ordinal() + 3] == Power.HELA && all.length >= Power.CUSTOM.ordinal() + 4,
                 "…CUSTOM, HEIMDALL, ODIN, HELA (the stream sends the ordinal; 3.6 appends after them)");
         check(Power.AGATHA.ordinal() == 14 && Power.CUSTOM.ordinal() == 17, "nobody before them moved");
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
+        TestKit.ModFiles mod = TestKit.modFiles();
         for (String name : List.of("en_us", "he_il")) {
             JsonObject lang = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang", name + ".json"),
                     StandardCharsets.UTF_8)).getAsJsonObject();
