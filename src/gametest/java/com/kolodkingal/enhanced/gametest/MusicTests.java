@@ -187,7 +187,7 @@ public final class MusicTests {
      * 3.8.4: "Sweet Dreams" is no longer built in. quicksilverSong = sweet_dreams plays the player's own
      * sweet_dreams.* first, then his quicksilver.* (or any other song); with none, Quicksilver's own Silver Hours.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sweetDreamsIsYourOwnCopyOrSilverHours(GameTestHelper helper) {
         check(MusicTracks.resolvePersonal("quicksilver", List.of(), true).isEmpty(), "no files: nothing of his own");
         check(MusicTracks.resolvePersonal("quicksilver", List.of("README.txt", "sweet_dreams.flac", "speed.ogg"), true)
