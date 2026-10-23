@@ -71,11 +71,11 @@ case old_a SERVER input=659f61a61d19797d output=cfd561f0f9dc9c2b backup=true rec
   apocalypse_shield.shieldRegenDelayTicks=Integer:160
   apocalypse_shield.shieldRegenFraction=Double:0.03
 case old_b SERVER input=9e8a6667e1b0ae2a output=1fe220317c64d5ad backup=true recreated=false values=1181c6619b1d6f84
-case client_default CLIENT input=4ba5323f49427654 output=4ba5323f49427654 backup=false recreated=false values=638b8d042af9294f
-case client_missing CLIENT input=none output=4ba5323f49427654 backup=false recreated=false values=638b8d042af9294f
-case client_values CLIENT input=205caf3584aaf779 output=205caf3584aaf779 backup=false recreated=false values=bfecac96c19a311d
+case client_default CLIENT input=5251c1d15fb04da8 output=5251c1d15fb04da8 backup=false recreated=false values=638b8d042af9294f
+case client_missing CLIENT input=none output=5251c1d15fb04da8 backup=false recreated=false values=638b8d042af9294f
+case client_values CLIENT input=a1be48a690d7ed97 output=a1be48a690d7ed97 backup=false recreated=false values=bfecac96c19a311d
   animation.animations=Boolean:false
   build_magic.ghostDetail=Integer:1000
   music.quicksilverSong=String:sweet_dreams
-case client_bad CLIENT input=fe3c989e2f49d847 output=94caa8126d26f893 backup=true recreated=false values=f77215ae0049c91a
+case client_bad CLIENT input=45955da1ac776fcf output=f65288dff9d78984 backup=true recreated=false values=f77215ae0049c91a
   build_magic.ghostDetail=Integer:0
