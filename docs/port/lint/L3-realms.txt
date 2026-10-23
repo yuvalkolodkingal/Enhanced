@@ -1,0 +1,33 @@
+# Port P0 lint allow-list of lane L3-realms: the files it still has to migrate (net.neoforged, @SubscribeEvent,
+# getPersistentData()/hasChannel outside platform/neoforge/**). Remove a line when its file is clean; delete
+# this file when the lane is done. build.gradle portLint (region "port P0 L8") reads it.
+src/gametest/java/com/kolodkingal/enhanced/gametest/AsgardRealmTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/AsgardTestSupport.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/AsgardianTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/EternityTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/InfinityStoneTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/OdinTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/RoadReviewTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/RoadRulesTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/RoadStructureTests.java
+src/gametest/java/com/kolodkingal/enhanced/gametest/RoadTestSupport.java
+src/main/java/com/kolodkingal/enhanced/asgard/AsgardGate.java
+src/main/java/com/kolodkingal/enhanced/asgard/AsgardRules.java
+src/main/java/com/kolodkingal/enhanced/asgard/FeastHall.java
+src/main/java/com/kolodkingal/enhanced/asgard/npc/AsgardNpcEvents.java
+src/main/java/com/kolodkingal/enhanced/asgard/npc/AsgardPopulation.java
+src/main/java/com/kolodkingal/enhanced/asgard/npc/AsgardianGoals.java
+src/main/java/com/kolodkingal/enhanced/eternity/EternityEvents.java
+src/main/java/com/kolodkingal/enhanced/heimdall/HeimdallEvents.java
+src/main/java/com/kolodkingal/enhanced/heimdall/HeimdallTalk.java
+src/main/java/com/kolodkingal/enhanced/odin/OdinAbilities.java
+src/main/java/com/kolodkingal/enhanced/odin/OdinEvents.java
+src/main/java/com/kolodkingal/enhanced/road/RoadEvents.java
+src/main/java/com/kolodkingal/enhanced/road/RoadRules.java
+src/main/java/com/kolodkingal/enhanced/road/copy/StructureCopyEvents.java
+src/main/java/com/kolodkingal/enhanced/stones/StoneAim.java
+src/main/java/com/kolodkingal/enhanced/stones/StoneEvents.java
+src/main/java/com/kolodkingal/enhanced/stones/StoneLedger.java
+src/main/java/com/kolodkingal/enhanced/stones/StoneSites.java
+src/main/java/com/kolodkingal/enhanced/stones/StoneTouch.java
+src/main/java/com/kolodkingal/enhanced/vormir/VormirEvents.java
