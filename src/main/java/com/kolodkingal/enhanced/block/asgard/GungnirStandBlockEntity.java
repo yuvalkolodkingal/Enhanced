@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.block.asgard;
 
 import com.kolodkingal.enhanced.odin.GungnirStand;
+import com.kolodkingal.enhanced.platform.ext.BlockEntityExt;
 import com.kolodkingal.enhanced.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -23,7 +24,7 @@ import java.util.UUID;
  * tells the clients the world's Gungnir owner ({@code [gungnir] onePerWorld}; read from {@code AsgardState} when the
  * stand is sent, never saved here), so the stand is drawn empty for everyone else.
  */
-public class GungnirStandBlockEntity extends BlockEntity {
+public class GungnirStandBlockEntity extends BlockEntity implements BlockEntityExt.UpdatePacket {
     /** On the client: the world's Gungnir owner, or null (none, or every victor may take one). */
     @Nullable
     private UUID owner;
@@ -54,14 +55,12 @@ public class GungnirStandBlockEntity extends BlockEntity {
         return tag;
     }
 
-    // TODO(port seam): NeoForge IBlockEntityExtension#handleUpdateTag; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
     }
 
-    // TODO(port seam): NeoForge IBlockEntityExtension#onDataPacket; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet,

@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitControl;
 import com.kolodkingal.enhanced.ironman.SuitItemState;
 import com.kolodkingal.enhanced.ironman.SuitKind;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -41,7 +42,7 @@ import java.util.function.Consumer;
  * (its armour still protects) until it is repaired at an anvil (iron ingots, diamonds for the Mark 50, netherite scrap
  * for the Mark 85, iron blocks for the Hulkbuster). Its durability is the server's ({@code [mark_*] durability}).
  */
-public class IronSuitItem extends ArmorItem {
+public class IronSuitItem extends ArmorItem implements ItemExt.Equip, ItemExt.DamageItem, ItemExt.MaxDamage {
     private final SuitKind kind;
 
     public IronSuitItem(SuitKind kind, Holder<ArmorMaterial> material, Properties properties) {
@@ -84,7 +85,6 @@ public class IronSuitItem extends ArmorItem {
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
-    // TODO(port seam): NeoForge IItemExtension#canEquip; a platform hook is requested (P0 L1 notes).
 
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
@@ -105,7 +105,6 @@ public class IronSuitItem extends ArmorItem {
     }
 
     /** Wear never breaks a suit: it stops at its last point ("offline"). */
-    // TODO(port seam): NeoForge IItemExtension#damageItem; a platform hook is requested (P0 L1 notes).
     @Override
     public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, @Nullable T entity,
                                                    Consumer<Item> onBroken) {

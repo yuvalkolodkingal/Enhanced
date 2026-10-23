@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.ext.EntityExt;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -58,7 +59,7 @@ import java.util.UUID;
  * he fades to nothing and Wanda rebuilds him after a while, as long as the Hex stands. Never saved: whoever has a Hex
  * has him, and he is made again when the world is loaded.
  */
-public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
+public class HexVisionEntity extends PathfinderMob implements OwnableEntity, EntityExt.LevelPresence {
     /** Ticks between two hits of his Mind Stone beam. */
     public static final int BEAM_INTERVAL = 10;
     /** Ticks between two punches. */
@@ -387,7 +388,6 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
         discard();
     }
 
-    // TODO(port seam): NeoForge IEntityExtension#onAddedToLevel; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void onAddedToLevel() {
@@ -397,7 +397,6 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
         }
     }
 
-    // TODO(port seam): NeoForge IEntityExtension#onRemovedFromLevel; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void onRemovedFromLevel() {

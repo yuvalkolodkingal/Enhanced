@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.ChatFormatting;
@@ -22,7 +23,7 @@ import java.util.List;
  * Wanda's crown. On the Scarlet Witch it transforms her (suit, 40 max health, Diamond-level protection); on anyone
  * else it is just a crown. The bonuses are applied in {@link com.kolodkingal.enhanced.ability.WandaAbilities}.
  */
-public class WandaCrownItem extends ArmorItem {
+public class WandaCrownItem extends ArmorItem implements ItemExt.ArmorTexture {
     public WandaCrownItem(Holder<ArmorMaterial> material, Type type, Properties properties) {
         super(material, type, properties);
     }

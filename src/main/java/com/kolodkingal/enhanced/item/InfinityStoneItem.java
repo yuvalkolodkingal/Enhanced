@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.stones.StoneLedger;
 import com.kolodkingal.enhanced.stones.StoneRules;
@@ -37,7 +38,7 @@ import java.util.UUID;
  * release when it stops (a held power, such as a beam, runs between the two). One who may hold the stone but not use it
  * (Thor and the Time Stone) is told so and nothing happens.
  */
-public class InfinityStoneItem extends Item {
+public class InfinityStoneItem extends Item implements ItemExt.StopUsing, ItemExt.EntityItemUpdate {
     /** How often (ticks) a stone on the ground glints. */
     private static final int GLINT_EVERY = 8;
     /** A use is held at most this long (a held power ends itself sooner). */
@@ -87,7 +88,6 @@ public class InfinityStoneItem extends Item {
     }
 
     /** The use stopped (let go, another item, death): the stone's power is told the key came up. */
-    // TODO(port seam): NeoForge IItemExtension#onStopUsing; a platform hook is requested (P0 L1 notes).
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         if (entity instanceof ServerPlayer player) {
@@ -109,7 +109,6 @@ public class InfinityStoneItem extends Item {
     }
 
     /** On the ground: it never despawns, and it glints in its colour. */
-    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         Level level = entity.level();

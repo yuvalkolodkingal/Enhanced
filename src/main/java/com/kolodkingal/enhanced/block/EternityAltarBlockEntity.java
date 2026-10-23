@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.EternityConfig;
 import com.kolodkingal.enhanced.eternity.EternityRealm;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
+import com.kolodkingal.enhanced.platform.ext.BlockEntityExt;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModBlockEntities;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -37,7 +38,7 @@ import java.util.UUID;
  * traveller at a time. The charge is not saved (a reload ends it); the key's copy and the start are synced to the
  * clients.
  */
-public class EternityAltarBlockEntity extends BlockEntity {
+public class EternityAltarBlockEntity extends BlockEntity implements BlockEntityExt.UpdatePacket {
     /** How far (blocks, from the altar's middle, across) the traveller may stand while it charges. */
     public static final double REACH = 3.0;
 
@@ -174,7 +175,6 @@ public class EternityAltarBlockEntity extends BlockEntity {
         return tag;
     }
 
-    // TODO(port seam): NeoForge IBlockEntityExtension#handleUpdateTag; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
@@ -182,7 +182,6 @@ public class EternityAltarBlockEntity extends BlockEntity {
         start = tag.getLong("Start");
     }
 
-    // TODO(port seam): NeoForge IBlockEntityExtension#onDataPacket; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void onDataPacket(net.minecraft.network.Connection net, ClientboundBlockEntityDataPacket packet,

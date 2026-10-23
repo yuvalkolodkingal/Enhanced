@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -55,7 +56,7 @@ import java.util.UUID;
  * in, Sneak and hold use for three seconds: {@link Snap}. A tap of Sneak + use is still the selected stone's
  * variant.</li> </ul>
  */
-public class InfinityGauntletItem extends AwakeningItem {
+public class InfinityGauntletItem extends AwakeningItem implements ItemExt.StopUsing {
     /** A crafted Gauntlet's use is held at most this long (a held power ends itself sooner). */
     private static final int HOLD = 72000;
     /** Whether each player's use of a crafted Gauntlet started as its variant (Sneak), until it stops. Server only. */
@@ -193,14 +194,14 @@ public class InfinityGauntletItem extends AwakeningItem {
         StoneKind stone = StoneKind.nth(used / step + 1);
         Vec3 hand = player.position().add(0.0, player.getBbHeight() * 0.7, 0.0);
         stone.voice().use(level, hand, 0.7F, 1.0F);
-        ((ServerLevel) level).sendParticles(new EnergyParticleOptions(stone.color(), 1.3F), hand.x, hand.y, hand.z, 14, 0.3, 0.3, 0.3, 0.06);
+        ((ServerLevel) level).sendParticles(new EnergyParticleOptions(stone.color(), 1.3F), hand.x, hand.y, hand.z, 14,
+                0.3, 0.3, 0.3, 0.06);
     }
 
     /**
      * The use of a crafted Gauntlet stopped (let go, another item, death): a Snap's charge let go at once is the
      * selected stone's variant (a tap), later it is nothing; a stone's held power is told the key came up.
      */
-    // TODO(port seam): NeoForge IItemExtension#onStopUsing; a platform hook is requested (P0 L1 notes).
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         if (!(entity instanceof ServerPlayer player) || contents(stack).titan()) {
