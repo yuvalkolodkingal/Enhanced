@@ -247,7 +247,7 @@ neoForge.runs.configureEach {
 //   neoforge  - a reference to net.neoforged.* in code (imports, qualified names, strings; comments do not count),
 //   subscribe - @SubscribeEvent / @EventBusSubscriber (the mod's listeners are @Subscribe on the common events),
 //   hidden    - NeoForge extension calls no import shows: getPersistentData() (-> ModAttachments.PERSISTENT_DATA) and
-//               hasChannel( (-> the platform's channel check),
+//               connection.hasChannel( (-> Net.hasChannel),
 //   impl      - the platform's NeoForge implementation (com.kolodkingal.enhanced.platform.neoforge, P1's neoforge/)
 //               outside platform/**,
 // outside platform/neoforge/** (main and gametest: the bridge, the platform implementation and the GameTest adapter)
@@ -277,7 +277,7 @@ abstract class PortLint extends DefaultTask {
     private static final Map<String, java.util.regex.Pattern> RULES = [
             neoforge : ~/\bnet\.neoforged\./,
             subscribe: ~/@(SubscribeEvent|EventBusSubscriber)\b/,
-            hidden   : ~/\bgetPersistentData\(\s*\)|\.hasChannel\(/,
+            hidden   : ~/\bgetPersistentData\(\s*\)|\bconnection\.hasChannel\(/,
             impl     : ~/\bcom\.kolodkingal\.enhanced\.platform\.neoforge\b/,
     ]
 
