@@ -2,11 +2,11 @@ package com.kolodkingal.enhanced.thanos;
 
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public final class ThanosEffects {
 
     /** Sends an effect to everyone within {@link #RANGE} of {@code at}. */
     public static void send(ServerLevel level, Vec3 at, ThanosFxPayload payload) {
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE, payload);
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE, payload);
     }
 
     private static ThanosFxPayload fx(int kind, int color, int entityId, int ticks, float radius, List<Vec3> points) {

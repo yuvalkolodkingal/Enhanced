@@ -56,7 +56,10 @@ public class Enhanced {
         ModCreativeTab.TABS.register(modBus);
         // 3.8: the beams of Iron Man's suits and Love's eyes (their styles, by id, on both sides).
         com.kolodkingal.enhanced.beam.AvengersBeams.init();
-        modBus.addListener(ModNetwork::register);
+        // Port P0: the messages are declared on the platform's channels; NeoSetup registers them.
+        ModNetwork.register();
+        com.kolodkingal.enhanced.network.SpeedNetwork.register();
+        com.kolodkingal.enhanced.network.SpiderNetwork.register();
         modBus.addListener(ModEntities::registerAttributes);
         container.registerConfig(ModConfig.Type.SERVER, EnhancedConfig.SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, EnhancedClientConfig.SPEC);

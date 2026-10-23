@@ -2,13 +2,13 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.CerebroView;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -76,7 +76,7 @@ public record CerebroPayload(List<Mind> minds, int ticksLeft, boolean amplified,
     }
 
     /** Only ever runs on a client. */
-    static void handle(CerebroPayload payload, IPayloadContext context) {
+    static void handle(CerebroPayload payload, PacketContext context) {
         CerebroView.accept(payload);
     }
 }

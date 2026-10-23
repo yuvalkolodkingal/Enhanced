@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SoulStoneConfig;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -40,7 +41,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -469,7 +469,7 @@ public final class Sacrifice {
                 Component.translatable("title.enhanced.vormir.soul_stone").withColor(ORANGE)));
         seeker.connection.send(new ClientboundSetSubtitleTextPacket(
                 Component.translatable("title.enhanced.vormir.soul_stone.subtitle").withColor(0xFFD6A0)));
-        PacketDistributor.sendToPlayer(seeker, new StoneFxPayload(StoneFxPayload.SOUL_GIVEN, seeker.getId(), List.of(),
+        Net.sendToPlayer(seeker, new StoneFxPayload(StoneFxPayload.SOUL_GIVEN, seeker.getId(), List.of(),
                 FADE_TICKS));
         ServerLevel at = seeker.serverLevel();
         at.playSound(null, seeker.getX(), seeker.getY(), seeker.getZ(), ModSounds.SOUL_SACRIFICE.get(),

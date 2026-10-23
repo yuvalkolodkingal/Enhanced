@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SpiderServer;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: what the local Spider-Man clings to, if anything. His own client moves him along the wall or the
@@ -36,7 +36,7 @@ public record SpiderClingPayload(int kind, int normal) implements CustomPacketPa
         return TYPE;
     }
 
-    static void handle(SpiderClingPayload payload, IPayloadContext context) {
+    static void handle(SpiderClingPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             SpiderServer.onClingReport(player, payload.kind(), payload.normal());
         }

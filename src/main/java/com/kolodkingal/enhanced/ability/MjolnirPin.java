@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -33,7 +34,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -161,7 +161,7 @@ public final class MjolnirPin {
                 Power.THOR.glow), 1.4F), at.x, at.y, at.z, 12,
                 0.3, 0.2, 0.3, 0.1);
         // Everyone nearby sees him bring it down (the slam of his arm).
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, 64, new ThorFxPayload(ThorFxPayload.PIN, pinner.getId(), List.of(at)));
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, 64, new ThorFxPayload(ThorFxPayload.PIN, pinner.getId(), List.of(at)));
     }
 
     /** The hammer lying on {@code target}, or null if it is not pinned. Works on both sides. */

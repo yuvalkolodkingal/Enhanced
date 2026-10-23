@@ -2,11 +2,11 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.healing.HealingFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client (3.7): a moment of a healer's healing factor everyone near should see (lane L1's): he goes DOWN,
@@ -40,7 +40,7 @@ public record HealingFxPayload(int kind, int entityId, int arg) implements Custo
         return TYPE;
     }
 
-    static void handle(HealingFxPayload payload, IPayloadContext context) {
+    static void handle(HealingFxPayload payload, PacketContext context) {
         HealingFx.receive(payload);
     }
 }

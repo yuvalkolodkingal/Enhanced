@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.network.CerebroPayload;
 import com.kolodkingal.enhanced.network.LabFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -31,7 +32,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -261,7 +261,7 @@ public final class CerebroRoom {
         }
         player.displayClientMessage(Component.translatable("message.enhanced.cerebro.amplified", found.size()), true);
         level.playSound(null, console, ModSounds.CEREBRO_CONSOLE_ON.get(), SoundSource.BLOCKS, 1.2F, 1.0F);
-        PacketDistributor.sendToPlayersNear(level, null, console.getX() + 0.5, console.getY() + 0.5,
+        Net.sendToPlayersNear(level, null, console.getX() + 0.5, console.getY() + 0.5,
                 console.getZ() + 0.5, 64.0, new LabFxPayload(LabFxPayload.CONSOLE_ON, console));
     }
 
@@ -345,7 +345,7 @@ public final class CerebroRoom {
             if (sound) {
                 level.playSound(null, at, ModSounds.CEREBRO_CONSOLE_OFF.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
             }
-            PacketDistributor.sendToPlayersNear(level, null, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 64.0,
+            Net.sendToPlayersNear(level, null, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, 64.0,
                     new LabFxPayload(LabFxPayload.CONSOLE_OFF, at));
         }
     }

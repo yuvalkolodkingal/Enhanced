@@ -2,11 +2,11 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.XavierControl;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client, to Professor X alone (3.3): open the screen that chooses his version ({@link #CHOOSE}), his mind has
@@ -41,7 +41,7 @@ public record XavierPayload(int kind, int entityId, int ticks) implements Custom
     }
 
     /** Only ever runs on a client, so the client class is only ever loaded there. */
-    static void handle(XavierPayload payload, IPayloadContext context) {
+    static void handle(XavierPayload payload, PacketContext context) {
         XavierControl.handle(payload.kind(), payload.entityId(), payload.ticks());
     }
 }

@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.death.DeathMeeting;
 import com.kolodkingal.enhanced.network.DeathMeetingPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -25,7 +26,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
@@ -204,7 +204,7 @@ public class DeathMeetingScreen extends DeathScreen {
 
     private void startInTheNether() {
         sleep();
-        PacketDistributor.sendToServer(new DeathMeetingPayload.Choose(DeathMeeting.NETHER));
+        Net.sendToServer(new DeathMeetingPayload.Choose(DeathMeeting.NETHER));
     }
 
     /** One road is taken: the buttons go quiet until the respawn closes the screen. */

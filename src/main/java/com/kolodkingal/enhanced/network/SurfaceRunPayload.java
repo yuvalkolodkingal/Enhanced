@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SpeedSurfaces;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: what the local speedster (Quicksilver or Tommy) runs on, if anything (3.3). His own client moves
@@ -35,7 +35,7 @@ public record SurfaceRunPayload(int kind, int normal) implements CustomPacketPay
         return TYPE;
     }
 
-    static void handle(SurfaceRunPayload payload, IPayloadContext context) {
+    static void handle(SurfaceRunPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             SpeedSurfaces.onReport(player, payload.kind(), payload.normal());
         }

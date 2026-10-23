@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.build.BuildView;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.HexBoltPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -42,7 +43,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -328,7 +328,7 @@ public final class BillyAbilities {
         sparks(level, player, end, 12);
 
         Vec3 from = player.getEyePosition().add(0, -0.3, 0).add(player.getLookAngle().scale(0.75));
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0,
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), 64.0,
                 new HexBoltPayload(player.getId(), from, end, forks, player.getRandom().nextLong()));
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.HEX_BOLT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }

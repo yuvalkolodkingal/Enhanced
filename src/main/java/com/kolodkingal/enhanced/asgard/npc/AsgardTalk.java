@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.asgard.AsgardProgress;
 import com.kolodkingal.enhanced.asgard.AsgardState;
 import com.kolodkingal.enhanced.config.AsgardConfig;
 import com.kolodkingal.enhanced.network.AsgardTalkPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.ChatFormatting;
@@ -13,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -152,7 +152,7 @@ public final class AsgardTalk {
 
     private static void send(ServerPlayer player, Entity speaker, Role role, String line, List<String> args, List<String> options) {
         List<String> clipped = args.size() > AsgardTalkPayload.MAX_ARGS ? args.subList(0, AsgardTalkPayload.MAX_ARGS) : args;
-        PacketDistributor.sendToPlayer(player, new AsgardTalkPayload.Open(speaker.getId(), role.ordinal(), line, List.copyOf(clipped),
+        Net.sendToPlayer(player, new AsgardTalkPayload.Open(speaker.getId(), role.ordinal(), line, List.copyOf(clipped),
                 List.copyOf(options)));
         if (speaker instanceof AsgardianEntity npc) {
             npc.murmur(0.7F);

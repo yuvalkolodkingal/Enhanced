@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.eternity.Wishes;
 import com.kolodkingal.enhanced.network.EternityScreenPayload;
 import com.kolodkingal.enhanced.network.EternityWishPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,7 +22,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -245,7 +245,7 @@ public class WishScreen extends Screen {
     }
 
     private void wish(byte kind, ResourceLocation item) {
-        PacketDistributor.sendToServer(new EternityWishPayload(kind, item == null
+        Net.sendToServer(new EternityWishPayload(kind, item == null
                 ? ResourceLocation.withDefaultNamespace("air") : item));
         onClose();
     }

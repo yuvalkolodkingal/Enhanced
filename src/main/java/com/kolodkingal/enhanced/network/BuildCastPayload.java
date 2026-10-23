@@ -3,12 +3,12 @@ package com.kolodkingal.enhanced.network;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.SpellRecipe;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: a Scarlet Witch or Billy casts a Build Magic spell, or asks what it would do ({@link #PREFLIGHT}). It
@@ -43,7 +43,7 @@ public record BuildCastPayload(int token, int flags, SpellRecipe recipe) impleme
         return TYPE;
     }
 
-    static void handle(BuildCastPayload payload, IPayloadContext context) {
+    static void handle(BuildCastPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             BuildMagic.cast(player, payload.recipe(), payload.token(), payload.flags());
         }

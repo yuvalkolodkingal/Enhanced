@@ -3,12 +3,12 @@ package com.kolodkingal.enhanced.network;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.npc.AsgardTalk;
 import com.kolodkingal.enhanced.client.screen.AsgardTalkScreen;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public final class AsgardTalkPayload {
         }
 
         /** The talk begins: the client opens the screen (one call into a client class, loaded only on a client). */
-        static void handle(Open payload, IPayloadContext context) {
+        static void handle(Open payload, PacketContext context) {
             AsgardTalkScreen.open(payload);
         }
     }
@@ -74,7 +74,7 @@ public final class AsgardTalkPayload {
             return TYPE;
         }
 
-        static void handle(Choose payload, IPayloadContext context) {
+        static void handle(Choose payload, PacketContext context) {
             if (context.player() instanceof ServerPlayer player && player.isAlive()) {
                 AsgardTalk.choose(player, payload.entityId(), payload.option());
             }

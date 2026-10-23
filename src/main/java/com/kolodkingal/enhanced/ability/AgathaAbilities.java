@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -45,7 +46,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -634,7 +634,7 @@ public final class AgathaAbilities {
     // Effects
 
     static void send(ServerLevel level, AgathaFxPayload payload) {
-        PacketDistributor.sendToPlayersNear(level, null, payload.a().x, payload.a().y, payload.a().z, 96.0, payload);
+        Net.sendToPlayersNear(level, null, payload.a().x, payload.a().y, payload.a().z, 96.0, payload);
     }
 
     private AgathaAbilities() {

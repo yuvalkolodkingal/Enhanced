@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.OpenRoadPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -35,7 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -214,7 +214,7 @@ public final class WitchesRoad {
      */
     private static void offerChoice(ServerPlayer player, BlockPos door) {
         int[] done = RoadTrials.doneAndTotal(player);
-        PacketDistributor.sendToPlayer(player, new OpenRoadPayload(door.immutable(), RoadTrials.doorMode(player) == RoadTrials.DoorMode.ENTER,
+        Net.sendToPlayer(player, new OpenRoadPayload(door.immutable(), RoadTrials.doorMode(player) == RoadTrials.DoorMode.ENTER,
                 done[0], done[1], false));
     }
 

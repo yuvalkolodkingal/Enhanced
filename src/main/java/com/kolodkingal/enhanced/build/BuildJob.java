@@ -3248,7 +3248,7 @@ public final class BuildJob {
     }
 
     private static void send(ServerPlayer player, net.minecraft.network.protocol.common.custom.CustomPacketPayload payload) {
-        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, payload);
+        com.kolodkingal.enhanced.platform.net.Net.sendToPlayer(player, payload);
     }
 
     // ------------------------------------------------------------------------------------------------------------

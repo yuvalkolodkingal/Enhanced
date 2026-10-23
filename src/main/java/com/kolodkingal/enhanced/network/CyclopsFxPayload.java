@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.CyclopsFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public record CyclopsFxPayload(byte kind, int shooter, List<Vec3> points, int pa
     }
 
     /** Only ever runs on a client, so the effects class is only ever loaded there. */
-    static void handle(CyclopsFxPayload payload, IPayloadContext context) {
+    static void handle(CyclopsFxPayload payload, PacketContext context) {
         CyclopsFx.handle(payload);
     }
 }

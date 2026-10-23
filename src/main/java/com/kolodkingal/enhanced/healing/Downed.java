@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.config.HealingConfig;
 import com.kolodkingal.enhanced.network.HealingFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -29,7 +30,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -321,7 +321,7 @@ public final class Downed {
 
     /** Sends a moment of his healing factor to him and everyone who sees him. */
     public static void fx(ServerPlayer player, int kind, int arg) {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new HealingFxPayload(kind, player.getId(), arg));
+        Net.sendToPlayersTrackingEntityAndSelf(player, new HealingFxPayload(kind, player.getId(), arg));
     }
 
     /** A sound of the healing factor at him, for everyone near. */

@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.heimdall.HeimdallFx;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -49,7 +50,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -559,13 +559,13 @@ public final class Bifrost {
         for (Listener listener : DEPARTED) {
             listener.on(landing.from(), landing.left(), player);
         }
-        PacketDistributor.sendToPlayersNear(landing.from(), null, landing.left().x, landing.left().y, landing.left().z, 128,
+        Net.sendToPlayersNear(landing.from(), null, landing.left().x, landing.left().y, landing.left().z, 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_DEPART, player.getId(), List.of(landing.left())));
         mark(landing.from(), landing.left());
         ServerLevel destination = landing.to();
         carry(player, group, mount, center, destination);
         destination.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.BIFROST_ARRIVE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
-        PacketDistributor.sendToPlayersNear(destination, null, player.getX(), player.getY(), player.getZ(), 128,
+        Net.sendToPlayersNear(destination, null, player.getX(), player.getY(), player.getZ(), 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_ARRIVAL, player.getId(), List.of(player.position())));
         mark(destination, player.position());
         for (Listener listener : ARRIVED) {
@@ -749,7 +749,7 @@ public final class Bifrost {
     /** The Bifrost's circle of runes, burned into the ground (seen by everyone nearby, fading after a minute). */
     public static void mark(ServerLevel level, Vec3 at) {
         Vec3 ground = ground(level, at.add(0, 0.5, 0));
-        PacketDistributor.sendToPlayersNear(level, null, ground.x, ground.y, ground.z, 128,
+        Net.sendToPlayersNear(level, null, ground.x, ground.y, ground.z, 128,
                 new ThorFxPayload(ThorFxPayload.BIFROST_MARK, -1, List.of(ground)));
     }
 

@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.hydra.HydraFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public record HydraFxPayload(int kind, int entityId, List<Vec3> points, int arg)
         return TYPE;
     }
 
-    static void handle(HydraFxPayload payload, IPayloadContext context) {
+    static void handle(HydraFxPayload payload, PacketContext context) {
         HydraFx.receive(payload);
     }
 }

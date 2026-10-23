@@ -3,12 +3,12 @@ package com.kolodkingal.enhanced.network;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.death.DeathMeetingClient;
 import com.kolodkingal.enhanced.death.DeathMeeting;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * The meeting with Death (3.7, lane L8): the server offers it to a player who dies ({@link Offer}, sent before the
@@ -38,7 +38,7 @@ public final class DeathMeetingPayload {
             return TYPE;
         }
 
-        static void handle(Offer payload, IPayloadContext context) {
+        static void handle(Offer payload, PacketContext context) {
             DeathMeetingClient.receive(payload);
         }
     }
@@ -58,7 +58,7 @@ public final class DeathMeetingPayload {
             return TYPE;
         }
 
-        static void handle(Choose payload, IPayloadContext context) {
+        static void handle(Choose payload, PacketContext context) {
             if (context.player() instanceof ServerPlayer player) {
                 DeathMeeting.choose(player, payload.choice());
             }

@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.hydra;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.HydraConfig;
 import com.kolodkingal.enhanced.network.HydraFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
@@ -19,7 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -82,7 +82,7 @@ public class HydraBlasterItem extends Item {
         level.addFreshEntity(bolt);
         level.playSound(null, from.x, from.y, from.z, ModSounds.HYDRA_BLASTER.get(), SoundSource.PLAYERS, 1.0F,
                 0.95F + level.random.nextFloat() * 0.1F);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(shooter, new HydraFxPayload(HydraFxPayload.MUZZLE,
+        Net.sendToPlayersTrackingEntityAndSelf(shooter, new HydraFxPayload(HydraFxPayload.MUZZLE,
                 shooter.getId(), List.of(from), HydraBoltEntity.RIFLE));
         return bolt;
     }

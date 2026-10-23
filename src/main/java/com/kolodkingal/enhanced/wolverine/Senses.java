@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.config.WolverineConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.ScentPayload;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -106,7 +106,7 @@ public final class Senses {
                 trails.add(new ScentPayload.Trail(points));
             }
         }
-        PacketDistributor.sendToPlayer(player, new ScentPayload(scents, trails,
+        Net.sendToPlayer(player, new ScentPayload(scents, trails,
                 WolverineAbilities.cfg(WolverineConfig.SNIFF_TICKS, 200)));
         ServerLevel level = player.serverLevel();
         WolverineAbilities.sound(level, player.position(), ModSounds.WOLVERINE_SNIFF.get(), 0.8F, 1.0F);
@@ -256,7 +256,7 @@ public final class Senses {
         }
         points.add(to);
         state.lastTrail = List.copyOf(points);
-        PacketDistributor.sendToPlayer(player, new ScentPayload(
+        Net.sendToPlayer(player, new ScentPayload(
                 List.of(new ScentPayload.Scent(target.getId(), ScentPayload.TRACKED)),
                 List.of(new ScentPayload.Trail(state.lastTrail)), SAMPLE + 10));
     }

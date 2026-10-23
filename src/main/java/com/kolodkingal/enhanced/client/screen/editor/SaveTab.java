@@ -9,13 +9,13 @@ import com.kolodkingal.enhanced.custom.CustomHeroJson;
 import com.kolodkingal.enhanced.custom.CustomHeroRules;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -63,7 +63,7 @@ public final class SaveTab extends EditorTab {
     }
 
     private void become() {
-        PacketDistributor.sendToServer(HeroCreatorPayload.apply(draft()));
+        Net.sendToServer(HeroCreatorPayload.apply(draft()));
         screen.closeAll();
     }
 

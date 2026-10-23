@@ -57,6 +57,7 @@ import com.kolodkingal.enhanced.network.SerumChoicePayload;
 import com.kolodkingal.enhanced.network.SerumScreenPayload;
 import com.kolodkingal.enhanced.network.TowerFxPayload;
 import com.kolodkingal.enhanced.odin.GungnirStand;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -109,7 +110,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforgespi.language.IModFileInfo;
 
 import java.io.IOException;
@@ -750,10 +750,10 @@ public final class AvengersSkeletonTests {
     /** What the server does with a message the client sends (the payload's own handler, as in RoadEndingTests). */
     private static <T> void answer(Class<T> type, T payload, ServerPlayer player) {
         try {
-            Method handle = type.getDeclaredMethod("handle", type, IPayloadContext.class);
+            Method handle = type.getDeclaredMethod("handle", type, PacketContext.class);
             handle.setAccessible(true);
-            IPayloadContext context = (IPayloadContext) Proxy.newProxyInstance(IPayloadContext.class.getClassLoader(),
-                    new Class[]{IPayloadContext.class}, (proxy, method, args) -> method.getName().equals("player")
+            PacketContext context = (PacketContext) Proxy.newProxyInstance(PacketContext.class.getClassLoader(),
+                    new Class[]{PacketContext.class}, (proxy, method, args) -> method.getName().equals("player")
                             ? player : null);
             handle.invoke(null, payload, context);
         } catch (ReflectiveOperationException e) {

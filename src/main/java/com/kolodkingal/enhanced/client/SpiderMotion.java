@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSwingPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -43,7 +44,6 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -505,7 +505,7 @@ public final class SpiderMotion {
                 toldNormal = normal;
                 return;
             }
-            PacketDistributor.sendToServer(new SpiderClingPayload(kind, normal));
+            Net.sendToServer(new SpiderClingPayload(kind, normal));
             toldKind = kind;
             toldNormal = normal;
             toldAt = player.tickCount;
@@ -1043,7 +1043,7 @@ public final class SpiderMotion {
         int action = anchor.kind() == SwingAssist.Kind.BOOST ? SpiderSwingPayload.BOOST
                 : anchor.kind() == SwingAssist.Kind.CLIMB ? SpiderSwingPayload.CLIMB : SpiderSwingPayload.ATTACH;
         float web = (float) anchor.web(player.position().add(0, SwingAssist.CENTRE, 0));
-        PacketDistributor.sendToServer(new SpiderSwingPayload(action, anchor.point(), anchor.face().get3DDataValue(), web,
+        Net.sendToServer(new SpiderSwingPayload(action, anchor.point(), anchor.face().get3DDataValue(), web,
                 anchor.kind() == SwingAssist.Kind.SKY));
     }
 
@@ -1122,7 +1122,7 @@ public final class SpiderMotion {
 
     /** The assisted swing lets go at its best moment, with a little launch; G still held, the next web follows. */
     private static void autoRelease(LocalPlayer player) {
-        PacketDistributor.sendToServer(new SpiderSwingPayload(SpiderSwingPayload.RELEASE, swingAnchor, 0, 0.0F, swingSky));
+        Net.sendToServer(new SpiderSwingPayload(SpiderSwingPayload.RELEASE, swingAnchor, 0, 0.0F, swingSky));
         stopSwing(player, RELEASED, true);
         carry = CARRY_TICKS;
         chain = zipKeyDown(Powers.get(player));

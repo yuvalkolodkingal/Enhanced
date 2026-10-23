@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.network.MindReadPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -34,7 +35,6 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -142,7 +142,7 @@ public final class MindReading {
         }
         MindReadPayload snapshot = snapshot(reader, target);
         if (fresh || reading.sent == null || now - reading.sentAt >= RESEND_TICKS || !sameContent(reading.sent, snapshot)) {
-            PacketDistributor.sendToPlayer(reader, snapshot);
+            Net.sendToPlayer(reader, snapshot);
             reading.sent = snapshot;
             reading.sentAt = now;
         }

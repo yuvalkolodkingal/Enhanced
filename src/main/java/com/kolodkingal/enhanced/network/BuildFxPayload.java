@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.build.BuildFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → everyone within 128 blocks of a Build Magic spell, and its caster: a moment of the spell everyone near should
@@ -82,7 +82,7 @@ public record BuildFxPayload(int kind, int job, int casterId, int hero, BlockPos
     }
 
     /** The running spells are drawn here (the client class is loaded only when this runs, on a client). */
-    static void handle(BuildFxPayload payload, IPayloadContext context) {
+    static void handle(BuildFxPayload payload, PacketContext context) {
         BuildFx.accept(payload);
     }
 }

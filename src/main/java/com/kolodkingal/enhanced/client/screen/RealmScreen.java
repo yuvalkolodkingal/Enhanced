@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.screen;
 
 import com.kolodkingal.enhanced.network.RealmScreenPayload;
 import com.kolodkingal.enhanced.network.StoneActionPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -11,7 +12,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -267,7 +267,7 @@ public class RealmScreen extends Screen {
     private void choose(int index) {
         Minecraft mc = Minecraft.getInstance();
         mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SPACE_STONE.get(), 1.2F, 0.6F));
-        PacketDistributor.sendToServer(new StoneActionPayload(StoneActionPayload.REALM, index));
+        Net.sendToServer(new StoneActionPayload(StoneActionPayload.REALM, index));
         onClose();
     }
 

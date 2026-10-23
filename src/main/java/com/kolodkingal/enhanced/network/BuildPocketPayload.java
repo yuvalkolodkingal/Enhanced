@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.build.BuildClient;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,7 +12,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
@@ -240,7 +240,7 @@ public record BuildPocketPayload(int pocket, int part, int parts, int sx, int sy
     }
 
     /** The owner's client gathers the parts (the client class is loaded only when this runs, on a client). */
-    static void handle(BuildPocketPayload payload, IPayloadContext context) {
+    static void handle(BuildPocketPayload payload, PacketContext context) {
         BuildClient.onPocketPart(payload);
     }
 }

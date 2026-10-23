@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.client.asgard.AsgardianRenderer;
 import com.kolodkingal.enhanced.network.AsgardTalkPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -15,7 +16,6 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,7 +186,7 @@ public class AsgardTalkScreen extends Screen {
             return;
         }
         answered = true;
-        PacketDistributor.sendToServer(new AsgardTalkPayload.Choose(talk.entityId(), option));
+        Net.sendToServer(new AsgardTalkPayload.Choose(talk.entityId(), option));
         waiting = 0;
         for (var child : children()) {
             if (child instanceof AbstractButton button) {
@@ -199,7 +199,7 @@ public class AsgardTalkScreen extends Screen {
     public void removed() {
         if (!answered) {
             answered = true;
-            PacketDistributor.sendToServer(new AsgardTalkPayload.Choose(talk.entityId(), ""));
+            Net.sendToServer(new AsgardTalkPayload.Choose(talk.entityId(), ""));
         }
         super.removed();
     }

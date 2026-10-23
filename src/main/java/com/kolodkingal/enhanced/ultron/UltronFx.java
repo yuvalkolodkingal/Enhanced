@@ -1,10 +1,10 @@
 package com.kolodkingal.enhanced.ultron;
 
 import com.kolodkingal.enhanced.network.UltronFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * Sends the effects of the Ultron fight to the players who can see them: a tell decal, a beam's aim, a ring, a data
@@ -17,7 +17,7 @@ public final class UltronFx {
 
     /** Sends an effect at a point, from a caster, to nearby players. */
     public static void send(ServerLevel level, int kind, int entityId, Vec3 at, Vec3 to, float radius, int ticks) {
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE, new UltronFxPayload(kind, entityId, at, to, radius, ticks));
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, RANGE, new UltronFxPayload(kind, entityId, at, to, radius, ticks));
     }
 
     /** An effect at a point. */

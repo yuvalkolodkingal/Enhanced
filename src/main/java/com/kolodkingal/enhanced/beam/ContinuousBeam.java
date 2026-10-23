@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.network.BeamPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -19,7 +20,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -170,7 +170,7 @@ public final class ContinuousBeam {
 
     private static void send(ServerPlayer shooter, BeamStyle style, float range, boolean on) {
         ServerLevel level = shooter.serverLevel();
-        PacketDistributor.sendToPlayersNear(level, null, shooter.getX(), shooter.getY(), shooter.getZ(), 96.0,
+        Net.sendToPlayersNear(level, null, shooter.getX(), shooter.getY(), shooter.getZ(), 96.0,
                 new BeamPayload(shooter.getId(), style.id(), range, on));
     }
 

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.road.RoadDimension;
 import com.kolodkingal.enhanced.road.RoadEnding;
@@ -11,7 +12,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: a seeker answered at an open Witches' Road door: he chose whose road to walk (Billy's or Tommy's), or, with
@@ -35,7 +35,7 @@ public record RoadChoicePayload(BlockPos door, Power choice) implements CustomPa
         return TYPE;
     }
 
-    static void handle(RoadChoicePayload payload, IPayloadContext context) {
+    static void handle(RoadChoicePayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             if (RoadEnding.isAtEnding(player)) {
                 if (payload.choice() == Power.NONE) {

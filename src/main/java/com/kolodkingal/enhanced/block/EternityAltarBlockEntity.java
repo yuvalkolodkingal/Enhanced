@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.EternityConfig;
 import com.kolodkingal.enhanced.eternity.EternityRealm;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModBlockEntities;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -90,7 +90,7 @@ public class EternityAltarBlockEntity extends BlockEntity {
         Vec3 at = Vec3.atCenterOf(worldPosition);
         level.playSound(null, at.x, at.y, at.z, ModSounds.ALTAR_PLACE.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         level.playSound(null, at.x, at.y, at.z, ModSounds.ALTAR_RISE.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
-        PacketDistributor.sendToPlayersNear(level, null, at.x, at.y, at.z, 64,
+        Net.sendToPlayersNear(level, null, at.x, at.y, at.z, 64,
                 new EternityFxPayload(EternityFxPayload.ALTAR_CHARGE, player.getId(), worldPosition, chargeTicks()));
         return true;
     }

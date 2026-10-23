@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.hulk.HulkHooks;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -32,7 +33,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -192,7 +192,7 @@ public final class Snap {
         Vec3 hand = hand(player);
         level.playSound(null, hand.x, hand.y, hand.z, ModSounds.SNAP.get(), SoundSource.PLAYERS, 2.0F, 1.0F);
         level.sendParticles(ParticleTypes.FLASH, hand.x, hand.y, hand.z, 1, 0.0, 0.0, 0.0, 0.0);
-        PacketDistributor.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), radius + 32.0,
+        Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), radius + 32.0,
                 new StoneFxPayload(StoneFxPayload.SNAP, player.getId(), List.of(hand), dust.size()));
         cost(player);
         player.setData(ModAttachments.STONES, player.getData(ModAttachments.STONES).with(StoneProgress.SNAPPED)

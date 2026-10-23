@@ -22,6 +22,7 @@ import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildPocketPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -53,7 +54,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -1370,7 +1370,7 @@ public final class BuildClient {
 
     private static void send(CustomPacketPayload payload) {
         if (Minecraft.getInstance().getConnection() != null) {
-            PacketDistributor.sendToServer(payload);
+            Net.sendToServer(payload);
         }
     }
 

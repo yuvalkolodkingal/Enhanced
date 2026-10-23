@@ -20,6 +20,7 @@ import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.network.EternityScreenPayload;
 import com.kolodkingal.enhanced.network.EternityWishPayload;
 import com.kolodkingal.enhanced.odin.GungnirStand;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -52,7 +53,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -492,10 +492,10 @@ public final class EternityTests {
     private static void answer(EternityWishPayload payload, ServerPlayer player) {
         try {
             Method handle = EternityWishPayload.class.getDeclaredMethod("handle", EternityWishPayload.class,
-                    IPayloadContext.class);
+                    PacketContext.class);
             handle.setAccessible(true);
-            IPayloadContext context = (IPayloadContext) Proxy.newProxyInstance(IPayloadContext.class.getClassLoader(),
-                    new Class[]{IPayloadContext.class}, (proxy, method, args) -> method.getName().equals("player")
+            PacketContext context = (PacketContext) Proxy.newProxyInstance(PacketContext.class.getClassLoader(),
+                    new Class[]{PacketContext.class}, (proxy, method, args) -> method.getName().equals("player")
                             ? player : null);
             handle.invoke(null, payload, context);
         } catch (ReflectiveOperationException e) {

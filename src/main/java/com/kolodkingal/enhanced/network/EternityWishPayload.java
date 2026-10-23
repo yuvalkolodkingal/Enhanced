@@ -2,13 +2,13 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.eternity.EternityRealm;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server (3.8): the wish screen's answer (lane L8's): an item ({@link #ITEM}, {@code item} named), to become
@@ -35,7 +35,7 @@ public record EternityWishPayload(byte kind, ResourceLocation item) implements C
         return TYPE;
     }
 
-    static void handle(EternityWishPayload payload, IPayloadContext context) {
+    static void handle(EternityWishPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             EternityRealm.wish(player, payload.kind(), payload.item());
         }

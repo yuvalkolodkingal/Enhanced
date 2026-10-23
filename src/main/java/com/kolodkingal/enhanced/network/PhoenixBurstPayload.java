@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.PhoenixFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client: the Phoenix Burst goes off, for everyone nearby to see (the firebird, the shell of fire, the
@@ -40,7 +40,7 @@ public record PhoenixBurstPayload(int caster, Vec3 centre, float yaw, float char
     }
 
     /** The Burst is drawn: the firebird, the shell of fire, the scorch. */
-    static void handle(PhoenixBurstPayload payload, IPayloadContext context) {
+    static void handle(PhoenixBurstPayload payload, PacketContext context) {
         PhoenixFx.add(payload);
     }
 }

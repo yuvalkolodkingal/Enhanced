@@ -2,13 +2,13 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BuildMagic;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Client → server: something a builder does that is not a cast (at most 22 bytes). What {@code a}, {@code b} and
@@ -61,7 +61,7 @@ public record BuildActionPayload(int action, BlockPos a, BlockPos b, int value) 
         return TYPE;
     }
 
-    static void handle(BuildActionPayload payload, IPayloadContext context) {
+    static void handle(BuildActionPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player) {
             BuildMagic.action(player, payload.action(), payload.a(), payload.b(), payload.value());
         }

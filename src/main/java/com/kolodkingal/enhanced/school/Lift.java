@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.school;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.SchoolLabConfig;
 import com.kolodkingal.enhanced.network.LabFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.world.SchoolLabPlan;
@@ -12,7 +13,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -117,7 +117,7 @@ public final class Lift {
         player.resetFallDistance();
         level.playSound(null, ride.to(), ModSounds.LIFT_RIDE.get(), SoundSource.BLOCKS, 0.9F, 1.0F);
         level.playSound(null, ride.to(), ModSounds.LIFT_DING.get(), SoundSource.BLOCKS, 0.8F, 1.0F);
-        PacketDistributor.sendToPlayer(player, new LabFxPayload(ride.down() ? LabFxPayload.LIFT_DOWN
+        Net.sendToPlayer(player, new LabFxPayload(ride.down() ? LabFxPayload.LIFT_DOWN
                 : LabFxPayload.LIFT_UP, ride.to()));
         return true;
     }

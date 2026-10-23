@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.item.InfinityStoneItem;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
 import com.kolodkingal.enhanced.network.EternityScreenPayload;
 import com.kolodkingal.enhanced.odin.GungnirStand;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -28,7 +29,6 @@ import net.minecraft.world.item.GameMasterBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -196,7 +196,7 @@ public final class Wishes {
         }
         player.serverLevel().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.LOVE_AWAKEN.get(),
                 SoundSource.PLAYERS, 1.2F, 1.0F);
-        PacketDistributor.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(), 64,
+        Net.sendToPlayersNear(player.serverLevel(), null, player.getX(), player.getY(), player.getZ(), 64,
                 new EternityFxPayload(EternityFxPayload.LOVE_AWAKEN, player.getId(), player.blockPosition(), 0));
     }
 

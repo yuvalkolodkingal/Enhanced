@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.school;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.block.LabDoors;
 import com.kolodkingal.enhanced.network.LabFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +14,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -62,7 +62,7 @@ public final class LabEvents {
             INSIDE.remove(player.getUUID());
         }
         if (inside || was) {
-            PacketDistributor.sendToPlayer(player, new LabFxPayload(LabFxPayload.AMBIENCE,
+            Net.sendToPlayer(player, new LabFxPayload(LabFxPayload.AMBIENCE,
                     inside ? new BlockPos(0, 1, 0) : BlockPos.ZERO));
         }
     }

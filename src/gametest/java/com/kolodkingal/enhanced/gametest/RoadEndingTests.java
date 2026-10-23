@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.OpenRoadPayload;
 import com.kolodkingal.enhanced.network.RoadChoicePayload;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -53,7 +54,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -163,9 +163,9 @@ public final class RoadEndingTests {
     /** What the server does with the message the client sends when the player presses a button on the screen. */
     private static void answer(ServerPlayer player, BlockPos door, Power power) {
         try {
-            Method handle = RoadChoicePayload.class.getDeclaredMethod("handle", RoadChoicePayload.class, IPayloadContext.class);
+            Method handle = RoadChoicePayload.class.getDeclaredMethod("handle", RoadChoicePayload.class, PacketContext.class);
             handle.setAccessible(true);
-            IPayloadContext context = (IPayloadContext) Proxy.newProxyInstance(IPayloadContext.class.getClassLoader(), new Class[]{IPayloadContext.class},
+            PacketContext context = (PacketContext) Proxy.newProxyInstance(PacketContext.class.getClassLoader(), new Class[]{PacketContext.class},
                     (proxy, method, args) -> method.getName().equals("player") ? player : null);
             handle.invoke(null, new RoadChoicePayload(door, power), context);
         } catch (ReflectiveOperationException e) {

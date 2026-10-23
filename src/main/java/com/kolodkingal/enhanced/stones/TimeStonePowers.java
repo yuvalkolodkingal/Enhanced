@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -159,7 +159,7 @@ public final class TimeStonePowers {
         TimeRewind.rewind(player, cast.data(), new TimeRewind.Cost(HeroAbility.THANOS_TIME, 0, REWIND_EXHAUSTION,
                 REWIND_MAX_HEAL, StoneKind.TIME.color()));
         cast.startCooldown(StonesConfig.TIME_REWIND_COOLDOWN.get());
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(StoneFxPayload.REWIND,
+        Net.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(StoneFxPayload.REWIND,
                 player.getId(), List.of(from, player.position()), 0));
     }
 
@@ -267,7 +267,7 @@ public final class TimeStonePowers {
     }
 
     private static void fx(ServerPlayer player, int kind) {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(kind, player.getId(),
+        Net.sendToPlayersTrackingEntityAndSelf(player, new StoneFxPayload(kind, player.getId(),
                 List.of(player.position()), (int) Math.round(StoneZones.radius())));
     }
 

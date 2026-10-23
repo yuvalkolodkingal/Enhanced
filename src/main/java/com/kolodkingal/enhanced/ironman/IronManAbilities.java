@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.config.IronManConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.IronFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -36,7 +37,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -615,7 +615,7 @@ public final class IronManAbilities {
     public static void send(ServerLevel level, Entity who, int kind, List<Vec3> points, int arg) {
         List<Vec3> list = points.size() > IronFxPayload.MAX_POINTS ? points.subList(0, IronFxPayload.MAX_POINTS)
                 : points;
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new IronFxPayload(kind, who.getId(), List.copyOf(list), arg));
     }
 

@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildPocketPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
@@ -33,7 +34,6 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -949,7 +949,7 @@ public final class BuildMagic {
         billy.displayClientMessage(BillyMagic.rankUp(rank), false);
         BuildSounds.rankUp(billy);
         BlockPos at = billy.blockPosition();
-        PacketDistributor.sendToPlayersNear(billy.serverLevel(), null, billy.getX(), billy.getY(), billy.getZ(), RANK_UP_RANGE,
+        Net.sendToPlayersNear(billy.serverLevel(), null, billy.getX(), billy.getY(), billy.getZ(), RANK_UP_RANGE,
                 new BuildFxPayload(BuildFxPayload.RANK_UP, 0, billy.getId(), BuildFxPayload.BILLY, at, at, at, 1000, rank, BuildFxPayload.NO_MOM,
                         BuildFxPayload.RISE));
     }
@@ -1064,7 +1064,7 @@ public final class BuildMagic {
             }
             if (stream.step()) {
                 for (BuildPocketPayload part : stream.next(POCKET_PARTS)) {
-                    PacketDistributor.sendToPlayer(player, part);
+                    Net.sendToPlayer(player, part);
                 }
                 if (stream.done()) {
                     session.setPocketStream(null);
@@ -1145,7 +1145,7 @@ public final class BuildMagic {
     }
 
     static void send(ServerPlayer player, BuildVerdictPayload verdict) {
-        PacketDistributor.sendToPlayer(player, verdict);
+        Net.sendToPlayer(player, verdict);
     }
 
     private BuildMagic() {

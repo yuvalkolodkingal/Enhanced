@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -56,7 +57,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -996,7 +996,7 @@ public final class OdinAbilities {
     // ---- what everyone near sees ----
 
     static void send(ServerLevel level, Entity who, int kind, List<Vec3> points, int arg) {
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new AsgardFxPayload(kind, who.getId(), List.copyOf(points), arg));
     }
 

@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.network.TowerFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -23,7 +24,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * The Avengers Tower's armoury (3.8, PLAN 9.3 and 9.4): what a suit display and a tech case give. Every display and
@@ -135,7 +135,7 @@ public final class Armoury {
     }
 
     static void fx(ServerLevel level, BlockPos pos, int kind, int arg) {
-        PacketDistributor.sendToPlayersNear(level, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+        Net.sendToPlayersNear(level, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                 FX_RANGE, new TowerFxPayload(kind, pos, arg));
     }
 

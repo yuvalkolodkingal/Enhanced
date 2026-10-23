@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.road;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
 import com.kolodkingal.enhanced.network.OpenRoadPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -20,7 +21,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -205,7 +205,7 @@ public final class RoadEnding {
             return false;
         }
         int total = RoadChallenges.count();
-        PacketDistributor.sendToPlayer(player, new OpenRoadPayload(trial.layout().exitDoor(), false, total, total, true));
+        Net.sendToPlayer(player, new OpenRoadPayload(trial.layout().exitDoor(), false, total, total, true));
         return true;
     }
 

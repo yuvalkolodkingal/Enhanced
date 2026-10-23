@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.beam.ContinuousBeam;
 import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -27,7 +28,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -120,7 +120,7 @@ public final class PowerBeam {
                 0.4, 0.4, 0.15);
         level.playSound(null, end.x, end.y, end.z, ModSounds.POWER_EXPLOSION.get(), SoundSource.PLAYERS, 1.2F,
                 0.9F + level.random.nextFloat() * 0.2F);
-        PacketDistributor.sendToPlayersNear(level, null, end.x, end.y, end.z, 64,
+        Net.sendToPlayersNear(level, null, end.x, end.y, end.z, 64,
                 new StoneFxPayload(StoneFxPayload.POWER_BLAST, player.getId(), List.of(end), Math.round(radius * 10)));
         crater(player, level, end);
     }

@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.config.SerumConfig;
 import com.kolodkingal.enhanced.custom.HeroItems;
 import com.kolodkingal.enhanced.falcon.FalconWings;
 import com.kolodkingal.enhanced.network.SerumScreenPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -16,7 +17,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -83,7 +83,7 @@ public final class SerumServer {
     private static void send(ServerPlayer player, Pending pending) {
         PENDING.put(player.getUUID(), pending);
         sound(player, ModSounds.SERUM_OPEN.get(), 0.8F, 1.0F);
-        PacketDistributor.sendToPlayer(player, new SerumScreenPayload(pending.hand(), FalconWings.carries(player)));
+        Net.sendToPlayer(player, new SerumScreenPayload(pending.hand(), FalconWings.carries(player)));
     }
 
     /** The choice he has open, or null. */

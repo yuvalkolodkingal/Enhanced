@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.AgathaFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client (3.3): one effect of Agatha Harkness that everyone near should see. Everything its picture needs is sent
@@ -60,7 +60,7 @@ public record AgathaFxPayload(byte kind, int id, Vec3 a, int other, int c, int d
     }
 
     /** The effect arrived: the client draws it (one call into a client class, loaded only on a client). */
-    static void handle(AgathaFxPayload payload, IPayloadContext context) {
+    static void handle(AgathaFxPayload payload, PacketContext context) {
         AgathaFx.handle(payload);
     }
 }

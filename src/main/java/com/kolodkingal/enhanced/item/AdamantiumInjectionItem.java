@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.WolverineConfig;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -25,7 +26,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -138,7 +138,7 @@ public class AdamantiumInjectionItem extends Item {
                 SoundSource.PLAYERS, 1.2F, 1.0F);
         Powers.burst(level, player.getX(), player.getY() + 1.0, player.getZ(), SILVER, 80, 1.0);
         // (The silver flash on his own screen.)
-        PacketDistributor.sendToPlayer(player, new WolverineFxPayload(WolverineFxPayload.SNIKT, player.getId(),
+        Net.sendToPlayer(player, new WolverineFxPayload(WolverineFxPayload.SNIKT, player.getId(),
                 List.of(player.position()), 1));
         Claws.awakened(player);
     }

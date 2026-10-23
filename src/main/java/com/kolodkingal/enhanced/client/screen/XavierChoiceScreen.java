@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.screen;
 
 import com.kolodkingal.enhanced.ability.XavierAbilities;
 import com.kolodkingal.enhanced.network.XavierChoicePayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
@@ -15,7 +16,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * "Which Charles are you?" (3.3): the screen that opens when a player awakens as Professor X. Two big cards, each with
@@ -87,7 +87,7 @@ public class XavierChoiceScreen extends Screen {
 
         @Override
         public void onPress() {
-            PacketDistributor.sendToServer(new XavierChoicePayload(version));
+            Net.sendToServer(new XavierChoicePayload(version));
             onClose();
         }
 

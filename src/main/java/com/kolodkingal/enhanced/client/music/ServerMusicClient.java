@@ -6,13 +6,13 @@ import com.kolodkingal.enhanced.music.MusicFiles;
 import com.kolodkingal.enhanced.music.MusicTracks;
 import com.kolodkingal.enhanced.network.MusicManifestPayload;
 import com.kolodkingal.enhanced.network.MusicRequestPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import net.minecraft.Util;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -84,7 +84,7 @@ public final class ServerMusicClient {
             synchronized (INCOMING) {
                 INCOMING.put(track.hash(), new MusicFiles.Assembly(track.hash(), track.size()));
             }
-            PacketDistributor.sendToServer(new MusicRequestPayload(track.hash()));
+            Net.sendToServer(new MusicRequestPayload(track.hash()));
             asked++;
         }
         Enhanced.LOGGER.info("The world's music: {} song(s) {}, {} to download", next.size(), next.keySet(), asked);

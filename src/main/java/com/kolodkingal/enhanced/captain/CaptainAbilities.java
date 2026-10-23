@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.config.CaptainConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.CaptainFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -32,7 +33,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -333,7 +333,7 @@ public final class CaptainAbilities {
     static void send(ServerLevel level, Entity who, int kind, List<Vec3> points, int arg) {
         List<Vec3> list = points.size() > CaptainFxPayload.MAX_POINTS ? points.subList(0, CaptainFxPayload.MAX_POINTS)
                 : points;
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new CaptainFxPayload(kind, who.getId(), List.copyOf(list), arg));
     }
 

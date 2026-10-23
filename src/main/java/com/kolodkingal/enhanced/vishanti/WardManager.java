@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.PlaceBook;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.network.WardSyncPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -357,13 +357,13 @@ public final class WardManager {
     /** Tells everyone in the level which wards stand near them (and their own, wherever). */
     public static void send(ServerLevel level) {
         for (ServerPlayer player : level.players()) {
-            PacketDistributor.sendToPlayer(player, payload(level, player));
+            Net.sendToPlayer(player, payload(level, player));
         }
     }
 
     /** Tells one player which wards stand near them in the level they are in. */
     public static void send(ServerPlayer player) {
-        PacketDistributor.sendToPlayer(player, payload(player.serverLevel(), player));
+        Net.sendToPlayer(player, payload(player.serverLevel(), player));
     }
 
     /** Every awake ward of the level (what the operators see; no client gets this much). */

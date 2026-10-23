@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.hydra;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.HydraConfig;
 import com.kolodkingal.enhanced.network.HydraFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.world.HydraOutpostPlan;
@@ -23,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -561,7 +561,7 @@ public final class HydraAlarm {
             points.add(Vec3.atCenterOf(outpost.where(lamp)));
         }
         Vec3 centre = Vec3.atCenterOf(outpost.centre());
-        PacketDistributor.sendToPlayersNear(level, null, centre.x, centre.y, centre.z, REACH + 16.0,
+        Net.sendToPlayersNear(level, null, centre.x, centre.y, centre.z, REACH + 16.0,
                 new HydraFxPayload(kind, -1, points, 0));
     }
 

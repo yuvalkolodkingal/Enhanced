@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.SpiderEffects;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ public record SpiderFxPayload(Kind kind, int player, Vec3 from, Vec3 to, Vec3 no
     }
 
     /** Draws the lines, splats and strikes, and tells the local hero's movement. */
-    static void handle(SpiderFxPayload payload, IPayloadContext context) {
+    static void handle(SpiderFxPayload payload, PacketContext context) {
         SpiderEffects.add(payload);
     }
 }

@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.captain.CaptainState;
 import com.kolodkingal.enhanced.client.custom.PreviewPuppet;
 import com.kolodkingal.enhanced.network.SerumChoicePayload;
 import com.kolodkingal.enhanced.network.SerumScreenPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -21,7 +22,6 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -128,7 +128,7 @@ public class SerumScreen extends Screen {
         if (!open(card)) {
             return;
         }
-        PacketDistributor.sendToServer(new SerumChoicePayload(HEROES[card]));
+        Net.sendToServer(new SerumChoicePayload(HEROES[card]));
         onClose();
     }
 

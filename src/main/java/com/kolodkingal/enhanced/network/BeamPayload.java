@@ -2,11 +2,11 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client: a continuous beam (3.2, see {@code ContinuousBeam}) is fired by this player, or has stopped. The
@@ -36,7 +36,7 @@ public record BeamPayload(int shooter, String style, float range, boolean on) im
     }
 
     /** Only ever runs on a client, so the renderer class is only ever loaded there. */
-    static void handle(BeamPayload payload, IPayloadContext context) {
+    static void handle(BeamPayload payload, PacketContext context) {
         BeamRenderer.update(payload);
     }
 }

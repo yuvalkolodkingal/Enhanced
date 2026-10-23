@@ -2,12 +2,12 @@ package com.kolodkingal.enhanced.network;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.SandFx;
+import com.kolodkingal.enhanced.platform.net.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Server → client: one effect of Apocalypse (the boss or the hero) that everyone nearby should see, the one small
@@ -87,7 +87,7 @@ public record ApocalypseFxPayload(byte kind, int id, Vec3 a, Vec3 b, int c, int 
     }
 
     /** The effect arrived: the client draws it (one call into a client class, loaded only on a client). */
-    static void handle(ApocalypseFxPayload payload, IPayloadContext context) {
+    static void handle(ApocalypseFxPayload payload, PacketContext context) {
         SandFx.handle(payload);
     }
 }

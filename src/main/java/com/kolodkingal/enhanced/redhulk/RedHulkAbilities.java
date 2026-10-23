@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.hulk.GrabSmash;
 import com.kolodkingal.enhanced.hulk.HulkAbilities;
 import com.kolodkingal.enhanced.hulk.SuperLeap;
 import com.kolodkingal.enhanced.network.RedHulkFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -45,7 +46,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -619,7 +619,7 @@ public final class RedHulkAbilities {
     static void send(ServerLevel level, Entity who, int kind, List<Vec3> points, int arg) {
         List<Vec3> list = points.size() > RedHulkFxPayload.MAX_POINTS ? points.subList(0, RedHulkFxPayload.MAX_POINTS)
                 : points;
-        PacketDistributor.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
+        Net.sendToPlayersNear(level, null, who.getX(), who.getY(), who.getZ(), FX_RANGE,
                 new RedHulkFxPayload(kind, who.getId(), List.copyOf(list), arg));
     }
 

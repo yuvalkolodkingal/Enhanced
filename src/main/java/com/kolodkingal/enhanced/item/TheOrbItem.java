@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.network.StoneFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.stones.StoneLedger;
@@ -20,7 +21,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.UUID;
@@ -63,7 +63,7 @@ public class TheOrbItem extends Item {
         StoneKind.POWER.voice().use(level, at, InfinityStone.UNDER, 1.0F);
         level.sendParticles(new EnergyParticleOptions(StoneKind.POWER.color(), 1.3F), at.x, at.y, at.z, 30, 0.25, 0.25,
                 0.25, 0.1);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,
+        Net.sendToPlayersTrackingEntityAndSelf(player,
                 new StoneFxPayload(StoneFxPayload.PEDESTAL_TAKE, player.getId(), List.of(at),
                         StoneKind.POWER.ordinal()));
         return stone;

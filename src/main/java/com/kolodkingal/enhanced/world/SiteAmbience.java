@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.world;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -16,7 +17,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -70,7 +70,7 @@ public final class SiteAmbience {
         } else {
             TOLD.put(player.getUUID(), site);
         }
-        PacketDistributor.sendToPlayer(player, new StoneFxPayload(StoneFxPayload.SITE_AMBIENCE, player.getId(),
+        Net.sendToPlayer(player, new StoneFxPayload(StoneFxPayload.SITE_AMBIENCE, player.getId(),
                 List.of(), site));
     }
 
