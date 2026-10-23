@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -395,7 +396,7 @@ public final class MagnetoMetalTests {
         AbilityHandler.onKey(magneto, 3, true);
         check(holder.getMainHandItem().isEmpty(), "V tears Stormbreaker out of a player's hand");
         List<ItemEntity> fallen = items(helper, ModItems.STORMBREAKER.get());
-        check(fallen.size() == 1 && !fallen.get(0).getPersistentData().contains(MagnetoAbilities.STRIPPED_BY_TAG),
+        check(fallen.size() == 1 && !ModAttachments.PERSISTENT_DATA.get(fallen.get(0)).contains(MagnetoAbilities.STRIPPED_BY_TAG),
                 "it falls at his feet, unmarked: the player may take it back first");
         check(!data.isReady(3, level.getGameTime()), "the strip rests");
         helper.succeed();
@@ -421,7 +422,7 @@ public final class MagnetoMetalTests {
         check(zombie.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && zombie.getMainHandItem().isEmpty(), "V empties its head and its hand");
         List<ItemEntity> swords = items(helper, Items.IRON_SWORD);
         check(swords.size() == 1, "the sword falls as an item");
-        CompoundTag mark = swords.get(0).getPersistentData();
+        CompoundTag mark = ModAttachments.PERSISTENT_DATA.get(swords.get(0));
         check(mark.hasUUID(MagnetoAbilities.STRIPPED_BY_TAG) && magneto.getUUID().equals(mark.getUUID(MagnetoAbilities.STRIPPED_BY_TAG)),
                 "marked as torn off a creature by him, for his pull");
         check(items(helper, Items.IRON_HELMET).isEmpty() && magneto.getInventory().countItem(Items.IRON_HELMET) == 0,

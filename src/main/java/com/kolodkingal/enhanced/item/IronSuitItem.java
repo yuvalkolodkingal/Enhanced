@@ -84,6 +84,8 @@ public class IronSuitItem extends ArmorItem {
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
+    // TODO(port seam): NeoForge IItemExtension#canEquip; a platform hook is requested (P0 L1 notes).
+
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
         if (slot != EquipmentSlot.CHEST || kind.nanotech()) {
@@ -103,6 +105,7 @@ public class IronSuitItem extends ArmorItem {
     }
 
     /** Wear never breaks a suit: it stops at its last point ("offline"). */
+    // TODO(port seam): NeoForge IItemExtension#damageItem; a platform hook is requested (P0 L1 notes).
     @Override
     public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, @Nullable T entity,
                                                    Consumer<Item> onBroken) {

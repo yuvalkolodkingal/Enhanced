@@ -97,6 +97,7 @@ public class DarkholdItem extends Item {
     }
 
     /** However the use ends (the key came up, the book was put away, a death): the beam ends, and a reading cut short fades. */
+    // TODO(port seam): NeoForge IItemExtension#onStopUsing; a platform hook is requested (P0 L1 notes).
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         if (entity instanceof ServerPlayer player) {

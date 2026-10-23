@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.entity.MjolnirPinEntity;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -33,7 +34,6 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public final class MjolnirPin {
      */
     @Nullable
     public static InteractionResult interact(Player player, InteractionHand hand, Entity clicked) {
-        Entity entity = clicked instanceof PartEntity<?> part ? part.getParent() : clicked;
+        Entity entity = Platform.get().parts().root(clicked);
         if (!(entity instanceof LivingEntity target) || player.isSpectator()) {
             return null;
         }

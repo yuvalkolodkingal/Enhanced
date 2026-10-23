@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.reg.RegEntry;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
@@ -33,8 +34,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -124,8 +123,8 @@ public final class InfinityStoneTests {
         return new OggInfo(channels, rate, ByteBuffer.wrap(ogg, last + 6, 8).order(ByteOrder.LITTLE_ENDIAN).getLong());
     }
 
-    private static JsonObject json(IModFile mod, String... path) throws IOException {
-        return JsonParser.parseString(Files.readString(mod.findResource(path))).getAsJsonObject();
+    private static JsonObject json(String... path) throws IOException {
+        return JsonParser.parseString(Files.readString(modFile(path))).getAsJsonObject();
     }
 
     /**
@@ -135,10 +134,9 @@ public final class InfinityStoneTests {
      */
     @EnhancedTest(template = ARENA)
     public static void everyStoneHasItsVoice(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        JsonObject sounds = json(mod, "assets", Enhanced.MODID, "sounds.json");
-        JsonObject en = json(mod, "assets", Enhanced.MODID, "lang", "en_us.json");
-        JsonObject he = json(mod, "assets", Enhanced.MODID, "lang", "he_il.json");
+        JsonObject sounds = json("assets", Enhanced.MODID, "sounds.json");
+        JsonObject en = json("assets", Enhanced.MODID, "lang", "en_us.json");
+        JsonObject he = json("assets", Enhanced.MODID, "lang", "he_il.json");
         check(InfinityStone.values().length == 6, "six Infinity Stones");
         for (InfinityStone stone : InfinityStone.values()) {
             for (boolean hum : new boolean[] {false, true}) {
@@ -154,7 +152,7 @@ public final class InfinityStoneTests {
                 check(takes.size() >= wanted, name + " has at least " + wanted + " takes, not " + takes.size());
                 for (JsonElement take : takes) {
                     ResourceLocation file = ResourceLocation.parse(take.getAsJsonObject().get("name").getAsString());
-                    Path path = mod.findResource(("assets/" + file.getNamespace() + "/sounds/" + file.getPath() + ".ogg").split("/"));
+                    Path path = modFile(("assets/" + file.getNamespace() + "/sounds/" + file.getPath() + ".ogg").split("/"));
                     check(Files.isRegularFile(path), file + " has its .ogg file");
                     OggInfo info = oggInfo(Files.readAllBytes(path));
                     check(info.channels() == 1 && info.rate() == 44100, file + " is mono 44.1 kHz, not " + info.channels() + " channels at " + info.rate());
@@ -372,5 +370,10 @@ public final class InfinityStoneTests {
         AbilityHandler.onKey(vision, 1, false);
         check(only(heard(vision), ModSounds.MIND_STONE).isEmpty(), "and neither does letting go");
         helper.succeed();
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

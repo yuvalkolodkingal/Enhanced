@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.ability;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -20,7 +21,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 /** Runs every hero's per-tick logic and keeps passive bonuses (flight, crown stats) in sync with the player's state. */
 public final class PowerTicker {
@@ -62,7 +62,7 @@ public final class PowerTicker {
                 && !(power == Power.FALCON && !com.kolodkingal.enhanced.falcon.FalconWings.canFly(player))
                 && !(power == Power.LOVE && !com.kolodkingal.enhanced.love.LoveAbilities.canFly(player))
                 && !HexRunes.silences(player) && !player.hasEffect(ModEffects.DRAINED); // 3.3: the Hex Runes hold a sorcerer's powers, flight too
-        setModifier(player, NeoForgeMod.CREATIVE_FLIGHT, FLIGHT_ID, 1.0, canFly);
+        setModifier(player, Platform.get().attributes().creativeFlight(), FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
         boolean survivalLike = !player.isCreative() && !player.isSpectator();

@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.network.ThoughtsPayload;
 import com.kolodkingal.enhanced.network.XavierChoicePayload;
 import com.kolodkingal.enhanced.network.XavierInputPayload;
 import com.kolodkingal.enhanced.network.XavierPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -52,13 +53,13 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -304,10 +305,9 @@ public final class XavierTests {
 
     @EnhancedTest(template = ARENA, batch = QUICK)
     public static void everyThoughtHasItsWordsInBothLanguages(GameTestHelper helper) throws IOException {
-        var mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String lang : List.of("en_us", "he_il")) {
             JsonObject json;
-            try (Reader r = Files.newBufferedReader(mod.findResource("assets", "enhanced", "lang", lang + ".json"), StandardCharsets.UTF_8)) {
+            try (Reader r = Files.newBufferedReader(modFile("assets", "enhanced", "lang", lang + ".json"), StandardCharsets.UTF_8)) {
                 json = JsonParser.parseReader(r).getAsJsonObject();
             }
             for (Map.Entry<String, Integer> kind : Thoughts.KINDS.entrySet()) {
@@ -676,5 +676,10 @@ public final class XavierTests {
     }
 
     private XavierTests() {
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

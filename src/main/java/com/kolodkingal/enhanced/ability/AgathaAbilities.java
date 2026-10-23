@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.network.AgathaFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -45,7 +46,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -405,7 +405,7 @@ public final class AgathaAbilities {
     static LivingEntity sight(ServerPlayer player, double range) {
         HitResult hit = Raycasts.any(player, range, ContinuousBeam.targets(player), 1.0F);
         if (hit instanceof EntityHitResult entityHit) {
-            Entity seen = entityHit.getEntity() instanceof PartEntity<?> part ? part.getParent() : entityHit.getEntity();
+            Entity seen = Platform.get().parts().root(entityHit.getEntity());
             if (seen instanceof LivingEntity living && !(seen instanceof ArmorStand)) {
                 return living;
             }

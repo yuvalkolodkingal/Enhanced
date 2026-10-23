@@ -4,11 +4,13 @@ import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.boss.BossHooks;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.SlowedProjectilePayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.Shelters;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.stones.StoneZones;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -24,7 +26,6 @@ import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -197,7 +198,8 @@ public final class SlowMotion {
 
     /** Whether this entity is slowed by Quicksilver Time at all (players and things they ride are never tick-skipped). */
     private static boolean affected(Entity entity) {
-        if (entity instanceof Player || entity instanceof PartEntity<?> || entity.getControllingPassenger() instanceof Player
+        if (entity instanceof Player || Platform.get().parts().isPart(entity)
+                || entity.getControllingPassenger() instanceof Player
                 || entity.hasPassenger(e -> e instanceof Player)) {
             return false;
         }
@@ -216,7 +218,7 @@ public final class SlowMotion {
 
     /** How fast time runs for this entity: 1/N for a slowed projectile, otherwise 1. */
     public static double timeScale(Entity entity) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(entity);
         return data.contains(SLOWED_TAG) ? 1.0 / Math.max(1, data.getCompound(SLOWED_TAG).getInt("Factor")) : 1.0;
     }
 
@@ -245,7 +247,8 @@ public final class SlowMotion {
             double radius = all.radii().get(z);
             AABB box = new AABB(center, center).inflate(radius);
             for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, box,
-                    p -> slowedBySpeed(p) && !returning(p) && !p.getPersistentData().contains(SLOWED_TAG) && !MagnetoAbilities.isHeld(p)
+                    p -> slowedBySpeed(p) && !returning(p) && !ModAttachments.PERSISTENT_DATA.get(p).contains(SLOWED_TAG)
+                            && !MagnetoAbilities.isHeld(p)
                             && factorOf(p) > 1 && isInZone(level, p.position()))) {
                 slow(projectile, factorOf(projectile));
             }
@@ -301,7 +304,7 @@ public final class SlowMotion {
             return;
         }
         Projectile projectile = (Projectile) entity;
-        CompoundTag data = projectile.getPersistentData();
+        CompoundTag data = ModAttachments.PERSISTENT_DATA.get(projectile);
         if (!data.contains(SLOWED_TAG)) {
             return;
         }
@@ -314,8 +317,9 @@ public final class SlowMotion {
 
     /** Server: a player started seeing a projectile that is already slowed. */
     public static void onStartTracking(Entity entity, ServerPlayer player) {
-        if (entity instanceof Projectile projectile && projectile.getPersistentData().contains(SLOWED_TAG)) {
-            int factor = projectile.getPersistentData().getCompound(SLOWED_TAG).getInt("Factor");
+        if (entity instanceof Projectile projectile
+                && ModAttachments.PERSISTENT_DATA.get(projectile).contains(SLOWED_TAG)) {
+            int factor = ModAttachments.PERSISTENT_DATA.get(projectile).getCompound(SLOWED_TAG).getInt("Factor");
             Net.sendToPlayer(player, new SlowedProjectilePayload(projectile.getId(), factor));
         }
     }
@@ -325,9 +329,9 @@ public final class SlowMotion {
         if (factor > 1) {
             CompoundTag tag = new CompoundTag();
             tag.putInt("Factor", factor);
-            entity.getPersistentData().put(SLOWED_TAG, tag);
+            ModAttachments.PERSISTENT_DATA.get(entity).put(SLOWED_TAG, tag);
         } else {
-            entity.getPersistentData().remove(SLOWED_TAG);
+            ModAttachments.PERSISTENT_DATA.get(entity).remove(SLOWED_TAG);
         }
     }
 
@@ -335,7 +339,7 @@ public final class SlowMotion {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("NoGravity", projectile.isNoGravity());
         tag.putInt("Factor", factor);
-        projectile.getPersistentData().put(SLOWED_TAG, tag);
+        ModAttachments.PERSISTENT_DATA.get(projectile).put(SLOWED_TAG, tag);
         projectile.setNoGravity(true);
         projectile.setDeltaMovement(projectile.getDeltaMovement().scale(1.0 / factor));
         projectile.hasImpulse = true;
@@ -354,15 +358,15 @@ public final class SlowMotion {
      * shield). If it is still in a zone afterwards, the next level tick slows it again.
      */
     public static void unslow(Projectile projectile) {
-        if (projectile.getPersistentData().contains(SLOWED_TAG)) {
+        if (ModAttachments.PERSISTENT_DATA.get(projectile).contains(SLOWED_TAG)) {
             SLOWED.remove(projectile);
             release(projectile, true);
         }
     }
 
     private static void release(Projectile projectile, boolean speedUp) {
-        CompoundTag tag = projectile.getPersistentData().getCompound(SLOWED_TAG);
-        projectile.getPersistentData().remove(SLOWED_TAG);
+        CompoundTag tag = ModAttachments.PERSISTENT_DATA.get(projectile).getCompound(SLOWED_TAG);
+        ModAttachments.PERSISTENT_DATA.get(projectile).remove(SLOWED_TAG);
         if (!projectile.level().isClientSide()) {
             Net.sendToPlayersTrackingEntity(projectile, new SlowedProjectilePayload(projectile.getId(), 0));
         }
@@ -376,7 +380,8 @@ public final class SlowMotion {
 
     /** A projectile saved to disk while slowed comes back at full speed (it is slowed again if still in a zone). */
     public static void onJoin(Entity entity) {
-        if (entity instanceof Projectile projectile && !SLOWED.contains(projectile) && projectile.getPersistentData().contains(SLOWED_TAG)) {
+        if (entity instanceof Projectile projectile && !SLOWED.contains(projectile)
+                && ModAttachments.PERSISTENT_DATA.get(projectile).contains(SLOWED_TAG)) {
             restore(projectile);
         }
     }

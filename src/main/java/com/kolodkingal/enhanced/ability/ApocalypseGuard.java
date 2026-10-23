@@ -13,6 +13,9 @@ import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.neoforge.bridge.Binding;
+import com.kolodkingal.enhanced.platform.neoforge.bridge.NeoForgeBridge;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -30,7 +33,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -160,6 +162,20 @@ public final class ApocalypseGuard {
             ripple(player, data, source, now);
         }
         return true;
+    }
+
+    /**
+     * {@link #guard(ServerPlayer, LivingIncomingDamageEvent)} for a handler still on NeoForge's event: the bridge's own
+     * adapter, which writes the amount and the cancellation through to NeoForge's event.
+     */
+    // TODO(port P0 L2): remove once apocalypse/ApocalypseEvents hands the common event (lane L2).
+    @SuppressWarnings("unchecked")
+    public static boolean guard(ServerPlayer player,
+                                net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent event) {
+        var binding = (Binding<LivingIncomingDamageEvent,
+                net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent>)
+                NeoForgeBridge.binding(LivingIncomingDamageEvent.class).orElseThrow();
+        return guard(player, binding.adapter().apply(event));
     }
 
     /** What was not taken by the shield (in strength points) goes through as damage; nothing left, the blow is stopped. */

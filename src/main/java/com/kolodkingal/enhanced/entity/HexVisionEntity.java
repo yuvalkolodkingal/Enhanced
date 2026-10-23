@@ -387,6 +387,8 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
         discard();
     }
 
+    // TODO(port seam): NeoForge IEntityExtension#onAddedToLevel; a platform hook is requested (P0 L1 notes).
+
     @Override
     public void onAddedToLevel() {
         super.onAddedToLevel();
@@ -394,6 +396,8 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
             HexVisions.joined(this);
         }
     }
+
+    // TODO(port seam): NeoForge IEntityExtension#onRemovedFromLevel; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void onRemovedFromLevel() {

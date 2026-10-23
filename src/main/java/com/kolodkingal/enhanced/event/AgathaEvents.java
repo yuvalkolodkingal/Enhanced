@@ -1,12 +1,17 @@
 package com.kolodkingal.enhanced.event;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AgathaAbilities;
 import com.kolodkingal.enhanced.ability.AgathaShield;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,12 +19,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 /**
  * Agatha Harkness's own game-bus events (3.3), at the priorities of {@code docs/HEROES-AND-BOSSES.md}: her shield takes the
@@ -29,10 +28,10 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
  * DarkholdBook#retaliate}: its numbers, its target and its wait per attacker), so a blow on Agatha holding the book is
  * answered once.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class AgathaEvents {
     /** Her shield, complete, takes the blow (or what it can of it). */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onShieldDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && AgathaAbilities.has(player, HeroAbility.AGATHA_SHIELD)) {
             AgathaShield.guard(player, event);
@@ -48,7 +47,7 @@ public final class AgathaEvents {
     }
 
     /** Magic used on her: whoever used it is poisoned. */
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    @Subscribe(priority = Priority.LOWEST, receiveCanceled = true)
     public static void onMagicOnHer(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer agatha) || !retaliates(agatha)) {
             return;
@@ -63,7 +62,7 @@ public final class AgathaEvents {
      * Magic that does no damage answers too: the spell of Loki's Scepter and the mind powers (Confused, Spellbound), and her
      * own Power Drain, laid on Agatha (or on the holder of the Darkhold, who is answered by the book for the others).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onMagicEffect(MobEffectEvent.Added event) {
         if (!(event.getEntity() instanceof ServerPlayer target) || !(event.getEffectSource() instanceof LivingEntity caster)) {
             return;
@@ -77,7 +76,7 @@ public final class AgathaEvents {
     }
 
     /** A projectile that reaches her complete shield is turned to violet sparks before it hits. */
-    @SubscribeEvent
+    @Subscribe
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)) {

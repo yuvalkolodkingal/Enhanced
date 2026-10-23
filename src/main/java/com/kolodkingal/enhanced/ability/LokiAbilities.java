@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
@@ -46,8 +47,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -510,7 +509,7 @@ public final class LokiAbilities {
             BlockState state = level.getBlockState(pos);
             if (state.is(Blocks.WATER) && state.getFluidState().is(Fluids.WATER) && state.getFluidState().isSource()
                     && level.isUnobstructed(ice, pos, CollisionContext.empty())
-                    && !EventHooks.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
+                    && !Platform.get().hooks().blockPlaceCancelled(player, level, pos, Direction.UP)) {
                 level.setBlockAndUpdate(pos, ice);
             }
         }

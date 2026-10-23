@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.ApocalypseAbilities;
 import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.apocalypse.SandControl;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -70,7 +71,7 @@ public abstract class AbstractSandProjectile extends ThrowableProjectile impleme
             return;
         }
         double scale = SlowMotion.timeScale(this);
-        if (getPersistentData().getBoolean(ApocalypseAbilities.SLOWED_TAG)) {
+        if (ModAttachments.PERSISTENT_DATA.get(this).getBoolean(ApocalypseAbilities.SLOWED_TAG)) {
             scale *= 0.5; // a Sandstorm slowed it to half, once (the flight below would otherwise undo it at once)
         }
         if ((life += scale) > MAX_LIFE) {

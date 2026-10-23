@@ -87,6 +87,7 @@ public class InfinityStoneItem extends Item {
     }
 
     /** The use stopped (let go, another item, death): the stone's power is told the key came up. */
+    // TODO(port seam): NeoForge IItemExtension#onStopUsing; a platform hook is requested (P0 L1 notes).
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         if (entity instanceof ServerPlayer player) {
@@ -108,6 +109,7 @@ public class InfinityStoneItem extends Item {
     }
 
     /** On the ground: it never despawns, and it glints in its colour. */
+    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         Level level = entity.level();

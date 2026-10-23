@@ -2,6 +2,11 @@ package com.kolodkingal.enhanced.world;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.Holder;
@@ -12,11 +17,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The client plays the loop as a looping sound for as long as he is inside and fades it out when he leaves (or when
  * no news came for a while). The Vormir Cliff's wind is lane L5's.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class SiteAmbience {
     /** How often a player is checked: a second. */
     public static final int CHECK = 20;
@@ -51,7 +51,7 @@ public final class SiteAmbience {
     /** What each player was last told (absent: nothing, i.e. {@link #NONE}). */
     private static final Map<UUID, Integer> TOLD = new ConcurrentHashMap<>();
 
-    @SubscribeEvent
+    @Subscribe
     public static void tick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || player.tickCount % CHECK != 0) {
             return;
@@ -113,22 +113,22 @@ public final class SiteAmbience {
     }
 
     /** A new world for the client (it stops its sounds): tell it afresh. */
-    @SubscribeEvent
+    @Subscribe
     public static void onDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         TOLD.remove(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         TOLD.remove(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         TOLD.remove(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onStop(ServerStoppedEvent event) {
         TOLD.clear();
     }

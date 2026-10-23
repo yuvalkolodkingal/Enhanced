@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -51,7 +52,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
@@ -434,7 +434,7 @@ public final class ThanosAbilities {
         if (entity instanceof LivingEntity living) {
             return living;
         }
-        return entity instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity parent ? parent : null;
+        return Platform.get().parts().parentOf(entity) instanceof LivingEntity parent ? parent : null;
     }
 
     /** What the stones see along his line of sight: the creature in it, if any, and where the line ends. */

@@ -21,6 +21,8 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
+import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.event.Events;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -89,12 +91,10 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforgespi.locating.IModFile;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
 
+import java.nio.file.Path;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -1288,7 +1288,7 @@ public final class SpiderManTests {
         ServerPlayer pinned = zipping(f, helper);
         f.pvp(true); // (Mjolnir pins a player only with PvP on; the others in this test must not be kicked at as players.)
         thor.setShiftKeyDown(true);
-        NeoForge.EVENT_BUS.post(new PlayerInteractEvent.EntityInteract(thor, InteractionHand.MAIN_HAND, pinned));
+        Events.post(new PlayerInteractEvent.EntityInteract(thor, InteractionHand.MAIN_HAND, pinned));
         thor.setShiftKeyDown(false);
         f.pvp(false);
         check(com.kolodkingal.enhanced.ability.MjolnirPin.isPinned(pinned), "Mjolnir lies on him");
@@ -2622,8 +2622,8 @@ public final class SpiderManTests {
             check(data(player).is(Live.ZIPPING) && data(player).is(Live.BLACK_EYES), how + ": he is zipping with the Black Eyes");
             switch (how) {
                 case "death" -> player.kill();
-                case "logout" -> NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedOutEvent(player));
-                default -> NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(player, Level.OVERWORLD, Level.NETHER));
+                case "logout" -> Events.post(new PlayerEvent.PlayerLoggedOutEvent(player));
+                default -> Events.post(new PlayerEvent.PlayerChangedDimensionEvent(player, Level.OVERWORLD, Level.NETHER));
             }
             check(!data(player).is(Live.ZIPPING) && !data(player).is(Live.BLACK_EYES), how + " ends the zip and the surge");
             check(!SpiderServer.hasState(player), how + ": the state is gone");
@@ -2736,7 +2736,6 @@ public final class SpiderManTests {
 
     @EnhancedTest(template = ARENA, batch = QUICK)
     public static void spiderManServerAssetsAndDataAreThere(GameTestHelper helper) {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         String[][] files = {
                 {"assets", Enhanced.MODID, "textures", "mob_effect", "webbed.png"},
                 {"assets", Enhanced.MODID, "textures", "mob_effect", "radioactive_bite.png"},
@@ -2748,15 +2747,15 @@ public final class SpiderManTests {
                 {"data", Enhanced.MODID, "loot_table", "inject", "radioactive_spider.json"},
         };
         for (String[] file : files) {
-            check(Files.isRegularFile(mod.findResource(file)), String.join("/", file) + " exists");
+            check(Files.isRegularFile(modFile(file)), String.join("/", file) + " exists");
         }
         for (String source : new String[]{"abandoned_mineshaft", "simple_dungeon", "trial_chambers_reward", "ancient_city", "cave_spider"}) {
-            check(Files.isRegularFile(mod.findResource("data", Enhanced.MODID, "loot_modifiers", "radioactive_spider_from_" + source + ".json")),
+            check(Files.isRegularFile(modFile("data", Enhanced.MODID, "loot_modifiers", "radioactive_spider_from_" + source + ".json")),
                     "the loot from " + source + " exists");
         }
         // The two effect icons are 18 x 18, as the effect overlay draws them.
         for (String icon : new String[]{"webbed.png", "radioactive_bite.png"}) {
-            try (InputStream in = Files.newInputStream(mod.findResource("assets", Enhanced.MODID, "textures", "mob_effect", icon))) {
+            try (InputStream in = Files.newInputStream(modFile("assets", Enhanced.MODID, "textures", "mob_effect", icon))) {
                 BufferedImage image = ImageIO.read(in);
                 check(image != null && image.getWidth() == 18 && image.getHeight() == 18, icon + " is a PNG of 18 x 18");
             } catch (IOException e) {
@@ -2769,5 +2768,10 @@ public final class SpiderManTests {
         check(EntityType.ENDER_DRAGON.is(ModTags.INSTANT_KILL_IMMUNE) && EntityType.WITHER.is(ModTags.INSTANT_KILL_IMMUNE),
                 "nor killed in one blow");
         helper.succeed();
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

@@ -4,12 +4,11 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.CrawlMath;
 import com.kolodkingal.enhanced.client.render.LegIk;
 import com.kolodkingal.enhanced.client.render.WebTiming;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -182,9 +181,8 @@ public final class SpiderClientTests {
     /** The eye overlays only paint the lenses, and the legs and the splat are the size their layers read them at. */
     @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theClientTexturesAreThere(GameTestHelper helper) {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String eyes : new String[]{"black_homemade", "black_iron", "black_bnd", "black_own", "kill_iron"}) {
-            BufferedImage image = read(mod.findResource("assets", Enhanced.MODID, "textures", "entity", "spider_eyes_" + eyes + ".png"));
+            BufferedImage image = read(modFile("assets", Enhanced.MODID, "textures", "entity", "spider_eyes_" + eyes + ".png"));
             check(image.getWidth() == 64 && image.getHeight() == 64, "spider_eyes_" + eyes + " is 64 x 64");
             int painted = 0;
             for (int y = 0; y < 64; y++) {
@@ -200,9 +198,9 @@ public final class SpiderClientTests {
             }
             check(painted >= 4 && painted <= 24, eyes + " paints a few pixels: " + painted);
         }
-        BufferedImage legs = read(mod.findResource("assets", Enhanced.MODID, "textures", "entity", "spider_legs.png"));
+        BufferedImage legs = read(modFile("assets", Enhanced.MODID, "textures", "entity", "spider_legs.png"));
         check(legs.getWidth() == 32 && legs.getHeight() == 32, "spider_legs is 32 x 32");
-        BufferedImage splat = read(mod.findResource("assets", Enhanced.MODID, "textures", "effect", "web_splat.png"));
+        BufferedImage splat = read(modFile("assets", Enhanced.MODID, "textures", "effect", "web_splat.png"));
         check(splat.getWidth() == 32 && splat.getHeight() == 32, "web_splat is 32 x 32");
         // The splat is a web: clear at the corners, white at the middle.
         check((splat.getRGB(0, 0) >>> 24) == 0 && (splat.getRGB(31, 31) >>> 24) == 0, "the splat's corners are clear");
@@ -219,5 +217,10 @@ public final class SpiderClientTests {
         } catch (IOException e) {
             throw new AssertionError(path + " cannot be read", e);
         }
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

@@ -174,11 +174,15 @@ public class EternityAltarBlockEntity extends BlockEntity {
         return tag;
     }
 
+    // TODO(port seam): NeoForge IBlockEntityExtension#handleUpdateTag; a platform hook is requested (P0 L1 notes).
+
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
         key = tag.contains("Key") ? ItemStack.parseOptional(registries, tag.getCompound("Key")) : ItemStack.EMPTY;
         start = tag.getLong("Start");
     }
+
+    // TODO(port seam): NeoForge IBlockEntityExtension#onDataPacket; a platform hook is requested (P0 L1 notes).
 
     @Override
     public void onDataPacket(net.minecraft.network.Connection net, ClientboundBlockEntityDataPacket packet,

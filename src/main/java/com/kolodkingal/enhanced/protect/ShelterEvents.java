@@ -1,10 +1,24 @@
 package com.kolodkingal.enhanced.protect;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent;
+import com.kolodkingal.enhanced.platform.event.EntityStruckByLightningEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTickEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.ExplosionEvent;
+import com.kolodkingal.enhanced.platform.event.ExplosionKnockbackEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.vishanti.Ward;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,28 +31,13 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.EvokerFangs;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.neoforge.event.level.ExplosionKnockbackEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,7 +50,7 @@ import java.util.UUID;
  * from outside: the harm it deals, its explosions, its effects, its projectiles and lightning, and whoever comes in through a
  * portal or by dying. Each ability that grips, pulls or curses asks {@link Shelters#stops} itself; this is everything else.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class ShelterEvents {
     /** Creatures on their way through a portal: where they arrive, the Hex judges them as coming from outside. */
     private static final Set<UUID> TRAVELLING = new HashSet<>();
@@ -64,7 +63,7 @@ public final class ShelterEvents {
      * that comes from nowhere (falling, hunger, poison, the Hex wall's own) and what bypasses invulnerability pass. First, before
      * any shield pays for it.
      */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         LivingEntity target = event.getEntity();
         if (!(target.level() instanceof ServerLevel level) || event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
@@ -127,7 +126,7 @@ public final class ShelterEvents {
      * wall; one a monster or a boss set off outside a ward does nothing inside it. (A lit TNT's or a fireball's maker is whoever
      * lit or shot it; a TNT nobody lit is nobody's, and stays out.)
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onDetonate(ExplosionEvent.Detonate event) {
         if (!(event.getLevel() instanceof ServerLevel level)) {
             return;
@@ -155,7 +154,7 @@ public final class ShelterEvents {
     }
 
     /** Billy's raised barrier stops the push of an explosion in front of him as it stops its harm. */
-    @SubscribeEvent
+    @Subscribe
     public static void onExplosionKnockback(ExplosionKnockbackEvent event) {
         if (event.getAffectedEntity() instanceof Player billy && !billy.level().isClientSide()
                 && BillyBarrier.isUp(billy) && BillyBarrier.covers(billy, event.getExplosion().center())) {
@@ -170,7 +169,7 @@ public final class ShelterEvents {
      * not take, nor one of a monster, a boss or dark magic in a ward, nor one from in front of Billy's raised barrier (it pays a
      * little for it).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
         Entity source = event.getEffectSource();
         LivingEntity target = event.getEntity();
@@ -189,7 +188,7 @@ public final class ShelterEvents {
      * boss's shot or dark magic, stops at the wall before it moves: it turns to sparks of the wall's colour (Mjolnir, Stormbreaker
      * and the other one-of-a-kind weapons turn back to their owner).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onEntityTick(EntityTickEvent.Pre event) {
         Entity entity = event.getEntity();
         if (!(entity instanceof Projectile || entity instanceof PrimedTnt) || !(entity.level() instanceof ServerLevel level)) {
@@ -233,7 +232,7 @@ public final class ShelterEvents {
      * What a power sends into a Hex or a ward without flying there (a projectile made right inside it, the fangs an Evoker raises
      * there, lightning called down there) does not come, if its maker stands outside and the wall keeps them out.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onJoin(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
         if (!(event.getLevel() instanceof ServerLevel level) || event.loadedFromDisk()) {
@@ -258,7 +257,7 @@ public final class ShelterEvents {
     }
 
     /** Lightning someone called down outside a Hex strikes no one inside it (unless they may cross the wall). */
-    @SubscribeEvent
+    @Subscribe
     public static void onStruckByLightning(EntityStruckByLightningEvent event) {
         LightningBolt bolt = event.getLightning();
         Entity target = event.getEntity();
@@ -274,7 +273,7 @@ public final class ShelterEvents {
      * A projectile that is already over the wall (it started its flight inside the box of a Hex it crossed this tick) hits
      * nothing inside: the impact is cancelled and it is neutralised where the wall is.
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (!(projectile.level() instanceof ServerLevel level) || !hasWalls(level) || WandaAbilities.isHeadingHome(projectile)) {
@@ -290,7 +289,7 @@ public final class ShelterEvents {
 
     // ---- coming in through a portal, by dying, or logging in ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTravel(EntityTravelToDimensionEvent event) {
         if (!event.isCanceled() && event.getEntity() instanceof LivingEntity living && !(living instanceof Player) && !living.level().isClientSide()) {
             TRAVELLING.add(living.getUUID());
@@ -298,7 +297,7 @@ public final class ShelterEvents {
     }
 
     /** A player who comes through a portal into a Hex is judged as one who crosses its wall (after its sides are forgotten). */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             HexManager.arrive(player.serverLevel(), player);
@@ -306,7 +305,7 @@ public final class ShelterEvents {
     }
 
     /** A player who respawns inside a Hex (a bed, an anchor, the spawn) that does not let them in is set down outside it. */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && !event.isEndConquered()) {
             HexManager.arrive(player.serverLevel(), player);
@@ -315,19 +314,19 @@ public final class ShelterEvents {
 
     // ---- the Hex Runes, and forgetting ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             HexRunes.tick(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         HexRunes.forget(event.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         Shelters.clear();
         BillyBarrier.clear();

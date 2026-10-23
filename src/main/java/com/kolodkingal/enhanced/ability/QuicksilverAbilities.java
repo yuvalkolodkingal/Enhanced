@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.config.SpeedConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -33,7 +34,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 /**
  * Quicksilver (Peter Maximoff): the fastest man alive. Since 3.3 his two powers are two abilities, each on its own key,
@@ -230,7 +230,7 @@ public final class QuicksilverAbilities {
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         PowerTicker.setModifier(player, Attributes.ATTACK_SPEED, ATTACK_ID, faster, quick,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        PowerTicker.setModifier(player, NeoForgeMod.SWIM_SPEED, SWIM_ID, faster, quick,
+        PowerTicker.setModifier(player, Platform.get().attributes().swimSpeed(), SWIM_ID, faster, quick,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 

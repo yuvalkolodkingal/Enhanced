@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -52,7 +53,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -68,7 +68,7 @@ public final class WandaAbilities {
 
     /** What the Chaos Beam can hit: creatures, Ender Dragon parts and End Crystals. */
     public static final Predicate<Entity> BEAM_TARGET = e -> e.isPickable() && !e.isSpectator()
-            && (e instanceof LivingEntity || e instanceof PartEntity<?> || e instanceof EndCrystal);
+            && (e instanceof LivingEntity || Platform.get().parts().isPart(e) || e instanceof EndCrystal);
 
     /** What Wanda's Chaos Beam hits: {@link #BEAM_TARGET}, but never the Vision her own Hex raised (he is on her side). */
     public static Predicate<Entity> beamTargets(Player wanda) {
@@ -207,7 +207,7 @@ public final class WandaAbilities {
             target.hurt(ModDamageTypes.source(level, ModDamageTypes.CHAOS_BEAM, player, player),
                     EnhancedConfig.CHAOS_BEAM_DAMAGE.get().floatValue());
             LivingEntity living = target instanceof LivingEntity l ? l
-                    : target instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity l ? l : null;
+                    : Platform.get().parts().parentOf(target) instanceof LivingEntity l ? l : null;
             int nausea = EnhancedConfig.CHAOS_BEAM_NAUSEA_TICKS.get();
             if (living != null && living.isAlive() && nausea > 0) {
                 living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, nausea, 0), player);

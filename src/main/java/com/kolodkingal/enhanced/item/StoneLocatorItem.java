@@ -50,6 +50,8 @@ public class StoneLocatorItem extends Item {
         }
     }
 
+    // TODO(port seam): NeoForge IItemExtension#shouldCauseReequipAnimation; a platform hook is requested (L1).
+
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return slotChanged || !newStack.is(oldStack.getItem());

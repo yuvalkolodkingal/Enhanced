@@ -113,6 +113,7 @@ public class GungnirItem extends SwordItem {
     }
 
     /** A copy whose bond is broken crumbles where it lies. */
+    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (entity.level() instanceof ServerLevel server && entity.tickCount % 10 == 0 && stale(stack, server)) {

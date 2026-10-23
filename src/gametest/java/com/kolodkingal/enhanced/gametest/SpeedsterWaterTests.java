@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.WaterRun;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -17,7 +18,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
@@ -114,7 +114,7 @@ public final class SpeedsterWaterTests {
         tommy.setDeltaMovement(Vec3.ZERO);
         data.setToggle(Toggle.SUPER_SPEED, true);
         check(run(helper, tommy, 10) >= Y + 1 - 1.0E-6, "at super speed on its top again, he stops sinking");
-        check(tommy.getAttributeValue(NeoForgeMod.SWIM_SPEED) > 1.0 + 1.0E-6,
+        check(tommy.getAttributeValue(Platform.get().attributes().swimSpeed()) > 1.0 + 1.0E-6,
                 "and with his Super Speed on he swims faster, as his uncle does");
         helper.succeed();
     }

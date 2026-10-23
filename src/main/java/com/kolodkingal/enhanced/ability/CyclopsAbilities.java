@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.network.CyclopsFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -36,7 +37,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -271,7 +271,7 @@ public final class CyclopsAbilities {
      * Dragon in its stead. Bosses and creatures that resist knockback resist it as they resist a blow.
      */
     static void shove(ServerPlayer shooter, Entity target, Vec3 direction, double strength, double lift) {
-        Entity body = target instanceof PartEntity<?> part ? part.getParent() : target;
+        Entity body = Platform.get().parts().root(target);
         if (strength <= 0.0 || body == shooter || !body.isAlive()) {
             return;
         }
@@ -359,7 +359,7 @@ public final class CyclopsAbilities {
         List<Double> at = new ArrayList<>();
         AABB search = new AABB(from, to).inflate(inflate + 1.0);
         for (Entity e : level.getEntities(player, search, ContinuousBeam.targets(player))) {
-            Entity body = e instanceof PartEntity<?> part ? part.getParent() : e;
+            Entity body = Platform.get().parts().root(e);
             if (!(body instanceof LivingEntity living) || living == player || found.contains(living)) {
                 continue;
             }

@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -46,8 +47,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -242,8 +241,8 @@ public final class TommyAbilities {
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SPEED_ID, EnhancedConfig.TOMMY_SPEED_BONUS.get(), running,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         PowerTicker.setModifier(player, Attributes.STEP_HEIGHT, STEP_ID, 0.65, running);
-        PowerTicker.setModifier(player, NeoForgeMod.SWIM_SPEED, SWIM_ID, QuicksilverAbilities.actionSpeed() - 1.0, quick,
-                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        PowerTicker.setModifier(player, Platform.get().attributes().swimSpeed(), SWIM_ID,
+                QuicksilverAbilities.actionSpeed() - 1.0, quick, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
     public static boolean isRunning(Player player) {
@@ -493,7 +492,7 @@ public final class TommyAbilities {
         // Breaking a block is a player action: spawn protection, claims and adventure mode all get their say.
         GameType mode = player.gameMode.getGameModeForPlayer();
         if (!player.mayInteract(level, pos) || player.blockActionRestricted(level, pos, mode)
-                || CommonHooks.fireBlockBreak(level, mode, player, pos, state).isCanceled()) {
+                || Platform.get().hooks().blockBreakCancelled(level, mode, player, pos, state)) {
             return;
         }
         data.startCooldown(HeroAbility.TOMMY_ACCELERATE, now, ACCELERATE_COOLDOWN);

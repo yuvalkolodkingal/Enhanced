@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -37,7 +38,6 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -319,7 +319,7 @@ public final class QuicksilverTests {
         run(peter, false);
         double attack = peter.getAttributeValue(Attributes.ATTACK_SPEED);
         double mining = peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED);
-        double swimming = peter.getAttributeValue(NeoForgeMod.SWIM_SPEED);
+        double swimming = peter.getAttributeValue(Platform.get().attributes().swimSpeed());
         double digging = peter.getDestroySpeed(stone);
 
         for (boolean time : new boolean[]{true, false}) {
@@ -328,14 +328,14 @@ public final class QuicksilverTests {
             run(peter, false);
             assertNear(peter.getAttributeValue(Attributes.ATTACK_SPEED), attack * speed, 1.0E-6, "attack speed in " + mode);
             assertNear(peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining * speed, 1.0E-6, "block break speed in " + mode);
-            assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming * speed, 1.0E-6, "swim speed in " + mode);
+            assertNear(peter.getAttributeValue(Platform.get().attributes().swimSpeed()), swimming * speed, 1.0E-6, "swim speed in " + mode);
             assertNear(peter.getDestroySpeed(stone), digging * speed, 1.0E-4, "mining stone in " + mode);
 
             toggle(peter, time);
             run(peter, false);
             assertNear(peter.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "attack speed is normal with " + mode + " off");
             assertNear(peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "block break speed is normal with " + mode + " off");
-            assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "swim speed is normal with " + mode + " off");
+            assertNear(peter.getAttributeValue(Platform.get().attributes().swimSpeed()), swimming, 1.0E-6, "swim speed is normal with " + mode + " off");
         }
 
         // Someone who stops being Quicksilver is not faster at anything.
@@ -345,11 +345,12 @@ public final class QuicksilverTests {
         assertNear(peter.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "a hero who is no longer Quicksilver attacks normally");
         assertNear(peter.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "and mines normally");
         // (3.6.1: Tommy swims faster with his own Super Speed on, as his uncle does; with it off, normally.)
-        assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming * speed, 1.0E-6,
+        assertNear(peter.getAttributeValue(Platform.get().attributes().swimSpeed()), swimming * speed, 1.0E-6,
                 "Tommy swims faster with his own Super Speed on");
         Powers.get(peter).setToggle(Toggle.SUPER_SPEED, false);
         run(peter, false);
-        assertNear(peter.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "and swims normally with it off");
+        assertNear(peter.getAttributeValue(Platform.get().attributes().swimSpeed()), swimming, 1.0E-6,
+                "and swims normally with it off");
         helper.succeed();
     }
 
@@ -437,7 +438,7 @@ public final class QuicksilverTests {
         ServerPlayer other = f.player(12.5, FLOOR, 10.5);
         double attack = other.getAttributeValue(Attributes.ATTACK_SPEED);
         double mining = other.getAttributeValue(Attributes.BLOCK_BREAK_SPEED);
-        double swimming = other.getAttributeValue(NeoForgeMod.SWIM_SPEED);
+        double swimming = other.getAttributeValue(Platform.get().attributes().swimSpeed());
 
         toggle(peter, true);
         run(peter, false);
@@ -445,7 +446,8 @@ public final class QuicksilverTests {
         check(QuicksilverAbilities.isQuick(peter) && !QuicksilverAbilities.isQuick(other), "but only Quicksilver is quicker");
         assertNear(other.getAttributeValue(Attributes.ATTACK_SPEED), attack, 1.0E-6, "he attacks at his own speed");
         assertNear(other.getAttributeValue(Attributes.BLOCK_BREAK_SPEED), mining, 1.0E-6, "mines at his own speed");
-        assertNear(other.getAttributeValue(NeoForgeMod.SWIM_SPEED), swimming, 1.0E-6, "and swims at his own speed");
+        assertNear(other.getAttributeValue(Platform.get().attributes().swimSpeed()), swimming, 1.0E-6,
+                "and swims at his own speed");
         int ticks = eatSteak(other);
         check(ticks >= 30, "and eats a steak in the usual time (took " + ticks + " ticks)");
         helper.succeed();

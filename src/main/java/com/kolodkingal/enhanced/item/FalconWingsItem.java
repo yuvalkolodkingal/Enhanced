@@ -28,10 +28,14 @@ public class FalconWingsItem extends ArmorItem {
         super(material, Type.CHESTPLATE, properties);
     }
 
+    // TODO(port seam): NeoForge IItemExtension#canElytraFly; a platform hook is requested (P0 L1 notes).
+
     @Override
     public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
         return FalconWings.canElytraFly(stack, entity);
     }
+
+    // TODO(port seam): NeoForge IItemExtension#elytraFlightTick; a platform hook is requested (P0 L1 notes).
 
     @Override
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {

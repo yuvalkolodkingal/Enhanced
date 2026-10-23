@@ -200,6 +200,7 @@ public class InfinityGauntletItem extends AwakeningItem {
      * The use of a crafted Gauntlet stopped (let go, another item, death): a Snap's charge let go at once is the
      * selected stone's variant (a tap), later it is nothing; a stone's held power is told the key came up.
      */
+    // TODO(port seam): NeoForge IItemExtension#onStopUsing; a platform hook is requested (P0 L1 notes).
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         if (!(entity instanceof ServerPlayer player) || contents(stack).titan()) {

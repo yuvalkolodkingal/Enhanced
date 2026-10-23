@@ -101,6 +101,8 @@ public class NanoArcReactorItem extends ArmorItem {
                 player.getY() + player.getBbHeight() * 0.68, player.getZ(), 20, 0.2, 0.2, 0.2, 0.05);
     }
 
+    // TODO(port seam): NeoForge IItemExtension#canEquip; a platform hook is requested (P0 L1 notes).
+
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
         return slot == EquipmentSlot.CHEST;
