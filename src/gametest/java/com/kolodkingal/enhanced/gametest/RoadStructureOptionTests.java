@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.road.RoadSave;
 import com.kolodkingal.enhanced.road.RoadSweeper;
@@ -13,7 +13,6 @@ import com.kolodkingal.enhanced.road.copy.StructureModel;
 import com.kolodkingal.enhanced.road.copy.StructureSupply;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -23,8 +22,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,11 +37,9 @@ import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** The options of the Copy the Structure trial and what each one changes: Check by hand, hints, the time limit, the size. Each test has a batch of its own, as a test that changes the config must. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadStructureOptionTests {
 
-    @GameTest(template = ARENA, batch = "road_structure_manual", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_structure_manual", timeoutTicks = 500)
     public static void withAutoCheckOffTheTrialIsWonOnlyWhenHePressesCheck(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.STRUCTURE_COPY_AUTO_CHECK, false);
@@ -64,7 +59,7 @@ public final class RoadStructureOptionTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_structure_hint", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_structure_hint", timeoutTicks = 500)
     public static void hintShowsGhostsOfTheLowestMissingBlocksForAFewSecondsAndCostsNothing(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.STRUCTURE_COPY_HINT_SECONDS, 1);
@@ -127,7 +122,7 @@ public final class RoadStructureOptionTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_structure_nohint", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "road_structure_nohint", timeoutTicks = 300)
     public static void withHintsOffTheHintButtonShowsNothing(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.STRUCTURE_COPY_HINTS, false);
@@ -143,7 +138,7 @@ public final class RoadStructureOptionTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_structure_time", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "road_structure_time", timeoutTicks = 400)
     public static void whenTheLongTimeRunsOutTheRoomIsTakenDownAndHeIsSentHomeWithEverything(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.STRUCTURE_COPY_TIME_LIMIT_SECONDS, 2);
@@ -171,12 +166,12 @@ public final class RoadStructureOptionTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_structure_tier1", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "road_structure_tier1", timeoutTicks = 400)
     public static void theSmallSizeIsAtMostFiveByFiveByFive(GameTestHelper helper) {
         sized(helper, 1, 5, 5, 5);
     }
 
-    @GameTest(template = ARENA, batch = "road_structure_tier3", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "road_structure_tier3", timeoutTicks = 400)
     public static void theLargeSizeIsAtMostElevenByElevenByNineAndBiggerThanTheSmall(GameTestHelper helper) {
         sized(helper, 3, 11, 11, 9);
     }
@@ -200,7 +195,7 @@ public final class RoadStructureOptionTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_structure_tier0", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "road_structure_tier0", timeoutTicks = 300)
     public static void sizeZeroGivesEachPlayerASizeOfHisOwnAndKeepsIt(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.STRUCTURE_COPY_TIER, 0);

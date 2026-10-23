@@ -4,17 +4,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.thanos.ThanosSounds;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
@@ -38,8 +36,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * expects, and every sound of the fight is a registered event with its files, its subtitle in both languages and the
  * right format (mono, 44.1 kHz). Nothing here names a client class: the tests run on a dedicated server.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosAssetsTests {
     private static final String BATCH = "thanos_assets";
 
@@ -115,7 +111,7 @@ public final class ThanosAssetsTests {
         return image(skin.getPath());
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void bothSkinsFollowTheSkinRules(GameTestHelper helper) throws IOException {
         List<Variant> looks = looks();
         check(looks.size() == 2, "Thanos has two skins (and 'your own skin', which has none): " + looks.size());
@@ -142,7 +138,7 @@ public final class ThanosAssetsTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void theEyesAreWhereEveryLookPutsThemAndTheHelmetLeavesThemClear(GameTestHelper helper) throws IOException {
         for (Variant look : looks()) {
             BufferedImage skin = skin(look);
@@ -192,7 +188,7 @@ public final class ThanosAssetsTests {
         return n;
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void everyBoxOfTheTitanAndOfHisSwordHasAPaintedFace(GameTestHelper helper) throws IOException {
         BufferedImage body = image("textures/entity/thanos.png");
         check(body.getWidth() == 128 && body.getHeight() == 128, "the Titan's texture is 128 by 128");
@@ -235,7 +231,7 @@ public final class ThanosAssetsTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void theGauntletItemIsAnAnimatedStripAndTheEffectIconsAreDrawn(GameTestHelper helper) throws IOException {
         BufferedImage strip = image("textures/item/infinity_gauntlet.png");
         check(strip.getWidth() == 16 && strip.getHeight() == 64, "the Gauntlet is four frames of 16 by 16: " + strip.getWidth() + "x" + strip.getHeight());
@@ -320,7 +316,7 @@ public final class ThanosAssetsTests {
         return new Ogg(channels, rate, samples);
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void everySoundOfTheFightIsRegisteredWithItsFilesItsSubtitlesAndTheRightFormat(GameTestHelper helper) throws IOException {
         JsonObject sounds = JsonParser.parseString(Files.readString(file("sounds.json"), StandardCharsets.UTF_8)).getAsJsonObject();
         JsonObject en = JsonParser.parseString(Files.readString(file("lang/en_us.json"), StandardCharsets.UTF_8)).getAsJsonObject();
@@ -360,7 +356,7 @@ public final class ThanosAssetsTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = BATCH)
+    @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void everyCueOfTheFightPlaysAnEventOfTheModAndOnlyThreeAreBorrowed(GameTestHelper helper) {
         Set<ThanosSounds> borrowed = Set.of(ThanosSounds.PORTAL, ThanosSounds.DISSOLVE, ThanosSounds.DEFLECT);
         for (ThanosSounds cue : ThanosSounds.values()) {

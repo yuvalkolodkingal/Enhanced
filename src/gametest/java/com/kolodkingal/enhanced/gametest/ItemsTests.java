@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.config.VishantiConfig;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.network.WardSyncPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -29,7 +30,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
@@ -69,8 +69,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +88,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * those of the ward in {@code items_ward} (whose radii are set small, so that one ward never reaches a neighbouring test);
  * a test that changes a setting the others rely on has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ItemsTests {
     private static final String BOOK = "items_vishanti";
     private static final String WARD = "items_ward";
@@ -148,7 +144,7 @@ public final class ItemsTests {
     // ------------------------------------------------------------------------------------------------------------
     // The item
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void theBookIsCraftedFromAmethystAnEnderEyeGoldABookAndLapis(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("book_of_the_vishanti"));
@@ -170,7 +166,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void theBookIsOneOfAKindAndSaysWhoCanReadIt(GameTestHelper helper) {
         ItemStack stack = new ItemStack(ModItems.BOOK_OF_THE_VISHANTI.get());
         check(stack.getMaxStackSize() == 1, "one book to a stack");
@@ -181,7 +177,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void onlyLokiTheScarletWitchAndBillyCanReadIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power power : Power.values()) {
@@ -193,7 +189,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void everyoneElseSeesTheRunesSwim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power power : new Power[]{Power.NONE, Power.TOMMY, Power.THOR, Power.MAGNETO, Power.VISION}) {
@@ -212,7 +208,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void theBookMustBeHeld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 10.5, 10.5, Power.LOKI);
@@ -233,7 +229,7 @@ public final class ItemsTests {
     // ------------------------------------------------------------------------------------------------------------
     // Places and teleporting
 
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = BOOK)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = BOOK)
     public static void everySorcererSavesAPlaceAndIsTakenBackToIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Power[] sorcerers = {Power.LOKI, Power.SCARLET_WITCH, Power.BILLY};
@@ -276,7 +272,7 @@ public final class ItemsTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = BOOK)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = BOOK)
     public static void theBookTakesItsHolderToAnotherWorldAndBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 4.5, 4.5, Power.SCARLET_WITCH);
@@ -310,7 +306,7 @@ public final class ItemsTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void sneakAndUseGoesToTheFirstBase(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 4.5, 4.5, Power.LOKI);
@@ -329,7 +325,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void theBookIsShutInTheWitchesRoad(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(VishantiBook.shutIn(ROAD), "the Witches' Road is shut to the book, whatever the config says");
@@ -342,7 +338,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_vishanti_shut")
+    @EnhancedTest(template = ARENA, batch = "items_vishanti_shut")
     public static void aShutWorldNeitherSavesNorTeleports(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(VishantiConfig.DENIED_DIMENSIONS, List.of("minecraft:overworld"));
@@ -358,7 +354,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_vishanti_cost")
+    @EnhancedTest(template = ARENA, batch = "items_vishanti_cost")
     public static void theCooldownAndTheCostOfATeleportAreConfigured(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(VishantiConfig.TELEPORT_COOLDOWN, 123);
@@ -383,7 +379,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void placeNamesAreCleanedAndTheListIsBounded(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 4.5, 4.5, Power.LOKI);
@@ -405,7 +401,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void thePlacesAndTheMessagesTravelAndSurviveASave(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BifrostData data = BifrostData.EMPTY
@@ -437,7 +433,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100, batch = "items_vishanti_hex")
+    @EnhancedTest(template = ARENA, timeoutTicks = 100, batch = "items_vishanti_hex")
     public static void aHexWallStopsTheBookLikeEveryOtherTeleport(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -461,7 +457,7 @@ public final class ItemsTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "items_vishanti_boss")
+    @EnhancedTest(template = ARENA, batch = "items_vishanti_boss")
     public static void aFighterInAnArenaCannotLeaveItWithTheBookNorRaiseAWardIntoIt(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -484,7 +480,7 @@ public final class ItemsTests {
     // ------------------------------------------------------------------------------------------------------------
     // The strength of a ward
 
-    @GameTest(template = ARENA, batch = BOOK)
+    @EnhancedTest(template = ARENA, batch = BOOK)
     public static void theStrongerTheSorcererTheLargerTheWard(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         int wanda = WardStrength.radius(Power.SCARLET_WITCH, 0.0);
@@ -546,7 +542,7 @@ public final class ItemsTests {
         return null;
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void aBaseRaisesAWardRoundItAsLargeAsTheSorcererIsStrong(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -583,7 +579,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void aPlayerKeepsAtMostAFewBasesAndMovesOneByNameAgain(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -608,7 +604,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void forgettingTheBaseTakesTheWardAway(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -625,7 +621,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 120, batch = WARD)
+    @EnhancedTest(template = ARENA, timeoutTicks = 120, batch = WARD)
     public static void aMonsterInsideTheWardIsPushedOutAndNothingElseIs(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -660,7 +656,7 @@ public final class ItemsTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 60, batch = WARD)
+    @EnhancedTest(template = ARENA, timeoutTicks = 60, batch = WARD)
     public static void bossesAndAFightsCreaturesAreKeptOutToo(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
@@ -683,7 +679,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void noMonsterSpawnsInsideAWard(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -717,7 +713,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "items_ward_spawns")
+    @EnhancedTest(template = ARENA, batch = "items_ward_spawns")
     public static void aWardThatIsToldNotToStopSpawnsDoesNot(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         f.config(VishantiConfig.WARD_BLOCKS_SPAWNS, false);
@@ -728,7 +724,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void wardsAreSavedWithTheWorldAndLoadAgain(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -744,7 +740,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100, batch = WARD)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100, batch = WARD)
     public static void aWardSleepsWhileItsOwnerIsNoSorcererAndWakesWhenTheyAre(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -765,7 +761,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void operatorsCanListAndRemoveWards(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -808,7 +804,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void everyWorldHasItsOwnWards(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -826,7 +822,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void aWardWhereNothingIsLoadedDoesNotLoadAnythingAndLooksAtNothing(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -846,7 +842,7 @@ public final class ItemsTests {
     // ------------------------------------------------------------------------------------------------------------
     // Review fixes
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void aWardWhoseBaseIsGoneIsTakenAwayAtLoginAndByIdAlone(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();
@@ -862,7 +858,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 60, batch = "items_ward_off")
+    @EnhancedTest(template = ARENA, timeoutTicks = 60, batch = "items_ward_off")
     public static void turningWardsOffSilencesEveryWardEvenOfOfflineOwners(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         f.config(VishantiConfig.WARDS_ENABLED, false);
@@ -886,7 +882,7 @@ public final class ItemsTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 100, batch = WARD)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100, batch = WARD)
     public static void aWardKeepsWhatThePlayerKeepsAndWhatIsBeingCured(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerPlayer loki = holder(f, 10.5, 10.5, Power.LOKI);
@@ -921,7 +917,7 @@ public final class ItemsTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void aMonsterIsNeverSetDownInLavaFireOrOnAnEdge(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos spot = helper.absolutePos(new BlockPos(5, 2, 5));
@@ -947,7 +943,7 @@ public final class ItemsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = WARD)
+    @EnhancedTest(template = ARENA, batch = WARD)
     public static void everyoneIsToldOnlyOfTheWardsNearThemAndTheirOwn(GameTestHelper helper) {
         TestKit.Fixture f = wardFixture(helper);
         ServerLevel level = helper.getLevel();

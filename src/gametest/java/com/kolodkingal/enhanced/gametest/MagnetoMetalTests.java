@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.MagnetPull;
@@ -10,6 +9,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -20,7 +20,6 @@ import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -46,8 +45,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +59,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Armor &amp; Weapon Strip takes and what it refuses, and that a Loki illusion gives nothing to anyone. Batches
  * {@code magneto_metal*} and {@code magneto_loki}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MagnetoMetalTests {
     private static final String METAL = "magneto_metal";
     private static final String LOKI = "magneto_loki";
@@ -79,7 +74,7 @@ public final class MagnetoMetalTests {
      * lifted metal block, an arrow in flight; and nothing else (leather, diamond, wood, Mjolnir, the Gauntlet, Ultron's
      * Core, the heroes' own gear, falling sand, a stuck arrow, a snowball).
      */
-    @GameTest(template = ARENA, batch = METAL)
+    @EnhancedTest(template = ARENA, batch = METAL)
     public static void metalIsEverythingWithMetalInIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -139,7 +134,7 @@ public final class MagnetoMetalTests {
      * M2. The heroes of metal: Vision in both looks (unless he phased, when there is nothing to grip), the Ultron hero in
      * every look, Thor while he holds Stormbreaker (never Mjolnir); the heroes' own gear is costume, not metal.
      */
-    @GameTest(template = ARENA, batch = METAL)
+    @EnhancedTest(template = ARENA, batch = METAL)
     public static void heroesOfMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = f.player(3.5, FLOOR, 3.5, Power.VISION);
@@ -176,7 +171,7 @@ public final class MagnetoMetalTests {
      * spawner or a vault; every metal item of 2.1 and none of its "not metal" list; gold through {@code
      * #minecraft:piglin_loved}; netherite armour; the Hex's Vision and the command block minecart.
      */
-    @GameTest(template = ARENA, batch = METAL)
+    @EnhancedTest(template = ARENA, batch = METAL)
     public static void theTagsHoldWhatTheDesignSays(GameTestHelper helper) {
         for (Block block : List.of(Blocks.IRON_BLOCK, Blocks.GOLD_BLOCK, Blocks.COPPER_BLOCK, Blocks.NETHERITE_BLOCK,
                 Blocks.RAW_IRON_BLOCK, Blocks.RAW_GOLD_BLOCK, Blocks.RAW_COPPER_BLOCK, Blocks.ANVIL, Blocks.CHIPPED_ANVIL,
@@ -266,7 +261,7 @@ public final class MagnetoMetalTests {
      * the arrow's own tick may stick it there; R again throws it where he looks, his now, and nobody gains the right to pick
      * it up. A snowball in flight is no metal, and a stuck arrow is not caught.
      */
-    @GameTest(template = ARENA, batch = METAL, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = METAL, timeoutTicks = 100)
     public static void magnetoCatchesMetalInFlight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -332,7 +327,7 @@ public final class MagnetoMetalTests {
      * M7. R takes falling and thrown metal blocks: a falling anvil; an iron block Wanda threw, which then glows in his grey;
      * but not a dirt block she threw.
      */
-    @GameTest(template = ARENA, batch = METAL)
+    @EnhancedTest(template = ARENA, batch = METAL)
     public static void magnetoCatchesFallingAndThrownMetalBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -370,7 +365,7 @@ public final class MagnetoMetalTests {
      * M9. Stormbreaker is metal: dropped, R holds it; in a zombie's hand, R holds the zombie; in a player's hand (PvP on),
      * V tears it off and drops it at his feet, unmarked, so he can take it back first.
      */
-    @GameTest(template = ARENA, batch = "magneto_metal_pvp")
+    @EnhancedTest(template = ARENA, batch = "magneto_metal_pvp")
     public static void stormbreakerIsMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -411,7 +406,7 @@ public final class MagnetoMetalTests {
      * fragments and the sound of it breaking; the sword at the ordinary chance falls, marked for his pull. The pull does
      * the same to a second such zombie: its sword is his, its helmet crumbles.
      */
-    @GameTest(template = ARENA, batch = METAL)
+    @EnhancedTest(template = ARENA, batch = METAL)
     public static void gearAMobNeverDropsCrumbles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = f.player(3.5, FLOOR, 10.5, Power.MAGNETO);
@@ -465,7 +460,7 @@ public final class MagnetoMetalTests {
      * takes nothing: the armour stays on, nothing falls, V does not rest, and he reads that PvP is off. His own horse's
      * armour V tears off, as in 3.0.
      */
-    @GameTest(template = ARENA, batch = METAL)
+    @EnhancedTest(template = ARENA, batch = METAL)
     public static void anotherPlayersHorseKeepsItsArmour(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -506,7 +501,7 @@ public final class MagnetoMetalTests {
      * inventory, and Loki still wears and holds his own. Cast again, the three copies in reach of the pull dissolve the
      * same way, nothing of theirs is made real, and the pull rests: it did something.
      */
-    @GameTest(template = ARENA, batch = LOKI)
+    @EnhancedTest(template = ARENA, batch = LOKI)
     public static void illusionsGiveNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -593,7 +588,7 @@ public final class MagnetoMetalTests {
      * M58. Tommy's Blitz passes a Loki illusion by (what it holds is a copy of Loki's): no sword reaches Tommy or the
      * ground; a zombie's sword still comes to him, as in 3.0.
      */
-    @GameTest(template = ARENA, batch = LOKI)
+    @EnhancedTest(template = ARENA, batch = LOKI)
     public static void blitzOnAnIllusionGivesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(1.5, FLOOR, 1.5, Power.LOKI);

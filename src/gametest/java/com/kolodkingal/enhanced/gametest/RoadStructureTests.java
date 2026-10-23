@@ -2,8 +2,8 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.road.RoadCanvas;
 import com.kolodkingal.enhanced.road.RoadChallenge;
@@ -23,7 +23,6 @@ import com.kolodkingal.enhanced.road.copy.StructureModel;
 import com.kolodkingal.enhanced.road.copy.StructureSupply;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -51,8 +50,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -72,8 +69,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * player has his things back and the room is gone. The tests that change an option have a batch of their own
  * ({@link RoadStructureOptionTests}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadStructureTests {
     static final String BATCH = "road_structure";
 
@@ -173,7 +168,7 @@ public final class RoadStructureTests {
 
     // ---- the room and the supply ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theTrialIsTheSecondAndItsRoomIsBuiltWithTheModelAndAnEmptyPlot(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         check(index() == 1 && RoadChallenges.get(0).id().equals("parkour"), "it is trial 2, after the parkour: " + index());
@@ -214,7 +209,7 @@ public final class RoadStructureTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void everyThemeStandsInTheRoadAsDrawnWithTheCornersAndJointsTheGameGives(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -266,7 +261,7 @@ public final class RoadStructureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void thePlayerIsGivenExactlyTheKindsOfBlockTheModelNeedsInGenerousQuantity(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -319,7 +314,7 @@ public final class RoadStructureTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void theSupplyChestFillsItselfUpAgain(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -344,7 +339,7 @@ public final class RoadStructureTests {
 
     // ---- building ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void blocksCanBePlacedAndBrokenOnThePlotAndNowhereElse(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -395,7 +390,7 @@ public final class RoadStructureTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void breakingOnThePlotIsInstantAndGivesTheBlockBack(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -439,7 +434,7 @@ public final class RoadStructureTests {
 
     // ---- Check ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void checkCountsWhatIsRightAndMarksWhatIsMissingWrongOrExtra(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -470,7 +465,7 @@ public final class RoadStructureTests {
 
     // ---- winning ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void aPerfectCopyWinsOnItsOwnAndOpensTheGate(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -505,7 +500,7 @@ public final class RoadStructureTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void aBlockTheWrongWayRoundIsNotACopy(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -535,7 +530,7 @@ public final class RoadStructureTests {
 
     // ---- the end of the trial, whatever way ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void leavingGivesBackHisThingsAndTakesTheRoomDown(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -569,7 +564,7 @@ public final class RoadStructureTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void loggingOutInTheTrialReturnsHisThingsAndLoggingInStartsTheRoomAgain(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -603,7 +598,7 @@ public final class RoadStructureTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void aCrashInTheTrialCannotCostHimHisThings(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -625,7 +620,7 @@ public final class RoadStructureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 500)
     public static void fallingOffThePlatformPutsHimBackAndTheBuildStays(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -648,7 +643,7 @@ public final class RoadStructureTests {
     }
 
     /** This test swaps the Road's trials for a Road of its own, which nothing running beside it may see: a batch of its own. */
-    @GameTest(template = ARENA, batch = "road_structure_swap", timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = "road_structure_swap", timeoutTicks = 700)
     public static void winningAndSteppingThroughTheGateMovesOnAndGivesBackHisThings(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -686,7 +681,7 @@ public final class RoadStructureTests {
 
     // ---- the seeds and the words ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void eachPlayerHasHisOwnModelAndKeepsIt(GameTestHelper helper) {
         int differ = 0;
         UUID base = UUID.randomUUID();
@@ -711,7 +706,7 @@ public final class RoadStructureTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everythingTheTrialSaysIsSaidInEnglishAndHebrew(GameTestHelper helper) throws IOException {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");
@@ -736,7 +731,7 @@ public final class RoadStructureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theOptionsOfTheTrialAreInTheServerConfigWithTheirDefaults(GameTestHelper helper) {
         check(WitchesRoadConfig.STRUCTURE_COPY_TIER.get() == 2 && WitchesRoadConfig.STRUCTURE_COPY_TIME_LIMIT_SECONDS.get() == 5400
                 && WitchesRoadConfig.STRUCTURE_COPY_SUPPLY_PERCENT.get() == 150, "size, the long time limit, the supply");

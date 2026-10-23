@@ -15,17 +15,15 @@ import com.kolodkingal.enhanced.client.render.GripMath;
 import com.kolodkingal.enhanced.client.render.HeroPoses;
 import com.kolodkingal.enhanced.client.render.MagnetStreamMath;
 import com.kolodkingal.enhanced.client.render.StancePoses;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -46,13 +44,11 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The pure maths of the hero animation (easing, springs, aiming, Thor's grip, the flight curves): no Minecraft client
  * classes, so it runs with the other GameTests.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AnimationMathTests {
     private static final float RAD = (float) (Math.PI / 180.0);
 
     /** Both spring closed forms give the same trajectory at any step size, and the damped one overshoots as it should. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void springsAreExactAtAnyFrameRate(GameTestHelper helper) {
         float[] steps = {1.0F / 60.0F, 1.0F / 20.0F, 1.0F, 3.0F};
         float[][] critical = new float[steps.length][41];
@@ -103,7 +99,7 @@ public final class AnimationMathTests {
     }
 
     /** Easing is frame-rate independent; the envelope has its documented values. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void easingAndEnvelope(GameTestHelper helper) {
         float a = 0.0F;
         float b = 0.0F;
@@ -144,7 +140,7 @@ public final class AnimationMathTests {
     }
 
     /** Aimed arms point where they are told on a pitched, rolled, turned body; the heads look where the camera looks. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aimingInThreeDimensions(GameTestHelper helper) {
         Random random = new Random(7);
         double worst = 0.0;
@@ -276,7 +272,7 @@ public final class AnimationMathTests {
     }
 
     /** Thor's weapon at rest sits in the fist exactly as the models' own third-person transforms put it. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void thorsGripMatchesTheItemModels(GameTestHelper helper) throws IOException {
         Vector3f[] points = {new Vector3f(8, 2.5F, 8), new Vector3f(8, 13, 8), new Vector3f(3, 12, 6), new Vector3f(13, 15, 10),
                 new Vector3f(8, -4, 8), new Vector3f(1, 7, 3), new Vector3f(15, 18, 8), new Vector3f(8, -6, 8)};
@@ -329,7 +325,7 @@ public final class AnimationMathTests {
      * arm width), and while the weapon whirls the fist stays on the line of the handle (Mjolnir hangs from it on its
      * strap).
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theHandlePassesThroughThorsFistInEveryGrip(GameTestHelper helper) throws IOException {
         GripMath.Kind[] kinds = GripMath.Kind.values();
         for (int k = 0; k < kinds.length; k++) {
@@ -372,7 +368,7 @@ public final class AnimationMathTests {
      * The points the grip maths calls the head, the grip and the strap really are the head, the grip and the strap of
      * the models.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void thorsGripMarksTheRealHeadGripAndStrap(GameTestHelper helper) throws IOException {
         GripMath.Kind[] kinds = GripMath.Kind.values();
         for (int k = 0; k < kinds.length; k++) {
@@ -416,7 +412,7 @@ public final class AnimationMathTests {
      * (So does the weapon thrust ahead in the lead grip, at any elevation. The few ticks of the hand-over between the
      * two, when the whirl has taken hold of only a part of the weapon, are not covered.)
      */
-    @GameTest(template = ARENA, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, timeoutTicks = 400)
     public static void theWhirlClearsThorsHeadAndBody(GameTestHelper helper) throws IOException {
         GripMath.Kind[] kinds = GripMath.Kind.values();
         for (int k = 0; k < kinds.length; k++) {
@@ -451,7 +447,7 @@ public final class AnimationMathTests {
      * the ground) the weapon arm is held at the planting angle of its weapon with the lead grip: the lowest point of
      * the weapon, whichever the size of it, touches the ground (within a centimetre or two), well ahead of the body.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aHeroLandingPlantsTheHeadOfEachWeaponOnTheGround(GameTestHelper helper) throws IOException {
         float[] plant = {HeroPoses.PLANT_MJOLNIR, HeroPoses.PLANT_STORMBREAKER};
         GripMath.Kind[] kinds = GripMath.Kind.values();
@@ -487,7 +483,7 @@ public final class AnimationMathTests {
     }
 
     /** The flight profile: the reference speeds, and a pitch curve that only ever leans further as he speeds up. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void flightProfileCurves(GameTestHelper helper) {
         assertNear(FlightProfile.vRef(0.075F), 0.758, 0.001, "Magneto's cruise speed");
         assertNear(FlightProfile.vRef(0.09F), 0.910, 0.001, "Wanda's cruise speed");
@@ -544,7 +540,7 @@ public final class AnimationMathTests {
     }
 
     /** Every gesture table is well formed, and each take-off ends exactly on its hero's hover pose: no pop as it hands over. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void flightGesturesAreWellFormedAndHandOverWithoutAPop(GameTestHelper helper) {
         for (Gestures.Def def : Gestures.all().values()) {
             check(def.problems().isEmpty(), "gesture " + def.id + ": " + def.problems());
@@ -608,7 +604,7 @@ public final class AnimationMathTests {
     // The ability gestures
 
     /** Every gesture has its keys, a sane envelope, and a table that is in order. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyGestureHasWellFormedKeys(GameTestHelper helper) {
         for (GestureId id : GestureId.values()) {
             Gestures.Def def = Gestures.get(id);
@@ -633,7 +629,7 @@ public final class AnimationMathTests {
     }
 
     /** A gesture that hands over to a stance ends exactly on that stance's pose, so nothing pops when it lets go. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void gesturesHandOverToStancesWithoutAPop(GameTestHelper helper) {
         // Both arms at the pose of the stance.
         Object[][] pairs = {
@@ -709,7 +705,7 @@ public final class AnimationMathTests {
      * faster or slower so the arms are thrown open (key 15) at the very tick the shield is complete, and a wind-up too
      * short to act is a snap. A raise the shield never formed for (let go of at once, or refused) stops its effects.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theShieldsRaiseKeepsTimeWithItsWindUp(GameTestHelper helper) {
         int opens = GestureRoutes.SHIELD_KEYED_WIND_UP;
         Gestures.Def raise = Gestures.get(GestureId.WANDA_SHIELD_RAISE);
@@ -743,7 +739,7 @@ public final class AnimationMathTests {
     }
 
     /** Every ability of every hero, every toggle, momentary state and flag is acted by a gesture, or has a reason why not. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void everyAbilityIsActedOrExplained(GameTestHelper helper) {
         // Every power that has abilities: the heroes of 3.0 are in without their lanes editing this line (a lane that
         // routes a toggle or a state to its own hero only would otherwise fail "has no gesture" here).
@@ -839,7 +835,7 @@ public final class AnimationMathTests {
      * the pull is rested and his hunger bar is not empty. R itself is still acted by the grab and the fling. The keys fling
      * both arms wide and up at tick 5, then draw both fists in to the chest with a lean back of 4 degrees at tick 12.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void thePullHasAGesture(GameTestHelper helper) {
         check(GestureRoutes.cooldown(Power.MAGNETO, 1, 100) == GestureId.MAG_PULL, "R's cooldown is the pull's");
         check(GestureRoutes.cooldown(Power.MAGNETO, 3, 60) == GestureId.MAG_DISARM, "V's is still the strip's");
@@ -889,7 +885,7 @@ public final class AnimationMathTests {
      * {@code MagnetStreamMath}, R59): 8 at 0 blocks, 12 at 8, 26 at 40. Its curve leaves where the thing was, arrives in his
      * hand and rises over the line between them (half as high with reduced motion); the icon shrinks from 0.5 to 0.35.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void streamTimingIsBounded(GameTestHelper helper) {
         check(MagnetStreamMath.flightTicks(0) == 8, "8 ticks at 0 blocks, not " + MagnetStreamMath.flightTicks(0));
         check(MagnetStreamMath.flightTicks(8) == 12, "12 ticks at 8 blocks, not " + MagnetStreamMath.flightTicks(8));

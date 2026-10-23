@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -9,13 +8,13 @@ import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -35,8 +34,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -55,8 +52,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * block set down becomes a block again only where its holder may place one (D-T 2.3); refused, it drops as an item, the
  * block itself when its loot is empty (R44).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BillyBlockTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -120,7 +115,7 @@ public final class BillyBlockTests {
     // Billy tears blocks out of the ground
 
     /** T1: V at dirt 8 blocks away: he holds it, glowing in his blue; Sneak + V: it lands and is dirt again. */
-    @GameTest(template = ARENA, batch = "billy_blocks", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "billy_blocks", timeoutTicks = 100)
     public static void billyTearsABlockOutAndSetsItDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
@@ -158,7 +153,7 @@ public final class BillyBlockTests {
     }
 
     /** T2: Billy reaches 16 blocks (here 6) and lifts up to hardness 3; Wanda's limits are her own. */
-    @GameTest(template = ARENA, batch = "billy_blocks_limits")
+    @EnhancedTest(template = ARENA, batch = "billy_blocks_limits")
     public static void billysBlocksHaveHisOwnLimits(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -205,7 +200,7 @@ public final class BillyBlockTests {
     }
 
     /** T3: a second block within {@code billy.blockLiftCooldown} waits; a creature never does. */
-    @GameTest(template = ARENA, batch = "billy_blocks_recharge", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "billy_blocks_recharge", timeoutTicks = 80)
     public static void billyNeedsAMomentBetweenBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -257,7 +252,7 @@ public final class BillyBlockTests {
     }
 
     /** T59 (R25): his recharge outlasts the crown his press puts on, and is not forgotten when the crown goes. */
-    @GameTest(template = ARENA, batch = "billy_blocks_long_recharge", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "billy_blocks_long_recharge", timeoutTicks = 260)
     public static void billysRechargeOutlastsHisCrown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -307,7 +302,7 @@ public final class BillyBlockTests {
     }
 
     /** T38: {@code billy.blockLifting} off: his V and Sneak + V lift no block, creatures still; Wanda's are unchanged. */
-    @GameTest(template = ARENA, batch = "billy_blocks_switch")
+    @EnhancedTest(template = ARENA, batch = "billy_blocks_switch")
     public static void billysBlockLiftingHasASwitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -350,7 +345,7 @@ public final class BillyBlockTests {
      * behind it and leaves the zombie, for Wanda, Billy and the Phoenix alike. (The second press comes more than a second
      * after the zombie was let go, past the Sneak grace of R41.)
      */
-    @GameTest(template = ARENA, batch = "telekinesis_sneak", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_sneak", timeoutTicks = 60)
     public static void sneakTakesTheBlockBehindACreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -390,7 +385,7 @@ public final class BillyBlockTests {
      * down, the Phoenix throws hers. Five ticks later the press tears nothing out and says nothing; 25 ticks later it tears
      * the block out.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_sneak_grace", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_sneak_grace", timeoutTicks = 60)
     public static void noBlockRightAfterAGrip(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -454,7 +449,7 @@ public final class BillyBlockTests {
     // A thrown block
 
     /** T5: Billy's thrown stone hits like Wanda's (a telekinetic slam he owns) and shatters into its loot. */
-    @GameTest(template = ARENA, batch = "billy_blocks", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "billy_blocks", timeoutTicks = 60)
     public static void billysThrownBlockHitsLikeWandas(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
@@ -499,7 +494,7 @@ public final class BillyBlockTests {
      * T6 (D-T 2.3): a claim (a listener that cancels the holder's place events) makes the set-down block drop as its item;
      * a block torn out outside a protected arena and set down inside it does too, and the cell stays air.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_place", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_place", timeoutTicks = 140)
     public static void aSetDownBlockRespectsClaimsAndArenas(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -583,7 +578,7 @@ public final class BillyBlockTests {
      * zombie): one cobblestone, the zombie unhurt; a glass block, whose loot is empty, drops as one glass block. In a
      * protected arena a borrowed block set down onto a zombie's cell crumbles: no block, no item.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_place_occupied", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_place_occupied", timeoutTicks = 100)
     public static void aSetDownBlockNeedsAFreeCell(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -668,7 +663,7 @@ public final class BillyBlockTests {
      * T40 (D-T 2.3 rule 4, R44): Billy logs out holding a block. Nobody's rights are assumed: over a claimed cell and an
      * unclaimed one alike the stone drops as cobblestone and never stands; a glass block drops as one glass block.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_place_offline", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_place_offline", timeoutTicks = 100)
     public static void aBlockOfALoggedOutHolderNeverLands(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -736,7 +731,7 @@ public final class BillyBlockTests {
      * as plain stone, does not drop as itself but gives what mining it gives, nothing but its silverfish; the glass, which
      * Silk Touch gives, drops as one glass block.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_place_creative", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_place_creative", timeoutTicks = 100)
     public static void aSetDownBlockNeverGivesACreativeOnlyItem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);

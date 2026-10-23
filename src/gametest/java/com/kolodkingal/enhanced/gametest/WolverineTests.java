@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.item.AdamantiumInjectionItem;
 import com.kolodkingal.enhanced.network.ScentPayload;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -36,7 +37,6 @@ import com.kolodkingal.enhanced.wolverine.Pounce;
 import com.kolodkingal.enhanced.wolverine.Senses;
 import com.kolodkingal.enhanced.wolverine.WolverineAbilities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -59,8 +59,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BubbleColumnBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -85,8 +83,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * bubble column lifts him), a custom hero's rows on other keys, and the pure tables of his animation. Batches: {@code
  * wolverine}, {@code wolverine_pvp} (PvP and the injection's option: server-wide), {@code wolverine_water}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class WolverineTests {
     private static final String BATCH = "wolverine";
     private static final String BATCH_PVP = "wolverine_pvp";
@@ -175,7 +171,7 @@ public final class WolverineTests {
     // The Adamantium Injection
 
     /** Held 60 ticks (not 59) the injection makes a powerless player Wolverine, and is used up; his claws come out. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theInjectionAwakensAfterSixtyTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = f.player(5.5, FLOOR, 5.5);
@@ -204,7 +200,7 @@ public final class WolverineTests {
     }
 
     /** A hero is refused at the first click: no hold, nothing used up; Deadpool too. Not craftable by default. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theInjectionRefusesAHero(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power power : new Power[]{Power.THOR, Power.DEADPOOL}) {
@@ -227,7 +223,7 @@ public final class WolverineTests {
     // The body
 
     /** Health 30, armour 4 and toughness 2, heavy, faster, stronger, metal for Magneto, the healing factor's trait. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisBodyIsAdamantium(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 5.5, 5.5);
@@ -252,7 +248,7 @@ public final class WolverineTests {
     // The claws
 
     /** G: the claws out; a blow of the empty hand is 7 and sweeps the one beside; in again: 3; an item hides them. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theClawsMakeTheEmptyHandHitSeven(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 5.5, 5.5);
@@ -288,7 +284,7 @@ public final class WolverineTests {
     // R: the Claw Slash and the Spin Slash
 
     /** 6, 6, 9; too soon is nothing; 30 ticks later the combo starts again; the claws pop out for it. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theSlashComboIsSixSixNine(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 5.5, 5.5);
@@ -316,7 +312,7 @@ public final class WolverineTests {
     }
 
     /** The cross-slash sweeps the three nearest of the cone; the first two hits strike one. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theCrossSlashSweepsThree(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 10.5);
@@ -340,7 +336,7 @@ public final class WolverineTests {
     }
 
     /** The Spin Slash: 7 to three husks round him, nothing to a player without PvP; its cooldown starts. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSpinHitsEveryoneRoundHimButAFriend(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 10.5, 10.5);
@@ -364,7 +360,7 @@ public final class WolverineTests {
     // V: the Pounce and the Feral Leap
 
     /** The Pounce lands beside a husk 9 blocks away, stabs it for 12 and pins it; no fall damage. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void thePounceStabsAndPins(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 3.5);
@@ -387,7 +383,7 @@ public final class WolverineTests {
     }
 
     /** A boss takes the stab's damage, not the pin. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void aBossIsNotPinned(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 10.5);
@@ -402,7 +398,7 @@ public final class WolverineTests {
     }
 
     /** No prey in sight: a plain leap to where he looks, without the stab. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void noPreyIsAPlainLeap(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 10.5);
@@ -419,7 +415,7 @@ public final class WolverineTests {
     }
 
     /** The Feral Leap: far and low. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theFeralLeapIsFarAndLow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 10.5);
@@ -445,7 +441,7 @@ public final class WolverineTests {
     // B: the Berserker Rage
 
     /** The Rage: a slash of 6 is 8.4, items are refused, the claws stay out; at its end he is tired. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theRageHitsHarderRefusesItemsAndTires(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 5.5, 5.5);
@@ -476,7 +472,7 @@ public final class WolverineTests {
     }
 
     /** In the Rage he heals at least the factor's always-on rate more than out of it. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theRageDoublesTheHealing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer angry = wolverine(f, 4.5, 4.5);
@@ -497,7 +493,7 @@ public final class WolverineTests {
     // N: the Sniff and Track
 
     /** The Sniff: each creature's kind of scent; the radius is 48 (40 in, 50 out); the cooldown. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSniffKnowsEachScent(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 10.5, 10.5);
@@ -529,7 +525,7 @@ public final class WolverineTests {
     }
 
     /** Track: a trail to a pig that moves, ended by its death (the switch off, the cooldown); a player is told. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void trackFollowsAPigUntilItDies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = wolverine(f, 3.5, 3.5);
@@ -563,7 +559,7 @@ public final class WolverineTests {
     // Sneak + G: Claw Climb
 
     /** Up a stone wall by his claws; not up glass; the climb needs the claws. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void clawClimbGoesUpStoneNotGlass(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (int y = 2; y <= 9; y++) {
@@ -595,7 +591,7 @@ public final class WolverineTests {
     // A custom hero
 
     /** A custom hero with his slash on G and his claws on R: each works on its own key; his body heals and is metal. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomHeroHasHisRowsOnOtherKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("wolverine.slash", 3).key(2, "wolverine.slash")
@@ -620,7 +616,7 @@ public final class WolverineTests {
     // The pure tables
 
     /** His gestures' keys and routes, his states' gestures, his rows' moves, his run, his payloads' gestures. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theAnimationTables(GameTestHelper helper) {
         int count = 0;
         for (GestureId id : GestureId.values()) {
@@ -648,7 +644,7 @@ public final class WolverineTests {
     }
 
     /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
         java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
                 .findResource("assets", Enhanced.MODID, "hero_presets", "wolverine.json");
@@ -669,7 +665,7 @@ public final class WolverineTests {
     // PvP and the injection's option (server-wide)
 
     /** With PvP on, the spin and a slash hurt a player. */
-    @GameTest(template = ARENA, batch = BATCH_PVP)
+    @EnhancedTest(template = ARENA, batch = BATCH_PVP)
     public static void withPvpHisClawsHurtAPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -685,7 +681,7 @@ public final class WolverineTests {
     }
 
     /** With {@code heroesRefused} off the injection replaces a hero's power. */
-    @GameTest(template = ARENA, batch = BATCH_PVP, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH_PVP, timeoutTicks = 120)
     public static void theOptionLetsTheInjectionReplaceAPower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(WolverineConfig.INJECTION_HEROES_REFUSED, false);
@@ -702,7 +698,7 @@ public final class WolverineTests {
     // His weight in water
 
     /** In deep water he sinks; he cannot swim up faster than 0.02; a boat would carry him (not tested here). */
-    @GameTest(template = ARENA, batch = BATCH_WATER, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH_WATER, timeoutTicks = 100)
     public static void heSinksInWater(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         pool(helper, 8, 8, false);
@@ -721,7 +717,7 @@ public final class WolverineTests {
     }
 
     /** A bubble column lifts him whatever he weighs. */
-    @GameTest(template = ARENA, batch = BATCH_WATER, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH_WATER, timeoutTicks = 100)
     public static void aBubbleColumnLiftsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         pool(helper, 8, 8, true);

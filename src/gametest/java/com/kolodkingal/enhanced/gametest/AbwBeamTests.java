@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
@@ -14,13 +13,13 @@ import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.network.BeamPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,8 +28,6 @@ import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +45,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * the beam infrastructure takes a style so another source can use it. With {@code billy.beam} false R is the old Hex Bolt
  * (the shared fixture switches the beam off, so the old tests keep running). Every test has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AbwBeamTests {
     private static void hold(ServerPlayer billy) {
         AbilityHandler.onKey(billy, 1, true);
@@ -75,7 +70,7 @@ public final class AbwBeamTests {
     }
 
     /** Held, it hurts what the crosshair is on, 1.5 every 5 ticks at rank 1; a block stops it; released, it stops. */
-    @GameTest(template = ARENA, batch = "abw_beam_aim", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_aim", timeoutTicks = 100)
     public static void beamHurtsWhatTheCrosshairIsOnAndStopsOnRelease(GameTestHelper helper) {
         TestKit.Fixture f = beamFixture(helper);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
@@ -116,7 +111,7 @@ public final class AbwBeamTests {
     }
 
     /** It burns hunger, refuses an empty stomach, dies when he starves or becomes a spectator, and the clients hear of it. */
-    @GameTest(template = ARENA, batch = "abw_beam_cost", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_cost", timeoutTicks = 60)
     public static void beamCostsHungerAndNeedsFood(GameTestHelper helper) {
         TestKit.Fixture f = beamFixture(helper);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
@@ -153,7 +148,7 @@ public final class AbwBeamTests {
     }
 
     /** The server repeats itself every few ticks while R is held, so a client that comes into range later still draws it. */
-    @GameTest(template = ARENA, batch = "abw_beam_keepalive", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_keepalive", timeoutTicks = 60)
     public static void beamRepeatsItselfWhileHeld(GameTestHelper helper) {
         TestKit.Fixture f = beamFixture(helper);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
@@ -185,7 +180,7 @@ public final class AbwBeamTests {
     }
 
     /** Damage and range grow evenly from the first rank to the highest (maxRank); rank 1 is the base. */
-    @GameTest(template = ARENA, batch = "abw_beam_rank")
+    @EnhancedTest(template = ARENA, batch = "abw_beam_rank")
     public static void beamGrowsWithBuildMagicRank(GameTestHelper helper) {
         TestKit.Fixture f = beamFixture(helper);
         f.config(BuildConfig.BILLY_MAX_RANK, 4);
@@ -210,7 +205,7 @@ public final class AbwBeamTests {
     }
 
     /** The range really is the rank's: a target 9 blocks away is out of reach at rank 1 (range 6) and in reach at the top (12). */
-    @GameTest(template = ARENA, batch = "abw_beam_range", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_range", timeoutTicks = 60)
     public static void rankLengthensTheBeamAndStrengthensIt(GameTestHelper helper) {
         TestKit.Fixture f = beamFixture(helper);
         f.config(EnhancedConfig.BILLY_BEAM_RANGE, 6);
@@ -234,7 +229,7 @@ public final class AbwBeamTests {
     }
 
     /** PvP rules: another player is hurt only when PvP is on. */
-    @GameTest(template = ARENA, batch = "abw_beam_pvp", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_pvp", timeoutTicks = 60)
     public static void beamFollowsThePvpRules(GameTestHelper helper) {
         TestKit.Fixture f = beamFixture(helper);
         ServerPlayer billy = f.player(3.5, FLOOR, 10.5, Power.BILLY);
@@ -256,7 +251,7 @@ public final class AbwBeamTests {
     }
 
     /** A Chaos Shield is solid to the beam: it ends on the sphere and wears the shield, and nothing behind it is hurt. */
-    @GameTest(template = ARENA, batch = "abw_beam_shield", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_shield", timeoutTicks = 80)
     public static void chaosShieldStopsTheBeam(GameTestHelper helper) {
         TestKit.Fixture f = beamFixture(helper);
         f.pvp(true);
@@ -278,7 +273,7 @@ public final class AbwBeamTests {
     }
 
     /** Apocalypse's shield turns it away like anything but mind power: no damage, the shield is not worn. */
-    @GameTest(template = ARENA, batch = "abw_beam_boss", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_boss", timeoutTicks = 80)
     public static void apocalypseShieldTakesNothingFromTheBeam(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         d.f().config(EnhancedConfig.BILLY_BEAM, true);
@@ -296,7 +291,7 @@ public final class AbwBeamTests {
     }
 
     /** With billy.beam false R is the old Hex Bolt: a shot with a cooldown, no beam. */
-    @GameTest(template = ARENA, batch = "abw_beam_off", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_off", timeoutTicks = 40)
     public static void withTheOptionOffRIsTheOldHexBolt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.BILLY_BEAM, false);
@@ -311,7 +306,7 @@ public final class AbwBeamTests {
     }
 
     /** The infrastructure takes a style: a second source with its own palette fires through the same driver and payload. */
-    @GameTest(template = ARENA, batch = "abw_beam_style", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_beam_style", timeoutTicks = 60)
     public static void aSecondStyleUsesTheSameInfrastructure(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BeamStyle purple = BeamStyles.register(new BeamStyle("abw_test_purple", "beam.enhanced.billy_hex", 0xFFFFFF, 0xF0D8FF, 0xB45CFF, 0x7A2FD6, 0x3A127A, true));

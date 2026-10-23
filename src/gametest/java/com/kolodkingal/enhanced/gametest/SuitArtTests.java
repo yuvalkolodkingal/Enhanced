@@ -7,11 +7,9 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.ironman.SuitParts;
 import com.kolodkingal.enhanced.ironman.SuitTimelines;
-import net.minecraft.gametest.framework.GameTest;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,8 +28,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Mark 1's plates come on one after another, the nanites spread out of the reactor, the Hulkbuster's frame opens and
  * closes and the Mark 5's suitcase opens and folds away. Nothing here names a client class.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SuitArtTests {
     private static final String BATCH = "suit_art";
     /** Every item of 3.8 (and the four block items): each has a model and an icon of its own. */
@@ -66,7 +62,7 @@ public final class SuitArtTests {
     }
 
     /** Every suit: its 128 x 128 texture and its emissive texture; the props' textures. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everySuitHasItsTextures(GameTestHelper helper) throws IOException {
         for (SuitKind kind : SuitKind.VALUES) {
             for (String name : new String[] {kind.id(), kind.id() + "_glow"}) {
@@ -85,7 +81,7 @@ public final class SuitArtTests {
      * of the skeleton's borrowed vanilla ones); the Mark 5 turns into its suitcase by the {@code enhanced:folded}
      * property.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyItemHasItsModelAndIcon(GameTestHelper helper) throws IOException {
         for (String item : ITEMS) {
             JsonObject model = json("models/item/" + item + ".json");
@@ -132,7 +128,7 @@ public final class SuitArtTests {
     }
 
     /** Every part of every suit goes on from 0 to exactly 1, never back, and comes off from 1 to exactly 0. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRevealsClimbAndEndAtOne(GameTestHelper helper) {
         for (SuitKind kind : SuitKind.VALUES) {
             for (SuitParts part : SuitParts.VALUES) {
@@ -163,7 +159,7 @@ public final class SuitArtTests {
     }
 
     /** On every suit-up the helmet and its faceplate are the last pieces on (and so the first off). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHelmetIsTheLastPieceOn(GameTestHelper helper) {
         for (SuitKind kind : SuitKind.VALUES) {
             for (SuitParts part : SuitParts.VALUES) {
@@ -189,7 +185,7 @@ public final class SuitArtTests {
     }
 
     /** A take-off is the suit-up played backwards, and shorter. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aTakeOffIsTheSuitUpBackwards(GameTestHelper helper) {
         for (SuitKind kind : SuitKind.VALUES) {
             check(kind.downTicks() < kind.upTicks(), kind.id() + " comes off faster than it goes on");
@@ -206,7 +202,7 @@ public final class SuitArtTests {
     }
 
     /** The Mark 1's plates clank on one after another: boots, shins, thighs, torso, arms, the helmet last. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theMarkOnesPlatesComeOneAfterAnother(GameTestHelper helper) {
         SuitParts[] order = {SuitParts.RIGHT_BOOT, SuitParts.LEFT_BOOT, SuitParts.RIGHT_SHIN, SuitParts.LEFT_SHIN,
                 SuitParts.RIGHT_THIGH, SuitParts.LEFT_THIGH, SuitParts.CHEST, SuitParts.BACK,
@@ -234,7 +230,7 @@ public final class SuitArtTests {
      * The Mark 50's and Mark 85's nanites flow out of the reactor: the chest first, every segment of a part after the
      * one nearer the reactor, the last segment of each part on with the part, the helmet last.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theNanitesSpreadFromTheReactor(GameTestHelper helper) {
         for (SuitKind kind : new SuitKind[] {SuitKind.MARK_50, SuitKind.MARK_85}) {
             for (SuitParts part : SuitParts.VALUES) {
@@ -264,7 +260,7 @@ public final class SuitArtTests {
     }
 
     /** The Hulkbuster's frame falls shut, opens, waits, closes; the Mark 5's suitcase snaps open and folds away. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFrameAndTheSuitcaseOpenAndClose(GameTestHelper helper) {
         check(SuitTimelines.frameOpen(0.0F) == 0.0F && SuitTimelines.frameOpen(29.9F) == 0.0F, "shut as it falls");
         check(SuitTimelines.frameOpen(45.0F) == 1.0F, "open for him to step in");

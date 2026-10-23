@@ -16,19 +16,17 @@ import com.kolodkingal.enhanced.custom.ModuleStats;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.SkinCheck;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforgespi.locating.IModFile;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,8 +53,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * keys, looks, skins), the checks of a skin, the numbers of every power at every strength, and the names of it all in both
  * languages. Pure: no world is needed, so these run in one quick batch.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomHeroDataTests {
     private static final String BATCH = "custom_data";
 
@@ -117,7 +113,7 @@ public final class CustomHeroDataTests {
 
     // ---- JSON ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aHeroSurvivesItsJsonTheSaveAndTheWire(GameTestHelper helper) {
         CustomHero hero = sample();
         String json = CustomHeroJson.write(hero);
@@ -149,7 +145,7 @@ public final class CustomHeroDataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void readingIsLenientAndSaysWhatItDidNotUnderstand(GameTestHelper helper) {
         check(!CustomHeroJson.read("").ok() && !CustomHeroJson.read(null).ok(), "nothing is no hero");
         check(!CustomHeroJson.read("{not json").ok(), "broken JSON is no hero");
@@ -182,7 +178,7 @@ public final class CustomHeroDataTests {
         return CustomHero.EMPTY.withName("Test").withPowers(List.of(picks));
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRulesCleanNamesStrengthsOptionsAndRepeats(GameTestHelper helper) {
         CustomHeroRules.Limits limits = CustomHeroRules.Limits.DEFAULT;
         check(CustomHeroRules.cleanName("§cRed§r  Hero\n").equals("Red Hero"), "formatting codes and controls go");
@@ -209,7 +205,7 @@ public final class CustomHeroDataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBudgetAndTheCountDropTheLastPicked(GameTestHelper helper) {
         // (3.4 raised the defaults to 90 points and 10 powers; the rules below are those of a server with 3.3's 60 and 8.)
         check(CustomHeroRules.Limits.DEFAULT.budget() == 90 && CustomHeroRules.Limits.DEFAULT.maxPowers() == 10, "the defaults");
@@ -235,7 +231,7 @@ public final class CustomHeroDataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void keysOnlyHoldPowersThatTakeAKey(GameTestHelper helper) {
         CustomHero h = only(new CustomHero.Pick("durability", 3, "armor", -1), new CustomHero.Pick("flight", 3, "", -1),
                 new CustomHero.Pick("healing", 3, "steady", -1))
@@ -249,7 +245,7 @@ public final class CustomHeroDataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void looksAndSkinsAreChecked(GameTestHelper helper) {
         CustomHeroRules.Limits limits = CustomHeroRules.Limits.DEFAULT;
         byte[] good = png(64, 64, 0xFF0000FF);
@@ -281,7 +277,7 @@ public final class CustomHeroDataTests {
     }
 
     /** The heroes to choose from come from the Power enum and the looks from Variants: a new hero appears by itself. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHeroesToChooseComeFromThePowersAndTheirLooks(GameTestHelper helper) {
         List<Power> heroes = HeroLooks.heroes();
         for (Power power : Power.values()) {
@@ -300,7 +296,7 @@ public final class CustomHeroDataTests {
 
     // ---- the catalogue and its numbers (F2, F5) ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thirtyPowersEachWithLogicOptionsAndNumbers(GameTestHelper helper) {
         check(PowerModule.values().length == 30, "thirty powers: " + PowerModule.values().length);
         for (PowerModule m : PowerModule.values()) {
@@ -338,7 +334,7 @@ public final class CustomHeroDataTests {
     }
 
     /** The server's damage and cooldown scales reach every number, and the preview shows the scaled ones. */
-    @GameTest(template = ARENA, batch = "custom_data_scale")
+    @EnhancedTest(template = ARENA, batch = "custom_data_scale")
     public static void theConfigScalesTheNumbers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(CustomHeroConfig.DAMAGE_SCALE, 2.0);
@@ -351,7 +347,7 @@ public final class CustomHeroDataTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aBeamOfAnyColourIsAStyle(GameTestHelper helper) {
         BeamStyle style = CustomBeams.style(0x123456, 0xABCDEF);
         check(style.main() == 0x123456 && style.inner() == 0xABCDEF, "the hero's colours");
@@ -373,7 +369,7 @@ public final class CustomHeroDataTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyPowerOptionNumberAndMessageHasItsWordsInBothLanguages(GameTestHelper helper) throws IOException {
         List<String> missing = new ArrayList<>();
         for (String language : List.of("en_us", "he_il")) {

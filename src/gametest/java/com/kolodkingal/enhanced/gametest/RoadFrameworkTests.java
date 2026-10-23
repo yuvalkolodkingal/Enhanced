@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadCanvas;
 import com.kolodkingal.enhanced.road.RoadCells;
 import com.kolodkingal.enhanced.road.RoadChallenge;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -34,8 +34,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,14 +50,12 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the saved progress, checkpoints, falls and death, leaving, winning and moving on to the next trial, and the rules inside.
  * They share one batch, {@code road_framework}: every test has players of its own, and so cells of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadFrameworkTests {
     static final String BATCH = "road_framework";
 
     // ---- the place ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRoadIsAVoidDimension(GameTestHelper helper) throws IOException {
         // (The GameTest server has only the vanilla dimensions: this reads the data pack's files the way a real server does.)
         RegistryAccess access = helper.getLevel().getServer().registryAccess();
@@ -88,7 +84,7 @@ public final class RoadFrameworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void cellsAreFarApartOnAGrid(GameTestHelper helper) {
         Set<BlockPos> seen = new HashSet<>();
         for (int i = 0; i < 300; i++) {
@@ -108,7 +104,7 @@ public final class RoadFrameworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCanvasKeepsInsideItsCell(GameTestHelper helper) {
         RoadCanvas canvas = new RoadCanvas(3, 0, 320);
         canvas.set(0, 5, 0, Blocks.STONE.defaultBlockState());
@@ -141,7 +137,7 @@ public final class RoadFrameworkTests {
 
     // ---- drawing and taking down ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void aCanvasIsPlacedInSlicesAndClearedWithNothingLeft(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -179,7 +175,7 @@ public final class RoadFrameworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void aTrialIsBuiltForThePlayerAndTakenDownWhenHeLeaves(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -227,7 +223,7 @@ public final class RoadFrameworkTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void aCellIsClearedInSlicesWithoutHoldingTheServer(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -254,7 +250,7 @@ public final class RoadFrameworkTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theSameCourseEveryTimeForTheSamePlayerAndAnotherForAnother(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -291,7 +287,7 @@ public final class RoadFrameworkTests {
 
     // ---- the saved progress ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void progressSurvivesTheWorldBeingSaved(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         RoadSave save = new RoadSave();
@@ -334,7 +330,7 @@ public final class RoadFrameworkTests {
 
     // ---- checkpoints, falls and death ----
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void fallingPutsThePlayerBackAtHisLastCheckpoint(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -377,7 +373,7 @@ public final class RoadFrameworkTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void dyingInTheRoadPutsThePlayerBackAtHisCheckpointNotInTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -408,7 +404,7 @@ public final class RoadFrameworkTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void aPlayerWhoLeavesStartsAgainAtHisCheckpoint(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -439,7 +435,7 @@ public final class RoadFrameworkTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theExitDoorLeavesTheRoadOnTheSecondClick(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);
@@ -464,7 +460,7 @@ public final class RoadFrameworkTests {
     // ---- winning, and on to the next trial ----
 
     /** A Road of its own (the registry is swapped): nothing running beside it may see that, so it has a batch of its own. */
-    @GameTest(template = ARENA, batch = "road_framework_swap", timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = "road_framework_swap", timeoutTicks = 600)
     public static void winningUnlocksTheNextTrialAndTheGateLeadsToIt(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -540,7 +536,7 @@ public final class RoadFrameworkTests {
         server.getCommands().performPrefixedCommand(as.createCommandSourceStack().withPermission(permission), command);
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void operatorsCanSetSkipAndResetTheTrialsAndAnyoneCanLeave(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();

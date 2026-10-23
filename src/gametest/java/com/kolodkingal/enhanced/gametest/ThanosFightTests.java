@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFights;
@@ -11,6 +10,7 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -24,7 +24,6 @@ import com.kolodkingal.enhanced.thanos.ThanosFight;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import com.kolodkingal.enhanced.thanos.ThanosState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
@@ -43,8 +42,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -60,8 +57,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The fight as a whole: whom he goes after, what he is immune to, how the other heroes meet him, and how a fight ends (the
  * wipe, the loss of interest, the victory with its Gauntlets and its rest), then the Gauntlet that makes a Thanos.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosFightTests {
 
     private static ThanosEntity boss(TestKit.Fixture f, ServerPlayer starter) {
@@ -76,7 +71,7 @@ public final class ThanosFightTests {
      * and a Vision before anyone; he keeps a choice for sixty ticks of the game (the review found that he kept it for sixty
      * of his idle ticks, which are a moment between two moves: the first target was held for minutes).
      */
-    @GameTest(template = ARENA, batch = "thanos_fight_target", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_target", timeoutTicks = 120)
     public static void targetingGoesToVisionThenTheBiggestHitterThenTheNearest(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer nearest = fighter(f, 0, 3);
@@ -117,7 +112,7 @@ public final class ThanosFightTests {
     }
 
     /** Until he has the Soul Stone he goes for the nearest of Loki's copies, which is the trick they are for. */
-    @GameTest(template = ARENA, batch = "thanos_fight_lure", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_lure", timeoutTicks = 60)
     public static void lokisCopiesLureHimUntilHeHasTheSoulStone(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer loki = fighter(f, 6, 6, Power.LOKI);
@@ -139,7 +134,7 @@ public final class ThanosFightTests {
     // Immunities and the other heroes
 
     /** What cannot touch him: the poisons and the weakeners, the stones' own effects, deep slowness, knockback, fire and falls. */
-    @GameTest(template = ARENA, batch = "thanos_fight_immune", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_immune", timeoutTicks = 40)
     public static void immunitiesRefuseTheEffectsAndTheKnocks(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -166,7 +161,7 @@ public final class ThanosFightTests {
     }
 
     /** The Hex bounces him at its wall, in and out; Mjolnir will not pin him. */
-    @GameTest(template = ARENA, batch = "thanos_fight_hex", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_hex", timeoutTicks = 40)
     public static void theHexBouncesHimAndMjolnirWillNotPinHim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -185,7 +180,7 @@ public final class ThanosFightTests {
     }
 
     /** The hooks of the other heroes: Quicksilver's time, Magneto's strip (one plate, 3.1), Spider-Man's web. */
-    @GameTest(template = ARENA, batch = "thanos_fight_hooks", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_hooks", timeoutTicks = 120)
     public static void theHeroesHooksAnswerForHim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.WEB_LOCK_TICKS, 20);
@@ -215,7 +210,7 @@ public final class ThanosFightTests {
     }
 
     /** A mob's blow does a quarter, and an Iron Golem that dares is swatted away. */
-    @GameTest(template = ARENA, batch = "thanos_fight_mobs", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_mobs", timeoutTicks = 40)
     public static void mobsDoAQuarterAndAGolemIsSwatted(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -236,7 +231,7 @@ public final class ThanosFightTests {
     }
 
     /** The stones' effects do not take on a boss, but they take on a zombie. */
-    @GameTest(template = ARENA, batch = "thanos_fight_spellbound", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_spellbound", timeoutTicks = 40)
     public static void spellboundImmuneCreaturesShakeOffTheStones(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -257,7 +252,7 @@ public final class ThanosFightTests {
     }
 
     /** A slam of Wanda's tears a plate away, but only once in six seconds. */
-    @GameTest(template = ARENA, batch = "thanos_fight_slam", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_slam", timeoutTicks = 40)
     public static void aTelekineticSlamTearsAPlateOnceInSixSeconds(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = fighter(f, 6, 6, Power.SCARLET_WITCH);
@@ -274,7 +269,7 @@ public final class ThanosFightTests {
     // The entity's keeping
 
     /** He is never saved, never despawns, and one that does not belong to a fight is swept away. */
-    @GameTest(template = ARENA, batch = "thanos_fight_keeping", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_keeping", timeoutTicks = 40)
     public static void aThanosIsNeverSavedAndAnOrphanIsSwept(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -290,7 +285,7 @@ public final class ThanosFightTests {
     }
 
     /** The bar is in the colour of his newest stone, and at five stones it says the Mind Stone remains. */
-    @GameTest(template = ARENA, batch = "thanos_fight_bar", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_bar", timeoutTicks = 80)
     public static void theBarShowsTheNewestStoneAndSaysFive(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = fighter(f, 6, 6);
@@ -335,7 +330,7 @@ public final class ThanosFightTests {
     // The end
 
     /** Every fighter dead for the wipe time: he leaves, nobody is rewarded and the rest is half. */
-    @GameTest(template = ARENA, batch = "thanos_fight_wipe", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_wipe", timeoutTicks = 160)
     public static void aWipeLeavesAHalfRestAndNoReward(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.WIPE_SECONDS, 1);
@@ -359,7 +354,7 @@ public final class ThanosFightTests {
     }
 
     /** Nobody near him for the abandon time: he loses interest and goes, with half the rest and no reward. */
-    @GameTest(template = ARENA, batch = "thanos_fight_abandon", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_abandon", timeoutTicks = 400)
     public static void leavingTheArenaMakesHimLoseInterest(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ABANDON_SECONDS, 10);
@@ -383,7 +378,7 @@ public final class ThanosFightTests {
     }
 
     /** Walled in by blocks with the fighter out of reach, he frees himself to a spot beside him within a few seconds. */
-    @GameTest(template = ARENA, batch = "thanos_fight_stuck", timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_stuck", timeoutTicks = 900)
     public static void theStuckRuleFreesHim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer target = fighter(f, 6, 6);
@@ -413,7 +408,7 @@ public final class ThanosFightTests {
      * Beaten, he rewards one Gauntlet to each fighter who did 3 percent or struck the last blow and not to the one who did
      * less, gives experience, kneels and turns to dust, and the rest begins.
      */
-    @GameTest(template = ARENA, batch = "thanos_fight_defeat", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_defeat", timeoutTicks = 260)
     public static void defeatDeliversTheGauntletsAndStartsTheRest(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.REWARD_MIN_SECONDS, 0);
@@ -467,7 +462,7 @@ public final class ThanosFightTests {
      * Held for the ritual with no power the Gauntlet makes Thanos and is used up; held by a hero it is refused with its
      * message and kept; in Creative it is kept.
      */
-    @GameTest(template = ARENA, batch = "thanos_gauntlet", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_gauntlet", timeoutTicks = 260)
     public static void theGauntletMakesThanosOnlyOfThePowerless(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -514,7 +509,7 @@ public final class ThanosFightTests {
     }
 
     /** No move takes the Mind Stone, and none is a Snap. */
-    @GameTest(template = ARENA, batch = "thanos_fight_nosnap", timeoutTicks = 20)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_nosnap", timeoutTicks = 20)
     public static void noSixthStoneNoSnap(GameTestHelper helper) {
         Set<String> names = new HashSet<>();
         for (ThanosMove move : ThanosMove.values()) {

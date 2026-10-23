@@ -22,6 +22,7 @@ import com.kolodkingal.enhanced.custom.HeroDamage;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -31,7 +32,6 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -48,8 +48,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -74,8 +72,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Tommy's run but not his slow time never slows the world). Batches {@code custom_speed}, {@code custom_speed_slow} (a
  * small slow-motion radius), {@code custom_speed_shield} (the shield never throws back) and {@code custom_speed_surface}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomSpeedTests {
     private static final String BATCH = "custom_speed";
     private static final List<Power> HEROES = List.of(Power.MAGNETO, Power.QUICKSILVER, Power.VISION, Power.TOMMY);
@@ -100,7 +96,7 @@ public final class CustomSpeedTests {
     // ---- the catalogue ----
 
     /** Every row of the four heroes has its name and line (and its Sneak variant's name iff it has one) in both languages. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyRowOfSpeedAndMetalIsNamedInBothLanguages(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
@@ -127,7 +123,7 @@ public final class CustomSpeedTests {
     }
 
     /** For the built-in heroes nothing changes: their own colours, their own slow time, their own walls. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBuiltInSpeedstersAreUnchanged(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(3.5, FLOOR, 3.5, Power.QUICKSILVER);
@@ -152,7 +148,7 @@ public final class CustomSpeedTests {
     // ---- Quicksilver ----
 
     /** The Speed Blitz on N strikes and rests on N; the Pickpocket (Sneak + G of another hero) snatches and rests on G. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void quicksilversBlitzAndPickpocketWorkOnAnyKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer blitzer = CustomKitSupport.hero(f, 3.5, 4.5, CustomKitSupport.def()
@@ -180,7 +176,7 @@ public final class CustomSpeedTests {
     }
 
     /** Super Speed on B runs only while it is on (Live.SPEEDING and the speed); Sneak + B dashes, resting on B, scaled. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void quicksilversSuperSpeedRunsOnlyWhileOnAndDashesOnSneak(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 3.5, 10.5, CustomKitSupport.def()
@@ -217,7 +213,7 @@ public final class CustomSpeedTests {
     }
 
     /** Quicksilver Time on G slows a creature next to him and not one far away; Sneak + G is the Walkman. */
-    @GameTest(template = ARENA, batch = "custom_speed_slow", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "custom_speed_slow", timeoutTicks = 100)
     public static void quicksilverTimeSlowsTheWorldForACustomHero(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
@@ -257,7 +253,7 @@ public final class CustomSpeedTests {
     }
 
     /** The Pebble Barrage on V; and a hero with only that gets none of Quicksilver's upkeep (no run, no slow time). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyThePickedAbilitiesUpkeepRuns(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 3.5, 10.5, CustomKitSupport.def()
@@ -287,7 +283,7 @@ public final class CustomSpeedTests {
     }
 
     /** Twelve hits of the blitz at strength 2 and at strength 9: the stronger hurts more (HeroDamage, SPEED_BLITZ). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSpeedStrikesScaleWithStrength(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         float[] lost = new float[2];
@@ -310,7 +306,7 @@ public final class CustomSpeedTests {
     // ---- Tommy ----
 
     /** Tommy's run starts on and runs at his speed; without his slow time the world never slows; Sneak + R dashes. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void tommysSpeedWithoutHisTimeNeverSlowsTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 3.5, 10.5, CustomKitSupport.def().pick("tommy.speed", 5).key(1, "tommy.speed").build());
@@ -339,7 +335,7 @@ public final class CustomSpeedTests {
     }
 
     /** Tommy's slow time on V slows the world; Sneak + V switches his Wall Run, not the time. */
-    @GameTest(template = ARENA, batch = "custom_speed_slow", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "custom_speed_slow", timeoutTicks = 100)
     public static void tommysSlowTimeOnAnotherKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
@@ -363,7 +359,7 @@ public final class CustomSpeedTests {
     }
 
     /** The Whirlwind on N, the Sonic Boom on Sneak + V, the Vibrate on G, the Disarm Blitz on Sneak + B, the Acceleration on R. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void tommysStrikesWorkOnAnyKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer whirl = CustomKitSupport.hero(f, 3.5, 2.5, CustomKitSupport.def().pick("tommy.whirlwind", 5).key(5, "tommy.whirlwind").build());
@@ -411,7 +407,7 @@ public final class CustomSpeedTests {
     // ---- Vision ----
 
     /** Vision's Phase on R passes through walls and floats him (without Flight); his Density on G stops his Flight. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void visionsPhasePassesWallsAndDensityStopsFlight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer ghost = CustomKitSupport.hero(f, 4.5, 4.5, CustomKitSupport.def().pick("vision.phase", 5).key(1, "vision.phase").build());
@@ -448,7 +444,7 @@ public final class CustomSpeedTests {
     }
 
     /** The Mind Stone beam held on B; the synthetic body only with its row, scaled; the disguise on N. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void visionsBeamBodyAndDisguise(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer beamer = CustomKitSupport.hero(f, 3.5, 4.5, CustomKitSupport.def().pick("vision.mind_beam", 5).key(4, "vision.mind_beam")
@@ -482,7 +478,7 @@ public final class CustomSpeedTests {
     // ---- Magneto ----
 
     /** Sneak + G with nothing held: the Magnetic Pull, resting on G; plain G grips metal; Sneak + G sets it down. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void magnetosPullRestsOnTheCustomKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos ore = new BlockPos(14, 1, 10);
@@ -505,7 +501,7 @@ public final class CustomSpeedTests {
     }
 
     /** The Strip on N, the Shrapnel held on B (it melts his iron), the grip of metal on V. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void magnetosStripShrapnelAndGripOnOtherKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer stripper = CustomKitSupport.hero(f, 3.5, 3.5, CustomKitSupport.def().pick("magneto.disarm", 5).key(5, "magneto.disarm").build());
@@ -539,7 +535,7 @@ public final class CustomSpeedTests {
     }
 
     /** The Magnetic Shield on V catches a metal arrow shot at a custom hero. */
-    @GameTest(template = ARENA, batch = "custom_speed_shield", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_speed_shield", timeoutTicks = 60)
     public static void magnetosShieldCatchesMetalArrows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SHIELD_REFLECT_CHANCE, 0.0);
@@ -568,7 +564,7 @@ public final class CustomSpeedTests {
     }
 
     /** Running on walls comes with Quicksilver's Wall Run (switched by its key) or Tommy's slow time with its variant. */
-    @GameTest(template = ARENA, batch = "custom_speed_surface")
+    @EnhancedTest(template = ARENA, batch = "custom_speed_surface")
     public static void wallRunComesWithItsRows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (int y = 2; y <= 8; y++) {

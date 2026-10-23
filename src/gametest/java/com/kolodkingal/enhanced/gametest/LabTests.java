@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.block.WeaponXPodBlock;
 import com.kolodkingal.enhanced.block.XDoorBlock;
 import com.kolodkingal.enhanced.block.XDoorRoundBlock;
 import com.kolodkingal.enhanced.config.SchoolLabConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -25,7 +26,6 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -55,8 +55,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
@@ -78,8 +76,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * blocks, its shell shutting out water. Batches {@code school_lab} (blocks and entrance in the arena), {@code
  * school_lab_gen} (the builds and the lift, far away, chunks forced) and {@code school_lab_cfg} (a switch turned).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class LabTests {
     static final String BATCH = "school_lab";
     static final String GEN = "school_lab_gen";
@@ -138,7 +134,7 @@ public final class LabTests {
         };
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTemplateHoldsThePlanAndHasNoHoles(GameTestHelper helper) throws Exception {
         LabTemplate t = LabTemplate.get(helper.getLevel());
         check(t.sx == 45 && t.sy == 28 && t.sz == 42, "45 x 28 x 42");
@@ -206,7 +202,7 @@ public final class LabTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void anXDoorOpensForAPlayerNearAndShutsBehindHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos left = new BlockPos(10, 2, 10);
@@ -235,7 +231,7 @@ public final class LabTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theRoundDoorOpensWhole(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -276,7 +272,7 @@ public final class LabTests {
                 abs, false));
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void theShelvesSwingOpenAndCloseWhenNobodyStandsInThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -303,7 +299,7 @@ public final class LabTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRackGivesOneInjectionToEachPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -332,7 +328,7 @@ public final class LabTests {
         return n + (player.getOffhandItem().is(item) ? player.getOffhandItem().getCount() : 0);
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCureStationFillsABottleOncePerCooldown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -357,7 +353,7 @@ public final class LabTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLabsMachinesAreUnbreakableInSurvival(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -377,7 +373,7 @@ public final class LabTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyTheOneWhoStandsInsideThePodIsInIt(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos pod = new BlockPos(10, 2, 10);
@@ -412,7 +408,7 @@ public final class LabTests {
         level.setBlock(site.school(SchoolLabPlan.LECTERN), Blocks.LECTERN.defaultBlockState(), Block.UPDATE_ALL);
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEntranceGoesOnlyOverTheSchoolsOwnBlocks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         LabSite site = arenaSchool(helper);
@@ -439,7 +435,7 @@ public final class LabTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void withOpenToAllOffOnlyTheXMenOpenTheShelves(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SchoolLabConfig.OPEN_TO_ALL, false);
@@ -528,22 +524,22 @@ public final class LabTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 200)
     public static void aLabIsBuiltUnturned(GameTestHelper helper) {
         builtInTurn(helper, 0, Rotation.NONE);
     }
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 200)
     public static void aLabIsBuiltTurnedClockwise(GameTestHelper helper) {
         builtInTurn(helper, 1, Rotation.CLOCKWISE_90);
     }
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 200)
     public static void aLabIsBuiltTurnedRound(GameTestHelper helper) {
         builtInTurn(helper, 2, Rotation.CLOCKWISE_180);
     }
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 200)
     public static void aLabIsBuiltTurnedCounterclockwise(GameTestHelper helper) {
         builtInTurn(helper, 3, Rotation.COUNTERCLOCKWISE_90);
     }
@@ -561,7 +557,7 @@ public final class LabTests {
         return h;
     }
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 400)
     public static void aRealSchoolGetsItsLabWithinTheBudgetAndKeepsItsCellar(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -653,7 +649,7 @@ public final class LabTests {
                 || SchoolLabPlan.LECTERN.equals(schoolPos);
     }
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 300)
     public static void aBuildCutShortResumesToTheSameBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -677,7 +673,7 @@ public final class LabTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 200)
     public static void theShellShutsOutWaterAcrossItsWall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -706,7 +702,7 @@ public final class LabTests {
 
     // ------------------------------------------------------------------------------------------------ the lift
 
-    @GameTest(template = ARENA, batch = GEN, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = GEN, timeoutTicks = 200)
     public static void theLiftCarriesAPlayerDownAndUpButNoMob(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -771,7 +767,7 @@ public final class LabTests {
 
     // ------------------------------------------------------------------------------------------------ the command
 
-    @GameTest(template = ARENA, batch = GEN)
+    @EnhancedTest(template = ARENA, batch = GEN)
     public static void theCommandSaysWhenThereIsNoSchool(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         MinecraftServer server = level.getServer();
@@ -826,7 +822,7 @@ public final class LabTests {
         return "?" + c;
     }
 
-    @GameTest(template = ARENA, batch = GEN)
+    @EnhancedTest(template = ARENA, batch = GEN)
     public static void aPlayerInsideABuiltLabIsToldOfIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

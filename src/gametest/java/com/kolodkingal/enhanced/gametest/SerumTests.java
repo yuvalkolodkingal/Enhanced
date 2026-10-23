@@ -1,23 +1,20 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.network.SerumScreenPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.serum.SerumServer;
 import com.kolodkingal.enhanced.wolverine.Claws;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -33,8 +30,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * serum moved to the other hand is refused; Escape (no answer) keeps it; the operators' command opens the screen
  * without a serum. Batch {@code serum}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SerumTests {
     private static final String BATCH = "serum";
 
@@ -77,7 +72,7 @@ public final class SerumTests {
     }
 
     /** The use sends the screen, Falcon locked; with the wings in the inventory, open. Nothing is used up. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theUseSendsTheScreen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer plain = holder(f, 3.5, 3.5, Power.NONE, InteractionHand.MAIN_HAND);
@@ -98,7 +93,7 @@ public final class SerumTests {
     }
 
     /** No screen open: the answer is refused and nothing changes. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aChoiceWithNoScreenIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 3.5, 3.5, Power.NONE, InteractionHand.MAIN_HAND);
@@ -108,7 +103,7 @@ public final class SerumTests {
     }
 
     /** A Falcon answer without the wings (a forged one: the card was locked) is refused; the serum is kept. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aForgedFalconChoiceIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 3.5, 3.5, Power.NONE, InteractionHand.MAIN_HAND);
@@ -131,7 +126,7 @@ public final class SerumTests {
      * Captain America through {@code Powers.awaken}: a Wolverine with his claws out loses them (the old hero cleared),
      * the serum is used up, a Vibranium Shield is put in the hand it left; in Creative the serum stays.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void captainAmericaThroughTheAwakening(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = holder(f, 3.5, 3.5, Power.WOLVERINE, InteractionHand.MAIN_HAND);
@@ -154,7 +149,7 @@ public final class SerumTests {
     }
 
     /** He is Captain America already: refused, the serum kept. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSameHeroIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = holder(f, 3.5, 3.5, Power.CAPTAIN_AMERICA, InteractionHand.MAIN_HAND);
@@ -165,7 +160,7 @@ public final class SerumTests {
     }
 
     /** The open screen is good for 599 ticks: an answer at 600 is refused. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void theScreenRunsOutAt600Ticks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer early = holder(f, 3.5, 3.5, Power.NONE, InteractionHand.MAIN_HAND);
@@ -187,7 +182,7 @@ public final class SerumTests {
     }
 
     /** The serum moved to the other hand (or another slot chosen) before the answer: refused, kept. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSerumMovedIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 3.5, 3.5, Power.NONE, InteractionHand.MAIN_HAND);
@@ -209,7 +204,7 @@ public final class SerumTests {
     }
 
     /** Escape sends nothing: the serum is kept and nothing changes; the screen opens again on the next use. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void escapeKeepsTheSerum(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = holder(f, 3.5, 3.5, Power.NONE, InteractionHand.MAIN_HAND);
@@ -225,7 +220,7 @@ public final class SerumTests {
     }
 
     /** The operators' command: the screen without a serum, the choice checked as any other, nothing used up. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCommandOpensTheScreen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(3.5, FLOOR, 3.5);

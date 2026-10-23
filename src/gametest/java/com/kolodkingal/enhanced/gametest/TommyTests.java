@@ -1,16 +1,15 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -24,8 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.EAST;
@@ -35,8 +32,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
 import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
 
 /** Tommy Maximoff (Speed). */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class TommyTests {
 
     private static void press(ServerPlayer player, int ability) {
@@ -44,7 +39,7 @@ public final class TommyTests {
         AbilityHandler.onKey(player, ability, false);
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void sprintingIsSuperSpeed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(10.5, FLOOR, 10.5, Power.TOMMY);
@@ -75,7 +70,7 @@ public final class TommyTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void disarmBlitzSnatchesEveryWeaponNearby(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(10.5, FLOOR, 10.5, Power.TOMMY);
@@ -107,7 +102,7 @@ public final class TommyTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, timeoutTicks = 200)
     public static void whirlwindSpinsCreaturesAndFlingsThem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(10.5, FLOOR, 10.5, Power.TOMMY);
@@ -133,7 +128,7 @@ public final class TommyTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void vibratesThroughWallsButNotThickOrUnbreakableOnes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(4.5, FLOOR, 10.5, Power.TOMMY);
@@ -170,7 +165,7 @@ public final class TommyTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void molecularAccelerationShattersBlocksAndHurts(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = f.player(6.5, FLOOR, 10.5, Power.TOMMY);

@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.cottage.CottageProgress;
 import com.kolodkingal.enhanced.cottage.CottageTrades;
 import com.kolodkingal.enhanced.cottage.Cottages;
 import com.kolodkingal.enhanced.cottage.Scratchy;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -29,7 +30,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -63,8 +63,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -92,8 +90,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Batches {@code cottage}, {@code cottage_keeper} and {@code cottage_one_each} (a player who is Agatha is seen
  * server-wide). The keeper's cottages here are fake records drawn small inside the arena ({@link #cottage}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CottageTests {
     static final String BATCH = "cottage";
     static final String KEEPER = "cottage_keeper";
@@ -239,7 +235,7 @@ public final class CottageTests {
 
     // ---- the template ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTemplateHoldsEveryPointAndChest(GameTestHelper helper) throws IOException {
         MinecraftServer server = helper.getLevel().getServer();
         ResourceLocation file = Enhanced.id("structure/" + CottagePlan.TEMPLATE.getPath() + ".nbt");
@@ -282,7 +278,7 @@ public final class CottageTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = KEEPER, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = KEEPER, timeoutTicks = 200)
     public static void aRealCottageMapsItsPointsInEveryTurn(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = helper.absolutePos(BlockPos.ZERO).atY(220);
@@ -337,7 +333,7 @@ public final class CottageTests {
      * Agatha's study chest (Eilon's wish): the Darkhold and 3 to 5 enchanted books from a good pool at levels 2 to 4.
      * The Darkhold has no one-per-world rule (it is crafted, and every Agatha is given one), so every chest holds it.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void agathasStudyChestHoldsTheDarkholdAndGoodBooks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         MinecraftServer server = level.getServer();
@@ -380,7 +376,7 @@ public final class CottageTests {
 
     // ---- the keeper ----
 
-    @GameTest(template = ARENA, batch = KEEPER, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = KEEPER, timeoutTicks = 120)
     public static void theKeeperMakesOneOfEachOnceAndAgainAfterAKill(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Cottages.Cottage cottage = cottage(fx);
@@ -417,7 +413,7 @@ public final class CottageTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void residentsNeverDieToAPlayer(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
@@ -434,7 +430,7 @@ public final class CottageTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = KEEPER, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = KEEPER, timeoutTicks = 120)
     public static void theirDayPutsEachInTheRightPlace(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Cottages.Cottage cottage = cottage(fx);
@@ -492,7 +488,7 @@ public final class CottageTests {
 
     // ---- one of each: a player who is Agatha ----
 
-    @GameTest(template = ARENA, batch = ONE_EACH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = ONE_EACH, timeoutTicks = 120)
     public static void aPlayerWhoIsAgathaSendsHerAwayAndNickyCallsHerMom(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Cottages.Cottage cottage = cottage(fx);
@@ -557,7 +553,7 @@ public final class CottageTests {
 
     // ---- talk, trades, gifts ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyLineAndAnswerIsInEnglishAndHebrew(GameTestHelper helper) throws IOException {
         CottageDialogue.register();
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
@@ -599,7 +595,7 @@ public final class CottageTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void agathaAndRioTradeKindThings(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         MerchantOffers agatha = AsgardTrades.offers(Role.AGATHA);
@@ -624,7 +620,7 @@ public final class CottageTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void nickyGivesAGiftAndRioABlessingOnceADay(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         CottageDialogue.register();
@@ -669,7 +665,7 @@ public final class CottageTests {
 
     // ---- Señor Scratchy ----
 
-    @GameTest(template = ARENA, batch = KEEPER, timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = KEEPER, timeoutTicks = 160)
     public static void scratchyRunsOffAndTheQuestBringsHimHomeOnce(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Cottages.Cottage cottage = cottage(fx);
@@ -732,7 +728,7 @@ public final class CottageTests {
 
     // ---- the cellar's Road door ----
 
-    @GameTest(template = ARENA, batch = KEEPER, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = KEEPER, timeoutTicks = 120)
     public static void theCellarDoorJoinsTheRoadAndWandaWalksIt(GameTestHelper helper) {
         TestKit.Fixture fx = TestKit.fixture(helper);
         Cottages.Cottage cottage = cottage(fx);

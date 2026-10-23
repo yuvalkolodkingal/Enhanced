@@ -1,10 +1,9 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -13,8 +12,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.UUID;
 
@@ -28,8 +25,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Telekinesis and the players it holds (3.1, D-M 3.8), for every form: a player let go of is not gripped again by the same
  * hero at once, and a friend let go of is spared his landing, until another grip takes him.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class TelekinesisFriendTests {
 
     /** Presses the key of an ability, with Sneak held or not. */
@@ -45,7 +40,7 @@ public final class TelekinesisFriendTests {
      * {@code telekinesis.player_regrip}, while Wanda's V takes the player at once (the wait is the holder's own); 60 ticks
      * ({@code magneto.telekinesisPlayerRegripTicks}) after his grip ended, his R holds the player again.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_regrip", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_regrip", timeoutTicks = 100)
     public static void aPlayerIsNotGrippedAgainAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -95,7 +90,7 @@ public final class TelekinesisFriendTests {
      * while he is in the air; once he has landed (3 ticks later) it hurts again. Wanda's let-go spares him too (every form).
      * With PvP on, a let-go spares nobody.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_friends", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_friends", timeoutTicks = 40)
     public static void friendsAreSetDownSafely(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -152,7 +147,7 @@ public final class TelekinesisFriendTests {
      * off) up in the air: he is spared his landing. Billy, on no team, takes hold of him before he lands: the guard was
      * hers, not his grip's, and goes; let go by Billy, who may hurt him, he is spared nothing, and a fall hurts him.
      */
-    @GameTest(template = ARENA, batch = "telekinesis_spared_enemy", timeoutTicks = 20)
+    @EnhancedTest(template = ARENA, batch = "telekinesis_spared_enemy", timeoutTicks = 20)
     public static void aFriendsGuardIsNotAnEnemysGrip(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);

@@ -26,6 +26,7 @@ import com.kolodkingal.enhanced.network.BifrostActionPayload;
 import com.kolodkingal.enhanced.network.HeimdallSightPayload;
 import com.kolodkingal.enhanced.network.ModNetwork;
 import com.kolodkingal.enhanced.network.ThorFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -42,7 +43,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.codec.StreamCodec;
@@ -65,8 +65,6 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -88,15 +86,13 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * refused, the keys of the Bifrost and its journeys: to Asgard (the Observatory), and with everyone inside its circle.
  * Batch {@code asgard_skel}; a test that changes the config has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AsgardSkeletonTests {
     static final String BATCH = "asgard_skel";
     static final List<Power> GODS = List.of(Power.HEIMDALL, Power.ODIN, Power.HELA);
 
     // ---- the powers, the rows, the bits ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGodsOfAsgardComeAfterCustomInOrder(GameTestHelper helper) throws IOException {
         Power[] all = Power.values();
         check(all[Power.CUSTOM.ordinal() + 1] == Power.HEIMDALL && all[Power.CUSTOM.ordinal() + 2] == Power.ODIN
@@ -130,7 +126,7 @@ public final class AsgardSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolMovedOnFromNine(GameTestHelper helper) {
         // (3.6 bumps the protocol to 10 and appends its own states: StoneSkeletonTests counts them exactly.)
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 9, "protocol 9 or later");
@@ -146,7 +142,7 @@ public final class AsgardSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsOfAsgardAreEighteenInTheirRegions(GameTestHelper helper) {
         check(HeroAbility.values().length >= 133, "81 + 18 rows, and the creator lane's 34 (3.5; 3.6 appends): "
                 + HeroAbility.values().length);
@@ -181,7 +177,7 @@ public final class AsgardSkeletonTests {
         return data;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePayloadsOfAsgardRoundTrip(GameTestHelper helper) {
         roundTrip(AsgardTalkPayload.Open.STREAM_CODEC, new AsgardTalkPayload.Open(7, 2, "npc.enhanced.frigga.greeting", List.of("Eilon"),
                 List.of("bye", "hela")), "the talk opening");
@@ -213,7 +209,7 @@ public final class AsgardSkeletonTests {
 
     // ---- the realm ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void asgardIsADimensionWithItsGeneratorAndTheLandingPlatform(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         ServerLevel asgard = AsgardTestSupport.withArrival(server);
@@ -237,7 +233,7 @@ public final class AsgardSkeletonTests {
 
     // ---- the gate ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGateLetsOnlyTheBifrostAndOperatorsThrough(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -265,7 +261,7 @@ public final class AsgardSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theVishantiCannotReachAsgard(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerPlayer loki = f.player(5.5, FLOOR, 5.5, Power.LOKI);
@@ -281,7 +277,7 @@ public final class AsgardSkeletonTests {
 
     // ---- the Bifrost ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theKeysOfTheBifrost(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer plain = f.player(2.5, FLOOR, 2.5);
@@ -312,7 +308,7 @@ public final class AsgardSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theBifrostToAsgardLandsAtTheObservatoryWithTheCircle(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerLevel asgard = AsgardTestSupport.withArrival(helper.getLevel().getServer());
@@ -348,7 +344,7 @@ public final class AsgardSkeletonTests {
     }
 
     /** A same-world journey to a saved place: who is in the circle goes, who is not stays; a boss never goes. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theBifrostTakesItsCircleAndNobodyElse(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer traveller = f.player(5.5, FLOOR, 5.5);
@@ -391,7 +387,7 @@ public final class AsgardSkeletonTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "asgard_skel_sneak", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "asgard_skel_sneak", timeoutTicks = 200)
     public static void sneakToStayKeepsASneakingPlayerBehind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(BifrostConfig.SNEAK_TO_STAY, true);
@@ -415,7 +411,7 @@ public final class AsgardSkeletonTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "asgard_skel_closed")
+    @EnhancedTest(template = ARENA, batch = "asgard_skel_closed")
     public static void asgardSwitchedOffClosesTheWayIn(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         f.config(AsgardConfig.ENABLED, false);
@@ -430,7 +426,7 @@ public final class AsgardSkeletonTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aLandingIsNeverInsideABlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();

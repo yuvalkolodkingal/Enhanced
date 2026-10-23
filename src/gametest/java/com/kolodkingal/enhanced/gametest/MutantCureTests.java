@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.config.CureConfig;
 import com.kolodkingal.enhanced.item.MutantCureItem;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -12,7 +13,6 @@ import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,8 +26,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -42,8 +40,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * only for an operator or with PvP on and within reach, it can be switched off, and its recipe. The switched-off test has
  * a batch of its own (it changes a setting).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MutantCureTests {
     private static final String BATCH = "mutant_cure";
     private static final String BATCH_OFF = "mutant_cure_off";
@@ -67,7 +63,7 @@ public final class MutantCureTests {
         return TestKit.heardSounds(player).stream().anyMatch(s -> s.id().equals(sound));
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theCureTakesEveryHerosPowerAndLeavesNothingBehind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // What a player who never had a power has: the baseline every cured hero must come back to.
@@ -112,7 +108,7 @@ public final class MutantCureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCureSaysSoAndIsKeptWhenItCannotCure(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer nobody = f.player(4.5, FLOOR, 4.5);
@@ -152,7 +148,7 @@ public final class MutantCureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void anotherPlayerOnlyByAnOperatorOrWithPvpAndWithinReach(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer doctor = f.player(5.5, FLOOR, 5.5);
@@ -204,7 +200,7 @@ public final class MutantCureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theCureIsCraftedFromAnEchoShard(GameTestHelper helper) {
         RecipeHolder<?> holder = helper.getLevel().getRecipeManager().byKey(Enhanced.id("mutant_cure")).orElse(null);
         check(holder != null && holder.value() instanceof CraftingRecipe, "the recipe exists: " + holder);
@@ -219,7 +215,7 @@ public final class MutantCureTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH_OFF)
+    @EnhancedTest(template = ARENA, batch = BATCH_OFF)
     public static void aServerCanSwitchTheCureOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(CureConfig.ENABLED, false);

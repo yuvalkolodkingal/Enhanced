@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.falcon.Redwing;
 import com.kolodkingal.enhanced.falcon.RedwingEntity;
 import com.kolodkingal.enhanced.ironman.IronMissileEntity;
 import com.kolodkingal.enhanced.network.FalconFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -26,7 +27,6 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -49,8 +49,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.Set;
@@ -75,8 +73,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Redwing refused, the wrist weapons not; and the pure tables of his animation. Batches: {@code falcon}, {@code
  * falcon_flight} (the sky opened over the arena: the dive and the climb).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class FalconTests {
     private static final String BATCH = "falcon";
     private static final String BATCH_FLIGHT = "falcon_flight";
@@ -197,7 +193,7 @@ public final class FalconTests {
     // The wings, the flight and the body
 
     /** He flies only with the wings on his chest, and not with broken ones; G says so without them. */
-    @GameTest(template = ARENA, batch = BATCH_FLIGHT)
+    @EnhancedTest(template = ARENA, batch = BATCH_FLIGHT)
     public static void heFliesOnlyWithTheWingsOnHisChest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 5.5, FLOOR, 5.5, false);
@@ -225,7 +221,7 @@ public final class FalconTests {
     }
 
     /** The wings are an elytra for Falcon, folded wings for a powerless wearer; the glide is FALCON_GLIDING. */
-    @GameTest(template = ARENA, batch = BATCH_FLIGHT)
+    @EnhancedTest(template = ARENA, batch = BATCH_FLIGHT)
     public static void theWingsAreAnElytraOnlyForFalcon(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 5.5, FLOOR + 6.0, 5.5, true);
@@ -247,7 +243,7 @@ public final class FalconTests {
     }
 
     /** His body: +4 health and +10 % speed; with the wings a fall and a wall do nothing; without them a fall hurts. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisBodyAndTheWingsSaveHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 5.5, FLOOR, 5.5, true);
@@ -267,7 +263,7 @@ public final class FalconTests {
     // R: the Wrist Blasters and the Wrist Rocket
 
     /** A press fires a pair of darts, the right 3 ticks after the left, 4 each; a new pair waits its gap. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDartsHitForFourEach(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 3.5, FLOOR, 10.5, true);
@@ -285,7 +281,7 @@ public final class FalconTests {
     }
 
     /** Sneak + R: one rocket, 8 and a small boom that breaks no block and spares him; R waits 80. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRocketHitsForEightAndBreaksNoBlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 3.5, FLOOR, 10.5, true);
@@ -309,7 +305,7 @@ public final class FalconTests {
     // V: the Dive and the Boost Climb
 
     /** On the ground the Dive is refused (and waits nothing); from 10 up it hits a husk for 10, the splash 3. */
-    @GameTest(template = ARENA, batch = BATCH_FLIGHT, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH_FLIGHT, timeoutTicks = 200)
     public static void theDiveGoesOnlyFromTheAirAndHitsForTen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -342,7 +338,7 @@ public final class FalconTests {
     }
 
     /** Sneak + V: the Boost Climb takes him 24 ± 1 up from the ground, and he hovers there. */
-    @GameTest(template = ARENA, batch = BATCH_FLIGHT, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH_FLIGHT, timeoutTicks = 200)
     public static void theBoostClimbRisesTwentyFour(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         openTheSky(helper, f);
@@ -362,7 +358,7 @@ public final class FalconTests {
     // B: the Wing Shield and the Wing Slash
 
     /** An arrow at the front of the Wing Shield bounces back, his now; he is not hurt. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWingShieldBouncesAnArrow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 4.5, FLOOR, 10.5, true);
@@ -387,7 +383,7 @@ public final class FalconTests {
     }
 
     /** Behind the Wing Shield a blow from the front loses 70 %; one from behind does not; it ends at 100 ticks. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theWingShieldCutsABlowFromTheFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 10.5, FLOOR, 10.5, true);
@@ -409,7 +405,7 @@ public final class FalconTests {
     }
 
     /** Sneak + B: the Wing Slash, 7 to every husk within 3, nothing to one at 5. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWingSlashHitsEveryoneRoundHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 10.5, FLOOR, 10.5, true);
@@ -429,7 +425,7 @@ public final class FalconTests {
     // N: Redwing and Redwing Strike
 
     /** Redwing marks the monsters within 32 and zaps the nearest marked one for 2 every 20 ticks; N takes it home. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void redwingMarksAndZaps(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 3.5, FLOOR, 3.5, true);
@@ -453,7 +449,7 @@ public final class FalconTests {
     }
 
     /** Shot down, Redwing drops into the pack and needs 600 ticks of repairs; N is refused till then. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void redwingShotDownNeedsRepairs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 3.5, FLOOR, 3.5, true);
@@ -475,7 +471,7 @@ public final class FalconTests {
     }
 
     /** Sneak + N: Redwing (launched first) rams the husk he looks at, 8 and Slowness II; N waits 200. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void redwingStrikeRams(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 3.5, FLOOR, 10.5, true);
@@ -496,7 +492,7 @@ public final class FalconTests {
     // Without the wings
 
     /** Without the wings every wing move and Redwing say "Put on your Exo-Wings!"; the wrist weapons still fire. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void withoutTheWingsOnlyTheWristsWork(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer sam = falcon(f, 3.5, FLOOR, 10.5, false);
@@ -529,7 +525,7 @@ public final class FalconTests {
     // A custom hero and the preset
 
     /** A custom hero with his Wing Shield on R and the blasters on G needs no item (the rows bring the wings). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomHeroHasHisWingsWithoutTheItem(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         com.kolodkingal.enhanced.custom.CustomHero def = CustomKitSupport.def()
@@ -552,7 +548,7 @@ public final class FalconTests {
     }
 
     /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
         java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
                 .findResource("assets", Enhanced.MODID, "hero_presets", "falcon.json");
@@ -573,7 +569,7 @@ public final class FalconTests {
     // His animation (pure tables)
 
     /** His gestures have keys, his moves' effects start them, the stances hand over, his rows act his moves. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisAnimationTablesAreWhole(GameTestHelper helper) {
         for (GestureId id : GestureId.values()) {
             if (id.name().startsWith("FALCON_")) {

@@ -12,12 +12,12 @@ import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.love.EyeLaser;
 import com.kolodkingal.enhanced.love.LoveAbilities;
 import com.kolodkingal.enhanced.love.ThunderStrike;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -29,8 +29,6 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,8 +46,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Thor's; the Eye Laser's 6 to a zombie once per 20 ticks, setting it burning, then its rest; flight only while she
  * holds the axe. Batch {@code love}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class LoveTests {
     private static final String BATCH = "love";
 
@@ -72,7 +68,7 @@ public final class LoveTests {
         return zombie;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herBodyIsThorsDaughters(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer love = love(f, 4.5, 4.5);
@@ -86,7 +82,7 @@ public final class LoveTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theAxeFliesOnlyWithStormbreakerAndComesHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer love = love(f, 3.5, 10.5);
@@ -107,7 +103,7 @@ public final class LoveTests {
                 && data.hammerEntityId() == -1);
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theThunderStrikeHitsEightWithinTwo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer love = love(f, 3.5, 10.5);
@@ -123,7 +119,7 @@ public final class LoveTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herLightningIsThors(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer love = love(f, 3.5, 10.5);
@@ -143,7 +139,7 @@ public final class LoveTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theEyeLaserBurnsSixOncePerSecond(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer love = love(f, 3.5, 10.5);
@@ -179,7 +175,7 @@ public final class LoveTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void sheFliesOnlyWithTheAxe(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer love = love(f, 4.5, 4.5);
@@ -195,7 +191,7 @@ public final class LoveTests {
     }
 
     /** Her five rows and two Sneak variants are hers. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herRowsWork(GameTestHelper helper) {
         List<HeroAbility> rows = List.of(HeroAbility.LOVE_AXE, HeroAbility.LOVE_LIGHTNING, HeroAbility.LOVE_EYE_LASER,
                 HeroAbility.LOVE_BIFROST, HeroAbility.LOVE_BODY);
@@ -208,7 +204,7 @@ public final class LoveTests {
     }
 
     /** Her preset (for the integrator's {@code HeroPresets.HEROES}) passes the rules at 60 points, with no note. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herPresetFitsSixtyPoints(GameTestHelper helper) throws IOException {
         Path file = ModList.get().getModFileById(Enhanced.MODID).getFile()
                 .findResource("assets", Enhanced.MODID, "hero_presets", "love.json");

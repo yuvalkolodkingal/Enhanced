@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.OpenRoadPayload;
 import com.kolodkingal.enhanced.network.RoadChoicePayload;
 import com.kolodkingal.enhanced.platform.net.PacketContext;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -33,7 +34,6 @@ import com.kolodkingal.enhanced.road.copy.StructureSupply;
 import com.kolodkingal.enhanced.vishanti.VishantiBook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -52,8 +52,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -72,8 +70,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * entered by gone, a second player, a crafted answer). The players of the tests are brought to the hall with the trials counted as won
  * ({@link #finisher}); {@link #theWholeRoadEndsInTheHall} walks the gates of a Road of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadEndingTests {
     static final String BATCH = "road_ending";
     private static final int FAREWELL = 100;
@@ -200,7 +196,7 @@ public final class RoadEndingTests {
     // ------------------------------------------------------------------------------------------------------------
     // The choice
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void roadEndingBillyIsAwakenedAndSentHome(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -275,7 +271,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void roadEndingTommyIsAwakenedAndSentHome(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -309,7 +305,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_ending_instant", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_ending_instant", timeoutTicks = 500)
     public static void roadEndingWithNoFarewellSendsHimAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.ENDING_FAREWELL_SECONDS, 0);
@@ -338,7 +334,7 @@ public final class RoadEndingTests {
     // ------------------------------------------------------------------------------------------------------------
     // The screen closed, the way out without choosing
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void closingTheScreenKeepsTheChoiceAndTheGene(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -375,7 +371,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void leavingTheRoadWithoutChoosingKeepsTheGeneAndTheDoorOffersTheChoice(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -408,7 +404,7 @@ public final class RoadEndingTests {
     // ------------------------------------------------------------------------------------------------------------
     // Logout, crash, death
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void aLogoutOnTheChoiceScreenResumesAtTheChoice(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -443,7 +439,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void aLogoutInTheFarewellSendsHimHomeAsHeroWhenHeComesBack(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -473,7 +469,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void deathAtTheFinishPutsHimBackInTheHallAndTheChoiceStands(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -512,7 +508,7 @@ public final class RoadEndingTests {
     // ------------------------------------------------------------------------------------------------------------
     // Where he comes out
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void ifThePlaceHeEnteredByIsGoneHeComesOutAtTheDoorHeOpened(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -547,7 +543,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void ifTheDoorIsGoneTooOrTheWorldHeCameFromIsNotLoadedHeComesOutAtTheWorldsSpawn(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -594,7 +590,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void heComesOutInTheOtherDimensionHeCameFrom(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -638,7 +634,7 @@ public final class RoadEndingTests {
     // ------------------------------------------------------------------------------------------------------------
     // Exactly once, a second player, a crafted answer
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void theGeneIsUsedUpExactlyOnceAndThereIsNoSecondEnding(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -672,7 +668,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 800)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 800)
     public static void twoPlayersAtTheEndEachHaveTheirOwnHallAndTheirOwnChoice(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -711,7 +707,7 @@ public final class RoadEndingTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void aCraftedAnswerCannotChooseAnywhereButAtTheEnd(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -766,7 +762,7 @@ public final class RoadEndingTests {
     // ------------------------------------------------------------------------------------------------------------
     // No leaving early
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void noBookNoBifrostNoPearlTakesHimOutOfTheHallBeforeTheFarewellEnds(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -797,7 +793,7 @@ public final class RoadEndingTests {
     // ------------------------------------------------------------------------------------------------------------
     // The operators
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void theOperatorCommandsStillWorkAtTheEnd(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -843,7 +839,7 @@ public final class RoadEndingTests {
     // The whole Road
 
     /** A Road of two small trials (its own batch: the registry is swapped): the gates lead to the hall, and the hall to the world. */
-    @GameTest(template = ARENA, batch = "road_ending_swap", timeoutTicks = 1200)
+    @EnhancedTest(template = ARENA, batch = "road_ending_swap", timeoutTicks = 1200)
     public static void theWholeRoadEndsInTheHall(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -907,7 +903,7 @@ public final class RoadEndingTests {
     }
 
     /** The structure trial puts his things aside (a Road of its own too, so a batch of its own); the way on, and the end, give every one of them back. */
-    @GameTest(template = ARENA, batch = "road_ending_stash", timeoutTicks = 1200)
+    @EnhancedTest(template = ARENA, batch = "road_ending_stash", timeoutTicks = 1200)
     public static void hisThingsComeBackFromTheStructureTrialAndSurviveTheEnd(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -973,7 +969,7 @@ public final class RoadEndingTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everythingTheEndingSaysIsSaidInEnglishAndHebrew(GameTestHelper helper) throws IOException {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");
@@ -1009,7 +1005,7 @@ public final class RoadEndingTests {
         return n;
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEndingsOptionHasItsDefaultAndTheScreenMessageTravelsIntact(GameTestHelper helper) {
         check(WitchesRoadConfig.ENDING_FAREWELL_SECONDS.get() == 5, "the farewell lasts 5 seconds");
         OpenRoadPayload open = new OpenRoadPayload(new BlockPos(3, 96, -7), false, 3, 3, true);
@@ -1022,7 +1018,7 @@ public final class RoadEndingTests {
     }
 
     /** The door with the trials on, held by a player who is not at the end. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 300)
     public static void theExitDoorOfATrialStillLeavesOnTheSecondClick(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerPlayer player = RoadTestSupport.walker(f, 10.5, 10.5);

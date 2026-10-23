@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
 import com.kolodkingal.enhanced.block.MjolnirBlockEntity;
@@ -25,6 +24,7 @@ import com.kolodkingal.enhanced.gametest.BuildTestSupport.Seen;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildPocketPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -34,7 +34,6 @@ import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -80,8 +79,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,8 +111,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Build Magic's spells as a hero casts them (D-B 19.2, spec 18.4 B14-B40 and B86): each through the payload's entry,
  * stepped by the test. Every test has a batch of its own (the jobs, histories and sessions are server-wide).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildSpellTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -128,7 +123,7 @@ public final class BuildSpellTests {
      * power are ignored and told nothing; a Scarlet Witch in Adventure is told {@code adventure}; turning it off lets
      * go of the box the others saw.
      */
-    @GameTest(template = ARENA, batch = "build_magic_mode")
+    @EnhancedTest(template = ARENA, batch = "build_magic_mode")
     public static void buildModeIsForWandaAndBillyOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = f.player(2.5, FLOOR, 2.5, Power.SCARLET_WITCH);
@@ -166,7 +161,7 @@ public final class BuildSpellTests {
      * and seals its step (the waiting one is dropped at a change of power); a change of dimension keeps build mode on,
      * lets go of the box, and the spell goes on in its own dimension.
      */
-    @GameTest(template = ARENA, batch = "build_magic_life", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_magic_life", timeoutTicks = 200)
     public static void buildModeEndsOnDeathRespawnAndPowerChangeButTheSpellGoesOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         MinecraftServer server = f.level().getServer();
@@ -241,7 +236,7 @@ public final class BuildSpellTests {
     /**
      * In build mode the Scarlet Witch still takes to the air with ability 2, and Billy still Hex-Bolts a zombie with 1.
      */
-    @GameTest(template = ARENA, batch = "build_magic_keys")
+    @EnhancedTest(template = ARENA, batch = "build_magic_keys")
     public static void abilityKeysStillWorkInBuildMode(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 2.5, 2.5, null);
@@ -268,7 +263,7 @@ public final class BuildSpellTests {
      * Billy fills a 3 x 3 x 3 box of 9 stone and 18 air with stone: 27 stone, 18 changed, his meter down by exactly 18;
      * the same fill again changes nothing ({@code NOTHING_CHANGES}) and costs nothing.
      */
-    @GameTest(template = ARENA, batch = "build_magic_fill")
+    @EnhancedTest(template = ARENA, batch = "build_magic_fill")
     public static void fillChangesOnlyWhatDiffers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = f.level().getServer().overworld().getGameTime();
@@ -301,7 +296,7 @@ public final class BuildSpellTests {
      * Room over a 5 x 4 x 5 box with stone inside: the shell is planks (82) and the 18 cells inside are air; Only the
      * empty over a floor with scattered stone keeps the stone and fills the air with planks.
      */
-    @GameTest(template = ARENA, batch = "build_magic_room")
+    @EnhancedTest(template = ARENA, batch = "build_magic_room")
     public static void roomEmptiesTheInsideAndOnlyTheEmptyKeepsWhatIsThere(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.OAK_PLANKS);
@@ -331,7 +326,7 @@ public final class BuildSpellTests {
      * Everything empties the box; Hollow out on a 5 x 5 x 5 stone cube keeps exactly its 98 outer cells; Plants and
      * trees takes logs, leaves and a flower and keeps the stone; This kind aimed at dirt leaves all the stone.
      */
-    @GameTest(template = ARENA, batch = "build_magic_vanish")
+    @EnhancedTest(template = ARENA, batch = "build_magic_vanish")
     public static void vanishStyles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -382,7 +377,7 @@ public final class BuildSpellTests {
     // B20
 
     /** A waterlogged slab vanishes into a water source; a slab filled into a water source is waterlogged. */
-    @GameTest(template = ARENA, batch = "build_magic_water")
+    @EnhancedTest(template = ARENA, batch = "build_magic_water")
     public static void aWaterloggedBlockLeavesItsWater(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -421,7 +416,7 @@ public final class BuildSpellTests {
      * slab (top) a spruce slab (top), the stone beside them untouched; Only the outside on a 3 x 3 x 3 stone cube
      * changes its 26 outer cells, the centre still stone.
      */
-    @GameTest(template = ARENA, batch = "build_magic_change")
+    @EnhancedTest(template = ARENA, batch = "build_magic_change")
     public static void changeKeepsShapesAndOnlyTheOutsideRepaintsTheSkin(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -462,7 +457,7 @@ public final class BuildSpellTests {
      * and nothing sealed until the stroke ends; STROKE_END seals one step, which one undo puts back whole. A stroke
      * left without its release is sealed 40 ticks after its last dab.
      */
-    @GameTest(template = ARENA, batch = "build_magic_paint", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_magic_paint", timeoutTicks = 200)
     public static void aPaintStrokeIsOneUndoStep(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -517,7 +512,7 @@ public final class BuildSpellTests {
     // B23
 
     /** A 3 x 3 stone wall: Pull +2 east adds 18 stone; undo; Push -1 takes the wall's 9. */
-    @GameTest(template = ARENA, batch = "build_magic_pull")
+    @EnhancedTest(template = ARENA, batch = "build_magic_pull")
     public static void pullGrowsAFaceAndPushTakesItIn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, null);
@@ -543,7 +538,7 @@ public final class BuildSpellTests {
      * under it untouched, written in order of distance from its base centre (the first tenth all nearer than the last
      * tenth); a planted Tower of radius 2 whose look set its height to 6 has 6 layers.
      */
-    @GameTest(template = ARENA, batch = "build_magic_shapes", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_magic_shapes", timeoutTicks = 200)
     public static void aShapeSitsOnTheSurfaceAndGrowsFromItsHeart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -596,7 +591,7 @@ public final class BuildSpellTests {
      * round the base and face east; stamped flipped along x, mirrored; two stamps make two copies and leave the pocket
      * as it was.
      */
-    @GameTest(template = ARENA, batch = "build_magic_copy")
+    @EnhancedTest(template = ARENA, batch = "build_magic_copy")
     public static void copyStampTurnAndFlip(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -692,7 +687,7 @@ public final class BuildSpellTests {
      * A box copy of a hollow 3 x 3 x 3 stone room stamped into a dirt mound carves its inside; a magic-selected log
      * with four leaves stamped into a dirt cube changes only those 5 cells.
      */
-    @GameTest(template = ARENA, batch = "build_magic_copy_air")
+    @EnhancedTest(template = ARENA, batch = "build_magic_copy_air")
     public static void aBoxCopyBringsItsAirAMaskCopyOnlyTheThing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -749,7 +744,7 @@ public final class BuildSpellTests {
      * there holds the 5 diamonds, the pig and the frame are 5 east, no item lies about, and there are exactly 5
      * diamonds; one undo puts back both ends and the frame.
      */
-    @GameTest(template = ARENA, batch = "build_magic_move_carry")
+    @EnhancedTest(template = ARENA, batch = "build_magic_move_carry")
     public static void moveCarriesBlocksContentsCreaturesAndFrames(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -806,7 +801,7 @@ public final class BuildSpellTests {
      * A row of 9 stone moved 10 east while a claim refuses the target cells from the sixth on: every refused cell's
      * source keeps its block, every allowed one moved, and there are 9 stone in all.
      */
-    @GameTest(template = ARENA, batch = "build_magic_move_claim")
+    @EnhancedTest(template = ARENA, batch = "build_magic_move_claim")
     public static void aMoveNeverLosesWhatItCouldNotPlace(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -846,7 +841,7 @@ public final class BuildSpellTests {
      * a quarter where it stands comes out exactly turned; turned again with someone standing on one of its corners (who
      * may not be buried), the corners stay as they were and the rest turns, every block in one place, once.
      */
-    @GameTest(template = ARENA, batch = "build_magic_move_overlap")
+    @EnhancedTest(template = ARENA, batch = "build_magic_move_overlap")
     public static void aMoveThatOverlapsItselfIsExact(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -918,7 +913,7 @@ public final class BuildSpellTests {
     // B30
 
     /** A 1 x 2 x 1 pillar repeated 3 times east with a gap of 1: pillars at +2, +4, +6; one step; undo takes all 6. */
-    @GameTest(template = ARENA, batch = "build_magic_repeat")
+    @EnhancedTest(template = ARENA, batch = "build_magic_repeat")
     public static void repeatPlacesARowWithGaps(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 20.5, null);
@@ -947,7 +942,7 @@ public final class BuildSpellTests {
      * change of hotbar slot Fill uses the hand again; a pick of bedrock, and a spawner from the palette, are {@code
      * BAD_BLOCK}; the hotbar's mix builds the very blocks its seed picks (D-B 5.3).
      */
-    @GameTest(template = ARENA, batch = "build_magic_pick")
+    @EnhancedTest(template = ARENA, batch = "build_magic_pick")
     public static void aPickTakesTheExactStateAndTheHandComesBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1010,7 +1005,7 @@ public final class BuildSpellTests {
     // B32
 
     /** A water bucket fills water sources; the Scarlet Witch's lava bucket fills lava; Billy's is {@code VOLATILE}. */
-    @GameTest(template = ARENA, batch = "build_magic_fluids")
+    @EnhancedTest(template = ARENA, batch = "build_magic_fluids")
     public static void fluids(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1046,7 +1041,7 @@ public final class BuildSpellTests {
      * brings them back whole; an oak door is no Fill material ({@code TWO_BLOCK}); a copy holding only a door's lower
      * half stamps no door.
      */
-    @GameTest(template = ARENA, batch = "build_magic_doors")
+    @EnhancedTest(template = ARENA, batch = "build_magic_doors")
     public static void doorsAndBedsAreNeverCutInHalf(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1095,7 +1090,7 @@ public final class BuildSpellTests {
      * A row of 5 oak fences filled in one spell: the middle one joins east and west. Vanishing a wall whose outside
      * face holds a wall torch takes the torch with no item dropped; undo puts back the wall and the torch.
      */
-    @GameTest(template = ARENA, batch = "build_magic_settle")
+    @EnhancedTest(template = ARENA, batch = "build_magic_settle")
     public static void theSettleStepJoinsFencesAndTorchesComeBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1128,7 +1123,7 @@ public final class BuildSpellTests {
      * A 3 x 1 x 3 sand fill two blocks over the floor: 40 ticks later no sand has fallen; air set beside one with
      * {@code setBlockAndUpdate} makes it fall within 10 ticks (it is ordinary sand).
      */
-    @GameTest(template = ARENA, batch = "build_magic_sand", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "build_magic_sand", timeoutTicks = 100)
     public static void floatingSandStaysWhereMagicPutIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1157,7 +1152,7 @@ public final class BuildSpellTests {
     /**
      * A cow in a 3-high fill stands on top of it, alive and unhurt; a Scarlet Witch inside her own fill stands on it.
      */
-    @GameTest(template = ARENA, batch = "build_magic_lift")
+    @EnhancedTest(template = ARENA, batch = "build_magic_lift")
     public static void creaturesAreLiftedOutOfNewBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 15.5, 15.5, Blocks.STONE);
@@ -1181,7 +1176,7 @@ public final class BuildSpellTests {
      * A chest with 3 diamonds and an empty chest in a box: Fill, Vanish and Change each leave the full one with its 3
      * diamonds and replace the empty one; the message counts 1; no item lies about.
      */
-    @GameTest(template = ARENA, batch = "build_magic_chests")
+    @EnhancedTest(template = ARENA, batch = "build_magic_chests")
     public static void chestsWithThingsAreLeftStanding(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1218,7 +1213,7 @@ public final class BuildSpellTests {
      * copy of them stamped over dirt leaves the dirt, and there is still exactly one Mjolnir; TNT in Billy's hand is
      * {@code VOLATILE}; 27 TNT of hers are done.
      */
-    @GameTest(template = ARENA, batch = "build_magic_untouchable")
+    @EnhancedTest(template = ARENA, batch = "build_magic_untouchable")
     public static void untouchablesStayAndAreNeverCopied(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1268,7 +1263,7 @@ public final class BuildSpellTests {
      * A sign reading "HI" stamps reading "HI"; Billy's copy of a chest with 3 diamonds stamps empty, the Scarlet
      * Witch's full; suspicious sand with a loot table stamps without one.
      */
-    @GameTest(template = ARENA, batch = "build_magic_data")
+    @EnhancedTest(template = ARENA, batch = "build_magic_data")
     public static void copiesKeepOnlyWhitelistedData(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1312,7 +1307,7 @@ public final class BuildSpellTests {
     // B40
 
     /** A Witches' Road door stamped by magic is one of the Road's doors; vanished, it is not. */
-    @GameTest(template = ARENA, batch = "build_magic_road")
+    @EnhancedTest(template = ARENA, batch = "build_magic_road")
     public static void roadDoorsFollowBuilding(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1358,7 +1353,7 @@ public final class BuildSpellTests {
      * ground); the emptied chest is where it was; the other iron block moved; the placed block stays; {@code
      * kept_changed} 3 (C12, R49). An overlapping Move by one cell (B29) still comes out exact.
      */
-    @GameTest(template = ARENA, batch = "build_move_cas", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "build_move_cas", timeoutTicks = 400)
     public static void aMoveNeverDuplicatesWhatChangedUnderIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();

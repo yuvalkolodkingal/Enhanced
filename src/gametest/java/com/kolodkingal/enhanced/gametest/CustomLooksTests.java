@@ -17,10 +17,10 @@ import com.kolodkingal.enhanced.custom.KeyLayout;
 import com.kolodkingal.enhanced.custom.LookCatalog;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -29,8 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -53,8 +51,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * search of the Powers tab in English and Hebrew, the Keys tab's Auto layout, the words of the moves and looks; and (R8)
  * "Choose a hero" giving the hero's own items once.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomLooksTests {
     private static final String BATCH = "custom_looks";
     private static final String ITEMS = "hero_items";
@@ -88,7 +84,7 @@ public final class CustomLooksTests {
 
     // ---- the layers ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyStyleOfEveryLayerHasItsArt(GameTestHelper helper) {
         List<String> missing = new ArrayList<>();
         int seen = 0;
@@ -109,7 +105,7 @@ public final class CustomLooksTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theLayersAreJudgedByTheRules(GameTestHelper helper) {
         CustomHero.Layers asked = CustomHero.Layers.NONE_ALL.with(0, new CustomHero.Layer("plain", 0x123456, 3, "flying"))
                 .with(1, new CustomHero.Layer("a_crown_nobody_made", -1, 0, "always"))
@@ -141,7 +137,7 @@ public final class CustomLooksTests {
 
     // ---- the presets ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyPresetFitsSixtyPointsWithNoNote(GameTestHelper helper) throws IOException {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");
@@ -197,7 +193,7 @@ public final class CustomLooksTests {
 
     // ---- the search and the Auto keys ----
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSearchFindsPowersInEnglishAndHebrew(GameTestHelper helper) throws IOException {
         Function<String, String> en = words(lang("en_us"));
         Function<String, String> he = words(lang("he_il"));
@@ -223,7 +219,7 @@ public final class CustomLooksTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void autoPutsTheHeroesAbilitiesOnTheirOwnKeys(GameTestHelper helper) {
         CustomHero raw = CustomKitSupport.def().raw().withPowers(List.of(new CustomHero.Pick("thor.lightning", 5, "both", -1),
                 new CustomHero.Pick("thor.hammer", 5, "both", -1), new CustomHero.Pick("flight", 5, "jet", -1),
@@ -244,7 +240,7 @@ public final class CustomLooksTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void buildMagicTakesNoKeyBox(GameTestHelper helper) {
         // Billy's Build Magic is used with its own Y key: no box holds it, by Auto or by hand (its box would do nothing).
         CustomHero raw = CustomKitSupport.def().raw().withPowers(List.of(new CustomHero.Pick("billy.build_magic", 5, "both", -1),
@@ -266,7 +262,7 @@ public final class CustomLooksTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theMovesAndLooksHaveTheirWords(GameTestHelper helper) throws IOException {
         JsonObject en = lang("en_us");
         JsonObject he = lang("he_il");
@@ -306,7 +302,7 @@ public final class CustomLooksTests {
         return n;
     }
 
-    @GameTest(template = ARENA, batch = ITEMS)
+    @EnhancedTest(template = ARENA, batch = ITEMS)
     public static void choosingThorGivesHisHammerClaimedOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(5.5, FLOOR, 5.5, GameType.CREATIVE);
@@ -327,7 +323,7 @@ public final class CustomLooksTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = ITEMS)
+    @EnhancedTest(template = ARENA, batch = ITEMS)
     public static void theHeadItemsArePutOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cyclops = f.player(5.5, FLOOR, 5.5, GameType.CREATIVE);
@@ -345,7 +341,7 @@ public final class CustomLooksTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = ITEMS)
+    @EnhancedTest(template = ARENA, batch = ITEMS)
     public static void theTableOfItemsFollowsHowEachHeroAwakens(GameTestHelper helper) {
         check(HeroItems.of(Power.THANOS, "").equals(List.of(ModItems.INFINITY_GAUNTLET.get())), "Thanos: the Gauntlet");
         check(HeroItems.of(Power.ULTRON, "").equals(List.of(ModItems.ULTRON_CORE.get())), "Ultron: his Core");
@@ -362,7 +358,7 @@ public final class CustomLooksTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = ITEMS_CONFIG)
+    @EnhancedTest(template = ARENA, batch = ITEMS_CONFIG)
     public static void theItemsCanBeSwitchedOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(CustomHeroConfig.CHOOSE_GIVES_ITEMS, false);

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.custom.HeroAbilityAnims;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.GestureRoutes;
@@ -15,14 +14,12 @@ import com.kolodkingal.enhanced.client.render.Stance;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hela.HelaBrain;
 import com.kolodkingal.enhanced.hela.HelaState;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Toggle;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -35,12 +32,10 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the form's and the grasp's gestures hand over to, what her own press starts, the boss's poses (one for every state,
  * meeting the server's moments), her walk, and the layers of her music.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HelaAnimationTests {
     private static final String BATCH = "hela_animation";
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyKeyOfHersIsActed(GameTestHelper helper) {
         Power p = Power.HELA;
         check(GestureRoutes.acting(p, 1).startsWith("none: ") && GestureRoutes.acting(p, 2).startsWith("none: "), "R and G by their payloads");
@@ -69,7 +64,7 @@ public final class HelaAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herGesturesEndOnTheirStances(GameTestHelper helper) {
         Gestures.Def on = Gestures.get(GestureId.HELA_FORM_ON);
         Gestures.ArmKey last = on.m.get(on.m.size() - 1);
@@ -84,7 +79,7 @@ public final class HelaAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBossHasAPoseForEveryStateThatMeetsTheServer(GameTestHelper helper) {
         check(HelaBossPoses.complete(), "every state has a pose from tick 0");
         float[] tell = HelaBossPoses.at(HelaState.VOLLEY, HelaBrain.VOLLEY_THROW - 2);
@@ -106,7 +101,7 @@ public final class HelaAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herMusicLayersFollowThePhase(GameTestHelper helper) {
         check(HelaMusicMath.layerWanted(1, 1) && !HelaMusicMath.layerWanted(2, 1) && !HelaMusicMath.layerWanted(3, 1), "phase 1: the drone");
         check(HelaMusicMath.layerWanted(2, 2) && !HelaMusicMath.layerWanted(3, 2), "phase 2: the strings and the choir");

@@ -4,14 +4,12 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.CrawlMath;
 import com.kolodkingal.enhanced.client.render.LegIk;
 import com.kolodkingal.enhanced.client.render.WebTiming;
-import net.minecraft.gametest.framework.GameTest;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforgespi.locating.IModFile;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -31,8 +29,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * checked in a real game (see the notes of the stage). A test class has no client class in a signature, so nothing here
  * names one.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SpiderClientTests {
     private static final String QUICK = "spider_client";
 
@@ -51,7 +47,7 @@ public final class SpiderClientTests {
      * For random targets within reach (not nearer than the leg can fold to) the tip is on the target, whatever the
      * knee's hint; the segments keep their lengths.
      */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void legIkReachesItsTarget(GameTestHelper helper) {
         RandomSource random = RandomSource.create(20260611L);
         Vec3 root = new Vec3(3, 3, 2.5);
@@ -82,7 +78,7 @@ public final class SpiderClientTests {
      * Out of reach the leg is stretched and points at the target; too near it folds and never breaks into numbers that
      * are not numbers.
      */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void legIkStretchesAndFolds(GameTestHelper helper) {
         Vec3 root = new Vec3(0, 0, 0);
         Vec3 bend = new Vec3(0, -1, 0.3);
@@ -117,7 +113,7 @@ public final class SpiderClientTests {
     // The crawl
 
     /** One cycle of his hands and knees for every 1.1 blocks he climbs, and none while he hangs still. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theCrawlPhaseAdvancesWithDistance(GameTestHelper helper) {
         for (float speed : new float[]{0.05F, 0.1F, 0.22F, 0.4F}) {
             float omega = CrawlMath.omega(speed);
@@ -146,7 +142,7 @@ public final class SpiderClientTests {
      * The strand of a Web Shot grows, holds and fades in four ticks; a burst's in seven; a splat fades over its last
      * eight.
      */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theWebEffectsRunTheirCourse(GameTestHelper helper) {
         check(WebTiming.shotReach(0.0F) == 0.0F && WebTiming.shotReach(WebTiming.SHOT_GROW) == 1.0F && WebTiming.shotReach(3.0F) == 1.0F, "a shot grows over two ticks");
         check(WebTiming.shotAlpha(0.0F) == 1.0F && WebTiming.shotAlpha(2.9F) == 1.0F, "it holds");
@@ -184,7 +180,7 @@ public final class SpiderClientTests {
     // The art the client draws with
 
     /** The eye overlays only paint the lenses, and the legs and the splat are the size their layers read them at. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theClientTexturesAreThere(GameTestHelper helper) {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String eyes : new String[]{"black_homemade", "black_iron", "black_bnd", "black_own", "kill_iron"}) {

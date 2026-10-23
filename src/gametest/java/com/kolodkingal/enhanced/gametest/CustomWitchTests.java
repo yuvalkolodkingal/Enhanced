@@ -22,6 +22,7 @@ import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -30,7 +31,6 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.protect.Sorcery;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -41,8 +41,6 @@ import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -74,8 +72,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * the damage grows with the strength. Quick tests share {@code custom_witch}; a test with PvP, a config change or a Hex has
  * a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomWitchTests {
     private static final String BATCH = "custom_witch";
 
@@ -113,7 +109,7 @@ public final class CustomWitchTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Scarlet Witch
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theChaosBeamOnGBurnsAndDizzies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 3.5, 10.5, def().pick("wanda.chaos_beam", 5).key(2, "wanda.chaos_beam"));
@@ -132,7 +128,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDamageGrowsWithTheStrength(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer weak = hero(f, 3.5, 4.5, def().pick("wanda.chaos_beam", 2).key(1, "wanda.chaos_beam"));
@@ -160,7 +156,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWitchesTelekinesisOnOtherKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = hero(f, 3.5, 4.5, def().pick("wanda.telekinesis", 5).key(1, "wanda.telekinesis"));
@@ -179,7 +175,7 @@ public final class CustomWitchTests {
     }
 
     /** The Chaos Shield with its old rules (not unlimited), so that its recharge shows on the custom key. */
-    @GameTest(template = ARENA, batch = "custom_witch_shield", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_witch_shield", timeoutTicks = 60)
     public static void theChaosShieldOnVStopsBlowsAndRechargesOnV(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, false);
@@ -203,7 +199,7 @@ public final class CustomWitchTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "custom_witch_hex", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "custom_witch_hex", timeoutTicks = 40)
     public static void theHexOfACustomHeroRisesIsControlledAndDissolves(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -241,7 +237,7 @@ public final class CustomWitchTests {
     // ------------------------------------------------------------------------------------------------------------
     // Billy
 
-    @GameTest(template = ARENA, batch = "custom_witch_beam", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_witch_beam", timeoutTicks = 60)
     public static void theHexBeamOnNBurnsUntilLetGo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.BILLY_BEAM, true);
@@ -261,7 +257,7 @@ public final class CustomWitchTests {
     }
 
     /** With {@code billy.beam} off the row is the Hex Bolt: it strikes, and its short recharge is on the custom key. */
-    @GameTest(template = ARENA, batch = "custom_witch_bolt")
+    @EnhancedTest(template = ARENA, batch = "custom_witch_bolt")
     public static void theHexBoltOnNStrikesAndRechargesOnN(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.BILLY_BEAM, false);
@@ -276,7 +272,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void freezeOnGSpellbindsAndRechargesOnG(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 4.5, 10.5, def().pick("billy.freeze", 5).key(2, "billy.freeze"));
@@ -291,7 +287,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theHexBarrierIsHeldOnSneakGAndLetGo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, def().pick("billy.freeze", 5).key(2, "billy.freeze"));
@@ -310,7 +306,7 @@ public final class CustomWitchTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void freezeWithoutItsVariantRaisesNoBarrier(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 4.5, 10.5, def().pick("billy.freeze", 5, HeroAbility.MAIN).key(2, "billy.freeze"));
@@ -325,7 +321,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theNoiseAloneHearsThoughtsAndMakesASorcerer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 4.5, 10.5, def().pick("billy.noise", 5).key(1, "billy.noise"));
@@ -344,7 +340,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void buildMagicIsBillysForACustomHeroWithIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer builder = hero(f, 4.5, 10.5, def().pick("billy.build_magic", 5).pick("billy.noise", 5).key(1, "billy.noise"));
@@ -367,7 +363,7 @@ public final class CustomWitchTests {
     // ------------------------------------------------------------------------------------------------------------
     // Agatha
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDrainOnRDrinksALifeAndRechargesOnR(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 4.5, def().pick("agatha.drain", 5).key(1, "agatha.drain"));
@@ -382,7 +378,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "custom_witch_pvp")
+    @EnhancedTest(template = ARENA, batch = "custom_witch_pvp")
     public static void theDrainTakesAHerosPower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -395,7 +391,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePurpleBeamOnVAndTheHexMarkOnSneakV(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 4.5, def().pick("agatha.purple_beam", 5).key(3, "agatha.purple_beam"));
@@ -416,7 +412,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRunesOnGAndTheirRechargeScales(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer normal = hero(f, 4.5, 10.5, def().pick("agatha.runes", 5).key(2, "agatha.runes"));
@@ -433,7 +429,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "custom_witch_agatha_shield", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_witch_agatha_shield", timeoutTicks = 60)
     public static void agathasShieldIsNoChaosShield(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, def().pick("agatha.shield", 5).key(1, "agatha.shield"));
@@ -453,7 +449,7 @@ public final class CustomWitchTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herBodyOnlyWithItsRowAndByItsStrength(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer without = hero(f, 4.5, 4.5, def().pick("agatha.drain", 5).key(1, "agatha.drain"));
@@ -478,7 +474,7 @@ public final class CustomWitchTests {
     // ------------------------------------------------------------------------------------------------------------
     // Shared fields, death, names
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void billysUpkeepLeavesAgathasBeamAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 4.5, def().pick("billy.noise", 5).key(1, "billy.noise")
@@ -495,7 +491,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void deathPutsEverythingOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, def().pick("wanda.chaos_beam", 5).key(1, "wanda.chaos_beam")
@@ -515,7 +511,7 @@ public final class CustomWitchTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyWitchRowHasItsNamesInBothLanguages(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();

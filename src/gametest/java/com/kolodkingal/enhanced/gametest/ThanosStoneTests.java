@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -8,6 +7,7 @@ import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.ThanosConfig;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -23,7 +23,6 @@ import com.kolodkingal.enhanced.thanos.ThanosPhantomEntity;
 import com.kolodkingal.enhanced.thanos.ThanosState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,8 +40,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -64,8 +61,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * What the five stones do: each stone's moves, started with {@code forceMove} and read as damage, effects and flags. The
  * test arena has a barrier roof nine blocks up, so the tests of what falls from the sky open a column in it first.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosStoneTests {
 
     private static ThanosEntity boss(TestKit.Fixture f, ServerPlayer starter, int stones) {
@@ -107,7 +102,7 @@ public final class ThanosStoneTests {
     /**
      * The Power Blast: 20 to the one it meets, 8 to those round where it ends, and the wall it ends on is not changed.
      */
-    @GameTest(template = ARENA, batch = "thanos_power_blast", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_power_blast", timeoutTicks = 120)
     public static void thePowerBlastHurtsSplashesAndChangesNoBlock(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer target = fighter(f, 0, 8);
@@ -133,7 +128,7 @@ public final class ThanosStoneTests {
     }
 
     /** A complete Chaos Shield stops the blast (and the splash), and loses 20. */
-    @GameTest(template = ARENA, batch = "thanos_power_blast_shield", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_power_blast_shield", timeoutTicks = 120)
     public static void aChaosShieldStopsThePowerBlastAndLosesTwenty(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = fighter(f, 0, 6, Power.SCARLET_WITCH);
@@ -156,7 +151,7 @@ public final class ThanosStoneTests {
     private static final float MAX_HEALTH = ThanosMoveSupport.MAX;
 
     /** The Overload fixes its sigils at tick 12: the one who stands there takes it, the one who left does not. */
-    @GameTest(template = ARENA, batch = "thanos_overload", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_overload", timeoutTicks = 120)
     public static void theOverloadMarksThenDetonatesWhereTheyWereAndBreaksNoBlock(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer stays = fighter(f, 5, 0);
@@ -182,7 +177,7 @@ public final class ThanosStoneTests {
     }
 
     /** With block damage on (and mob griefing), the Overload digs a small crater: close blocks go, far ones stay. */
-    @GameTest(template = ARENA, batch = "thanos_overload_crater", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_overload_crater", timeoutTicks = 120)
     public static void withBlockDamageOnTheOverloadMakesASmallCrater(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.BLOCK_DAMAGE, true);
@@ -204,7 +199,7 @@ public final class ThanosStoneTests {
     }
 
     /** The ring of the Shockwave: someone on the ground takes 18, someone in the air when it passes takes nothing. */
-    @GameTest(template = ARENA, batch = "thanos_shockwave", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_shockwave", timeoutTicks = 100)
     public static void theShockwaveIsJumpable(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer onGround = fighter(f, 5, 0);
@@ -230,7 +225,7 @@ public final class ThanosStoneTests {
      * A fighter sealed in a stone room, where he can neither be seen nor walked to, is found by the Power Pulse after
      * the config's time: 12 damage through the walls, and not again before the Pulse's cooldown.
      */
-    @GameTest(template = ARENA, batch = "thanos_pulse", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "thanos_pulse", timeoutTicks = 300)
     public static void thePowerPulseFindsAFighterSealedInARoom(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.UNREACHABLE_TICKS, 40);
@@ -275,7 +270,7 @@ public final class ThanosStoneTests {
     // The Space Stone
 
     /** The Portal Step puts him behind the target, then a Jab or a Sweep follows at once. */
-    @GameTest(template = ARENA, batch = "thanos_step", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_step", timeoutTicks = 120)
     public static void thePortalStepArrivesBehindAndChainsAStrike(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer target = fighter(f, 0, 7);
@@ -300,7 +295,7 @@ public final class ThanosStoneTests {
     }
 
     /** A Hex wall between him and where he would land refuses the step: he does not move. */
-    @GameTest(template = ARENA, batch = "thanos_step_hex", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "thanos_step_hex", timeoutTicks = 80)
     public static void aHexWallRefusesThePortalStep(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -323,7 +318,7 @@ public final class ThanosStoneTests {
     }
 
     /** One meteor for each player, landing on its ring for 16 in radius 2.5, breaking no block. */
-    @GameTest(template = ARENA, batch = "thanos_meteor", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_meteor", timeoutTicks = 200)
     public static void meteorHailMarksEveryPlayerAndEachLandsInItsRing(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.METEOR_EXTRA, 0);
@@ -353,7 +348,7 @@ public final class ThanosStoneTests {
     }
 
     /** A crowd is marked with at most ten meteors, however many players there are. */
-    @GameTest(template = ARENA, batch = "thanos_meteor_cap", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_meteor_cap", timeoutTicks = 200)
     public static void meteorHailNeverCallsDownMoreThanTen(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         List<ServerPlayer> crowd = new ArrayList<>();
@@ -376,7 +371,7 @@ public final class ThanosStoneTests {
     }
 
     /** A Chaos Shield stops a meteor and loses 16. */
-    @GameTest(template = ARENA, batch = "thanos_meteor_shield", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_meteor_shield", timeoutTicks = 200)
     public static void aChaosShieldStopsAMeteorAndLosesSixteen(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.METEOR_EXTRA, 0);
@@ -398,7 +393,7 @@ public final class ThanosStoneTests {
     }
 
     /** The Pull draws in those he can see (not the one behind a wall, not a phased Vision), then crushes close to him for 14. */
-    @GameTest(template = ARENA, batch = "thanos_pull", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_pull", timeoutTicks = 160)
     public static void gravityPullBreaksOnCoverAndCrushesWhatItDrawsIn(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer seen = fighter(f, 0, 9);
@@ -434,7 +429,7 @@ public final class ThanosStoneTests {
      * The Space Barrier turns ranged blows (an arrow, Thor's beam, a dagger) to nothing, and lets the stone-born through (Wanda's
      * beam, Vision's beam, Stormbreaker); it stands 60 ticks and rests 300.
      */
-    @GameTest(template = ARENA, batch = "thanos_barrier", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_barrier", timeoutTicks = 200)
     public static void theBarrierStopsRangedNotStoneBorn(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -472,7 +467,7 @@ public final class ThanosStoneTests {
     // The Reality Stone
 
     /** The Veil turns arrows within twelve blocks to bubbles, leaves Stormbreaker alone, and falls after 120 ticks. */
-    @GameTest(template = ARENA, batch = "thanos_veil", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_veil", timeoutTicks = 260)
     public static void theVeilTurnsProjectilesToBubbles(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -504,7 +499,7 @@ public final class ThanosStoneTests {
     }
 
     /** The Phantoms: three illusions of 1 health, the real one hidden for 80 ticks until something touches him. */
-    @GameTest(template = ARENA, batch = "thanos_phantoms", timeoutTicks = 220)
+    @EnhancedTest(template = ARENA, batch = "thanos_phantoms", timeoutTicks = 220)
     public static void phantomsAndTheHiddenReal(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -543,7 +538,7 @@ public final class ThanosStoneTests {
     }
 
     /** The Reality orb turns the first player it meets to stone for 60 ticks (half damage, cannot move); a Chaos Shield and a Creative player are not touched. */
-    @GameTest(template = ARENA, batch = "thanos_orb", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_orb", timeoutTicks = 200)
     public static void thePetrifyOrbFreezesOnePlayerAndMeetsAShield(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -589,7 +584,7 @@ public final class ThanosStoneTests {
     // The Soul Stone
 
     /** The Soul Stone sees through Loki: the duplicates dissolve, the invisibility ends and his borrowed shape is gone. */
-    @GameTest(template = ARENA, batch = "thanos_sight", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_sight", timeoutTicks = 120)
     public static void soulSightDissolvesLokisTricks(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -623,7 +618,7 @@ public final class ThanosStoneTests {
      * Soul Drain: 3 every ten ticks that armour and enchantments cannot lessen, 40 percent of it healing him; the chain snaps
      * when a block comes between, and when 60 poise of blows are dealt to him.
      */
-    @GameTest(template = ARENA, batch = "thanos_drain", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_drain", timeoutTicks = 260)
     public static void soulDrainTakesLifeThroughArmourAndHealsHim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -652,7 +647,7 @@ public final class ThanosStoneTests {
     }
 
     /** A block between him and the chain snaps it before its first beat; the victim loses nothing. */
-    @GameTest(template = ARENA, batch = "thanos_drain_snap", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_drain_snap", timeoutTicks = 160)
     public static void theDrainChainSnapsWithoutASightAndBreaksUnderPoise(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer cut = fighter(f, 6, 0);
@@ -675,7 +670,7 @@ public final class ThanosStoneTests {
     }
 
     /** Sixty poise of blows during the Drain end it. */
-    @GameTest(template = ARENA, batch = "thanos_drain_poise", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_drain_poise", timeoutTicks = 160)
     public static void poiseBreaksTheDrain(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer victim = fighter(f, 6, 0);
@@ -698,7 +693,7 @@ public final class ThanosStoneTests {
     }
 
     /** The Soul World takes whoever is in the pillar at the end (nothing hurts them), heals him 3 percent each and spares those who left. */
-    @GameTest(template = ARENA, batch = "thanos_soulworld", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_soulworld", timeoutTicks = 160)
     public static void soulworldHoldsAndHeals(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = f.level();
@@ -736,7 +731,7 @@ public final class ThanosStoneTests {
      * The Rewind returns up to 8 percent of his health, the broken plates and his place, and does nothing if he is staggered
      * first; it is not chosen until he has taken enough damage.
      */
-    @GameTest(template = ARENA, batch = "thanos_rewind", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_rewind", timeoutTicks = 260)
     public static void theRewindRestoresWhatWasLost(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = fighter(f, 6, 6);
@@ -772,7 +767,7 @@ public final class ThanosStoneTests {
     }
 
     /** A stagger in the Rewind's wind-up undoes it. */
-    @GameTest(template = ARENA, batch = "thanos_rewind_fail", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_rewind_fail", timeoutTicks = 160)
     public static void aStaggeredTitanCannotRewind(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = fighter(f, 6, 6);
@@ -799,7 +794,7 @@ public final class ThanosStoneTests {
     }
 
     /** The Rewind is his answer to a lot of damage taken lately, and not otherwise. */
-    @GameTest(template = ARENA, batch = "thanos_rewind_trigger", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_rewind_trigger", timeoutTicks = 200)
     public static void theRewindIsChosenOnlyAfterEnoughDamage(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = fighter(f, 6, 6);
@@ -823,7 +818,7 @@ public final class ThanosStoneTests {
     }
 
     /** The Snare locks those in the discs at the end of the wind-up, not the ones who stepped out. */
-    @GameTest(template = ARENA, batch = "thanos_snare", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_snare", timeoutTicks = 120)
     public static void timeSnareLocksOnlyThoseInside(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer stays = fighter(f, 5, 0);
@@ -850,7 +845,7 @@ public final class ThanosStoneTests {
      * The Infinity Beam: 40 to each in the fan once, none to the one behind a wall or outside, the Chaos Shield shatters, and it
      * waits for the fifth stone.
      */
-    @GameTest(template = ARENA, batch = "thanos_infinity", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_infinity", timeoutTicks = 200)
     public static void theInfinityBeamNeedsFiveAndAWall(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer straight = fighter(f, 0, 8);
@@ -880,7 +875,7 @@ public final class ThanosStoneTests {
     }
 
     /** A Chaos Shield in the beam's way loses 40 (it shatters at its usual strength). */
-    @GameTest(template = ARENA, batch = "thanos_infinity_shield", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_infinity_shield", timeoutTicks = 200)
     public static void aChaosShieldShattersUnderTheInfinityBeam(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = fighter(f, 0, 8, Power.SCARLET_WITCH);

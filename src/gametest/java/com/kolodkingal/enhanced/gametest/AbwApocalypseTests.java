@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseAttack;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseBrain;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
@@ -9,13 +8,11 @@ import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.entity.SandLanceEntity;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -32,13 +29,11 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * Apocalypse tests run with the factor at 1.0 (see {@link ApocalypseTestSupport#fixture}), so these tests have their own
  * batches and set the factor themselves.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AbwApocalypseTests {
     private static final int WARM = 2;
 
     /** The master factor is 0.65 by default, in the range 0.1 to 1.0, and the retuned defaults are what the notes say. */
-    @GameTest(template = ARENA, batch = "abw_apocalypse_defaults")
+    @EnhancedTest(template = ARENA, batch = "abw_apocalypse_defaults")
     public static void defaultsAreWeakerThanIn31(GameTestHelper helper) {
         assertNear(ApocalypseBossConfig.POWER_FACTOR.getDefault(), 0.65, 1.0E-9, "the default factor");
         check(ApocalypseBossConfig.POWER_FACTOR.getSpec().test(0.1) && ApocalypseBossConfig.POWER_FACTOR.getSpec().test(1.0), "0.1 and 1.0 are allowed");
@@ -58,7 +53,7 @@ public final class AbwApocalypseTests {
     }
 
     /** The helpers: damage times the factor, counts rounded up (never below one, zero stays zero), pauses divided by it. */
-    @GameTest(template = ARENA, batch = "abw_apocalypse_helpers")
+    @EnhancedTest(template = ARENA, batch = "abw_apocalypse_helpers")
     public static void helpersApplyTheFactor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(ApocalypseBossConfig.POWER_FACTOR, 0.65);
@@ -75,7 +70,7 @@ public final class AbwApocalypseTests {
     }
 
     /** The Backhand does the damage times the factor: 12 at 1.0 (the new default), 6 at 0.5, 7.8 at 0.65. */
-    @GameTest(template = ARENA, batch = "abw_apocalypse_backhand", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_apocalypse_backhand", timeoutTicks = 100)
     public static void backhandDamageScalesWithTheFactor(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.NONE);
         ServerPlayer hero = d.hero();
@@ -109,7 +104,7 @@ public final class AbwApocalypseTests {
     }
 
     /** At the default factor the fan has four lances of 3.9, not five of 6; the attack then rests 1/0.65 times as long. */
-    @GameTest(template = ARENA, batch = "abw_apocalypse_lances", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_apocalypse_lances", timeoutTicks = 100)
     public static void lancesAreFewerAndWeaker(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.NONE);
         ApocalypseEntity boss = d.boss();
@@ -134,7 +129,7 @@ public final class AbwApocalypseTests {
     }
 
     /** The number of Horsemen: min(ceil(max x factor), 1 + fighters), and their added damage scales too. */
-    @GameTest(template = ARENA, batch = "abw_apocalypse_horsemen")
+    @EnhancedTest(template = ARENA, batch = "abw_apocalypse_horsemen")
     public static void fewerHorsemen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(ApocalypseBossConfig.POWER_FACTOR, 1.0);

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
@@ -11,6 +10,7 @@ import com.kolodkingal.enhanced.config.ThanosConfig;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -22,7 +22,6 @@ import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,8 +42,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -67,8 +64,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Thanos, the hero, continued: the Soul Stone's Drain and Sight, the Time Stone's Rewind and Lock, what ends when he
  * does (his life, his session, his dimension, his power), the Gauntlet's ceremony, and the hero beside the boss.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosSoulTimeTests {
 
     // ============================================================================================================
@@ -83,7 +78,7 @@ public final class ThanosSoulTimeTests {
      * Hold B: every ten ticks three that armour and enchantments cannot lessen (a zombie in full netherite with
      * Protection IV loses exactly three), half of it healing him; letting go ends it and starts the cooldown.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_drain", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_drain", timeoutTicks = 100)
     public static void soulDrainTakesLifeThroughArmourAndHealsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosConfig.REGEN_PER_SECOND, 0.0);
@@ -125,7 +120,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** A block that comes between ends the chain at once. */
-    @GameTest(template = ARENA, batch = "thanos_hero_drain_ends")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_drain_ends")
     public static void aBlockBetweenEndsTheSoulDrain(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -146,7 +141,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** Past the chain's slack it parts: a creature that leaves, or a Thanos who is starving or held, ends it. */
-    @GameTest(template = ARENA, batch = "solo_the_soul_drain_ends_out_of_range_and_when_he_starves_or_is_held")
+    @EnhancedTest(template = ARENA, batch = "solo_the_soul_drain_ends_out_of_range_and_when_he_starves_or_is_held")
     public static void theSoulDrainEndsOutOfRangeAndWhenHeStarvesOrIsHeld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosConfig.DRAIN_RANGE, 4.0);
@@ -183,7 +178,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** Sixty damage in a second tears the chain: the next tick finds it parted, with a flinch. */
-    @GameTest(template = ARENA, batch = "thanos_hero_drain_ends")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_drain_ends")
     public static void aHardEnoughBlowTearsTheSoulDrain(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -204,7 +199,7 @@ public final class ThanosSoulTimeTests {
      * A Chaos Shield around the target stops the chain at its surface and loses twelve; a letting go of the hold ends
      * it.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_drain_shield", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_drain_shield", timeoutTicks = 60)
     public static void aChaosShieldStopsTheSoulDrainAndLosesTwelve(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -227,7 +222,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** B released with no drain running (a Soul Sight press, a spent key) does nothing at all. */
-    @GameTest(template = ARENA, batch = "thanos_hero_drain_ends")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_drain_ends")
     public static void letGoOfBWithNoDrainDoesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -244,7 +239,7 @@ public final class ThanosSoulTimeTests {
      * What Loki hides, the Soul Sight shows: duplicates dissolve, he is seen, his shape is his own; the config can keep
      * the tricks.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_sight", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_sight", timeoutTicks = 260)
     public static void soulSightRevealsAndBreaksLokisTricks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -281,7 +276,7 @@ public final class ThanosSoulTimeTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "solo_with_the_config_off_the_soul_sight_keeps_lokis_tricks", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "solo_with_the_config_off_the_soul_sight_keeps_lokis_tricks", timeoutTicks = 60)
     public static void withTheConfigOffTheSoulSightKeepsLokisTricks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosConfig.SIGHT_BREAKS_ILLUSIONS, false);
@@ -300,7 +295,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** In Creative the Sight has no cooldown and costs no hunger. */
-    @GameTest(template = ARENA, batch = "thanos_hero_sight_keeps")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_sight_keeps")
     public static void inCreativeTheSoulSightHasNoCooldown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 3.5);
@@ -318,7 +313,7 @@ public final class ThanosSoulTimeTests {
      * harm that began since and keeps what was already there; it costs hunger and the long cooldown, and the history is
      * spent.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_rewind", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_rewind", timeoutTicks = 60)
     public static void rewindRestoresPositionAndHealthAndUndoesNewHarm(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -348,7 +343,7 @@ public final class ThanosSoulTimeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_hero_rewind", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_rewind", timeoutTicks = 60)
     public static void rewindWithTooLittleHistoryDoesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 6.5, 6.5);
@@ -367,7 +362,7 @@ public final class ThanosSoulTimeTests {
      * The history builds as he lives (a snapshot every few ticks, for five seconds) and the Rewind goes back to its
      * oldest.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_rewind_ticks", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_rewind_ticks", timeoutTicks = 200)
     public static void theHistoryBuildsAsHeLivesAndItsWindowIsFiveSeconds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 6.5, 6.5);
@@ -394,7 +389,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** The cap on what a rewind heals, and the health he had then as the ceiling. */
-    @GameTest(template = ARENA, batch = "thanos_hero_rewind", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_rewind", timeoutTicks = 60)
     public static void rewindHealsAtMostTheConfigAndNeverPastTheOldHealth(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 6.5, 6.5);
@@ -419,7 +414,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** A Hex wall refuses the place (the health still returns); Mjolnir's pin refuses all of it. */
-    @GameTest(template = ARENA, batch = "thanos_hero_rewind_hex", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_rewind_hex", timeoutTicks = 60)
     public static void theHexRefusesThePlaceButNotTheHealthAndThePinRefusesAll(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_MIN_RADIUS, 4);
@@ -449,7 +444,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** The history goes with his life, his session, his dimension and his power: nothing is carried into the next. */
-    @GameTest(template = ARENA, batch = "thanos_hero_rewind_ends", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_rewind_ends", timeoutTicks = 60)
     public static void theHistoryIsDroppedOnDeathLogoutDimensionAndPowerLoss(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 6.5, 6.5);
@@ -474,7 +469,7 @@ public final class ThanosSoulTimeTests {
      * Time Lock: in a dome of six blocks, for five seconds, creatures are locked (a zombie, not his wolf, not a player
      * with PvP off, nor one outside), and an arrow flying through it hangs and crawls and falls again after.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_lock", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_lock", timeoutTicks = 160)
     public static void timeLockHoldsCreaturesAndHangsProjectiles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -520,7 +515,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** A player is locked only with PvP on. */
-    @GameTest(template = ARENA, batch = "thanos_hero_lock_pvp", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_lock_pvp", timeoutTicks = 60)
     public static void timeLockHoldsPlayersOnlyWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -547,7 +542,7 @@ public final class ThanosSoulTimeTests {
      * dome held is free, the arrow it hung falls, the drain lets go, the sight shuts, the veil is down; and what he
      * turned to stone is flesh again.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_ends", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_ends", timeoutTicks = 100)
     public static void whatStandsForHimEndsWithHisLifeHisSessionAndHisPower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -592,7 +587,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** His session ending ends them too. */
-    @GameTest(template = ARENA, batch = "thanos_hero_ends_logout", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_ends_logout", timeoutTicks = 60)
     public static void theDomeEndsWhenHeLogsOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 10.5, 10.5);
@@ -611,7 +606,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** Held down by the stones' own rule: letting the hold go (a screen, a death) lets the chain go. */
-    @GameTest(template = ARENA, batch = "thanos_hero_ends_hold")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_ends_hold")
     public static void releasingTheHoldLetsTheChainGo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -633,7 +628,7 @@ public final class ThanosSoulTimeTests {
      * The Gauntlet's hold: the five voices in turn, from Power to Time; then a bolt of light that hurts nobody, and he
      * is Thanos.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_gauntlet", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_gauntlet", timeoutTicks = 60)
     public static void theGauntletLightsTheFiveStonesInTurnAndStrikesWithALightThatHurtsNobody(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -660,7 +655,7 @@ public final class ThanosSoulTimeTests {
      * The hero beside the boss: his Power Blast is a beam (the Barrier turns it away), his Soul Drain is not a
      * projectile (it passes), and what he does counts in the fight's ledger.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_boss", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_boss", timeoutTicks = 160)
     public static void theHeroBlastIsRangedForTheBarrierAndTheDrainPassesAndBothAreCredited(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         ServerPlayer thanos = ThanosTests.thanos(f, 4.5, 10.5);
@@ -703,7 +698,7 @@ public final class ThanosSoulTimeTests {
      * What holds, the Mad Titan shakes off: a Transmute (it cracks and falls), a Pull (he is not drawn anywhere) and a Time
      * Lock (the dome does not slow him): the tags that keep a boss from being held.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_boss_held", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_boss_held", timeoutTicks = 160)
     public static void theMadTitanShakesOffTheStonesThatHold(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         ServerPlayer thanos = ThanosTests.thanos(f, 7.5, 10.5);
@@ -728,7 +723,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** A hand turned to stone lets go of the spells it held: a Scarlet Witch's beam and shield stop. */
-    @GameTest(template = ARENA, batch = "thanos_hero_stone_hand", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_stone_hand", timeoutTicks = 60)
     public static void aPetrifiedHandLetsGoOfHeldSpells(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -742,7 +737,7 @@ public final class ThanosSoulTimeTests {
     }
 
     /** Ability keys of another hero's plug-in do nothing for Thanos: his keys reach only his own stones. */
-    @GameTest(template = ARENA, batch = "thanos_hero_keys")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_keys")
     public static void aKeyReachesOnlyTheStonesOfThePlayersOwnPower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer plain = f.player(10.5, FLOOR, 10.5);

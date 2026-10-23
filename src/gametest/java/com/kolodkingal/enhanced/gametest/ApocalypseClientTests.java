@@ -8,11 +8,9 @@ import com.kolodkingal.enhanced.client.render.ApocalypseFxMath;
 import com.kolodkingal.enhanced.client.render.SandMath;
 import com.kolodkingal.enhanced.client.render.SandPalette;
 import com.kolodkingal.enhanced.client.render.SandShapes;
-import net.minecraft.gametest.framework.GameTest;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -32,15 +30,13 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the music and the amber air follow the tables of the design, and every texture the stage needs is there at the size the
  * model reads. Pure: nothing here draws, and nothing touches the world, so they share a batch of their own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public class ApocalypseClientTests {
     private static final String PURE = "apocalypse_client_pure";
 
     // ------------------------------------------------------------------------------------------------------------
     // The model
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theBossHasTwentyFourCubesThatFitTheTexture(GameTestHelper helper) {
         List<ApocalypseCubes.Cube> all = ApocalypseCubes.ALL;
         check(all.size() == 24, "24 cubes, not " + all.size());
@@ -69,7 +65,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void aMirroredCubeIsTheBoxReflectedAboutItsPivot(GameTestHelper helper) {
         // The left arm is the right arm turned about the pivot: a box from x to x + w becomes the box from -(x + w) to -x.
         assertNear(ApocalypseCubes.mirroredX(-3, 4), -1, 1.0E-6, "an arm that spans -3 to 1 spans -1 to 3 on the other side");
@@ -87,7 +83,7 @@ public class ApocalypseClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The poses
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void everyStateOfTheBossHasAPoseThatStartsWhereHeStands(GameTestHelper helper) {
         ApocalypseBossPoses.Out stand = new ApocalypseBossPoses.Out().stand();
         ApocalypseBossPoses.Out out = new ApocalypseBossPoses.Out();
@@ -111,7 +107,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void aPoseEndsWithItsTellAndTheAttacksFollowThrough(GameTestHelper helper) {
         for (ApocalypseBossPoses.Pose pose : ApocalypseBossPoses.Pose.values()) {
             float end = ApocalypseBossPoses.end(pose);
@@ -133,7 +129,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void thePosesAreSmoothAndHoldTheirLastKey(GameTestHelper helper) {
         ApocalypseBossPoses.Out a = new ApocalypseBossPoses.Out();
         ApocalypseBossPoses.Out b = new ApocalypseBossPoses.Out();
@@ -157,7 +153,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theTellsAreReadableBeforeTheBlowLands(GameTestHelper helper) {
         // Every attack must show something before it lands: its pose has moved well away from the standing one by the tell's
         // second half. (The arm, the lean or the drop: the largest change of any channel.)
@@ -188,7 +184,7 @@ public class ApocalypseClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The sand
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theBouldersEndTheirOrbitWhereTheServerThrowsThemFrom(GameTestHelper helper) {
         Vec3 feet = new Vec3(10.0, 64.0, -3.0);
         double height = 2.7;
@@ -209,7 +205,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theSpikesRiseSettleAndSink(GameTestHelper helper) {
         assertNear(SandMath.spike(-1.0F), 0.0, 1.0E-6, "nothing before the eruption");
         assertNear(SandMath.spike(0.0F), 0.0, 1.0E-6, "nothing at its first tick");
@@ -231,7 +227,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theRidgeAndTheRingsFollowTheirFormulas(GameTestHelper helper) {
         assertNear(SandMath.ridge(0.0, 1.1), 1.1, 1.0E-9, "the crest stands 1.1 tall");
         assertNear(SandMath.ridge(SandMath.RIDGE_LENGTH, 1.1), 0.0, 1.0E-9, "the tail is on the ground");
@@ -249,7 +245,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theCracksAndRipplesLieOnTheSphereOfTheShield(GameTestHelper helper) {
         Vec3 centre = new Vec3(2.0, 65.0, -4.0);
         double radius = 2.6;
@@ -274,7 +270,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theColoursOfTheSandMixAndTheEnergiesAreDistinct(GameTestHelper helper) {
         check(SandShapes.mixRgb(0x000000, 0xFFFFFF, 0.0F) == 0x000000, "the first colour at 0");
         check(SandShapes.mixRgb(0x000000, 0xFFFFFF, 1.0F) == 0xFFFFFF, "the second at 1");
@@ -295,7 +291,7 @@ public class ApocalypseClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The eyes, the music and the air
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theEyesGlowAsTheDesignSays(GameTestHelper helper) {
         check(ApocalypseFxMath.eyeTint(ApocalypseState.AWAKENING, 5.0F, 100.0F, true) == 0, "dark while he steps out of the portal");
         check(alpha(ApocalypseFxMath.eyeTint(ApocalypseState.AWAKENING, 40.0F, 100.0F, true)) == 255, "lit by the end of it");
@@ -314,7 +310,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theMusicIsLoudNearHimAndGoneFarAway(GameTestHelper helper) {
         check(!ApocalypseFxMath.wantsFinale(1, false) && !ApocalypseFxMath.wantsFinale(2, false), "the first two phases play the theme");
         check(ApocalypseFxMath.wantsFinale(3, false) && ApocalypseFxMath.wantsFinale(4, false), "from the third the fuller one");
@@ -333,7 +329,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theWallRisesAndTheAirTurnsAmberInsideIt(GameTestHelper helper) {
         assertNear(ApocalypseFxMath.wallRisen(0.0F), 0.0, 1.0E-6, "the wall begins on the ground");
         assertNear(ApocalypseFxMath.wallRisen(20.0F), 0.5, 1.0E-6, "is half up after half of forty ticks");
@@ -349,7 +345,7 @@ public class ApocalypseClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The art
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void everyTextureOfTheStageIsThereAtTheSizeTheModelReads(GameTestHelper helper) {
         String[][] sized = {
                 {"apocalypse_boss", "128", "64"}, {"apocalypse_boss_true", "128", "64"},
@@ -374,7 +370,7 @@ public class ApocalypseClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = PURE)
+    @EnhancedTest(template = ARENA, batch = PURE)
     public static void theEyesOfTheBossGlowOnlyWhereTheyAreMeantTo(GameTestHelper helper) {
         // The glow textures are black wherever they should not glow: most of the image is transparent or black, and what is
         // lit is a small part of it (the eyes, the cracks).

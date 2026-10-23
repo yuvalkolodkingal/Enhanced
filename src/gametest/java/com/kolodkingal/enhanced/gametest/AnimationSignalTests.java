@@ -1,18 +1,17 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.CustomState;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -21,8 +20,6 @@ import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -36,8 +33,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * ability starts its cooldown only when it worked (a hand that thrusts at nothing would be a lie), and flight, telekinesis and
  * Thor's weapon say what they are doing in the data every other client sees.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AnimationSignalTests {
 
     private static void press(ServerPlayer player, int ability) {
@@ -50,7 +45,7 @@ public final class AnimationSignalTests {
     }
 
     /** With nothing to act on, an ability does not start its cooldown (so no gesture plays for a move that did nothing). */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aMoveWithNothingToActOnStartsNoCooldown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // Alone in the arena, looking straight up: the tests of a batch run side by side, and the creatures of the arena next
@@ -88,7 +83,7 @@ public final class AnimationSignalTests {
     }
 
     /** Moves that always work say so at once: the bolt, the whirlwind, Molecular Acceleration on a creature, the freeze on a crowd. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aMoveThatWorksStartsItsCooldownAndRaisesItsState(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
@@ -112,7 +107,7 @@ public final class AnimationSignalTests {
     }
 
     /** Flight says so in the data on the next server tick, take-off and landing alike. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void flightIsSyncedOnTheNextTick(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(10.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -130,7 +125,7 @@ public final class AnimationSignalTests {
     }
 
     /** Telekinesis names what it holds, and stops naming it when it lets go (by a launch or gently). */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void telekinesisNamesWhatItHolds(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(4.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -158,7 +153,7 @@ public final class AnimationSignalTests {
      * caught it is unnamed. (A batch of its own, and a throw of 12 blocks, as in {@code ThorTests}: at its usual range
      * the weapon struck the arena's wall, which stands on the border of a chunk where nothing ticks in a test.)
      */
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = "thor_weapon_signal")
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = "thor_weapon_signal")
     public static void thorsWeaponSaysWhereItIs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
@@ -184,7 +179,7 @@ public final class AnimationSignalTests {
     }
 
     /** Called from the inventory: the cooldown starts, the weapon is in his hand, and nothing flies. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aWeaponDrawnFromTheInventoryStartsTheCooldown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 10.5, Power.THOR);
@@ -198,7 +193,7 @@ public final class AnimationSignalTests {
     }
 
     /** Loki's two cooldowns tell the gesture apart: a single dagger is short, a fan long; both raise nothing else. */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void lokisDaggersCooldownsTellTheGesturesApart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer loki = f.player(10.5, FLOOR, 10.5, Power.LOKI);
@@ -221,7 +216,7 @@ public final class AnimationSignalTests {
      * client plays the gesture of that binding whatever the strength did to the cooldown's length; a press that does
      * nothing (the key cooling down) does not move it.
      */
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void aCustomHerosKeyNamesItsBindingInTheCastMarker(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = CustomKitSupport.hero(f, 10.5, 10.5, CustomKitSupport.def()

@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -21,7 +22,6 @@ import com.kolodkingal.enhanced.road.RoadDoors;
 import com.kolodkingal.enhanced.road.WitchesRoad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,8 +46,6 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,8 +62,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Billy Maximoff (Wiccan) and the Witches' Road. The doors of a dimension all belong to one Road, so each test that walks
  * it has its own batch and starts from an empty Road.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BillyTests {
 
     private static void press(ServerPlayer player, int ability) {
@@ -104,7 +100,7 @@ public final class BillyTests {
 
     // (3.2: with the trials on, the door asks to walk the Road and the choice comes at its end: these two tests pin the door as it is
     // when witches_road.enabled is off, which is the 3.1 door; RoadDoorTests pins the new one.)
-    @GameTest(template = ARENA, timeoutTicks = 200, batch = "witches_road_classic")
+    @EnhancedTest(template = ARENA, timeoutTicks = 200, batch = "witches_road_classic")
     public static void geneAndDoorAwakenBillyOrTommy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(WitchesRoadConfig.ENABLED, false);
@@ -135,7 +131,7 @@ public final class BillyTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "witches_road_classic")
+    @EnhancedTest(template = ARENA, batch = "witches_road_classic")
     public static void theRoadOpensOnlyForWitchBloodWithoutPowers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(WitchesRoadConfig.ENABLED, false);
@@ -166,7 +162,7 @@ public final class BillyTests {
         });
     }
 
-    @GameTest(template = ARENA, timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, timeoutTicks = 140)
     public static void aDoorSetDownOpenClosesByItself(GameTestHelper helper) {
         BlockPos rel = new BlockPos(10, 2, 10);
         helper.setBlock(rel, ModBlocks.WITCHES_ROAD_DOOR.get().defaultBlockState().setValue(WitchesRoadDoorBlock.OPEN, true));
@@ -180,7 +176,7 @@ public final class BillyTests {
 
     // ---- Walking the Road ----
 
-    @GameTest(template = ARENA, batch = "witches_road_walk")
+    @EnhancedTest(template = ARENA, batch = "witches_road_walk")
     public static void wandaAndBillyWalkTheRoad(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -216,7 +212,7 @@ public final class BillyTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "witches_road_lost_door")
+    @EnhancedTest(template = ARENA, batch = "witches_road_lost_door")
     public static void aMissingDoorIsSkipped(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -242,7 +238,7 @@ public final class BillyTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void theDoorIsCraftedAndDropsItself(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("witches_road_door"));
@@ -267,7 +263,7 @@ public final class BillyTests {
 
     // ---- Ability 1: Hex Bolt ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void hexBoltStrikesAndForks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
@@ -286,7 +282,7 @@ public final class BillyTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void hexBoltForksToTwoAtMost(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
@@ -305,7 +301,7 @@ public final class BillyTests {
 
     // ---- Ability 3: Telekinesis ----
 
-    @GameTest(template = ARENA, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, timeoutTicks = 60)
     public static void telekinesisCatchesAnArrowInFlight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
@@ -341,7 +337,7 @@ public final class BillyTests {
 
     // ---- Ability 4: Freeze ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void freezeSpellbindsTheConeInFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 10.5, Power.BILLY);
@@ -372,7 +368,7 @@ public final class BillyTests {
      * The spellbound zombie is watched every tick and must never move; the free one has until tick 90 to walk a block
      * (a zombie can take more than two seconds to set off after a target it was handed).
      */
-    @GameTest(template = ARENA, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, timeoutTicks = 100)
     public static void aSpellboundZombieDoesNotGoAfterItsTarget(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Zombie frozen = helper.spawn(EntityType.ZOMBIE, new Vec3(4.5, FLOOR, 6.5));
@@ -399,7 +395,7 @@ public final class BillyTests {
 
     // ---- Abilities 2 and 5, and the crown ----
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void flightTheNoiseAndTheCrown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(10.5, FLOOR, 10.5, Power.BILLY);

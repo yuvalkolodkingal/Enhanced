@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.build.BuildJob;
@@ -16,11 +15,11 @@ import com.kolodkingal.enhanced.gametest.BuildTestSupport.Seen;
 import com.kolodkingal.enhanced.gametest.BuildTestSupport.World;
 import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,8 +33,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +60,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * clears them when a test ends. The pulses are cast {@value #PULSE_GAP} ticks apart (a stroke pulses at most every
  * {@value LandBrush#PULSE_TICKS}), and the test steps each pulse's job itself.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildBrushTests {
     /** The ticks between two pulses of a test's stroke: one more than a stroke's pulses need. */
     private static final int PULSE_GAP = LandBrush.PULSE_TICKS + 1;
@@ -83,7 +78,7 @@ public final class BuildBrushTests {
      * moves a column toward the surfaces round it; the falloff and the stroke's memory decide which columns move,
      * nearest the middle first.
      */
-    @GameTest(template = ARENA, batch = "build_brushes_pure")
+    @EnhancedTest(template = ARENA, batch = "build_brushes_pure")
     public static void aPulseMovesWholeColumns(GameTestHelper helper) {
         BlockState grass = Blocks.GRASS_BLOCK.defaultBlockState();
         BlockState dirt = Blocks.DIRT.defaultBlockState();
@@ -187,7 +182,7 @@ public final class BuildBrushTests {
      * Smooth pulses leave no two neighbouring columns more than one apart; each stroke is one undo step, and two undos
      * give the meadow back.
      */
-    @GameTest(template = ARENA, batch = "build_brushes_raise", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "build_brushes_raise", timeoutTicks = 400)
     public static void landRaisesAHillAndSmoothsItAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, null);
@@ -268,7 +263,7 @@ public final class BuildBrushTests {
      * oak's trunk (next to the middle) and its leaves have not moved, nor the grass under the trunk; one stroke is one
      * step, and his practice and his price are its blocks. With an empty meter his next stroke ends at its first pulse.
      */
-    @GameTest(template = ARENA, batch = "build_brushes_lower", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_brushes_lower", timeoutTicks = 200)
     public static void landLowersAndLeavesTreesAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -352,7 +347,7 @@ public final class BuildBrushTests {
      * after a pulse wait, the newer in the older's place, and the server begins the newer when its turn comes; the
      * stroke is one step of its two pulses.
      */
-    @GameTest(template = ARENA, batch = "build_brushes_pace", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "build_brushes_pace", timeoutTicks = 100)
     public static void aStrokePulsesEveryFourTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, null);
@@ -384,7 +379,7 @@ public final class BuildBrushTests {
      * does); two Shrink pulses take the bump away (the first its six arms, which touch air on five faces, the second the
      * block left standing); the swell is one undo step and gives the air back.
      */
-    @GameTest(template = ARENA, batch = "build_brushes_grow", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_brushes_grow", timeoutTicks = 200)
     public static void growSwellsAndShrinks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, null);
@@ -437,7 +432,7 @@ public final class BuildBrushTests {
      * cells the planner predicts (the same pure code, planned before the cast); on the arena's smooth stone nothing changes,
      * and "Nothing grows here" is said once for the stroke.
      */
-    @GameTest(template = ARENA, batch = "build_brushes_bloom", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_brushes_bloom", timeoutTicks = 200)
     public static void bloomGrowsWhatThePlannerSaid(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, null);

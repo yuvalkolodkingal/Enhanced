@@ -37,6 +37,7 @@ import com.kolodkingal.enhanced.odin.OdinAbilities;
 import com.kolodkingal.enhanced.odin.OdinDialogue;
 import com.kolodkingal.enhanced.odin.RavenEntity;
 import com.kolodkingal.enhanced.odin.Vault;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -48,7 +49,6 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -70,8 +70,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,8 +96,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * the hand), the vault's door, his words, and the pure animation tables. Tests that keep server-wide state (a config, PvP,
  * Asgard's state) have batches of their own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class OdinTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -160,7 +156,7 @@ public final class OdinTests {
     // Gungnir: the stand, the bond, the Bifrost
 
     /** The stand gives Gungnir only to one who beat Hela, once; again only to its owner who has lost his. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void theStandGivesGungnirOnlyToAHelaVictorOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         freeGungnir(f);
@@ -200,7 +196,7 @@ public final class OdinTests {
      * its owner a new one when he lost his, and gives one to a player in Creative without making him the owner. Off:
      * every victor takes his own.
      */
-    @GameTest(template = ARENA, batch = "odin_gungnir")
+    @EnhancedTest(template = ARENA, batch = "odin_gungnir")
     public static void onlyOnePlayerInTheWorldTakesGungnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         freeGungnir(f);
@@ -247,7 +243,7 @@ public final class OdinTests {
     }
 
     /** A copy whose bond is broken crumbles in an inventory and where it lies; the newest and an unowned one never do. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void aStaleGungnirCrumbles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(5.5, FLOOR, 5.5);
@@ -271,7 +267,7 @@ public final class OdinTests {
     }
 
     /** Gungnir opens the Bifrost for its owner only; anyone may wield it. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void gungnirOpensTheBifrostForItsOwnerOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(5.5, FLOOR, 5.5);
@@ -289,7 +285,7 @@ public final class OdinTests {
     // The coronation
 
     /** Only a powerless player holding his own Gungnir who stays on the throne is crowned. */
-    @GameTest(template = ARENA, batch = "odin", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "odin", timeoutTicks = 200)
     public static void theCoronationNeedsHisOwnGungnirNoPowerAndTheThrone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         BlockPos throne = helper.absolutePos(new BlockPos(10, 2, 10));
@@ -334,7 +330,7 @@ public final class OdinTests {
     // The keys of the hero
 
     /** R: the blast needs Gungnir in his hand; it strikes what he looks at; with none of his own anywhere, a new one comes. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void theBlastNeedsGungnirAndStrikes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 3.5, 10.5);
@@ -368,7 +364,7 @@ public final class OdinTests {
     }
 
     /** Sneak + R: the spear flies, strikes, turns at the wall and comes home to his hand. */
-    @GameTest(template = ARENA, batch = "odin", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "odin", timeoutTicks = 200)
     public static void theThrowFliesAndComesHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 2.5, 10.5);
@@ -395,7 +391,7 @@ public final class OdinTests {
     }
 
     /** R while the spear flies calls it back at once. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void rAgainCallsTheSpearBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 2.5, 10.5);
@@ -410,7 +406,7 @@ public final class OdinTests {
     }
 
     /** G held: the shield forms, takes a blow off its strength and turns an arrow to sparks; released, it rests. */
-    @GameTest(template = ARENA, batch = "odin_fight", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "odin_fight", timeoutTicks = 100)
     public static void theShieldStopsABlowAndAnArrow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 10.5, 10.5);
@@ -443,7 +439,7 @@ public final class OdinTests {
     }
 
     /** Sneak + G heals him and his allies and takes their harmful effects away; a monster near is not healed. */
-    @GameTest(template = ARENA, batch = "odin_fight")
+    @EnhancedTest(template = ARENA, batch = "odin_fight")
     public static void theHealHealsAlliesNotFoes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 10.5, 10.5);
@@ -464,7 +460,7 @@ public final class OdinTests {
     }
 
     /** V: a monster is banished (gone, nothing left); a named one resists and is hurt; a cow is spared and costs nothing. */
-    @GameTest(template = ARENA, batch = "odin_fight")
+    @EnhancedTest(template = ARENA, batch = "odin_fight")
     public static void banishRemovesAMonsterButNotANamedOne(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 3.5, 10.5);
@@ -495,7 +491,7 @@ public final class OdinTests {
     }
 
     /** Sneak + V: the wave strikes and throws every foe round him, never a player with PvP off. */
-    @GameTest(template = ARENA, batch = "odin_fight")
+    @EnhancedTest(template = ARENA, batch = "odin_fight")
     public static void theWaveStrikesAndThrowsFoes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 10.5, 10.5);
@@ -513,7 +509,7 @@ public final class OdinTests {
     }
 
     /** B: two ravens fly out and circle; he cannot hurt them; their time over, they leave and the state clears. */
-    @GameTest(template = ARENA, batch = "odin_config", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "odin_config", timeoutTicks = 100)
     public static void theRavensFlyAndLeave(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(OdinConfig.RAVENS_SECONDS, 1);
@@ -541,7 +537,7 @@ public final class OdinTests {
     }
 
     /** Sneak + N: the Odinsleep holds him still, refuses his other keys, heals him and ends when he wakes. */
-    @GameTest(template = ARENA, batch = "odin", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "odin", timeoutTicks = 100)
     public static void theOdinsleepHealsAndHoldsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 10.5, 10.5);
@@ -574,7 +570,7 @@ public final class OdinTests {
     }
 
     /** N: the command is given (the warriors are the Asgardians'); its rest begins. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void theCommandIsGiven(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 10.5, 10.5);
@@ -584,7 +580,7 @@ public final class OdinTests {
     }
 
     /** His body: +12 health, +6 armour, +0.5 knockback resistance; a custom hero's by its strength; none on anyone else. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void theBodyIsByItsRow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 10.5, 10.5);
@@ -610,7 +606,7 @@ public final class OdinTests {
     // The custom hero (3.4's rules)
 
     /** R1/R3/R7: on another key the blast leaves a custom hero's bare hand; its Sneak cell throws only a Gungnir he holds. */
-    @GameTest(template = ARENA, batch = "odin", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "odin", timeoutTicks = 120)
     public static void aCustomHeroBlastsFromHisHandAndThrowsOnlyGungnir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("odin.gungnir", 5).key(3, "odin.gungnir").build();
@@ -643,7 +639,7 @@ public final class OdinTests {
     }
 
     /** R4: a custom hero with only the ravens keeps none of Odin's other upkeep (no shield, no sleep), and a body only by its row. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void aCustomHeroGetsOnlyHisRowsUpkeep(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = CustomKitSupport.hero(f, 10.5, 10.5, CustomKitSupport.def().pick("odin.odinforce", 3).key(2, "odin.odinforce").build());
@@ -664,7 +660,7 @@ public final class OdinTests {
     // PvP
 
     /** Banish spares a player while PvP is off; with it on, the Bifrost takes him home. */
-    @GameTest(template = ARENA, batch = "odin_pvp")
+    @EnhancedTest(template = ARENA, batch = "odin_pvp")
     public static void banishSendsAPlayerHomeOnlyWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer odin = odin(f, 3.5, 10.5);
@@ -684,7 +680,7 @@ public final class OdinTests {
     // The vault and his words
 
     /** The vault's door opens once (its blocks gone) and tells its listeners; a 3.6 place is kept empty in the vault. */
-    @GameTest(template = ARENA, batch = "odin_realm", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "odin_realm", timeoutTicks = 200)
     public static void theVaultOpensOnce(GameTestHelper helper) {
         TestKit.Fixture f = AsgardTestSupport.fixture(helper);
         ServerLevel asgard = AsgardTestSupport.ensureAsgard(helper.getLevel().getServer());
@@ -710,7 +706,7 @@ public final class OdinTests {
     }
 
     /** His words follow the way to the throne; every line and answer has its words in English and Hebrew. */
-    @GameTest(template = ARENA, batch = "odin")
+    @EnhancedTest(template = ARENA, batch = "odin")
     public static void odinsWordsFollowTheWayToTheThrone(GameTestHelper helper) throws IOException {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -775,7 +771,7 @@ public final class OdinTests {
     // The animation (pure)
 
     /** Every key is acted; each cooldown tells its use by its length; his states have gestures; the rows are animated. */
-    @GameTest(template = ARENA, batch = "odin_pure")
+    @EnhancedTest(template = ARENA, batch = "odin_pure")
     public static void everyKeyIsActedAndTheCooldownsTellTheirUses(GameTestHelper helper) {
         check(GestureRoutes.acting(Power.ODIN, 1).equals("cooldown") && GestureRoutes.acting(Power.ODIN, 2).equals("flag:CHAOS_SHIELD")
                 && GestureRoutes.acting(Power.ODIN, 4).equals("live:ODIN_RAVENS"), "how his keys are acted");
@@ -807,7 +803,7 @@ public final class OdinTests {
     }
 
     /** His gestures are well formed; those that hand over to a stance end on its pose; the cocoon and the wave never jump. */
-    @GameTest(template = ARENA, batch = "odin_pure")
+    @EnhancedTest(template = ARENA, batch = "odin_pure")
     public static void theGesturesAreWellFormedAndHandOver(GameTestHelper helper) {
         List<GestureId> ids = List.of(GestureId.ODIN_BLAST, GestureId.ODIN_THROW, GestureId.ODIN_CATCH, GestureId.ODIN_SHIELD_UP,
                 GestureId.ODIN_SHIELD_DOWN, GestureId.ODIN_HEAL, GestureId.ODIN_BANISH, GestureId.ODIN_WAVE, GestureId.ODIN_RAVENS,

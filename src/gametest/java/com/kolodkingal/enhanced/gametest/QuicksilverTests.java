@@ -1,11 +1,11 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.SlowMotion;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -14,7 +14,6 @@ import com.kolodkingal.enhanced.power.Toggle;
 import com.kolodkingal.enhanced.registry.ModItems;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -39,8 +38,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +53,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * slow motion would otherwise reach into the neighbouring test arenas. (Super Speed slows nothing, so a test that
  * only uses Super Speed needs no small radius.)
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class QuicksilverTests {
 
     /** Makes the player sprint and runs his tick, as a connected client's tick would. */
@@ -66,7 +61,7 @@ public final class QuicksilverTests {
         PowerTicker.tick(player);
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void gogglesAwakenQuicksilver(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -116,7 +111,7 @@ public final class QuicksilverTests {
 
     private static final int EFFECT_TICKS = 400;
 
-    @GameTest(template = ARENA, batch = "quicksilver_speed")
+    @EnhancedTest(template = ARENA, batch = "quicksilver_speed")
     public static void sprintingWithSuperSpeedIsRunningAndTimeIsApart(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -168,7 +163,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_standing", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "quicksilver_standing", timeoutTicks = 100)
     public static void quicksilverTimeSlowsAZombieWhileHeStandsStill(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
@@ -193,7 +188,7 @@ public final class QuicksilverTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_super_speed", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "quicksilver_super_speed", timeoutTicks = 100)
     public static void superSpeedSlowsNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -230,7 +225,7 @@ public final class QuicksilverTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void slowTimeAndRunningAreTwoKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -251,7 +246,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void bothModesAreSavedAndSynced(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -270,7 +265,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_hunger")
+    @EnhancedTest(template = ARENA, batch = "quicksilver_hunger")
     public static void quicksilverTimeCostsHungerAndStopsWhenStarving(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -313,7 +308,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_actions")
+    @EnhancedTest(template = ARENA, batch = "quicksilver_actions")
     public static void bothModesDoEverythingFaster(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -373,7 +368,7 @@ public final class QuicksilverTests {
         return ticks;
     }
 
-    @GameTest(template = ARENA, batch = "solo_eating_finishes_in_a_quarter_of_the_ticks")
+    @EnhancedTest(template = ARENA, batch = "solo_eating_finishes_in_a_quarter_of_the_ticks")
     public static void eatingFinishesInAQuarterOfTheTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -406,7 +401,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_brushes_spyglasses_and_horns_keep_their_own_pace")
+    @EnhancedTest(template = ARENA, batch = "solo_brushes_spyglasses_and_horns_keep_their_own_pace")
     public static void brushesSpyglassesAndHornsKeepTheirOwnPace(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -434,7 +429,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_others_are_not_rushed_by_quicksilver_time")
+    @EnhancedTest(template = ARENA, batch = "solo_others_are_not_rushed_by_quicksilver_time")
     public static void othersAreNotRushedByQuicksilverTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -456,7 +451,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_bows")
+    @EnhancedTest(template = ARENA, batch = "quicksilver_bows")
     public static void bowsStillReleaseAndCrossbowsStillCharge(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 5);
@@ -508,7 +503,7 @@ public final class QuicksilverTests {
         return CrossbowItem.isCharged(crossbow);
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_slow_blocks", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "quicksilver_slow_blocks", timeoutTicks = 100)
     public static void quicksilverTimeSlowsTheWorld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
@@ -550,7 +545,7 @@ public final class QuicksilverTests {
         return sand;
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_arrows", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "quicksilver_arrows", timeoutTicks = 60)
     public static void arrowsHangInTheAir(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 8);
@@ -603,7 +598,7 @@ public final class QuicksilverTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "quicksilver_trident", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "quicksilver_trident", timeoutTicks = 40)
     public static void returningTridentLeavesTheSlowMotion(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 8);
@@ -652,7 +647,7 @@ public final class QuicksilverTests {
         });
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void walkmanTogglesTheSong(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -665,7 +660,7 @@ public final class QuicksilverTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA)
+    @EnhancedTest(template = ARENA)
     public static void speedBlitzAndPickpocket(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);

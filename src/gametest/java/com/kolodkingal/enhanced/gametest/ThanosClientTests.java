@@ -6,18 +6,16 @@ import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.ThanosBossPoses;
 import com.kolodkingal.enhanced.client.render.ThanosGlow;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import com.kolodkingal.enhanced.thanos.ThanosState;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
@@ -37,8 +35,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * of the stage (what is drawn) is judged by eye in a real game. No method here has a client class in its signature: the
  * tests run on a dedicated server.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosClientTests {
     private static final String PURE = "thanos_client_pure";
     private static final String CLOCKS = "thanos_client_clocks";
@@ -61,7 +57,7 @@ public final class ThanosClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The pose table
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void thePoseTableIsWellFormed(GameTestHelper helper) {
         String problem = ThanosBossPoses.problem();
         check(problem == null, "the pose table has no fault: " + problem);
@@ -77,7 +73,7 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void everyMoveHasAPoseThatLastsAsLongAsTheMoveAndSamplesCleanly(GameTestHelper helper) {
         for (ThanosMove move : ThanosMove.values()) {
             ThanosBossPoses.Pose pose = ThanosBossPoses.poseFor(move);
@@ -94,7 +90,7 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void theStatePosesKeepTheirOwnTime(GameTestHelper helper) {
         check(ThanosBossPoses.Pose.SURGE.length() == 60, "the surge lasts three seconds");
         check(ThanosBossPoses.Pose.STAGGER.length() == 40, "the stagger lasts two");
@@ -106,7 +102,7 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void theDeathEndsSeatedAndTheSurgeKneelsAndComesBackUp(GameTestHelper helper) {
         ThanosBossPoses.Pose death = ThanosBossPoses.Pose.DEATH;
         ThanosBossPoses.Out start = sample(death, 0.0F, 100);
@@ -123,7 +119,7 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void everyMoveShowsItsTellInTheBodyBeforeItStrikes(GameTestHelper helper) {
         ThanosBossPoses.Out stand = new ThanosBossPoses.Out().stand();
         for (ThanosMove move : ThanosMove.values()) {
@@ -139,7 +135,7 @@ public final class ThanosClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The glow of the Gauntlet
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void theSocketsFollowTheStonesHeldAndTheNextOneComing(GameTestHelper helper) {
         float[] alpha = new float[ThanosGlow.SOCKETS];
         ThanosGlow.sockets(alpha, 3, -1, ThanosState.IDLE, null, 0.0F, 100.0F, 0.0F);
@@ -170,7 +166,7 @@ public final class ThanosClientTests {
     }
 
     /** A Gauntlet held shut (a stagger, a Spider-Man's web) has dark stones, even the one a clench was lighting. */
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void aLockedGauntletHasDarkStones(GameTestHelper helper) {
         float[] alpha = new float[ThanosGlow.SOCKETS];
         ThanosGlow.sockets(alpha, 5, -1, ThanosState.TELL, ThanosMove.POWER_BLAST, ThanosMove.POWER_BLAST.tell(), 5.0F, 10.0F);
@@ -182,7 +178,7 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void aClenchLightsItsOwnStoneAndTheSurgeFlaresTheNewestAndDeathDarkensAll(GameTestHelper helper) {
         float[] alpha = new float[ThanosGlow.SOCKETS];
         ThanosGlow.sockets(alpha, 4, -1, ThanosState.TELL, ThanosMove.POWER_BLAST, ThanosMove.POWER_BLAST.tell(), 5.0F, 0.0F);
@@ -227,7 +223,7 @@ public final class ThanosClientTests {
         }
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void theTexturesTheRenderersAskForExistWithTheSizeTheModelsWereCutFor(GameTestHelper helper) throws IOException {
         BufferedImage body = image("textures/entity/thanos.png");
         check(body.getWidth() == 128 && body.getHeight() == 128, "the Titan is a 128 by 128 skin");
@@ -254,7 +250,7 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void thePayloadKindsTheServerSendsAreAllKnownToTheClient(GameTestHelper helper) {
         int highest = -1;
         for (int kind = 0; kind <= 14; kind++) {
@@ -266,7 +262,7 @@ public final class ThanosClientTests {
         helper.succeed();
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void noTestOfThisClassHasAClientClassInItsSignature(GameTestHelper helper) {
         for (Method method : ThanosClientTests.class.getDeclaredMethods()) {
             check(!isClientClass(method.getReturnType()), method.getName() + " returns no client class");
@@ -285,7 +281,7 @@ public final class ThanosClientTests {
         return name.startsWith("net.minecraft.client.") || name.startsWith("com.mojang.blaze3d.");
     }
 
-    @GameTest(template = TestKit.ARENA, batch = PURE)
+    @EnhancedTest(template = TestKit.ARENA, batch = PURE)
     public static void theHeroPlugInLoadsOnAServerThatListsTheHeroes(GameTestHelper helper) {
         // The plug-in is created when the table of heroes is first read, on a dedicated server too: it must not make
         // the verifier load a client class (a LocalPlayer passed on as a Player does), which is why its work is in
@@ -299,7 +295,7 @@ public final class ThanosClientTests {
     // ------------------------------------------------------------------------------------------------------------
     // The clocks of the entity
 
-    @GameTest(template = TestKit.ARENA, batch = CLOCKS)
+    @EnhancedTest(template = TestKit.ARENA, batch = CLOCKS)
     public static void theEntityKeepsTheClocksTheAnimationReads(GameTestHelper helper) {
         TestKit.Fixture f = ThanosBossTests.fixture(helper);
         ServerPlayer starter = f.player(5.5, TestKit.FLOOR, 5.5);
@@ -321,7 +317,7 @@ public final class ThanosClientTests {
         });
     }
 
-    @GameTest(template = TestKit.ARENA, batch = CLOCKS)
+    @EnhancedTest(template = TestKit.ARENA, batch = CLOCKS)
     public static void aViewersPoseStopsTheClocksAtTheTickItWasGiven(GameTestHelper helper) {
         ThanosEntity shown = new ThanosEntity(ModEntities.THANOS.get(), helper.getLevel());
         check(!shown.shownByViewer(), "an entity is not a viewer's until it is shown");

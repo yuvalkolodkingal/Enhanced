@@ -1,7 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.road.RoadChallenge;
@@ -17,7 +17,6 @@ import com.kolodkingal.enhanced.road.boat.IceBoatChallenge;
 import com.kolodkingal.enhanced.road.boat.IceTrack;
 import com.kolodkingal.enhanced.road.boat.IceTrackGenerator;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -28,8 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.UUID;
@@ -45,8 +42,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * out and in, and the options. A test player has no client to drive the boat, so these move the boat and the player the way the
  * game's packets would; the drive itself is in {@link RoadBoatRunTests}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadBoatTests {
     static final String BATCH = "road_boat";
 
@@ -115,7 +110,7 @@ public final class RoadBoatTests {
 
     // ------------------------------------------------------------------------------------------------------------
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 700)
     public static void theCourseIsDrawnWithTheBoatAtTheStartLineAndNothingIsLeftAfterwards(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -166,7 +161,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void theBarrierHoldsUntilGoAndTheNewBoatCarriesThePlayer(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerLevel road = RoadDimension.level(helper.getLevel().getServer());
@@ -193,7 +188,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void aPlayerWhoClimbsOutDuringTheCountdownIsBackOnTheGridAndTheCountdownStartsAgain(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         ServerLevel road = RoadDimension.level(helper.getLevel().getServer());
@@ -225,7 +220,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void aBoatThatFallsOffIsReplacedAndThePlayerIsPutInTheNewOneOnTheLastCheckpoint(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -265,7 +260,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_boat_sneak", timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = "road_boat_sneak", timeoutTicks = 900)
     public static void sneakingOutOfTheBoatGoesBackToTheCheckpointAndAnEarlySneakOnlyKeepsHimInTheBoat(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.BOAT_RACE_RESPAWN_COOLDOWN_SECONDS, 2);
@@ -308,7 +303,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_boat_time", timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = "road_boat_time", timeoutTicks = 900)
     public static void whenTheTimeRunsOutTheBoatAndThePlayerAreBackAtTheStartAndTheBarrierIsShutAgain(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.BOAT_RACE_TIME_LIMIT_SECONDS, 5);
@@ -344,7 +339,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void crossingTheFinishLineWinsTheTrialOpensTheGateAndKeepsTheBestTime(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -394,7 +389,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 1100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 1100)
     public static void loggingBackInDuringTheRaceBuildsTheCourseAgainAndPutsHimInABoatOnHisCheckpoint(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -437,7 +432,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 900)
     public static void leavingTheRoadInTheMiddleOfTheRaceTakesEverythingAway(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -466,7 +461,7 @@ public final class RoadBoatTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_boat_config", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_boat_config", timeoutTicks = 500)
     public static void theOptionsShapeTheCourseAndTheClock(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.BOAT_RACE_LENGTH, 300);

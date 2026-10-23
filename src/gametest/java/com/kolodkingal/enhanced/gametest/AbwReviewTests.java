@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -18,12 +17,12 @@ import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.gametest.BuildTestSupport.Seen;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,8 +35,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.put;
 import static com.kolodkingal.enhanced.gametest.BuildTestSupport.abs;
@@ -60,13 +57,11 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * cannot hit faster than its interval; the unlimited Chaos Shield can be made limited against bosses; the Death Horseman
  * is not lost when the Four are cut to three. Every test has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AbwReviewTests {
     private static final BoundingBox BIG = new BoundingBox(1, 2, 1, 19, 9, 19);
 
     /** An Instant undo in chunks that are not loaded goes at normal speed at once (it used to hold the tick until instantMaxMillis ran out). */
-    @GameTest(template = ARENA, batch = "abw_review_instant_dark", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_review_instant_dark", timeoutTicks = 100)
     public static void instantUndoInUnloadedChunksDoesNotSpin(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.WANDA_INSTANT_MAX_MILLIS, 4000);
@@ -88,7 +83,7 @@ public final class AbwReviewTests {
     }
 
     /** The Instant time of one server tick is shared: when the first Instant spell spends it, the second goes at normal speed without writing. */
-    @GameTest(template = ARENA, batch = "abw_review_instant_tick", timeoutTicks = 1200)
+    @EnhancedTest(template = ARENA, batch = "abw_review_instant_tick", timeoutTicks = 1200)
     public static void instantSpellsShareTheTicksTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.WANDA_INSTANT_MAX_MILLIS, 5000);
@@ -129,7 +124,7 @@ public final class AbwReviewTests {
     }
 
     /** Press, release, press within two ticks hits once (and the interval still holds after the second press). */
-    @GameTest(template = ARENA, batch = "abw_review_beam_tap", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_review_beam_tap", timeoutTicks = 60)
     public static void tappingTheBeamKeyCannotHitFasterThanItsInterval(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.BILLY_BEAM, true);
@@ -167,7 +162,7 @@ public final class AbwReviewTests {
     }
 
     /** The default: unlimited against bosses too. His Backhand does not wear the shield. */
-    @GameTest(template = ARENA, batch = "abw_review_shield_boss_on", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_review_shield_boss_on", timeoutTicks = 100)
     public static void unlimitedShieldIsUnlimitedAgainstBossesByDefault(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, true);
@@ -175,7 +170,7 @@ public final class AbwReviewTests {
     }
 
     /** With shieldUnlimitedVsBosses off, what a boss deals wears the shield by the old rules; an arrow still does not. */
-    @GameTest(template = ARENA, batch = "abw_review_shield_boss_off", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "abw_review_shield_boss_off", timeoutTicks = 100)
     public static void bossDamageWearsTheUnlimitedShieldWhenAsked(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, true);
@@ -210,7 +205,7 @@ public final class AbwReviewTests {
     }
 
     /** Death is not lost when powerFactor cuts the Four to three in a fight big enough for four. */
-    @GameTest(template = ARENA, batch = "abw_review_horsemen_kinds")
+    @EnhancedTest(template = ARENA, batch = "abw_review_horsemen_kinds")
     public static void deathTakesThePlaceOfTheThirdHorseman(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(ApocalypseBossConfig.POWER_FACTOR, 0.65);
@@ -224,7 +219,7 @@ public final class AbwReviewTests {
     }
 
     /** The key's name follows billy.beam: "Hex Beam" with the beam, "Hex Bolt" with the single shot. */
-    @GameTest(template = ARENA, batch = "abw_review_billy_key_name")
+    @EnhancedTest(template = ARENA, batch = "abw_review_billy_key_name")
     public static void theKeyNameFollowsTheBeamOption(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.BILLY_BEAM, true);

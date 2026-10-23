@@ -1,26 +1,23 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
 import com.kolodkingal.enhanced.ability.WaterRun;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
@@ -31,8 +28,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * {@code SpeedsterSurfaceTests}: each tick his run along his facing and gravity, the water's hold ({@link WaterRun},
  * what his client does before it moves him), then the move with the game's collision. Each test has a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SpeedsterWaterTests {
     /** The run speed along +x (blocks per tick). */
     private static final double SPEED = 0.5;
@@ -79,7 +74,7 @@ public final class SpeedsterWaterTests {
      * Tommy at super speed with his Wall &amp; Water Run on (from the start) runs across the pool and never sinks; with
      * it switched off (Sneak + R), or not running, he sinks.
      */
-    @GameTest(template = ARENA, batch = "speedster_water")
+    @EnhancedTest(template = ARENA, batch = "speedster_water")
     public static void tommyRunsOnWaterWhileSpeeding(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = onThePool(f, helper, Power.TOMMY);
@@ -105,7 +100,7 @@ public final class SpeedsterWaterTests {
     }
 
     /** Walking (not at super speed) Tommy sinks; running again on the water's top, the water holds him from then on. */
-    @GameTest(template = ARENA, batch = "speedster_water_walk")
+    @EnhancedTest(template = ARENA, batch = "speedster_water_walk")
     public static void tommyStopsSinkingOnlyWhileHeRuns(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tommy = onThePool(f, helper, Power.TOMMY);
@@ -125,7 +120,7 @@ public final class SpeedsterWaterTests {
     }
 
     /** Quicksilver's Wall &amp; Water Run is the same rule: on, he runs on water; off (B), he sinks. */
-    @GameTest(template = ARENA, batch = "speedster_water_qs")
+    @EnhancedTest(template = ARENA, batch = "speedster_water_qs")
     public static void quicksilverRunsOnWaterByTheSameRule(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = onThePool(f, helper, Power.QUICKSILVER);

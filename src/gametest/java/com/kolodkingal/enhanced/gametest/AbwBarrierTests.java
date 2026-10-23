@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
@@ -11,11 +10,11 @@ import com.kolodkingal.enhanced.apocalypse.SandControl;
 import com.kolodkingal.enhanced.build.BuildData;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
@@ -26,8 +25,6 @@ import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.put;
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
@@ -44,8 +41,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * explosions here are stopped whole and cost it nothing. Billy stands at
  * (10.5, 8.5) looking south (+z): "in front" is z greater than his.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AbwBarrierTests {
     private static ServerPlayer billy(TestKit.Fixture f) {
         ServerPlayer billy = f.player(10.5, FLOOR, 8.5, Power.BILLY);
@@ -90,7 +85,7 @@ public final class AbwBarrierTests {
     }
 
     /** Front: stopped and paid for. Side, back: they pass whole. */
-    @GameTest(template = ARENA, batch = "abw_barrier_arc", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_arc", timeoutTicks = 60)
     public static void barrierStopsWhatComesFromTheFrontOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -119,7 +114,7 @@ public final class AbwBarrierTests {
     }
 
     /** A creature's blow: stopped from the front and the attacker thrown back; from behind it lands. */
-    @GameTest(template = ARENA, batch = "abw_barrier_melee", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_melee", timeoutTicks = 60)
     public static void barrierStopsABlowFromTheFrontAndThrowsTheAttackerBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -141,7 +136,7 @@ public final class AbwBarrierTests {
     }
 
     /** Explosions in front: all of it is stopped (3.3), damage and push; behind: all of it lands. */
-    @GameTest(template = ARENA, batch = "abw_barrier_explosion", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_explosion", timeoutTicks = 60)
     public static void barrierStopsAnExplosionInFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -162,7 +157,7 @@ public final class AbwBarrierTests {
     }
 
     /** At 0 it shatters (the hit that breaks it is stopped too), B waits 10 seconds, and it mends from nothing while down. */
-    @GameTest(template = ARENA, batch = "abw_barrier_break", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_break", timeoutTicks = 60)
     public static void barrierShattersAndMends(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -189,7 +184,7 @@ public final class AbwBarrierTests {
     }
 
     /** No time limit: still up after 15 seconds of holding; letting go lowers it, keeps what is left, and a short recharge follows. */
-    @GameTest(template = ARENA, batch = "abw_barrier_time", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_time", timeoutTicks = 400)
     public static void barrierHasNoTimeLimit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -227,7 +222,7 @@ public final class AbwBarrierTests {
     }
 
     /** No hunger: it costs none and can be raised on an empty stomach; he still walks slowly behind it. */
-    @GameTest(template = ARENA, batch = "abw_barrier_hunger", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_hunger", timeoutTicks = 60)
     public static void barrierCostsNoHungerAndSlowsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -250,7 +245,7 @@ public final class AbwBarrierTests {
     }
 
     /** 60 at every rank by default (3.3.1); with barrierRankHealthBonus it grows evenly to the highest rank. */
-    @GameTest(template = ARENA, batch = "abw_barrier_rank")
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_rank")
     public static void barrierHealthAndRank(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(BuildConfig.BILLY_MAX_RANK, 4);
@@ -265,7 +260,7 @@ public final class AbwBarrierTests {
     }
 
     /** The option off: the key raises nothing. */
-    @GameTest(template = ARENA, batch = "abw_barrier_hud", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_hud", timeoutTicks = 60)
     public static void theSwitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -282,7 +277,7 @@ public final class AbwBarrierTests {
     }
 
     /** Plain B is still Freeze: with no Sneak it does not raise a barrier. */
-    @GameTest(template = ARENA, batch = "abw_barrier_freeze", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_freeze", timeoutTicks = 40)
     public static void plainBIsStillFreeze(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = billy(f);
@@ -296,7 +291,7 @@ public final class AbwBarrierTests {
     }
 
     /** 3.3: the boss's attacks from the front are stopped: his Backhand, his Mind Crush, his Entomb. */
-    @GameTest(template = ARENA, batch = "abw_barrier_boss", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "abw_barrier_boss", timeoutTicks = 120)
     public static void barrierStopsTheBossFromTheFront(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         ServerPlayer billy = d.hero();

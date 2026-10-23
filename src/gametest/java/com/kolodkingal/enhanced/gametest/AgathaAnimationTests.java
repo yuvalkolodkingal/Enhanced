@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.AgathaGestures;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
 import com.kolodkingal.enhanced.client.render.GestureId;
@@ -11,13 +10,11 @@ import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.ShieldStyles;
 import com.kolodkingal.enhanced.client.render.Stance;
 import com.kolodkingal.enhanced.client.render.StancePoses;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -30,12 +27,10 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * shield ending on the poses that take over, what her own key press starts at once, when her eyes burn, and her shield's
  * HUD line. (The rows of the shared tables are in {@code AnimationMathTests}' regions.)
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class AgathaAnimationTests {
     private static final String BATCH = "agatha_animation";
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyAbilityOfHersIsActed(GameTestHelper helper) {
         Power p = Power.AGATHA;
         check(GestureRoutes.acting(p, 1).equals("live:BEAMING"), "R by the beam's state");
@@ -60,7 +55,7 @@ public final class AgathaAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herTakeOffAndShieldEndOnThePosesThatTakeOver(GameTestHelper helper) {
         FlightProfile profile = FlightProfile.of(Power.AGATHA, false);
         check(profile != null, "she flies with a profile of her own");
@@ -80,7 +75,7 @@ public final class AgathaAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herOwnPressActsOnlyWhatTheServerWillDo(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000L;
@@ -94,7 +89,7 @@ public final class AgathaAnimationTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herEyesBurnWhileSheWorksMagic(GameTestHelper helper) {
         PowerData data = new PowerData();
         long now = 1000L;
@@ -115,7 +110,7 @@ public final class AgathaAnimationTests {
         return line != null && line.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t ? t.getKey() : "";
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herShieldsHudLineIsTheSharedOne(GameTestHelper helper) {
         PowerData data = new PowerData();
         data.raiseChaosShield(100L, 8, 40.0F);

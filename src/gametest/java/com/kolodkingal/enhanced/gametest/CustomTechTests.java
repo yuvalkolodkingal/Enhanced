@@ -23,6 +23,7 @@ import com.kolodkingal.enhanced.custom.CustomHeroes;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.Resource;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -35,7 +36,6 @@ import com.kolodkingal.enhanced.ultron.UltronBoltEntity;
 import com.kolodkingal.enhanced.ultron.UltronDrones;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -53,8 +53,6 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -78,8 +76,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * languages. A test that keeps server-wide state (the sand that rolls, a beam, the drones, a link) has a batch of its own
  * and {@link TestKit#bossFixture}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CustomTechTests {
     private static final String QUICK = "custom_tech";
     private static final String PVP = "custom_tech_pvp";
@@ -182,7 +178,7 @@ public final class CustomTechTests {
     // Spider-Man
 
     /** spider.web on B: the shot webs the creature looked at; Sneak + B is the Web Burst, its cooldown on B. */
-    @GameTest(template = ARENA, batch = SPIDER, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = SPIDER, timeoutTicks = 60)
     public static void spiderWebOnB(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hero(f, 10.5, 6.5, "spider.web", 4);
@@ -210,7 +206,7 @@ public final class CustomTechTests {
     }
 
     /** spider.zip on R: the zip starts and ends at the block; Sneak + R held is a swing that ends when R is let go. */
-    @GameTest(template = ARENA, batch = SPIDER, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = SPIDER, timeoutTicks = 60)
     public static void spiderZipAndSwingOnR(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.ZIP_COOLDOWN, 0);
@@ -243,7 +239,7 @@ public final class CustomTechTests {
     }
 
     /** spider.crawl on N: crawl and the sense start on; N switches the crawl, Sneak + N the sense; it clings with the row only. */
-    @GameTest(template = ARENA, batch = SPIDER)
+    @EnhancedTest(template = ARENA, batch = SPIDER)
     public static void spiderCrawlOnN(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hero(f, 4.5, 4.5, "spider.crawl", 5);
@@ -273,7 +269,7 @@ public final class CustomTechTests {
     }
 
     /** spider.legs on R in his own look: the legs come out (reach, no fall damage); Sneak + R twice is Instant Kill. */
-    @GameTest(template = ARENA, batch = SPIDER)
+    @EnhancedTest(template = ARENA, batch = SPIDER)
     public static void spiderLegsInAnyLook(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hero(f, 4.5, 4.5, "spider.legs", 1);
@@ -300,7 +296,7 @@ public final class CustomTechTests {
     }
 
     /** spider.black_eyes on G: the surge with its speed; G again calms it, with half the cooldown on G. */
-    @GameTest(template = ARENA, batch = SPIDER)
+    @EnhancedTest(template = ARENA, batch = SPIDER)
     public static void spiderBlackEyesOnG(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hero(f, 4.5, 4.5, "spider.black_eyes", 2);
@@ -318,7 +314,7 @@ public final class CustomTechTests {
     }
 
     /** The body of Spider-Man comes with spider.body only, scaled by its strength; another of his rows gives none of it. */
-    @GameTest(template = ARENA, batch = SPIDER)
+    @EnhancedTest(template = ARENA, batch = SPIDER)
     public static void spiderBodyOnlyWithItsRow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer web = hero(f, 4.5, 4.5, "spider.web", 1);
@@ -341,7 +337,7 @@ public final class CustomTechTests {
     // Ultron
 
     /** ultron.repulsor on V: held, plasma bolts fly; let go, they stop. Sneak + V: the Overcharge, its cooldown on V. */
-    @GameTest(template = ARENA, batch = "custom_tech_ultron", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_ultron", timeoutTicks = 100)
     public static void ultronRepulsorOnV(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -380,7 +376,7 @@ public final class CustomTechTests {
     }
 
     /** ultron.gravity on R pulls a creature, its cooldown on R; Sneak + R slams; ultron.body: the machine. */
-    @GameTest(template = ARENA, batch = "custom_tech_ultron_pull", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_ultron_pull", timeoutTicks = 60)
     public static void ultronGravityOnRAndHisBody(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 3.5, 10.5, "ultron.gravity", 1, "ultron.body", 0);
@@ -409,7 +405,7 @@ public final class CustomTechTests {
     }
 
     /** ultron.army on G: Sentries of his own; ultron.upload on B jumps into one; losing his powers takes the army away. */
-    @GameTest(template = ARENA, batch = "custom_tech_ultron_army", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_ultron_army", timeoutTicks = 100)
     public static void ultronArmyAndUploadForACustomOwner(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 10.5, 10.5, "ultron.army", 2, "ultron.upload", 4);
@@ -440,7 +436,7 @@ public final class CustomTechTests {
     }
 
     /** magneto.shrapnel and ultron.repulsor use the one iron charge: the later one is left out with a note. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theIronChargeIsOneOwners(GameTestHelper helper) {
         CustomHero hero = CustomKitSupport.def().pick("magneto.shrapnel", 5).pick("ultron.repulsor", 5).raw();
         CustomHeroRules.Result result = CustomHeroRules.sanitize(hero, CustomHeroRules.Limits.DEFAULT);
@@ -455,7 +451,7 @@ public final class CustomTechTests {
     // Apocalypse
 
     /** apocalypse.shield on R: held, it forms and stops a blow; let go, it drops with its cooldown on R. */
-    @GameTest(template = ARENA, batch = "custom_tech_apoc_shield", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_apoc_shield", timeoutTicks = 100)
     public static void apocalypseShieldOnR(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 10.5, 10.5, "apocalypse.shield", 1);
@@ -479,7 +475,7 @@ public final class CustomTechTests {
     }
 
     /** apocalypse.sand on G: a wave rolls, its cooldown on G; Sneak + G entombs. Nothing of his body without its row. */
-    @GameTest(template = ARENA, batch = "custom_tech_apoc_sand", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_apoc_sand", timeoutTicks = 120)
     public static void apocalypseSandOnG(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 1.5, 10.5, "apocalypse.sand", 2);
@@ -506,7 +502,7 @@ public final class CustomTechTests {
     }
 
     /** apocalypse.bestow on V (Sneak: the storm) and apocalypse.portal on N; apocalypse.body: his body and healing. */
-    @GameTest(template = ARENA, batch = "custom_tech_apoc_bestow", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_apoc_bestow", timeoutTicks = 100)
     public static void apocalypseBestowPortalAndBody(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 4.5, 10.5, "apocalypse.bestow", 3, "apocalypse.portal", 5, "apocalypse.body", 0);
@@ -534,7 +530,7 @@ public final class CustomTechTests {
     // Cyclops
 
     /** cyclops.optic_blast on G without glasses: held, it burns; let go, it stops; Sneak + G: the Ricochet, its cooldown on G. */
-    @GameTest(template = ARENA, batch = "custom_tech_optic", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_optic", timeoutTicks = 60)
     public static void cyclopsOpticBlastNeedsNoGlasses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 3.5, 10.5, "cyclops.optic_blast", 2);
@@ -561,7 +557,7 @@ public final class CustomTechTests {
     }
 
     /** cyclops.glasses on R: Sneak + R opens his eyes (the giant beam pours out); R shuts them and it stops. */
-    @GameTest(template = ARENA, batch = "custom_tech_unleashed", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_unleashed", timeoutTicks = 60)
     public static void cyclopsEyesOpenAndShut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 3.5, 10.5, "cyclops.glasses", 1);
@@ -588,7 +584,7 @@ public final class CustomTechTests {
     }
 
     /** cyclops.concussion on N, cyclops.leap on B, cyclops.rally on V: each on its column; cyclops.body only with its row. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void cyclopsBlastsLeapAndRally(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hero(f, 4.5, 10.5, "cyclops.concussion", 5, "cyclops.leap", 4, "cyclops.rally", 3);
@@ -615,7 +611,7 @@ public final class CustomTechTests {
     // Professor X
 
     /** xavier.mental_blast on N and xavier.freeze_minds on G, each on its column; thoughts on V; Cerebro on B. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void xavierBlastFreezeThoughtsAndCerebro(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = hero(f, 4.5, 10.5, "xavier.mental_blast", 5, "xavier.freeze_minds", 2, "xavier.thoughts", 3,
@@ -643,7 +639,7 @@ public final class CustomTechTests {
     }
 
     /** xavier.take_over on R: R takes the creature looked at, R again brings him back, and R rests. */
-    @GameTest(template = ARENA, batch = "custom_tech_link", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "custom_tech_link", timeoutTicks = 60)
     public static void xavierTakeOverReturnsOnItsColumn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer p = hero(f, 3.5, 10.5, "xavier.take_over", 1);
@@ -666,7 +662,7 @@ public final class CustomTechTests {
     }
 
     /** With PvP on, a custom Mental Blast hurts a player through armour, scaled by its strength (2 against 9). */
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void theMentalBlastScalesByStrength(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -693,7 +689,7 @@ public final class CustomTechTests {
     // The generic Wall Crawl, the names
 
     /** The generic Wall Crawl, on, raises the cling flag Spider-Man's stances are read from; off or on the ground, none. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theGenericWallCrawlSetsTheClingFlags(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer p = CustomKitSupport.hero(f, 4.5, 4.5, CustomKitSupport.def().pick("wall_crawl", 5).key(1, "wall_crawl").build());
@@ -715,7 +711,7 @@ public final class CustomTechTests {
     }
 
     /** Every row of the five heroes has its name and its line (and its Sneak variant's name) in English and Hebrew. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void everyRowOfTheFiveHasItsNames(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();

@@ -86,7 +86,7 @@ public final class TestKit {
      * Magnetic Pulls): when the test ends, pass or fail, it lets every fight go, clears the heroes' statics, Build Magic
      * and the pulls, puts back the boss lanes and the Thanos summoning the mod registered and the rewards that were
      * waiting, so a fight left over from one test never reaches the next. A boss test also has a batch of its own
-     * ({@code @GameTest(batch = ...)}), so no other test runs while it does.
+     * ({@code @EnhancedTest(batch = ...)}), so no other test runs while it does.
      */
     public static Fixture bossFixture(GameTestHelper helper) {
         Fixture fixture = fixture(helper);

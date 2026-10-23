@@ -1,17 +1,14 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.boat.IceBoatModel;
 import com.kolodkingal.enhanced.road.boat.IceTrack;
 import com.kolodkingal.enhanced.road.boat.IceTrackGenerator;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
@@ -22,8 +19,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * tick. Then the facts the course is built on are measured on the real boat: it does not climb a slab, it slows down on snow, and it
  * crosses a gap of five blocks only above a speed that {@link IceBoatModel#minJumpSpeed} gets right.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadBoatPhysicsTests {
     static final String BATCH = "road_boat_physics";
 
@@ -100,17 +95,17 @@ public final class RoadBoatPhysicsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theSimulationAgreesWithTheRealBoatOnAWholeCourse(GameTestHelper helper) {
         sameAsTheRealBoat(helper, IceTrackGenerator.generate(41, new IceTrackGenerator.Params(600, 9, 2, 1, true, true, 100)), false, 0.0, 1500);
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theSimulationAgreesWithTheRealBoatWhenItHitsWallsAndSnow(GameTestHelper helper) {
         sameAsTheRealBoat(helper, IceTrackGenerator.generate(77, new IceTrackGenerator.Params(600, 9, 3, 1, true, true, 100)), false, 1.0, 1200);
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theSimulationAgreesWithTheRealBoatOverAShortcutAndItsGap(GameTestHelper helper) {
         // The first course with a shortcut that the driver takes.
         for (long seed = 1; seed < 60; seed++) {
@@ -141,7 +136,7 @@ public final class RoadBoatPhysicsTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void aBoatDoesNotClimbAnythingNotEvenASlabOrALayerOfSnow(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         BlockState[] steps = {
@@ -166,7 +161,7 @@ public final class RoadBoatPhysicsTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void snowTakesTheSpeedOffTheBoatButNeverStopsIt(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         RoadBoatSupport.Cell cell = RoadBoatSupport.draw(f, c -> {
@@ -220,7 +215,7 @@ public final class RoadBoatPhysicsTests {
         return across;
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void aGapOfFiveBlocksWithALowerFarSideIsCrossedByASpeedTheModelKnows(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         RoadBoatSupport.Cell cell = RoadBoatSupport.draw(f, c -> {

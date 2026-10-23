@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.AreaTargets;
@@ -18,6 +17,7 @@ import com.kolodkingal.enhanced.gametest.BossTestSupport.TestLane;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.ScepterRituals;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -25,7 +25,6 @@ import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,8 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.Set;
 import java.util.UUID;
@@ -60,8 +57,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * sweeps, the hooks in Quicksilver's slow motion, Magneto's strip, Wanda's telekinesis and the Hex, the commands and
  * the Scepter ritual that start a fight.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossHookTests {
 
     /** A zombie that answers Quicksilver Time like a boss would. */
@@ -109,7 +104,7 @@ public final class BossHookTests {
     // ------------------------------------------------------------------------------------------------------------
     // Members, minions, credit and orphans
 
-    @GameTest(template = ARENA, batch = "boss_members")
+    @EnhancedTest(template = ARENA, batch = "boss_members")
     public static void aFightKnowsItsMembersAndMinionsAndItsBossSparesItsOwn(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -141,7 +136,7 @@ public final class BossHookTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_orphans")
+    @EnhancedTest(template = ARENA, batch = "boss_orphans")
     public static void anEntityOfABossThatNoRunningFightOwnsNeverJoinsALevel(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -196,7 +191,7 @@ public final class BossHookTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_credit")
+    @EnhancedTest(template = ARENA, batch = "boss_credit")
     public static void aPlayersDamageToTheBossAndItsMinionsGoesInTheirLedgerAndTheKillerStrikesTheLastBlow(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -235,7 +230,7 @@ public final class BossHookTests {
     // ------------------------------------------------------------------------------------------------------------
     // Hooks in the heroes
 
-    @GameTest(template = ARENA, batch = "boss_hook_slow")
+    @EnhancedTest(template = ARENA, batch = "boss_hook_slow")
     public static void quicksilverTimeSlowsABossAsItSaysAndEverythingElseAsBefore(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer quicksilver = f.player(10.5, FLOOR, 10.5, Power.QUICKSILVER);
@@ -267,7 +262,7 @@ public final class BossHookTests {
         return skipped;
     }
 
-    @GameTest(template = ARENA, batch = "boss_hook_strip")
+    @EnhancedTest(template = ARENA, batch = "boss_hook_strip")
     public static void magnetosStripGoesToABossFirstAndSkipsTheNormalStripWhenItIsHandled(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer magneto = f.player(4.5, FLOOR, 10.5, Power.MAGNETO);
@@ -288,7 +283,7 @@ public final class BossHookTests {
     }
 
     /** Lightning is told to an entity that wants to know, with Thor if it is his, and only when it got through. */
-    @GameTest(template = ARENA, batch = "boss_hook_lightning")
+    @EnhancedTest(template = ARENA, batch = "boss_hook_lightning")
     public static void lightningIsToldToABossWithThorIfItIsHisAndOnlyWhenItGotThrough(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -320,7 +315,7 @@ public final class BossHookTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_hook_telekinesis", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_hook_telekinesis", timeoutTicks = 60)
     public static void wandasTelekinesisGoesToTheFightFirstWhenSheHoldsNothingAndWhenSheThrows(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer wanda = f.player(6.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -353,7 +348,7 @@ public final class BossHookTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_hook_hex")
+    @EnhancedTest(template = ARENA, batch = "boss_hook_hex")
     public static void theHexLetsAFightsMembersThroughOnlyWhenTheLaneSaysSo(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer member = f.player(10.5, FLOOR, 10.5, Power.THOR);
@@ -375,7 +370,7 @@ public final class BossHookTests {
     // ------------------------------------------------------------------------------------------------------------
     // Commands and the ritual
 
-    @GameTest(template = ARENA, batch = "boss_commands")
+    @EnhancedTest(template = ARENA, batch = "boss_commands")
     public static void theBossCommandsStartListAndStopARealFightThroughItsLane(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -391,7 +386,7 @@ public final class BossHookTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_ritual")
+    @EnhancedTest(template = ARENA, batch = "boss_ritual")
     public static void theScepterAndTheProgramStartTheUltronFightThroughItsLane(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);

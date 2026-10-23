@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.config.ApocalypseBossConfig;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -18,7 +19,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -42,8 +42,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +57,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the boss is when nothing owns it. The ritual here is the real one (a Capstone, Sneak and right-click on sand under the
  * open sky in daylight, a Scarlet Witch near); only the arena is made small.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ApocalypseRitualTests {
     /** The block of the floor the Capstone is planted on (relative coordinates). */
     static final BlockPos CLICK = new BlockPos(10, 1, 10);
@@ -68,7 +64,7 @@ public final class ApocalypseRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // The recipe and the items
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void capstoneRecipeIsAPyramid(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("capstone"));
@@ -101,7 +97,7 @@ public final class ApocalypseRitualTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void capstoneAndEssenceAreInTheCreativeTab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         CreativeModeTabs.tryRebuildTabContents(level.enabledFeatures(), true, level.registryAccess());
@@ -112,7 +108,7 @@ public final class ApocalypseRitualTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_pure")
+    @EnhancedTest(template = ARENA, batch = "apocalypse_pure")
     public static void essenceAndCapstoneAreNotInChests(GameTestHelper helper) throws Exception {
         MinecraftServer server = helper.getLevel().getServer();
         var manager = server.getResourceManager();
@@ -182,7 +178,7 @@ public final class ApocalypseRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // The ritual
 
-    @GameTest(template = ARENA, batch = "apocalypse_ritual", timeoutTicks = 320)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_ritual", timeoutTicks = 320)
     public static void ritualStartsTheFightOnSandInDaylight(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         readyGround(f);
@@ -225,7 +221,7 @@ public final class ApocalypseRitualTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_ritual_breaker", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_ritual_breaker", timeoutTicks = 100)
     public static void ritualRefusesWithoutABreaker(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         readyGround(f);
@@ -278,7 +274,7 @@ public final class ApocalypseRitualTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "apocalypse_ritual_checks", timeoutTicks = 800)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_ritual_checks", timeoutTicks = 800)
     public static void ritualChecksEachConditionAndUsesNothingUpWhenItRefuses(GameTestHelper helper) {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         readyGround(f);
@@ -404,7 +400,7 @@ public final class ApocalypseRitualTests {
     // ------------------------------------------------------------------------------------------------------------
     // Nobody summons him
 
-    @GameTest(template = ARENA, batch = "apocalypse_orphans", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "apocalypse_orphans", timeoutTicks = 100)
     public static void apocalypseCannotBeSummonedAndOrphansAreSwept(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = ApocalypseTestSupport.fixture(helper);
         ServerLevel level = f.level();

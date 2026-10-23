@@ -20,6 +20,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.SpiderClingPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -37,7 +38,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -93,8 +93,6 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
@@ -130,8 +128,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * <p>Nothing ticks a player without a client, so a test ticks the hero itself ({@code PowerTicker.tick}); what depends on
  * the game's clock (a cooldown, a hysteresis, a timeout) is driven by {@code everyTick}, one hero tick per game tick.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SpiderManTests {
     private static final String QUICK = "spider";
     private static final String CLIMB = "spider_climb";
@@ -364,7 +360,7 @@ public final class SpiderManTests {
     // ------------------------------------------------------------------------------------------------------------
     // Getting the power
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 400)
     public static void theRadioactiveBiteAwakensSpiderMan(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -400,7 +396,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aBiteChangesNothingForAHero(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -435,7 +431,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_milk_and_another_power_cancel_the_bite", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "spider_milk_and_another_power_cancel_the_bite", timeoutTicks = 200)
     public static void milkAndAnotherPowerCancelTheBite(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.BITE_DELAY_TICKS, 20);
@@ -474,7 +470,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 200)
     public static void theRecipeAndTheLootAreThere(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Optional<RecipeHolder<?>> holder = level.getRecipeManager().byKey(Enhanced.id("radioactive_spider"));
@@ -557,7 +553,7 @@ public final class SpiderManTests {
         return player.getAttributeValue(Attributes.ARMOR);
     }
 
-    @GameTest(template = ARENA, batch = "spider_each_suit_has_its_protection")
+    @EnhancedTest(template = ARENA, batch = "spider_each_suit_has_its_protection")
     public static void eachSuitHasItsProtection(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -586,7 +582,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_body_is_quicker_stronger_and_lands_softly")
+    @EnhancedTest(template = ARENA, batch = "spider_body_is_quicker_stronger_and_lands_softly")
     public static void theBodyIsQuickerStrongerAndLandsSoftly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -626,7 +622,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void webbingNeverHoldsASpiderMan(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -658,7 +654,7 @@ public final class SpiderManTests {
     // ------------------------------------------------------------------------------------------------------------
     // Web Shot, organic webs, web blocks
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 100)
     public static void aWebShotWebsACreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 6.5);
@@ -705,7 +701,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_web_shot_at_nothing_costs_nothing")
+    @EnhancedTest(template = ARENA, batch = "spider_web_shot_at_nothing_costs_nothing")
     public static void aWebShotAtNothingCostsNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.WEB_SHOT_RANGE, 4);
@@ -729,7 +725,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aWebShotOnABlockLaysAPatch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 6.5);
@@ -760,7 +756,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_web_blocks_switch_and_cap_and_vanish", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "spider_web_blocks_switch_and_cap_and_vanish", timeoutTicks = 200)
     public static void theWebBlocksSwitchAndCapAndVanish(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -808,7 +804,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_organic_webs_last_longer_and_cost_more")
+    @EnhancedTest(template = ARENA, batch = "spider_organic_webs_last_longer_and_cost_more")
     public static void organicWebsLastLongerAndCostMore(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.WEB_SHOT_COOLDOWN, 0);
@@ -875,7 +871,7 @@ public final class SpiderManTests {
         }
     }
 
-    @GameTest(template = ARENA, batch = "spider_bosses_and_spider_man_cannot_be_webbed")
+    @EnhancedTest(template = ARENA, batch = "spider_bosses_and_spider_man_cannot_be_webbed")
     public static void bossesAndSpiderManCannotBeWebbed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -913,7 +909,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_instant_kill_spares_the_minions_and_bosses_of_a_fight")
+    @EnhancedTest(template = ARENA, batch = "spider_instant_kill_spares_the_minions_and_bosses_of_a_fight")
     public static void instantKillSparesTheMinionsAndBossesOfAFight(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -957,7 +953,7 @@ public final class SpiderManTests {
      * does, not at every strike: a leg that resets the minion's invulnerability for every strike (as it does for the
      * creatures it kills) would hit it twice as often, and four legs would clear a boss's army in seconds.
      */
-    @GameTest(template = ARENA, batch = "spider_instant_kill_does_not_hasten_the_blows_on_a_minion", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_instant_kill_does_not_hasten_the_blows_on_a_minion", timeoutTicks = 100)
     public static void instantKillDoesNotHastenTheBlowsOnAMinionOfAFight(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -992,7 +988,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_no_web_block_goes_up_in_a_protected_arena")
+    @EnhancedTest(template = ARENA, batch = "spider_no_web_block_goes_up_in_a_protected_arena")
     public static void noWebBlockGoesUpInAProtectedArena(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1013,7 +1009,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aTornWebBreaksFree(GameTestHelper helper) {
         Zombie zombie = zombie(helper, 10.5, 10.5);
         toughen(zombie);
@@ -1033,7 +1029,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aWebBurstWebsEveryoneAround(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -1068,7 +1064,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aWebBurstNeedsSomeoneNearby(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 15.5);
@@ -1087,7 +1083,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_chaos_shield_stops_his_webs")
+    @EnhancedTest(template = ARENA, batch = "spider_chaos_shield_stops_his_webs")
     public static void aChaosShieldStopsHisWebs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1130,7 +1126,7 @@ public final class SpiderManTests {
     // ------------------------------------------------------------------------------------------------------------
     // Zip and swing
 
-    @GameTest(template = ARENA, batch = "spider_zip_needs_a_block_in_range")
+    @EnhancedTest(template = ARENA, batch = "spider_zip_needs_a_block_in_range")
     public static void aZipNeedsABlockInRange(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.ZIP_RANGE, 8);
@@ -1172,7 +1168,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aZipThroughTheHexIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = HexTests.raiseHex(f);
@@ -1228,7 +1224,7 @@ public final class SpiderManTests {
     }
 
     /** The position of a hero on a slow client or a hitching connection comes in steps of several ticks at once. */
-    @GameTest(template = ARENA, batch = "spider_zip_hitch", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_zip_hitch", timeoutTicks = 100)
     public static void aHitchDoesNotEndAZip(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.ZIP_COOLDOWN, 0);
@@ -1253,7 +1249,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_zip_ends_when_it_should", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "spider_zip_ends_when_it_should", timeoutTicks = 200)
     public static void aZipEndsWhenItShould(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.ZIP_COOLDOWN, 0);
@@ -1337,7 +1333,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 100)
     public static void zipsChain(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = zipping(f, helper);
@@ -1361,7 +1357,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void zipMathRampsAndBrakes(GameTestHelper helper) {
         double top = 1.3;
         double factor = 1.15;
@@ -1399,7 +1395,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_swing_lasts_while_g_is_held", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_swing_lasts_while_g_is_held", timeoutTicks = 100)
     public static void aSwingLastsWhileGIsHeld(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 4.5);
@@ -1447,7 +1443,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 100)
     public static void aSwingEndsOnTheFloorAndWhenHeLeapsOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 4.5);
@@ -1485,7 +1481,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void swingMathIsAPendulum(GameTestHelper helper) {
         double g = 0.06;
         double length = 8.0;
@@ -1542,7 +1538,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theKickCounterIsResetWhileHanging(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = zipping(f, helper);
@@ -1582,7 +1578,7 @@ public final class SpiderManTests {
         player.absMoveTo(at.x, at.y, at.z);
     }
 
-    @GameTest(template = ARENA, batch = CLIMB)
+    @EnhancedTest(template = ARENA, batch = CLIMB)
     public static void surfacesAreDetected(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1633,7 +1629,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theKeysMoveHimAlongEveryWall(GameTestHelper helper) {
         for (Direction normal : Direction.Plane.HORIZONTAL) {
             SpiderClimb.Surface wall = new SpiderClimb.Surface(SpiderClimb.Kind.WALL, normal);
@@ -1688,7 +1684,7 @@ public final class SpiderManTests {
         return new Vec3(into.x * Math.cos(radians), -Math.sin(radians), into.z * Math.cos(radians));
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theSpeedFactorScalesEveryMovement(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -1718,7 +1714,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
     public static void clingingRaisesTheFlagAndResetsFalls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -1775,7 +1771,7 @@ public final class SpiderManTests {
      * stance of a hero who climbs or descends. The claim is believed only while a block is there, for a few ticks at a
      * time, and only for a Spider-Man.
      */
-    @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
     public static void whatHisClientSaysHeClingsToIsBelievedOnlyWhereABlockIs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         builtSurfaces(helper);
@@ -1830,7 +1826,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
     public static void aClientThatSaysItLetGoDropsTheFlagAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         builtSurfaces(helper);
@@ -1855,7 +1851,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theClingReportRoundTripsAndNearIsAPureCheck(GameTestHelper helper) {
         for (int kind : new int[]{SpiderClingPayload.NONE, SpiderClingPayload.WALL, SpiderClingPayload.CEILING}) {
             for (Direction direction : Direction.values()) {
@@ -1881,7 +1877,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
     public static void theClingFlagOutlivesLostContactByFourTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -1903,7 +1899,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = CLIMB)
+    @EnhancedTest(template = ARENA, batch = CLIMB)
     public static void aCeilingIsClungToInTheAirAndNotWhileFalling(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -1925,7 +1921,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void leapAndMantleRules(GameTestHelper helper) {
         for (Direction normal : Direction.Plane.HORIZONTAL) {
             SpiderClimb.Surface wall = new SpiderClimb.Surface(SpiderClimb.Kind.WALL, normal);
@@ -1947,7 +1943,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CLIMB)
+    @EnhancedTest(template = ARENA, batch = CLIMB)
     public static void crawlingCostsHungerOnlyWhileMoving(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -1973,7 +1969,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = CLIMB, timeoutTicks = 100)
     public static void blockedHeroesDoNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -2043,7 +2039,7 @@ public final class SpiderManTests {
     // Iron Spider: legs and Instant Kill
 
     /** Batch of its own: Magneto's strip of a player asks PvP, which the test switches on (3.1, D-M 5). */
-    @GameTest(template = ARENA, batch = "spider_legs_magneto_pvp")
+    @EnhancedTest(template = ARENA, batch = "spider_legs_magneto_pvp")
     public static void legsAreIronSpiderOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2084,7 +2080,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_legs_guard_against_threats_only", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_legs_guard_against_threats_only", timeoutTicks = 100)
     public static void legsGuardAgainstThreatsOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -2141,7 +2137,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_instant_kill_needs_a_confirmation", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "spider_instant_kill_needs_a_confirmation", timeoutTicks = 200)
     public static void instantKillNeedsAConfirmation(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2187,7 +2183,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_instant_kill_kills_threats_and_spares_the_rest", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "spider_instant_kill_kills_threats_and_spares_the_rest", timeoutTicks = 200)
     public static void instantKillKillsThreatsAndSparesTheRest(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -2228,7 +2224,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_instant_kill_ends_when_it_should", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_instant_kill_ends_when_it_should", timeoutTicks = 100)
     public static void instantKillEndsWhenItShould(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.INSTANT_KILL_MAX_TICKS, 20);
@@ -2267,7 +2263,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_chaos_shield_stops_a_legs_strike")
+    @EnhancedTest(template = ARENA, batch = "spider_chaos_shield_stops_a_legs_strike")
     public static void aChaosShieldStopsALegsStrike(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -2287,7 +2283,7 @@ public final class SpiderManTests {
     }
 
     /** Batch of its own: Magneto's strip of a player asks PvP, which the test switches on (3.1, D-M 5). */
-    @GameTest(template = ARENA, batch = "spider_magneto_pvp", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "spider_magneto_pvp", timeoutTicks = 300)
     public static void magnetoCanLiftAndStripTheIronSpiderOnly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2335,7 +2331,7 @@ public final class SpiderManTests {
     // ------------------------------------------------------------------------------------------------------------
     // Black Eyes and spider-sense
 
-    @GameTest(template = ARENA, batch = "spider_black_eyes_boost_and_drain", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "spider_black_eyes_boost_and_drain", timeoutTicks = 300)
     public static void theBlackEyesBoostAndDrain(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.BLACK_EYES_MAX_TICKS, 40);
@@ -2392,7 +2388,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theBlackEyesEndAtZeroFoodAndCostNothingInCreative(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2414,7 +2410,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_black_eyes_can_switch_on_by_themselves", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "spider_black_eyes_can_switch_on_by_themselves", timeoutTicks = 200)
     public static void theBlackEyesCanSwitchOnByThemselves(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2442,7 +2438,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "spider_spider_sense_warns_of_an_arrow_once_and_to_him_alone", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_spider_sense_warns_of_an_arrow_once_and_to_him_alone", timeoutTicks = 100)
     public static void spiderSenseWarnsOfAnArrowOnceAndToHimAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -2477,7 +2473,7 @@ public final class SpiderManTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void spiderSenseIgnoresWhatCannotHurtHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -2512,7 +2508,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "spider_spider_sense_warns_of_fuses_and_strikes")
+    @EnhancedTest(template = ARENA, batch = "spider_spider_sense_warns_of_fuses_and_strikes")
     public static void spiderSenseWarnsOfFusesAndStrikes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -2567,7 +2563,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theBlackEyesDoubleTheRangeOfTheSense(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 2.5);
@@ -2581,7 +2577,7 @@ public final class SpiderManTests {
     // ------------------------------------------------------------------------------------------------------------
     // Lifecycle
 
-    @GameTest(template = ARENA, batch = "spider_losing_the_power_cleans_everything", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "spider_losing_the_power_cleans_everything", timeoutTicks = 100)
     public static void losingThePowerCleansEverything(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SpiderConfig.WEB_SHOT_COOLDOWN, 0);
@@ -2612,7 +2608,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void deathLogoutAndDimensionEndEverything(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (String how : List.of("death", "logout", "dimension")) {
@@ -2641,7 +2637,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void spiderTogglesDefaultAndPersist(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 10.5);
@@ -2660,7 +2656,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theWebGeometryAndTheThreatMathHoldUp(GameTestHelper helper) {
         // The strands of the burst: unit vectors spread evenly over a sphere.
         for (int count : new int[]{6, 24, 96}) {
@@ -2682,7 +2678,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aLokiDuplicateDissolvesAtAWebAndIsNotFeared(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f, 10.5, 6.5);
@@ -2702,7 +2698,7 @@ public final class SpiderManTests {
     // ------------------------------------------------------------------------------------------------------------
     // Config and assets
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void spiderManConfigIsSane(GameTestHelper helper) throws IllegalAccessException {
         int options = 0;
         for (Field field : SpiderConfig.class.getDeclaredFields()) {
@@ -2738,7 +2734,7 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void spiderManServerAssetsAndDataAreThere(GameTestHelper helper) {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         String[][] files = {

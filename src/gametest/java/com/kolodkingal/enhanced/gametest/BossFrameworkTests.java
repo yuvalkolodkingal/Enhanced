@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossEnd;
@@ -9,13 +8,13 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGifts;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestArena;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestLane;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -28,8 +27,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -44,8 +41,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * and how the reward reaches them. A {@link TestFight} stands in for the boss, so none of this needs a real one. Every
  * test has a batch of its own: a fight is server-wide state, and one fight may run at a time.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossFrameworkTests {
     /** The middle of the test floor: every arena is a circle round it. */
     static final Vec3 CENTRE = new Vec3(10.5, FLOOR, 10.5);
@@ -100,7 +95,7 @@ public final class BossFrameworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Starting a fight
 
-    @GameTest(template = ARENA, batch = "boss_no_lane")
+    @EnhancedTest(template = ARENA, batch = "boss_no_lane")
     public static void aBossWithNoLaneRefusesPolitely(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer player = f.player(5.5, FLOOR, 5.5);
@@ -113,7 +108,7 @@ public final class BossFrameworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_start_rules")
+    @EnhancedTest(template = ARENA, batch = "boss_start_rules")
     public static void aStartMeetsTheSharedRulesBeforeTheLaneAndBeforeAnythingIsUsedUp(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -164,7 +159,7 @@ public final class BossFrameworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_begin")
+    @EnhancedTest(template = ARENA, batch = "boss_begin")
     public static void aFightBeginsWithItsStarterTheBarsAndTheTickets(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -192,7 +187,7 @@ public final class BossFrameworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Participants and the ledger
 
-    @GameTest(template = ARENA, batch = "boss_ledger")
+    @EnhancedTest(template = ARENA, batch = "boss_ledger")
     public static void playersJoinByDistanceAndTheLedgerCountsWhatTheyDo(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer starter = f.player(10.5, FLOOR, 10.5);
@@ -236,7 +231,7 @@ public final class BossFrameworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Losing, abandoning and timing out
 
-    @GameTest(template = ARENA, batch = "boss_wipe", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "boss_wipe", timeoutTicks = 120)
     public static void aFightIsWipedWhenEveryFighterIsDeadForWipeSeconds(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.WIPE_SECONDS, 1);
@@ -263,7 +258,7 @@ public final class BossFrameworkTests {
      * A wipe is told to the fallen: when everyone is dead, nobody stands near the bars any more (the dead leave the
      * level a second after they die), and the line still reaches every participant.
      */
-    @GameTest(template = ARENA, batch = "boss_wipe_told", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "boss_wipe_told", timeoutTicks = 160)
     public static void theFallenAreToldOfTheWipe(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.WIPE_SECONDS, 3);
@@ -318,7 +313,7 @@ public final class BossFrameworkTests {
      * A fighter who walks out of the arena alive has not fallen: the fight is not wiped after the wipe time, and if
      * nobody comes back it is abandoned (the boss loses interest), with its own words.
      */
-    @GameTest(template = ARENA, batch = "boss_walk_away", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_walk_away", timeoutTicks = 200)
     public static void walkingAwayAliveIsAnAbandonmentNotAWipe(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.WIPE_SECONDS, 1);
@@ -350,7 +345,7 @@ public final class BossFrameworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_wipe_creative", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "boss_wipe_creative", timeoutTicks = 140)
     public static void creativePlayersCannotDieSoAFightOfOnlyThemNeverWipes(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.WIPE_SECONDS, 1);
@@ -370,7 +365,7 @@ public final class BossFrameworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_abandon", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "boss_abandon", timeoutTicks = 120)
     public static void aFightIsAbandonedWhenNobodyIsNearForAbandonSeconds(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ABANDON_SECONDS, 1);
@@ -389,7 +384,7 @@ public final class BossFrameworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_time_out", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_time_out", timeoutTicks = 60)
     public static void aFightThatLastsTooLongIsEnded(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.MAX_FIGHT_MINUTES, 1);
@@ -406,7 +401,7 @@ public final class BossFrameworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_peaceful", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_peaceful", timeoutTicks = 60)
     public static void aFightEndsWhenTheWorldGoesPeacefulAndTheItemComesBack(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -430,7 +425,7 @@ public final class BossFrameworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Refunds follow the ending
 
-    @GameTest(template = ARENA, batch = "boss_refund")
+    @EnhancedTest(template = ARENA, batch = "boss_refund")
     public static void theRitualItemComesBackOnlyWhenTheEndingIsNotThePlayersDoing(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -460,7 +455,7 @@ public final class BossFrameworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Winding down and letting go
 
-    @GameTest(template = ARENA, batch = "boss_wind_down", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_wind_down", timeoutTicks = 200)
     public static void anEndedFightStaysProtectedUntilTheLaneIsDone(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -497,7 +492,7 @@ public final class BossFrameworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_wind_down_stuck", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_wind_down_stuck", timeoutTicks = 60)
     public static void aLaneThatNeverFinishesIsFinishedByForce(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = f.player(10.5, FLOOR, 10.5);
@@ -517,7 +512,7 @@ public final class BossFrameworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_stop", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "boss_stop", timeoutTicks = 100)
     public static void anOperatorsStopWindsDownAndASecondStopOrTheServerStoppingPutsItAllBack(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -541,7 +536,7 @@ public final class BossFrameworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_crash", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_crash", timeoutTicks = 60)
     public static void aLaneThatThrowsEndsItsFightInsteadOfBreakingTheServer(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = f.player(10.5, FLOOR, 10.5);
@@ -562,7 +557,7 @@ public final class BossFrameworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_rest", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_rest", timeoutTicks = 60)
     public static void aBossRestsAfterAFightTheLaneAsksAndTheRestIsSaved(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         MinecraftServer server = helper.getLevel().getServer();

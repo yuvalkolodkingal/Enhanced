@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
@@ -11,6 +10,7 @@ import com.kolodkingal.enhanced.config.ThanosConfig;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.InfinityStone;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -21,7 +21,6 @@ import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
@@ -40,8 +39,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +56,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * between tests but what is the player's own, so the tests that tick for a while have a batch each only where another
  * test running at the same time could be reached by what they do.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -139,7 +134,7 @@ public final class ThanosTests {
      * A Titan's body: forty health, six armour and two toughness more, half the knockback, three more strength, a tenth
      * taller, a longer reach and stride, half the fall; no flight; and all of it gone when the power is.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_body")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_body")
     public static void thanosHasATitansBodyAndCannotFly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = f.player(10.5, FLOOR, 10.5, Power.THANOS);
@@ -172,7 +167,7 @@ public final class ThanosTests {
     /**
      * Another hero's power given to a Thanos takes his body off him at once (the modifiers are removed by the plug-in).
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_body")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_body")
     public static void anotherPowerTakesTheTitansBodyAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 10.5, 10.5);
@@ -190,7 +185,7 @@ public final class ThanosTests {
      * The Titan healing factor: not hurt for a while, he heals half a point a second, for a little hunger; a hurt makes
      * it wait; with an empty hunger bar there is none.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_regen", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_regen", timeoutTicks = 200)
     public static void theTitanHealingFactorWaitsAfterAHurtAndCostsHunger(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosConfig.REGEN_DELAY_TICKS, 40);
@@ -226,7 +221,7 @@ public final class ThanosTests {
      * round where it ends (not the cow, not the one far off), the cooldown of the key and a little hunger, and no block
      * changes even with block damage on.
      */
-    @GameTest(template = ARENA, batch = "solo_the_power_blast_hurts_one_splashes_the_rest_and_breaks_no_block", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "solo_the_power_blast_hurts_one_splashes_the_rest_and_breaks_no_block", timeoutTicks = 60)
     public static void thePowerBlastHurtsOneSplashesTheRestAndBreaksNoBlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(ThanosBossConfig.BLOCK_DAMAGE, true);
@@ -270,7 +265,7 @@ public final class ThanosTests {
      * A creature standing between: only the first is hit by the blast itself; one behind it takes nothing from the
      * beam.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_blast", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_blast", timeoutTicks = 60)
     public static void thePowerBlastStopsAtTheFirstCreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 2.5, 10.5);
@@ -286,7 +281,7 @@ public final class ThanosTests {
      * Players are hit only with PvP on, and the stone says so when PvP spared one; a Creative player is never hit; the
      * Blast passes them by.
      */
-    @GameTest(template = ARENA, batch = "solo_the_power_blast_spares_players_with_pvp_off_and_creative_always", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "solo_the_power_blast_spares_players_with_pvp_off_and_creative_always", timeoutTicks = 60)
     public static void thePowerBlastSparesPlayersWithPvpOffAndCreativeAlways(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 2.5, 10.5);
@@ -313,7 +308,7 @@ public final class ThanosTests {
     }
 
     /** The stones that fall on an area, and the Drain, say so when PvP spares a player (and do nothing to him). */
-    @GameTest(template = ARENA, batch = "thanos_hero_pvp", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_pvp", timeoutTicks = 60)
     public static void theAreaStonesAndTheDrainSayWhenPvpSparesAPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 2.5, 10.5);
@@ -334,7 +329,7 @@ public final class ThanosTests {
      * A complete Chaos Shield in the way stops the beam at its surface and loses twelve; the creature behind is
      * untouched.
      */
-    @GameTest(template = ARENA, batch = "solo_a_chaos_shield_stops_the_power_blast_and_loses_twelve", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "solo_a_chaos_shield_stops_the_power_blast_and_loses_twelve", timeoutTicks = 60)
     public static void aChaosShieldStopsThePowerBlastAndLosesTwelve(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -353,7 +348,7 @@ public final class ThanosTests {
      * The key is one cooldown slot: after the Blast the Slam must wait for the Blast's seventy, and the Slam's makes it
      * wait longer.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_blast", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_blast", timeoutTicks = 60)
     public static void theBlastAndTheSlamShareTheKeysCooldown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -375,7 +370,7 @@ public final class ThanosTests {
      * thrown and takes ten (the zombies, once), the one in the air when it passes takes nothing, nor does the cow, nor
      * Thanos himself, nor the one beyond the ring.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_slam", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_slam", timeoutTicks = 60)
     public static void theTitanSlamIsJumpable(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 10.5, 10.5);
@@ -412,7 +407,7 @@ public final class ThanosTests {
     }
 
     /** The Slam is an explosion to a Chaos Shield: it takes most of it away and wears. */
-    @GameTest(template = ARENA, batch = "thanos_hero_slam_shield", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_slam_shield", timeoutTicks = 60)
     public static void aChaosShieldTakesMostOfTheSlamAsAnExplosion(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -435,7 +430,7 @@ public final class ThanosTests {
     }
 
     /** A Vision phased through everything is out of reach of every stone: the Blast passes him, the Transmute and the Drain have no target. */
-    @GameTest(template = ARENA, batch = "thanos_hero_phased", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_phased", timeoutTicks = 60)
     public static void aPhasedVisionCannotBeTouchedByAnyStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -464,7 +459,7 @@ public final class ThanosTests {
      * The Portal Step: he steps onto the block he looks at, or right behind the creature; it costs the cooldown and a
      * little hunger, and if there is no room behind, or nothing to look at, he says so and pays nothing.
      */
-    @GameTest(template = ARENA, batch = "solo_the_portal_step_lands_on_the_block_or_behind_the_creature", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "solo_the_portal_step_lands_on_the_block_or_behind_the_creature", timeoutTicks = 60)
     public static void thePortalStepLandsOnTheBlockOrBehindTheCreature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -502,7 +497,7 @@ public final class ThanosTests {
     }
 
     /** No room behind the creature: "No room there", nothing paid. */
-    @GameTest(template = ARENA, batch = "thanos_hero_step", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_step", timeoutTicks = 60)
     public static void thePortalStepNeedsRoomForHisWholeBody(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -525,7 +520,7 @@ public final class ThanosTests {
     }
 
     /** A Hex wall refuses the step into it (no cooldown, no move); and Mjolnir's pin refuses it as well. */
-    @GameTest(template = ARENA, batch = "thanos_hero_step_hex", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_step_hex", timeoutTicks = 60)
     public static void theHexAndThePinRefuseThePortalStep(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_MIN_RADIUS, 4);
@@ -556,7 +551,7 @@ public final class ThanosTests {
      * The Space Pull: the creature he looks at is drawn to two blocks in front of him, dazed. A boss, a pinned
      * creature, an armour stand and a player with PvP off are not.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_pull", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_pull", timeoutTicks = 80)
     public static void theSpacePullDrawsCreaturesInButNotBossesOrThePinned(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 10.5, 4.5);
@@ -576,7 +571,7 @@ public final class ThanosTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "thanos_hero_pull_not", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_pull_not", timeoutTicks = 80)
     public static void theSpacePullLeavesBossesThePinnedAndPlayersWithPvpOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 10.5, 4.5);
@@ -609,7 +604,7 @@ public final class ThanosTests {
     }
 
     /** The Hex judges the landing of what the Pull draws in: a hero outside a Hex is not drawn into it. */
-    @GameTest(template = ARENA, batch = "thanos_hero_pull_hex", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_pull_hex", timeoutTicks = 60)
     public static void aHexWallRefusesWhatThePullWouldDrawIn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -640,7 +635,7 @@ public final class ThanosTests {
      * Transmute: the sphere takes six ticks, then the creature is stone for sixty: it cannot move, and takes half of
      * what hurts it. A boss shakes it off; a player is stone only with PvP on.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_transmute", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_transmute", timeoutTicks = 120)
     public static void transmuteTurnsACreatureToStoneForHalfDamage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -667,7 +662,7 @@ public final class ThanosTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "solo_transmute_is_held_back_by_pvp_and_by_shields", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "solo_transmute_is_held_back_by_pvp_and_by_shields", timeoutTicks = 60)
     public static void transmuteIsHeldBackByPvpAndByShields(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -696,7 +691,7 @@ public final class ThanosTests {
     }
 
     /** A Creative player and a Loki's duplicate: no target for the first; the second dissolves. */
-    @GameTest(template = ARENA, batch = "solo_transmute_never_holds_creative_players", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "solo_transmute_never_holds_creative_players", timeoutTicks = 60)
     public static void transmuteNeverHoldsCreativePlayers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -714,7 +709,7 @@ public final class ThanosTests {
      * gone); the Veil costs a little hunger a tick, is saved with him, and goes out at an empty hunger bar. A hammer
      * of Thor's is not a bubble.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_veil", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_veil", timeoutTicks = 100)
     public static void theRealityVeilTurnsArrowsIntoBubbles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -760,7 +755,7 @@ public final class ThanosTests {
      * The Veil is saved with the player; the impact hook takes an arrow that was too fast for the tick, and not
      * Mjolnir.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_veil", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_veil", timeoutTicks = 60)
     public static void theVeilIsSavedAndLeavesTheUnstoppableAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -788,7 +783,7 @@ public final class ThanosTests {
     }
 
     /** What he shot himself is not a bubble, even if it comes back at him. */
-    @GameTest(template = ARENA, batch = "thanos_hero_veil", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_veil", timeoutTicks = 60)
     public static void theVeilLeavesWhatHeShotHimselfAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -812,7 +807,7 @@ public final class ThanosTests {
     }
 
     /** A creature that is pinned while the vortex draws it in stays where it is. */
-    @GameTest(template = ARENA, batch = "thanos_hero_pull_not", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_pull_not", timeoutTicks = 60)
     public static void aCreaturePinnedWhileTheVortexDrawsItStaysWhereItIs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 10.5, 4.5);
@@ -842,7 +837,7 @@ public final class ThanosTests {
      * While he is held (Billy's spell, stone, the Soul World), no stone answers: the film's flaw. Nothing starts, no
      * cooldown is paid, he is told why; and when he is free again they answer.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_held")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_held")
     public static void aHeldThanosUsesNoStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -872,7 +867,7 @@ public final class ThanosTests {
      * An empty hunger bar: "too hungry for the stones", nothing starts; in Creative there is no hunger to pay; a
      * Spectator does nothing.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_hunger")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_hunger")
     public static void hungerCreativeAndSpectatorDecideWhetherTheStonesAnswer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = thanos(f, 3.5, 10.5);
@@ -901,7 +896,7 @@ public final class ThanosTests {
      * Three looks, H cycles them (the first is the Infinity War, the last his own skin), and the powers stay; the
      * colours are the Power Stone's.
      */
-    @GameTest(template = ARENA, batch = "thanos_hero_looks")
+    @EnhancedTest(template = ARENA, batch = "thanos_hero_looks")
     public static void thanosHasThreeLooksAndThePowerStonesColours(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);

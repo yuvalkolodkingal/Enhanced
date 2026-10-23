@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.healing.HealingState;
 import com.kolodkingal.enhanced.healing.Regeneration;
 import com.kolodkingal.enhanced.healing.Rescue;
 import com.kolodkingal.enhanced.healing.Suppression;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -25,7 +26,6 @@ import com.kolodkingal.enhanced.road.RoadTrials;
 import com.kolodkingal.enhanced.vormir.VormirTracker;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
@@ -48,8 +48,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.EffectCures;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -75,8 +73,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the line of a defeat, the advancement, the hooks. Batches: {@code healing}, {@code healing_pvp} (PvP on), {@code
  * healing_boss} (a fight), and one per changed config ({@code healing_cfg*}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class HealingTests {
     private static final String BATCH = "healing";
     private static final String PVP = "healing_pvp";
@@ -191,7 +187,7 @@ public final class HealingTests {
      * health and DOWN (the bit everyone sees), the zombie forgets him and cannot take him again; still (no speed, no
      * jump); after 100 ticks he rises with 8 health and Resistance, the hooks heard both, "Back on Your Feet" is his.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void aZombiesBlowNeverKillsAHealer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 4.5, 4.5, Power.WOLVERINE);
@@ -236,7 +232,7 @@ public final class HealingTests {
     }
 
     /** While DOWN he is untouchable: an arrow and a zombie's bite do nothing; a chaos beam kills him. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void whileDownOnlyAKillerReachesHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -253,7 +249,7 @@ public final class HealingTests {
     }
 
     /** The Infinity Stones, chaos magic, the Allfather's power and the Phoenix defeat a healer; the Darkhold does not. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyTheTopPowersDefeatHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         List<ResourceKey<DamageType>> killers = List.of(ModDamageTypes.POWER_STONE_BEAM, ModDamageTypes.CHAOS_BEAM,
@@ -270,7 +266,7 @@ public final class HealingTests {
     }
 
     /** The void and /kill are never a trap: they always kill. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theVoidAndKillAlwaysKill(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 4.5, 4.5, Power.WOLVERINE);
@@ -283,7 +279,7 @@ public final class HealingTests {
     }
 
     /** A Totem of Undying is never used by a blow he survives (the death never happens). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aTotemIsNotUsedUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -297,7 +293,7 @@ public final class HealingTests {
      * The net for code that kills without a blow: a death with a plain source is refused (1 health, DOWN); a death by
      * chaos goes through. Absorption counts: a blow absorbed in part leaves exactly 1 health.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aDeathWithoutABlowIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 4.5, 4.5, Power.WOLVERINE);
@@ -318,7 +314,7 @@ public final class HealingTests {
     }
 
     /** A DOWN healer uses no item; logging out while DOWN, he logs in risen (8 health). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void downHeUsesNothingAndLogsInRisen(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -334,7 +330,7 @@ public final class HealingTests {
     }
 
     /** The tip of his first DOWN is told once; the line of a defeat is heard by those near. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theTipOnceAndTheLineOfADefeat(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -355,7 +351,7 @@ public final class HealingTests {
     }
 
     /** The Witches' Road's own rule goes first: in a trial he is put back whole, never DOWN. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRoadsRuleWins(GameTestHelper helper) throws ReflectiveOperationException {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -384,7 +380,7 @@ public final class HealingTests {
      * Poison switches the healing off: the HUD's OFF (told once), no regeneration, no Burst, and a zombie kills him
      * ("...could not stop the poison"); milk turns it back on at once.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void poisonSwitchesItOffAndMilkBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 4.5, 4.5, Power.WOLVERINE);
@@ -420,7 +416,7 @@ public final class HealingTests {
      * 1.0 health a second after a blow, 3.0 once he has had 60 ticks out of harm (to the tick); food pays 0.05 for each
      * health; twice as fast in Wolverine's Berserker Rage; at food 0 a quarter.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 160)
     public static void regenerationOneThenThree(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -453,7 +449,7 @@ public final class HealingTests {
     }
 
     /** The shrug: Slowness lasts half as long; Poison and Spellbound do not; nothing is shrugged while poisoned. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShrugHalvesTheGamesHarm(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -472,7 +468,7 @@ public final class HealingTests {
     }
 
     /** The Healing Burst: half his health at once, the game's harm cleared (not a spell); refused while poisoned. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHealingBurst(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer logan = healer(f, 6.5, 6.5, Power.WOLVERINE);
@@ -501,7 +497,7 @@ public final class HealingTests {
     // The rescue
 
     /** DOWN in a deep tank of water: when he rises he stands on the dry floor beside it, his air full. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void downInDeepWaterHeRisesOnDryGround(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (int x = 8; x <= 12; x++) {
@@ -531,7 +527,7 @@ public final class HealingTests {
     }
 
     /** DOWN in lava: he rises out of it, not burning. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void downInLavaHeRisesOut(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (int x = 8; x <= 12; x++) {
@@ -558,7 +554,7 @@ public final class HealingTests {
     // PvP and Vormir
 
     /** With PvP on: a friend's blow takes him DOWN; then nothing a player strikes reaches him; Wanda's chaos does. */
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void aFriendsBlowsTakeHimDownChaosDefeatsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -577,7 +573,7 @@ public final class HealingTests {
     }
 
     /** Pushed off a Vormir Cliff, a healer is taken by the Soul Stone's price: he dies. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void pushedOffVormirAHealerIsTaken(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -606,7 +602,7 @@ public final class HealingTests {
     }
 
     /** A healer who falls into the chasm alone goes DOWN at its floor and rises (the ladder leads out). */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aSoloFallIntoVormirIsOnlyDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -630,7 +626,7 @@ public final class HealingTests {
     // A boss fight
 
     /** A boss fight is not wiped while a healer is DOWN: he counts as standing. */
-    @GameTest(template = ARENA, batch = "healing_boss", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "healing_boss", timeoutTicks = 120)
     public static void aBossFightIsNotWipedWhileAHealerIsDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BossConfig.ANNOUNCE_FIGHTS, false);
@@ -657,7 +653,7 @@ public final class HealingTests {
     // The options (one batch each: they change the server's config)
 
     /** Each group of killers can be switched off (it spares him), and the Darkhold on. */
-    @GameTest(template = ARENA, batch = CFG)
+    @EnhancedTest(template = ARENA, batch = CFG)
     public static void eachKillerGroupIsAnOption(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Object[][] groups = {
@@ -685,7 +681,7 @@ public final class HealingTests {
     }
 
     /** poisonStopsHealing off: poison changes nothing; customHeroes off: a custom healer dies; enabled off: anyone. */
-    @GameTest(template = ARENA, batch = "healing_cfg_who")
+    @EnhancedTest(template = ARENA, batch = "healing_cfg_who")
     public static void whoHasItAndWhetherPoisonStopsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HealingConfig.POISON_STOPS_HEALING, false);
@@ -713,7 +709,7 @@ public final class HealingTests {
      * The timing options: downTicks 20 (he rises after 20 ticks), riseHealth 12, no Resistance; downMobsForget off (the
      * zombie keeps him as its target); the tip on every DOWN with tipOnce off.
      */
-    @GameTest(template = ARENA, batch = "healing_cfg_time", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "healing_cfg_time", timeoutTicks = 80)
     public static void theTimesOfDownAndRise(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HealingConfig.DOWN_TICKS, 20);
@@ -741,7 +737,7 @@ public final class HealingTests {
     }
 
     /** No dry place within rescueRadius (4) of a healer DOWN in water: he rises at his respawn point. */
-    @GameTest(template = ARENA, batch = "healing_cfg_rescue", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "healing_cfg_rescue", timeoutTicks = 200)
     public static void noDryPlaceNearHeRisesAtHisRespawnPoint(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(HealingConfig.RESCUE_RADIUS, 4);

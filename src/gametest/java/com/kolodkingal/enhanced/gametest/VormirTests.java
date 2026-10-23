@@ -1,12 +1,12 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.block.StonePedestalBlock;
 import com.kolodkingal.enhanced.block.StonePedestalBlockEntity;
 import com.kolodkingal.enhanced.config.SoulStoneConfig;
 import com.kolodkingal.enhanced.item.InfinityGauntletItem;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -27,7 +27,6 @@ import com.kolodkingal.enhanced.vormir.VormirSites;
 import com.kolodkingal.enhanced.vormir.VormirTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -55,8 +54,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,8 +75,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * to its master as it falls, a friend who lands alive, a seeker who is no Bearer earning the stone on a pedestal (and a
  * Bearer or his Gauntlet taking it), and the plain lines that tell a seeker why it did not count.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class VormirTests {
     /** Tests with PvP off (the server's default) and the defaults. */
     private static final String BATCH = "vormir";
@@ -153,7 +148,7 @@ public final class VormirTests {
      * power is gone; Thor is in the pool holding the Soul Stone, has his progress, hears "A soul for a soul."; the
      * friend respawns with nothing and his ender chest, and is told.
      */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void thorPushesAFriendOffTheEdgeAndWakesWithTheSoulStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -214,7 +209,7 @@ public final class VormirTests {
      * Under {@code keepInventory} the friend still loses every item and his experience (the user's decision), and the
      * ender chest is still untouched.
      */
-    @GameTest(template = ARENA, batch = "vormir_keep", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "vormir_keep", timeoutTicks = 60)
     public static void keepInventoryStillLosesEverything(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -240,7 +235,7 @@ public final class VormirTests {
     }
 
     /** His own tamed wolf pushed off the edge: the stone; the wolf drops nothing and its soul rises to him. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void hisOwnWolfIsASacrifice(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
@@ -261,7 +256,7 @@ public final class VormirTests {
      * 3.6.1: his own tamed cat pushed off the edge. A cat never takes fall damage: it lands alive on the pit's floor,
      * and the fall takes it there; Thor wakes with the stone.
      */
-    @GameTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
     public static void hisOwnCatLandsAliveAndTheFallTakesIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
@@ -276,7 +271,7 @@ public final class VormirTests {
      * 3.6.1: his own tamed horse (30 health) pushed off the edge. A horse takes half the fall's damage and lives: the
      * fall takes it on the pit's floor.
      */
-    @GameTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
     public static void hisOwnHorseLandsAliveAndTheFallTakesIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f, 11);
@@ -322,7 +317,7 @@ public final class VormirTests {
      * 3.6.1: a dog pushed off the edge falling into the chasm does not teleport to its master (12 blocks away and more:
      * its follow goal would bring it back to his side, alive); it lands, and is taken.
      */
-    @GameTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "vormir_land", timeoutTicks = 80)
     public static void aFallingDogDoesNotTeleportToItsMaster(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
@@ -356,7 +351,7 @@ public final class VormirTests {
     }
 
     /** 3.6.1: with PvP off Thor's blow never lands, and nothing is given; he is told it was the PvP. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void withPvpOffTheSeekerIsToldWhy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
@@ -375,7 +370,7 @@ public final class VormirTests {
     }
 
     /** 3.6.1: Thor knocks his friend into the chasm from elsewhere than the edge: he is told it must be the edge. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void notFromTheEdgeTheSeekerIsToldWhy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -400,7 +395,7 @@ public final class VormirTests {
     }
 
     /** Someone else's dog pushed off: not his to give: an ordinary death, and the keeper says so. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void someoneElsesDogIsNotHisToGive(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
@@ -422,7 +417,7 @@ public final class VormirTests {
     // ---- the accidents (6.5): each an ordinary death ----
 
     /** A friend jumps off the edge by himself: nobody pushed him. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aSoloFallFromTheEdgeGivesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -436,7 +431,7 @@ public final class VormirTests {
     }
 
     /** Thor hits his friend, then a zombie's blow throws him off: the last push is the zombie's. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aMobsPushGivesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -455,7 +450,7 @@ public final class VormirTests {
      * Another cliff: pushed off a ledge that is not the edge he dies in the chasm (no departure from the edge); pushed
      * off the edge he dies outside the chasm. Neither counts.
      */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aFallFromAnotherCliffGivesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -494,7 +489,7 @@ public final class VormirTests {
     }
 
     /** With PvP off a friend cannot be pushed: the blow does not land; his fall is an ordinary death. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void withPvpOffAFriendCannotBePushed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);
@@ -505,7 +500,7 @@ public final class VormirTests {
     }
 
     /** The friend holds a totem of undying: he lives; no stone, nothing lost. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aTotemSavesTheFriendAndGivesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -525,7 +520,7 @@ public final class VormirTests {
      * 3.6.1: the friend lands alive on the pit's floor (good armour, Feather Falling, a hero who takes no fall damage):
      * the fall takes him all the same ({@code enhanced:vormir_fall}, which nothing softens), and he is given.
      */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aFriendWhoLandsAliveIsTakenByTheFall(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -555,7 +550,7 @@ public final class VormirTests {
     }
 
     /** A totem of undying saves a friend from the fall's taking too: he lives, and Thor is told why nothing came. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aTotemSavesALandedFriendAndTheSeekerIsTold(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -594,7 +589,7 @@ public final class VormirTests {
     }
 
     /** A Creative seeker never counts. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aCreativeSeekerGetsNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -615,7 +610,7 @@ public final class VormirTests {
      * the ledger has it as his. Another who is no Bearer is refused it; he takes it himself, with a shulker box in his
      * inventory: it goes into the box, stamped as his, and the pedestal goes.
      */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aNonBearerEarnsTheStoneOnAPedestal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -658,7 +653,7 @@ public final class VormirTests {
      * A Bearer may take a stone held for another (to carry it to him): it stays stamped as the seeker's. A seeker with
      * a crafted Infinity Gauntlet takes his straight into it.
      */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aBearerOrTheSeekersGauntletTakesAHeldStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -712,7 +707,7 @@ public final class VormirTests {
     }
 
     /** {@code onePer = player}: one who has had his Soul Stone gets no second one. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void oneWhoHasHisStoneGetsNoOther(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -728,7 +723,7 @@ public final class VormirTests {
     }
 
     /** The push must come within 100 ticks before he leaves the edge: 101 ticks is too old. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 160)
     public static void aPushOlderThanTheWindowGivesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -761,7 +756,7 @@ public final class VormirTests {
     }
 
     /** One who logs out in the air is forgotten: nothing is kept of him. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aLogoutInTheAirForgetsHim(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -789,7 +784,7 @@ public final class VormirTests {
     // ---- the pushes ----
 
     /** Wanda (a Bearer) lifts her friend off the edge with telekinesis and lets go over the chasm: her push. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 60)
     public static void aTelekineticDropIsAPush(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -831,7 +826,7 @@ public final class VormirTests {
      * The shared push helper ({@code StonePowers.shove} with its caster) credits a player; a creature's shove takes the
      * credit away; none changes nothing; his pet's bite and his arrow are his.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 20)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 20)
     public static void theSharedPushesAreCredited(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(4.5, TestKit.FLOOR, 4.5, Power.THOR);
@@ -861,7 +856,7 @@ public final class VormirTests {
     // ---- the configs (each its own batch) ----
 
     /** {@code destroyItems = false}: his things drop as in any death (his power still goes). */
-    @GameTest(template = ARENA, batch = "vormir_cfg_items", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "vormir_cfg_items", timeoutTicks = 60)
     public static void withDestroyItemsOffHisThingsDrop(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -877,7 +872,7 @@ public final class VormirTests {
     }
 
     /** {@code playerSacrifice = false}: a friend is no sacrifice (only a pet); the keeper says so. */
-    @GameTest(template = ARENA, batch = "vormir_cfg_players", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "vormir_cfg_players", timeoutTicks = 60)
     public static void withPlayerSacrificeOffAFriendIsNoSacrifice(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -895,7 +890,7 @@ public final class VormirTests {
     }
 
     /** {@code friendRule = team}: a player of no team is not his friend; a team mate is. */
-    @GameTest(template = ARENA, batch = "vormir_cfg_team", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "vormir_cfg_team", timeoutTicks = 60)
     public static void withTheTeamRuleOnlyATeamMateCounts(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -936,7 +931,7 @@ public final class VormirTests {
      * second cliff another gets nothing and the keeper says it has been taken. The cliff follows the ledger: with a
      * ledger that holds nothing (the 3.6 skeleton's, before lane L1's is merged) the second is given his own.
      */
-    @GameTest(template = ARENA, batch = "vormir_cfg_world", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "vormir_cfg_world", timeoutTicks = 60)
     public static void inWorldModeTheSecondCliffHasNoStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -979,7 +974,7 @@ public final class VormirTests {
     // ---- the Stonekeeper ----
 
     /** His three lines, the third for who asks; a right-click starts them (one every 40 ticks) and he is met. */
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 140)
     public static void theStonekeeperSaysHisLines(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1016,7 +1011,7 @@ public final class VormirTests {
      * Nothing moves or hurts him: a blow, a push, a knockback, a shove, gravity; he floats over his place; {@code
      * /kill} reaches him, and a missing keeper is put back, once. His tags keep the powers off him.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 40)
     public static void theStonekeeperCannotBeHurtOrPushed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         VormirTestSite cliff = VormirTestSite.build(f);

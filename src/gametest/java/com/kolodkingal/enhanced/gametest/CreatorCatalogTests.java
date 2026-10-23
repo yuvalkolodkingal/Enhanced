@@ -15,15 +15,13 @@ import com.kolodkingal.enhanced.custom.CustomHeroRules;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKit;
 import com.kolodkingal.enhanced.custom.PowerModule;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -51,8 +49,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * English and Hebrew, found by the search in both languages, of its hero; that every Sneak variant is a card of its own
  * and works alone (Billy's Hex Barrier); and the rules of the variant rows and of the Scarlet Witch's Build Magic.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CreatorCatalogTests {
     private static final String BATCH = "creator_catalog";
 
@@ -169,7 +165,7 @@ public final class CreatorCatalogTests {
      * found by the search box by its own name in either language (and among its hero's cards); every flier's flight is
      * a style of the Flight power. Every row of the sixteen heroes is in the table, so nothing a hero has is left out.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyAbilityOfEveryBuiltInHeroIsACardInBothLanguages(GameTestHelper helper) throws IOException {
         Map<String, String> en = lang("en_us");
         Map<String, String> he = lang("he_il");
@@ -225,7 +221,7 @@ public final class CreatorCatalogTests {
      * Every Sneak variant of the sixteen heroes is a card of its own: a row acting as its parent's variant, of its hero
      * and key.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everySneakVariantIsACardOfItsOwn(GameTestHelper helper) {
         for (HeroAbility a : HeroAbility.values()) {
             if (!AUDIT.containsKey(a.hero) || a.isVariant()) {
@@ -257,7 +253,7 @@ public final class CreatorCatalogTests {
     /**
      * A variant row alone: bound as its parent's Sneak variant on its own (plain) key, the parent's code acting for it.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theHexBarrierAloneIsRaisedOnAPlainKey(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero hero = def().pick("billy.hex_barrier", 5).key(3, "billy.hex_barrier").build();
@@ -289,7 +285,7 @@ public final class CreatorCatalogTests {
      * Picked with its parent, a variant row is the variant's card: the parent keeps its main action, its Sneak cell is
      * free; each key's cooldown goes on the key that was pressed.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aVariantRowWithItsParentLeavesItsParentTheMainAction(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero hero = def().pick("loki.daggers", 5).key(1, "loki.daggers")
@@ -319,7 +315,7 @@ public final class CreatorCatalogTests {
     /**
      * The Scarlet Witch's Build Magic: her numbers (no meter, Instant); with Billy's, one of the two (Resource.BUILD).
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theScarletWitchsBuildMagicIsHers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = CustomKitSupport.hero(f, 10.5, 10.5, def().pick("wanda.build_magic", 5).build());

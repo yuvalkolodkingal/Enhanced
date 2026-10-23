@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.config.CyclopsConfig;
 import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.network.BeamPayload;
 import com.kolodkingal.enhanced.network.CyclopsFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -20,7 +21,6 @@ import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModItems;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -38,8 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +54,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * logout, never started by coming back), the Ricochet, the Concussion Blast, the Optic Leap, the Rally, his body and his
  * looks. Every test that keeps server-wide state (a beam, his record) has a batch of its own and {@link TestKit#bossFixture}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CyclopsTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -127,7 +123,7 @@ public final class CyclopsTests {
     // The glasses, the power, the body
 
     /** Putting the glasses on with no power makes Cyclops (30 health, armour 4, no flight); on another hero they are only glasses. */
-    @GameTest(template = ARENA, batch = "cyclops_awaken")
+    @EnhancedTest(template = ARENA, batch = "cyclops_awaken")
     public static void theGlassesMakeCyclops(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer nobody = f.player(4.5, FLOOR, 4.5);
@@ -155,7 +151,7 @@ public final class CyclopsTests {
     }
 
     /** The item: a helmet, unbreakable, epic; his two looks and his own skin; his place after Apocalypse. */
-    @GameTest(template = ARENA, batch = "cyclops_pure")
+    @EnhancedTest(template = ARENA, batch = "cyclops_pure")
     public static void theGlassesAndTheLooks(GameTestHelper helper) {
         ItemStack glasses = new ItemStack(ModItems.RUBY_QUARTZ_GLASSES.get());
         check(glasses.getItem() instanceof RubyQuartzGlassesItem item && item.getEquipmentSlot() == EquipmentSlot.HEAD, "worn on the head");
@@ -173,7 +169,7 @@ public final class CyclopsTests {
     // The Optic Blast
 
     /** R held with the glasses on: a beam from his eyes hurts and shoves what the crosshair is on; released, it stops. */
-    @GameTest(template = ARENA, batch = "cyclops_optic", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "cyclops_optic", timeoutTicks = 80)
     public static void theOpticBlastHurtsPushesAndStops(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 3.5, 10.5);
@@ -213,7 +209,7 @@ public final class CyclopsTests {
     }
 
     /** No blast of his eyes without the glasses on, or on an empty stomach. */
-    @GameTest(template = ARENA, batch = "cyclops_optic_refused")
+    @EnhancedTest(template = ARENA, batch = "cyclops_optic_refused")
     public static void theOpticBlastNeedsTheGlassesAndFood(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 3.5, 10.5);
@@ -244,7 +240,7 @@ public final class CyclopsTests {
      * Sneak + N takes the glasses off into his hand: the giant beam pours out, hurts everything along its line (the crosshair's
      * creature and the one behind it) and never him; N puts them back on and it stops. The cooldown of N says off and on.
      */
-    @GameTest(template = ARENA, batch = "cyclops_unleashed", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "cyclops_unleashed", timeoutTicks = 80)
     public static void takingTheGlassesOffUnleashesTheBeamUntilTheyAreBackOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 3.5, 10.5);
@@ -286,7 +282,7 @@ public final class CyclopsTests {
     }
 
     /** The glasses leaving the head slot any way at all lets it out; putting them back in the slot stops it. */
-    @GameTest(template = ARENA, batch = "cyclops_slot")
+    @EnhancedTest(template = ARENA, batch = "cyclops_slot")
     public static void theHeadSlotIsTheRule(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 3.5, 10.5);
@@ -311,7 +307,7 @@ public final class CyclopsTests {
     }
 
     /** It ends when he dies and when he leaves, and coming back without the glasses never starts it. */
-    @GameTest(template = ARENA, batch = "cyclops_safe")
+    @EnhancedTest(template = ARENA, batch = "cyclops_safe")
     public static void itEndsAtDeathAndLogoutAndNeverRestartsByItself(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 3.5, 10.5);
@@ -344,7 +340,7 @@ public final class CyclopsTests {
     }
 
     /** With PvP off the giant beam spares players; the crosshair's creature still takes it. */
-    @GameTest(template = ARENA, batch = "cyclops_pvp", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "cyclops_pvp", timeoutTicks = 60)
     public static void theGiantBeamFollowsThePvpRule(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.pvp(false);
@@ -366,7 +362,7 @@ public final class CyclopsTests {
     }
 
     /** No block breaks by default; with the option, the struck wall breaks, but never round his own feet. */
-    @GameTest(template = ARENA, batch = "cyclops_blocks", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "cyclops_blocks", timeoutTicks = 60)
     public static void theGiantBeamBreaksBlocksOnlyWhenAllowed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 3.5, 10.5);
@@ -395,7 +391,7 @@ public final class CyclopsTests {
     // The other abilities
 
     /** Sneak + R: the bolt strikes the wall ahead and comes back off it to hit the husk behind him; everyone near sees its path. */
-    @GameTest(template = ARENA, batch = "cyclops_ricochet")
+    @EnhancedTest(template = ARENA, batch = "cyclops_ricochet")
     public static void theRicochetBouncesOffWalls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 5.5, 10.5);
@@ -419,7 +415,7 @@ public final class CyclopsTests {
     }
 
     /** G: the cone ahead is hit and thrown back; what is behind or beside him is not. */
-    @GameTest(template = ARENA, batch = "cyclops_concussion")
+    @EnhancedTest(template = ARENA, batch = "cyclops_concussion")
     public static void theConcussionBlastHitsTheConeAhead(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 5.5, 10.5);
@@ -439,7 +435,7 @@ public final class CyclopsTests {
     }
 
     /** V: he is thrown up and forward, the husk at his feet is thrown out, and the fall of the leap does him no harm. */
-    @GameTest(template = ARENA, batch = "cyclops_leap")
+    @EnhancedTest(template = ARENA, batch = "cyclops_leap")
     public static void theOpticLeapThrowsHimUpWithoutFallDamage(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 5.5, 10.5);
@@ -458,7 +454,7 @@ public final class CyclopsTests {
     }
 
     /** B: he and his allies near him are given Speed, Strength and Resistance; a husk is not. */
-    @GameTest(template = ARENA, batch = "cyclops_rally")
+    @EnhancedTest(template = ARENA, batch = "cyclops_rally")
     public static void theRallyStrengthensHisSide(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer hero = hero(f, 5.5, 10.5);
@@ -484,7 +480,7 @@ public final class CyclopsTests {
     // Data
 
     /** The effects payload goes there and back, and the loot that the Mutant School (and a rare chest) can name exists. */
-    @GameTest(template = ARENA, batch = "cyclops_pure")
+    @EnhancedTest(template = ARENA, batch = "cyclops_pure")
     public static void thePayloadAndTheLoot(GameTestHelper helper) {
         CyclopsFxPayload sent = new CyclopsFxPayload(CyclopsFxPayload.RICOCHET, 42, List.of(new Vec3(1, 2, 3), new Vec3(-4.5, 5, 6.25)), 2);
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());

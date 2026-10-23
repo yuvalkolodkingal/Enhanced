@@ -19,6 +19,7 @@ import com.kolodkingal.enhanced.ironman.SuitPhases;
 import com.kolodkingal.enhanced.item.ArcReactorItem;
 import com.kolodkingal.enhanced.item.IronSuitItem;
 import com.kolodkingal.enhanced.platform.neoforge.NeoAttach;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -27,7 +28,6 @@ import com.kolodkingal.enhanced.power.Variants;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -43,8 +43,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.attachment.AttachmentSync;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.network.payload.SyncAttachmentsPayload;
 
 import java.util.ArrayList;
@@ -65,8 +63,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * UP only, the 40-tick settling, H skipping, death completing silently, a new watcher receiving the phase); Magneto and
  * the suits; a custom hero's suit row. Batches {@code iron_core} and {@code iron_suitup}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class IronCoreTests {
     private static final String BATCH = "iron_core";
     private static final String SUITUP = "iron_suitup";
@@ -158,7 +154,7 @@ public final class IronCoreTests {
     // Becoming Iron Man
 
     /** Held 40 ticks (not 39) the Arc Reactor makes a Hulk Iron Man: his size is gone, the reactor kept. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theArcReactorMakesIronManAfterFortyTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer bruce = f.player(5.5, FLOOR, 5.5, Power.HULK);
@@ -192,7 +188,7 @@ public final class IronCoreTests {
     }
 
     /** The Nano Arc Reactor put on the chest slot makes a powerless player Iron Man at once. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theNanoReactorOnTheChestMakesIronMan(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(5.5, FLOOR, 5.5);
@@ -205,7 +201,7 @@ public final class IronCoreTests {
     }
 
     /** A powerless player cannot put a suit on (told why); Iron Man and a Creative builder can. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void onlyIronManWearsASuit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer plain = f.player(3.5, FLOOR, 3.5);
@@ -231,7 +227,7 @@ public final class IronCoreTests {
     // Powered, flight, energy
 
     /** A suit and a reactor: powered (armour on, flight on). The reactor dropped: unpowered, flight off, armour on. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aSuitWorksOnlyWithAReactor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_3);
@@ -253,7 +249,7 @@ public final class IronCoreTests {
     }
 
     /** Flight and its speed per suit: Mark 3 0.10, Mark 5 0.08; the Mark 1 does not fly (G is its boost). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void flightIsPerSuit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer three = suited(f, 3.5, 3.5, SuitKind.MARK_3);
@@ -275,7 +271,7 @@ public final class IronCoreTests {
     }
 
     /** Flight drains 0.6 a second (Mark 3); on the ground it recharges 3 a second after 20 quiet ticks. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void energyDrainsInFlightAndRechargesOnTheGround(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_3);
@@ -299,7 +295,7 @@ public final class IronCoreTests {
     }
 
     /** The meter running dry in flight: the flight ends, with Slow Falling for a soft landing. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void emptyEnergyEndsFlightWithSlowFalling(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_3);
@@ -323,7 +319,7 @@ public final class IronCoreTests {
     // H and the phases
 
     /** H takes a classic suit off (DOWN, 25 ticks): the suit goes into the inventory. */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 200)
     public static void hTakesTheSuitOffIntoTheInventory(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_3);
@@ -351,7 +347,7 @@ public final class IronCoreTests {
      * Unsuited, H suits him up from the inventory: the Mark 3 over the Mark 1 (the last worn first); the UP of the Mark
      * 3 lasts exactly 50 ticks: powered at 50, not 49; the suit is on the chest from its start.
      */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 200)
     public static void hSuitsUpAndTheMark3TakesFiftyTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = tony(f, 5.5, 5.5);
@@ -381,7 +377,7 @@ public final class IronCoreTests {
     }
 
     /** The Mark 5's suitcase: used, it unfolds onto the chest; H folds it back into his hand. */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 300)
     public static void theSuitcaseUnfoldsAndFoldsBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = tony(f, 5.5, 5.5);
@@ -407,7 +403,7 @@ public final class IronCoreTests {
     }
 
     /** During UP a blow is halved; after it, and during DOWN, it is whole. */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 200)
     public static void theSuitUpHalvesDamageOnlyDuringUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = tony(f, 5.5, 5.5);
@@ -437,7 +433,7 @@ public final class IronCoreTests {
     }
 
     /** A new phase within 40 ticks of the last one's end is refused ("still settling"); after them it begins. */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 300)
     public static void aNewPhaseWaitsFortyTicks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = tony(f, 5.5, 5.5);
@@ -462,7 +458,7 @@ public final class IronCoreTests {
     }
 
     /** H during UP skips it to its end: powered at once, and the protection is over that very tick. */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 100)
     public static void hDuringUpSkipsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = tony(f, 5.5, 5.5);
@@ -482,7 +478,7 @@ public final class IronCoreTests {
     }
 
     /** Death mid-UP completes it silently: the suit is on, the phase gone. */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 100)
     public static void deathMidUpCompletesIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = tony(f, 5.5, 5.5);
@@ -497,7 +493,7 @@ public final class IronCoreTests {
     }
 
     /** A player who starts watching him mid-phase is sent the phase (the attachment's first sync), at its tick. */
-    @GameTest(template = ARENA, batch = SUITUP, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = SUITUP, timeoutTicks = 100)
     public static void aNewWatcherReceivesThePhase(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = tony(f, 5.5, 5.5);
@@ -531,7 +527,7 @@ public final class IronCoreTests {
     // With the rest of the mod
 
     /** Magneto can take a powered Mark 3 (iron), not a deployed Mark 85 (nanites). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void magnetoTakesAMark3NotAMark85(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer three = suited(f, 3.5, 3.5, SuitKind.MARK_3);
@@ -555,7 +551,7 @@ public final class IronCoreTests {
     }
 
     /** Another hero set on him: the suit stops (items stay); his flight and lights are off. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void anotherHeroStopsTheSuit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer tony = suited(f, 5.5, 5.5, SuitKind.MARK_3);
@@ -569,7 +565,7 @@ public final class IronCoreTests {
     }
 
     /** A custom hero's suit row: +8 armour and +4 toughness (no item), and the meter. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomHerosSuitRow(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("iron_man.suit", 3).build();
@@ -586,7 +582,7 @@ public final class IronCoreTests {
     }
 
     /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
         java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
                 .findResource("assets", Enhanced.MODID, "hero_presets", "iron_man.json");
@@ -604,7 +600,7 @@ public final class IronCoreTests {
     }
 
     /** The phases' lengths are the plan's (Appendix B). */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thePhaseLengthsAreThePlans(GameTestHelper helper) {
         int[] up = {60, 50, 40, 30, 24, 80};
         int[] down = {30, 25, 20, 15, 12, 40};

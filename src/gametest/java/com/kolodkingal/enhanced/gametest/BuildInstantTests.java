@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BuildJob;
 import com.kolodkingal.enhanced.build.BuildMagic;
 import com.kolodkingal.enhanced.build.BuildScheduler;
@@ -16,11 +15,11 @@ import com.kolodkingal.enhanced.network.BuildActionPayload;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,8 +27,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -54,8 +51,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  *
  * <p>Jobs, histories and sessions are server-wide, so every test has a batch of its own ({@code build_instant_*}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BuildInstantTests {
     /** A 19 x 8 x 19 box: 2,888 cells. */
     private static final BoundingBox BIG = new BoundingBox(1, 2, 1, 19, 9, 19);
@@ -65,7 +60,7 @@ public final class BuildInstantTests {
      * step kept, when the cast returns, in the same game tick; the client is sent the instant pop (and no progress); with
      * the switch off the same fill has written nothing yet.
      */
-    @GameTest(template = ARENA, batch = "build_instant_cast", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_instant_cast", timeoutTicks = 200)
     public static void anInstantSpellIsWrittenInTheTickItIsCast(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -114,7 +109,7 @@ public final class BuildInstantTests {
      * Above {@code instantMaxBlocks} the spell goes at normal speed and she is told how big it is and what the most is; a
      * spell within it is instant at the same time; with {@code instantMaxBlocks} 0 the switch is refused and she is told.
      */
-    @GameTest(template = ARENA, batch = "build_instant_limit", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_instant_limit", timeoutTicks = 200)
     public static void aSpellAboveTheLimitGoesAtNormalSpeed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.WANDA_INSTANT_MAX_BLOCKS, 1000);
@@ -156,7 +151,7 @@ public final class BuildInstantTests {
      * Her undo and her redo are instant too while the switch is on: one call and every cell is back (and gone again); with
      * the switch off the undo waits for the ticks; an undo of more cells than the limit goes at normal speed.
      */
-    @GameTest(template = ARENA, batch = "build_instant_undo", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_instant_undo", timeoutTicks = 200)
     public static void undoAndRedoAreInstantToo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer wanda = builder(f, Power.SCARLET_WITCH, 0.5, 0.5, Blocks.STONE);
@@ -198,7 +193,7 @@ public final class BuildInstantTests {
      * Every rule still holds: a claim mod that refuses the place event of half the box leaves that half empty; a chunk that
      * is not loaded is left, whole, and counted; the arena of a running protected fight is left alone.
      */
-    @GameTest(template = ARENA, batch = "build_instant_rules", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_instant_rules", timeoutTicks = 200)
     public static void protectedAreasAndUnloadedChunksAreStillLeftAlone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -236,7 +231,7 @@ public final class BuildInstantTests {
     }
 
     /** Billy has no Instant level: the switch says it is hers, stays off, and his spell goes at the usual pace. */
-    @GameTest(template = ARENA, batch = "build_instant_billy", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "build_instant_billy", timeoutTicks = 200)
     public static void billyCannotUseInstant(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
@@ -268,7 +263,7 @@ public final class BuildInstantTests {
      * The tick's time is the safety net: with {@code instantMaxMillis} at its least (100) a spell of 512,000 cells cannot be
      * written in one go; it stops writing when the time is up, she is told, and the rest goes at normal speed to the end.
      */
-    @GameTest(template = ARENA, batch = "build_instant_time", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "build_instant_time", timeoutTicks = 400)
     public static void aSpellThatTakesTooLongFinishesAtNormalSpeed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.config(BuildConfig.WANDA_INSTANT_MAX_MILLIS, 100);

@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.ThanosConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModTags;
@@ -20,7 +21,6 @@ import com.kolodkingal.enhanced.thanos.ThanosFight;
 import com.kolodkingal.enhanced.thanos.ThanosMove;
 import com.kolodkingal.enhanced.thanos.ThanosState;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,8 +31,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -56,8 +54,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * state) and takes {@link TestKit#bossFixture}. A test drives the fight by the hooks the entity offers ({@code
  * forceStones}, {@code forceMove}, {@code forceCombatTicks}, {@code setPassive}) instead of waiting for it.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ThanosBossTests {
     /** The middle of the floor: Thanos stands here, and the arena is round it. */
     static final Vec3 CENTRE = new Vec3(10.5, FLOOR, 10.5);
@@ -114,7 +110,7 @@ public final class ThanosBossTests {
     // A. Data and registries
 
     /** Every key the fight uses is in both languages with the same placeholders. */
-    @GameTest(template = ARENA, batch = "thanos_data")
+    @EnhancedTest(template = ARENA, batch = "thanos_data")
     public static void everyThanosKeyIsInBothLanguagesWithTheSamePlaceholders(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject en = lang(mod, "en_us");
@@ -140,7 +136,7 @@ public final class ThanosBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_data")
+    @EnhancedTest(template = ARENA, batch = "thanos_data")
     public static void thanosTagsAndDamageTypesAreWhatTheFightReads(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         EntityType<?> thanos = ModEntities.THANOS.get();
@@ -176,7 +172,7 @@ public final class ThanosBossTests {
     }
 
     /** Every number of the config lies in its range, and no sixth stone can be asked for. */
-    @GameTest(template = ARENA, batch = "thanos_data")
+    @EnhancedTest(template = ARENA, batch = "thanos_data")
     public static void thanosConfigDefaultsAreInRangeAndThereIsNoSixthStone(GameTestHelper helper) throws IllegalAccessException {
         int checked = 0;
         for (Class<?> config : List.of(ThanosBossConfig.class, ThanosConfig.class)) {
@@ -198,7 +194,7 @@ public final class ThanosBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_data")
+    @EnhancedTest(template = ARENA, batch = "thanos_data")
     public static void theMindStoneIsNeverGranted(GameTestHelper helper) {
         check(StoneKind.values().length == 6, "six stones exist");
         check(StoneKind.granted().equals(List.of(StoneKind.POWER, StoneKind.SPACE, StoneKind.REALITY, StoneKind.SOUL, StoneKind.TIME)),
@@ -221,7 +217,7 @@ public final class ThanosBossTests {
 
     private static final ThanosDefence.Hit PLAIN = new ThanosDefence.Hit(false, false, false, false, false);
 
-    @GameTest(template = ARENA, batch = "thanos_defence")
+    @EnhancedTest(template = ARENA, batch = "thanos_defence")
     public static void theDamagePipelineTakesTheStepsInOrder(GameTestHelper helper) {
         ThanosDefence.Stance bare = stance(ThanosState.IDLE, false, 0, false, 0.0F);
         check(Math.abs(ThanosDefence.damageTaken(PLAIN, bare, 50.0F) - 50.0F) < 1.0E-3, "a plain hit is what it is");
@@ -267,7 +263,7 @@ public final class ThanosBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_defence")
+    @EnhancedTest(template = ARENA, batch = "thanos_defence")
     public static void platesBreakWhereTheHealthCrossesTheirThresholds(GameTestHelper helper) {
         check(ThanosDefence.crossed(0.80F, 0.70F) == ThanosDefence.R_PAULDRON, "below 75 percent the right pauldron goes");
         check(ThanosDefence.crossed(0.60F, 0.50F) == ThanosDefence.L_PAULDRON, "below 55 the left");
@@ -283,7 +279,7 @@ public final class ThanosBossTests {
     // ------------------------------------------------------------------------------------------------------------
     // C. The boss
 
-    @GameTest(template = ARENA, batch = "thanos_fight_health")
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_health")
     public static void healthScalesWithTheFightersAndKeepsItsFraction(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = f.player(6.5, FLOOR, 6.5);
@@ -313,7 +309,7 @@ public final class ThanosBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_clock")
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_clock")
     public static void theClockAddsTheStonesInOrderAndNeverASixth(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = f.player(6.5, FLOOR, 6.5);
@@ -332,7 +328,7 @@ public final class ThanosBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_clock_max")
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_clock_max")
     public static void maxStonesAndTheIntervalAreTheConfigs(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(ThanosBossConfig.MAX_STONES, 3);
@@ -350,7 +346,7 @@ public final class ThanosBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_clock_fighters", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_clock_fighters", timeoutTicks = 100)
     public static void theClockNeedsAFighterInTheArena(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer starter = f.player(6.5, FLOOR, 6.5, GameType.CREATIVE);
@@ -371,7 +367,7 @@ public final class ThanosBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_surge", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_surge", timeoutTicks = 200)
     public static void aNewStoneIsASurgeAndIsAnnouncedBefore(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = f.player(6.5, FLOOR, 6.5);
@@ -410,7 +406,7 @@ public final class ThanosBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_plates")
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_plates")
     public static void platesBreakAtTheHealthThresholdsInTheEntity(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = f.player(6.5, FLOOR, 6.5);
@@ -432,7 +428,7 @@ public final class ThanosBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_plates_mjolnir")
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_plates_mjolnir")
     public static void mjolnirBreaksTheHelmetAtOnceAndWandasBeamTearsPlates(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer thor = f.player(6.5, FLOOR, 6.5);
@@ -451,7 +447,7 @@ public final class ThanosBossTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_poise", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_poise", timeoutTicks = 100)
     public static void poiseInterruptsAClenchAndLeavesTheSwordMoves(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer a = f.player(6.5, FLOOR, 4.5);
@@ -479,7 +475,7 @@ public final class ThanosBossTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "thanos_fight_stormbreaker", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "thanos_fight_stormbreaker", timeoutTicks = 120)
     public static void stormbreakerCutsTheBlastAndStaggersHim(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer thor = f.player(10.5, FLOOR, 4.5);

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.HeroLifecycle;
@@ -13,6 +12,7 @@ import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -22,7 +22,6 @@ import com.kolodkingal.enhanced.ultron.UltronBoltEntity;
 import com.kolodkingal.enhanced.ultron.UltronDrones;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,8 +37,6 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.Set;
@@ -66,8 +63,6 @@ import static com.kolodkingal.enhanced.gametest.UltronTestSupport.sentryAt;
  * Each test has a batch of its own: drones, Sentries and a fight are server-wide state that lives from one tick to the
  * next.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class UltronNetworkTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -118,7 +113,7 @@ public final class UltronNetworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 4: Upload
 
-    @GameTest(template = ARENA, batch = "ultron_upload", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "ultron_upload", timeoutTicks = 100)
     public static void upload(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -165,7 +160,7 @@ public final class UltronNetworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "ultron_cut", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "ultron_cut", timeoutTicks = 100)
     public static void aVisionNearCutsTheNetwork(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = hero(f, 4.5, 10.5);
@@ -191,7 +186,7 @@ public final class UltronNetworkTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "ultron_gate", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "ultron_gate", timeoutTicks = 100)
     public static void uploadWillNotCrossAHexOrLeaveTheArena(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -238,7 +233,7 @@ public final class UltronNetworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // The passive: Second Life
 
-    @GameTest(template = ARENA, batch = "ultron_second_life", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "ultron_second_life", timeoutTicks = 100)
     public static void secondLife(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(UltronConfig.VISION_CUT_RANGE, 0);
@@ -295,7 +290,7 @@ public final class UltronNetworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Sneak + B: the Hack
 
-    @GameTest(template = ARENA, batch = "ultron_hack", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_hack", timeoutTicks = 200)
     public static void hack(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -363,7 +358,7 @@ public final class UltronNetworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_hack_limits", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "ultron_hack_limits", timeoutTicks = 100)
     public static void theHackNeverTakesABodyOrNothing(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -409,7 +404,7 @@ public final class UltronNetworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 5: the Sentry Army
 
-    @GameTest(template = ARENA, batch = "ultron_army", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_army", timeoutTicks = 200)
     public static void sentryArmy(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -467,7 +462,7 @@ public final class UltronNetworkTests {
      * and its simulation distance is 0), so that drone would keep the target it had, and the test failed on about one
      * placement of the arena in ten.
      */
-    @GameTest(template = ARENA, batch = "ultron_drones", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "ultron_drones", timeoutTicks = 300)
     public static void dronesFollowAndFight(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -507,7 +502,7 @@ public final class UltronNetworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_drone_players", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_drone_players", timeoutTicks = 200)
     public static void dronesNeverHuntAPlayerUnlessPvpAndProvoked(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = hero(f, 3.5, 3.5);
@@ -540,7 +535,7 @@ public final class UltronNetworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_drone_end", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "ultron_drone_end", timeoutTicks = 100)
     public static void dronesFallApartWithTheirMaster(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -581,7 +576,7 @@ public final class UltronNetworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // Sneak + N: Command
 
-    @GameTest(template = ARENA, batch = "ultron_command", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "ultron_command", timeoutTicks = 200)
     public static void command(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = hero(f, 1.5, 1.5);
@@ -617,7 +612,7 @@ public final class UltronNetworkTests {
     // ------------------------------------------------------------------------------------------------------------
     // The other heroes
 
-    @GameTest(template = ARENA, batch = "ultron_others", timeoutTicks = 300)
+    @EnhancedTest(template = ARENA, batch = "ultron_others", timeoutTicks = 300)
     public static void otherHeroesAndUltron(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -686,7 +681,7 @@ public final class UltronNetworkTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "ultron_hex_pass", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "ultron_hex_pass", timeoutTicks = 100)
     public static void aHexThatLetsHimInLetsHisDronesThrough(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = hero(f, 10.5, 10.5);

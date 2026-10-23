@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.BlockRights;
 import com.kolodkingal.enhanced.ability.PlaceBook;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -16,6 +15,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKeys;
 import com.kolodkingal.enhanced.item.MjolnirOwner;
 import com.kolodkingal.enhanced.network.SlingRingActionPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -37,7 +37,6 @@ import com.kolodkingal.enhanced.strange.SlingPortalEntity;
 import com.kolodkingal.enhanced.strange.SlingPortals;
 import com.kolodkingal.enhanced.strange.SlingRingActions;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -54,8 +53,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -73,8 +70,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.look;
  * strange_astral}; the Mirror and the arenas (server-wide state, a config) {@code strange_mirror}; the tests that hurt
  * players {@code strange_pvp}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class StrangeTests {
     private static final String BATCH = "strange";
     private static final String PORTAL = "strange_portal";
@@ -126,7 +121,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Eye of Agamotto
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEyeMakesThePowerlessDoctorStrangeAndStaysHis(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer peter = f.player(4.5, FLOOR, 4.5);
@@ -149,7 +144,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aHeroWhoIsNoSorcererFindsTheEyeClosed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = f.player(4.5, FLOOR, 4.5, Power.THOR);
@@ -162,7 +157,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void billyUsesTheEyeForTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(4.5, FLOOR, 4.5, Power.BILLY);
@@ -176,7 +171,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void yWithoutTheEyeIsRefusedAndWithItSlowsTime(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 4.5, 4.5);
@@ -199,7 +194,7 @@ public final class StrangeTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEyesRewindTakesHimBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 4.5, 4.5);
@@ -217,7 +212,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // R: the whip
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theWhipsComboHurtsAndPulls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 4.5);
@@ -242,7 +237,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theGrapplePullsHimToTheBlock(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 2.5);
@@ -262,7 +257,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // V: the Shield and the Dome
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShieldStopsAnArrowFromTheFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 4.5);
@@ -283,7 +278,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theDomeShieldsAFriendInside(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 10.5);
@@ -304,7 +299,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // B: the Bands
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBandsBindAZombieFourSecondsAndABossOne(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 2.5);
@@ -327,7 +322,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // G: the Cloak
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void gLiftsHimOnTheCloakAndSetsHimDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 4.5, 10.5);
@@ -343,7 +338,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // The body
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisBodyAndTheCloaksSoftLanding(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 10.5);
@@ -366,7 +361,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Hero Creator
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomHeroLashesOnHisOwnKeyAndGrapplesOnSneak(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("strange.whip", 5).key(3, "strange.whip").build();
@@ -384,7 +379,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theEyeIsACustomHerosYRowAndOnlyOne(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         CustomHero def = CustomKitSupport.def().pick("strange.eye", 5).build();
@@ -409,7 +404,7 @@ public final class StrangeTests {
         return strange;
     }
 
-    @GameTest(template = ARENA, batch = PORTAL, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = PORTAL, timeoutTicks = 200)
     public static void aPairCarriesAZombieAndAnItemKeepingTheirSpeed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = opener(f);
@@ -440,7 +435,7 @@ public final class StrangeTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = PORTAL_CFG, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = PORTAL_CFG, timeoutTicks = 260)
     public static void onePairAtATimeAndItsFarChunkIsLetGo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StrangeConfig.PORTAL_SECONDS, 2);
@@ -456,7 +451,7 @@ public final class StrangeTests {
                 && helper.getLevel().getEntity(second.near()) == null);
     }
 
-    @GameTest(template = ARENA, batch = PORTAL)
+    @EnhancedTest(template = ARENA, batch = PORTAL)
     public static void theRingsPlaneIsCrossedEitherWayWithinItsRadius(GameTestHelper helper) {
         Vec3 c = Vec3.ZERO;
         Vec3 n = new Vec3(0, 0, 1);
@@ -472,7 +467,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Sling Ring
 
-    @GameTest(template = ARENA, batch = PORTAL)
+    @EnhancedTest(template = ARENA, batch = PORTAL)
     public static void theSlingRingSavesAndOpensAWayToAnotherWorldForASorcerer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(10.5, FLOOR, 4.5, Power.BILLY);
@@ -511,7 +506,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // Sneak + B: the Astral Projection
 
-    @GameTest(template = ARENA, batch = ASTRAL)
+    @EnhancedTest(template = ARENA, batch = ASTRAL)
     public static void theSpiritLeavesItsBodyAndTheBodyCallsItBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 10.5);
@@ -536,7 +531,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = ASTRAL)
+    @EnhancedTest(template = ARENA, batch = ASTRAL)
     public static void aSpiritThatLogsOutReturnsToItsBodyFirst(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer strange = strange(f, 10.5, 10.5);
@@ -555,7 +550,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // Sneak + N: the Mirror Dimension
 
-    @GameTest(template = ARENA, batch = MIRROR)
+    @EnhancedTest(template = ARENA, batch = MIRROR)
     public static void insideTheMirrorAnExplosionBreaksNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StrangeConfig.MIRROR_RADIUS, 6);
@@ -585,7 +580,7 @@ public final class StrangeTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = MIRROR, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = MIRROR, timeoutTicks = 100)
     public static void aZombieHeHurtInTheMirrorCannotLeave(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StrangeConfig.MIRROR_RADIUS, 6);
@@ -607,7 +602,7 @@ public final class StrangeTests {
     }
 
     // (Its own batch: a boss fixture forgets every hero's statics when it closes.)
-    @GameTest(template = ARENA, batch = "strange_arena")
+    @EnhancedTest(template = ARENA, batch = "strange_arena")
     public static void theMirrorAndTheSpiritAreRefusedInABossArena(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer strange = strange(f, 10.5, 10.5);
@@ -626,7 +621,7 @@ public final class StrangeTests {
     // ------------------------------------------------------------------------------------------------------------
     // Players
 
-    @GameTest(template = ARENA, batch = PVP, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = PVP, timeoutTicks = 100)
     public static void aPlayerHeHurtInTheMirrorCannotLeaveWhilePvpIsOn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -646,7 +641,7 @@ public final class StrangeTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = PVP)
+    @EnhancedTest(template = ARENA, batch = PVP)
     public static void theShieldTurnsAPlayersBlowFromTheFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);

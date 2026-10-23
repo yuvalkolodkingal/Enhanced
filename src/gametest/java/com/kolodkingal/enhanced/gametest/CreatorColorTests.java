@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.SpeedStrikes;
@@ -19,17 +18,15 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +43,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * ({@link AbilityColors}), the server sends it where it sends an effect (a beam's style, a thrown dagger, the Hex), the
  * built-in heroes keep their colours, and the colours survive the JSON file, the save and the wire.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CreatorColorTests {
     private static final String BATCH = "creator_color";
     private static final int GREEN = 0x43A047;
@@ -67,7 +62,7 @@ public final class CreatorColorTests {
      * Every row of the catalogue takes its pick's colour; "hero colour" (-1) takes none (the effect keeps its own, or
      * the hero's); a variant row not picked takes its parent's pick's, and a parent not picked its variant row's.
      */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyRowTakesTheColourOfItsPick(GameTestHelper helper) {
         List<String> wrong = new ArrayList<>();
         for (HeroAbility a : HeroAbility.values()) {
@@ -99,7 +94,7 @@ public final class CreatorColorTests {
     }
 
     /** A built-in hero keeps every colour of his: nothing chosen, his beam's own style. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBuiltInHeroesKeepTheirColours(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(10.5, TestKit.FLOOR, 10.5);
@@ -118,7 +113,7 @@ public final class CreatorColorTests {
      * thrown dagger's colour (synced with the entity), the Hex's colour (synced with the level's Hexes), a dash's
      * colours, a grip's.
      */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 40)
     public static void theServerSendsEveryEffectInItsColour(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEFAULT_RADIUS, 8);
@@ -157,7 +152,7 @@ public final class CreatorColorTests {
     }
 
     /** Every pick's colour, a hero row's and a variant row's too, survives the JSON file, the save and the wire. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theColoursOfEveryPickSurviveJsonSaveAndWire(GameTestHelper helper) {
         CustomHero raw = def().build().withPowers(List.of(pick("billy.hex_barrier", GREEN),
                 new CustomHero.Pick("wanda.chaos_beam", 6, HeroAbility.BOTH, BLUE), pick("spider.web", GOLD),

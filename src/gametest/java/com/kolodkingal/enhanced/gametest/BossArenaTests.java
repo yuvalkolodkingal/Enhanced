@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossArena;
 import com.kolodkingal.enhanced.boss.BossArena.Containment;
 import com.kolodkingal.enhanced.boss.BossEnd;
@@ -16,11 +15,11 @@ import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.ability.Telekinesis;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -51,8 +50,6 @@ import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.PistonEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -69,8 +66,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The arena of a boss fight: what it protects, how it keeps the fighters in (the field, the wall, the tractor), its
  * teleport gate, and that the mod's own abilities ask it before they change a block.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossArenaTests {
 
     private static BlockPos at(GameTestHelper helper, int x, int y, int z) {
@@ -80,7 +75,7 @@ public final class BossArenaTests {
     // ------------------------------------------------------------------------------------------------------------
     // Protection
 
-    @GameTest(template = ARENA, batch = "boss_arena_events")
+    @EnhancedTest(template = ARENA, batch = "boss_arena_events")
     public static void aProtectedArenaCancelsEveryEventThatWouldChangeItsBlocks(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -132,7 +127,7 @@ public final class BossArenaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_arena_explosion", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_explosion", timeoutTicks = 40)
     public static void explosionsInAProtectedArenaBreakNothingUntilTheFightIsOver(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -151,7 +146,7 @@ public final class BossArenaTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "boss_arena_switches")
+    @EnhancedTest(template = ARENA, batch = "boss_arena_switches")
     public static void protectionFollowsTheArenaTheConfigAndTheHeightOfTheCylinder(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -179,7 +174,7 @@ public final class BossArenaTests {
      * borrowed block) and the hole mends {@code arenaMendTicks} later; Tommy's acceleration and Loki's ice change nothing
      * in a protected arena. With the fight over, all three act on the same blocks as anywhere.
      */
-    @GameTest(template = ARENA, batch = "boss_arena_abilities", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_abilities", timeoutTicks = 80)
     public static void wandaBorrowsABlockWhileTommyAndLokiLeaveAProtectedArenaAlone(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         f.config(BossConfig.ARENA_MEND_TICKS, 20);
@@ -235,7 +230,7 @@ public final class BossArenaTests {
     // ------------------------------------------------------------------------------------------------------------
     // Containment
 
-    @GameTest(template = ARENA, batch = "boss_arena_field", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_field", timeoutTicks = 100)
     public static void theFieldRescuesAFighterWhoStraysWithADamageThatCannotKill(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer fighter = f.player(10.5, FLOOR, 10.5);
@@ -272,7 +267,7 @@ public final class BossArenaTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_arena_ending", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_ending", timeoutTicks = 100)
     public static void theArenaHoldsItsFightersWhileTheEndingLasts(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer fighter = f.player(10.5, FLOOR, 10.5);
@@ -296,7 +291,7 @@ public final class BossArenaTests {
      * the column it brings them to, and its tickets load the chunks round it. The test world is flat, and the arena
      * stands beside the structure, on open ground.
      */
-    @GameTest(template = ARENA, batch = "boss_arena_ground", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_ground", timeoutTicks = 160)
     public static void theRealFieldPutsAFighterOnTheGroundAndItsTicketsLoadTheChunks(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -321,7 +316,7 @@ public final class BossArenaTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_arena_wall", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_wall", timeoutTicks = 100)
     public static void theWallPushesBackOncePerSecondAndStopsFlightAtTheTop(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer fighter = f.player(10.5, FLOOR, 10.5);
@@ -345,7 +340,7 @@ public final class BossArenaTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_arena_none", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_none", timeoutTicks = 60)
     public static void withoutContainmentNobodyIsHeldAndTheTractorLiftsWhoSinksTooDeep(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerPlayer fighter = f.player(10.5, FLOOR, 10.5);
@@ -369,7 +364,7 @@ public final class BossArenaTests {
     // ------------------------------------------------------------------------------------------------------------
     // The teleport gate
 
-    @GameTest(template = ARENA, batch = "boss_arena_gate")
+    @EnhancedTest(template = ARENA, batch = "boss_arena_gate")
     public static void aFighterInsideTheArenaCannotTeleportOutOfItNorToAnotherDimension(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -413,7 +408,7 @@ public final class BossArenaTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_arena_no_gate")
+    @EnhancedTest(template = ARENA, batch = "boss_arena_no_gate")
     public static void anArenaWithoutContainmentGatesNothing(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -432,7 +427,7 @@ public final class BossArenaTests {
     // ------------------------------------------------------------------------------------------------------------
     // Drops
 
-    @GameTest(template = ARENA, batch = "boss_arena_drops", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "boss_arena_drops", timeoutTicks = 40)
     public static void whatAFighterDropsWhenTheyDieInAnArenaThatKeepsDropsLastsUntilTheFightIsOver(GameTestHelper helper) {
         TestKit.Fixture f = fixture(helper);
         ServerLevel level = helper.getLevel();

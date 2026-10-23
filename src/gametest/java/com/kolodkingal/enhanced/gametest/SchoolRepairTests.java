@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.world.SchoolRepair;
 import com.kolodkingal.enhanced.world.TemplateSitePiece;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -10,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -33,8 +33,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,15 +47,13 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * the hall's south wall) is mended to what 3.3.1 builds, at the school's turn, touching only the 76 changed blocks and
  * keeping what a player put there. The school is built far from the arenas (100,000 blocks out), where nothing else is.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class SchoolRepairTests {
     static final String BATCH = "school_repair";
     /** The school's middle, at ground level (the template's floor layer 6 lies here). */
     static final BlockPos CENTER = new BlockPos(100_408, 60, 100_808);
 
     /** The 76 changes: 71 blocks of the hall's wall round the door, a ladder of 5 up the tower. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRepairKnowsTheSeventySixChangedBlocks(GameTestHelper helper) {
         List<SchoolRepair.Change> changes = SchoolRepair.changes();
         check(changes.size() == 76, "76 blocks differ between the 3.3.0 and 3.3.1 templates: " + changes.size());
@@ -69,7 +65,7 @@ public final class SchoolRepairTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
     public static void anOldSchoolIsRepairedRoundItsDoorAndAPlayersBlockIsKept(GameTestHelper helper) throws CommandSyntaxException {
         ServerLevel level = helper.getLevel();
         MinecraftServer server = level.getServer();

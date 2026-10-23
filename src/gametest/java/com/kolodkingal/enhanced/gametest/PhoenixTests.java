@@ -23,6 +23,7 @@ import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.PhoenixEmberItem;
 import com.kolodkingal.enhanced.network.MindReadPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
@@ -44,7 +45,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -109,8 +109,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -142,8 +140,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * change a setting or switch PvP on, and keep what they do inside their own arena; a test that changes a setting (Mind
  * Sense and the Psionic Field are given a radius that fits in the arena) or needs PvP runs in a batch of its own.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class PhoenixTests {
     /** The quick tests: no waves, PvP stays off, no setting changed. */
     static final String QUICK = "phoenix";
@@ -246,7 +242,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // Awakening: the Ember
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void emberAwakensAPowerlessPlayerAfterTheRitual(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -293,7 +289,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_the_ember_is_held_as_long_as_the_server_says")
+    @EnhancedTest(template = ARENA, batch = "solo_the_ember_is_held_as_long_as_the_server_says")
     public static void theEmberIsHeldAsLongAsTheServerSays(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -303,7 +299,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aHeroCannotBeAwakenedByTheEmber(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -321,7 +317,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void creativeKeepsTheEmber(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -334,7 +330,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void emberIsInTheChestsLikeTheTesseract(GameTestHelper helper) throws IOException {
         ServerLevel level = helper.getLevel();
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
@@ -388,7 +384,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void commandSetsPhoenixInALook(GameTestHelper helper) throws CommandSyntaxException {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
@@ -406,7 +402,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void phoenixLooksAreTheTwoFilmsAndYourOwn(GameTestHelper helper) {
         List<Variant> looks = Variants.of(Power.PHOENIX);
         check(looks.stream().map(Variant::id).toList().equals(List.of("apocalypse", "brand_new_day", "own")), "the looks: " + looks);
@@ -423,7 +419,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 1: Mind Reading
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindReadingShowsHandsArmourAndTheMood(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -473,7 +469,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_mind_reading_lists_a_players_whole_inventory")
+    @EnhancedTest(template = ARENA, batch = "solo_mind_reading_lists_a_players_whole_inventory")
     public static void mindReadingListsAPlayersWholeInventory(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -515,7 +511,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_mind_reading_needs_line_of_sight_and_range")
+    @EnhancedTest(template = ARENA, batch = "solo_mind_reading_needs_line_of_sight_and_range")
     public static void mindReadingNeedsLineOfSightAndRange(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -535,7 +531,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindReadingRefusesTheUnreadable(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 10.5, 10.5);
@@ -565,7 +561,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindReadingSeesThroughLokisShape(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -584,7 +580,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_the_player_who_is_read_feels_it")
+    @EnhancedTest(template = ARENA, batch = "solo_the_player_who_is_read_feels_it")
     public static void thePlayerWhoIsReadFeelsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -613,7 +609,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindReadingCostsHunger(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 10.5, 10.5);
@@ -637,7 +633,7 @@ public final class PhoenixTests {
      * The payload codec refuses a string over 256 characters. A creature a command named at length, and the creature it
      * hunts, must not make the snapshot throw in the middle of the Phoenix's tick (which would take the server with it).
      */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aVeryLongNameNeverBreaksTheSnapshot(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -654,7 +650,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindReadPayloadRoundTrips(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         List<ItemStack> worn = new ArrayList<>();
@@ -677,7 +673,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindReadPayloadIsStrippedAndBounded(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -719,7 +715,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // Mind Sense (Sneak + R)
 
-    @GameTest(template = ARENA, batch = "solo_mind_sense_ping_flags_and_cools_down", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "solo_mind_sense_ping_flags_and_cools_down", timeoutTicks = 80)
     public static void mindSensePingFlagsAndCoolsDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         // A radius that fits in the arena (the quick tests share the level), and a short ping.
@@ -773,7 +769,7 @@ public final class PhoenixTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindSenseFindsAHiddenLoki(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 10.5, 10.5);
@@ -794,7 +790,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 2: Flight
 
-    @GameTest(template = ARENA, batch = "solo_the_key_of_flight_takes_her_up_and_down")
+    @EnhancedTest(template = ARENA, batch = "solo_the_key_of_flight_takes_her_up_and_down")
     public static void theKeyOfFlightTakesHerUpAndDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 10.5, 10.5);
@@ -814,7 +810,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 3: Telekinesis
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 60)
     public static void phoenixTelekinesisLiftsAndLaunches(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 3.5, 10.5);
@@ -855,7 +851,7 @@ public final class PhoenixTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 60)
     public static void phoenixTelekinesisCatchesArrowsItemsAndBlocksButNotBosses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -919,7 +915,7 @@ public final class PhoenixTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void sneakAndVSetsDownAndLosingThePowerLetsGo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -940,7 +936,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void phoenixTelekinesisUsesPsychicColours(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         check(Telekinesis.Mode.JEAN.color == PhoenixAbilities.PSY_MAIN, "Jean's telekinesis is violet");
@@ -971,7 +967,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // Ability 4: Mind Control
 
-    @GameTest(template = ARENA, batch = "phoenix_control", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "phoenix_control", timeoutTicks = 80)
     public static void mindControlTakesOneCreatureThatFightsForHer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.MIND_CONTROL_TICKS, 20);
@@ -1011,7 +1007,7 @@ public final class PhoenixTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aHostGoesForWhatHurtOrWasHitByHerBeforeTheNearestHostile(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 5.5, 10.5);
@@ -1061,7 +1057,7 @@ public final class PhoenixTests {
      * and her team (found in game: a possessed hoglin all but killed the Phoenix who had taken it), and keeps the one
      * she sent it on.
      */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aPossessedCreatureWithABrainNeverTurnsOnHerSide(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -1097,7 +1093,7 @@ public final class PhoenixTests {
     }
 
     /** A bucket of milk (or a totem) cures a possession like any effect: the creature is nobody's and forgets her quarrel. */
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aHostCuredWithMilkIsNobodysAndForgetsItsQuarrel(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -1113,7 +1109,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_a_second_host_frees_the_first_confused_unless_she_may_hold_two")
+    @EnhancedTest(template = ARENA, batch = "solo_a_second_host_frees_the_first_confused_unless_she_may_hold_two")
     public static void aSecondHostFreesTheFirstConfusedUnlessSheMayHoldTwo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -1142,7 +1138,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void mindControlRespectsRangeLineOfSightAndImmunity(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 10.5, 10.5);
@@ -1194,7 +1190,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_mind_control_on_a_player_only_with_pvp")
+    @EnhancedTest(template = ARENA, batch = "solo_mind_control_on_a_player_only_with_pvp")
     public static void mindControlOnAPlayerOnlyWithPvp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -1230,7 +1226,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aPossessedCreatureEndsWithItsOwner(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer dies = jean(f, 3.5, 3.5);
@@ -1268,7 +1264,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK, timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = QUICK, timeoutTicks = 40)
     public static void aPossessedCreatureWhoseOwnerIsGoneWakesUp(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         Zombie orphan = zombie(helper, 10.5, 10.5);
@@ -1283,7 +1279,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // The Psionic Field
 
-    @GameTest(template = ARENA, batch = "solo_psionic_field_holds_everyone_in_the_sphere")
+    @EnhancedTest(template = ARENA, batch = "solo_psionic_field_holds_everyone_in_the_sphere")
     public static void psionicFieldHoldsEveryoneInTheSphere(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.PSIONIC_RADIUS, 8);
@@ -1358,7 +1354,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_an_empty_field_costs_nothing")
+    @EnhancedTest(template = ARENA, batch = "solo_an_empty_field_costs_nothing")
     public static void anEmptyFieldCostsNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.PSIONIC_RADIUS, 8);
@@ -1376,7 +1372,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // The API for the Apocalypse lane
 
-    @GameTest(template = ARENA, batch = "solo_phoenix_mind_power_is_the_burst_and_her_slams")
+    @EnhancedTest(template = ARENA, batch = "solo_phoenix_mind_power_is_the_burst_and_her_slams")
     public static void phoenixMindPowerIsTheBurstAndHerSlams(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1407,7 +1403,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "solo_phoenix_listener_sees_refused_casts")
+    @EnhancedTest(template = ARENA, batch = "solo_phoenix_listener_sees_refused_casts")
     public static void phoenixListenerSeesRefusedCasts(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.PSIONIC_RADIUS, 8);
@@ -1443,7 +1439,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // Her body
 
-    @GameTest(template = ARENA, batch = "solo_fire_never_hurts_the_phoenix")
+    @EnhancedTest(template = ARENA, batch = "solo_fire_never_hurts_the_phoenix")
     public static void fireNeverHurtsThePhoenix(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1470,7 +1466,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aSpectatorPhoenixUsesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = f.player(10.5, FLOOR, 10.5, GameType.SPECTATOR);
@@ -1486,7 +1482,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void losingThePowerEndsEverythingSheLeft(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -1514,7 +1510,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = QUICK)
+    @EnhancedTest(template = ARENA, batch = QUICK)
     public static void aDeadPhoenixLetsGoOfTheChargeAndEverythingElse(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -1536,7 +1532,7 @@ public final class PhoenixTests {
     // ------------------------------------------------------------------------------------------------------------
     // The older heroes and the rules
 
-    @GameTest(template = ARENA, batch = "solo_mjolnir_pin_stops_her_flight_but_not_her_mind")
+    @EnhancedTest(template = ARENA, batch = "solo_mjolnir_pin_stops_her_flight_but_not_her_mind")
     public static void mjolnirPinStopsHerFlightButNotHerMind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1571,7 +1567,7 @@ public final class PhoenixTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_hex")
+    @EnhancedTest(template = ARENA, batch = "phoenix_hex")
     public static void hexWallBouncesThePhoenix(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.HEX_DEATH_CHANCE, 1.0);
@@ -1597,7 +1593,7 @@ public final class PhoenixTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "phoenix_helmet")
+    @EnhancedTest(template = ARENA, batch = "phoenix_helmet")
     public static void magnetoHelmetBlocksTelepathyButNotTelekinesis(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(PhoenixConfig.PSIONIC_RADIUS, 8);

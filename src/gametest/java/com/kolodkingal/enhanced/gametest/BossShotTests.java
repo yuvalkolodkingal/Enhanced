@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.Metal;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -9,6 +8,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossGrip;
 import com.kolodkingal.enhanced.config.ThanosBossConfig;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -27,7 +27,6 @@ import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,8 +46,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +63,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * shots the tags leave to telekinesis and which the villains' own pulls pass by; Thanos's sword, meteor and orb caught,
  * still in the grip, and thrown back at him; Ultron's bolts thrown back at his side, which they no longer spare.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossShotTests {
 
     /**
@@ -76,7 +71,7 @@ public final class BossShotTests {
      * and the pulls still pass them by; what no telekinesis lifts (the Ender Dragon, a fragment of Mjolnir, the Hex's
      * Vision, Apocalypse's cocoon, the Vibranium Key) is in both. A Thanos stone's grasp still refuses every boss.
      */
-    @GameTest(template = ARENA, batch = "boss_shot_tags")
+    @EnhancedTest(template = ARENA, batch = "boss_shot_tags")
     public static void bossTagsAreSplit(GameTestHelper helper) {
         TestKit.fixture(helper).onClose(Telekinesis::clear);
         for (EntityType<?> type : List.of(ModEntities.ULTRON.get(), ModEntities.THANOS.get(), ModEntities.APOCALYPSE.get(),
@@ -115,7 +110,7 @@ public final class BossShotTests {
      * Magneto's 1.5 times as long (60): on metal, his grip is the stronger. A shot is no boss: nothing keeps it from the
      * next grip.
      */
-    @GameTest(template = ARENA, batch = "boss_shot_hold")
+    @EnhancedTest(template = ARENA, batch = "boss_shot_hold")
     public static void magnetoHoldsTheSwordLonger(GameTestHelper helper) {
         TestKit.fixture(helper).onClose(Telekinesis::clear);
         ThanosSwordEntity sword = ModEntities.THANOS_SWORD.get().create(helper.getLevel());
@@ -213,7 +208,7 @@ public final class BossShotTests {
      * again and throws it at once at Thanos: it strikes him as Billy's telekinetic slam and a plate tears; then it turns at
      * the wall behind him and comes home harming nobody (a zombie put on its way is untouched), into his hand.
      */
-    @GameTest(template = ARENA, batch = "boss_shot_sword", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_shot_sword", timeoutTicks = 200)
     public static void theSwordCaughtTearsFreeOrIsThrownAtHim(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -305,7 +300,7 @@ public final class BossShotTests {
      * changes; an orb Billy throws at Thanos staggers him, one at a Phantom of his dissolves it, and one at a zombie
      * petrifies it.
      */
-    @GameTest(template = ARENA, batch = "boss_shot_meteor", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "boss_shot_meteor", timeoutTicks = 120)
     public static void aCaughtMeteorOrOrbIsTheThrowers(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -421,7 +416,7 @@ public final class BossShotTests {
      * flies home stays where his grip holds it for 20 ticks, still away from Thanos's hand, and a zombie standing in it is
      * not cut. An orb he holds against a zombie for 20 ticks petrifies nothing.
      */
-    @GameTest(template = ARENA, batch = "boss_shot_still", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "boss_shot_still", timeoutTicks = 260)
     public static void aCaughtShotIsStillInTheHand(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -552,7 +547,7 @@ public final class BossShotTests {
      * and the orphan sweep leaves it alone: its owner is Billy), and it hurts the side it was fired for. Thrown at a
      * Sentry, the Sentry is hurt; thrown at Ultron's body, his health drops and the fight's ledger credits Billy.
      */
-    @GameTest(template = ARENA, batch = "boss_shot_bolt", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "boss_shot_bolt", timeoutTicks = 80)
     public static void boltsThrownBackHitUltronAndHisSentries(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);

@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.Raycasts;
@@ -13,19 +12,17 @@ import com.kolodkingal.enhanced.ironman.nano.NanoBeams;
 import com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity;
 import com.kolodkingal.enhanced.ironman.nano.NanoDrones;
 import com.kolodkingal.enhanced.ironman.nano.NanoTech;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -47,8 +44,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * shield pays what the hit would have done. Fired from inside the sphere, Iron Man's beams still never touch her.
  * Each test has a batch of its own (they need PvP on, and the tests of a batch run side by side).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class ChaosShieldIronManTests {
     private static final double WANDA_X = 12.5;
     private static final double WANDA_Z = 10.5;
@@ -102,7 +97,7 @@ public final class ChaosShieldIronManTests {
     // ---- the classic suits ----
 
     /** Mark 3, R: the repulsor's ray ends on the shield; no damage, no boom there, the shield pays its 6. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_repulsor_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_repulsor_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheClassicRepulsor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -127,7 +122,7 @@ public final class ChaosShieldIronManTests {
     }
 
     /** Mark 3, V: the Unibeam ends on the shield and wears it down 4 every 10 ticks; she is never hurt. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_unibeam_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_unibeam_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheUnibeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -155,7 +150,7 @@ public final class ChaosShieldIronManTests {
     }
 
     /** Mark 5, N: the Laser Burst's lasers end on the shield, for her and for the husk inside it. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_laser_burst_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_laser_burst_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheLaserBurst(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -181,7 +176,7 @@ public final class ChaosShieldIronManTests {
     }
 
     /** From inside her shield Iron Man's beams are not stopped at the sphere, but never touch her either. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_point_blank_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_point_blank_pvp", timeoutTicks = 100)
     public static void ironMansBeamsFromInsideTheShieldStillNeverHurtHer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -209,7 +204,7 @@ public final class ChaosShieldIronManTests {
     // ---- the nanotech suits ----
 
     /** Mark 85, R: both palms' repulsors end on the shield; the shield pays 9 for each. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_nano_repulsor_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_nano_repulsor_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheNanoRepulsors(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -234,7 +229,7 @@ public final class ChaosShieldIronManTests {
     }
 
     /** Mark 85, V: the giant chest laser ends on the shield, and does not go through to the husk behind her. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_chest_laser_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_chest_laser_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheChestLaser(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -262,7 +257,7 @@ public final class ChaosShieldIronManTests {
     }
 
     /** Mark 50, V: its Unibeam ends on the shield too. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_mark50_unibeam_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_mark50_unibeam_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheMark50Unibeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -284,7 +279,7 @@ public final class ChaosShieldIronManTests {
     }
 
     /** Mark 50, N held and let go: the nano cannon's blast ends on the shield, with no boom there. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_cannon_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_cannon_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheNanoCannon(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -309,7 +304,7 @@ public final class ChaosShieldIronManTests {
      * Mark 85, Sneak + B: aimed at her, the Refocuser's bolt strikes the shield and the chain ends there; aimed at a
      * husk outside it, the chain leaps to her and stops at the shield (the husk behind her is never reached).
      */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_refocuser_pvp", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_refocuser_pvp", timeoutTicks = 100)
     public static void theChaosShieldStopsTheRefocusersLightning(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -343,7 +338,7 @@ public final class ChaosShieldIronManTests {
     }
 
     /** Mark 85, Sneak + N: the drones shoot at Wanda, who struck him; their lasers end on the shield. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_drones_pvp", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_drones_pvp", timeoutTicks = 160)
     public static void theChaosShieldStopsTheDronesLasers(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);
@@ -372,7 +367,7 @@ public final class ChaosShieldIronManTests {
     // ---- the Hulkbuster ----
 
     /** The Hulkbuster, V: the heavy Unibeam ends on the shield, and does not go through to the husk behind her. */
-    @GameTest(template = ARENA, batch = "chaos_shield_iron_hulkbuster_pvp", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "chaos_shield_iron_hulkbuster_pvp", timeoutTicks = 120)
     public static void theChaosShieldStopsTheHulkbustersUnibeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = wanda(f);

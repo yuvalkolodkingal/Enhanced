@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.beam.ContinuousBeam;
@@ -10,6 +9,7 @@ import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.CustomHeroRules;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.item.ScepterRituals;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -30,7 +30,6 @@ import com.kolodkingal.enhanced.stones.TimeRewind;
 import com.kolodkingal.enhanced.stones.TimeStonePowers;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -53,8 +52,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -70,8 +67,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * Power Stone's Purple Beam, its craters and the bolt; the Space Stone's step and the Realm Picker; the Soul Stone's
  * drain and sight; and the custom heroes' stone rows. Non-gods cannot use Reality, Power or Soul at all.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class StonePowerTests {
 
     // ============================================================================================================
@@ -149,7 +144,7 @@ public final class StonePowerTests {
     // The Reality Stone
 
     /** An arrow, a ghast's fireball and an Ultron bolt flying at Thor become bubbles; his own arrow does not. */
-    @GameTest(template = ARENA, batch = "stones_reality")
+    @EnhancedTest(template = ARENA, batch = "stones_reality")
     public static void projectilesAtTheRealityStoneTurnToBubbles(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = f.level();
@@ -181,7 +176,7 @@ public final class StonePowerTests {
     }
 
     /** Non-gods cannot use Reality, Power or Soul at all: a powerless player is told so and nothing happens. */
-    @GameTest(template = ARENA, batch = "stones_reality")
+    @EnhancedTest(template = ARENA, batch = "stones_reality")
     public static void aMortalCannotUseRealityPowerOrSoul(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer mortal = holder(f, 5.5, 5.5, Power.NONE, StoneKind.REALITY);
@@ -205,7 +200,7 @@ public final class StonePowerTests {
     }
 
     /** The Transmute turns the zombie Thor looks at to stone, and starts the cooldown. */
-    @GameTest(template = ARENA, batch = "stones_reality")
+    @EnhancedTest(template = ARENA, batch = "stones_reality")
     public static void theTransmuteTurnsAZombieToStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 10.5, Power.THOR, StoneKind.REALITY);
@@ -220,7 +215,7 @@ public final class StonePowerTests {
     }
 
     /** The Illusion: Thor vanishes, a red copy walks off, and the zombie that hunted him hunts it. */
-    @GameTest(template = ARENA, batch = "stones_reality")
+    @EnhancedTest(template = ARENA, batch = "stones_reality")
     public static void theIllusionDrawsTheZombieAway(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 10.5, 10.5, Power.THOR, StoneKind.REALITY);
@@ -238,7 +233,7 @@ public final class StonePowerTests {
     // The Mind Stone
 
     /** The beam hurts the husk twice a second and confuses it. */
-    @GameTest(template = ARENA, batch = "stones_mind")
+    @EnhancedTest(template = ARENA, batch = "stones_mind")
     public static void theMindBeamHurtsAndConfuses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 10.5, Power.THOR, StoneKind.MIND);
@@ -262,7 +257,7 @@ public final class StonePowerTests {
      * A powerless player fires the beam through Loki's Scepter with Sneak and an empty other hand; it does not
      * explode.
      */
-    @GameTest(template = ARENA, batch = "stones_mind")
+    @EnhancedTest(template = ARENA, batch = "stones_mind")
     public static void theScepterFiresTheMindBeamForAMortal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer mortal = f.player(3.5, FLOOR, 10.5);
@@ -290,7 +285,7 @@ public final class StonePowerTests {
     }
 
     /** The Mind Command makes the husk Thor's ally: it may not take him as its target. */
-    @GameTest(template = ARENA, batch = "stones_mind")
+    @EnhancedTest(template = ARENA, batch = "stones_mind")
     public static void theMindCommandMakesAZombieAnAlly(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 10.5, Power.THOR, StoneKind.MIND);
@@ -310,7 +305,7 @@ public final class StonePowerTests {
      * Through the stone's own item (lane L1's): a use starts the Mind Beam and holds the stone; letting go of it ends
      * the beam with the short cooldown.
      */
-    @GameTest(template = ARENA, batch = "stones_mind")
+    @EnhancedTest(template = ARENA, batch = "stones_mind")
     public static void theStoneItemsUseHoldsAndReleasesTheBeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 16.5, Power.THOR, StoneKind.MIND);
@@ -325,7 +320,7 @@ public final class StonePowerTests {
     }
 
     /** The Titan's Mind Stone in a Gauntlet answers him unless {@code mindForThanos} is off. */
-    @GameTest(template = ARENA, batch = "stones_mind_cfg")
+    @EnhancedTest(template = ARENA, batch = "stones_mind_cfg")
     public static void theTitansMindStoneFollowsTheConfig(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thanos = f.player(5.5, FLOOR, 5.5, Power.THANOS);
@@ -337,7 +332,7 @@ public final class StonePowerTests {
     }
 
     /** A player is never commanded: with PvP on he is only confused. */
-    @GameTest(template = ARENA, batch = "stones_mind_pvp")
+    @EnhancedTest(template = ARENA, batch = "stones_mind_pvp")
     public static void theMindCommandOnlyConfusesAPlayer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -355,7 +350,7 @@ public final class StonePowerTests {
     // The Time Stone
 
     /** Thor may hold the Time Stone, but it will not answer him: he is no sorcerer. */
-    @GameTest(template = ARENA, batch = "stones_time")
+    @EnhancedTest(template = ARENA, batch = "stones_time")
     public static void thorHoldsTheTimeStoneButCannotUseIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 5.5, 5.5, Power.THOR, StoneKind.TIME);
@@ -367,7 +362,7 @@ public final class StonePowerTests {
     }
 
     /** Billy slows time round him: the husk is in the zone, at the Time Stone's factor; again, and it stops. */
-    @GameTest(template = ARENA, batch = "stones_time")
+    @EnhancedTest(template = ARENA, batch = "stones_time")
     public static void billySlowsTimeRoundAZombie(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = holder(f, 5.5, 10.5, Power.BILLY, StoneKind.TIME);
@@ -389,7 +384,7 @@ public final class StonePowerTests {
     }
 
     /** Slow Time ends by itself at its limit. */
-    @GameTest(template = ARENA, batch = "stones_time_cfg")
+    @EnhancedTest(template = ARENA, batch = "stones_time_cfg")
     public static void slowTimeEndsAtItsLimit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StonesConfig.TIME_SLOW_MAX_TICKS, 20);
@@ -403,7 +398,7 @@ public final class StonePowerTests {
     }
 
     /** The Rewind takes Billy back to where he was, with the health he had then. */
-    @GameTest(template = ARENA, batch = "stones_time")
+    @EnhancedTest(template = ARENA, batch = "stones_time")
     public static void theRewindReturnsPositionAndHealth(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = holder(f, 4.5, 10.5, Power.BILLY, StoneKind.TIME);
@@ -420,7 +415,7 @@ public final class StonePowerTests {
     }
 
     /** Mjolnir's pin refuses the Rewind. */
-    @GameTest(template = ARENA, batch = "stones_time_pin")
+    @EnhancedTest(template = ARENA, batch = "stones_time_pin")
     public static void theRewindIsRefusedWhenPinned(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -436,7 +431,7 @@ public final class StonePowerTests {
     }
 
     /** The Time Stone on wheat grows it one stage; with Sneak, takes it back one. */
-    @GameTest(template = ARENA, batch = "stones_time")
+    @EnhancedTest(template = ARENA, batch = "stones_time")
     public static void theTimeStoneGrowsAndUngrowsACrop(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = holder(f, 4.5, 10.5, Power.BILLY, StoneKind.TIME);
@@ -453,7 +448,7 @@ public final class StonePowerTests {
     }
 
     /** The Time Stone's use, looking at wheat, grows it (the item's use reaches StoneUse, which finds the crop). */
-    @GameTest(template = ARENA, batch = "stones_time")
+    @EnhancedTest(template = ARENA, batch = "stones_time")
     public static void theTimeStonesUseOnACropGrowsIt(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = holder(f, 12.5, 4.5, Power.BILLY, StoneKind.TIME);
@@ -474,7 +469,7 @@ public final class StonePowerTests {
     /**
      * The Purple Beam burns the husk it is on and bursts where it ends: the husk beside it is hurt, no block breaks.
      */
-    @GameTest(template = ARENA, batch = "stones_power")
+    @EnhancedTest(template = ARENA, batch = "stones_power")
     public static void thePurpleBeamHurtsAndExplodes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 10.5, Power.THOR, StoneKind.POWER);
@@ -493,7 +488,7 @@ public final class StonePowerTests {
     }
 
     /** The beam overheats at its limit: the long cooldown. */
-    @GameTest(template = ARENA, batch = "stones_power")
+    @EnhancedTest(template = ARENA, batch = "stones_power")
     public static void thePurpleBeamOverheats(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 3.5, Power.THOR, StoneKind.POWER);
@@ -506,7 +501,7 @@ public final class StonePowerTests {
     }
 
     /** The Power Bolt: Thanos's blast with the stone's numbers. */
-    @GameTest(template = ARENA, batch = "stones_power")
+    @EnhancedTest(template = ARENA, batch = "stones_power")
     public static void thePowerBoltStrikes(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 10.5, Power.THOR, StoneKind.POWER);
@@ -520,7 +515,7 @@ public final class StonePowerTests {
     }
 
     /** With terrainDamage and mobGriefing on, the burst leaves a small crater; with mobGriefing off, none. */
-    @GameTest(template = ARENA, batch = "stones_power_cfg")
+    @EnhancedTest(template = ARENA, batch = "stones_power_cfg")
     public static void craterOnlyWithTheConfigAndMobGriefing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StonesConfig.POWER_TERRAIN_DAMAGE, true);
@@ -544,7 +539,7 @@ public final class StonePowerTests {
     // The Space Stone
 
     /** The Portal Step takes Thor to the wall he looks at. */
-    @GameTest(template = ARENA, batch = "stones_space")
+    @EnhancedTest(template = ARENA, batch = "stones_space")
     public static void thePortalStepTakesHimWhereHeLooks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 2.5, 10.5, Power.THOR, StoneKind.SPACE);
@@ -560,7 +555,7 @@ public final class StonePowerTests {
     }
 
     /** The Tesseract: a plain use is the old one, Sneak + use opens the Realm Picker. */
-    @GameTest(template = ARENA, batch = "stones_space")
+    @EnhancedTest(template = ARENA, batch = "stones_space")
     public static void theTesseractsSneakUseOpensThePicker(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer mortal = f.player(5.5, FLOOR, 5.5);
@@ -576,7 +571,7 @@ public final class StonePowerTests {
     }
 
     /** With reachesAsgard off the picker greys Asgard out. */
-    @GameTest(template = ARENA, batch = "stones_space_cfg")
+    @EnhancedTest(template = ARENA, batch = "stones_space_cfg")
     public static void reachesAsgardOffClosesAsgard(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(StonesConfig.SPACE_REACHES_ASGARD, false);
@@ -588,7 +583,7 @@ public final class StonePowerTests {
     }
 
     /** Mjolnir's pin refuses the Realm Picker. */
-    @GameTest(template = ARENA, batch = "stones_space_pin")
+    @EnhancedTest(template = ARENA, batch = "stones_space_pin")
     public static void thePickerIsRefusedWhenPinned(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -602,7 +597,7 @@ public final class StonePowerTests {
     }
 
     /** The picker takes Thor to the Nether, onto safe ground, and the stone rests. */
-    @GameTest(template = ARENA, batch = "stones_space_nether", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "stones_space_nether", timeoutTicks = 400)
     public static void theRealmPickerLandsSafelyInTheNether(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 5.5, 5.5, Power.THOR, StoneKind.SPACE);
@@ -618,7 +613,7 @@ public final class StonePowerTests {
     }
 
     /** The picker takes Thor to the End's main island. */
-    @GameTest(template = ARENA, batch = "stones_space_end", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "stones_space_end", timeoutTicks = 400)
     public static void theRealmPickerLandsOnTheEndIsland(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 5.5, 5.5, Power.THOR, StoneKind.SPACE);
@@ -633,7 +628,7 @@ public final class StonePowerTests {
     // The Soul Stone
 
     /** The drain takes the husk's life and heals Thor with half of it; letting go ends it and starts the cooldown. */
-    @GameTest(template = ARENA, batch = "stones_soul")
+    @EnhancedTest(template = ARENA, batch = "stones_soul")
     public static void theSoulDrainHealsAndEndsOnRelease(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 10.5, Power.THOR, StoneKind.SOUL);
@@ -657,7 +652,7 @@ public final class StonePowerTests {
     }
 
     /** A hard blow tears the chain. */
-    @GameTest(template = ARENA, batch = "stones_soul")
+    @EnhancedTest(template = ARENA, batch = "stones_soul")
     public static void aHardBlowTearsTheSoulDrain(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer thor = holder(f, 3.5, 4.5, Power.THOR, StoneKind.SOUL);
@@ -671,7 +666,7 @@ public final class StonePowerTests {
     }
 
     /** The Soul Sight opens for its time, then closes. */
-    @GameTest(template = ARENA, batch = "stones_soul_cfg")
+    @EnhancedTest(template = ARENA, batch = "stones_soul_cfg")
     public static void theSoulSightOpensAndCloses(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(SoulStoneConfig.SIGHT_TICKS, 20);
@@ -693,7 +688,7 @@ public final class StonePowerTests {
     }
 
     /** A custom Bearer with stone.mind and the Mind Stone fires the beam on his key; letting go ends it. */
-    @GameTest(template = ARENA, batch = "stones_rows")
+    @EnhancedTest(template = ARENA, batch = "stones_rows")
     public static void aStoneRowFiresWithTheStone(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = CustomKitSupport.hero(f, 3.5, 10.5, rowHero("stone.mind"));
@@ -710,7 +705,7 @@ public final class StonePowerTests {
     }
 
     /** Without the stone the row refuses. */
-    @GameTest(template = ARENA, batch = "stones_rows")
+    @EnhancedTest(template = ARENA, batch = "stones_rows")
     public static void aStoneRowWithoutTheStoneIsRefused(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = CustomKitSupport.hero(f, 3.5, 4.5, rowHero("stone.mind"));
@@ -722,7 +717,7 @@ public final class StonePowerTests {
     }
 
     /** stone.time needs a sorcerer: a custom Bearer who is not one is refused. */
-    @GameTest(template = ARENA, batch = "stones_rows")
+    @EnhancedTest(template = ARENA, batch = "stones_rows")
     public static void theTimeRowNeedsASorcerer(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = CustomKitSupport.hero(f, 3.5, 16.5, rowHero("stone.time"));
@@ -735,7 +730,7 @@ public final class StonePowerTests {
     }
 
     /** A hero's beam and a stone's beam drive the same resource: the rules keep one of them and say so. */
-    @GameTest(template = ARENA, batch = "stones_rows")
+    @EnhancedTest(template = ARENA, batch = "stones_rows")
     public static void twoBeamRowsKeepOneOwner(GameTestHelper helper) {
         CustomHero raw = CustomKitSupport.def().pick("billy.hex_beam", 1).pick("stone.mind", 1).raw();
         CustomHeroRules.Result result = CustomHeroRules.sanitize(raw, CustomHeroRules.Limits.DEFAULT);

@@ -1,30 +1,25 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.config.WitchesRoadConfig;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.road.RoadChallenge;
 import com.kolodkingal.enhanced.road.RoadDimension;
 import com.kolodkingal.enhanced.road.RoadProgress;
 import com.kolodkingal.enhanced.road.RoadSave;
 import com.kolodkingal.enhanced.road.RoadTrial;
 import com.kolodkingal.enhanced.road.RoadTrials;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.check;
 
 /** The options of the Road: what each of them changes. Each test has a batch of its own, as every test that changes the config must. */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RoadConfigTests {
 
-    @GameTest(template = ARENA, batch = "road_off", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "road_off", timeoutTicks = 200)
     public static void withTheTrialsOffTheDoorGivesTheInstantChoiceAndNobodyEntersTheRoad(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.ENABLED, false);
@@ -36,7 +31,7 @@ public final class RoadConfigTests {
         helper.succeed();
     }
 
-    @GameTest(template = ARENA, batch = "road_full", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_full", timeoutTicks = 500)
     public static void aRoadWithNoRoomMakesTheNextWait(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.MAX_PLAYERS, 1);
@@ -53,7 +48,7 @@ public final class RoadConfigTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_timed", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_timed", timeoutTicks = 500)
     public static void aTimedParkourPutsThePlayerBackAtTheStartWhenTheTimeRunsOut(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.PARKOUR_TIME_LIMIT_SECONDS, 2);
@@ -78,7 +73,7 @@ public final class RoadConfigTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_resume_off", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_resume_off", timeoutTicks = 500)
     public static void withResumeOffALoginInTheRoadSendsThePlayerHome(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.RESUME_ON_LOGIN, false);
@@ -102,7 +97,7 @@ public final class RoadConfigTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = ARENA, batch = "road_restart", timeoutTicks = 500)
+    @EnhancedTest(template = ARENA, batch = "road_restart", timeoutTicks = 500)
     public static void withResumeAtCheckpointOffATrialStartsFromItsBeginning(GameTestHelper helper) {
         TestKit.Fixture f = RoadTestSupport.fixture(helper);
         f.config(WitchesRoadConfig.RESUME_AT_CHECKPOINT, false);

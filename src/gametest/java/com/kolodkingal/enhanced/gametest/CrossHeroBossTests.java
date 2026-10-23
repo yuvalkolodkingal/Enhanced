@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
@@ -29,6 +28,7 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -45,7 +45,6 @@ import com.kolodkingal.enhanced.thanos.ThanosState;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronFight;
 import com.kolodkingal.enhanced.ultron.UltronSentryEntity;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
@@ -66,8 +65,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -91,8 +88,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * <p>The quick rows of the matrix (the rituals, the rewards, the village, one fight at a time, the gifts, a restart and the
  * lift) are in {@link CrossHeroTests}.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CrossHeroBossTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -240,7 +235,7 @@ public final class CrossHeroBossTests {
      * the Burst is mind power, so it wears his shield five times over and what is left of it gets through
      * (apocalypse.md 4.4).
      */
-    @GameTest(template = ARENA, batch = "cross_burst_chaos_shield", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "cross_burst_chaos_shield", timeoutTicks = 140)
     public static void aBurstWearsAChaosShieldDownAndOnlyTheRestGetsThrough(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -310,7 +305,7 @@ public final class CrossHeroBossTests {
      * Burst takes ten times what it did off the shield; a full one (30, so 300) breaks shield 1 of a lone fighter, and
      * what is left over is thrown away.
      */
-    @GameTest(template = ARENA, batch = "cross_burst_apocalypse", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "cross_burst_apocalypse", timeoutTicks = 160)
     public static void burstsWearApocalypsesShieldByFiveTimesAndAFullOneBreaksIt(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.PHOENIX);
         smallBursts(d.f());
@@ -375,7 +370,7 @@ public final class CrossHeroBossTests {
      * (phoenix.md 4.4), so pressing the key again at once is not a second cast: the shield feels each of her touches once
      * per its recharge.
      */
-    @GameTest(template = ARENA, batch = "cross_phoenix_strain", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "cross_phoenix_strain", timeoutTicks = 100)
     public static void thePhoenixsMindStrainsApocalypsesShieldOncePerCast(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.PHOENIX);
         ApocalypseTestSupport.noCrits(d.f()); // the strains counted once a cast, at their 3.0 numbers (8a.2)
@@ -411,7 +406,7 @@ public final class CrossHeroBossTests {
      * (apocalypse.md 4.4: "A Phoenix's Mind Control and Psionic Field strain it by 25 and 60"), once per cast, where PvP lets
      * her reach him.
      */
-    @GameTest(template = ARENA, batch = "cross_phoenix_strain_hero", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "cross_phoenix_strain_hero", timeoutTicks = 100)
     public static void thePhoenixsMindStrainsAHeroApocalypsesShieldToo(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -456,7 +451,7 @@ public final class CrossHeroBossTests {
      * Billy's Hex Bolt is magic but not mind power (apocalypse.md 3.5.2, question 1: a server may add it): the shield turns it
      * away, whole. Wanda's Chaos Beam, held on him, wears it five points a hit and never touches his health.
      */
-    @GameTest(template = ARENA, batch = "cross_apocalypse_witches", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "cross_apocalypse_witches", timeoutTicks = 140)
     public static void billysHexBoltLeavesApocalypsesShieldWholeAndWandasBeamWearsIt(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         ApocalypseEntity boss = d.boss();
@@ -502,7 +497,7 @@ public final class CrossHeroBossTests {
      * Thor's strongest attacks are not mind power: the lightning beam, held on him, and a thrown Mjolnir leave the shield and
      * his health whole, and the hammer is turned back to Thor, never destroyed (apocalypse.md 3.5.3).
      */
-    @GameTest(template = ARENA, batch = "cross_apocalypse_thor", timeoutTicks = 220)
+    @EnhancedTest(template = ARENA, batch = "cross_apocalypse_thor", timeoutTicks = 220)
     public static void thorsLightningBeamAndThrownMjolnirLeaveApocalypsesShieldWhole(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.THOR);
         d.f().config(EnhancedConfig.MJOLNIR_THROW_RANGE, 12);
@@ -554,7 +549,7 @@ public final class CrossHeroBossTests {
      * {@code web_immune}) and wears nothing, and the legs in Instant Kill strike him for their own five, which the shield
      * turns away like everything else.
      */
-    @GameTest(template = ARENA, batch = "cross_apocalypse_spider", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "cross_apocalypse_spider", timeoutTicks = 100)
     public static void spiderMansWebsAndInstantKillLeaveApocalypsesShieldWhole(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SPIDER_MAN);
         ApocalypseEntity boss = d.boss();
@@ -593,7 +588,7 @@ public final class CrossHeroBossTests {
      * but his shield turns away every grip that is not mind power: {@code boss_shield}), the strip outside a window takes
      * nothing, and the Mind Stone's beam is not mind power by default.
      */
-    @GameTest(template = ARENA, batch = "cross_apocalypse_magneto_vision", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "cross_apocalypse_magneto_vision", timeoutTicks = 140)
     public static void magnetoAndVisionLeaveApocalypsesShieldWhole(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.MAGNETO);
         ApocalypseEntity boss = d.boss();
@@ -646,7 +641,7 @@ public final class CrossHeroBossTests {
      * Gravity Pull and Slam do not even reach him (ultron.md 4.3: a boss is {@code pull_immune}, which the villains' pulls
      * pass by).
      */
-    @GameTest(template = ARENA, batch = "cross_apocalypse_villains", timeoutTicks = 220)
+    @EnhancedTest(template = ARENA, batch = "cross_apocalypse_villains", timeoutTicks = 220)
     public static void theUltronAndThanosHeroesLeaveApocalypsesShieldWhole(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.ULTRON);
         ApocalypseEntity boss = d.boss();
@@ -721,7 +716,7 @@ public final class CrossHeroBossTests {
      * back: while the shield is up it is turned away like anything else, and once the shield is broken the next one he throws
      * back hurts the boss (it is his sand, thrown by Billy).
      */
-    @GameTest(template = ARENA, batch = "cross_apocalypse_lances_billy", timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = "cross_apocalypse_lances_billy", timeoutTicks = 260)
     public static void billyCatchesASandLanceAndThrowsItBack(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.BILLY);
         ServerLevel level = d.level();
@@ -810,7 +805,7 @@ public final class CrossHeroBossTests {
      * A complete Chaos Shield stops every lance of a real volley at its surface, pays six for each (their damage) and keeps
      * the Scarlet Witch untouched (apocalypse.md 3.14; the lance is a {@code ShieldCost}).
      */
-    @GameTest(template = ARENA, batch = "cross_apocalypse_lances_shield", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "cross_apocalypse_lances_shield", timeoutTicks = 140)
     public static void aChaosShieldStopsAVolleyOfSandLances(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         d.f().config(EnhancedConfig.CHAOS_SHIELD_STRENGTH, 200.0);
@@ -849,7 +844,7 @@ public final class CrossHeroBossTests {
      * jabbed for the legs' five (spider-man.md 4.3.4; ultron.md 3.14 "they take the legs' 5 damage"). In Instant Kill the
      * Zombie dies at the first strike, and the Sentry, a boss's minion, still takes only the legs' damage.
      */
-    @GameTest(template = ARENA, batch = "cross_spider_legs_ultron", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "cross_spider_legs_ultron", timeoutTicks = 160)
     public static void spiderLegsJabAZombieAndASentryButKillOnlyTheZombie(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         ServerPlayer spider = tank(f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SPIDER_MAN));
@@ -927,7 +922,7 @@ public final class CrossHeroBossTests {
      * locked for {@code webLockTicks}, at most once per {@code webLockCooldown}, and a web in the clench of a stone move breaks
      * it and staggers him (spider-man.md 4.6.1, thanos.md 3.8).
      */
-    @GameTest(template = ARENA, batch = "cross_spider_thanos", timeoutTicks = 140)
+    @EnhancedTest(template = ARENA, batch = "cross_spider_thanos", timeoutTicks = 140)
     public static void aWebShotAtThanosLocksTheGauntlet(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.config(ThanosBossConfig.WEB_LOCK_TICKS, 30);
@@ -975,7 +970,7 @@ public final class CrossHeroBossTests {
      * scatters the nanites (the suit's armour and the legs are off for a while, Instant Kill ends). In the homemade suit he is
      * cloth: Magneto cannot lift him.
      */
-    @GameTest(template = ARENA, batch = "cross_magneto_spider", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "cross_magneto_spider", timeoutTicks = 60)
     public static void magnetoLiftsAndStripsAnIronSpiderButNotAHomemadeOne(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1015,7 +1010,7 @@ public final class CrossHeroBossTests {
      * R holds a body as a boss, for {@code holdTicks} times {@code boss.magnetoHoldFactor} (90 ticks), and then it breaks
      * free; the strip still does nothing to him.
      */
-    @GameTest(template = ARENA, batch = "cross_magneto_ultron", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "cross_magneto_ultron", timeoutTicks = 160)
     public static void magnetoLiftsASentryAndHoldsAnUltronBodyAsABoss(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         ServerPlayer magneto = tank(f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.MAGNETO));
@@ -1082,7 +1077,7 @@ public final class CrossHeroBossTests {
      * Quicksilver Time slows the Mad Titan to one half (not one fifth) while he has no Time Stone and not at all with it
      * (thanos.md 3.9: {@code slowFactor}); Super Speed slows nothing.
      */
-    @GameTest(template = ARENA, batch = "cross_quicksilver_thanos", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "cross_quicksilver_thanos", timeoutTicks = 160)
     public static void quicksilverTimeSlowsThanosToHalfUntilTheTimeStone(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         smallZone(f);
@@ -1123,7 +1118,7 @@ public final class CrossHeroBossTests {
     /**
      * Ultron's bodies are not slowed by Quicksilver Time at all, his Sentries are, five times (ultron.md 3.14).
      */
-    @GameTest(template = ARENA, batch = "cross_quicksilver_ultron", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "cross_quicksilver_ultron", timeoutTicks = 100)
     public static void quicksilverTimeSlowsTheSentriesButNotUltron(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         smallZone(f);
@@ -1156,7 +1151,7 @@ public final class CrossHeroBossTests {
      * Apocalypse adapts (apocalypse.md 3.14): Quicksilver Time slows him fully for {@code adaptTicks}, then he is immune to it
      * for a while and answers with an Entomb at the speedster's feet.
      */
-    @GameTest(template = ARENA, batch = "cross_quicksilver_apocalypse", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "cross_quicksilver_apocalypse", timeoutTicks = 200)
     public static void apocalypseAdaptsToQuicksilverTimeAndEntombsTheSpeedster(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.QUICKSILVER);
         smallZone(d.f());
@@ -1237,7 +1232,7 @@ public final class CrossHeroBossTests {
      * The Mad Titan is {@code hex_resistant}: the wall bounces him back, alive, whichever way he goes; his phantoms are
      * creatures without powers and die at it (thanos.md 3.9: "a Hex is a perfect arena").
      */
-    @GameTest(template = ARENA, batch = "cross_hex_thanos", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "cross_hex_thanos", timeoutTicks = 120)
     public static void theHexBouncesThanosAndUnmakesHisPhantoms(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         ServerPlayer wanda = ThanosMoveSupport.fighter(f, 0, 3, Power.SCARLET_WITCH);
@@ -1279,7 +1274,7 @@ public final class CrossHeroBossTests {
      * Ultron's bodies are {@code hex_resistant} (bounced, never killed) and his Sentries die at the wall (ultron.md 3.14),
      * and a Sentry that dies at the wall leaves the fight's count.
      */
-    @GameTest(template = ARENA, batch = "cross_hex_ultron", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "cross_hex_ultron", timeoutTicks = 120)
     public static void theHexBouncesUltronAndUnmakesHisSentries(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         ServerPlayer wanda = tank(f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.SCARLET_WITCH));
@@ -1314,7 +1309,7 @@ public final class CrossHeroBossTests {
      * Apocalypse is {@code hex_resistant}: bounced, never killed; the Horsemen are Husks, creatures without powers, and die at
      * the wall (apocalypse.md 3.14).
      */
-    @GameTest(template = ARENA, batch = "cross_hex_apocalypse", timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = "cross_hex_apocalypse", timeoutTicks = 120)
     public static void theHexBouncesApocalypseAndUnmakesHisHorsemen(GameTestHelper helper) {
         Duel d = ApocalypseTestSupport.duel(helper, 1, Power.SCARLET_WITCH);
         ServerPlayer wanda = d.hero();

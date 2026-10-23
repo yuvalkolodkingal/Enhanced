@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.BlockLifting;
@@ -36,6 +35,7 @@ import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -56,7 +56,6 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.MinecraftServer;
@@ -82,8 +81,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -114,8 +111,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * (X10 to X12, X14 to X18). Each is named in the register and has the batch the register gives it ({@code v31_cross_*});
  * a test that changes a config value or PvP has a batch of its own, as in {@code docs/HEROES-AND-BOSSES.md} section 5.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class V31CrossTests {
     private static final double CENTER = 10.5;
     /** How close to the listener by the wall a crack or a flame has to be to count as the Vision's. */
@@ -165,7 +160,7 @@ public final class V31CrossTests {
      * X1 (M3, PvP off). Magneto's R holds a Vision player; Vision phases (V): the next tick Magneto holds nothing and
      * reads {@code telekinesis.slipped}; R at the phased Vision once more says {@code telekinesis.phased}.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_vision", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_vision", timeoutTicks = 40)
     public static void magnetoHoldsVisionUntilHePhases(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -202,7 +197,7 @@ public final class V31CrossTests {
      * inside, his last line is {@code telekinesis.hex_holds}, and he did not come apart: a listener by the wall heard
      * no {@code hex_cross} (nor the crackle), and no small flame was sent.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_hex", timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_hex", timeoutTicks = 60)
     public static void onlyMagnetoLiftsTheHexVision(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -258,7 +253,7 @@ public final class V31CrossTests {
      * X4 (M5). A Vision player carried to the wall of a Wanda's Hex by Magneto's grip is not to blame: released inside,
      * his health unchanged, Magneto told {@code hex_holds}. Walking across himself, the wall bites him.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_hex", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_hex", timeoutTicks = 100)
     public static void aVisionCarriedToTheHexWallIsNotBitten(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = raiseHex(f);
@@ -309,7 +304,7 @@ public final class V31CrossTests {
      * spared the slam: his health is unchanged when the flight ends. (Wanda's Hex stands in the corner so the barrier
      * wall of the arena is inside it.)
      */
-    @GameTest(template = ARENA, batch = "v31_cross_hex_friend", timeoutTicks = 80)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_hex_friend", timeoutTicks = 80)
     public static void theHexsVisionIsSetDownSafely(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(false);
@@ -362,7 +357,7 @@ public final class V31CrossTests {
      * stays; at a bell a villager claimed it says {@code fixed_metal_off} (the pull would leave it); at an empty hopper
      * {@code fixed_metal}.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_fixed", timeoutTicks = 30)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_fixed", timeoutTicks = 30)
     public static void fixedMetalTellsTheTruthAboutThePull(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -393,7 +388,7 @@ public final class V31CrossTests {
     }
 
     /** X3, the other half: with {@code magneto.pullTakesBuiltMetal} off, the hopper (and the bell) say {@code fixed_metal_off}. */
-    @GameTest(template = ARENA, batch = "v31_cross_fixed_off", timeoutTicks = 30)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_fixed_off", timeoutTicks = 30)
     public static void fixedMetalTellsTheTruthWithTheSwitchOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -498,7 +493,7 @@ public final class V31CrossTests {
      * Mjolnir holds nothing, V leaves it in the hand, the pull takes an ingot beside it and leaves it; the same for a
      * worthy Magneto.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_mjolnir", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_mjolnir", timeoutTicks = 200)
     public static void mjolnirNeverAnswersToMagnetism(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -542,7 +537,7 @@ public final class V31CrossTests {
      * he has arrived, V tears one and rests; V again after its rest, within the six seconds, none; the pull (120 ticks
      * after the first) one more; R catches the sword he throws; and dying, nothing.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_thanos", timeoutTicks = 520)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_thanos", timeoutTicks = 520)
     public static void magnetoStripsAPlateFromThanos(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -642,7 +637,7 @@ public final class V31CrossTests {
      * where it was caught each tick), and at the 60th tears free ({@code sword_slips}) and flies home; Billy catches it
      * on its way and his grip holds 39 ticks and tears free at the 40th.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_sword", timeoutTicks = 400)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_sword", timeoutTicks = 400)
     public static void magnetoHoldsTheSwordLongerThanBilly(GameTestHelper helper) {
         TestKit.Fixture f = ThanosMoveSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -706,7 +701,7 @@ public final class V31CrossTests {
     // X7, X8: Ultron
 
     /** X7 (M40). V at Ultron's body on the ground says it is all metal ({@code disarm.metal_body}) and starts no rest. */
-    @GameTest(template = ARENA, batch = "v31_cross_ultron_strip", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_ultron_strip", timeoutTicks = 40)
     public static void ultronsBodyHasNothingToStrip(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         ServerPlayer magneto = f.player(UltronTestSupport.MIDDLE.x, FLOOR, UltronTestSupport.MIDDLE.z, Power.MAGNETO);
@@ -733,7 +728,7 @@ public final class V31CrossTests {
      * tick before he would break free. Over 1,400 ticks (four whole cycles of 350) his brain runs at least 934 times,
      * he is grabbed at least 4 times, and never within {@code boss.regripTicks} of the end of the last throw's still.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_duty", timeoutTicks = 1500)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_duty", timeoutTicks = 1500)
     public static void magnetoAloneKeepsUltronActingTwoThirds(GameTestHelper helper) {
         TestKit.Fixture f = UltronTestSupport.fixture(helper);
         f.onClose(Telekinesis::clear);
@@ -869,7 +864,7 @@ public final class V31CrossTests {
      * Scarlet Witch's fill across its edge changes only the cells outside it, and Magneto's pull leaves the ore inside it
      * and takes the one outside (he reads {@code pull.done_protected}). Both go by {@code build_magic.allArenasProtected}.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_arena", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_arena", timeoutTicks = 100)
     public static void aSpellAndThePullAgreeOnEveryArena(GameTestHelper helper) {
         arenaAgreement(helper, true);
     }
@@ -878,7 +873,7 @@ public final class V31CrossTests {
      * X10 with {@code build_magic.allArenasProtected} off: the same fight's arena is open to both, so the fill changes the
      * cells inside it too and the pull takes both ores.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_arena_open", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_arena_open", timeoutTicks = 100)
     public static void aSpellAndThePullAgreeWhenArenasAreOpen(GameTestHelper helper) {
         arenaAgreement(helper, false);
     }
@@ -947,7 +942,7 @@ public final class V31CrossTests {
      * the fight, nothing lies anywhere, and both journals (the arena's, the island's note, which says it landed and owes
      * nothing) are still on disk, and gone after two saves of the world.
      */
-    @GameTest(template = SokoviaTestSupport.PAD, batch = "v31_cross_island", timeoutTicks = 900)
+    @EnhancedTest(template = SokoviaTestSupport.PAD, batch = "v31_cross_island", timeoutTicks = 900)
     public static void theIslandIsSafeFromEveryFeature(GameTestHelper helper) {
         TestKit.Fixture f = SokoviaTestSupport.pad(helper);
         f.config(UltronBossConfig.SENTRIES_AT_START, 0);
@@ -1091,7 +1086,7 @@ public final class V31CrossTests {
      * her undo restores none of the cells and says {@code kept_changed} 9; the iron blocks in the world and in his
      * inventory are 9, never more.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_undo", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_undo", timeoutTicks = 100)
     public static void anUndoNeverRestoresWhatThePullTook(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();
@@ -1141,7 +1136,7 @@ public final class V31CrossTests {
      * is counted among the bodies; a Move of the box leaves it where it is, pinned. Magneto's pull never tugs a pinned
      * golem (one that is not pinned slides toward him), and Wanda's V at it says Mjolnir holds it down.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_pinned", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_pinned", timeoutTicks = 100)
     public static void pinnedCreaturesStayPutForEveryPower(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1207,7 +1202,7 @@ public final class V31CrossTests {
      * X15 (spec 4.2, 4.6). With build mode on, Billy's V at a block holds it and his meter is not touched; Sneak + V
      * sets it down, and it is dirt again where it lands. He is still in build mode.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_billy", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_billy", timeoutTicks = 100)
     public static void billyInBuildModeStillLiftsBlocks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1253,7 +1248,7 @@ public final class V31CrossTests {
      * it, her Sneak + V says it is too strong; Magneto's pull (which does take an iron block beside it) and his R leave it;
      * and the level holds exactly one Mjolnir.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_mjolnir_block", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_mjolnir_block", timeoutTicks = 100)
     public static void mjolnirIsUntouchedByEveryFeature(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1323,7 +1318,7 @@ public final class V31CrossTests {
      * X17 (D-B 17, D-T 2.3). Wanda holds a stone she tore out, floating inside a box; Billy's fill completes around it and
      * the stone is still held; set down where no cell is free, it shatters into its item and no stone stands in the box.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_held", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_held", timeoutTicks = 100)
     public static void aHeldBlockIsNotACell(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.onClose(Telekinesis::clear);
@@ -1385,7 +1380,7 @@ public final class V31CrossTests {
      * is not moved (it is counted {@code kept_changed}) and its target stays air. Iron blocks in the world plus his
      * inventory are 3, never more.
      */
-    @GameTest(template = ARENA, batch = "v31_cross_move_pull", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "v31_cross_move_pull", timeoutTicks = 200)
     public static void aMoveAndThePullNeverMakeTwoOfOne(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerLevel level = f.level();

@@ -22,6 +22,7 @@ import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.platform.attach.AttachKey;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -32,7 +33,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -62,8 +62,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +79,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * The skeleton of 3.1 (step S of the spec, 18.1): the shared pieces every lane builds on exist and answer as 3.0 did, or
  * as the spec fixes them. Each test that keeps state or changes a config value has a batch of its own ({@code v31_skeleton*}).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class V31SkeletonTests {
 
     // ------------------------------------------------------------------------------------------------------------
@@ -94,7 +90,7 @@ public final class V31SkeletonTests {
      * GameTest server has no spawn protection) each refuse it. {@link BlockRights#mayPlace} and the two posts ask the
      * listeners exactly once each.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_rights")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_rights")
     public static void blockRightsKeepTheOldRules(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -170,7 +166,7 @@ public final class V31SkeletonTests {
      * The area rule of the two mass edits, with {@code build_magic.allArenasProtected} on (the default): the cylinder of any
      * running fight is refused, protected or not; outside it nothing is.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_mass")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_mass")
     public static void massEditRefusesArenasHiddenGroundAndHexes(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -197,7 +193,7 @@ public final class V31SkeletonTests {
      * With {@code build_magic.allArenasProtected} off, an unprotected arena is open to the mass edits and a protected one
      * still is not; with {@code boss.protectArena} off too, the ground a fight hides is still refused, and only that cell.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_mass_open")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_mass_open")
     public static void massEditRefusesArenasHiddenGroundAndHexesWithTheSwitchOff(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         f.config(BuildConfig.ALL_ARENAS_PROTECTED, false);
@@ -235,7 +231,7 @@ public final class V31SkeletonTests {
      * With {@code build_magic.hexIsAClaim} on, a cell in someone else's Hex is refused to a stranger, never to its owner,
      * and no longer once the owner has allowed him in.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_hex")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_hex")
     public static void massEditRefusesAStrangersHex(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(BuildConfig.HEX_IS_A_CLAIM, true);
@@ -261,7 +257,7 @@ public final class V31SkeletonTests {
      * The questions the lanes ask the boss fights: with no fight every answer is no; with one, its cylinder, a box across
      * its edge, its fighter, the drop it keeps for him, and what it locks.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_facade", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_facade", timeoutTicks = 40)
     public static void theNewFacadeAnswers(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -311,7 +307,7 @@ public final class V31SkeletonTests {
      * Every number of Billy's ten ranks grows from the five of his first (D-B 8.2, 3.2: ranks 1 to 4 are those of 3.1), and
      * practice makes the rank.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_ranks")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_ranks")
     public static void billysRanksComeFromFiveNumbers(GameTestHelper helper) {
         int[] meter = {512, 1024, 2048, 4096, 6144, 8192, 12288, 16384, 24576, 32768};
         double[] refill = {16, 24, 32, 40, 56, 72, 96, 128, 160, 192};
@@ -373,7 +369,7 @@ public final class V31SkeletonTests {
     }
 
     /** With {@code build_magic_billy.maxRank} 1 he stays an Apprentice whatever he practises or learned. */
-    @GameTest(template = ARENA, batch = "v31_skeleton_rank_cap")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_rank_cap")
     public static void billysRanksStopAtMaxRank(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(BuildConfig.BILLY_MAX_RANK, 1);
@@ -394,7 +390,7 @@ public final class V31SkeletonTests {
      * what they were given; only the meter, the rank, the practice and the pocket are saved; and a player saved before
      * 3.1 reads as {@link BuildData#EMPTY}: rank 1, a full meter.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_sync")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_sync")
     public static void buildDataAndViewSyncAndOldWorldsLoad(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer billy = f.player(9.5, FLOOR, 10.5, Power.BILLY);
@@ -475,7 +471,7 @@ public final class V31SkeletonTests {
     // The telekinesis seams (S10), the new rays (S11) and Billy's crown (S12)
 
     /** {@code Telekinesis.lastGripEnd} is the game time of a set-down, of a throw, and of a grip lost to distance. */
-    @GameTest(template = ARENA, batch = "v31_skeleton_grip", timeoutTicks = 40)
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_grip", timeoutTicks = 40)
     public static void lastGripEndIsRecorded(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         f.onClose(Telekinesis::clear);
@@ -519,7 +515,7 @@ public final class V31SkeletonTests {
      * Magneto's aim finds a rail past tall grass and over a carpet and a bottom slab, and stops at a stone wall; sight goes
      * over a carpet and a slab, not through stone; the picking ray finds a poppy where the ordinary one finds the grass.
      */
-    @GameTest(template = ARENA, batch = "v31_skeleton_rays")
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_rays")
     public static void raycastsSeeRailsAndStopAtWalls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -574,7 +570,7 @@ public final class V31SkeletonTests {
     }
 
     /** Billy's crown stays on while his {@code BuildView} is active; out of build mode it goes when its time is over. */
-    @GameTest(template = ARENA, batch = "v31_skeleton_crown", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "v31_skeleton_crown", timeoutTicks = 160)
     public static void billysCrownFollowsBuildView(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         ServerPlayer billy = f.player(10.5, FLOOR, 10.5, Power.BILLY);

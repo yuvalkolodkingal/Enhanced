@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.boss.StopReason;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -25,7 +26,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -80,8 +80,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -107,8 +105,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * pillars, one block above the floor, where his eyes see each piece over everything lower; ores and raw-metal blocks are
  * set into the floor, where only magnetism reaches them.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class MagnetPullTests {
     private static final String PULL = "magnet_pull";
 
@@ -126,7 +122,7 @@ public final class MagnetPullTests {
      * without Fortune (gilded blackstone its nuggets, ancient debris its scrap); nothing drops and no experience appears;
      * the pull rests, costs one hunger point and was heard.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void thePullTakesTheMetalOutOfTheOres(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = magneto(f);
@@ -167,7 +163,7 @@ public final class MagnetPullTests {
      * one scrap from ancient debris. A block whose only loot is itself (a mod's ore, as a raw iron block stands in) gives
      * nothing and is not taken. Each ore's ground, and the ground by height and dimension for a block in no ground tag.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void oreYieldsAreMiningsWithoutFortune(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos pos = helper.absolutePos(new BlockPos(10, 1, 10));
@@ -210,7 +206,7 @@ public final class MagnetPullTests {
      * slab (two slabs), a lightning rod, and exactly one of each door; every cell is air, both halves of each door, and no
      * item lies anywhere.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void thePullTakesMetalBlocksWhole(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = magneto(f);
@@ -251,7 +247,7 @@ public final class MagnetPullTests {
      * with raw iron; empty, they come whole and spill nothing. A chest minecart with an apple stays, an empty one comes as
      * its item. An extended piston and a powered one stay; a plain one in view comes.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void aHopperComesOnlyWhenEmpty(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -313,7 +309,7 @@ public final class MagnetPullTests {
     }
 
     /** M25. The block under his feet never comes: he does not pull his own floor away. Another iron block does. */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void thePullSparesHisFloor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = magneto(f);
@@ -334,7 +330,7 @@ public final class MagnetPullTests {
      * M26. Hungry: an empty hunger bar says so and nothing comes. In Creative a pull costs no hunger. A pull rests: at once
      * Sneak + R says it is recharging and nothing comes; 100 ticks after it began resting, the next pull comes.
      */
-    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = PULL, timeoutTicks = 200)
     public static void thePullHasACostAndARecharge(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -398,7 +394,7 @@ public final class MagnetPullTests {
      * does nothing at all (no line, no new search); {@code magneto.pullRetryTicks} (10) ticks after the first it searches
      * again.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void nothingToPullCostsNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -430,7 +426,7 @@ public final class MagnetPullTests {
     }
 
     /** M28. Holding something, Sneak + R still sets it down gently: no pull, no rest. */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void sneakRWhileHoldingStillSetsDown(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = magneto(f);
@@ -449,7 +445,7 @@ public final class MagnetPullTests {
      * line, the ore unchanged; 20 ticks after the grip ended it pulls. Riding a minecart, Sneak + R does nothing (Sneak is
      * how he gets off); off it, he pulls.
      */
-    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = PULL, timeoutTicks = 100)
     public static void noPullRightAfterAGrip(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -504,7 +500,7 @@ public final class MagnetPullTests {
      * M56 (R54). A Spectator's press, however it reaches the server, does nothing: no pull, no line, the ore as it was. A
      * pull whose Magneto becomes a Spectator, or dies, ends that tick, and nothing more comes.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void aSpectatorNeverPulls(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         List<BlockPos> ores = List.of(new BlockPos(6, 1, 10), new BlockPos(14, 1, 10), new BlockPos(10, 1, 6), new BlockPos(10, 1, 14));
@@ -551,7 +547,7 @@ public final class MagnetPullTests {
      * nearest of 30 raw iron blocks, and 20 stay; his payloads carry 10 streams in all, never more than 2 at once, and the
      * first says the field began, with its radius.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_budget")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_budget")
     public static void thePullIsSlicedAndBounded(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_PER_TICK, 2);
@@ -602,7 +598,7 @@ public final class MagnetPullTests {
      * M30. At radius 9 and 512 cells a tick, the search spreads over several ticks, and still finds the ores at the far
      * edge of the sphere.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_scan")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_scan")
     public static void theSearchSpreadsOverTicksAtABigRadius(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_RADIUS, 9);
@@ -627,7 +623,7 @@ public final class MagnetPullTests {
      * M31. The pull stops at once when Magneto dies: 3 taken (one a tick), and 20 ticks later still 3. The same when he
      * loses the power of Magneto.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_stop", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_stop", timeoutTicks = 100)
     public static void thePullStopsWhenMagnetoDies(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_PER_TICK, 1);
@@ -681,7 +677,7 @@ public final class MagnetPullTests {
      * M50. The pull stays where he pressed: teleported 100 blocks away after 2 pull ticks (one a tick), exactly 2 were
      * taken, 20 ticks later still 2, and the pull is over, with the line for what came so far.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_move")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_move")
     public static void theJobStaysWhereHePressed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_PER_TICK, 1);
@@ -720,7 +716,7 @@ public final class MagnetPullTests {
      * Adventure the ores stay and a dropped ingot comes. In the cylinder of a running fight, protected or not (R5), the
      * ore stays and the one outside comes.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_rights", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_rights", timeoutTicks = 100)
     public static void thePullNeverTouchesProtectedPlaces(GameTestHelper helper) {
         TestKit.Fixture f = BossFrameworkTests.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -863,7 +859,7 @@ public final class MagnetPullTests {
      * M47. A blast furnace and a bell that villagers have claimed (a job site, a meeting point) stay; an unclaimed blast
      * furnace comes. And the pull's answer to R names the claimed one as not coming.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_poi")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_poi")
     public static void aVillagersWorkStays(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -908,7 +904,7 @@ public final class MagnetPullTests {
     // Sight, the cone, the switches (M34a, M35, M46, M59)
 
     /** M34a. With built metal off, the ore and the raw iron block come; the iron block, the rail and the hopper stay. */
-    @GameTest(template = ARENA, batch = "magnet_pull_built")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_built")
     public static void theBuiltMetalSwitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_TAKES_BUILT_METAL, false);
@@ -933,7 +929,7 @@ public final class MagnetPullTests {
     }
 
     /** M35. With the debris switch off, ancient debris stays and an iron ore still comes. */
-    @GameTest(template = ARENA, batch = "magnet_pull_debris")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_debris")
     public static void theDebrisSwitch(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_ANCIENT_DEBRIS, false);
@@ -954,13 +950,13 @@ public final class MagnetPullTests {
      * and gives its iron (magnetism goes through rock); an iron block in plain sight and a rail seen over a carpet and a
      * bottom slab come.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_sight")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_sight")
     public static void builtMetalNeedsSight(GameTestHelper helper) {
         sight(helper, true);
     }
 
     /** M46, with {@code magneto.pullBuiltNeedsSight} off: the iron block behind the wall comes too. */
-    @GameTest(template = ARENA, batch = "magnet_pull_sight_off")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_sight_off")
     public static void builtMetalNeedsSightUnlessSwitchedOff(GameTestHelper helper) {
         sight(helper, false);
     }
@@ -1009,13 +1005,13 @@ public final class MagnetPullTests {
      * M59 (R36). Built metal comes only from where he looks: looking east, a lantern and a rail east of him come; a
      * lantern and a hopper behind him stay, while the ore behind him gives its iron and a dropped ingot behind him comes.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void builtMetalComesFromWhereHeLooks(GameTestHelper helper) {
         cone(helper, false);
     }
 
     /** M59 with {@code magneto.pullBuiltCone} 360: the lantern behind him comes too. */
-    @GameTest(template = ARENA, batch = "magnet_pull_cone_all")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_cone_all")
     public static void builtMetalComesFromAllRoundAt360(GameTestHelper helper) {
         cone(helper, true);
     }
@@ -1062,7 +1058,7 @@ public final class MagnetPullTests {
      * end line does not hide "your inventory is full" (21.7 #29): it comes {@link MagnetPull#FULL_LINE_TICKS} ticks after
      * it, and nothing else is said.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_full")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_full")
     public static void aFullInventoryDropsTheRestAtHisFeet(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_MAX_TARGETS, 64);
@@ -1137,7 +1133,7 @@ public final class MagnetPullTests {
      * and the chest keeps its ingots, the item frame its sword and the armour stand its chestplate, as for anyone without
      * room.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_full_creative")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_full_creative")
     public static void aFullInventoryInCreativeLosesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.pvp(true);
@@ -1186,7 +1182,7 @@ public final class MagnetPullTests {
      * is full" stands; whatever ends a pull at once (he dies, logs out, changes dimension, loses his power) drops it, and
      * so does his next press, which answers for itself (it is recharging) without the old end line put over its answer.
      */
-    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 260)
+    @EnhancedTest(template = ARENA, batch = PULL, timeoutTicks = 260)
     public static void aHeldEndLineGivesWayToWhatComesNext(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1255,7 +1251,7 @@ public final class MagnetPullTests {
      * M48 (R38). With {@code magneto.pullFromStorage} off: a chest keeps its ingots, a barrel its sword, an item frame its
      * ingot, an armour stand its iron chestplate; the ingot lying beside them comes.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void aChestKeepsItsMetal(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = magneto(f);
@@ -1291,7 +1287,7 @@ public final class MagnetPullTests {
      * a chest on someone's claim keeps its iron; and a Magneto in Adventure takes a loose ingot but no frame's or
      * stand's metal.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_storage", timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_storage", timeoutTicks = 100)
     public static void storageOnlyWhenAsked(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_FROM_STORAGE, true);
@@ -1433,7 +1429,7 @@ public final class MagnetPullTests {
      * leather boots, the iron armour of another player's horse and an armour stand's gold chestplate stay where they
      * are, and the villager is left alone.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void thePullTakesLooseMetalAndGear(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer magneto = magneto(f);
@@ -1482,7 +1478,7 @@ public final class MagnetPullTests {
      * M22. V at a zombie in an iron chestplate, then Sneak + R the next tick: the chestplate the strip marked for him
      * comes at once, through its pickup delay; an iron ingot another player threw a tick before the strip does not.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void theStripThenThePullAtOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1525,7 +1521,7 @@ public final class MagnetPullTests {
      * given); a chest minecart with dirt in it, a minecart a zombie rides and the command block minecart stay; another
      * player's drone, with PvP off, is not tugged.
      */
-    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 240)
+    @EnhancedTest(template = ARENA, batch = PULL, timeoutTicks = 240)
     public static void thePullTugsGolemsAndTakesEmptyCarts(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1603,7 +1599,7 @@ public final class MagnetPullTests {
      * wall keeps everything. Within the grace a second pull leaves A his helmet; after it a third one takes it. V at A tears
      * his chestplate off, unmarked.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_pvp", timeoutTicks = 360)
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_pvp", timeoutTicks = 360)
     public static void thePullAndPlayers(GameTestHelper helper) {
         players(helper, false);
     }
@@ -1613,7 +1609,7 @@ public final class MagnetPullTests {
      * pickup delay is the 40 ticks of a torn-off piece, counted from the take: 35 ticks after it not even A can pick the
      * sword up; 41 ticks after it A takes it back.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_pvp_feet", timeoutTicks = 160)
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_pvp_feet", timeoutTicks = 160)
     public static void thePullAndPlayersGearToFeet(GameTestHelper helper) {
         players(helper, true);
     }
@@ -1777,7 +1773,7 @@ public final class MagnetPullTests {
      * M36. With {@code magneto.pullTakesGear} off and {@code magneto.pullTug} 0: a zombie keeps its iron helmet, an Iron
      * Golem does not move, and a dropped ingot still comes.
      */
-    @GameTest(template = ARENA, batch = "magnet_pull_gear")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_gear")
     public static void theGearSwitchAndTheTug(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(EnhancedConfig.PULL_TAKES_GEAR, false);
@@ -1812,7 +1808,7 @@ public final class MagnetPullTests {
     // Piglins (M52)
 
     /** M52. A gold block pulled angers the piglins near him, as breaking it by hand does; an iron block does not. */
-    @GameTest(template = ARENA, batch = "magnet_pull_piglin")
+    @EnhancedTest(template = ARENA, batch = "magnet_pull_piglin")
     public static void piglinsMindTheirGold(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1848,7 +1844,7 @@ public final class MagnetPullTests {
      * the first starting the field's pulse, and a stream of raw iron from the middle of each of the two ores) and hears
      * the pull begin and the ores break; a player 600 blocks away (farther than anyone is tracked) is sent none of it.
      */
-    @GameTest(template = ARENA, batch = PULL, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = PULL, timeoutTicks = 200)
     public static void thePullIsSeenAndHeardNearby(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -1919,7 +1915,7 @@ public final class MagnetPullTests {
      * seconds' unit stands beside its number. With a Latin "s" the line starts left to right ("[R]"), the number joined
      * the Hebrew words before it, and the "s" was drawn alone at the far end of the line.
      */
-    @GameTest(template = ARENA, batch = PULL)
+    @EnhancedTest(template = ARENA, batch = PULL)
     public static void thePullsHudLineKeepsItsSecondsTogetherInHebrew(GameTestHelper helper) throws IOException {
         IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         JsonObject he = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang", "he_il.json"),

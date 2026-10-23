@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.CyclopsGlasses;
 import com.kolodkingal.enhanced.client.render.CyclopsHeroMath;
 import com.kolodkingal.enhanced.client.render.FlightProfile;
@@ -9,12 +8,10 @@ import com.kolodkingal.enhanced.client.render.GestureRoutes;
 import com.kolodkingal.enhanced.client.render.Gestures;
 import com.kolodkingal.enhanced.client.render.Stance;
 import com.kolodkingal.enhanced.client.render.StancePoses;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -27,13 +24,11 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  * on, the gestures are well formed and reach the visor exactly where the Optic Blast's stance holds the hand, his stances are
  * the aimed kind, he has no flight profile, and the glow of the visor and the breathing of the giant beam move without a jump.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class CyclopsAnimationTests {
     private static final List<GestureId> GESTURES = List.of(GestureId.CYCLOPS_RICOCHET, GestureId.CYCLOPS_CONCUSSION, GestureId.CYCLOPS_LEAP,
             GestureId.CYCLOPS_RALLY, GestureId.CYCLOPS_GLASSES_OFF, GestureId.CYCLOPS_GLASSES_ON);
 
-    @GameTest(template = ARENA, batch = "cyclops_pure")
+    @EnhancedTest(template = ARENA, batch = "cyclops_pure")
     public static void everyAbilityIsActedAndTheGlassesTellOffFromOn(GameTestHelper helper) {
         GestureId[] expected = {GestureId.CYCLOPS_RICOCHET, GestureId.CYCLOPS_CONCUSSION, GestureId.CYCLOPS_LEAP, GestureId.CYCLOPS_RALLY};
         for (int ability = 1; ability <= 5; ability++) {
@@ -57,7 +52,7 @@ public final class CyclopsAnimationTests {
     }
 
     /** Every gesture is well formed, starts and ends with the arms at rest, and the hand that goes to the visor goes to the stance's pose. */
-    @GameTest(template = ARENA, batch = "cyclops_pure")
+    @EnhancedTest(template = ARENA, batch = "cyclops_pure")
     public static void theGesturesAreWellFormedAndReachTheVisor(GameTestHelper helper) {
         for (GestureId id : GESTURES) {
             Gestures.Def def = Gestures.get(id);
@@ -77,7 +72,7 @@ public final class CyclopsAnimationTests {
     }
 
     /** The visor's glow rises in three ticks and then never drops below 0.8; the giant beam breathes without a jump. */
-    @GameTest(template = ARENA, batch = "cyclops_pure")
+    @EnhancedTest(template = ARENA, batch = "cyclops_pure")
     public static void theGlowAndTheBeamMoveSmoothly(GameTestHelper helper) {
         check(CyclopsHeroMath.visorGlow(0.0F) == 0.0F, "dark before it begins");
         float previous = 0.0F;

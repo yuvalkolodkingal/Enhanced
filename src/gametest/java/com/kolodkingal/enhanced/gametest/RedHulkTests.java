@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroPresets;
 import com.kolodkingal.enhanced.hulk.HulkAbilities;
 import com.kolodkingal.enhanced.network.RedHulkFxPayload;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -31,7 +32,6 @@ import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,8 +43,6 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -66,8 +64,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * custom hero's Ross, his preset, and the pure tables of his animation. Batches {@code red_hulk} and {@code
  * red_hulk_grief} (the game rule and the config, one test).
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class RedHulkTests {
     private static final String BATCH = "red_hulk";
     private static final String BATCH_GRIEF = "red_hulk_grief";
@@ -193,7 +189,7 @@ public final class RedHulkTests {
     // The body and the forms
 
     /** A new Red Hulk grows to 1.5 times over his change; then the body: +12 attack, -15 % speed, 44 health. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void heGrowsToOneAndAHalfWithHisBody(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = f.player(10.5, FLOOR, 10.5, Power.RED_HULK);
@@ -212,7 +208,7 @@ public final class RedHulkTests {
     }
 
     /** In a two-high tunnel there is no room to grow: the new Red Hulk stays Ross, N is refused, anger 100 waits. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void inATunnelRossStaysRoss(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         for (int dx = -1; dx <= 1; dx++) {
@@ -236,7 +232,7 @@ public final class RedHulkTests {
     }
 
     /** N: Red Hulk shrinks into Ross (no body, keys refused) and grows back. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void theTransformBothWaysAndRossKeys(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -261,7 +257,7 @@ public final class RedHulkTests {
     }
 
     /** Ross at anger 100 turns into Red Hulk. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
     public static void rossAtAHundredTurnsRed(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -278,7 +274,7 @@ public final class RedHulkTests {
     }
 
     /** Fire, lava and a magma floor do Red Hulk nothing; Ross burns as anyone. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void fireAndLavaDoNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -304,7 +300,7 @@ public final class RedHulkTests {
     // Anger
 
     /** +3 per health taken, +1 per health dealt; it cools 4 a second after 100 ticks out of the fight. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
     public static void angerFillsAndCools(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -328,7 +324,7 @@ public final class RedHulkTests {
     }
 
     /** At 100 the burst: three husks within 6 hurt and burning, anger spent; the advancement. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void atAHundredTheBurst(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -350,7 +346,7 @@ public final class RedHulkTests {
      * The burst lights blocks only with the game rule mobGriefing and {@code burstSetsFire}: on and on → fire; the rule
      * off → none; the option off → none.
      */
-    @GameTest(template = ARENA, batch = BATCH_GRIEF, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH_GRIEF, timeoutTicks = 200)
     public static void theBurstLightsBlocksOnlyWithMobGriefingAndTheOption(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         mobGriefing(f, true);
@@ -378,7 +374,7 @@ public final class RedHulkTests {
     }
 
     /** B below 50 anger: "Not angry enough… yet." and no cooldown; from 50 the burst now, scaled. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theEarlyBurstNeedsFifty(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -402,7 +398,7 @@ public final class RedHulkTests {
     // The moves
 
     /** R: the Ground Smash hits a husk on the ground for 8 and launches it 0.9. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theSmashHitsForEightAndLaunches(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -417,7 +413,7 @@ public final class RedHulkTests {
     }
 
     /** Sneak + R: Grab &amp; Slam, 5 + 5 + 7. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void grabAndSlam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -435,7 +431,7 @@ public final class RedHulkTests {
     }
 
     /** G: the Heat Wave burns the husk in front (5, burning) and not the one behind. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHeatWaveBurnsWhatIsInFront(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -450,7 +446,7 @@ public final class RedHulkTests {
     }
 
     /** Sneak + G: the Roar frightens a husk and adds 10 anger. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRoarFrightens(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -462,7 +458,7 @@ public final class RedHulkTests {
     }
 
     /** The Super Jump's heights by the game's physics: no charge 8, a full one 30. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theSuperJumpHeightsFollowTheCharge(GameTestHelper helper) {
         assertNear(SuperJump.height(SuperJump.charge(0)), 8.0, 1.0E-9, "no charge: 8");
         assertNear(SuperJump.height(SuperJump.charge(30)), 30.0, 1.0E-9, "a full charge: 30");
@@ -476,7 +472,7 @@ public final class RedHulkTests {
     }
 
     /** V held then released: the launch at the charge's speed, the next fall damage cancelled once. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void theJumpLaunchesAndItsLandingIsSafeOnce(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -499,7 +495,7 @@ public final class RedHulkTests {
     }
 
     /** Sneak + V: the Bound flies him (the Hulk's), and it waits its cooldown. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theBound(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -513,7 +509,7 @@ public final class RedHulkTests {
     }
 
     /** Sneak + B held: fire, an explosion, lightning and a beam feed his anger and do no harm; a husk's blow hurts. */
-    @GameTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
     public static void theAbsorbSoaksEnergyNotBlows(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer red = redHulk(f, 10.5, 10.5);
@@ -543,7 +539,7 @@ public final class RedHulkTests {
     }
 
     /** A custom hero with red_hulk.transform: N is his Human Form (every row off but N), and back. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void aCustomHerosRossIsHisHumanForm(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer hero = CustomKitSupport.hero(f, 10.5, 10.5, CustomKitSupport.def().pick("red_hulk.smash", 3)
@@ -562,7 +558,7 @@ public final class RedHulkTests {
     }
 
     /** His preset reads, is his hero's, and fits 60 points with no note. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
         java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
                 .findResource("assets", Enhanced.MODID, "hero_presets", "red_hulk.json");
@@ -578,7 +574,7 @@ public final class RedHulkTests {
     }
 
     /** The pure tables: his gestures have keys, the routes, the rows, his run. */
-    @GameTest(template = ARENA, batch = BATCH)
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisAnimationTables(GameTestHelper helper) {
         for (GestureId id : GestureId.values()) {
             if (id.name().startsWith("RED_HULK_")) {

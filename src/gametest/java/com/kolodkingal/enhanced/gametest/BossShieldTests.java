@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.gametest;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.ability.PowerTicker;
@@ -8,12 +7,12 @@ import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModItems;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -24,8 +23,6 @@ import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.List;
 
@@ -40,8 +37,6 @@ import static com.kolodkingal.enhanced.gametest.TestKit.lookAt;
  * colour, the {@link ShieldCost} interface): the shield does for Mjolnir, Stormbreaker and arrows exactly what it did,
  * and does for a projectile that says what it costs, and whether it is one of a kind, what it says.
  */
-@GameTestHolder(Enhanced.MODID)
-@PrefixGameTestTemplate(false)
 public final class BossShieldTests {
 
     /** A bolt that wears the shield by 7 and is destroyed by it. */
@@ -89,7 +84,7 @@ public final class BossShieldTests {
      * The pin of the refactor: the Chaos Shield still throws Mjolnir back to Thor, and still pays what the throw would
      * have done.
      */
-    @GameTest(template = ARENA, batch = "boss_shield_mjolnir", timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = "boss_shield_mjolnir", timeoutTicks = 200)
     public static void chaosShieldStillTurnsMjolnirHome(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
@@ -124,7 +119,7 @@ public final class BossShieldTests {
         });
     }
 
-    @GameTest(template = ARENA, batch = "boss_shield_neutralize")
+    @EnhancedTest(template = ARENA, batch = "boss_shield_neutralize")
     public static void neutralizeTurnsAWeaponHomeAndDisintegratesTheRestInTheColourItIsGiven(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
@@ -157,7 +152,7 @@ public final class BossShieldTests {
                 .filter(EnergyParticleOptions.class::isInstance).map(particle -> ((EnergyParticleOptions) particle).color()).toList();
     }
 
-    @GameTest(template = ARENA, batch = "boss_shield_cost")
+    @EnhancedTest(template = ARENA, batch = "boss_shield_cost")
     public static void aProjectileSaysWhatItCostsTheShieldAndWhetherItIsOneOfAKind(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
