@@ -2,7 +2,7 @@
 
 A Minecraft mod where you can become one of the *Enhanced*:
 **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**;
-**Quicksilver**, who slows the world down around him (to *Sweet Dreams*) or just outruns it;
+**Quicksilver**, who slows the world down around him (to his own song) or just outruns it;
 **Vision**, the Mind Stone in a synthetic body (or **White Vision**);
 Wanda's sons **Tommy (Speed)** and **Billy (Wiccan)**; **Loki**, the God of Mischief;
 **Jean Grey, the Phoenix**, who reads minds and burns with cosmic fire;
@@ -275,12 +275,10 @@ without their armour, which still protects them), and since 3.7 *Deadpool's joke
 ## Quicksilver's song
 
 Since 3.5 Quicksilver's Walkman plays his own original theme, *Silver Hours*, and Speed's plays
-*Westview Blur*. *Sweet Dreams (Are Made of This)* by Eurythmics is still built into the mod
-(`src/main/resources/assets/enhanced/sounds/quicksilver/sweet_dreams.ogg`) and plays when a player sets the
-client option `quicksilverSong = "sweet_dreams"`.
-
-The recording is copyrighted, so this repository and the mods built from it are for personal use
-only. Keep the repository private and don't share the built jar publicly.
+*Westview Blur*. Since 3.8.4 *Sweet Dreams (Are Made of This)* is no longer built into the mod. A
+player who wants it puts their own copy in `config/enhanced/music/` as `sweet_dreams.mp3` (or `.ogg`
+or `.wav`) and sets the client option `quicksilverSong = "sweet_dreams"`; without the file,
+Quicksilver plays *Silver Hours* and the game says once where to put it.
 
 To play a different song, start the game once (this creates the folder `config/enhanced/music/` in
 your Minecraft folder) and put an `.mp3`, `.ogg` or `.wav` file there (`quicksilver.*`, `speed.*`,
@@ -311,7 +309,8 @@ boss framework and its rules) is in [docs/HEROES-AND-BOSSES.md](docs/HEROES-AND-
 * Hero concepts: Eilon Kolodkin-Gal.
 * Scarlet Witch skin: the community skin
   ["Scarlet Witch"](https://www.minecraftskins.com/skin/18465369/scarlet-witch/) from minecraftskins.com.
-* *Sweet Dreams (Are Made of This)*: Eurythmics. Bundled for personal use only.
+* *Sweet Dreams (Are Made of This)*: Eurythmics. No longer built into the mod (3.8.4); a player can put
+  their own copy in `config/enhanced/music/`.
 
 ## For server owners
 

@@ -525,11 +525,14 @@ sprinted. Now he can stand still, walk, mine, build, fight or eat in the middle 
 * **The world starts playing his song**: everyone near him hears the theme from his Walkman for as long as
   Quicksilver Time is on, running or not (if his Walkman is on). It fades in when he turns Quicksilver Time on, keeps
   playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
-  * The song is *Sweet Dreams (Are Made of This)* by Eurythmics, built into the mod.
+  * The song was *Sweet Dreams (Are Made of This)* by Eurythmics until 3.5; since 3.5 it is his own theme,
+    *Silver Hours*, and since 3.8.4 *Sweet Dreams* is no longer built into the mod: a player who chooses
+    `quicksilverSong = "sweet_dreams"` puts their own copy in `config/enhanced/music/` as `sweet_dreams.*`
+    (without it, *Silver Hours* plays and the game says once where to put it).
   * **(added)** To play a different song, put an `.mp3`, `.ogg` or `.wav` file into
     `config/enhanced/music/` in the Minecraft folder (the mod creates that folder and a short README
     the first time it starts). The first file in alphabetical order is used. Remove it to go back
-    to *Sweet Dreams*.
+    to his theme.
 * A cool grey shade at the edges of the screen shows that time is slowed, and while he runs Quicksilver
   leaves a grey blur and fading afterimages behind him (in the X-Men films his speed has no
   coloured glow).
@@ -3337,7 +3340,7 @@ One entity `enhanced:asgardian` with a `Role` (Heimdall, Odin, Frigga, Sif, Valk
 
 ### 35.5 Music, the Hero Creator and the fixes of 3.5
 
-* **Music**: Quicksilver's own theme *Silver Hours* (client `[music] quicksilverSong`: `theme` or `sweet_dreams`); Speed's Walkman with *Westview Blur* (while he runs with Super Speed or his Slow Time is on; 2 s of grace, then a 10-s silent tail); the Road's sixth version, `music.road.choice`; **the world's music** (`<world>/serverconfig/enhanced/music/`: `quicksilver.ogg`, `speed.ogg`, `witches_road.ogg`, `witches_road_<part>.ogg`, `music.ogg`; Ogg Vorbis checked by header, `music.maxFileKB`; sent by SHA-256 in 30-KB pieces, `music.chunksPerTick`, cached in `config/enhanced/music_cache/`, on an optional channel of its own (`MUSIC_VERSION` 1) so older clients still join; `/enhanced music reload|list`; client `ignoreServerMusic`). Precedence: the player's own song, then the world's, then the mod's.
+* **Music**: Quicksilver's own theme *Silver Hours* (client `[music] quicksilverSong`: `theme` or `sweet_dreams`, the player's own copy since 3.8.4); Speed's Walkman with *Westview Blur* (while he runs with Super Speed or his Slow Time is on; 2 s of grace, then a 10-s silent tail); the Road's sixth version, `music.road.choice`; **the world's music** (`<world>/serverconfig/enhanced/music/`: `quicksilver.ogg`, `speed.ogg`, `witches_road.ogg`, `witches_road_<part>.ogg`, `music.ogg`; Ogg Vorbis checked by header, `music.maxFileKB`; sent by SHA-256 in 30-KB pieces, `music.chunksPerTick`, cached in `config/enhanced/music_cache/`, on an optional channel of its own (`MUSIC_VERSION` 1) so older clients still join; `/enhanced music reload|list`; client `ignoreServerMusic`). Precedence: the player's own song, then the world's, then the mod's.
 * **The Hero Creator**: every Sneak variant of the built-in heroes is a row of its own (33, plus the Scarlet Witch's Build Magic: 133 rows), bound as its parent's Sneak half on any key; a parent picked with its variant keeps its main action. `custom/AbilityColors`: a chosen colour per row (the pick's, shared with its variant), recolouring palettes by hue and saturation, greyscale textures tinted, energy bursts where vanilla particles cannot be tinted; built-in heroes keep their exact colours. The colour picker (`ColorPickerScreen`). The editor asks before discarding unsaved changes.
 * **Fixes**: `/enhanced structure repair_school [radius]` (the 76 blocks 3.3.1 changed, through the school's own processors); Loki's body (`loki.bodyHealthBonus` 10, `bodyArmor` 6, `bodyToughness` 2: 30 health); Agatha's drain only on sorcerers (`agatha.drainOnlySorcerers`: Loki, the Scarlet Witch, Billy, Agatha, or a custom hero with any of their rows); the Brand New Day skin redrawn from the film; a hero change moves another hero's worn item from the head into the inventory (`HeroItems.takeOffForeign`).
 

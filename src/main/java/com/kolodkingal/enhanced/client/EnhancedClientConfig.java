@@ -91,8 +91,11 @@ public final class EnhancedClientConfig {
         BUILDER.pop();
         // ===== 3.5 music =====
         BUILDER.push("music");
-        QUICKSILVER_SONG = BUILDER.comment("What Quicksilver's Walkman plays: theme (his own song, new in 3.5) or sweet_dreams (\"Sweet Dreams",
-                        "(Are Made of This)\", as before 3.5). A song of your own in config/enhanced/music, or the world's, plays instead.")
+        QUICKSILVER_SONG = BUILDER.comment(
+                        "What Quicksilver's Walkman plays: theme (his own song, Silver Hours) or sweet_dreams.",
+                        "\"Sweet Dreams (Are Made of This)\" is no longer built in: for sweet_dreams, put your own",
+                        "copy in config/enhanced/music as sweet_dreams.mp3 (or .ogg or .wav); without one he plays",
+                        "Silver Hours. A song of your own there, or the world's, plays instead of his theme.")
                 .translation("config.enhanced.quicksilver_song")
                 // (A list that may be asked whether it holds null, which List.of may not: a missing value is checked that way.)
                 .defineInList("quicksilverSong", "theme", java.util.Arrays.asList("theme", "sweet_dreams"));
@@ -213,7 +216,10 @@ public final class EnhancedClientConfig {
         return !SPEC.isLoaded() || WEB_ASSIST_PREVIEW.get();
     }
 
-    /** Whether Quicksilver's Walkman plays "Sweet Dreams" rather than his own song (false until the config has loaded). */
+    /**
+     * Whether the player chose quicksilverSong = sweet_dreams (false until the config has loaded): his own copy of
+     * "Sweet Dreams" in config/enhanced/music plays for Quicksilver first; without one, Quicksilver's own song (3.8.4).
+     */
     public static boolean sweetDreams() {
         return SPEC.isLoaded() && "sweet_dreams".equals(QUICKSILVER_SONG.get());
     }

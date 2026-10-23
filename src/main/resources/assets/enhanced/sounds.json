@@ -3,7 +3,7 @@
     "subtitle": "subtitles.enhanced.quicksilver_theme",
     "sounds": [
       {
-        "name": "enhanced:quicksilver/sweet_dreams",
+        "name": "enhanced:music/quicksilver_theme",
         "stream": true
       }
     ]

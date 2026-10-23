@@ -94,7 +94,7 @@ jobs:
           notes="Built from ${GITHUB_SHA::7} on ${GITHUB_REF_NAME}.
 
           Install: put the jar in the mods folder of a NeoForge 21.1 (Minecraft 1.21.1) instance, on the client and,
-          for multiplayer, on the server too. Personal use only: the jar contains a copyrighted song."
+          for multiplayer, on the server too."
           gh release create "$tag" dist/*.jar \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \

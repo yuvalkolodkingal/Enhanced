@@ -33,7 +33,7 @@ cd enhanced
 
 GitHub Actions (`.github/workflows/build.yml`) מריץ את אותה בנייה ואת ה-GameTests בכל דחיפה ובכל pull request, ומפרסם גרסה לכל דחיפה ל-`main` (או לתגית `v*`). ה-jar של הבנייה החדשה ביותר הוא זה שמסומן *Latest* בדף ה-[Releases](https://github.com/yuvalkolodkingal/enhanced/releases).
 
-בקובץ ה-jar יש שיר מוגן בזכויות יוצרים, ולכן הבניות הן לשימוש אישי בלבד (ראו [קרדיטים](Credits-HE)).
+מאז 3.8.4 השיר *Sweet Dreams (Are Made of This)* כבר לא נמצא בתוך ה-jar; שחקן יכול לשים עותק משלו בתיקייה `config/enhanced/music/` (ראו [מוזיקה](Music-HE)).
 
 ## איפה כל דבר
 

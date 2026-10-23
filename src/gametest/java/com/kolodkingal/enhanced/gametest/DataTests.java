@@ -254,8 +254,8 @@ public final class DataTests {
     }
 
     /**
-     * Every sound the mod defines, Quicksilver's song included, is a registered sound event backed by a real Ogg file
-     * in the mod (not missing, renamed or an LFS pointer).
+     * Every sound the mod defines is a registered sound event backed by a real Ogg file in the mod (not missing,
+     * renamed or an LFS pointer), and the "Sweet Dreams" recording is gone (3.8.4).
      */
     @EnhancedTest(template = ARENA)
     public static void everySoundHasItsFile(GameTestHelper helper) throws IOException {
@@ -280,8 +280,16 @@ public final class DataTests {
         for (var registered : ModSounds.SOUNDS.getEntries()) {
             check(sounds.has(registered.getId().getPath()), registered.getId() + " has an entry in sounds.json");
         }
+        // 3.8.4: "Sweet Dreams" is no longer in the mod. Its sound event stays registered (NeoForge syncs the sound
+        // registry; protocol 13) and points at Quicksilver's own song.
         Path song = mod.findResource("assets", Enhanced.MODID, "sounds", "quicksilver", "sweet_dreams.ogg");
-        check(Files.size(song) > 1_000_000, "Sweet Dreams is the whole song (" + Files.size(song) + " bytes)");
+        check(!Files.exists(song), "the Sweet Dreams recording is no longer in the mod");
+        check(!sounds.toString().contains("sweet_dreams"), "no sound in sounds.json names it");
+        check(BuiltInRegistries.SOUND_EVENT.containsKey(ModSounds.QUICKSILVER_THEME.getId()),
+                "enhanced:quicksilver_theme is still registered");
+        check(sounds.getAsJsonObject("quicksilver_theme").getAsJsonArray("sounds")
+                .equals(sounds.getAsJsonObject("music.quicksilver").getAsJsonArray("sounds")),
+                "and it plays Silver Hours, Quicksilver's own song");
         helper.succeed();
     }
 

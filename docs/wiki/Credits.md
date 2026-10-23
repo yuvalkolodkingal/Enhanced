@@ -9,7 +9,7 @@
 ## Skins, music and libraries
 
 * **Scarlet Witch skin:** the community skin ["Scarlet Witch"](https://www.minecraftskins.com/skin/18465369/scarlet-witch/) from minecraftskins.com.
-* ***Sweet Dreams (Are Made of This)*:** Eurythmics. Bundled for personal use only (since 3.5 it plays only if a player chooses it): the recording is copyrighted, so do not share the jar publicly.
+* ***Sweet Dreams (Are Made of This)*:** Eurythmics. No longer built into the mod (3.8.4): a player can put their own copy in `config/enhanced/music/` and choose it with `quicksilverSong = "sweet_dreams"` (see [Music](Music)).
 * **The Walkman themes** (3.5): Quicksilver's *Silver Hours* and Speed's *Westview Blur*, original synth-pop written for the mod in the spirit of the 80s (the style only; no melody, bass line or chords of any song).
 * **The music of the Witches' Road** (3.3): an original ballad written for the mod in the spirit of *Agatha All Along*, synthesised in five arrangements, and a sixth in 3.5 for the choice; not the show's song.
 * **The music and sounds of Asgard** (3.5): Asgard's three pieces, the Guardian's Watch, Hela's three-layer battle theme, and every sound of Heimdall, Odin, Hela and the Asgardians, all synthesised for the mod; no film audio.

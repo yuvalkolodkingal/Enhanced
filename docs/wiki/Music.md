@@ -12,7 +12,7 @@ Since 3.5 Quicksilver's Walkman plays **his own theme, "Silver Hours"**: an orig
 
 The rules haven't changed: it plays while **Quicksilver Time** is on (running or standing still; Super Speed alone plays nothing), for everyone near enough to be caught in the slow motion, and only while his Walkman is on (**Sneak + R**). See [Quicksilver](Quicksilver).
 
-**Want *Sweet Dreams* back?** It is still in the mod. In your own game's options, **`config/enhanced-client.toml`**, section `[music]`, set `quicksilverSong = "sweet_dreams"` (the default is `"theme"`). The game's **Mods → Enhanced → Config** screen has it too. Only your own game changes.
+**Want *Sweet Dreams*?** Since 3.8.4 it is no longer built into the mod, but you can play your own copy: put it in **`config/enhanced/music/`** as `sweet_dreams.mp3` (or `.ogg` or `.wav`), and in your own game's options, **`config/enhanced-client.toml`**, section `[music]`, set `quicksilverSong = "sweet_dreams"` (the default is `"theme"`). The game's **Mods → Enhanced → Config** screen has it too. Only your own game changes. Without the file he plays *Silver Hours*, and the game tells you once where to put it.
 
 ### Speed: "Westview Blur"
 
@@ -70,7 +70,7 @@ New in 3.5: a server owner can replace the Walkman songs and the Road's music **
 **Which one plays** (the first that exists):
 
 * a part of the Road: `witches_road_<part>.ogg` → `witches_road.ogg` → `music.ogg` → the mod's own;
-* Quicksilver: `quicksilver.ogg` → `music.ogg` → his theme (or *Sweet Dreams*, if the player chose it);
+* Quicksilver: `quicksilver.ogg` → `music.ogg` → his theme;
 * Speed: `speed.ogg` → `music.ogg` → his theme.
 
 ### The files
@@ -93,13 +93,14 @@ The server options are `music.enabled` (true; false sends no songs), `music.maxF
 * The folder **`config/enhanced/music/`** in your Minecraft folder (the mod makes it, with a `README.txt`), as before. Any `.mp3`, `.ogg` or `.wav`.
 * **New:** files named after the music: `quicksilver.*`, `speed.*`, `witches_road.*` and `witches_road_<part>.*` (the same parts as above).
 * **As before:** any other song file there (`my song.mp3`, `music.mp3`...) is Quicksilver's; with several, the first in alphabetical order.
+* **`sweet_dreams.*`** (3.8.4): your own copy of *Sweet Dreams*. With `quicksilverSong = "sweet_dreams"` it plays for Quicksilver before any other file.
 * Your own songs play only in your own game. **Your song beats the world's, and the world's beats the mod's.**
 
 ## Options
 
 | Where | Option | Default | What it does |
 |---|---|---|---|
-| Client (`enhanced-client.toml`, `[music]`) | `quicksilverSong` | `theme` | Quicksilver's built-in song: `theme` ("Silver Hours") or `sweet_dreams`. |
+| Client (`enhanced-client.toml`, `[music]`) | `quicksilverSong` | `theme` | Quicksilver's song: `theme` ("Silver Hours") or `sweet_dreams` (your own copy, `sweet_dreams.*` in `config/enhanced/music/`; without it, "Silver Hours"). |
 | Client (`enhanced-client.toml`, `[music]`) | `ignoreServerMusic` | `false` | Don't download or play the world's songs. |
 | Server (`[music]`) | `enabled` | `true` | Send the songs of the world's music folder to the players. |
 | Server (`[music]`) | `maxFileKB` | `8192` | The biggest song sent, in KB (16 to 65536). |

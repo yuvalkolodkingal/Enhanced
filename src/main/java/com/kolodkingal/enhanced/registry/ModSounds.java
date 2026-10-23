@@ -7,14 +7,19 @@ import com.kolodkingal.enhanced.platform.reg.Registrars;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 
-/** The mod's own sound effects (all original, synthesized) and Quicksilver's song. */
+/** The mod's own sound effects and music (all original, synthesized). */
 public final class ModSounds {
     public static final Registrar<SoundEvent> SOUNDS = Registrars.create(Registries.SOUND_EVENT, Enhanced.MODID);
 
     /**
-     * "Sweet Dreams (Are Made of This)", which Quicksilver's Walkman played during Quicksilver Time until 3.5; since 3.5 his
-     * own song ({@link #MUSIC_QUICKSILVER}) is the default, and this one the client option quicksilverSong = sweet_dreams. A
-     * player (config/enhanced/music) or the world (its music folder) can play another song instead (see SpeedsterMusic).
+     * Once "Sweet Dreams (Are Made of This)", which Quicksilver's Walkman played until 3.5, and until 3.8.4 when a
+     * player chose quicksilverSong = sweet_dreams. Since 3.8.4 the recording is no longer in the mod: that option plays
+     * the player's own copy from config/enhanced/music, or else his own song ({@link #MUSIC_QUICKSILVER}). Nothing
+     * plays this event any more, and sounds.json points it at his own song all the same.
+     * <p>
+     * It stays registered on purpose: NeoForge syncs the sound_event registry when a player joins, so without it a
+     * 3.8.3 client and a 3.8.4 server (or the other way round) would no longer agree, and the player would be turned
+     * away. Keeping the id keeps network protocol "13" working between them.
      */
     public static final RegEntry<SoundEvent, SoundEvent> QUICKSILVER_THEME = register("quicksilver_theme");
 
