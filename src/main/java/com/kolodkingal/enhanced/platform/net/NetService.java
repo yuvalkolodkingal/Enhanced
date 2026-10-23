@@ -29,4 +29,7 @@ public interface NetService {
 
     void sendToPlayersTrackingChunk(ServerLevel level, ChunkPos chunkPos, CustomPacketPayload payload,
                                     CustomPacketPayload... payloads);
+
+    /** See {@link Net#hasChannel}. */
+    boolean hasChannel(ServerPlayer player, CustomPacketPayload.Type<?> type);
 }
