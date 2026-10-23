@@ -24,4 +24,17 @@ public final class Keys {
                                     String category) {
         return newKey(name, context, KeyMod.NONE, type, keyCode, category);
     }
+
+    /**
+     * Whether {@code key} pressed now is {@code mapping}'s: its context is active, the key is its bound key and its
+     * modifier is held (NeoForge: {@code isActiveAndMatches}).
+     */
+    public static boolean matches(KeyMapping mapping, InputConstants.Key key) {
+        return ClientServices.get().matches(mapping, key);
+    }
+
+    /** The key {@code mapping} is bound to now (NeoForge: {@code getKey()}). */
+    public static InputConstants.Key boundKey(KeyMapping mapping) {
+        return ClientServices.get().boundKey(mapping);
+    }
 }

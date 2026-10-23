@@ -31,6 +31,12 @@ public interface ClientServices {
     KeyMapping newKey(String name, KeyContext context, KeyMod modifier, InputConstants.Type type, int keyCode,
                       String category);
 
+    /** See {@link Keys#matches}. */
+    boolean matches(KeyMapping mapping, InputConstants.Key key);
+
+    /** See {@link Keys#boundKey}. */
+    InputConstants.Key boundKey(KeyMapping mapping);
+
     /** {@link KeyContext#isActive()} of the loader's own contexts. */
     boolean isActive(KeyContext.Vanilla context);
 

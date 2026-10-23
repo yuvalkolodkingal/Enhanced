@@ -47,6 +47,16 @@ public final class NeoClientServices implements ClientServices {
     }
 
     @Override
+    public boolean matches(KeyMapping mapping, InputConstants.Key key) {
+        return mapping.isActiveAndMatches(key);
+    }
+
+    @Override
+    public InputConstants.Key boundKey(KeyMapping mapping) {
+        return mapping.getKey();
+    }
+
+    @Override
     public boolean isActive(KeyContext.Vanilla context) {
         return toNeo(context).isActive();
     }
