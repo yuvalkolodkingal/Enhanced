@@ -1,6 +1,18 @@
 package com.kolodkingal.enhanced.boss;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.BlockDropsEvent;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EntityMobGriefingEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTeleportEvent;
+import com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent;
+import com.kolodkingal.enhanced.platform.event.ExplosionEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDestroyBlockEvent;
+import com.kolodkingal.enhanced.platform.event.MobSpawnEvent;
+import com.kolodkingal.enhanced.platform.event.PistonEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -13,19 +25,6 @@ import net.minecraft.world.item.SolidBucketItem;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityMobGriefingEvent;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent;
-import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.neoforge.event.level.PistonEvent;
 
 /**
  * What keeps a boss arena as it was: while a fight lasts, the blocks of its cylinder cannot be broken, placed, flooded,
@@ -35,7 +34,7 @@ import net.neoforged.neoforge.event.level.PistonEvent;
  * questions where they act (Tommy's acceleration, Loki's ice, the Hex gate); block telekinesis only borrows an arena's
  * blocks, which the arena gets back ({@link ArenaLoans}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class BossArenaEvents {
 
     private static boolean protects(LevelAccessor level, BlockPos pos) {
@@ -54,7 +53,7 @@ public final class BossArenaEvents {
      * Nobody breaks a block of the arena. The one cell a loan of block telekinesis is asking about ({@link
      * BossFights#lending}) is let through, so that the claim mods that listen after the arena decide it.
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onBreak(BlockEvent.BreakEvent event) {
         if (BossFights.isLending(event.getPos())) {
             return;
@@ -65,7 +64,7 @@ public final class BossArenaEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onPlace(BlockEvent.EntityPlaceEvent event) {
         if (protects(event.getLevel(), event.getPos())) {
             refuse(event.getEntity());
@@ -74,7 +73,7 @@ public final class BossArenaEvents {
     }
 
     /** Water and lava turning into stone or obsidian where they meet. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onFluidPlace(BlockEvent.FluidPlaceBlockEvent event) {
         if (protects(event.getLevel(), event.getPos())) {
             event.setCanceled(true);
@@ -82,7 +81,7 @@ public final class BossArenaEvents {
     }
 
     /** A bucket empties or fills where the player points; there is no bucket event, so the use is stopped. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onBucketOnBlock(PlayerInteractEvent.RightClickBlock event) {
         if (isBucket(event.getItemStack()) && bucketTouches(event.getEntity(), event.getHitVec())) {
             refuse(event.getEntity());
@@ -90,7 +89,7 @@ public final class BossArenaEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onBucketInTheAir(PlayerInteractEvent.RightClickItem event) {
         if (!isBucket(event.getItemStack()) || !(event.getLevel() instanceof ServerLevel)) {
             return;
@@ -113,7 +112,7 @@ public final class BossArenaEvents {
                 && (BossFights.protects(level, hit.getBlockPos()) || BossFights.protects(level, hit.getBlockPos().relative(hit.getDirection())));
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onPiston(PistonEvent.Pre event) {
         if (protects(event.getLevel(), event.getPos())) {
             event.setCanceled(true);
@@ -124,7 +123,7 @@ public final class BossArenaEvents {
      * A block that leans on a borrowed block's open hole (a torch on it, a flower, a lantern under it) and that its
      * neighbours break meanwhile drops nothing: the mend puts it back ({@link ArenaLoans}).
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onDrops(BlockDropsEvent event) {
         if (BossFights.leansOnALoan(event.getLevel(), event.getPos())) {
             event.setCanceled(true);
@@ -132,7 +131,7 @@ public final class BossArenaEvents {
     }
 
     /** Explosions hurt and break nothing. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onExplosion(ExplosionEvent.Detonate event) {
         if (event.getLevel() instanceof ServerLevel level && !event.getAffectedBlocks().isEmpty()) {
             event.getAffectedBlocks().removeIf(pos -> BossFights.protects(level, pos));
@@ -142,7 +141,7 @@ public final class BossArenaEvents {
     // ---- mobs ----
 
     /** Withers, Ravagers and zombies at the door break nothing. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onDestroy(LivingDestroyBlockEvent event) {
         if (protects(event.getEntity().level(), event.getPos())) {
             event.setCanceled(true);
@@ -150,7 +149,7 @@ public final class BossArenaEvents {
     }
 
     /** Endermen carry no blocks away, Silverfish eat none, Creepers' craters stay. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onMobGriefing(EntityMobGriefingEvent event) {
         if (event.getEntity() != null && protects(event.getEntity().level(), event.getEntity().blockPosition())) {
             event.setCanGrief(false);
@@ -158,7 +157,7 @@ public final class BossArenaEvents {
     }
 
     /** Nothing spawns in the arena by itself (a spawner, a patrol, the night). */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onSpawn(MobSpawnEvent.PositionCheck event) {
         if (event.getLevel() instanceof ServerLevel level && BossFights.protects(level, BlockPos.containing(event.getX(), event.getY(), event.getZ()))) {
             event.setResult(MobSpawnEvent.PositionCheck.Result.FAIL);
@@ -171,7 +170,7 @@ public final class BossArenaEvents {
      * A Chorus Fruit cannot take a fighter out of the arena. (Ender Pearls, the Bifrost, Vanish, the Tesseract and the
      * Witches' Road are judged where the Hex judges them; an operator's {@code /tp} is never stopped.)
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onChorusFruit(EntityTeleportEvent.ChorusFruit event) {
         Entity entity = event.getEntity();
         if (entity.level() instanceof ServerLevel level && !BossFights.allowsTeleport(level, entity, event.getTarget())) {
@@ -181,7 +180,7 @@ public final class BossArenaEvents {
     }
 
     /** A portal does not take a fighter out of the arena either. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onTravel(EntityTravelToDimensionEvent event) {
         Entity entity = event.getEntity();
         if (entity.level() instanceof ServerLevel level && level.getServer() != null) {

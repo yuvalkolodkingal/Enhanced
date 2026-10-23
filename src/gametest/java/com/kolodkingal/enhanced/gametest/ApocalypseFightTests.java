@@ -24,6 +24,8 @@ import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Duel;
 import com.kolodkingal.enhanced.gametest.ApocalypseTestSupport.Log;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -53,8 +55,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.HashSet;
 import java.util.List;
@@ -807,7 +807,7 @@ public final class ApocalypseFightTests {
         BlockPos stone = new BlockPos(14, 2, 10);
         helper.setBlock(stone, Blocks.STONE);
         BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(level, helper.absolutePos(stone), level.getBlockState(helper.absolutePos(stone)), hero);
-        NeoForge.EVENT_BUS.post(event);
+        Events.post(event);
         check(event.isCanceled(), "a block cannot be broken");
         Vec3 blast = helper.absoluteVec(new Vec3(14.5, FLOOR + 0.5, 10.5));
         level.explode(null, blast.x, blast.y, blast.z, 4.0F, Level.ExplosionInteraction.TNT);

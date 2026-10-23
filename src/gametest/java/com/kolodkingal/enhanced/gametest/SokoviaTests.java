@@ -4,6 +4,10 @@ import com.kolodkingal.enhanced.boss.BossEnd;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.network.SokoviaLiftPayload;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.PistonEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -34,11 +38,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.PistonEvent;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -547,13 +546,13 @@ public final class SokoviaTests {
             for (BlockPos pos : List.of(on, above, beyond)) {
                 boolean inside = pos != beyond;
                 BlockEvent.BreakEvent broke = new BlockEvent.BreakEvent(level, pos, level.getBlockState(pos), starter);
-                NeoForge.EVENT_BUS.post(broke);
+                Events.post(broke);
                 BlockEvent.EntityPlaceEvent placed = new BlockEvent.EntityPlaceEvent(
-                        BlockSnapshot.create(level.dimension(), level, pos), Blocks.DIRT.defaultBlockState(), starter);
-                NeoForge.EVENT_BUS.post(placed);
+                        level, pos, level.getBlockState(pos), Blocks.DIRT.defaultBlockState(), starter);
+                Events.post(placed);
                 PistonEvent.Pre pushed = new PistonEvent.Pre(level, pos, Direction.UP,
                         PistonEvent.PistonMoveType.EXTEND);
-                NeoForge.EVENT_BUS.post(pushed);
+                Events.post(pushed);
                 check(broke.isCanceled() == inside, "breaking " + (inside ? "in" : "beyond") + " the island");
                 check(placed.isCanceled() == inside, "placing " + (inside ? "in" : "beyond") + " the island");
                 check(pushed.isCanceled() == inside, "a piston " + (inside ? "in" : "beyond") + " the island");
@@ -835,7 +834,7 @@ public final class SokoviaTests {
         });
         script.then("a player sees the key while it rises", () -> {
             TestKit.sentPackets(latecomer);
-            NeoForge.EVENT_BUS.post(new PlayerEvent.StartTracking(latecomer, fight.key()));
+            Events.post(new PlayerEvent.StartTracking(latecomer, fight.key()));
             List<SokoviaLiftPayload> told = new ArrayList<>();
             collect(latecomer, told);
             check(told.size() == 1 && told.get(0).phase() == SokoviaLiftPayload.RISE && told.get(0).bossId() == fight.key().getId(), "told the rise, with the key: " + told);
@@ -846,12 +845,12 @@ public final class SokoviaTests {
         });
         script.then("and while it is up", () -> {
             TestKit.sentPackets(latecomer);
-            NeoForge.EVENT_BUS.post(new PlayerEvent.StartTracking(latecomer, fight.key()));
+            Events.post(new PlayerEvent.StartTracking(latecomer, fight.key()));
             List<SokoviaLiftPayload> told = new ArrayList<>();
             collect(latecomer, told);
             check(told.size() == 1 && told.get(0).phase() == SokoviaLiftPayload.END && told.get(0).hide(), "told the island is up and the ground is hidden: " + told);
             // A player who sees something else is told nothing.
-            NeoForge.EVENT_BUS.post(new PlayerEvent.StartTracking(latecomer, boss(fight)));
+            Events.post(new PlayerEvent.StartTracking(latecomer, boss(fight)));
             collect(latecomer, told);
             check(told.size() == 1, "(only the key tells)");
         });

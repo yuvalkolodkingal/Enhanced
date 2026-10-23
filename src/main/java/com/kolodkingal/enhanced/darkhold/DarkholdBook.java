@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.config.AgathaConfig;
 import com.kolodkingal.enhanced.config.DarkholdConfig;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.HexRunes;
@@ -36,7 +37,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -244,7 +244,7 @@ public final class DarkholdBook {
         Entity seen = null;
         HitResult hit = Raycasts.any(player, DarkholdConfig.MARK_RANGE.get(), ContinuousBeam.targets(player), 1.0F);
         if (hit instanceof EntityHitResult entityHit) {
-            seen = entityHit.getEntity() instanceof PartEntity<?> part ? part.getParent() : entityHit.getEntity();
+            seen = Platform.get().parts().root(entityHit.getEntity());
         }
         if (seen instanceof LivingEntity target && !(seen instanceof ArmorStand)) {
             return mark(player, target);

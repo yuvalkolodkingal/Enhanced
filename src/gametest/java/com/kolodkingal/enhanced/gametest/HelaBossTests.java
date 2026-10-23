@@ -472,7 +472,7 @@ public final class HelaBossTests {
         stray.moveTo(at.x, at.y, at.z);
         level.addFreshEntity(stray);
         BerserkerEntity loose = new BerserkerEntity(ModEntities.BERSERKER.get(), level);
-        loose.getPersistentData().putBoolean(HelaArmy.LOOSE_TAG, true);
+        ModAttachments.PERSISTENT_DATA.get(loose).putBoolean(HelaArmy.LOOSE_TAG, true);
         loose.moveTo(at.x + 4, at.y, at.z);
         level.addFreshEntity(loose);
         helper.runAfterDelay(3, () -> {

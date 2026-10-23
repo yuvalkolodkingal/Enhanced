@@ -1,11 +1,17 @@
 package com.kolodkingal.enhanced.ultron;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.MobEffectEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -15,13 +21,6 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 /**
  * Ultron's own game-bus events, at the priorities of {@code docs/HEROES-AND-BOSSES.md}: the damage bonuses
@@ -29,7 +28,7 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
  * does about it: no fall damage, no Poison or Wither, and Second Life. (The rest of what the fight needs is in the
  * entities and the fight, or is the framework's; the hero's five abilities are {@code UltronAbilities}.)
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class UltronEvents {
 
     /**
@@ -37,7 +36,7 @@ public final class UltronEvents {
      * (Thor's beam and arcs, his strike, the weather's), and the Mind Stone beam {@code visionBeamBonus} times to the
      * bodies and the Sentries (the film: Vision, who came from the same stone and the same Stark's code).
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         LivingEntity target = event.getEntity();
         boolean robot = target.getType().is(ModTags.ULTRON_ROBOTS);
@@ -56,7 +55,7 @@ public final class UltronEvents {
     }
 
     /** HIGH: a machine takes no Poison and no Wither. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
         if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.ULTRON_BODY)
                 && (event.getEffectInstance().is(MobEffects.POISON) || event.getEffectInstance().is(MobEffects.WITHER))) {
@@ -69,7 +68,7 @@ public final class UltronEvents {
      * death is cancelled, and nothing that follows a death ({@code CommonEvents}, the fight's fallen fighter) hears of
      * it.
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onSecondLife(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.ULTRON_UPLOAD)
                 && UltronDrones.secondLife(player, event.getSource())) {
@@ -82,7 +81,7 @@ public final class UltronEvents {
      * else) is what his drones go for next; and a player who hurt him, or a drone of his, is fair game for them for a
      * while (when PvP allows it).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onDamaged(LivingDamageEvent.Post event) {
         LivingEntity victim = event.getEntity();
         Entity cause = event.getSource().getEntity();
@@ -105,7 +104,7 @@ public final class UltronEvents {
      * 30 percent more and no hit takes more than {@code maxHitFraction} of its health. (The void and {@code /kill} are
      * not touched.)
      */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onBodyDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof UltronEntity body) {
             event.setAmount(body.adjust(event.getSource(), event.getAmount()));
@@ -113,7 +112,7 @@ public final class UltronEvents {
     }
 
     /** A fighter fell: the first one earns a line from Ultron. */
-    @SubscribeEvent
+    @Subscribe
     public static void onDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;

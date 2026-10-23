@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.hela;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.asgard.AsgardProgress;
 import com.kolodkingal.enhanced.asgard.npc.AsgardDialogue;
@@ -8,10 +7,10 @@ import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
+import com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.server.level.ServerLevel;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.List;
 
@@ -21,10 +20,10 @@ import java.util.List;
  * ({@link AreaTargets#addAllyRule}), and the warnings the warriors of Asgard give about her are added to their dialogue
  * (lane L5's talk screen shows them).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, bus = EventBusSubscriber.Bus.MOD)
+@Subscriber
 public final class HelaSetup {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             BossFights.register(BossKind.HELA, new HelaLane());

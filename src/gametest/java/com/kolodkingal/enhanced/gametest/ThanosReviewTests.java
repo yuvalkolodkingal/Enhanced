@@ -6,16 +6,16 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosFight;
 import com.kolodkingal.enhanced.thanos.ThanosState;
+import java.nio.file.NoSuchFileException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -158,8 +158,9 @@ public final class ThanosReviewTests {
         });
     }
 
-    private static JsonObject lang(IModFile mod, String name) throws IOException {
-        Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+    private static JsonObject lang(String name) throws IOException {
+        String path = "assets/" + Enhanced.MODID + "/lang/" + name + ".json";
+        Path file = Platform.get().modResource(path).orElseThrow(() -> new NoSuchFileException(path));
         return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
     }
 
@@ -171,9 +172,8 @@ public final class ThanosReviewTests {
      */
     @EnhancedTest(template = ARENA, batch = "thanos_review_data")
     public static void theTitlesFitTheScreenAtEveryScale(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (String language : new String[]{"en_us", "he_il"}) {
-            JsonObject lang = lang(mod, language);
+            JsonObject lang = lang(language);
             for (String key : new String[]{"message.enhanced.thanos.summon.title", "message.enhanced.thanos.reward"}) {
                 int length = lang.get(key).getAsString().length();
                 check(length <= 14, language + " " + key + " is a title and has " + length + " characters");

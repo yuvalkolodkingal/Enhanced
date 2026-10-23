@@ -19,6 +19,10 @@ import com.kolodkingal.enhanced.config.ApocalypseShieldConfig;
 import com.kolodkingal.enhanced.config.BossConfig;
 import com.kolodkingal.enhanced.entity.TelekineticBlockEntity;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Events;
+import com.kolodkingal.enhanced.platform.event.LevelEvent;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -49,10 +53,6 @@ import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -177,7 +177,7 @@ public final class ArenaLoanTests {
 
     /** One save of the dimension, as the game posts it once the chunks are queued to the disk. */
     private static void saveHook(ServerLevel level) {
-        NeoForge.EVENT_BUS.post(new LevelEvent.Save(level));
+        Events.post(new LevelEvent.Save(level));
     }
 
     /** The fight's journal as it is on the disk once everything handed over is written, or null if there is none. */
@@ -496,12 +496,12 @@ public final class ArenaLoanTests {
                 event.setCanceled(true);
             }
         };
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, claim);
-        f.onClose(() -> NeoForge.EVENT_BUS.unregister(claim));
+        EventHub.Registration claimRegistration = EventHub.of(BlockEvent.BreakEvent.class).register(claim);
+        f.onClose(claimRegistration::close);
 
         check(borrow(helper, wanda, Telekinesis.Mode.WANDA, claimed) == null, "a claim keeps the arena from lending its block");
         check(ArenaLoans.PROTECTED.equals(lastActionBarKey(wanda)) && helper.getBlockState(claimed).is(Blocks.DIRT), "\"This place is protected\"");
-        NeoForge.EVENT_BUS.unregister(claim);
+        claimRegistration.close();
         dropDust(wanda, borrowed(helper, wanda, Telekinesis.Mode.WANDA, claimed));
         check(helper.getBlockState(claimed).isAir(), "without the claim the same cell is lent");
 

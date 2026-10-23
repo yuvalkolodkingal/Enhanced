@@ -1,12 +1,28 @@
 package com.kolodkingal.enhanced.apocalypse;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ApocalypseAbilities;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent;
+import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
+import com.kolodkingal.enhanced.platform.event.LivingChangeTargetEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDropsEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEntityUseItemEvent;
+import com.kolodkingal.enhanced.platform.event.LivingExperienceDropEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import net.minecraft.server.level.ServerLevel;
@@ -16,23 +32,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -43,17 +42,17 @@ import org.jetbrains.annotations.Nullable;
  * creature in a cocoon of sand can neither strike nor use anything. (The events that protect the arena and hand over the
  * rewards are the boss framework's.)
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class ApocalypseEvents {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             SandHazards.tickLevel(level);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         SandHazards.clear();
     }
@@ -62,7 +61,7 @@ public final class ApocalypseEvents {
      * HIGHEST: the hero's shield takes the blows meant for him, before Wanda's branch of the damage chain (see {@link
      * ApocalypseGuard#guard}): everything but mind power is stopped, mind power wears it, and what it cannot take goes on.
      */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && !player.level().isClientSide()) {
             ApocalypseGuard.guard(player, event);
@@ -75,7 +74,7 @@ public final class ApocalypseEvents {
      * volley cut Pestilence down and he and Famine fought it out within half a minute of their coming). A Horseman a
      * Phoenix has taken over is hers: it fights them, and they may fight it back.
      */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onFriendlyFire(LivingIncomingDamageEvent event) {
         LivingEntity victim = event.getEntity();
         if (!victim.level().isClientSide() && sameSide(victim, event.getSource().getEntity())) {
@@ -84,7 +83,7 @@ public final class ApocalypseEvents {
     }
 
     /** No Horseman takes another of the fight, or him, for a target (unless a Phoenix holds one of the two). */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onChangeTarget(LivingChangeTargetEvent event) {
         LivingEntity entity = event.getEntity();
         if (!entity.level().isClientSide() && sameSide(entity, event.getNewAboutToBeSetTarget())) {
@@ -102,7 +101,7 @@ public final class ApocalypseEvents {
     }
 
     /** The healing factor of the hero waits for quiet: any damage that reached him starts the wait over. */
-    @SubscribeEvent
+    @Subscribe
     public static void onDamaged(LivingDamageEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.APOCALYPSE_BODY)) {
             ApocalypseAbilities.hurt(player);
@@ -115,7 +114,7 @@ public final class ApocalypseEvents {
      * everything else turns to gold dust. What his own side shoots (a lance, a Horseman's shard) is left alone. The same for
      * the hero, whose complete shield turns away what is shot at him (and charges it a part of the damage it would have done).
      */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)) {
@@ -139,7 +138,7 @@ public final class ApocalypseEvents {
     }
 
     /** A Horseman that no fight owns (a crash left it in a chunk) never joins a level. */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
         if (!event.getLevel().isClientSide() && entity instanceof Husk && Horsemen.kindOf(entity) != null && BossFights.fightOf(entity) == null) {
@@ -148,14 +147,14 @@ public final class ApocalypseEvents {
     }
 
     /** The Horsemen drop nothing and give no experience: they are never farmed. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onDrops(LivingDropsEvent event) {
         if (Horsemen.kindOf(event.getEntity()) != null) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onExperience(LivingExperienceDropEvent event) {
         if (Horsemen.kindOf(event.getEntity()) != null || event.getEntity() instanceof ApocalypseEntity) {
             event.setDroppedExperience(0);
@@ -163,7 +162,7 @@ public final class ApocalypseEvents {
     }
 
     /** A player comes into view of the boss: the clients that were not there at the ritual are told where the arena is. */
-    @SubscribeEvent
+    @Subscribe
     public static void onStartTracking(PlayerEvent.StartTracking event) {
         if (event.getTarget() instanceof ApocalypseEntity boss && event.getEntity() instanceof ServerPlayer player && boss.fight() != null) {
             boss.fight().tellArena(player);
@@ -171,7 +170,7 @@ public final class ApocalypseEvents {
     }
 
     /** The first fighter to fall earns a word. */
-    @SubscribeEvent
+    @Subscribe
     public static void onDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -189,42 +188,42 @@ public final class ApocalypseEvents {
         return entity.hasEffect(ModEffects.ENTOMBED);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onAttack(AttackEntityEvent event) {
         if (entombed(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (entombed(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (entombed(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         if (entombed(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if (entombed(event.getEntity())) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onUseItem(LivingEntityUseItemEvent.Start event) {
         if (entombed(event.getEntity())) {
             event.setCanceled(true);

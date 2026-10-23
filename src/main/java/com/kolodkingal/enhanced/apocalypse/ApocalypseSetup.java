@@ -1,26 +1,25 @@
 package com.kolodkingal.enhanced.apocalypse;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.entity.SandCocoonEntity;
+import com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 /**
  * The mod-bus side of Apocalypse: when the mod loads, his lane is registered with the boss framework (so that the
  * Capstone's ritual and {@code /enhanced boss start apocalypse} can wake him), the Phoenix's mind is told what it does to
  * his shield, and the cocoons a hero casts are exempted from the orphan sweep (a boss's are marked by their fight).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, bus = EventBusSubscriber.Bus.MOD)
+@Subscriber
 public final class ApocalypseSetup {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             BossFights.register(BossKind.APOCALYPSE, new ApocalypseLane());

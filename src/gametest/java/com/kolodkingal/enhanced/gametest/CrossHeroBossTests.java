@@ -28,6 +28,9 @@ import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.ApocalypseFxPayload;
 import com.kolodkingal.enhanced.network.SpiderFxPayload;
+import com.kolodkingal.enhanced.platform.event.EntityTickEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -62,9 +65,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -164,8 +164,7 @@ public final class CrossHeroBossTests {
 
         static TickCounter install(TestKit.Fixture f) {
             TickCounter counter = new TickCounter();
-            NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, EntityTickEvent.Post.class, counter);
-            f.onClose(() -> NeoForge.EVENT_BUS.unregister(counter));
+            f.onClose(EventHub.of(EntityTickEvent.Post.class).register(Priority.NORMAL, false, counter)::close);
             return counter;
         }
 

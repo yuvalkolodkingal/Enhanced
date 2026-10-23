@@ -1,10 +1,12 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.ultron.SokoviaJob;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal;
-import com.kolodkingal.enhanced.ultron.SokoviaShape;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
+import com.kolodkingal.enhanced.ultron.SokoviaShape;
 import com.kolodkingal.enhanced.ultron.SokoviaTemplate;
 import com.kolodkingal.enhanced.ultron.SokoviaValidator;
 import net.minecraft.core.BlockPos;
@@ -26,9 +28,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -399,12 +398,11 @@ public final class SokoviaShapeTests {
                 event.setCanceled(true);
             }
         };
-        IEventBus bus = NeoForge.EVENT_BUS;
-        bus.addListener(claim);
-        f.onClose(() -> bus.unregister(claim));
+        EventHub.Registration claimRegistration = EventHub.of(BlockEvent.BreakEvent.class).register(claim);
+        f.onClose(claimRegistration::close);
         check("message.enhanced.ultron.refuse.protected".equals(key(SokoviaValidator.refusal(level, spec, centre, starter))), "a claim over the sky");
         check(SokoviaValidator.refusal(level, spec, centre, null) == null, "(the warning does not ask the claim again)");
-        bus.unregister(claim);
+        claimRegistration.close();
         check(SokoviaValidator.refusal(level, spec, centre, starter) == null, "and it passes when the claim is lifted");
         helper.succeed();
     }

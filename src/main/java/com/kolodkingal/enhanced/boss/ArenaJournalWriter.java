@@ -1,16 +1,16 @@
 package com.kolodkingal.enhanced.boss;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStartingEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.ultron.SokoviaJournal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * the journals still kept waiting for a save of the world is then retired, at most ten seconds are given to the queue, and
  * the thread ends.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class ArenaJournalWriter {
     /** The folder of the journals, inside the world. */
     public static final String DIRECTORY = "data/enhanced/arena";
@@ -66,7 +66,7 @@ public final class ArenaJournalWriter {
     // The server's life
 
     /** The thread starts with the server (HIGH, before the journals of a crash are read). */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onServerStarting(ServerStartingEvent event) {
         start();
     }
@@ -75,7 +75,7 @@ public final class ArenaJournalWriter {
      * The server has stopped, after the flushed save of the stop (R48): every journal entry, every journal kept for a save
      * and every island note retiring are retired at once, then the queue is drained and the thread ends.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         retireAll(event.getServer());
         drain();

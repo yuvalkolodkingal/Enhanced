@@ -1,19 +1,18 @@
 package com.kolodkingal.enhanced.ultron;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ServerStartingEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppingEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /**
  * The game-bus events of the Sokovia lift, at the priorities of {@code docs/HEROES-AND-BOSSES.md}:
@@ -33,10 +32,10 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
  *     <li><b>Start tracking:</b> a player who comes within sight of the island's key is told what it is doing.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class SokoviaEvents {
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @Subscribe(priority = Priority.HIGHEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (!SokoviaLift.any() || !(event.getEntity() instanceof ServerPlayer player) || event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return;
@@ -46,7 +45,7 @@ public final class SokoviaEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SokoviaRecovery.onLogin(player);
@@ -54,45 +53,45 @@ public final class SokoviaEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SokoviaLift.onLogout(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SokoviaLift.onDeath(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onStartTracking(PlayerEvent.StartTracking event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getTarget() instanceof VibraniumKeyEntity key) {
             SokoviaLift.tellNewcomer(player, key);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStarting(ServerStartingEvent event) {
         SokoviaRecovery.recoverAll(event.getServer());
     }
 
     /** After the boss framework has finished the fights (and with them any island of a fight). */
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopping(ServerStoppingEvent event) {
         SokoviaRecovery.finishAllNow();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         SokoviaLift.clear();
         SokoviaRecovery.clear();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             SokoviaRecovery.tick(level);

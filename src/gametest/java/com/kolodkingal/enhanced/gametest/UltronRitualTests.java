@@ -7,6 +7,8 @@ import com.kolodkingal.enhanced.boss.BossKind;
 import com.kolodkingal.enhanced.config.UltronBossConfig;
 import com.kolodkingal.enhanced.gametest.UltronTestSupport.Log;
 import com.kolodkingal.enhanced.item.ScepterRituals;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -47,9 +49,6 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -287,11 +286,11 @@ public final class UltronRitualTests {
 
         // A claim: a simulated break of a block of the island is cancelled.
         Consumer<BlockEvent.BreakEvent> claim = event -> event.setCanceled(true);
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, claim);
+        EventHub.Registration claimRegistration = EventHub.of(BlockEvent.BreakEvent.class).register(claim);
         try {
             expect(lane, player, "message.enhanced.ultron.refuse.protected", "the ground is protected");
         } finally {
-            NeoForge.EVENT_BUS.unregister(claim);
+            claimRegistration.close();
         }
 
         // The ground is too uneven: a pillar higher than maxRelief in the disc.

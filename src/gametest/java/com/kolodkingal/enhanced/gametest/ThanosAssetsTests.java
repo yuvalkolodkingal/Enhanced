@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
@@ -12,8 +13,6 @@ import com.kolodkingal.enhanced.thanos.ThanosSounds;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -40,13 +39,9 @@ public final class ThanosAssetsTests {
     private static final String BATCH = "thanos_assets";
 
     // ---- the files
-    private static IModFile mod() {
-        return ModList.get().getModFileById(Enhanced.MODID).getFile();
-    }
-
     private static Path file(String path) {
-        Path file = mod().findResource(("assets/" + Enhanced.MODID + "/" + path).split("/"));
-        check(Files.isRegularFile(file), path + " exists");
+        Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/" + path).orElse(null);
+        check(file != null && Files.isRegularFile(file), path + " exists");
         return file;
     }
 

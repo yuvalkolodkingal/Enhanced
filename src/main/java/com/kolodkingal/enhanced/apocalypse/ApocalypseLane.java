@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.apocalypse;
 
+import com.kolodkingal.enhanced.ability.BlockRights;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossLane;
@@ -17,8 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -220,7 +219,7 @@ public final class ApocalypseLane implements BossLane {
             return true;
         }
         BlockState state = level.getBlockState(pos);
-        return NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, pos, state, starter)).isCanceled();
+        return !BlockRights.postBreak(starter, level, pos, state);
     }
 
     /** Whether a hero who can break his shield stands within {@code breakerRange} of the centre (not Creative, not Spectator). */
