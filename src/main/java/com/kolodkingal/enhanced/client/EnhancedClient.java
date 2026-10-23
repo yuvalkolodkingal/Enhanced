@@ -1,7 +1,9 @@
 package com.kolodkingal.enhanced.client;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.neoforge.client.NeoClientRegistrar;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
@@ -13,7 +15,9 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
  */
 @Mod(value = Enhanced.MODID, dist = Dist.CLIENT)
 public final class EnhancedClient {
-    public EnhancedClient(ModContainer container) {
+    public EnhancedClient(ModContainer container, IEventBus modBus) {
+        // Port P0: the platform's client registrar, for the client's registrations made while the mod is set up.
+        NeoClientRegistrar.install(container, modBus);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 }

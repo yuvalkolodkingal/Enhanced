@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.build.BuildScheduler;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.item.ScepterRituals;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.authlib.GameProfile;
@@ -22,32 +23,23 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
 import net.minecraft.gametest.framework.GameTestListener;
 import net.minecraft.gametest.framework.GameTestRunner;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.network.registration.ChannelAttributes;
 
 import java.lang.reflect.Field;
-import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -211,16 +203,9 @@ public final class TestKit {
          */
         public ServerPlayer player(double x, double y, double z, GameType gameType, UUID uuid) {
             ServerLevel level = helper.getLevel();
-            MinecraftServer server = level.getServer();
             GameProfile profile = new GameProfile(uuid, "enh-test-" + (++playerCounter));
-            CommonListenerCookie cookie = new CommonListenerCookie(profile, 0, ClientInformation.createDefault(), false, ConnectionType.NEOFORGE);
-            ServerPlayer player = new ServerPlayer(server, level, profile, cookie.clientInformation());
-            Connection connection = new Connection(PacketFlow.SERVERBOUND);
-            new EmbeddedChannel(connection);
             // The fake client "supports" every channel, so synced attachments (powers, Hexes) can be sent to it.
-            connection.channel().attr(ChannelAttributes.ADHOC_CHANNELS).set(new AcceptAll());
-            ChannelAttributes.setConnectionType(connection, ConnectionType.NEOFORGE);
-            server.getPlayerList().placeNewPlayer(connection, player, cookie);
+            ServerPlayer player = TestHooks.get().mockPlayerWithConnection(level, profile);
             player.setGameMode(gameType);
             clearSpawnInvulnerability(player);
             Vec3 at = helper.absoluteVec(new Vec3(x, y, z));
@@ -459,29 +444,6 @@ public final class TestKit {
     }
 
     // ------------------------------------------------------------------------------------------------------------
-
-    /** A channel set that contains every channel, so the fake client accepts every payload. */
-    private static final class AcceptAll extends AbstractSet<ResourceLocation> {
-        @Override
-        public boolean contains(Object o) {
-            return true;
-        }
-
-        @Override
-        public boolean add(ResourceLocation resourceLocation) {
-            return false;
-        }
-
-        @Override
-        public Iterator<ResourceLocation> iterator() {
-            return Collections.emptyIterator();
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-    }
 
     private TestKit() {
     }

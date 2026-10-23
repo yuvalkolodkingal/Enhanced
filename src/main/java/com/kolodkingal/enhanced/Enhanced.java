@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.network.ModNetwork;
+import com.kolodkingal.enhanced.platform.neoforge.NeoSetup;
 import com.kolodkingal.enhanced.registry.ModArmorMaterials;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlockEntities;
@@ -31,6 +32,8 @@ public class Enhanced {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public Enhanced(IEventBus modBus, ModContainer container) {
+        // Port P0: the platform layer's NeoForge glue (attachments, messages, entity attributes) comes first.
+        NeoSetup.init(modBus);
         ModArmorMaterials.ARMOR_MATERIALS.register(modBus);
         ModDataComponents.DATA_COMPONENTS.register(modBus);
         ModBlocks.BLOCKS.register(modBus);
