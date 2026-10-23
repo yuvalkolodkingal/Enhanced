@@ -44,6 +44,7 @@ import com.kolodkingal.enhanced.network.SpiderFxPayload;
 import com.kolodkingal.enhanced.network.SpiderSensePayload;
 import com.kolodkingal.enhanced.network.ThanosFxPayload;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
+import com.kolodkingal.enhanced.platform.event.Events;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -106,8 +107,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -386,7 +386,7 @@ public final class SkeletonTests {
         for (var event : List.of(new PlayerEvent.PlayerLoggedInEvent(wanda), new PlayerEvent.PlayerLoggedOutEvent(wanda),
                 new PlayerEvent.PlayerRespawnEvent(wanda, false), new PlayerEvent.PlayerChangedDimensionEvent(wanda, Level.OVERWORLD, Level.NETHER))) {
             calls.clear();
-            NeoForge.EVENT_BUS.post(event);
+            Events.post(event);
             String expected = (event instanceof PlayerEvent.PlayerLoggedInEvent ? "login:" : event instanceof PlayerEvent.PlayerLoggedOutEvent ? "logout:"
                     : event instanceof PlayerEvent.PlayerRespawnEvent ? "respawn:" : "dimension:") + other;
             check(calls.equals(List.of(expected)), event.getClass().getSimpleName() + ": " + calls);

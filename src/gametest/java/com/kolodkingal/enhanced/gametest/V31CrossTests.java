@@ -35,6 +35,7 @@ import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.hex.HexVisions;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.event.Events;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -79,8 +80,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.LevelEvent;
+import com.kolodkingal.enhanced.platform.event.LevelEvent;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -1068,8 +1068,8 @@ public final class V31CrossTests {
             SokoviaJournal.Header note = SokoviaJournal.read(server, fight.id());
             check(note != null && SokoviaJournal.LANDED.equals(note.state()) && !note.refund() && SokoviaJournal.isRetiring(fight.id()),
                     "the island's note is kept, says it landed and owes nothing: " + note);
-            NeoForge.EVENT_BUS.post(new LevelEvent.Save(level));
-            NeoForge.EVENT_BUS.post(new LevelEvent.Save(level));
+            Events.post(new LevelEvent.Save(level));
+            Events.post(new LevelEvent.Save(level));
             ArenaJournalWriter.flush();
             check(!Files.exists(ArenaJournalWriter.file(server, fight.id())), "two saves later the arena's journal is gone");
             check(SokoviaJournal.read(server, fight.id()) == null && !Files.exists(SokoviaJournal.retiringFile(server, fight.id())),

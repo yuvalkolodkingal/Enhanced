@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.config.core.ConfigSpec;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -48,9 +49,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.attachment.AttachmentHolder;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -259,8 +257,7 @@ public final class DataTests {
      */
     @EnhancedTest(template = ARENA)
     public static void everySoundHasItsFile(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        Path soundsJson = mod.findResource("assets", Enhanced.MODID, "sounds.json");
+        Path soundsJson = modFile("assets", Enhanced.MODID, "sounds.json");
         check(Files.isRegularFile(soundsJson), "assets/enhanced/sounds.json exists");
         JsonObject sounds = JsonParser.parseString(Files.readString(soundsJson)).getAsJsonObject();
         check(sounds.has("quicksilver_theme"), "Quicksilver's song is defined");
@@ -269,7 +266,7 @@ public final class DataTests {
             for (JsonElement sound : event.getValue().getAsJsonObject().getAsJsonArray("sounds")) {
                 String name = sound.isJsonObject() ? sound.getAsJsonObject().get("name").getAsString() : sound.getAsString();
                 ResourceLocation id = ResourceLocation.parse(name);
-                Path file = mod.findResource(("assets/" + id.getNamespace() + "/sounds/" + id.getPath() + ".ogg").split("/"));
+                Path file = modFile(("assets/" + id.getNamespace() + "/sounds/" + id.getPath() + ".ogg").split("/"));
                 check(Files.isRegularFile(file), name + " has its .ogg file");
                 byte[] head = new byte[4];
                 try (InputStream in = Files.newInputStream(file)) {
@@ -280,7 +277,7 @@ public final class DataTests {
         for (var registered : ModSounds.SOUNDS.getEntries()) {
             check(sounds.has(registered.getId().getPath()), registered.getId() + " has an entry in sounds.json");
         }
-        Path song = mod.findResource("assets", Enhanced.MODID, "sounds", "quicksilver", "sweet_dreams.ogg");
+        Path song = modFile("assets", Enhanced.MODID, "sounds", "quicksilver", "sweet_dreams.ogg");
         check(Files.size(song) > 1_000_000, "Sweet Dreams is the whole song (" + Files.size(song) + " bytes)");
         helper.succeed();
     }
@@ -291,9 +288,8 @@ public final class DataTests {
      */
     @EnhancedTest(template = ARENA)
     public static void everyLookHasItsSkinAndEveryNameItsTranslation(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        JsonObject en = lang(mod, "en_us");
-        JsonObject he = lang(mod, "he_il");
+        JsonObject en = lang("en_us");
+        JsonObject he = lang("he_il");
         check(en.keySet().equals(he.keySet()), "en_us and he_il have the same keys; differing: "
                 + symmetricDifference(en.keySet(), he.keySet()));
         List<String> missing = new ArrayList<>();
@@ -317,10 +313,10 @@ public final class DataTests {
                     missing.add(look.translationKey());
                 }
                 if (look.skin() != null) {
-                    checkImage(mod, look.skin(), 64, 64);
+                    checkImage(look.skin(), 64, 64);
                 }
                 if (look.cape() != null) {
-                    checkImage(mod, look.cape(), 64, 32);
+                    checkImage(look.cape(), 64, 32);
                 }
             }
         }
@@ -331,10 +327,9 @@ public final class DataTests {
     /** Every entity the mod adds has a name, and every damage type its death messages, in English and in Hebrew. */
     @EnhancedTest(template = ARENA)
     public static void everyEntityHasANameAndEveryDamageTypeItsDeathMessages(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
         for (String name : List.of("en_us", "he_il")) {
-            JsonObject lang = lang(mod, name);
+            JsonObject lang = lang(name);
             for (var entity : ModEntities.ENTITIES.getEntries()) {
                 String key = "entity." + Enhanced.MODID + "." + entity.getId().getPath();
                 if (!lang.has(key)) {
@@ -368,8 +363,7 @@ public final class DataTests {
      */
     @EnhancedTest(template = ARENA)
     public static void everyItemBlockEffectSubtitleAndOptionHasANameInBothLanguages(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        JsonObject sounds = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "sounds.json"),
+        JsonObject sounds = JsonParser.parseString(Files.readString(modFile("assets", Enhanced.MODID, "sounds.json"),
                 StandardCharsets.UTF_8)).getAsJsonObject();
         List<String> keys = new ArrayList<>();
         ModItems.ITEMS.getEntries().forEach(item -> keys.add(item.get().getDescriptionId()));
@@ -410,8 +404,8 @@ public final class DataTests {
         check(sections.containsAll(List.of("animation", "appearance", "thanos", "build_magic")),
                 "the sections of the client options are read from its spec (" + sections + ")");
         check(keys.size() > 40, "there are names to check (" + keys.size() + ")");
-        JsonObject en = lang(mod, "en_us");
-        JsonObject he = lang(mod, "he_il");
+        JsonObject en = lang("en_us");
+        JsonObject he = lang("he_il");
         List<String> missing = new ArrayList<>();
         for (String key : keys) {
             for (JsonObject lang : List.of(en, he)) {
@@ -482,7 +476,7 @@ public final class DataTests {
         Powers.get(player).setWallRun(false);
 
         CompoundTag file = player.saveWithoutId(new CompoundTag());
-        CompoundTag attachment = file.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY)
+        CompoundTag attachment = file.getCompound(TestKit.attachmentsKey())
                 .getCompound(Enhanced.id("power").toString());
         check(attachment.getString("power").equals("quicksilver") && !attachment.getBoolean("wall_run"),
                 "the player file holds the power attachment: " + attachment);
@@ -506,18 +500,17 @@ public final class DataTests {
      */
     @EnhancedTest(template = ARENA)
     public static void thorsLoveAndThunderLooksFollowTheSkinRules(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> ids = Variants.of(Power.THOR).stream().map(Variant::id).toList();
         check(ids.indexOf("love_and_thunder_helmet") == ids.indexOf("love_and_thunder") + 1,
                 "the helmet look follows the Love and Thunder look in the cycle: " + ids);
-        BufferedImage thorCape = readImage(mod, Variants.get(Power.THOR, "thor").cape());
-        BufferedImage eyes = readImage(mod, Enhanced.id("textures/entity/thor_eyes.png"));
+        BufferedImage thorCape = readImage(Variants.get(Power.THOR, "thor").cape());
+        BufferedImage eyes = readImage(Enhanced.id("textures/entity/thor_eyes.png"));
         Map<String, BufferedImage> skins = new java.util.LinkedHashMap<>();
         for (String id : List.of("love_and_thunder", "love_and_thunder_helmet")) {
             Variant look = Variants.get(Power.THOR, id);
             check(look.id().equals(id) && !look.slim(), id + " is a look of Thor with the classic arms");
-            BufferedImage skin = readImage(mod, look.skin());
-            BufferedImage cape = readImage(mod, look.cape());
+            BufferedImage skin = readImage(look.skin());
+            BufferedImage cape = readImage(look.cape());
             check(skin.getWidth() == 64 && skin.getHeight() == 64, id + " skin is 64x64");
             boolean[][] used = new boolean[64][64];
             for (SkinPart part : SKIN_PARTS) {
@@ -593,8 +586,8 @@ public final class DataTests {
             new SkinPart("rleg", true, 0, 16, 4, 12, 4), new SkinPart("rpants", false, 0, 32, 4, 12, 4),
             new SkinPart("lleg", true, 16, 48, 4, 12, 4), new SkinPart("lpants", false, 0, 48, 4, 12, 4));
 
-    private static BufferedImage readImage(IModFile mod, ResourceLocation texture) throws IOException {
-        Path file = mod.findResource(("assets/" + texture.getNamespace() + "/" + texture.getPath()).split("/"));
+    private static BufferedImage readImage(ResourceLocation texture) throws IOException {
+        Path file = modFile(("assets/" + texture.getNamespace() + "/" + texture.getPath()).split("/"));
         try (InputStream in = Files.newInputStream(file)) {
             BufferedImage image = ImageIO.read(in);
             check(image != null, texture + " is a readable image");
@@ -608,9 +601,8 @@ public final class DataTests {
      */
     @EnhancedTest(template = ARENA)
     public static void everyAwakeningLineIsSeenWhole(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        JsonObject en = lang(mod, "en_us");
-        JsonObject he = lang(mod, "he_il");
+        JsonObject en = lang("en_us");
+        JsonObject he = lang("he_il");
         TestKit.Fixture f = TestKit.fixture(helper);
         for (Power power : Power.values()) {
             if (!power.hasPowers()) {
@@ -658,11 +650,10 @@ public final class DataTests {
     /** Every line Build Magic says (message.enhanced.build.*) is short enough to be read whole at the default window. */
     @EnhancedTest(template = ARENA)
     public static void everyBuildMagicLineIsShortEnoughToReadWhole(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> tooLong = new ArrayList<>();
         int seen = 0;
         for (String name : List.of("en_us", "he_il")) {
-            for (var entry : lang(mod, name).entrySet()) {
+            for (var entry : lang(name).entrySet()) {
                 if (!entry.getKey().startsWith("message.enhanced.build.")) {
                     continue;
                 }
@@ -682,8 +673,8 @@ public final class DataTests {
         return text.getContents() instanceof TranslatableContents contents && contents.getKey().equals(key);
     }
 
-    private static JsonObject lang(IModFile mod, String name) throws IOException {
-        Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+    private static JsonObject lang(String name) throws IOException {
+        Path file = modFile("assets", Enhanced.MODID, "lang", name + ".json");
         return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
     }
 
@@ -697,8 +688,8 @@ public final class DataTests {
     }
 
     /** The texture exists and is a PNG of the given size. */
-    private static void checkImage(IModFile mod, ResourceLocation texture, int width, int height) throws IOException {
-        Path file = mod.findResource(("assets/" + texture.getNamespace() + "/" + texture.getPath()).split("/"));
+    private static void checkImage(ResourceLocation texture, int width, int height) throws IOException {
+        Path file = modFile(("assets/" + texture.getNamespace() + "/" + texture.getPath()).split("/"));
         check(Files.isRegularFile(file), texture + " exists");
         // The PNG header: the signature, then the IHDR chunk with the width and height (no image library on a server).
         byte[] head = new byte[24];
@@ -712,5 +703,10 @@ public final class DataTests {
     }
 
     private DataTests() {
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

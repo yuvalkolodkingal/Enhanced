@@ -4,11 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -178,12 +177,9 @@ public final class SoundAssetTests {
     /** The 3.8 ambience loop (Eternity's realm): long. */
     static final List<String> AMBIENCE_LOOPS_38 = List.of("eternity_ambient");
 
-    private static IModFile mod() {
-        return ModList.get().getModFileById(Enhanced.MODID).getFile();
-    }
 
     private static Path file(String path) {
-        Path file = mod().findResource(("assets/" + Enhanced.MODID + "/" + path).split("/"));
+        Path file = modFile(("assets/" + Enhanced.MODID + "/" + path).split("/"));
         check(Files.isRegularFile(file), path + " exists");
         return file;
     }
@@ -399,7 +395,7 @@ public final class SoundAssetTests {
 
     @EnhancedTest(template = TestKit.ARENA, batch = BATCH)
     public static void noSoundFileOfTheModIsThePlaceholder(GameTestHelper helper) throws IOException {
-        Path root = mod().findResource("assets", Enhanced.MODID, "sounds");
+        Path root = modFile("assets", Enhanced.MODID, "sounds");
         check(Files.isDirectory(root), "the mod has its sounds folder");
         List<String> placeholders = new ArrayList<>();
         int count = 0;
@@ -421,5 +417,10 @@ public final class SoundAssetTests {
     }
 
     private SoundAssetTests() {
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

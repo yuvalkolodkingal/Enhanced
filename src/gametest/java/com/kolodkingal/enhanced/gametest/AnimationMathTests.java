@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.client.render.GripMath;
 import com.kolodkingal.enhanced.client.render.HeroPoses;
 import com.kolodkingal.enhanced.client.render.MagnetStreamMath;
 import com.kolodkingal.enhanced.client.render.StancePoses;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -23,7 +24,6 @@ import com.kolodkingal.enhanced.power.Toggle;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -191,7 +191,7 @@ public final class AnimationMathTests {
 
     /** An item model of the mod, as shipped (the same JSON the game draws the weapon from). */
     private static JsonObject itemModel(String name) throws IOException {
-        Path file = ModList.get().getModFileById(Enhanced.MODID).getFile().findResource("assets", Enhanced.MODID, "models", "item", name + ".json");
+        Path file = modFile("assets", Enhanced.MODID, "models", "item", name + ".json");
         return JsonParser.parseString(Files.readString(file)).getAsJsonObject();
     }
 
@@ -933,5 +933,10 @@ public final class AnimationMathTests {
         if (id != null) {
             used.add(id);
         }
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }
