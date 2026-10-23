@@ -2,7 +2,11 @@ package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.network.MusicManifestPayload;
 import com.kolodkingal.enhanced.platform.CommonTags;
+import com.kolodkingal.enhanced.platform.ItemAccess;
 import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.event.BlockEvent;
+import com.kolodkingal.enhanced.platform.event.EventHub;
+import com.kolodkingal.enhanced.platform.event.Priority;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.platform.test.TestHooks;
@@ -15,12 +19,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,22 +57,28 @@ public final class PlatformSeamTests {
         helper.succeed();
     }
 
-    /** S5-2: a zombie with water over his eyes can drown in it; one on the dry floor cannot. */
+    /**
+     * S5-2: a pig with water over its eyes can drown in it; one on the dry floor cannot; a zombie under water cannot
+     * (it breathes there: on NeoForge water's drowning rule asks {@code canBreatheUnderwater}).
+     */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void waterAtTheEyesDrowns(GameTestHelper helper) {
-        for (int x = 3; x <= 5; x++) {
+        for (int x = 3; x <= 7; x++) {
             for (int y = 2; y <= 5; y++) {
                 for (int z = 3; z <= 5; z++) {
                     helper.setBlock(new BlockPos(x, y, z), Blocks.WATER);
                 }
             }
         }
-        Zombie wet = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(4, 2, 4));
-        Zombie dry = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(14, 2, 14));
+        Pig wet = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new BlockPos(4, 2, 4));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(6, 2, 4));
+        Pig dry = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new BlockPos(14, 2, 14));
         var hooks = Platform.get().hooks();
         helper.succeedWhen(() -> {
-            check(hooks.drownsInFluidAtEyes(wet), "water over his eyes");
-            check(!hooks.drownsInFluidAtEyes(dry), "air at his eyes");
+            check(wet.isEyeInFluid(FluidTags.WATER) && zombie.isEyeInFluid(FluidTags.WATER), "both under water");
+            check(hooks.drownsInFluidAtEyes(wet), "the pig, water over its eyes");
+            check(!hooks.drownsInFluidAtEyes(zombie), "the zombie breathes under water");
+            check(!hooks.drownsInFluidAtEyes(dry), "air at the dry pig's eyes");
         });
     }
 
@@ -116,6 +130,52 @@ public final class PlatformSeamTests {
         ServerPlayer unconnected = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
                 new GameProfile(UUID.randomUUID(), "unconnected"), ClientInformation.createDefault());
         check(!Net.hasChannel(unconnected, MusicManifestPayload.TYPE), "no connection, no channel");
+        helper.succeed();
+    }
+
+    /**
+     * SR-L1-1: a chest's slots take what fits and give back the rest; a simulated insert changes nothing.
+     */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aStoreTakesWhatFits(GameTestHelper helper) {
+        BlockPos at = new BlockPos(4, 2, 4);
+        helper.setBlock(at, Blocks.CHEST);
+        BlockPos abs = helper.absolutePos(at);
+        ItemAccess.Slots slots = Platform.get().itemAccess().blockSlots(helper.getLevel(), abs);
+        check(slots != null && slots.getSlots() == 27, "a chest has 27 slots");
+        ItemStack dirt = new ItemStack(Items.DIRT, 5);
+        check(slots.insertItem(0, dirt, true).isEmpty() && slots.getStackInSlot(0).isEmpty(),
+                "a simulated insert fits and changes nothing");
+        check(slots.insertItem(0, dirt, false).isEmpty() && dirt.getCount() == 5, "the insert fits; the stack is kept");
+        check(((ChestBlockEntity) helper.getLevel().getBlockEntity(abs)).getItem(0).getCount() == 5, "5 dirt inside");
+        ItemStack left = slots.insertItem(0, new ItemStack(Items.DIRT, 64), false);
+        check(left.getCount() == 5 && slots.getStackInSlot(0).getCount() == 64, "what did not fit comes back: " + left);
+        check(slots.insertItem(0, new ItemStack(Items.STONE), false).getCount() == 1,
+                "a full slot of dirt takes no stone");
+        helper.succeed();
+    }
+
+    /** SR-L1-2: the plain block-break event reaches the mod's listeners, and their cancellation is the answer. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theBreakEventIsPostedAndCancelled(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(4.5, FLOOR, 4.5);
+        BlockPos at = helper.absolutePos(new BlockPos(6, 2, 6));
+        helper.setBlock(new BlockPos(6, 2, 6), Blocks.STONE);
+        List<BlockPos> seen = new ArrayList<>();
+        boolean cancelled;
+        try (EventHub.Registration r = EventHub.of(BlockEvent.BreakEvent.class).register(Priority.LOWEST, e -> {
+            if (e.getPlayer() == player) {
+                seen.add(e.getPos());
+                e.setCanceled(true);
+            }
+        })) {
+            cancelled = Platform.get().hooks().blockBreakEventCancelled(helper.getLevel(), at,
+                    Blocks.STONE.defaultBlockState(), player);
+        }
+        check(seen.equals(List.of(at)), "the listener saw the break at " + at + ": " + seen);
+        check(cancelled, "its cancellation is the answer");
+        helper.assertBlockPresent(Blocks.STONE, new BlockPos(6, 2, 6));
         helper.succeed();
     }
 }

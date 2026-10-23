@@ -9,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +35,14 @@ public interface LoaderHooks {
     /** Whether {@code player} breaking the block at {@code pos} is cancelled (the block-break event). */
     boolean blockBreakCancelled(Level level, GameType gameType, ServerPlayer player, BlockPos pos, BlockState state);
 
+    /**
+     * Whether the loader's plain block-break event for {@code player} breaking {@code state} at {@code pos} is
+     * cancelled (claim mods, the mod's own break rules): only the event, posted to every listener, unlike
+     * {@link #blockBreakCancelled} (the loader's whole pre-break check, which also refuses a sword in Creative and
+     * sends block updates). NeoForge: {@code NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(...)).isCanceled()}.
+     */
+    boolean blockBreakEventCancelled(Level level, BlockPos pos, BlockState state, Player player);
+
     /** Whether a projectile's impact is cancelled (the projectile-impact event); call it before acting on the hit. */
     boolean projectileImpactCancelled(Projectile projectile, HitResult hit);
 
@@ -54,8 +63,8 @@ public interface LoaderHooks {
 
     /**
      * Whether the fluid at {@code entity}'s eyes is one it can drown in (water; other mods' fluids by their own rule).
-     * Whether it breathes under water anyway ({@code canBreatheUnderwater}) is not asked. NeoForge:
-     * {@code getEyeInFluidType()} is not air and {@code canDrownInFluidType} of it.
+     * In water this already answers false for an entity that breathes there ({@code canBreatheUnderwater}: a zombie,
+     * a fish). NeoForge: {@code getEyeInFluidType()} is not air and {@code canDrownInFluidType} of it.
      */
     boolean drownsInFluidAtEyes(LivingEntity entity);
 }
