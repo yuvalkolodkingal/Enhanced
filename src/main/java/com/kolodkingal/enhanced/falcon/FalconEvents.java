@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced.falcon;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.FalconFxPayload;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -12,11 +16,6 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.List;
 
@@ -31,9 +30,9 @@ import java.util.List;
  * <li>{@code ProjectileImpactEvent}, NORMAL: a projectile at the front of the Wing Shield bounces back the way it came,
  * at full speed, his now.</li> </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class FalconEvents {
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onFallOrWall(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -49,7 +48,7 @@ public final class FalconEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onShieldedBlow(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -77,7 +76,7 @@ public final class FalconEvents {
         clang(player, from);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)

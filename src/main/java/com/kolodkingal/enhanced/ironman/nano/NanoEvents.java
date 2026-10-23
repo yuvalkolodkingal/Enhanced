@@ -1,12 +1,25 @@
 package com.kolodkingal.enhanced.ironman.nano;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ironman.MissileGuidance;
 import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.ironman.SuitMoves;
 import com.kolodkingal.enhanced.ironman.SuitPhases;
 import com.kolodkingal.enhanced.ironman.hulkbuster.Hulkbuster;
 import com.kolodkingal.enhanced.ironman.hulkbuster.HulkbusterMoves;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.EntityStruckByLightningEvent;
+import com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent;
+import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.LivingDeathEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.ProjectileImpactEvent;
+import com.kolodkingal.enhanced.platform.event.ServerStoppedEvent;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -15,20 +28,6 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,15 +47,15 @@ import java.util.UUID;
  * <li>{@link EntityStruckByLightningEvent}: a bolt charges the Refocuser.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class NanoEvents {
     /** The strength of each player's last blow (read before the game resets it). */
     private static final Map<UUID, Float> STRENGTH = new HashMap<>();
 
     /** The moves of the suits of lane L4, registered with lane L3's framework when the mod sets up. */
-    @EventBusSubscriber(modid = Enhanced.MODID, bus = EventBusSubscriber.Bus.MOD)
+    @Subscriber
     public static final class Setup {
-        @SubscribeEvent
+        @Subscribe
         public static void onSetup(FMLCommonSetupEvent event) {
             event.enqueueWork(NanoEvents::registerMoves);
         }
@@ -82,14 +81,14 @@ public final class NanoEvents {
         SuitPhases.listen(SuitKind.HULKBUSTER, Hulkbuster.INSTANCE);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             NanoHousings.rebuild(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level && level.getGameTime() % 100 == 0) {
             MissileGuidance.sweep(level);
@@ -97,7 +96,7 @@ public final class NanoEvents {
     }
 
     /** A shield's share of a blow from the front; lightning charges the Refocuser. */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onIncoming(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -118,7 +117,7 @@ public final class NanoEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onAttack(AttackEntityEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             STRENGTH.put(player.getUUID(), player.getAttackStrengthScale(0.5F));
@@ -126,7 +125,7 @@ public final class NanoEvents {
     }
 
     /** A blow of his empty main hand with the blades out: the blade's damage, and a full one sweeps. */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onBladeBlow(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         if (!(source.getEntity() instanceof ServerPlayer player) || source.getDirectEntity() != player
@@ -144,14 +143,14 @@ public final class NanoEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onHurt(LivingDamageEvent.Post event) {
         if (event.getEntity() instanceof Player player && !player.level().isClientSide()) {
             NanoHousings.onHurt(player, event.getSource(), event.getOriginalDamage());
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onProjectile(ProjectileImpactEvent event) {
         if (event.getRayTraceResult() instanceof EntityHitResult hit && hit.getEntity() instanceof ServerPlayer player
                 && EnergyShield.bounces(player, event.getProjectile())) {
@@ -159,14 +158,14 @@ public final class NanoEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLightning(EntityStruckByLightningEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             LightningRefocuser.struck(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntity();
         if (entity instanceof ServerPlayer player && !event.isCanceled()) {
@@ -174,7 +173,7 @@ public final class NanoEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             gone(player);
@@ -182,14 +181,14 @@ public final class NanoEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             NanoDrones.recall(player);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onStopped(ServerStoppedEvent event) {
         clear();
     }

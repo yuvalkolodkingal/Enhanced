@@ -1,7 +1,14 @@
 package com.kolodkingal.enhanced.wolverine;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.healing.HealingHooks;
+import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
+import com.kolodkingal.enhanced.platform.event.LivingEntityUseItemEvent;
+import com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerInteractEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -17,14 +24,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +40,7 @@ import java.util.UUID;
  * angry to eat!").</li> </ul>
  * And the healing factor's hooks ({@link HealingHooks}): when he rises, a growl and the claws.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
+@Subscriber
 public final class WolverineEvents {
     /** The sweep of a full-strength claw blow: its damage, its reach round the one struck. */
     public static final float SWEEP_DAMAGE = 2.0F;
@@ -77,7 +76,7 @@ public final class WolverineEvents {
         });
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
         if (player.level().isClientSide() && !player.isLocalPlayer()) {
@@ -87,7 +86,7 @@ public final class WolverineEvents {
         ClawClimb.move(player);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onFall(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getSource().is(DamageTypeTags.IS_FALL)
                 && (Pounce.fallGuarded(player) || ClawClimb.on(player, Powers.get(player))
@@ -96,7 +95,7 @@ public final class WolverineEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onAttack(AttackEntityEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             STRENGTH.put(player.getUUID(), player.getAttackStrengthScale(0.5F));
@@ -104,7 +103,7 @@ public final class WolverineEvents {
     }
 
     /** A blow of his empty main hand with the claws out: the claws' damage, and a full one sweeps. */
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onClawBlow(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         if (!(source.getEntity() instanceof ServerPlayer player) || source.getDirectEntity() != player
@@ -134,7 +133,7 @@ public final class WolverineEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onUseItem(LivingEntityUseItemEvent.Start event) {
         if (event.getEntity() instanceof Player player && Berserker.raging(player)) {
             event.setCanceled(true);
@@ -142,7 +141,7 @@ public final class WolverineEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (Berserker.raging(event.getEntity())) {
             event.setCanceled(true);
