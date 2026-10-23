@@ -51,8 +51,10 @@ public record IronFxPayload(int kind, int entityId, List<Vec3> points, int arg) 
     public static final int CANNON_FIRE = 21;
     public static final int REFOCUSER = 22;
     public static final int LOCK = 23;
+    /** The drones go (entity: their Iron Man; the clients fold his wing blades away). */
     public static final int DRONES_IN = 24;
     public static final int DRONES_OUT = 25;
+    /** A drone's laser (entity: the drone; points: from, to; arg: its blade, 0 inner or 1 outer, since 3.8.3). */
     public static final int DRONE_SHOT = 26;
     public static final int GRAB = 27;
     public static final int THROW = 28;

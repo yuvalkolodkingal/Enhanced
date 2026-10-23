@@ -1,59 +1,62 @@
 package com.kolodkingal.enhanced.client.ironman.nano;
 
 import com.kolodkingal.enhanced.ironman.nano.NanoDroneEntity;
+import com.kolodkingal.enhanced.ironman.nano.WingFormation;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 /**
- * Draws a Mark 85 nanotech drone (3.8, lane L4): {@link NanoDroneModel} in red and gold, its eye glowing blue, turned
- * with Iron Man's facing (interpolated), tilting a little as it follows, its eye flaring when it fires (the laser flash
- * is {@link NanoClient}'s) and flickering white when something hits it.
+ * Draws a Mark 85 nanotech drone (3.8, lane L4; since 3.8.3 the Endgame wing unit): its two crescent blades ({@link
+ * NanoDroneModel}) beside its Iron Man's arm, placed by {@link WingDraw} from him (not from the drone's own synced
+ * place, so they never lag behind in flight), growing out of his arm when it forms, flickering white when something
+ * hits it.
  */
 public class NanoDroneRenderer extends EntityRenderer<NanoDroneEntity> {
-    private static final ResourceLocation WHITE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
-    static final int RED = 0xFFB3121B;
-    static final int GOLD = 0xFFE8B23A;
-    static final int DARK = 0xFF3A3A40;
-    static final int EYE = 0xFF9FE8FF;
-
-    private final NanoDroneModel model;
-
     public NanoDroneRenderer(EntityRendererProvider.Context context) {
         super(context);
-        model = new NanoDroneModel(context.bakeLayer(NanoDroneModel.LAYER));
-        shadowRadius = 0.15F;
+        WingDraw.model = new NanoDroneModel(context.bakeLayer(NanoDroneModel.LAYER));
+        shadowRadius = 0.0F;
+    }
+
+    @Override
+    public boolean shouldRender(NanoDroneEntity drone, Frustum frustum, double camX, double camY, double camZ) {
+        // The blades are drawn from him, wide of the drone's own little box: no frustum test on that box.
+        return drone.owner() != null && drone.shouldRender(camX, camY, camZ);
     }
 
     @Override
     public void render(NanoDroneEntity drone, float yaw, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffer, int light) {
-        poseStack.pushPose();
+        Player owner = drone.owner();
+        if (owner == null) {
+            return;
+        }
+        WingDraw.seen(owner, drone.slot());
+        Vec3 origin = new Vec3(Mth.lerp(partialTick, drone.xo, drone.getX()),
+                Mth.lerp(partialTick, drone.yo, drone.getY()), Mth.lerp(partialTick, drone.zo, drone.getZ()));
         float age = drone.tickCount + partialTick;
-        poseStack.translate(0.0, 0.2, 0.0);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - Mth.rotLerp(partialTick, drone.yRotO, drone.getYRot())));
-        poseStack.mulPose(Axis.XP.rotationDegrees(6.0F * Mth.sin(age * 0.11F)));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(4.0F * Mth.sin(age * 0.07F + drone.slot())));
-        poseStack.scale(-1.0F, -1.0F, 1.0F);
-        float flicker = drone.flicker(partialTick);
-        int tint = flicker > 0.0F && ((int) (age * 2.0F) & 1) == 0 ? 0xFFFFFFFF : 0;
-        model.renderSolid(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(WHITE)), light,
-                OverlayTexture.NO_OVERLAY, tint != 0 ? tint : RED, tint != 0 ? tint : GOLD, DARK);
-        model.eye.render(poseStack, buffer.getBuffer(RenderType.eyes(WHITE)), LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY, EYE);
-        poseStack.popPose();
-        super.render(drone, yaw, partialTick, poseStack, buffer, light);
+        // A hit: the metal flashes full bright every other half tick.
+        boolean flash = drone.flicker(partialTick) > 0.0F && ((int) (age * 2.0F) & 1) == 0;
+        int lit = flash ? LightTexture.FULL_BRIGHT : light;
+        int side = WingFormation.side(drone.slot());
+        for (int blade = 0; blade < WingFormation.BLADES; blade++) {
+            int rank = WingFormation.rank(drone.slot(), blade);
+            float shown = WingFormation.grown(rank, age);
+            WingDraw.Pose pose = WingDraw.pose(owner, side, rank, partialTick, shown);
+            WingDraw.draw(poseStack, buffer, origin, pose, shown, lit, 0xFFFFFFFF);
+        }
     }
 
     @Override
     public ResourceLocation getTextureLocation(NanoDroneEntity drone) {
-        return WHITE;
+        return WingDraw.METAL;
     }
 }

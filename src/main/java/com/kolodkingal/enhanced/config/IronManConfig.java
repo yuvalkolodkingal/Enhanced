@@ -548,13 +548,13 @@ public final class IronManConfig {
                 .defineInRange("missileEnergy", 15.0, 0.0, 100.0);
         MARK85_MISSILE_COOLDOWN = builder.comment("Cooldown (ticks) of the homing mini-missiles.")
                 .defineInRange("missileCooldown", 120, 0, 72000);
-        MARK85_DRONE_COUNT = builder.comment("Nanotech drones that form behind him.")
+        MARK85_DRONE_COUNT = builder.comment("Nanotech drones: wing units of two crescent blades, one beside each arm.")
                 .defineInRange("droneCount", 2, 1, 8);
         MARK85_DRONE_TICKS = builder.comment("Ticks the drones stay.")
                 .defineInRange("droneTicks", 400, 1, 12000);
         MARK85_DRONE_DAMAGE = builder.comment("Damage of each drone's laser.")
                 .defineInRange("droneDamage", 6.0, 0.0, 200.0);
-        MARK85_DRONE_SHOT_GAP = builder.comment("Ticks between two shots of a drone.")
+        MARK85_DRONE_SHOT_GAP = builder.comment("Ticks between two shots of a drone (its two blades fire in turn).")
                 .defineInRange("droneShotGap", 15, 1, 400);
         MARK85_DRONE_RANGE = builder.comment("Range (blocks) of the drones' lasers.")
                 .defineInRange("droneRange", 20.0, 2.0, 64.0);
