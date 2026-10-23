@@ -1,15 +1,19 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.network.MusicManifestPayload;
 import com.kolodkingal.enhanced.platform.CommonTags;
 import com.kolodkingal.enhanced.platform.Platform;
+import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModItems;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
@@ -18,6 +22,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
 import static com.kolodkingal.enhanced.gametest.TestKit.FLOOR;
@@ -96,6 +101,21 @@ public final class PlatformSeamTests {
                 "deepslate iron ore, in deepslate");
         check(Blocks.NETHER_GOLD_ORE.defaultBlockState().is(CommonTags.Blocks.ORES_IN_GROUND_NETHERRACK),
                 "nether gold ore, in netherrack");
+        helper.succeed();
+    }
+
+    /**
+     * Net.hasChannel: a player on the tests' fake connection (whose client "has" every channel) has the music channel;
+     * a player with no connection has none.
+     */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aClientHasTheChannelsItAccepts(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer connected = f.player(4.5, FLOOR, 4.5);
+        check(Net.hasChannel(connected, MusicManifestPayload.TYPE), "the fake client has the music channel");
+        ServerPlayer unconnected = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
+                new GameProfile(UUID.randomUUID(), "unconnected"), ClientInformation.createDefault());
+        check(!Net.hasChannel(unconnected, MusicManifestPayload.TYPE), "no connection, no channel");
         helper.succeed();
     }
 }

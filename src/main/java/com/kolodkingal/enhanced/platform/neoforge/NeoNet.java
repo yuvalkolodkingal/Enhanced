@@ -125,4 +125,9 @@ final class NeoNet implements NetService {
                                            CustomPacketPayload... payloads) {
         PacketDistributor.sendToPlayersTrackingChunk(level, chunkPos, payload, payloads);
     }
+
+    @Override
+    public boolean hasChannel(ServerPlayer player, CustomPacketPayload.Type<?> type) {
+        return player.connection != null && player.connection.hasChannel(type);
+    }
 }
