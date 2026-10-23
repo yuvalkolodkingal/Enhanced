@@ -1,4 +1,0 @@
-# Port P0 lint allow-list of lane L8-infra: the files it still has to migrate (net.neoforged, @SubscribeEvent,
-# getPersistentData()/hasChannel outside platform/neoforge/**). Remove a line when its file is clean; delete
-# this file when the lane is done. build.gradle portLint (region "port P0 L8") reads it.
-src/main/java/com/kolodkingal/enhanced/network/ModNetwork.java

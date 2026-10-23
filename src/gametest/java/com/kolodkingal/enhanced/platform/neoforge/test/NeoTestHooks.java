@@ -18,10 +18,12 @@ import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
+import net.neoforged.neoforge.attachment.AttachmentSync;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.network.payload.SyncAttachmentsPayload;
@@ -112,6 +114,26 @@ public final class NeoTestHooks implements TestHooks {
     @Override
     public String modVersion() {
         return ModList.get().getModContainerById(Enhanced.MODID).orElseThrow().getModInfo().getVersion().toString();
+    }
+
+    @Override
+    public List<Object> initialSyncPackets(Entity holder, ServerPlayer watcher) {
+        List<Object> packets = new ArrayList<>();
+        AttachmentSync.syncInitialEntityAttachments(holder, watcher, packets::add);
+        return packets;
+    }
+
+    @Override
+    public void receiveSync(Object packet, Entity target) {
+        if (packet instanceof ClientboundBundlePacket bundle) {
+            for (Object sub : bundle.subPackets()) {
+                receiveSync(sub, target);
+            }
+        } else if (packet instanceof ClientboundCustomPayloadPacket custom
+                && custom.payload() instanceof SyncAttachmentsPayload sync) {
+            AttachmentSync.receiveSyncedDataAttachments(target, target.registryAccess(), sync.types(),
+                    sync.syncPayload());
+        }
     }
 
     /** A channel set that contains every channel, so the fake client accepts every payload. */

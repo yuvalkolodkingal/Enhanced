@@ -132,9 +132,7 @@ public final class ModNetwork {
      * server sends the music messages only to a client that has it.
      */
     public static boolean hasMusic(ServerPlayer player) {
-        // TODO(port seam): Net.hasChannel(player, MusicManifestPayload.TYPE) once platform/net has it (seam request
-        // L8-1); until then NeoForge's own check, the one ServerMusic made.
-        return player.connection != null && player.connection.hasChannel(MusicManifestPayload.TYPE);
+        return Net.hasChannel(player, MusicManifestPayload.TYPE);
     }
 
     private ModNetwork() {
