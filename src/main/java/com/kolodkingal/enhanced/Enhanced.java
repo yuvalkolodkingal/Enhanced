@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.network.ModNetwork;
+import com.kolodkingal.enhanced.platform.neoforge.NeoRegistrars;
 import com.kolodkingal.enhanced.platform.neoforge.NeoSetup;
 import com.kolodkingal.enhanced.registry.ModArmorMaterials;
 import com.kolodkingal.enhanced.registry.ModAttachments;
@@ -34,26 +35,26 @@ public class Enhanced {
     public Enhanced(IEventBus modBus, ModContainer container) {
         // Port P0: the platform layer's NeoForge glue (attachments, messages, entity attributes) comes first.
         NeoSetup.init(modBus);
-        ModArmorMaterials.ARMOR_MATERIALS.register(modBus);
-        ModDataComponents.DATA_COMPONENTS.register(modBus);
-        ModBlocks.BLOCKS.register(modBus);
-        ModBlockEntities.BLOCK_ENTITIES.register(modBus);
-        ModItems.ITEMS.register(modBus);
-        ModEffects.EFFECTS.register(modBus);
-        ModEntities.ENTITIES.register(modBus);
+        NeoRegistrars.register(ModArmorMaterials.ARMOR_MATERIALS, modBus);
+        NeoRegistrars.register(ModDataComponents.DATA_COMPONENTS, modBus);
+        NeoRegistrars.register(ModBlocks.BLOCKS, modBus);
+        NeoRegistrars.register(ModBlockEntities.BLOCK_ENTITIES, modBus);
+        NeoRegistrars.register(ModItems.ITEMS, modBus);
+        NeoRegistrars.register(ModEffects.EFFECTS, modBus);
+        NeoRegistrars.register(ModEntities.ENTITIES, modBus);
         ModAttachments.init();
-        ModParticles.PARTICLES.register(modBus);
-        ModSounds.SOUNDS.register(modBus);
+        NeoRegistrars.register(ModParticles.PARTICLES, modBus);
+        NeoRegistrars.register(ModSounds.SOUNDS, modBus);
         // 3.3: the world structures (the Hydra outposts, Mjolnir's landing sites, the Mutant School).
-        ModStructures.STRUCTURE_TYPES.register(modBus);
-        ModStructures.STRUCTURE_PIECES.register(modBus);
+        NeoRegistrars.register(ModStructures.STRUCTURE_TYPES, modBus);
+        NeoRegistrars.register(ModStructures.STRUCTURE_PIECES, modBus);
         // 3.5: the chunk generator of Asgard.
-        com.kolodkingal.enhanced.registry.ModChunkGenerators.CHUNK_GENERATORS.register(modBus);
-        ModStructures.PROCESSORS.register(modBus);
+        NeoRegistrars.register(com.kolodkingal.enhanced.registry.ModChunkGenerators.CHUNK_GENERATORS, modBus);
+        NeoRegistrars.register(ModStructures.PROCESSORS, modBus);
         // 3.6: the stones' recipe (a stone out of its vessel) and loot function (a site stone in a chest).
-        com.kolodkingal.enhanced.registry.ModRecipes.SERIALIZERS.register(modBus);
-        com.kolodkingal.enhanced.registry.ModLootFunctions.FUNCTIONS.register(modBus);
-        ModCreativeTab.TABS.register(modBus);
+        NeoRegistrars.register(com.kolodkingal.enhanced.registry.ModRecipes.SERIALIZERS, modBus);
+        NeoRegistrars.register(com.kolodkingal.enhanced.registry.ModLootFunctions.FUNCTIONS, modBus);
+        NeoRegistrars.register(ModCreativeTab.TABS, modBus);
         // 3.8: the beams of Iron Man's suits and Love's eyes (their styles, by id, on both sides).
         com.kolodkingal.enhanced.beam.AvengersBeams.init();
         // Port P0: the messages are declared on the platform's channels; NeoSetup registers them.

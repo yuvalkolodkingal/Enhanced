@@ -18,6 +18,9 @@ import com.kolodkingal.enhanced.block.SpiderWebBlock;
 import com.kolodkingal.enhanced.block.StonePedestalBlock;
 import com.kolodkingal.enhanced.block.TesseractCradleBlock;
 import com.kolodkingal.enhanced.block.WitchesRoadDoorBlock;
+import com.kolodkingal.enhanced.platform.reg.BlockEntry;
+import com.kolodkingal.enhanced.platform.reg.BlockRegistrar;
+import com.kolodkingal.enhanced.platform.reg.Registrars;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.IronBarsBlock;
@@ -31,14 +34,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModBlocks {
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Enhanced.MODID);
+    public static final BlockRegistrar BLOCKS = Registrars.blocks(Enhanced.MODID);
 
     /** Mjolnir at rest: unbreakable, unmovable, blast-proof. Its item is {@link ModItems#MJOLNIR}, not a block item. */
-    public static final DeferredBlock<MjolnirBlock> MJOLNIR = BLOCKS.register("mjolnir",
+    public static final BlockEntry<MjolnirBlock> MJOLNIR = BLOCKS.register("mjolnir",
             () -> new MjolnirBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(-1.0F, 3600000.0F)
@@ -51,7 +52,7 @@ public final class ModBlocks {
      * The door to the Witches' Road, set flat in the floor. Wood (an axe breaks it fastest); pistons can't push it; its
      * blue-green outline glows faintly, and the open Road pours out light.
      */
-    public static final DeferredBlock<WitchesRoadDoorBlock> WITCHES_ROAD_DOOR = BLOCKS.registerBlock("witches_road_door",
+    public static final BlockEntry<WitchesRoadDoorBlock> WITCHES_ROAD_DOOR = BLOCKS.registerBlock("witches_road_door",
             WitchesRoadDoorBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BROWN)
                     .instrument(NoteBlockInstrument.BASS)
@@ -64,7 +65,7 @@ public final class ModBlocks {
 
     // ===== spider =====
     /** The temporary web of Spider-Man: no item, no drop; a hand or a sword clears it (hardness 0.5, no tool needed). */
-    public static final DeferredBlock<SpiderWebBlock> SPIDER_WEB = BLOCKS.registerBlock("spider_web",
+    public static final BlockEntry<SpiderWebBlock> SPIDER_WEB = BLOCKS.registerBlock("spider_web",
             SpiderWebBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.WOOL)
                     .sound(SoundType.COBWEB)
@@ -78,7 +79,7 @@ public final class ModBlocks {
     // ===== asgard (3.5) =====
     // (The skeleton registers the three blocks whose behaviour is another lane's; lane L1 adds the realm's blocks here.)
     /** Hela's Seal behind the throne: unbreakable, no item; its click calls Hela (lane L4). */
-    public static final DeferredBlock<HelaSealBlock> HELA_SEAL = BLOCKS.registerBlock("hela_seal",
+    public static final BlockEntry<HelaSealBlock> HELA_SEAL = BLOCKS.registerBlock("hela_seal",
             HelaSealBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BLACK)
                     .strength(-1.0F, 3600000.0F)
@@ -88,7 +89,7 @@ public final class ModBlocks {
                     .noLootTable()
                     .isValidSpawn(Blocks::never));
     /** The Throne of Asgard: unbreakable in the city; sitting on it is the coronation (lane L3). */
-    public static final DeferredBlock<OdinThroneBlock> ODIN_THRONE = BLOCKS.registerBlock("odin_throne",
+    public static final BlockEntry<OdinThroneBlock> ODIN_THRONE = BLOCKS.registerBlock("odin_throne",
             OdinThroneBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.GOLD)
                     .strength(-1.0F, 3600000.0F)
@@ -97,7 +98,7 @@ public final class ModBlocks {
                     .pushReaction(PushReaction.BLOCK)
                     .noLootTable());
     /** Gungnir's stand in the vault: what it gives is lane L3's. */
-    public static final DeferredBlock<GungnirStandBlock> GUNGNIR_STAND = BLOCKS.registerBlock("gungnir_stand",
+    public static final BlockEntry<GungnirStandBlock> GUNGNIR_STAND = BLOCKS.registerBlock("gungnir_stand",
             GungnirStandBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.GOLD)
                     .strength(-1.0F, 3600000.0F)
@@ -107,25 +108,25 @@ public final class ModBlocks {
                     .noLootTable());
     // The realm's own blocks (lane L1): the gold and the realm stone of the city, the bridge, the falls, the paintings of
     // the throne room, the Observatory's socket and mechanism, braziers, benches and the Overworld's rune stones.
-    public static final DeferredBlock<Block> ASGARD_GOLD_PLATING = BLOCKS.registerSimpleBlock("asgard_gold_plating", gold());
-    public static final DeferredBlock<Block> ASGARD_GOLD_TRIM = BLOCKS.registerSimpleBlock("asgard_gold_trim", gold());
-    public static final DeferredBlock<RotatedPillarBlock> ASGARD_GOLD_PILLAR = BLOCKS.registerBlock("asgard_gold_pillar",
+    public static final BlockEntry<Block> ASGARD_GOLD_PLATING = BLOCKS.registerSimpleBlock("asgard_gold_plating", gold());
+    public static final BlockEntry<Block> ASGARD_GOLD_TRIM = BLOCKS.registerSimpleBlock("asgard_gold_trim", gold());
+    public static final BlockEntry<RotatedPillarBlock> ASGARD_GOLD_PILLAR = BLOCKS.registerBlock("asgard_gold_pillar",
             RotatedPillarBlock::new, gold());
-    public static final DeferredBlock<IronBarsBlock> ASGARD_GOLD_LATTICE = BLOCKS.registerBlock("asgard_gold_lattice",
+    public static final BlockEntry<IronBarsBlock> ASGARD_GOLD_LATTICE = BLOCKS.registerBlock("asgard_gold_lattice",
             IronBarsBlock::new, gold().noOcclusion());
-    public static final DeferredBlock<Block> REALM_STONE = BLOCKS.registerSimpleBlock("realm_stone", realmStone());
-    public static final DeferredBlock<Block> REALM_STONE_BRICKS = BLOCKS.registerSimpleBlock("realm_stone_bricks", realmStone());
-    public static final DeferredBlock<Block> POLISHED_REALM_STONE = BLOCKS.registerSimpleBlock("polished_realm_stone", realmStone());
-    public static final DeferredBlock<RotatedPillarBlock> REALM_STONE_PILLAR = BLOCKS.registerBlock("realm_stone_pillar",
+    public static final BlockEntry<Block> REALM_STONE = BLOCKS.registerSimpleBlock("realm_stone", realmStone());
+    public static final BlockEntry<Block> REALM_STONE_BRICKS = BLOCKS.registerSimpleBlock("realm_stone_bricks", realmStone());
+    public static final BlockEntry<Block> POLISHED_REALM_STONE = BLOCKS.registerSimpleBlock("polished_realm_stone", realmStone());
+    public static final BlockEntry<RotatedPillarBlock> REALM_STONE_PILLAR = BLOCKS.registerBlock("realm_stone_pillar",
             RotatedPillarBlock::new, realmStone());
-    public static final DeferredBlock<StairBlock> REALM_STONE_BRICK_STAIRS = BLOCKS.registerBlock("realm_stone_brick_stairs",
+    public static final BlockEntry<StairBlock> REALM_STONE_BRICK_STAIRS = BLOCKS.registerBlock("realm_stone_brick_stairs",
             p -> new StairBlock(REALM_STONE_BRICKS.get().defaultBlockState(), p), realmStone());
-    public static final DeferredBlock<SlabBlock> REALM_STONE_BRICK_SLAB = BLOCKS.registerBlock("realm_stone_brick_slab",
+    public static final BlockEntry<SlabBlock> REALM_STONE_BRICK_SLAB = BLOCKS.registerBlock("realm_stone_brick_slab",
             SlabBlock::new, realmStone());
-    public static final DeferredBlock<WallBlock> REALM_STONE_BRICK_WALL = BLOCKS.registerBlock("realm_stone_brick_wall",
+    public static final BlockEntry<WallBlock> REALM_STONE_BRICK_WALL = BLOCKS.registerBlock("realm_stone_brick_wall",
             WallBlock::new, realmStone().forceSolidOn());
     /** The Rainbow Bridge: glowing crystal, its light flowing along its axis. */
-    public static final DeferredBlock<BifrostBridgeBlock> BIFROST_BRIDGE = BLOCKS.registerBlock("bifrost_bridge",
+    public static final BlockEntry<BifrostBridgeBlock> BIFROST_BRIDGE = BLOCKS.registerBlock("bifrost_bridge",
             BifrostBridgeBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_LIGHT_BLUE)
                     .strength(1.5F, 6.0F)
@@ -137,7 +138,7 @@ public final class ModBlocks {
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
     /** The cosmic falls: light-water falling into the void; no collision, no fluid, no ticks. */
-    public static final DeferredBlock<CosmicFallsBlock> COSMIC_FALLS = BLOCKS.registerBlock("cosmic_falls",
+    public static final BlockEntry<CosmicFallsBlock> COSMIC_FALLS = BLOCKS.registerBlock("cosmic_falls",
             CosmicFallsBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.WATER)
                     .noCollission()
@@ -150,10 +151,10 @@ public final class ModBlocks {
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
     /** A tile of the throne room's paintings (peace or conquest). */
-    public static final DeferredBlock<AsgardMuralBlock> ASGARD_MURAL = BLOCKS.registerBlock("asgard_mural",
+    public static final BlockEntry<AsgardMuralBlock> ASGARD_MURAL = BLOCKS.registerBlock("asgard_mural",
             AsgardMuralBlock::new, realmStone());
     /** The Hofund socket in the Observatory: unbreakable, no item. */
-    public static final DeferredBlock<HofundSocketBlock> HOFUND_SOCKET = BLOCKS.registerBlock("hofund_socket",
+    public static final BlockEntry<HofundSocketBlock> HOFUND_SOCKET = BLOCKS.registerBlock("hofund_socket",
             HofundSocketBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.GOLD)
                     .strength(-1.0F, 3600000.0F)
@@ -162,7 +163,7 @@ public final class ModBlocks {
                     .pushReaction(PushReaction.BLOCK)
                     .noLootTable());
     /** The Bifrost mechanism: the Observatory's spinning ring; unbreakable, no item. */
-    public static final DeferredBlock<BifrostMechanismBlock> BIFROST_MECHANISM = BLOCKS.registerBlock("bifrost_mechanism",
+    public static final BlockEntry<BifrostMechanismBlock> BIFROST_MECHANISM = BLOCKS.registerBlock("bifrost_mechanism",
             BifrostMechanismBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.GOLD)
                     .strength(-1.0F, 3600000.0F)
@@ -171,10 +172,10 @@ public final class ModBlocks {
                     .pushReaction(PushReaction.BLOCK)
                     .noLootTable());
     /** A golden brazier, always lit. */
-    public static final DeferredBlock<AsgardBrazierBlock> ASGARD_BRAZIER = BLOCKS.registerBlock("asgard_brazier",
+    public static final BlockEntry<AsgardBrazierBlock> ASGARD_BRAZIER = BLOCKS.registerBlock("asgard_brazier",
             AsgardBrazierBlock::new, gold().noOcclusion().lightLevel(state -> 15));
     /** A Bifrost rune stone, the heart of an Overworld Bifrost site: unbreakable, no item. */
-    public static final DeferredBlock<BifrostRuneStoneBlock> BIFROST_RUNE_STONE = BLOCKS.registerBlock("bifrost_rune_stone",
+    public static final BlockEntry<BifrostRuneStoneBlock> BIFROST_RUNE_STONE = BLOCKS.registerBlock("bifrost_rune_stone",
             BifrostRuneStoneBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.STONE)
                     .strength(-1.0F, 3600000.0F)
@@ -184,7 +185,7 @@ public final class ModBlocks {
                     .noLootTable()
                     .isValidSpawn(Blocks::never));
     /** The golden leaves of Asgard's trees (they never fall). */
-    public static final DeferredBlock<LeavesBlock> ASGARD_GOLDEN_LEAVES = BLOCKS.registerBlock("asgard_golden_leaves",
+    public static final BlockEntry<LeavesBlock> ASGARD_GOLDEN_LEAVES = BLOCKS.registerBlock("asgard_golden_leaves",
             LeavesBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.GOLD)
                     .strength(0.2F)
@@ -199,7 +200,7 @@ public final class ModBlocks {
                     .pushReaction(PushReaction.DESTROY)
                     .isRedstoneConductor((state, level, pos) -> false));
     /** A stone bench to sit on. */
-    public static final DeferredBlock<AsgardBenchBlock> ASGARD_BENCH = BLOCKS.registerBlock("asgard_bench",
+    public static final BlockEntry<AsgardBenchBlock> ASGARD_BENCH = BLOCKS.registerBlock("asgard_bench",
             AsgardBenchBlock::new, realmStone().noOcclusion());
 
     private static BlockBehaviour.Properties gold() {
@@ -220,7 +221,7 @@ public final class ModBlocks {
     // ===== stones (3.6) =====
     // (The skeleton registers every block of 3.6, with placeholder looks; each lane owns its classes.)
     /** The stone pedestal of a site: unbreakable, no loot (lane L1). */
-    public static final DeferredBlock<StonePedestalBlock> STONE_PEDESTAL = BLOCKS.registerBlock(
+    public static final BlockEntry<StonePedestalBlock> STONE_PEDESTAL = BLOCKS.registerBlock(
             "stone_pedestal", StonePedestalBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.STONE)
                     .strength(-1.0F, 3600000.0F)
@@ -232,7 +233,7 @@ public final class ModBlocks {
                     .noLootTable());
     // ===== stone_sites (3.6) =====
     /** The Tesseract's cradle on Avengers Tower: unbreakable, no loot (lane L4). */
-    public static final DeferredBlock<TesseractCradleBlock> TESSERACT_CRADLE = BLOCKS.registerBlock(
+    public static final BlockEntry<TesseractCradleBlock> TESSERACT_CRADLE = BLOCKS.registerBlock(
             "tesseract_cradle", TesseractCradleBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(-1.0F, 3600000.0F)
@@ -243,7 +244,7 @@ public final class ModBlocks {
                     .noLootTable());
     // ===== hulk (3.6) =====
     /** The Gamma Emitter: a crafted lab device; it drops itself (lane L7). */
-    public static final DeferredBlock<GammaEmitterBlock> GAMMA_EMITTER = BLOCKS.registerBlock(
+    public static final BlockEntry<GammaEmitterBlock> GAMMA_EMITTER = BLOCKS.registerBlock(
             "gamma_emitter", GammaEmitterBlock::new, BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(5.0F, 6.0F)
@@ -258,7 +259,7 @@ public final class ModBlocks {
     // (Lane L4 owns the classes, lane L3 the pod's treatment, lane L5 the console's Cerebro. All are unbreakable in
     // Survival, like the stone pedestal, so a built lab's entrance, doors and machines stay; Creative breaks them.)
     /** A secret bookshelf of the study (lane L4). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.SecretBookshelfBlock> SECRET_BOOKSHELF =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.SecretBookshelfBlock> SECRET_BOOKSHELF =
             BLOCKS.registerBlock("secret_bookshelf", com.kolodkingal.enhanced.block.SecretBookshelfBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.WOOD)
@@ -266,7 +267,7 @@ public final class ModBlocks {
                     .pushReaction(PushReaction.BLOCK)
                     .sound(SoundType.WOOD));
     /** An elevator pad (lane L4). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.ElevatorPadBlock> ELEVATOR_PAD =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.ElevatorPadBlock> ELEVATOR_PAD =
             BLOCKS.registerBlock("elevator_pad", com.kolodkingal.enhanced.block.ElevatorPadBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -274,7 +275,7 @@ public final class ModBlocks {
                     .pushReaction(PushReaction.BLOCK)
                     .sound(SoundType.METAL));
     /** An X-door half (lane L4). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.XDoorBlock> X_DOOR =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.XDoorBlock> X_DOOR =
             BLOCKS.registerBlock("x_door", com.kolodkingal.enhanced.block.XDoorBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -283,7 +284,7 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .noOcclusion());
     /** A part of Cerebro's round X-door (lane L4). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.XDoorRoundBlock> X_DOOR_ROUND =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.XDoorRoundBlock> X_DOOR_ROUND =
             BLOCKS.registerBlock("x_door_round", com.kolodkingal.enhanced.block.XDoorRoundBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -292,7 +293,7 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .noOcclusion());
     /** The Weapon X rack of the Adamantium Injections (lane L4). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.AdamantiumRackBlock> ADAMANTIUM_RACK =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.AdamantiumRackBlock> ADAMANTIUM_RACK =
             BLOCKS.registerBlock("adamantium_rack", com.kolodkingal.enhanced.block.AdamantiumRackBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -301,7 +302,7 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .noOcclusion());
     /** The Weapon X Pod (lane L4; its treatment lane L3). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.WeaponXPodBlock> WEAPON_X_POD =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.WeaponXPodBlock> WEAPON_X_POD =
             BLOCKS.registerBlock("weapon_x_pod", com.kolodkingal.enhanced.block.WeaponXPodBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -311,7 +312,7 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> 6));
     /** Hank's Cure Station (lane L4). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.CureStationBlock> CURE_STATION =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.CureStationBlock> CURE_STATION =
             BLOCKS.registerBlock("cure_station", com.kolodkingal.enhanced.block.CureStationBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -320,7 +321,7 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .noOcclusion());
     /** The Cerebro console (lane L4; its Cerebro lane L5). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.CerebroConsoleBlock> CEREBRO_CONSOLE =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.CerebroConsoleBlock> CEREBRO_CONSOLE =
             BLOCKS.registerBlock("cerebro_console", com.kolodkingal.enhanced.block.CerebroConsoleBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -335,7 +336,7 @@ public final class ModBlocks {
     // (Lane L6 owns the classes, lane L7 the display's renderer. A generated one (state generated=true) does not break
     // in Survival; a placed one breaks as a metal block.)
     /** Iron Man's suit display (lane L6): two high. */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.SuitDisplayBlock> SUIT_DISPLAY =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.SuitDisplayBlock> SUIT_DISPLAY =
             BLOCKS.registerBlock("suit_display", com.kolodkingal.enhanced.block.SuitDisplayBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -346,7 +347,7 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> 3));
     /** A tech case (lane L6). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.TechCaseBlock> TECH_CASE =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.TechCaseBlock> TECH_CASE =
             BLOCKS.registerBlock("tech_case", com.kolodkingal.enhanced.block.TechCaseBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
@@ -358,7 +359,7 @@ public final class ModBlocks {
                     .lightLevel(state -> 6));
     // ===== eternity (3.8) =====
     /** Eternity's altar (lane L8). */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.EternityAltarBlock> ETERNITY_ALTAR =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.EternityAltarBlock> ETERNITY_ALTAR =
             BLOCKS.registerBlock("eternity_altar", com.kolodkingal.enhanced.block.EternityAltarBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
@@ -369,7 +370,7 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> 10));
     /** The still mirror of Eternity's realm (lane L8): translucent, unbreakable in Survival. */
-    public static final DeferredBlock<com.kolodkingal.enhanced.block.EternityMirrorBlock> ETERNITY_MIRROR =
+    public static final BlockEntry<com.kolodkingal.enhanced.block.EternityMirrorBlock> ETERNITY_MIRROR =
             BLOCKS.registerBlock("eternity_mirror", com.kolodkingal.enhanced.block.EternityMirrorBlock::new,
                     BlockBehaviour.Properties.of()
                     .mapColor(MapColor.SNOW)

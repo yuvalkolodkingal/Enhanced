@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.ability.PowerTicker;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.item.TesseractItem;
+import com.kolodkingal.enhanced.platform.reg.RegEntry;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.LokiForm;
@@ -41,7 +42,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 
@@ -67,7 +67,7 @@ public final class LokiTests {
     }
 
     /** How many times {@code listener} heard {@code sound} played inside {@code where} since it last asked. */
-    private static long heard(ServerPlayer listener, AABB where, DeferredHolder<SoundEvent, SoundEvent> sound) {
+    private static long heard(ServerPlayer listener, AABB where, RegEntry<SoundEvent, SoundEvent> sound) {
         return TestKit.heardSounds(listener).stream().filter(s -> s.id().equals(sound.getId()) && where.contains(s.at())).count();
     }
 

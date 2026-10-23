@@ -8,6 +8,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.AbilityHandler;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.item.LokisScepterItem;
+import com.kolodkingal.enhanced.platform.reg.RegEntry;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -33,7 +34,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
@@ -71,7 +71,7 @@ public final class InfinityStoneTests {
         return heard;
     }
 
-    private static List<Heard> only(List<Heard> all, DeferredHolder<SoundEvent, SoundEvent> sound) {
+    private static List<Heard> only(List<Heard> all, RegEntry<SoundEvent, SoundEvent> sound) {
         return all.stream().filter(h -> h.id().equals(sound.getId())).toList();
     }
 
