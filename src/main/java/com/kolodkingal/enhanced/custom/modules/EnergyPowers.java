@@ -15,20 +15,18 @@ import com.kolodkingal.enhanced.custom.ModuleStats;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.Shots;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.CommonTags;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.registry.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -38,7 +36,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -54,12 +51,6 @@ import java.util.UUID;
  * Force Field, Magic (mystic bolts, a healing ward, a curse), Energy and Power Absorption, and the Sonic Scream.
  */
 public final class EnergyPowers {
-    /** The loaders' common tags of glass ({@code c:glass_blocks}, {@code c:glass_panes}: NeoForge's {@code Tags}). */
-    private static final TagKey<Block> GLASS_BLOCKS =
-            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "glass_blocks"));
-    private static final TagKey<Block> GLASS_PANES =
-            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "glass_panes"));
-
     public static void register(Map<PowerModule, ModuleLogic> logic) {
         logic.put(PowerModule.ENERGY_BLAST, new Blast());
         logic.put(PowerModule.FORCE_FIELD, new Field());
@@ -495,7 +486,7 @@ public final class EnergyPowers {
             for (double d = 1; d <= range && broken < 16; d += 0.5) {
                 BlockPos pos = BlockPos.containing(p.getEyePosition().add(p.getLookAngle().scale(d)));
                 BlockState state = c.level().getBlockState(pos);
-                if ((state.is(GLASS_BLOCKS) || state.is(GLASS_PANES)) && BlockRights.mayBreak(p, c.level(), pos, state)) {
+                if ((state.is(CommonTags.Blocks.GLASS_BLOCKS) || state.is(CommonTags.Blocks.GLASS_PANES)) && BlockRights.mayBreak(p, c.level(), pos, state)) {
                     c.level().destroyBlock(pos, false, p);
                     broken++;
                 }
