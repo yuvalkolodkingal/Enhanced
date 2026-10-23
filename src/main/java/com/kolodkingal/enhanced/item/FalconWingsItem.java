@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.item;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.FalconConfig;
 import com.kolodkingal.enhanced.falcon.FalconWings;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -23,19 +24,17 @@ import java.util.List;
  * client/falcon/FalconWingsLayer}). Their durability is {@code [falcon] wingsDurability} (900); iron ingots mend them
  * on an anvil.
  */
-public class FalconWingsItem extends ArmorItem {
+public class FalconWingsItem extends ArmorItem implements ItemExt.ElytraFlight, ItemExt.MaxDamage {
     public FalconWingsItem(Holder<ArmorMaterial> material, Properties properties) {
         super(material, Type.CHESTPLATE, properties);
     }
 
-    // TODO(port seam): NeoForge IItemExtension#canElytraFly; a platform hook is requested (P0 L1 notes).
 
     @Override
     public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
         return FalconWings.canElytraFly(stack, entity);
     }
 
-    // TODO(port seam): NeoForge IItemExtension#elytraFlightTick; a platform hook is requested (P0 L1 notes).
 
     @Override
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {

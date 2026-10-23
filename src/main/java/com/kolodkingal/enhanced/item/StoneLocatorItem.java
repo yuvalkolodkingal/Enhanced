@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.finders.LocatorState;
 import com.kolodkingal.enhanced.finders.StoneLocator;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -24,7 +25,7 @@ import java.util.List;
  * stone's energy was read into the device. <b>Use</b>: a spark trail toward the site; <b>Sneak + use</b>: the next
  * stone to look for (every stone he lacks, then each in turn).
  */
-public class StoneLocatorItem extends Item {
+public class StoneLocatorItem extends Item implements ItemExt.ReequipAnimation {
     public StoneLocatorItem(Properties properties) {
         super(properties);
     }
@@ -50,7 +51,6 @@ public class StoneLocatorItem extends Item {
         }
     }
 
-    // TODO(port seam): NeoForge IItemExtension#shouldCauseReequipAnimation; a platform hook is requested (L1).
 
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -44,7 +45,7 @@ import java.util.List;
  * bond). So there is only ever one Gungnir of each owner. A Gungnir with no owner (an operator's {@code /give}) is bound to
  * nobody and never crumbles.
  */
-public class GungnirItem extends SwordItem {
+public class GungnirItem extends SwordItem implements ItemExt.EntityItemUpdate {
     private static final ResourceLocation REACH = Enhanced.id("gungnir_reach");
 
     public GungnirItem(Properties properties) {
@@ -53,7 +54,8 @@ public class GungnirItem extends SwordItem {
 
     /** 8 attack damage at a spear's speed, and one block more reach than a hand. */
     public static ItemAttributeModifiers createAttributes() {
-        return SwordItem.createAttributes(Tiers.NETHERITE, 4, -2.8F).withModifierAdded(Attributes.ENTITY_INTERACTION_RANGE,
+        return SwordItem.createAttributes(Tiers.NETHERITE, 4,
+                -2.8F).withModifierAdded(Attributes.ENTITY_INTERACTION_RANGE,
                 new AttributeModifier(REACH, 1.0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND);
     }
 
@@ -113,7 +115,6 @@ public class GungnirItem extends SwordItem {
     }
 
     /** A copy whose bond is broken crumbles where it lies. */
-    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (entity.level() instanceof ServerLevel server && entity.tickCount % 10 == 0 && stale(stack, server)) {

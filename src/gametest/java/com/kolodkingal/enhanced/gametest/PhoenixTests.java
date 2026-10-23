@@ -1100,8 +1100,8 @@ public final class PhoenixTests {
         lookAt(jean, host);
         press(jean, 4);
         check(host.hasEffect(ModEffects.POSSESSED) && host.getTarget() == skeleton, "taken, and sent after the skeleton");
-        check(host.removeEffectsCuredBy(net.neoforged.neoforge.common.EffectCures.MILK), "milk cures it");
-        check(!host.hasEffect(ModEffects.POSSESSED), "the possession is gone");
+        Items.MILK_BUCKET.finishUsingItem(new ItemStack(Items.MILK_BUCKET), helper.getLevel(), host); // it drinks milk
+        check(!host.hasEffect(ModEffects.POSSESSED), "milk cures it: the possession is gone");
         check(PhoenixAbilities.hostsOf(jean).isEmpty(), "it is nobody's: " + PhoenixAbilities.hostsOf(jean));
         check(host.getTarget() == null, "and it forgets what she sent it after: " + host.getTarget());
         helper.succeed();

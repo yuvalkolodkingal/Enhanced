@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.mixin.AbstractArrowAccessor;
 import com.kolodkingal.enhanced.mixin.ArmorStandAccessor;
 import com.kolodkingal.enhanced.mixin.ItemFrameAccessor;
 import com.kolodkingal.enhanced.network.MagnetPullPayload;
+import com.kolodkingal.enhanced.platform.CommonTags;
 import com.kolodkingal.enhanced.platform.ItemAccess;
 import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
@@ -25,13 +26,11 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.RandomizableContainer;
@@ -138,10 +137,6 @@ public final class MagnetPull {
             EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
     /** How long a tugged mob without AI is flown at most, in ticks. */
     private static final int TUG_TICKS = 10;
-    /** The common {@code c:ores_in_ground/*} tags (the ground an ore sits in), as the loaders name them. */
-    private static final TagKey<Block> ORES_IN_STONE = groundTag("stone");
-    private static final TagKey<Block> ORES_IN_DEEPSLATE = groundTag("deepslate");
-    private static final TagKey<Block> ORES_IN_NETHERRACK = groundTag("netherrack");
 
     /** What {@link #searchEndedAt} answers for a Magneto who never searched: long enough ago for any wait. */
     public static final long NEVER = Long.MIN_VALUE / 2;
@@ -836,10 +831,6 @@ public final class MagnetPull {
         return drops;
     }
 
-    private static TagKey<Block> groundTag(String ground) {
-        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores_in_ground/" + ground));
-    }
-
     /**
      * The ground a pulled ore becomes (D-M 4.3): the block whose {@code c:ores_in_ground} tag holds it (stone, deepslate,
      * netherrack); gilded blackstone becomes blackstone, ancient debris netherrack; any other by its dimension: the Nether
@@ -849,13 +840,13 @@ public final class MagnetPull {
         if (ore.is(Blocks.GILDED_BLACKSTONE)) {
             return Blocks.BLACKSTONE.defaultBlockState();
         }
-        if (ore.is(Blocks.ANCIENT_DEBRIS) || ore.is(ORES_IN_NETHERRACK)) {
+        if (ore.is(Blocks.ANCIENT_DEBRIS) || ore.is(CommonTags.Blocks.ORES_IN_GROUND_NETHERRACK)) {
             return Blocks.NETHERRACK.defaultBlockState();
         }
-        if (ore.is(ORES_IN_DEEPSLATE)) {
+        if (ore.is(CommonTags.Blocks.ORES_IN_GROUND_DEEPSLATE)) {
             return Blocks.DEEPSLATE.defaultBlockState();
         }
-        if (ore.is(ORES_IN_STONE)) {
+        if (ore.is(CommonTags.Blocks.ORES_IN_GROUND_STONE)) {
             return Blocks.STONE.defaultBlockState();
         }
         if (level.dimension() == Level.NETHER) {
@@ -1250,10 +1241,7 @@ public final class MagnetPull {
             container.setChanged();
             return came;
         }
-        // TODO(port seam): ItemAccess.Slots has no insertItem yet (seam request in the P0 L1 notes); NeoForge's item
-        // handler until it has.
-        net.neoforged.neoforge.items.IItemHandler items = level.getCapability(
-                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, null);
+        ItemAccess.Slots items = Platform.get().itemAccess().blockSlots(level, pos);
         if (items != null) {
             for (int slot = 0; slot < items.getSlots(); slot++) {
                 ItemStack there = items.getStackInSlot(slot);

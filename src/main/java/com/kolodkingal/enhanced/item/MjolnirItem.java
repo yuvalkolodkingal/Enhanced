@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.item;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.Worthiness;
 import com.kolodkingal.enhanced.block.MjolnirBlock;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -35,7 +36,7 @@ import java.util.List;
  * player, Sneak + right click, to pin it in place ({@link com.kolodkingal.enhanced.ability.MjolnirPin}). Never breaks;
  * fire and lava can't hurt it.
  */
-public class MjolnirItem extends Item {
+public class MjolnirItem extends Item implements ItemExt.EntityItemUpdate {
     public MjolnirItem(Properties properties) {
         super(properties);
     }
@@ -43,9 +44,11 @@ public class MjolnirItem extends Item {
     /** 10 attack damage at axe-like speed (Stormbreaker's 12 is a fifth more). */
     public static ItemAttributeModifiers createAttributes() {
         return ItemAttributeModifiers.builder()
-                .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 9.0, AttributeModifier.Operation.ADD_VALUE),
+                .add(Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 9.0, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND)
-                .add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -3.0, AttributeModifier.Operation.ADD_VALUE),
+                .add(Attributes.ATTACK_SPEED,
+                        new AttributeModifier(BASE_ATTACK_SPEED_ID, -3.0, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND)
                 .build();
     }
@@ -87,7 +90,6 @@ public class MjolnirItem extends Item {
     }
 
     /** A dropped Mjolnir comes to rest as a block where it lands; until then it never despawns. */
-    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (entity.level() instanceof ServerLevel level) {

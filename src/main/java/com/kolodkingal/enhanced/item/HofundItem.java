@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.heimdall.HofundBond;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import net.minecraft.ChatFormatting;
@@ -32,7 +33,7 @@ import java.util.List;
  * see {@link HofundBond}): a powerless owner who holds his own Hofund becomes Heimdall ({@code HeimdallServer}); a copy older
  * than its owner's newest crumbles when it next ticks, in an inventory or on the ground.
  */
-public class HofundItem extends SwordItem {
+public class HofundItem extends SwordItem implements ItemExt.EntityItemUpdate {
     public HofundItem(Properties properties) {
         super(Tiers.NETHERITE, properties);
     }
@@ -74,7 +75,6 @@ public class HofundItem extends SwordItem {
     }
 
     /** And one lying on the ground. */
-    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (entity.level() instanceof ServerLevel server && entity.tickCount % 10 == 0 && HofundBond.shouldCrumble(server.getServer(), stack)) {

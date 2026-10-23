@@ -14,8 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 /**
  * One rule book for every power of the mod that changes blocks in someone's name (3.1, spec 5.1): Wanda's, Billy's, the
@@ -46,12 +44,8 @@ public final class BlockRights {
      *
      * @return true if nobody cancelled it
      */
-    // TODO(port seam): posts NeoForge's own event (claim mods listen there); a LoaderHooks method is requested (P0 L1
-    // notes).
     public static boolean postBreak(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState old) {
-        BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(level, pos, old, player);
-        NeoForge.EVENT_BUS.post(event);
-        return !event.isCanceled();
+        return !Platform.get().hooks().blockBreakEventCancelled(level, pos, old, player);
     }
 
     /**

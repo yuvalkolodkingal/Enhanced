@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.gametest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -11,8 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,8 +33,7 @@ public final class HeroesInGameTests {
     private static final int TITLE_LIMIT = 14;
 
     private static JsonObject lang(String name) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+        Path file = modFile("assets", Enhanced.MODID, "lang", name + ".json");
         return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
     }
 
@@ -84,5 +82,10 @@ public final class HeroesInGameTests {
     }
 
     private HeroesInGameTests() {
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }

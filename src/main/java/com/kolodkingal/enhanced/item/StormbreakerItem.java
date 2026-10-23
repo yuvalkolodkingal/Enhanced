@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.ability.ThorAbilities;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -25,7 +26,7 @@ import java.util.List;
  * and so it is here: a fifth stronger than Mjolnir in everything they share (the blow, the throw, the lightning beam
  * through it). Never breaks; fire and lava can't hurt it.
  */
-public class StormbreakerItem extends AxeItem {
+public class StormbreakerItem extends AxeItem implements ItemExt.EntityItemUpdate {
     public StormbreakerItem(Properties properties) {
         super(Tiers.NETHERITE, properties);
     }
@@ -42,7 +43,6 @@ public class StormbreakerItem extends AxeItem {
     }
 
     /** A dropped Stormbreaker never despawns (but {@code /give}'s look-alike still vanishes). */
-    // TODO(port seam): NeoForge IItemExtension#onEntityItemUpdate; a platform hook is requested (P0 L1 notes).
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (!entity.level().isClientSide() && entity.tickCount == 1 && !ThorAbilities.isFakeDrop(entity)) {

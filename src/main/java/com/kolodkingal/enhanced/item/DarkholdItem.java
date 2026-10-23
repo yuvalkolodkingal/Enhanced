@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.AgathaAbilities;
 import com.kolodkingal.enhanced.beam.BeamStyle;
 import com.kolodkingal.enhanced.beam.BeamStyles;
 import com.kolodkingal.enhanced.darkhold.DarkholdBook;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,7 +27,7 @@ import java.util.List;
  * abilities (see {@link DarkholdBook}): hold use fires her purple beam (the use is held like a bow's, so the holder moves
  * slowly while it burns), Sneak + use is the hex mark or the mind glimpse, and magic used on the holder poisons whoever used it.
  */
-public class DarkholdItem extends Item {
+public class DarkholdItem extends Item implements ItemExt.StopUsing {
     /**
      * The purple beam's look: purple magic with a white core (Agatha's, in WandaVision). Registered here so that the server and
      * every client know it as soon as the item is made.
@@ -97,7 +98,6 @@ public class DarkholdItem extends Item {
     }
 
     /** However the use ends (the key came up, the book was put away, a death): the beam ends, and a reading cut short fades. */
-    // TODO(port seam): NeoForge IItemExtension#onStopUsing; a platform hook is requested (P0 L1 notes).
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         if (entity instanceof ServerPlayer player) {

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.item;
 
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.ext.ItemExt;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.ChatFormatting;
@@ -29,7 +30,7 @@ import java.util.List;
  * path; as Iron Man, putting it on changes nothing. On the chest it is the nanotech suits' home (H deploys the selected
  * one); taken off, a deployed suit retracts at once.
  */
-public class NanoArcReactorItem extends ArmorItem {
+public class NanoArcReactorItem extends ArmorItem implements ItemExt.Equip {
     public NanoArcReactorItem(Holder<ArmorMaterial> material, Properties properties) {
         super(material, Type.CHESTPLATE, properties);
     }
@@ -101,7 +102,6 @@ public class NanoArcReactorItem extends ArmorItem {
                 player.getY() + player.getBbHeight() * 0.68, player.getZ(), 20, 0.2, 0.2, 0.2, 0.05);
     }
 
-    // TODO(port seam): NeoForge IItemExtension#canEquip; a platform hook is requested (P0 L1 notes).
 
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {

@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.heimdall.HeimdallPost;
 import com.kolodkingal.enhanced.heimdall.HeimdallTalk;
 import com.kolodkingal.enhanced.network.AsgardTalkPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -30,8 +31,6 @@ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -148,10 +147,9 @@ public final class OneOfEachTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void helasHeaddressIsNoLongerThePineapple(GameTestHelper helper) throws IOException, NoSuchAlgorithmException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         for (Map.Entry<String, String> old : OLD_TEXTURES.entrySet()) {
             String[] parts = ("assets/" + Enhanced.MODID + "/" + old.getKey()).split("/");
-            Path path = mod.findResource(parts);
+            Path path = modFile(parts);
             check(Files.exists(path), old.getKey() + " exists");
             byte[] bytes = Files.readAllBytes(path);
             String sha = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
@@ -328,5 +326,10 @@ public final class OneOfEachTests {
             }
         }
         return false;
+    }
+
+    /** A file of the mod by its path parts (a path that does not exist if the mod has no such file). */
+    private static Path modFile(String... parts) {
+        return Platform.get().modResource(String.join("/", parts)).orElse(Path.of("missing", parts));
     }
 }
