@@ -49,6 +49,11 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.8.4
+
+* ***Sweet Dreams* is no longer built into the mod.** Quicksilver's Walkman plays his own theme, *Silver Hours*, as it has by default since 3.5. If you chose `quicksilverSong = "sweet_dreams"`, put your own copy in `config/enhanced/music/` as `sweet_dreams.mp3` (or `.ogg` or `.wav`) and it plays as before; without it you hear *Silver Hours*, and the game tells you once where to put the file. See [Music](Music#the-walkman-quicksilver-and-speed).
+* Keep the server and the players on the same version (network protocol **13**, unchanged: 3.8.1 to 3.8.4 play together).
+
 ## What's new in 3.8.3
 
 Eilon asked: "Redesign the drones to look like that" (the Mark 85's wings in *Endgame*).
