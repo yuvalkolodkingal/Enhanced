@@ -17,6 +17,7 @@ import com.kolodkingal.enhanced.cottage.CottageProgress;
 import com.kolodkingal.enhanced.cottage.CottageTrades;
 import com.kolodkingal.enhanced.cottage.Cottages;
 import com.kolodkingal.enhanced.cottage.Scratchy;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -62,13 +63,12 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -556,12 +556,12 @@ public final class CottageTests {
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyLineAndAnswerIsInEnglishAndHebrew(GameTestHelper helper) throws IOException {
         CottageDialogue.register();
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
         int cottageKeys = 0;
         for (String name : List.of("en_us", "he_il")) {
-            JsonObject lang = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang",
-                    name + ".json"), StandardCharsets.UTF_8)).getAsJsonObject();
+            Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json")
+                    .orElseThrow();
+            JsonObject lang = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
             for (String key : AsgardDialogue.langKeys()) {
                 if (!lang.has(key)) {
                     missing.add(name + ":" + key);
@@ -719,7 +719,7 @@ public final class CottageTests {
                     && player.getInventory().countItem(Items.EMERALD) == 3,
                     "once per run-off");
             Rabbit copy = net.minecraft.world.entity.EntityType.RABBIT.create(level);
-            copy.getPersistentData().putLong(Scratchy.TAG, cottage.key());
+            ModAttachments.PERSISTENT_DATA.get(copy).putLong(Scratchy.TAG, cottage.key());
             copy.moveTo(Vec3.atBottomCenterOf(hutch));
             check(!level.addFreshEntity(copy), "no second Scratchy");
             return true;

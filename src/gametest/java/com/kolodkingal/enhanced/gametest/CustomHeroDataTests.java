@@ -16,6 +16,7 @@ import com.kolodkingal.enhanced.custom.ModuleStats;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.SkinCheck;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
@@ -25,8 +26,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -362,8 +361,7 @@ public final class CustomHeroDataTests {
     // ---- the words ----
 
     private static JsonObject lang(String name) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        Path path = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+        Path path = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json").orElseThrow();
         try (InputStream in = Files.newInputStream(path)) {
             return JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
         }

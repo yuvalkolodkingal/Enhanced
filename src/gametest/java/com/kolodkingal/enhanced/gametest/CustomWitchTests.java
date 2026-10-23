@@ -22,6 +22,7 @@ import com.kolodkingal.enhanced.darkhold.DarkholdBook;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexAction;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -40,8 +41,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -513,10 +512,10 @@ public final class CustomWitchTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyWitchRowHasItsNamesInBothLanguages(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
         for (String name : List.of("en_us", "he_il")) {
-            Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+            Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json")
+                    .orElseThrow();
             JsonObject lang = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
             for (HeroAbility row : HeroAbility.values()) {
                 if (row.hero != Power.SCARLET_WITCH && row.hero != Power.BILLY && row.hero != Power.AGATHA) {

@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.build.ShapeKind;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import net.minecraft.core.BlockPos;
@@ -27,8 +28,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -346,9 +345,8 @@ public final class BuildGrammarTests {
                 "the other spells' holds still push a side");
 
         // Every row of every spell and state has its words in both languages.
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
-        JsonObject en = lang(mod, "en_us");
-        JsonObject he = lang(mod, "he_il");
+        JsonObject en = lang("en_us");
+        JsonObject he = lang("he_il");
         for (Spell spell : Spell.values()) {
             for (Stage stage : Stage.values()) {
                 for (int style = 0; style < spell.styles(); style++) {
@@ -406,8 +404,8 @@ public final class BuildGrammarTests {
         return "";
     }
 
-    private static JsonObject lang(IModFile mod, String name) throws IOException {
-        Path file = mod.findResource("assets", Enhanced.MODID, "lang", name + ".json");
+    private static JsonObject lang(String name) throws IOException {
+        Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json").orElseThrow();
         return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
     }
 }
