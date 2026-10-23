@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.platform.test;
 import com.kolodkingal.enhanced.platform.attach.AttachKey;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
@@ -39,6 +40,18 @@ public interface TestHooks {
      * {@code entityId}.
      */
     boolean isAttachmentSync(Object packet, AttachKey<?> key, int entityId);
+
+    /**
+     * The packets the server sends {@code watcher} about {@code holder}'s synced attachments when he starts seeing it
+     * (the first sync), in order; check them with {@link #isAttachmentSync}.
+     */
+    List<Object> initialSyncPackets(Entity holder, ServerPlayer watcher);
+
+    /**
+     * Applies the synced attachments that {@code packet} (a single packet or a bundle) carries to {@code target}, as a
+     * client receiving it applies them to its copy of the entity; a packet that carries none changes nothing.
+     */
+    void receiveSync(Object packet, Entity target);
 
     /** Finds the loader's hooks once. */
     final class Lookup {
