@@ -3,6 +3,12 @@ package com.kolodkingal.enhanced.client;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderNameTagEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent;
 import com.kolodkingal.enhanced.power.LokiForm;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -21,12 +27,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderNameTagEvent;
-import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import java.util.Set;
  * the head, his walk), with no name tag; in another player's shape he wears that player's skin and shows their name.
  * In first person nothing changes. While he hides behind his duplicates, nothing of him is drawn at all.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class Shapeshifts {
     /** The creature body drawn for each shapeshifted Loki (by player entity id). Never added to the level. */
     private static final Map<Integer, LivingEntity> BODIES = new HashMap<>();
@@ -48,7 +48,7 @@ public final class Shapeshifts {
     /** Guards against two Lokis wearing each other's faces. */
     private static int copying;
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
         Player player = event.getEntity();
         if (LokiAbilities.isHidden(player)) {
@@ -75,7 +75,7 @@ public final class Shapeshifts {
     }
 
     /** A copied player's name over Loki's head. */
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderNameTag(RenderNameTagEvent event) {
         if (event.getEntity() instanceof Player player) {
             LokiForm form = playerForm(player);

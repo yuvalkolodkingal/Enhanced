@@ -6,6 +6,12 @@ import com.kolodkingal.enhanced.client.stones.StoneFx;
 import com.kolodkingal.enhanced.finders.LocatorState;
 import com.kolodkingal.enhanced.network.LabFxPayload;
 import com.kolodkingal.enhanced.network.StoneFxPayload;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.thanos.StoneKind;
@@ -23,12 +29,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -44,7 +44,7 @@ import java.util.List;
  * ticks and fade). It also hears the Cerebro console turn on and off ({@code LabFxPayload.CONSOLE_ON|OFF}) for {@link
  * CerebroSphere}.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class LocatorClient {
     public static final ResourceLocation ANGLE = Enhanced.id("angle");
     /** A full slow sweep of the needle while it searches (ticks). */
@@ -121,7 +121,7 @@ public final class LocatorClient {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -166,7 +166,7 @@ public final class LocatorClient {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         synchronized (TRAILS) {
             TRAILS.clear();
@@ -174,10 +174,9 @@ public final class LocatorClient {
         CerebroSphere.clear();
     }
 
-    /** The socket's tint (a mod-bus event, routed by its type). */
-    @SubscribeEvent
-    public static void onItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, tint) -> tint == 1 ? socketColor(stack) : -1, ModItems.STONE_LOCATOR.get());
+    /** The socket's tint (port P0: through the platform's client registrar, see ClientSetup). */
+    public static void registerColors(ClientRegistrar registrar) {
+        registrar.itemColor((stack, tint) -> tint == 1 ? socketColor(stack) : -1, List.of(ModItems.STONE_LOCATOR));
     }
 
     private LocatorClient() {

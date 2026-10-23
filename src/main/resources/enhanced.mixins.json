@@ -18,6 +18,7 @@
   "client": [
     "client.AbstractClientPlayerMixin",
     "client.CapeLayerMixin",
+    "client.DeathScreenAccessor",
     "client.GuiAccessor",
     "client.HumanoidArmorLayerMixin",
     "client.ItemInHandLayerMixin",
@@ -27,6 +28,7 @@
     "client.MinecraftAccessor",
     "client.MinecraftMixin",
     "client.MultiPlayerGameModeAccessor",
+    "client.ParticleAccessor",
     "client.ParticleEngineMixin",
     "client.ParticleMixin",
     "client.PlayerModelMixin",

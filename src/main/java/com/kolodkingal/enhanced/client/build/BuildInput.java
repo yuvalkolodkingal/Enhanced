@@ -1,22 +1,22 @@
 package com.kolodkingal.enhanced.client.build;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BuildGrammar;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.build.VanishStyle;
+import com.kolodkingal.enhanced.platform.client.Keys;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.InputEvent;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -50,7 +50,7 @@ import org.lwjgl.glfw.GLFW;
  * of the builder is forgotten ({@link BuildClient#clear}, {@link BuildFx#clear}, {@link BuildRenderer#clear},
  * {@link BuildHud#clear}, {@link BlockPaletteScreen#clear}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class BuildInput {
     /** Ticks Y is held before it is a hold (the Spell Wheel) rather than a tap (D-B 2.2, 14.7). */
     public static final int WHEEL_TICKS = 6;
@@ -72,7 +72,7 @@ public final class BuildInput {
     private static double scrollRest;
     private static boolean scrollTaken;
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -222,7 +222,7 @@ public final class BuildInput {
      * Vanilla's attack, use and pick-block (D-B 11.10), in build mode with no screen open. Both hands' use get the same
      * answer: cancelling the main hand's returns before the off hand's is asked.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onInteraction(InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -283,14 +283,14 @@ public final class BuildInput {
      * Middle click (the pick-block key, wherever it is bound), seen as it is pressed: vanilla asks its own event only
      * for a block within a hand's reach, and the builder picks one as far as his magic reaches; vanilla's pick runs.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onMouseButton(InputEvent.MouseButton.Pre event) {
         if (event.getAction() == GLFW.GLFW_PRESS) {
             pressed(InputConstants.Type.MOUSE.getOrCreate(event.getButton()));
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onKey(InputEvent.Key event) {
         if (event.getAction() == GLFW.GLFW_PRESS) {
             pressed(InputConstants.getKey(event.getKey(), event.getScanCode()));
@@ -300,13 +300,14 @@ public final class BuildInput {
     private static void pressed(InputConstants.Key key) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player != null && mc.screen == null && BuildClient.buildMode() && mc.options.keyPickItem.isActiveAndMatches(key)) {
+        if (player != null && mc.screen == null && BuildClient.buildMode() && Keys.matches(mc.options.keyPickItem,
+                key)) {
             BuildClient.pick(player);
         }
     }
 
     /** The scroll wheel in build mode: the grammar's when it has a use for it, else the hotbar's. */
-    @SubscribeEvent
+    @Subscribe
     public static void onScroll(InputEvent.MouseScrollingEvent event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -337,7 +338,7 @@ public final class BuildInput {
      * Logging out forgets everything of the builder: his state, the grammar, the spells seen, the glow kept on the
      * graphics card (spec 5.6).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         reset();
         BuildClient.clear();

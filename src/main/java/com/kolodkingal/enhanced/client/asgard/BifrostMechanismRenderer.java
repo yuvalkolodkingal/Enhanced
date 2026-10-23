@@ -60,7 +60,7 @@ public class BifrostMechanismRenderer implements BlockEntityRenderer<BifrostMech
         return true;
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(BifrostMechanismBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(4.0, 2.0, 4.0);
     }

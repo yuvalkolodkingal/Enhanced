@@ -3,8 +3,13 @@ package com.kolodkingal.enhanced.client.sokovia;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.network.SokoviaLiftPayload;
-import com.kolodkingal.enhanced.ultron.SokoviaShape;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.ultron.SokoviaShape.Spec;
+import com.kolodkingal.enhanced.ultron.SokoviaShape;
 import com.kolodkingal.enhanced.ultron.SokoviaTemplate;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -18,11 +23,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -52,7 +52,7 @@ import java.util.List;
  * <p>A client without the chunks sees holes; a client that reloads the chunks sees the ground again; the server's world
  * is the same in every case. This class is loaded only when a payload arrives, on a client.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SokoviaClient {
     /** The ground is hidden and shown again this many blocks a tick. */
     private static final int SLICE = 700;
@@ -210,7 +210,7 @@ public final class SokoviaClient {
     // ---------------------------------------------------------------------------------------------------------
     // Every tick
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         Island current = island;
@@ -257,7 +257,7 @@ public final class SokoviaClient {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         drop(island, true);
     }

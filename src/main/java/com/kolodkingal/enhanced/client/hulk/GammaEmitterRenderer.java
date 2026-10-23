@@ -56,7 +56,7 @@ public class GammaEmitterRenderer implements BlockEntityRenderer<GammaEmitterBlo
         return true;
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(GammaEmitterBlockEntity emitter) {
         return new AABB(emitter.getBlockPos()).inflate(GammaEmitterBlockEntity.beamLength() + 1.0);
     }

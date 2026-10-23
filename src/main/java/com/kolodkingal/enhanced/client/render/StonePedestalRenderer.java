@@ -159,7 +159,7 @@ public class StonePedestalRenderer implements BlockEntityRenderer<StonePedestalB
         }
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(StonePedestalBlockEntity pedestal) {
         return new AABB(pedestal.getBlockPos()).expandTowards(0, 1.5, 0);
     }

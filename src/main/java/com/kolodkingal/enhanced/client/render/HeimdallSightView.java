@@ -8,6 +8,15 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.heimdall.HeimdallAbilities;
 import com.kolodkingal.enhanced.hela.HelaShadowEntity;
 import com.kolodkingal.enhanced.network.HeimdallSightPayload;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ComputeFovModifierEvent;
+import com.kolodkingal.enhanced.platform.event.client.FMLClientSetupEvent;
+import com.kolodkingal.enhanced.platform.event.client.InputEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -34,16 +43,6 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ import java.util.Locale;
  * <li>Far Sight (Sneak + G held) zooms the view ×6, and the mouse wheel takes it up to ×10 and back.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HeimdallSightView {
     public static final int PLAYER = 0xFFD24A;
     public static final int MONSTER = 0xFF4A3A;
@@ -160,9 +159,9 @@ public final class HeimdallSightView {
     // ---- setup and the client's life ----
 
     /** The glow source and the drawers of Heimdall's effects (the mod bus: the client's setup). */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    @Subscriber(side = Side.CLIENT)
     public static final class Setup {
-        @SubscribeEvent
+        @Subscribe
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
                 EntityGlow.register(HeimdallSightView::reveals, HeimdallSightView::color);
@@ -170,9 +169,10 @@ public final class HeimdallSightView {
             });
         }
 
-        @SubscribeEvent
-        public static void onRegisterGui(RegisterGuiLayersEvent event) {
-            event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("heimdall_sight"), HeimdallSightView::drawHud);
+        /** The sight's HUD layer (port P0: through the platform's client registrar, see ClientSetup). */
+        public static void register(ClientRegistrar registrar) {
+            registrar.guiLayer(Enhanced.id("heimdall_sight"), ClientRegistrar.HudAnchor.ABOVE,
+                    ClientRegistrar.VanillaHud.CAMERA_OVERLAYS, HeimdallSightView::drawHud);
         }
 
         private Setup() {
@@ -198,21 +198,21 @@ public final class HeimdallSightView {
         zoomTarget = ZOOM_MIN;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         clear();
     }
 
     // ---- Far Sight ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onComputeFov(ComputeFovModifierEvent event) {
         if (zoom > 1.001F && event.getPlayer() == Minecraft.getInstance().player) {
             event.setNewFovModifier(event.getNewFovModifier() / zoom);
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onScroll(InputEvent.MouseScrollingEvent event) {
         if (farSight() && Minecraft.getInstance().screen == null) {
             zoomTarget = Mth.clamp(zoomTarget + (float) Math.signum(event.getScrollDeltaY()) * ZOOM_STEP, ZOOM_MIN, ZOOM_MAX);
@@ -222,7 +222,7 @@ public final class HeimdallSightView {
 
     // ---- the marks in the world ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !active()) {
             return;

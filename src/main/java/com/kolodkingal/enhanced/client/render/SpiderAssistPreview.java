@@ -1,19 +1,18 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SwingAssist;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.SpiderMotion;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -23,7 +22,7 @@ import org.joml.Matrix4f;
  * anchor to the next near it, fades out and back in where the next is far, and is drawn between ticks where it really
  * is (nothing snaps or blinks). See {@link SpiderMotion#preview}.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SpiderAssistPreview {
     private static final int WHITE = 0xFFFFFF;
     private static final int SILVER = 0xDDE8F2;
@@ -42,7 +41,7 @@ public final class SpiderAssistPreview {
     private static float alphaOld;
     private static boolean sky;
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
@@ -78,7 +77,7 @@ public final class SpiderAssistPreview {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || at == null || (alpha <= 0.01F && alphaOld <= 0.01F)) {
             return;

@@ -52,7 +52,7 @@ public class TesseractCradleRenderer implements BlockEntityRenderer<TesseractCra
         pose.popPose();
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public AABB getRenderBoundingBox(TesseractCradleBlockEntity be) {
         return new AABB(be.getBlockPos()).expandTowards(0, 2, 0);
     }

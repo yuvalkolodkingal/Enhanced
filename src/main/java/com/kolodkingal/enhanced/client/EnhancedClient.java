@@ -16,8 +16,8 @@ import net.neoforged.fml.common.Mod;
 @Mod(value = Enhanced.MODID, dist = Dist.CLIENT)
 public final class EnhancedClient {
     public EnhancedClient(ModContainer container, IEventBus modBus) {
-        // Port P0: the platform's client registrar, for the client's registrations made while the mod is set up.
-        NeoClientRegistrar.install(container, modBus);
+        // Port P0: the platform's client registrar, and every client registration of the mod through it.
+        ClientSetup.register(NeoClientRegistrar.install(container, modBus));
         // Port P0 L7: the mod's own settings screen (NeoForge's Mods list opens it).
         ClientRegistrar.get().configScreen(ConfigScreen::new);
     }

@@ -1,7 +1,12 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -17,12 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -41,7 +40,7 @@ import static com.kolodkingal.enhanced.client.render.EnergyGeometry.argb;
  * player who comes into view later) and {@code ARENA_OFF} when it ends; everything here follows from those and from the
  * camera. With <em>Reduced motion</em> there is no tint, no fog, no tremor and the wall is a plain one that does not scroll.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ArenaFx {
     /** How far from the wall the amber air is seen: the arena's radius and this much more. */
     private static final double TINT_REACH = ApocalypseFxMath.TINT_REACH;
@@ -172,7 +171,7 @@ public final class ArenaFx {
     // ---------------------------------------------------------------------------------------------------------
     // Every tick
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -239,7 +238,7 @@ public final class ArenaFx {
     // The air
 
     /** The fog turns the amber of the haze of Cairo; in a storm it is the colour of the sand. */
-    @SubscribeEvent
+    @Subscribe
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         float k = fade * 0.8F;
         Minecraft mc = Minecraft.getInstance();
@@ -255,7 +254,7 @@ public final class ArenaFx {
     }
 
     /** Inside the circle the fog closes in to 40 blocks; inside a storm it blots the sight out to a few. */
-    @SubscribeEvent
+    @Subscribe
     public static void onFog(ViewportEvent.RenderFog event) {
         if (event.getType() != FogType.NONE || event.getMode() != FogRenderer.FogMode.FOG_TERRAIN || EnhancedClientConfig.reducedMotion()) {
             return;
@@ -277,7 +276,7 @@ public final class ArenaFx {
     }
 
     /** The camera trembles while the ground shakes (not with reduced motion). */
-    @SubscribeEvent
+    @Subscribe
     public static void onCamera(ViewportEvent.ComputeCameraAngles event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || shakeStrength <= 0.01F || EnhancedClientConfig.reducedMotion()) {
@@ -297,7 +296,7 @@ public final class ArenaFx {
     // ---------------------------------------------------------------------------------------------------------
     // The wall and the column
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;

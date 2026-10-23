@@ -1,8 +1,11 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.ThanosClientView;
 import com.kolodkingal.enhanced.client.render.ThanosFx;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.thanos.StoneKind;
@@ -18,10 +21,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 
 /**
  * The air round the Mad Titan (DESIGN section 15.14.3 and 15.14.2): within 64 blocks of a living Thanos the fog turns
@@ -32,7 +31,7 @@ import net.neoforged.neoforge.client.event.ViewportEvent;
  * orange sky over a still water with a gateway far ahead. The client options {@code bossAtmosphere} and reduced motion
  * are honoured.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ThanosAtmosphere {
     /** The colour the fog turns. */
     private static final int FOG = 0x2A1A40;
@@ -125,7 +124,7 @@ public final class ThanosAtmosphere {
                 || used.is(ModItems.LOKIS_SCEPTER.get()) && other.is(ModItems.TESSERACT.get());
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         if (fog <= 0.001F) {
             return;
@@ -137,7 +136,7 @@ public final class ThanosAtmosphere {
     }
 
     /** A landing and a blow near by shake the camera a little (not with reduced motion). */
-    @SubscribeEvent
+    @Subscribe
     public static void onCamera(ViewportEvent.ComputeCameraAngles event) {
         float shake = ThanosFx.shake();
         if (shake <= 0.01F || EnhancedClientConfig.reducedMotion()) {

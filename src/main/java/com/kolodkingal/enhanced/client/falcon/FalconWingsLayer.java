@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced.client.falcon;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.FalconActing;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderHandEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -22,11 +26,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
 
 /**
  * Falcon's Exo-Wings on the wearer's back (3.8, PLAN 8.2): the pack and its nozzles, and the two wings in the pose of
@@ -36,7 +35,7 @@ import net.neoforged.neoforge.client.event.RenderHandEvent;
  * Falcon's rows. In first person, the spread wings' top feathers rise from low in his view out to its edges ({@link
  * #onRenderHand}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     /** The sweep (degrees, forward negative) of the wings as his own eyes see them. */
     static final float FIRST_PERSON_SWEEP = -30.0F;
@@ -106,7 +105,7 @@ public class FalconWingsLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
      * out to its edges, while he flies or glides (drawn once a frame, with the main hand, so not with the hands hidden;
      * before {@code FirstPersonArms}, which takes the hands over and cancels the event).
      */
-    @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
+    @Subscribe(priority = Priority.HIGH, receiveCanceled = true)
     public static void onRenderHand(RenderHandEvent event) {
         FalconWingsModel model = firstPersonModel;
         Minecraft mc = Minecraft.getInstance();

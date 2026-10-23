@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.CerebroPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Power;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
@@ -12,11 +16,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.List;
@@ -27,7 +26,7 @@ import java.util.List;
  * in its direction so a mind a thousand blocks off still has its marker on screen; {@link XavierOverlay} draws the blue
  * of Cerebro over the screen and the list. A marker moves smoothly from one report to the next (once a second).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class CerebroView {
     /** The furthest a marker is drawn (blocks); a mind further off is drawn this far away in its direction. */
     static final double MARKER_DISTANCE = 40.0;
@@ -103,7 +102,7 @@ public final class CerebroView {
         return len <= MARKER_DISTANCE ? at : eye.add(d.scale(MARKER_DISTANCE / len));
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         // 3.7: inside the lab's sphere the amplified Cerebro draws its stars instead (lane L5's CerebroSphere).
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !active()
@@ -150,7 +149,7 @@ public final class CerebroView {
         buffers.endBatch();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         minds = List.of();
         before = List.of();

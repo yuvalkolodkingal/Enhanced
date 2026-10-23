@@ -1,9 +1,9 @@
 package com.kolodkingal.enhanced.client;
 
+import com.kolodkingal.enhanced.platform.client.KeyContext;
+import com.kolodkingal.enhanced.platform.client.Keys;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.neoforged.neoforge.client.settings.IKeyConflictContext;
-import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -22,24 +22,24 @@ public final class KeyBindings {
             create(5, GLFW.GLFW_KEY_N),
     };
 
-    public static final KeyMapping CHANGE_LOOK = new KeyMapping("key.enhanced.change_look", KeyConflictContext.IN_GAME,
+    public static final KeyMapping CHANGE_LOOK = Keys.newKey("key.enhanced.change_look", KeyContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
 
-    public static final KeyMapping VISION_COMMAND = new KeyMapping("key.enhanced.vision_command", KeyConflictContext.IN_GAME,
+    public static final KeyMapping VISION_COMMAND = Keys.newKey("key.enhanced.vision_command", KeyContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY);
 
     /**
      * 3.6: in game, like {@code IN_GAME}, but in conflict with no other context (see {@link #STONE_WHEEL}). Declared
      * before it: a static field is set in the order of the class, and the wheel's mapping needs its context.
      */
-    public static final IKeyConflictContext STONES = new IKeyConflictContext() {
+    public static final KeyContext STONES = new KeyContext() {
         @Override
         public boolean isActive() {
-            return KeyConflictContext.IN_GAME.isActive();
+            return KeyContext.IN_GAME.isActive();
         }
 
         @Override
-        public boolean conflicts(IKeyConflictContext other) {
+        public boolean conflicts(KeyContext other) {
             return other == this;
         }
     };
@@ -50,11 +50,12 @@ public final class KeyBindings {
      * #STONES}, conflicts with nothing, so both mappings hear the key and each acts only for its own player (a Gauntlet
      * in the hand, Spider-Man's swing).
      */
-    public static final KeyMapping STONE_WHEEL = new KeyMapping("key.enhanced.stone_wheel", KeyBindings.STONES,
+    public static final KeyMapping STONE_WHEEL = Keys.newKey("key.enhanced.stone_wheel", KeyBindings.STONES,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
 
     private static KeyMapping create(int ability, int key) {
-        return new KeyMapping("key.enhanced.ability_" + ability, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, key, CATEGORY);
+        return Keys.newKey("key.enhanced.ability_" + ability, KeyContext.IN_GAME, InputConstants.Type.KEYSYM, key,
+                CATEGORY);
     }
 
     /** The key for ability 1-5. */

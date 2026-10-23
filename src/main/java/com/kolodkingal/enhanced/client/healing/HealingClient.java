@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client.healing;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.GestureId;
 import com.kolodkingal.enhanced.client.render.HeroAnimState;
@@ -9,6 +8,12 @@ import com.kolodkingal.enhanced.healing.Downed;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.HealingFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderHandEvent;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import net.minecraft.client.Minecraft;
@@ -19,12 +24,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +38,7 @@ import java.util.UUID;
  * the local player while he is DOWN, the world tipped a little on its side and his hands out of sight (the HUD's part is
  * {@link HealingHud}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HealingClient {
     /** The healing factor's light, and its brighter core. */
     static final int GLINT = Downed.GLINT;
@@ -146,7 +145,7 @@ public final class HealingClient {
 
     // ---- the tick ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -215,7 +214,7 @@ public final class HealingClient {
 
     // ---- the view of the one who is DOWN ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onCamera(ViewportEvent.ComputeCameraAngles event) {
         float roll = Mth.lerp((float) event.getPartialTick(), viewRollO, viewRoll);
         if (roll != 0.0F) {
@@ -224,7 +223,7 @@ public final class HealingClient {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderHand(RenderHandEvent event) {
         LocalPlayer self = Minecraft.getInstance().player;
         if (self != null && HealingFactor.isDown(self)) {

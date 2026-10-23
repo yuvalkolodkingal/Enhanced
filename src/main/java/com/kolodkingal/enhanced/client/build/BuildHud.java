@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client.build;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.build.BillyMagic;
 import com.kolodkingal.enhanced.build.BillyRanks;
 import com.kolodkingal.enhanced.build.BuildData;
@@ -12,9 +11,15 @@ import com.kolodkingal.enhanced.build.SpellMath;
 import com.kolodkingal.enhanced.build.SpellPlanner;
 import com.kolodkingal.enhanced.build.SpellRecipe;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.client.HudLayerIds;
 import com.kolodkingal.enhanced.client.build.HudDraw.Picture;
 import com.kolodkingal.enhanced.mixin.client.GuiAccessor;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.client.HudHeights;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderGuiLayerEvent;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.Util;
@@ -30,19 +35,14 @@ import net.minecraft.client.sounds.SoundEventListener;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ import java.util.Map;
  *
  * <p>Only ever loaded on a client.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class BuildHud implements LayeredDraw.Layer {
     /** How long the done pop rises (D-B 6.3). */
     public static final int POP_TICKS = 40;
@@ -215,12 +215,12 @@ public final class BuildHud implements LayeredDraw.Layer {
     // The crosshair
 
     /** In build mode, in first person, the rune stands where vanilla's crosshair would. */
-    @SubscribeEvent
+    @Subscribe
     public static void onLayer(RenderGuiLayerEvent.Pre event) {
         Minecraft mc = Minecraft.getInstance();
-        if (VanillaGuiLayers.CROSSHAIR.equals(event.getName()) && runeShown(mc)) {
+        if (HudLayerIds.CROSSHAIR.equals(event.getName()) && runeShown(mc)) {
             event.setCanceled(true);
-        } else if (VanillaGuiLayers.OVERLAY_MESSAGE.equals(event.getName())) {
+        } else if (HudLayerIds.OVERLAY_MESSAGE.equals(event.getName())) {
             // The action bar's line (the words of a cast, an undo, a refusal) never runs under the hint strip: it stands aside.
             float shift = messageShift(mc, event.getGuiGraphics().guiWidth(), event.getGuiGraphics().guiHeight());
             if (shift != 0.0F) {
@@ -232,9 +232,9 @@ public final class BuildHud implements LayeredDraw.Layer {
     }
 
     /** The action bar's layer is drawn: puts back the shift of its line. */
-    @SubscribeEvent
+    @Subscribe
     public static void onLayerDrawn(RenderGuiLayerEvent.Post event) {
-        if (messageShifted && VanillaGuiLayers.OVERLAY_MESSAGE.equals(event.getName())) {
+        if (messageShifted && HudLayerIds.OVERLAY_MESSAGE.equals(event.getName())) {
             event.getGuiGraphics().pose().popPose();
             messageShifted = false;
         }
@@ -788,7 +788,7 @@ public final class BuildHud implements LayeredDraw.Layer {
         }
         if (left < width / 2 + 91 + 4) {
             // It would run into the hotbar: over the food bar instead.
-            bottom = Math.min(bottom, height - Math.max(22, mc.gui.rightHeight) - 3);
+            bottom = Math.min(bottom, height - Math.max(22, HudHeights.right()) - 3);
         }
         int top = bottom - h;
         stripLeft = left;
@@ -838,7 +838,7 @@ public final class BuildHud implements LayeredDraw.Layer {
         int w = pad + pw + 8 + font.width(text) + pad + 1;
         int h = pad + arrow + ph + pad;
         // Over the action bar, which stands over the hearts and the food (or 68 above the bottom).
-        int bottom = height - Math.max(68, Math.max(mc.gui.leftHeight, mc.gui.rightHeight) + 9) - 7;
+        int bottom = height - Math.max(68, Math.max(HudHeights.left(), HudHeights.right()) + 9) - 7;
         int left = width / 2 - w / 2;
         int top = bottom - h;
         if (badge != null && top < badge[1] + badge[3] && bottom > badge[1] && left < badge[0] + badge[2] && left + w > badge[0]) {

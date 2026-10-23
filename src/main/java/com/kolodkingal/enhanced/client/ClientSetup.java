@@ -5,32 +5,32 @@ import com.kolodkingal.enhanced.client.build.BuildHud;
 import com.kolodkingal.enhanced.client.build.BuildKeys;
 import com.kolodkingal.enhanced.client.music.CustomMusic;
 import com.kolodkingal.enhanced.client.particle.EnergyParticle;
-import com.kolodkingal.enhanced.client.render.GauntletLayer;
+import com.kolodkingal.enhanced.client.render.AgathaHatLayer;
 import com.kolodkingal.enhanced.client.render.ApocalypseAuraLayer;
 import com.kolodkingal.enhanced.client.render.ApocalypseModel;
 import com.kolodkingal.enhanced.client.render.ApocalypseRenderer;
 import com.kolodkingal.enhanced.client.render.ApocalypseViewer;
+import com.kolodkingal.enhanced.client.render.BeamRenderer;
+import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
+import com.kolodkingal.enhanced.client.render.BlackEyesLayer;
+import com.kolodkingal.enhanced.client.render.CyclopsBeamFx;
+import com.kolodkingal.enhanced.client.render.CyclopsVisorLayer;
+import com.kolodkingal.enhanced.client.render.GauntletLayer;
 import com.kolodkingal.enhanced.client.render.GlowingEyesLayer;
 import com.kolodkingal.enhanced.client.render.HandTrackerLayer;
 import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
-import com.kolodkingal.enhanced.client.render.BeamRenderer;
-import com.kolodkingal.enhanced.client.render.AgathaHatLayer;
-import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
-import com.kolodkingal.enhanced.client.render.BlackEyesLayer;
-import com.kolodkingal.enhanced.client.render.CyclopsBeamFx;
-import com.kolodkingal.enhanced.client.render.CyclopsVisorLayer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
 import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
 import com.kolodkingal.enhanced.client.render.PhoenixFlameLayer;
 import com.kolodkingal.enhanced.client.render.PowerAuraLayer;
-import com.kolodkingal.enhanced.client.render.SpiderLegsLayer;
-import com.kolodkingal.enhanced.client.render.SoulSight;
 import com.kolodkingal.enhanced.client.render.SandBoulderRenderer;
 import com.kolodkingal.enhanced.client.render.SandCocoonRenderer;
 import com.kolodkingal.enhanced.client.render.SandLanceRenderer;
+import com.kolodkingal.enhanced.client.render.SoulSight;
+import com.kolodkingal.enhanced.client.render.SpiderLegsLayer;
 import com.kolodkingal.enhanced.client.render.TelekineticBlockRenderer;
 import com.kolodkingal.enhanced.client.render.ThanosMeteorRenderer;
 import com.kolodkingal.enhanced.client.render.ThanosModel;
@@ -48,8 +48,15 @@ import com.kolodkingal.enhanced.client.render.UltronSentryRenderer;
 import com.kolodkingal.enhanced.client.render.UltronViewer;
 import com.kolodkingal.enhanced.client.render.VibraniumKeyModel;
 import com.kolodkingal.enhanced.client.render.VibraniumKeyRenderer;
-import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
 import com.kolodkingal.enhanced.client.render.XavierChair;
+import com.kolodkingal.enhanced.item.RubyQuartzGlassesItem;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar.HudAnchor;
+import com.kolodkingal.enhanced.platform.client.ClientRegistrar.VanillaHud;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.FMLClientSetupEvent;
 import com.kolodkingal.enhanced.registry.ModEntities;
 import com.kolodkingal.enhanced.registry.ModParticles;
 import net.minecraft.client.KeyMapping;
@@ -62,26 +69,17 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
-import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
-/** Client registration (mod bus): keys, renderers, model layers, particles, HUD. */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+import java.util.List;
+
+/** Client registration (through the platform's {@link ClientRegistrar}): keys, renderers, model layers, HUD. */
+@Subscriber(side = Side.CLIENT)
 public final class ClientSetup {
     /** A slightly inflated player model, for energy drawn just above the skin. */
     public static final ModelLayerLocation ENERGY_WIDE = new ModelLayerLocation(Enhanced.id("player_energy"), "wide");
     public static final ModelLayerLocation ENERGY_SLIM = new ModelLayerLocation(Enhanced.id("player_energy"), "slim");
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientSetup(FMLClientSetupEvent event) {
         CustomMusic.prepareFolder();
         // Who glows through walls for the local player: Billy's Noise, and the senses of the heroes of 3.0 as they add
@@ -177,273 +175,276 @@ public final class ClientSetup {
         });
     }
 
-    @SubscribeEvent
-    public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
+    static void registerKeys(ClientRegistrar registrar) {
         for (KeyMapping key : KeyBindings.ABILITIES) {
-            event.register(key);
+            registrar.keyMapping(key);
         }
-        event.register(KeyBindings.CHANGE_LOOK);
-        event.register(KeyBindings.VISION_COMMAND);
+        registrar.keyMapping(KeyBindings.CHANGE_LOOK);
+        registrar.keyMapping(KeyBindings.VISION_COMMAND);
         // 3.6: the Stone Wheel (J).
-        event.register(KeyBindings.STONE_WHEEL);
+        registrar.keyMapping(KeyBindings.STONE_WHEEL);
         // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).
         for (KeyMapping key : BuildKeys.ALL) {
-            event.register(key);
+            registrar.keyMapping(key);
         }
     }
 
-    @SubscribeEvent
-    public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.IRON_SHRAPNEL.get(), ctx -> new ThrownItemRenderer<>(ctx, 0.75F, false));
-        event.registerEntityRenderer(ModEntities.TELEKINETIC_BLOCK.get(), TelekineticBlockRenderer::new);
-        event.registerEntityRenderer(ModEntities.THROWN_WEAPON.get(), ThrownWeaponRenderer::new);
-        event.registerEntityRenderer(ModEntities.MJOLNIR_FRAGMENT.get(), MjolnirFragmentRenderer::new);
-        event.registerEntityRenderer(ModEntities.MJOLNIR_PIN.get(), MjolnirPinRenderer::new);
-        event.registerEntityRenderer(ModEntities.LOKI_DAGGER.get(), LokiDaggerRenderer::new);
-        event.registerEntityRenderer(ModEntities.LOKI_ILLUSION.get(), LokiIllusionRenderer::new);
-        event.registerEntityRenderer(ModEntities.HEX_VISION.get(), HexVisionRenderer::new);
+    static void registerRenderers(ClientRegistrar registrar) {
+        registrar.entityRenderer(ModEntities.IRON_SHRAPNEL, ctx -> new ThrownItemRenderer<>(ctx, 0.75F, false));
+        registrar.entityRenderer(ModEntities.TELEKINETIC_BLOCK, TelekineticBlockRenderer::new);
+        registrar.entityRenderer(ModEntities.THROWN_WEAPON, ThrownWeaponRenderer::new);
+        registrar.entityRenderer(ModEntities.MJOLNIR_FRAGMENT, MjolnirFragmentRenderer::new);
+        registrar.entityRenderer(ModEntities.MJOLNIR_PIN, MjolnirPinRenderer::new);
+        registrar.entityRenderer(ModEntities.LOKI_DAGGER, LokiDaggerRenderer::new);
+        registrar.entityRenderer(ModEntities.LOKI_ILLUSION, LokiIllusionRenderer::new);
+        registrar.entityRenderer(ModEntities.HEX_VISION, HexVisionRenderer::new);
 
         // The entities of 3.0, one region per hero (the // ===== lines): drawn as nothing until the lane that builds
         // them replaces its line with a renderer of its own.
         // ===== phoenix =====
         // ===== spider =====
         // ===== thanos =====
-        event.registerEntityRenderer(ModEntities.THANOS.get(), ThanosRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_SWORD.get(), ThanosSwordRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_METEOR.get(), ThanosMeteorRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_ORB.get(), ThanosOrbRenderer::new);
-        event.registerEntityRenderer(ModEntities.THANOS_PHANTOM.get(), ThanosPhantomRenderer::new);
+        registrar.entityRenderer(ModEntities.THANOS, ThanosRenderer::new);
+        registrar.entityRenderer(ModEntities.THANOS_SWORD, ThanosSwordRenderer::new);
+        registrar.entityRenderer(ModEntities.THANOS_METEOR, ThanosMeteorRenderer::new);
+        registrar.entityRenderer(ModEntities.THANOS_ORB, ThanosOrbRenderer::new);
+        registrar.entityRenderer(ModEntities.THANOS_PHANTOM, ThanosPhantomRenderer::new);
         // ===== ultron =====
-        event.registerEntityRenderer(ModEntities.ULTRON.get(), UltronRenderer::new);
-        event.registerEntityRenderer(ModEntities.ULTRON_SENTRY.get(), UltronSentryRenderer::new);
-        event.registerEntityRenderer(ModEntities.VIBRANIUM_KEY.get(), VibraniumKeyRenderer::new);
-        event.registerEntityRenderer(ModEntities.ULTRON_BOLT.get(), UltronBoltRenderer::new);
+        registrar.entityRenderer(ModEntities.ULTRON, UltronRenderer::new);
+        registrar.entityRenderer(ModEntities.ULTRON_SENTRY, UltronSentryRenderer::new);
+        registrar.entityRenderer(ModEntities.VIBRANIUM_KEY, VibraniumKeyRenderer::new);
+        registrar.entityRenderer(ModEntities.ULTRON_BOLT, UltronBoltRenderer::new);
         // ===== apocalypse =====
-        event.registerEntityRenderer(ModEntities.APOCALYPSE.get(), ApocalypseRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), SandLanceRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_BOULDER.get(), SandBoulderRenderer::new);
-        event.registerEntityRenderer(ModEntities.SAND_COCOON.get(), SandCocoonRenderer::new);
+        registrar.entityRenderer(ModEntities.APOCALYPSE, ApocalypseRenderer::new);
+        registrar.entityRenderer(ModEntities.SAND_LANCE, SandLanceRenderer::new);
+        registrar.entityRenderer(ModEntities.SAND_BOULDER, SandBoulderRenderer::new);
+        registrar.entityRenderer(ModEntities.SAND_COCOON, SandCocoonRenderer::new);
         // The renderers (and block entity renderers) of 3.5, one region per lane: the skeleton draws its entities with
         // nothing until their lanes give them renderers.
         // ===== asgard (3.5) =====
-        event.registerEntityRenderer(ModEntities.SEAT.get(), NoopRenderer::new);
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.BIFROST_MECHANISM.get(),
+        registrar.entityRenderer(ModEntities.SEAT, NoopRenderer::new);
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.BIFROST_MECHANISM,
                 com.kolodkingal.enhanced.client.asgard.BifrostMechanismRenderer::new);
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.HOFUND_SOCKET.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.HOFUND_SOCKET,
                 com.kolodkingal.enhanced.client.asgard.HofundSocketRenderer::new);
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.GUNGNIR_STAND.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.GUNGNIR_STAND,
                 com.kolodkingal.enhanced.client.asgard.GungnirStandRenderer::new);
         // ===== heimdall (3.5) =====
         // ===== odin (3.5) =====
-        event.registerEntityRenderer(ModEntities.GUNGNIR.get(),
+        registrar.entityRenderer(ModEntities.GUNGNIR,
                 com.kolodkingal.enhanced.client.render.GungnirRenderer::new);
-        event.registerEntityRenderer(ModEntities.RAVEN.get(),
+        registrar.entityRenderer(ModEntities.RAVEN,
                 com.kolodkingal.enhanced.client.render.RavenRenderer::new);
         // ===== hela (3.5) =====
-        event.registerEntityRenderer(ModEntities.HELA_SHADOW.get(), com.kolodkingal.enhanced.client.render.HelaShadowRenderer::new);
-        event.registerEntityRenderer(ModEntities.HELA.get(), com.kolodkingal.enhanced.client.render.HelaRenderer::new);
-        event.registerEntityRenderer(ModEntities.BERSERKER.get(), com.kolodkingal.enhanced.client.render.BerserkerRenderer::new);
-        event.registerEntityRenderer(ModEntities.FENRIS.get(), com.kolodkingal.enhanced.client.render.FenrisRenderer::new);
-        event.registerEntityRenderer(ModEntities.NECROSWORD.get(), com.kolodkingal.enhanced.client.render.NecroswordRenderer::new);
-        event.registerEntityRenderer(ModEntities.BLADE_SPIKE.get(), com.kolodkingal.enhanced.client.render.BladeSpikeRenderer::new);
+        registrar.entityRenderer(ModEntities.HELA_SHADOW,
+                com.kolodkingal.enhanced.client.render.HelaShadowRenderer::new);
+        registrar.entityRenderer(ModEntities.HELA, com.kolodkingal.enhanced.client.render.HelaRenderer::new);
+        registrar.entityRenderer(ModEntities.BERSERKER, com.kolodkingal.enhanced.client.render.BerserkerRenderer::new);
+        registrar.entityRenderer(ModEntities.FENRIS, com.kolodkingal.enhanced.client.render.FenrisRenderer::new);
+        registrar.entityRenderer(ModEntities.NECROSWORD,
+                com.kolodkingal.enhanced.client.render.NecroswordRenderer::new);
+        registrar.entityRenderer(ModEntities.BLADE_SPIKE,
+                com.kolodkingal.enhanced.client.render.BladeSpikeRenderer::new);
         // ===== asgardians (3.5) =====
-        event.registerEntityRenderer(ModEntities.ASGARDIAN.get(), com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
+        registrar.entityRenderer(ModEntities.ASGARDIAN, com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
         // The renderers (and block entity renderers) of 3.6, one region per lane: the skeleton draws its entities with
         // nothing (or a stand-in) until their lanes give them renderers; the blocks are plain models until then.
         // ===== stones (3.6) =====
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.STONE_PEDESTAL.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.STONE_PEDESTAL,
                 com.kolodkingal.enhanced.client.render.StonePedestalRenderer::new);
         // ===== strange (3.6) =====
-        event.registerEntityRenderer(ModEntities.SLING_PORTAL.get(),
+        registrar.entityRenderer(ModEntities.SLING_PORTAL,
                 com.kolodkingal.enhanced.client.render.SlingPortalRenderer::new);
-        event.registerEntityRenderer(ModEntities.ASTRAL_BODY.get(),
+        registrar.entityRenderer(ModEntities.ASTRAL_BODY,
                 com.kolodkingal.enhanced.client.render.AstralBodyRenderer::new);
         // ===== stone_sites (3.6) =====
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TESSERACT_CRADLE.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TESSERACT_CRADLE,
                 com.kolodkingal.enhanced.client.render.TesseractCradleRenderer::new);
         // ===== vormir (3.6) =====
-        event.registerEntityRenderer(ModEntities.STONEKEEPER.get(),
+        registrar.entityRenderer(ModEntities.STONEKEEPER,
                 com.kolodkingal.enhanced.client.vormir.StonekeeperRenderer::new);
         // ===== hulk (3.6) =====
-        event.registerEntityRenderer(ModEntities.HULK_BOULDER.get(),
+        registrar.entityRenderer(ModEntities.HULK_BOULDER,
                 com.kolodkingal.enhanced.client.hulk.HulkBoulderRenderer::new);
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.GAMMA_EMITTER.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.GAMMA_EMITTER,
                 com.kolodkingal.enhanced.client.hulk.GammaEmitterRenderer::new);
         // ===== hydra (3.6) =====
-        event.registerEntityRenderer(ModEntities.HYDRA_SOLDIER.get(),
+        registrar.entityRenderer(ModEntities.HYDRA_SOLDIER,
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
-        event.registerEntityRenderer(ModEntities.HYDRA_OFFICER.get(),
+        registrar.entityRenderer(ModEntities.HYDRA_OFFICER,
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
-        event.registerEntityRenderer(ModEntities.HYDRA_BOLT.get(),
+        registrar.entityRenderer(ModEntities.HYDRA_BOLT,
                 com.kolodkingal.enhanced.client.hydra.HydraBoltRenderer::new);
         // The renderers of 3.7, one region per lane (the skeleton's stand-ins until the lanes draw their own).
         // ===== healing (3.7) =====
         // ===== wolverine (3.7) =====
         // ===== deadpool (3.7) =====
-        event.registerEntityRenderer(ModEntities.DEADPOOL_BULLET.get(),
+        registrar.entityRenderer(ModEntities.DEADPOOL_BULLET,
                 com.kolodkingal.enhanced.client.deadpool.DeadpoolBulletRenderer::new);
-        event.registerEntityRenderer(ModEntities.DOGPOOL.get(),
+        registrar.entityRenderer(ModEntities.DOGPOOL,
                 com.kolodkingal.enhanced.client.deadpool.DogpoolRenderer::new);
         // ===== school_lab (3.7) =====
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.ADAMANTIUM_RACK.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.ADAMANTIUM_RACK,
                 com.kolodkingal.enhanced.client.school.LabRenderers.Rack::new);
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.WEAPON_X_POD.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.WEAPON_X_POD,
                 com.kolodkingal.enhanced.client.school.LabRenderers.Pod::new);
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.CEREBRO_CONSOLE.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.CEREBRO_CONSOLE,
                 com.kolodkingal.enhanced.client.school.LabRenderers.Console::new);
         // ===== finders (3.7) =====
         // ===== cottage (3.7) =====
-        event.registerEntityRenderer(ModEntities.COTTAGE_RESIDENT.get(),
+        registrar.entityRenderer(ModEntities.COTTAGE_RESIDENT,
                 com.kolodkingal.enhanced.client.asgard.AsgardianRenderer::new);
         // The renderers of 3.8, one region per lane (the skeleton's stand-ins: nothing, or a box's outline, until the
         // lanes draw their own).
         // ===== captain (3.8) =====
-        event.registerEntityRenderer(ModEntities.THROWN_SHIELD.get(),
+        registrar.entityRenderer(ModEntities.THROWN_SHIELD,
                 com.kolodkingal.enhanced.client.captain.ThrownShieldRenderer::new);
         // ===== iron_man (3.8) =====
-        event.registerEntityRenderer(ModEntities.IRON_MISSILE.get(),
+        registrar.entityRenderer(ModEntities.IRON_MISSILE,
                 com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
         // ===== nanotech (3.8) =====
-        event.registerEntityRenderer(ModEntities.NANO_DRONE.get(),
+        registrar.entityRenderer(ModEntities.NANO_DRONE,
                 com.kolodkingal.enhanced.client.ironman.nano.NanoDroneRenderer::new);
         // (The Hulkbuster's frame: lane L7's renderer, in the suit_art region.)
         // ===== suit_art (3.8) =====
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.SUIT_DISPLAY.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.SUIT_DISPLAY,
                 com.kolodkingal.enhanced.client.ironman.suits.SuitDisplayRenderer::new);
-        event.registerEntityRenderer(ModEntities.HULKBUSTER_FRAME.get(),
+        registrar.entityRenderer(ModEntities.HULKBUSTER_FRAME,
                 com.kolodkingal.enhanced.client.ironman.suits.HulkbusterFrameRenderer::new);
         // ===== falcon (3.8) =====
         // (The Wrist Rocket is one of Iron Man's missiles, of the kind FALCON: lane L3's renderer draws it.)
-        event.registerEntityRenderer(ModEntities.FALCON_ROCKET.get(),
+        registrar.entityRenderer(ModEntities.FALCON_ROCKET,
                 com.kolodkingal.enhanced.client.ironman.IronMissileRenderer::new);
-        event.registerEntityRenderer(ModEntities.FALCON_DART.get(),
+        registrar.entityRenderer(ModEntities.FALCON_DART,
                 com.kolodkingal.enhanced.client.falcon.FalconDartRenderer::new);
-        event.registerEntityRenderer(ModEntities.REDWING.get(),
+        registrar.entityRenderer(ModEntities.REDWING,
                 com.kolodkingal.enhanced.client.falcon.RedwingRenderer::new);
         // ===== tower (3.8) =====
         // (the suit display: lane L7's SuitDisplayRenderer, in the suit_art region)
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TECH_CASE.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TECH_CASE,
                 com.kolodkingal.enhanced.client.tower.TechCaseRenderer::new);
         // ===== eternity (3.8) =====
-        event.registerEntityRenderer(ModEntities.ETERNITY.get(),
+        registrar.entityRenderer(ModEntities.ETERNITY,
                 com.kolodkingal.enhanced.client.eternity.EternityRenderer::new);
-        event.registerBlockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.ETERNITY_ALTAR.get(),
+        registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.ETERNITY_ALTAR,
                 com.kolodkingal.enhanced.client.eternity.AltarRenderer::new);
         // ===== love (3.8) =====
     }
 
     /** 3.5: the sky of Asgard (the dimension type names the effects {@code enhanced:asgard}). */
-    @SubscribeEvent
-    public static void onRegisterDimensionEffects(RegisterDimensionSpecialEffectsEvent event) {
-        event.register(Enhanced.id("asgard"), new com.kolodkingal.enhanced.client.asgard.AsgardSkyEffects());
+    static void registerDimensionEffects(ClientRegistrar registrar) {
+        registrar.dimensionEffects(Enhanced.id("asgard"),
+                new com.kolodkingal.enhanced.client.asgard.AsgardSkyEffects());
         // ===== eternity (3.8) =====
-        event.register(Enhanced.id("eternity"), new com.kolodkingal.enhanced.client.eternity.EternitySkyEffects());
+        registrar.dimensionEffects(Enhanced.id("eternity"),
+                new com.kolodkingal.enhanced.client.eternity.EternitySkyEffects());
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */
-    @SubscribeEvent
-    public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener((ResourceManagerReloadListener) resourceManager -> FrostGiantSkins.clear());
+    static void registerReloadListeners(ClientRegistrar registrar) {
+        registrar.reloadListener((ResourceManagerReloadListener) resourceManager -> FrostGiantSkins.clear());
     }
 
-    @SubscribeEvent
-    public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(ENERGY_WIDE, () -> LayerDefinition.create(PlayerModel.createMesh(new CubeDeformation(0.3F), false), 64, 64));
-        event.registerLayerDefinition(ENERGY_SLIM, () -> LayerDefinition.create(PlayerModel.createMesh(new CubeDeformation(0.3F), true), 64, 64));
+    static void registerLayerDefinitions(ClientRegistrar registrar) {
+        registrar.layerDefinition(ENERGY_WIDE,
+                () -> LayerDefinition.create(PlayerModel.createMesh(new CubeDeformation(0.3F), false), 64, 64));
+        registrar.layerDefinition(ENERGY_SLIM,
+                () -> LayerDefinition.create(PlayerModel.createMesh(new CubeDeformation(0.3F), true), 64, 64));
         // The model layers of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
         // ===== spider =====
         // ===== thanos =====
-        event.registerLayerDefinition(ThanosModel.LAYER, ThanosModel::createBodyLayer);
-        event.registerLayerDefinition(ThanosSwordModel.LAYER, ThanosSwordModel::createBodyLayer);
-        event.registerLayerDefinition(GauntletLayer.LAYER, GauntletLayer::createLayer);
+        registrar.layerDefinition(ThanosModel.LAYER, ThanosModel::createBodyLayer);
+        registrar.layerDefinition(ThanosSwordModel.LAYER, ThanosSwordModel::createBodyLayer);
+        registrar.layerDefinition(GauntletLayer.LAYER, GauntletLayer::createLayer);
         // ===== ultron =====
-        event.registerLayerDefinition(UltronModel.LAYER, UltronModel::createBodyLayer);
-        event.registerLayerDefinition(VibraniumKeyModel.LAYER, VibraniumKeyModel::createBodyLayer);
+        registrar.layerDefinition(UltronModel.LAYER, UltronModel::createBodyLayer);
+        registrar.layerDefinition(VibraniumKeyModel.LAYER, VibraniumKeyModel::createBodyLayer);
         // ===== apocalypse =====
-        event.registerLayerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
-        event.registerLayerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);
+        registrar.layerDefinition(ApocalypseModel.LAYER, ApocalypseModel::createBodyLayer);
+        registrar.layerDefinition(SandCocoonRenderer.LAYER, SandCocoonRenderer::createBodyLayer);
         // ===== cyclops (3.3) =====
-        event.registerLayerDefinition(CyclopsVisorLayer.LAYER, CyclopsVisorLayer::createLayer);
+        registrar.layerDefinition(CyclopsVisorLayer.LAYER, CyclopsVisorLayer::createLayer);
         // ===== professor_x (3.3) =====
-        event.registerLayerDefinition(XavierChair.LAYER, XavierChair::createChairLayer);
-        event.registerLayerDefinition(XavierChair.HELMET_LAYER, XavierChair::createHelmetLayer);
+        registrar.layerDefinition(XavierChair.LAYER, XavierChair::createChairLayer);
+        registrar.layerDefinition(XavierChair.HELMET_LAYER, XavierChair::createHelmetLayer);
         // ===== agatha (3.3) =====
-        event.registerLayerDefinition(AgathaHatLayer.LAYER, AgathaHatLayer::createLayer);
+        registrar.layerDefinition(AgathaHatLayer.LAYER, AgathaHatLayer::createLayer);
         // ===== asgard (3.5) =====
         // ===== heimdall (3.5) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER,
                 com.kolodkingal.enhanced.client.render.HeimdallHelmLayer::createLayer);
         // ===== odin (3.5) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER,
                 com.kolodkingal.enhanced.client.render.OdinHelmLayer::createLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.RavenModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.RavenModel.LAYER,
                 com.kolodkingal.enhanced.client.render.RavenModel::createBodyLayer);
         // ===== hela (3.5) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.LAYER, com.kolodkingal.enhanced.client.render.HelaModel::createBodyLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.CLOAK,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.LAYER,
+                com.kolodkingal.enhanced.client.render.HelaModel::createBodyLayer);
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.HelaModel.CLOAK,
                 com.kolodkingal.enhanced.client.render.HelaModel::createCloakLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER,
                 com.kolodkingal.enhanced.client.render.HelaHeaddressLayer::createLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER,
                 com.kolodkingal.enhanced.client.render.NecroswordModel::createBodyLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.BerserkerModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.BerserkerModel.LAYER,
                 com.kolodkingal.enhanced.client.render.BerserkerModel::createBodyLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.render.FenrisModel.LAYER, com.kolodkingal.enhanced.client.render.FenrisModel::createBodyLayer);
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.render.FenrisModel.LAYER,
+                com.kolodkingal.enhanced.client.render.FenrisModel::createBodyLayer);
         // ===== asgardians (3.5) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel.LAYER,
                 com.kolodkingal.enhanced.client.asgard.AsgardianHelmetModel::createLayer);
         // ===== stones (3.6) =====
         // ===== strange (3.6) =====
         // ===== vormir (3.6) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.vormir.StonekeeperModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.vormir.StonekeeperModel.LAYER,
                 com.kolodkingal.enhanced.client.vormir.StonekeeperModel::createBodyLayer);
         // ===== hulk (3.6) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.hulk.HulkModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.hulk.HulkModel.LAYER,
                 () -> com.kolodkingal.enhanced.client.hulk.HulkModel.createLayer(0.0F));
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.hulk.HulkModel.ENERGY,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.hulk.HulkModel.ENERGY,
                 () -> com.kolodkingal.enhanced.client.hulk.HulkModel.createLayer(0.35F));
         // ===== hydra (3.6) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.hydra.HydraGearModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.hydra.HydraGearModel.LAYER,
                 com.kolodkingal.enhanced.client.hydra.HydraGearModel::createLayer);
         // ===== healing (3.7) =====
         // ===== wolverine (3.7) =====
         // ===== deadpool (3.7) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.deadpool.KatanaModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.deadpool.KatanaModel.LAYER,
                 com.kolodkingal.enhanced.client.deadpool.KatanaModel::createLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.deadpool.PistolModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.deadpool.PistolModel.LAYER,
                 com.kolodkingal.enhanced.client.deadpool.PistolModel::createLayer);
         // ===== school_lab (3.7) =====
         // ===== finders (3.7) =====
         // ===== cottage (3.7) =====
         // ===== captain (3.8) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.captain.ShieldModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.captain.ShieldModel.LAYER,
                 com.kolodkingal.enhanced.client.captain.ShieldModel::createLayer);
         // ===== red_hulk (3.8) =====
         // ===== iron_man (3.8) =====
         // ===== nanotech (3.8) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.ironman.nano.NanoDroneModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.ironman.nano.NanoDroneModel.LAYER,
                 com.kolodkingal.enhanced.client.ironman.nano.NanoDroneModel::createLayer);
         // ===== suit_art (3.8) =====
-        com.kolodkingal.enhanced.client.ironman.suits.SuitArt.registerLayers(event);
+        com.kolodkingal.enhanced.client.ironman.suits.SuitArt.registerLayers(registrar);
         // ===== falcon (3.8) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER,
                 com.kolodkingal.enhanced.client.falcon.FalconWingsModel::createLayer);
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.falcon.RedwingModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.falcon.RedwingModel.LAYER,
                 com.kolodkingal.enhanced.client.falcon.RedwingModel::createLayer);
         // ===== eternity (3.8) =====
-        event.registerLayerDefinition(com.kolodkingal.enhanced.client.eternity.EternityModel.LAYER,
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.eternity.EternityModel.LAYER,
                 com.kolodkingal.enhanced.client.eternity.EternityModel::createLayer);
         // ===== love (3.8) =====
     }
 
-    @SubscribeEvent
-    public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
-        for (PlayerSkin.Model skin : event.getSkins()) {
-            if (event.getSkin(skin) instanceof PlayerRenderer renderer) {
+    static void addLayers(ClientRegistrar.LayerContext layers) {
+        for (PlayerSkin.Model skin : layers.skins()) {
+            if (layers.playerRenderer(skin) instanceof PlayerRenderer renderer) {
                 boolean slim = skin == PlayerSkin.Model.SLIM;
                 PlayerModel<net.minecraft.client.player.AbstractClientPlayer> energy =
-                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim);
+                        new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim);
                 renderer.addLayer(new PowerAuraLayer(renderer, energy));
                 renderer.addLayer(new GlowingEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
@@ -451,33 +452,33 @@ public final class ClientSetup {
                 // The layers of 3.0, one region per hero (the // ===== lines), before the last one.
                 // ===== phoenix =====
                 renderer.addLayer(new PhoenixFlameLayer(renderer,
-                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
+                        new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
                 // ===== spider =====
                 renderer.addLayer(new SpiderLegsLayer(renderer));
                 renderer.addLayer(new BlackEyesLayer(renderer));
                 // ===== thanos =====
-                renderer.addLayer(new GauntletLayer(renderer, event.getContext().bakeLayer(GauntletLayer.LAYER)));
+                renderer.addLayer(new GauntletLayer(renderer, layers.context().bakeLayer(GauntletLayer.LAYER)));
                 // ===== ultron =====
                 // ===== apocalypse =====
                 renderer.addLayer(new ApocalypseAuraLayer(renderer, energy));
                 // ===== cyclops (3.3) =====
-                renderer.addLayer(new CyclopsVisorLayer(renderer, event.getContext().bakeLayer(CyclopsVisorLayer.LAYER)));
+                renderer.addLayer(new CyclopsVisorLayer(renderer, layers.context().bakeLayer(CyclopsVisorLayer.LAYER)));
                 // ===== professor_x (3.3) =====
-                renderer.addLayer(new XavierChair(renderer, event.getContext().bakeLayer(XavierChair.LAYER),
-                        event.getContext().bakeLayer(XavierChair.HELMET_LAYER)));
+                renderer.addLayer(new XavierChair(renderer, layers.context().bakeLayer(XavierChair.LAYER),
+                        layers.context().bakeLayer(XavierChair.HELMET_LAYER)));
                 // ===== agatha (3.3) =====
-                renderer.addLayer(new AgathaHatLayer(renderer, event.getContext().bakeLayer(AgathaHatLayer.LAYER)));
+                renderer.addLayer(new AgathaHatLayer(renderer, layers.context().bakeLayer(AgathaHatLayer.LAYER)));
                 // ===== heimdall (3.5) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.HeimdallHelmLayer(renderer,
-                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER)));
+                        layers.context().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER)));
                 // ===== odin (3.5) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.OdinHelmLayer(renderer,
-                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER)));
+                        layers.context().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER)));
                 // ===== hela (3.5) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.HelaHeaddressLayer(renderer,
-                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER)));
+                        layers.context().bakeLayer(com.kolodkingal.enhanced.client.render.HelaHeaddressLayer.LAYER)));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.HelaBladesLayer(renderer, new com.kolodkingal.enhanced.client.render.NecroswordModel(
-                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER))));
+                        layers.context().bakeLayer(com.kolodkingal.enhanced.client.render.NecroswordModel.LAYER))));
                 // ===== stones (3.6) =====
                 // ===== strange (3.6) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.CloakLayer(renderer));
@@ -491,16 +492,16 @@ public final class ClientSetup {
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.WolverineCowlLayer(renderer));
                 // ===== deadpool (3.7) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.DeadpoolGearLayer(renderer,
-                        new com.kolodkingal.enhanced.client.deadpool.KatanaModel(event.getContext().bakeLayer(
+                        new com.kolodkingal.enhanced.client.deadpool.KatanaModel(layers.context().bakeLayer(
                                 com.kolodkingal.enhanced.client.deadpool.KatanaModel.LAYER)),
-                        new com.kolodkingal.enhanced.client.deadpool.PistolModel(event.getContext().bakeLayer(
+                        new com.kolodkingal.enhanced.client.deadpool.PistolModel(layers.context().bakeLayer(
                                 com.kolodkingal.enhanced.client.deadpool.PistolModel.LAYER))));
                 // ===== captain (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.captain.CapShieldLayer(renderer));
                 // ===== red_hulk (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.HeatLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.redhulk.RossSuitLayer(renderer,
-                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
+                        new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
                 // ===== iron_man (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.SuitLayer(renderer));
                 // ===== nanotech (3.8) =====
@@ -508,21 +509,22 @@ public final class ClientSetup {
                 if (!slim) {
                     // The Hulkbuster's renderer swap (one renderer: the suit covers the arms of both skins).
                     com.kolodkingal.enhanced.client.ironman.HulkbusterRenderer.set(
-                            new com.kolodkingal.enhanced.client.ironman.HulkbusterRenderer(event.getContext()));
+                            new com.kolodkingal.enhanced.client.ironman.HulkbusterRenderer(layers.context()));
                 }
                 // ===== suit_art (3.8) =====
-                com.kolodkingal.enhanced.client.ironman.suits.SuitArt.bake(event.getEntityModels());
+                com.kolodkingal.enhanced.client.ironman.suits.SuitArt.bake(layers.context().getModelSet());
                 renderer.addLayer(new com.kolodkingal.enhanced.client.ironman.suits.SuitExtrasLayer(renderer));
                 // ===== falcon (3.8) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.falcon.FalconWingsLayer(renderer,
-                        event.getContext().bakeLayer(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER)));
+                        layers.context().bakeLayer(com.kolodkingal.enhanced.client.falcon.FalconWingsModel.LAYER)));
                 // ===== love (3.8) =====
                 // ===== custom hero (3.4): the layers of his look =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.custom.CustomLooksLayer(renderer,
-                        new PlayerModel<>(event.getContext().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
-                        event.getContext().bakeLayer(AgathaHatLayer.LAYER), event.getContext().bakeLayer(XavierChair.HELMET_LAYER),
-                        event.getContext().bakeLayer(CyclopsVisorLayer.LAYER),
-                        new net.minecraft.client.model.HumanoidModel<>(event.getContext().bakeLayer(
+                        new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim),
+                        layers.context().bakeLayer(AgathaHatLayer.LAYER),
+                                layers.context().bakeLayer(XavierChair.HELMET_LAYER),
+                        layers.context().bakeLayer(CyclopsVisorLayer.LAYER),
+                        new net.minecraft.client.model.HumanoidModel<>(layers.context().bakeLayer(
                                 net.minecraft.client.model.geom.ModelLayers.PLAYER_OUTER_ARMOR))));
                 // The last layer: it records where the hands, feet and weapon are, after everything else is drawn.
                 renderer.addLayer(new HandTrackerLayer(renderer));
@@ -530,17 +532,17 @@ public final class ClientSetup {
         }
         // ===== hulk (3.6): the Hulk's own body, a renderer of its own with the layers that fit him =====
         com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer hulk =
-                new com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer(event.getContext());
-        com.kolodkingal.enhanced.client.hulk.HulkLayers.addTo(hulk, event.getContext());
+                new com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer(layers.context());
+        com.kolodkingal.enhanced.client.hulk.HulkLayers.addTo(hulk, layers.context());
         // ===== red_hulk (3.8): Red Hulk is drawn on the Hulk's body; his heat glows on it =====
         hulk.addLayer(new com.kolodkingal.enhanced.client.redhulk.HeatLayer(hulk));
         com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer.set(hulk);
         // ===== asgardians (3.5): the Heimdall and Odin NPCs wear the heroes' helms =====
         npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.HEIMDALL,
-                event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER),
+                layers.context().bakeLayer(com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.LAYER),
                 com.kolodkingal.enhanced.client.render.HeimdallHelmLayer.TEXTURE);
         npcHelm(com.kolodkingal.enhanced.asgard.npc.Role.ODIN,
-                event.getContext().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER),
+                layers.context().bakeLayer(com.kolodkingal.enhanced.client.render.OdinHelmLayer.LAYER),
                 com.kolodkingal.enhanced.client.render.OdinHelmLayer.TEXTURE);
         // 3.7.2: the Rio of Death's screen wears Death's crown of branches over her hood
         com.kolodkingal.enhanced.client.asgard.AsgardianRenderer.registerHeadgear(
@@ -557,81 +559,88 @@ public final class ClientSetup {
                         net.minecraft.client.renderer.entity.LivingEntityRenderer.getOverlayCoords(npc, 0.0F)));
     }
 
-    @SubscribeEvent
-    public static void onRegisterParticles(RegisterParticleProvidersEvent event) {
-        event.registerSpriteSet(ModParticles.ENERGY.get(), EnergyParticle.Provider::new);
+    static void registerParticles(ClientRegistrar registrar) {
+        registrar.particleSprites(ModParticles.ENERGY, EnergyParticle.Provider::new);
     }
 
-    @SubscribeEvent
-    public static void onRegisterGui(RegisterGuiLayersEvent event) {
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("powers"), new PowerHud());
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("slow_motion"), new SlowMotionOverlay());
+    static void registerGui(ClientRegistrar registrar) {
+        registrar.guiLayer(Enhanced.id("powers"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY, new PowerHud());
+        registrar.guiLayer(Enhanced.id("slow_motion"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new SlowMotionOverlay());
         // 3.3: the speed lines of a speedster running on a wall or a ceiling.
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("speed_lines"), new SpeedSurfaceFx.SpeedLines());
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("anim_state"), new AnimStateOverlay());
+        registrar.guiLayer(Enhanced.id("speed_lines"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new SpeedSurfaceFx.SpeedLines());
+        registrar.guiLayer(Enhanced.id("anim_state"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
+                new AnimStateOverlay());
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("mind_read"), new MindReadingOverlay());
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("phoenix_light"), new PhoenixOverlay());
+        registrar.guiLayer(Enhanced.id("mind_read"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
+                new MindReadingOverlay());
+        registrar.guiLayer(Enhanced.id("phoenix_light"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new PhoenixOverlay());
         // ===== spider =====
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("spider_sense"), new SpiderSenseOverlay());
+        registrar.guiLayer(Enhanced.id("spider_sense"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new SpiderSenseOverlay());
         // ===== thanos =====
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("thanos_atmosphere"), new ThanosAtmosphere.Overlay());
+        registrar.guiLayer(Enhanced.id("thanos_atmosphere"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new ThanosAtmosphere.Overlay());
         // ===== ultron =====
         // ===== apocalypse =====
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("apocalypse"), new ApocalypseOverlay());
+        registrar.guiLayer(Enhanced.id("apocalypse"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new ApocalypseOverlay());
         // ===== professor_x (3.3) =====
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("xavier"), new XavierOverlay());
+        registrar.guiLayer(Enhanced.id("xavier"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS, new XavierOverlay());
         // 3.1: Build Magic's badge, rings, hint strip and tips.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("build_magic"), new BuildHud());
+        registrar.guiLayer(Enhanced.id("build_magic"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY, new BuildHud());
         // 3.2: the Darkhold's hint panel while it is held.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("darkhold"), new DarkholdHud());
+        registrar.guiLayer(Enhanced.id("darkhold"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY, new DarkholdHud());
         // 3.3: a custom hero's panel, in his colours.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("custom_hero"), new com.kolodkingal.enhanced.client.custom.CustomHeroHud());
+        registrar.guiLayer(Enhanced.id("custom_hero"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
+                new com.kolodkingal.enhanced.client.custom.CustomHeroHud());
         // 3.3, lane PROT: the Hex Barrier's health bar and the Hex Runes' line.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("protect"), new ProtectHud());
+        registrar.guiLayer(Enhanced.id("protect"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY, new ProtectHud());
         // ===== stones (3.6) =====
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("stones"), new StoneHud());
+        registrar.guiLayer(Enhanced.id("stones"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY, new StoneHud());
         // 3.6, lane L7: the Hulk's rage bar, Banner's heart rate, the gamma flash.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("hulk"),
+        registrar.guiLayer(Enhanced.id("hulk"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new com.kolodkingal.enhanced.client.hulk.HulkHud());
         // ===== healing (3.7) =====
         // 3.7, lane L1: the healing factor's line under the powers' panel; DOWN, the dark edges and the countdown.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("healing"),
+        registrar.guiLayer(Enhanced.id("healing"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new com.kolodkingal.enhanced.client.healing.HealingHud());
         // ===== wolverine (3.7) =====
         // (The Rage's red edge and the injection's silver flash.)
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("wolverine"),
+        registrar.guiLayer(Enhanced.id("wolverine"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
                 new com.kolodkingal.enhanced.client.wolverine.WolverineHud());
         // ===== deadpool (3.7) =====
         // ===== school_lab (3.7) =====
         // the lift's doors closing and opening on the rider's screen
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("lab_lift"),
+        registrar.guiLayer(Enhanced.id("lab_lift"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
                 new com.kolodkingal.enhanced.client.school.LabClient.FadeLayer());
         // ===== finders (3.7) =====
         // The Stone Locator's line over the hotbar and the amplified Cerebro's stone sites.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("finders"),
+        registrar.guiLayer(Enhanced.id("finders"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new com.kolodkingal.enhanced.client.finders.FindersHud());
         // ===== cottage (3.7) =====
         // ===== serum (3.8) =====
         // ===== captain (3.8) =====
         // (The super-soldier's line under the powers' panel.)
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("captain"),
+        registrar.guiLayer(Enhanced.id("captain"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new com.kolodkingal.enhanced.client.captain.CaptainHud());
         // ===== red_hulk (3.8) =====
         // The Anger bar, Ross's line, the jump's charge ring, the absorb's time, the burst's flash.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("red_hulk"),
+        registrar.guiLayer(Enhanced.id("red_hulk"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new com.kolodkingal.enhanced.client.redhulk.RedHulkHud());
         // ===== iron_man (3.8) =====
         // 3.8, lane L3: the suit's panel (name, energy, durability), the helmet frame and the faceplate.
-        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, Enhanced.id("iron_man"),
+        registrar.guiLayer(Enhanced.id("iron_man"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new com.kolodkingal.enhanced.client.ironman.IronHud());
         // ===== nanotech (3.8) =====
         // ===== falcon (3.8) =====
         // ===== tower (3.8) =====
         // ===== eternity (3.8) =====
         // The white flash of the journey to Eternity and home.
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, Enhanced.id("eternity_flash"),
+        registrar.guiLayer(Enhanced.id("eternity_flash"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
                 new com.kolodkingal.enhanced.client.eternity.EternityClient.FlashLayer());
         // ===== love (3.8) =====
     }
@@ -641,31 +650,53 @@ public final class ClientSetup {
      * model), the Exo-Wings, the suits and the reactors (their worn models are the mod's layers; their armour textures
      * are empty). The skeleton registers the plain extensions; each lane gives its item its model in its region.
      */
-    @SubscribeEvent
-    public static void onRegisterClientExtensions(
-            net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+    static void registerItemRenderers(ClientRegistrar registrar) {
         // ===== captain (3.8) =====
-        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
-            @Override
-            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return com.kolodkingal.enhanced.client.captain.ShieldItemRenderer.get();
-            }
-        }, com.kolodkingal.enhanced.registry.ModItems.VIBRANIUM_SHIELD.get());
+        registrar.specialItemRenderer(com.kolodkingal.enhanced.client.captain.ShieldItemRenderer::get,
+                List.of(com.kolodkingal.enhanced.registry.ModItems.VIBRANIUM_SHIELD));
         // ===== iron_man (3.8) =====
-        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
-        }, com.kolodkingal.enhanced.registry.ModItems.ARC_REACTOR.get(),
-                com.kolodkingal.enhanced.registry.ModItems.NANO_ARC_REACTOR.get(),
-                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_1.get(),
-                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_3.get(),
-                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_5.get(),
-                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_50.get(),
-                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_85.get(),
-                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_HULKBUSTER.get());
+        registrar.specialItemRenderer(null, List.of(com.kolodkingal.enhanced.registry.ModItems.ARC_REACTOR,
+                com.kolodkingal.enhanced.registry.ModItems.NANO_ARC_REACTOR,
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_1,
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_3,
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_5,
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_50,
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_MARK_85,
+                com.kolodkingal.enhanced.registry.ModItems.IRON_MAN_HULKBUSTER));
         // ===== nanotech (3.8) =====
         // ===== suit_art (3.8) =====
         // ===== falcon (3.8) =====
-        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
-        }, com.kolodkingal.enhanced.registry.ModItems.FALCON_EXO_WINGS.get());
+        registrar.specialItemRenderer(null, List.of(com.kolodkingal.enhanced.registry.ModItems.FALCON_EXO_WINGS));
+    }
+
+    /**
+     * Port P0: every client registration of the mod, handed to the loader through the platform's registrar (called by
+     * the client entry point while the mod is constructed). Each kind reaches the loader in the order it is registered
+     * here, which is the order NeoForge called the old registration listeners in (docs/port/listener-order.txt).
+     */
+    public static void register(ClientRegistrar registrar) {
+        // Development only (-Denhanced.bridgeSelfTest=true): the self-test of the client's event bridges.
+        BridgeSelfTest.install(registrar);
+        // HUD layers: Vormir's, the Stones', Heimdall's, then the mod's own (below).
+        com.kolodkingal.enhanced.client.vormir.VormirClient.Setup.register(registrar);
+        com.kolodkingal.enhanced.client.stones.StoneClient.Setup.register(registrar);
+        com.kolodkingal.enhanced.client.render.HeimdallSightView.Setup.register(registrar);
+        // Keys: Spider-Man's Web Assist, then the mod's own.
+        SpiderAssistKey.Registration.register(registrar);
+        registerKeys(registrar);
+        registerRenderers(registrar);
+        registerLayerDefinitions(registrar);
+        registrar.addLayers(ClientSetup::addLayers);
+        registerParticles(registrar);
+        registerGui(registrar);
+        com.kolodkingal.enhanced.client.finders.LocatorClient.registerColors(registrar);
+        registerItemRenderers(registrar);
+        registerDimensionEffects(registrar);
+        registerReloadListeners(registrar);
+        // Client commands, in the order NeoForge called them.
+        registrar.clientCommands(ModelViewer::register);
+        registrar.clientCommands(AnimDebugCommands::register);
+        registrar.clientCommands(com.kolodkingal.enhanced.client.render.UltronFxCommand::register);
     }
 
     private ClientSetup() {

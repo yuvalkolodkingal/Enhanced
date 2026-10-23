@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client.eternity;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.beam.AvengersBeams;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.love.LoveEyeBeamFx;
@@ -9,6 +8,12 @@ import com.kolodkingal.enhanced.client.render.LoveActing;
 import com.kolodkingal.enhanced.eternity.EternityRealm;
 import com.kolodkingal.enhanced.network.EternityFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.ViewportEvent;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -27,12 +32,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +44,7 @@ import java.util.function.BooleanSupplier;
  * (fog from 48 to 200 blocks; client option {@code eternityFog}), and the realm's ambient
  * pad and soft rings of light round the walkers' feet on the still water; by an altar, the shrine's hum.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class EternityClient {
     /** The mist: its colour, where it begins at the most (blocks) and where it ends at the most. */
     static final float MIST_R = 0.95F;
@@ -143,7 +142,7 @@ public final class EternityClient {
 
     // ---- the mist ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onFogColour(ViewportEvent.ComputeFogColor event) {
         if (inRealm()) {
             event.setRed(MIST_R);
@@ -152,7 +151,7 @@ public final class EternityClient {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onFog(ViewportEvent.RenderFog event) {
         if (!inRealm() || event.getType() != FogType.NONE || !EnhancedClientConfig.eternityFog()) {
             return;
@@ -177,7 +176,7 @@ public final class EternityClient {
 
     // ---- the sounds ----
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
@@ -233,7 +232,7 @@ public final class EternityClient {
         mc.getSoundManager().play(loop);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         HUMS.clear();
         ambient = null;

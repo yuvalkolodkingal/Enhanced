@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced.client.deadpool;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -13,11 +17,6 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.HashMap;
@@ -31,7 +30,7 @@ import java.util.Map;
  * three seconds and fades. One bubble per Deadpool (a new line replaces the old). Long lines wrap. The client's {@code
  * deadpoolLines} option hides them. (The way {@code ThoughtBubbles} writes thoughts over heads.)
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class LineBubbles {
     /** How long (ticks) a bubble shows, and its pop in and fade out. */
     static final int LIFE = 60;
@@ -60,7 +59,7 @@ public final class LineBubbles {
         return Math.min(Mth.clamp(age / 2.0F, 0.0F, 1.0F), Mth.clamp((LIFE - age) / FADE, 0.0F, 1.0F));
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || SAID.isEmpty()) {
             return;
@@ -129,7 +128,7 @@ public final class LineBubbles {
         buffers.endBatch();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         SAID.clear();
     }

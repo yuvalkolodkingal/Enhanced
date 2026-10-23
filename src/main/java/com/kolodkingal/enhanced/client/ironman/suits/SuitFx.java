@@ -1,6 +1,5 @@
 package com.kolodkingal.enhanced.client.ironman.suits;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.block.SuitDisplayBlockEntity;
 import com.kolodkingal.enhanced.client.render.HeroAnimState;
@@ -11,6 +10,10 @@ import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.ironman.SuitParts;
 import com.kolodkingal.enhanced.ironman.SuitTimelines;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -32,10 +35,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -47,7 +46,7 @@ import org.joml.Vector3f;
  * which tower display's gantry serves a Mark 3 suit-up. The phase's opening sound is the Iron Man lane's (its FX
  * payload); these are the pieces'.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SuitFx {
     public static final int BLADES = 0;
     public static final int SHIELD = 1;
@@ -105,7 +104,7 @@ public final class SuitFx {
         return null;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTick(ClientTickEvent.Post event) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) {

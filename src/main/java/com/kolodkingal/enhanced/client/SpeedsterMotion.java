@@ -1,9 +1,13 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.SpeedSurfaces;
 import com.kolodkingal.enhanced.ability.SurfaceRun;
 import com.kolodkingal.enhanced.network.SurfaceRunPayload;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.MovementInputUpdateEvent;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -12,11 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
  * A speedster's own run up walls and along ceilings (3.3), done by the player's own client like Spider-Man's cling,
@@ -27,7 +26,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
  * camera is turned round over a few ticks when the run reverses his way (onto a ceiling, round the lip of an
  * overhang). What he runs on is told to the server ({@link SurfaceRunPayload}), which shows it to everyone.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SpeedsterMotion {
     /** What he runs on is told to the server again this often while it lasts (it believes it for 12 ticks). */
     private static final int REPORT_TICKS = 6;
@@ -60,7 +59,7 @@ public final class SpeedsterMotion {
     }
 
     /** The keys that would move him are kept out of the game while the run owns his velocity. */
-    @SubscribeEvent
+    @Subscribe
     public static void onMovementInput(MovementInputUpdateEvent event) {
         if (event.getEntity() != owner || !RUNNER.active()) {
             return;
@@ -75,7 +74,7 @@ public final class SpeedsterMotion {
         input.forwardImpulse = input.up ? KEEP_SPRINT : 0.0F;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
         if (!(event.getEntity() instanceof LocalPlayer player)) {
             return;
@@ -126,7 +125,7 @@ public final class SpeedsterMotion {
     }
 
     /** The camera turns round (when the run reverses his way) after the tick's start, so it is drawn turning smoothly. */
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTickPost(PlayerTickEvent.Post event) {
         if (event.getEntity() != owner || !(event.getEntity() instanceof LocalPlayer player)) {
             return;

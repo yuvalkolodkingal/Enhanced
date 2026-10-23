@@ -64,19 +64,19 @@ public class AsgardSkyEffects extends DimensionSpecialEffects {
         return false;
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public boolean renderClouds(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, double camX, double camY, double camZ,
                                 Matrix4f modelViewMatrix, Matrix4f projectionMatrix) {
         return true;
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public boolean renderSnowAndRain(ClientLevel level, int ticks, float partialTick, LightTexture lightTexture, double camX, double camY,
                                      double camZ) {
         return true;
     }
 
-    @Override
+    // A NeoForge hook, not a vanilla method: no @Override (the port compiles this code against vanilla too).
     public boolean renderSky(ClientLevel level, int ticks, float partialTick, Matrix4f modelViewMatrix, Camera camera, Matrix4f projectionMatrix,
                              boolean isFoggy, Runnable setupFog) {
         if (stars == null) {

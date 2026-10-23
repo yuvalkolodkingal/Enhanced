@@ -1,11 +1,17 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.LevelEvent;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -14,12 +20,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
@@ -41,7 +41,7 @@ import java.util.Map;
  * ApocalypseModel}, a Sentry): the entity type to show and how to put it in a state. The viewer makes the entity on
  * the client only, never adds it to a server, and keeps it where it was put (no AI, no gravity, no collision).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ModelViewer {
     /** How far in front of the player the model stands, in blocks. */
     private static final double DISTANCE = 5.0;
@@ -76,9 +76,9 @@ public final class ModelViewer {
         SUBJECTS.put(name, subject);
     }
 
-    @SubscribeEvent
-    public static void onRegister(RegisterClientCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("enhanced_model")
+    /** The command's registration (port P0: through the platform's client registrar, see ClientSetup). */
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
+        dispatcher.register(Commands.literal("enhanced_model")
                 .then(Commands.literal("list").executes(ctx -> list()))
                 .then(Commands.literal("clear").executes(ctx -> {
                     clear();
@@ -159,7 +159,7 @@ public final class ModelViewer {
         subject = null;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onTick(ClientTickEvent.Post event) {
         if (shown == null) {
             return;
@@ -175,7 +175,7 @@ public final class ModelViewer {
         subject.pose(shown, state, tick);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelUnload(LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
             shown = null;

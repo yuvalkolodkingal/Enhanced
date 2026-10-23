@@ -1,6 +1,9 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.SelectMusicEvent;
 import com.kolodkingal.enhanced.ultron.UltronEntity;
 import com.kolodkingal.enhanced.ultron.UltronSounds;
 import net.minecraft.client.Minecraft;
@@ -8,10 +11,6 @@ import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -21,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * options (so it is silent with that slider at 0) and is not a tune anyone owns: the track is {@code ultron_theme}
  * ({@link UltronSounds#THEME}), streamed from its file.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class UltronMusic {
     /** How near a body must be to be heard, in blocks. */
     private static final double RANGE = 96.0;
@@ -73,7 +72,7 @@ public final class UltronMusic {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onSelectMusic(SelectMusicEvent event) {
         if (holds()) {
             event.setMusic(null);

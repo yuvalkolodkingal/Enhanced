@@ -1,7 +1,10 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.ThanosClientView;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.SelectMusicEvent;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import com.kolodkingal.enhanced.thanos.ThanosEntity;
 import com.kolodkingal.enhanced.thanos.ThanosState;
@@ -12,10 +15,6 @@ import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ import java.util.function.Supplier;
  * heartbeat; 2: low strings; 3: dissonant high choir; 4: a driving ostinato; 5: the bells of the call), made to sound
  * together in any combination.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ThanosMusic {
     /** The layer each stone count adds, first to fifth: they play together, so the music grows as he does. */
     public static final List<Supplier<SoundEvent>> THEMES = List.of(
@@ -96,7 +95,7 @@ public final class ThanosMusic {
     }
 
     /** The game's own music waits while the fight's plays. */
-    @SubscribeEvent
+    @Subscribe
     public static void onSelectMusic(SelectMusicEvent event) {
         Music chosen = event.getMusic();
         if (playing && chosen != null) {

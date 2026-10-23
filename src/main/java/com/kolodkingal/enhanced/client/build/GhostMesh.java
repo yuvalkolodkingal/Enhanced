@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.build;
 
 import com.kolodkingal.enhanced.build.SpellMath;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
+import com.kolodkingal.enhanced.platform.client.BlockModels;
 import com.mojang.blaze3d.shaders.Uniform;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -22,7 +23,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -37,7 +37,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -195,15 +194,11 @@ final class GhostMesh implements AutoCloseable {
                 BlockState state = cells.states.get(i);
                 BlockPos at = base.offset(x, y, z);
                 if (state.getRenderShape() == RenderShape.MODEL) {
-                    BakedModel model = dispatcher.getBlockModel(state);
-                    ModelData data = model.getModelData(view, at, state, ModelData.EMPTY);
                     random.setSeed(state.getSeed(at));
-                    for (RenderType type : model.getRenderTypes(state, random, data)) {
-                        pose.pushPose();
-                        pose.translate(x, y, z);
-                        dispatcher.renderBatched(state, at, view, pose, blocks, true, random, data, type);
-                        pose.popPose();
-                    }
+                    pose.pushPose();
+                    pose.translate(x, y, z);
+                    BlockModels.renderBatched(dispatcher, state, at, view, pose, true, random, type -> blocks);
+                    pose.popPose();
                 } else if (state.getBlock() instanceof LiquidBlock) {
                     // The liquid renderer writes a section's offsets (each axis & 15): moved to the cell's own.
                     dispatcher.renderLiquid(at, view, new Shifted(blocks, x - (at.getX() & 15), y - (at.getY() & 15), z - (at.getZ() & 15)),

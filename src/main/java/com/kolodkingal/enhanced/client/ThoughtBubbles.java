@@ -1,7 +1,11 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.network.ThoughtsPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
@@ -13,11 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.HashMap;
@@ -32,7 +31,7 @@ import java.util.Map;
  * afraid, grey for a mind closed to him. A thought fades in when it is heard, and out if it is not heard again (the
  * server says them every two seconds), and they are only drawn while the listener still hears ({@link TheNoise#active}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ThoughtBubbles {
     /** A thought is drawn this long after it was last heard (ticks); the server repeats them every 40. */
     static final int LIFE = 60;
@@ -79,7 +78,7 @@ public final class ThoughtBubbles {
         return Math.min(in, out);
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || HEARD.isEmpty()) {
             return;
@@ -136,7 +135,7 @@ public final class ThoughtBubbles {
         buffers.endBatch();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         HEARD.clear();
     }

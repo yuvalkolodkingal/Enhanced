@@ -11,6 +11,12 @@ import com.kolodkingal.enhanced.custom.ModuleStats;
 import com.kolodkingal.enhanced.custom.PowerModule;
 import com.kolodkingal.enhanced.custom.modules.EnergyPowers;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Powers;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -24,12 +30,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.joml.Matrix4f;
 
 /**
@@ -38,7 +38,7 @@ import org.joml.Matrix4f;
  * local player only, Wall-Crawling (players move themselves, so the climb is the client's). The skins' cache is tidied
  * here too.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class CustomFx {
     private static final ResourceLocation LATTICE = Enhanced.id("textures/entity/hex_wall.png");
 
@@ -90,7 +90,7 @@ public final class CustomFx {
     static void clear() {
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;
@@ -146,7 +146,7 @@ public final class CustomFx {
      * Wall-Crawling, for the local player: against a wall he climbs while he moves (Sneak holds him still on it), at the
      * speed of the power's strength ("fast" half again as fast).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         if (!(event.getEntity() instanceof LocalPlayer player) || !CustomHeroes.isOn(player, PowerModule.WALL_CRAWL)
                 || player.getAbilities().flying || player.isSpectator() || !player.horizontalCollision) {
@@ -164,7 +164,7 @@ public final class CustomFx {
         player.minorHorizontalCollision = true;
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         CustomSkins.clear();
     }

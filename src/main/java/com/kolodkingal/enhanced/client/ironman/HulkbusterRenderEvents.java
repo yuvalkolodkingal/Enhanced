@@ -2,16 +2,16 @@ package com.kolodkingal.enhanced.client.ironman;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderArmEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
-import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 
 /**
  * Where the Hulkbuster takes the place of the player (3.8, lane L4, PLAN 6.4; the {@code HulkRenderEvents} pattern):
@@ -21,10 +21,10 @@ import net.neoforged.neoforge.client.event.RenderPlayerEvent;
  * then this one (low): a renderer that already drew him cancelled the event, and this one steps aside. The inner
  * render fires the event again, for the Hulkbuster renderer: it is let through.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HulkbusterRenderEvents {
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @Subscribe(priority = Priority.LOW)
     public static void onRenderPlayer(RenderPlayerEvent.Pre event) {
         if (event.isCanceled() || event.getRenderer() instanceof HulkbusterRenderer) {
             return;
@@ -52,7 +52,7 @@ public final class HulkbusterRenderEvents {
     }
 
     /** His arm in first person, before the suit layer's (which would draw his own arm with the suit's pieces). */
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @Subscribe(priority = Priority.HIGH)
     public static void onRenderArm(RenderArmEvent event) {
         AbstractClientPlayer player = event.getPlayer();
         float pt = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);

@@ -1,10 +1,13 @@
 package com.kolodkingal.enhanced.client.finders;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.CerebroView;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.finders.CerebroRoom;
 import com.kolodkingal.enhanced.network.CerebroPayload;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModSounds;
@@ -27,10 +30,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -53,7 +52,7 @@ import java.util.Map;
  * cerebro_amplified}, looped while on); lane L4's console renderer may ask {@link #consoleOn} to lift the helmet off
  * its stand.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class CerebroSphere {
     /** The stars stand this far in from the sphere's inner surface. */
     static final double INSET = 0.7;
@@ -185,7 +184,7 @@ public final class CerebroSphere {
     // ------------------------------------------------------------------------------------------------------------
     // Drawing
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !inside()) {
             return;

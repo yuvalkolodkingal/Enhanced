@@ -1,9 +1,12 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.HelaMusicMath;
 import com.kolodkingal.enhanced.hela.HelaEntity;
 import com.kolodkingal.enhanced.hela.HelaState;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.SelectMusicEvent;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
@@ -13,10 +16,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -30,7 +29,7 @@ import java.util.function.Supplier;
  * music, follows no packet (the boss the client can see), and is silent with the client option {@code bossMusic} off.
  * Original music, not the film's.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HelaMusic {
     public static final double REACH = HelaMusicMath.REACH;
     private static final float FADE_IN = 1.0F / 40.0F;
@@ -112,7 +111,7 @@ public final class HelaMusic {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onSelectMusic(SelectMusicEvent event) {
         Music chosen = event.getMusic();
         if (playing && chosen != null) {

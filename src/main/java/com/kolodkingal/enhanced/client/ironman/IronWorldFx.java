@@ -1,18 +1,17 @@
 package com.kolodkingal.enhanced.client.ironman;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ import java.util.List;
  * ({@link IronClientFx}), drawn after the particles in the additive energy batch, every size a function of the frame's
  * time (partial ticks included).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class IronWorldFx {
     /** At most this many flashes at once (a fight of many Iron Men stays cheap). */
     static final int MAX = 48;
@@ -58,7 +57,7 @@ public final class IronWorldFx {
         FLASHES.clear();
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || FLASHES.isEmpty()) {
             return;

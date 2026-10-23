@@ -2,6 +2,11 @@ package com.kolodkingal.enhanced.client.wolverine;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.hulk.HulkPlayerRenderer;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderArmEvent;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.wolverine.Claws;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -27,11 +32,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelPart;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
 import org.joml.Matrix4f;
 
 /**
@@ -231,9 +231,9 @@ public class ClawLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Abs
     }
 
     /** The first-person hook, after the Hulk's (his forearm is his own). */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+    @Subscriber(side = Side.CLIENT)
     public static final class Hooks {
-        @SubscribeEvent(priority = EventPriority.LOW)
+        @Subscribe(priority = Priority.LOW)
         public static void onRenderArm(RenderArmEvent event) {
             ClawLayer.onRenderArm(event);
         }

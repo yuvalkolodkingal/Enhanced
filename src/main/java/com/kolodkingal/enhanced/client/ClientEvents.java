@@ -1,15 +1,16 @@
 package com.kolodkingal.enhanced.client;
 
-import com.kolodkingal.enhanced.Enhanced;
-import com.kolodkingal.enhanced.bifrost.BifrostKeys;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.ability.QuicksilverAbilities;
-import com.kolodkingal.enhanced.ability.WaterRun;
 import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.ability.TommyAbilities;
+import com.kolodkingal.enhanced.ability.WaterRun;
+import com.kolodkingal.enhanced.bifrost.BifrostKeys;
 import com.kolodkingal.enhanced.client.render.Afterimages;
 import com.kolodkingal.enhanced.client.render.BarrierRenderer;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
+import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
+import com.kolodkingal.enhanced.client.render.CustomActing;
 import com.kolodkingal.enhanced.client.render.FlightEffects;
 import com.kolodkingal.enhanced.client.render.GestureEffects;
 import com.kolodkingal.enhanced.client.render.HandTracker;
@@ -17,8 +18,6 @@ import com.kolodkingal.enhanced.client.render.HeroAnimator;
 import com.kolodkingal.enhanced.client.render.HeroClients;
 import com.kolodkingal.enhanced.client.render.MagnetStreams;
 import com.kolodkingal.enhanced.client.render.ThorEffects;
-import com.kolodkingal.enhanced.client.render.BillyCrownLayer;
-import com.kolodkingal.enhanced.client.render.CustomActing;
 import com.kolodkingal.enhanced.client.render.WorldEffectsRenderer;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
 import com.kolodkingal.enhanced.client.screen.HexScreen;
@@ -31,6 +30,18 @@ import com.kolodkingal.enhanced.network.AbilityKeyPayload;
 import com.kolodkingal.enhanced.network.ChangeLookPayload;
 import com.kolodkingal.enhanced.network.HexActionPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.client.Keys;
+import com.kolodkingal.enhanced.platform.event.LevelEvent;
+import com.kolodkingal.enhanced.platform.event.PlayerTickEvent;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent;
+import com.kolodkingal.enhanced.platform.event.client.ClientTickEvent;
+import com.kolodkingal.enhanced.platform.event.client.ComputeFovModifierEvent;
+import com.kolodkingal.enhanced.platform.event.client.InputEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent;
+import com.kolodkingal.enhanced.platform.event.client.SelectMusicEvent;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -47,21 +58,11 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.Music;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
-import net.neoforged.neoforge.client.event.RenderPlayerEvent;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.Optional;
 
 /** Client game events: ability keys, hand poses and flight particles. */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class ClientEvents {
     /** Whether we told the server that ability key i is down. */
     private static final boolean[] SENT_DOWN = new boolean[PowerData.ABILITIES + 1];
@@ -73,16 +74,16 @@ public final class ClientEvents {
     private static final byte[] PRESS_SNEAK = new byte[PowerData.ABILITIES + 1];
 
     /** 3.5: an ability key went down: remember whether Sneak was held at that moment. */
-    @SubscribeEvent
-    public static void onKeyInput(net.neoforged.neoforge.client.event.InputEvent.Key event) {
+    @Subscribe
+    public static void onKeyInput(InputEvent.Key event) {
         if (event.getAction() == org.lwjgl.glfw.GLFW.GLFW_PRESS) {
             pressed(com.mojang.blaze3d.platform.InputConstants.getKey(event.getKey(), event.getScanCode()));
         }
     }
 
     /** 3.5: the same for an ability bound to a mouse button. */
-    @SubscribeEvent
-    public static void onMouseInput(net.neoforged.neoforge.client.event.InputEvent.MouseButton.Post event) {
+    @Subscribe
+    public static void onMouseInput(InputEvent.MouseButton.Post event) {
         if (event.getAction() == org.lwjgl.glfw.GLFW.GLFW_PRESS) {
             pressed(com.mojang.blaze3d.platform.InputConstants.Type.MOUSE.getOrCreate(event.getButton()));
         }
@@ -91,13 +92,13 @@ public final class ClientEvents {
     private static void pressed(com.mojang.blaze3d.platform.InputConstants.Key input) {
         Minecraft mc = Minecraft.getInstance();
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
-            if (PRESS_SNEAK[i] == 0 && KeyBindings.ability(i).isActiveAndMatches(input)) {
+            if (PRESS_SNEAK[i] == 0 && Keys.matches(KeyBindings.ability(i), input)) {
                 PRESS_SNEAK[i] = (byte) (mc.options.keyShift.isDown() ? 2 : 1);
             }
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -124,7 +125,7 @@ public final class ClientEvents {
     }
 
     /** The game's own music waits while a speedster's Walkman song plays, and for its usual pause after the song ends. */
-    @SubscribeEvent
+    @Subscribe
     public static void onSelectMusic(SelectMusicEvent event) {
         Music chosen = event.getMusic();
         if (chosen != null && SpeedsterMusic.holdsGameMusic(chosen)) {
@@ -132,7 +133,7 @@ public final class ClientEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         java.util.Arrays.fill(SENT_DOWN, false);
         SpeedsterMusic.stop();
@@ -160,7 +161,7 @@ public final class ClientEvents {
      * A new world (a dimension change, say) starts the heroes' lean from scratch, and nothing of the old one (a Magnetic
      * Pull's streams) is drawn in it.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onLevelUnload(LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
             HeroAnimator.clear();
@@ -266,7 +267,7 @@ public final class ClientEvents {
      * The speedsters' footwork on water, done on the client because players move themselves ({@link WaterRun}: 3.3
      * Quicksilver's Wall &amp; Water Run; 3.6.1 Tommy's Wall Run too). Walls and ceilings are {@link SpeedsterMotion}'s.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         if (event.getEntity() instanceof LocalPlayer player && !SpeedsterMotion.runner().active()) {
             WaterRun.hold(player);
@@ -274,7 +275,7 @@ public final class ClientEvents {
     }
 
     /** Running at super speed would otherwise widen the field of view absurdly. */
-    @SubscribeEvent
+    @Subscribe
     public static void onComputeFov(ComputeFovModifierEvent event) {
         if (QuicksilverAbilities.isRunning(event.getPlayer()) || TommyAbilities.isRunning(event.getPlayer())) {
             event.setNewFovModifier(Math.min(event.getNewFovModifier(), 1.2F));
@@ -342,7 +343,7 @@ public final class ClientEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderPlayerPost(RenderPlayerEvent.Post event) {
         Afterimages.render(event);
     }

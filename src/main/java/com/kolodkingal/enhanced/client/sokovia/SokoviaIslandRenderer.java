@@ -1,14 +1,13 @@
 package com.kolodkingal.enhanced.client.sokovia;
 
-import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderLevelStageEvent;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
 /**
  * Draws the picture of the island ({@link SokoviaMesh}) while it rises or comes down. The game fires the stages after
@@ -20,10 +19,10 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
  * <p>Translucent blocks (glass, ice) are not part of the picture: the island's blocks are the ground, and the ground is
  * opaque. They are real the moment the server places the island.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class SokoviaIslandRenderer {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderStage(RenderLevelStageEvent event) {
         RenderLevelStageEvent.Stage stage = event.getStage();
         RenderType type;

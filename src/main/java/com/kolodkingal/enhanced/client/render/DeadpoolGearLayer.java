@@ -1,9 +1,12 @@
 package com.kolodkingal.enhanced.client.render;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.deadpool.KatanaModel;
 import com.kolodkingal.enhanced.client.deadpool.PistolModel;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderArmEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
@@ -22,10 +25,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.Items;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
 
 /**
  * Deadpool's weapons on his body (3.7, PLAN 5.2): two katanas in black scabbards crossed on his back (their hilts over
@@ -35,7 +34,7 @@ import net.neoforged.neoforge.client.event.RenderArmEvent;
  * weapon's place; an elytra hides the scabbards (as capes are hidden). His first-person hands hold them too ({@link
  * #onRenderArm}).
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public class DeadpoolGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     /** The weapons' sizes against the player model. */
     static final float KATANA_SCALE = 0.85F;
@@ -152,7 +151,7 @@ public class DeadpoolGearLayer extends RenderLayer<AbstractClientPlayer, PlayerM
      * His hands in first person hold his swords or pistols while he uses them (the arm is drawn by the game after this,
      * in the same pose; the weapon is drawn at its fist).
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderArm(RenderArmEvent event) {
         AbstractClientPlayer player = event.getPlayer();
         KatanaModel katana = firstPersonKatana;

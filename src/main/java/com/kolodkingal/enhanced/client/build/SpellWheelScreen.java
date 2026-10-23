@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.build.Limits;
 import com.kolodkingal.enhanced.build.ShapeKind;
 import com.kolodkingal.enhanced.build.Spell;
 import com.kolodkingal.enhanced.build.SpellRecipe;
+import com.kolodkingal.enhanced.platform.client.Keys;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -850,7 +851,7 @@ public final class SpellWheelScreen extends Screen {
     }
 
     private static boolean isMagicKey(int key, int scan) {
-        return InputConstants.getKey(key, scan).equals(BuildKeys.MAGIC.getKey());
+        return InputConstants.getKey(key, scan).equals(Keys.boundKey(BuildKeys.MAGIC));
     }
 
     /** 0 for the key 1 up to 8 for 9, 9 for 0; -1 for any other key (the number pad counts too). */

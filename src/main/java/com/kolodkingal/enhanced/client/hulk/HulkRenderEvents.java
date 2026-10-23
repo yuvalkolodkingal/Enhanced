@@ -3,6 +3,12 @@ package com.kolodkingal.enhanced.client.hulk;
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.LokiAbilities;
 import com.kolodkingal.enhanced.hulk.HulkAbilities;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.CalculateDetachedCameraDistanceEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderArmEvent;
+import com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -12,12 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
-import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 
 /**
  * Where the Hulk's body takes the place of the player's (3.6): a player in a Hulk look is drawn by {@link
@@ -26,10 +26,10 @@ import net.neoforged.neoforge.client.event.RenderPlayerEvent;
  * one is drawn as his creature). The inner render fires the event again, for the Hulk renderer: it is let through, so
  * the other listeners of {@code Post} see him once.
  */
-@EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+@Subscriber(side = Side.CLIENT)
 public final class HulkRenderEvents {
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderPlayer(RenderPlayerEvent.Pre event) {
         if (event.isCanceled() || event.getRenderer() instanceof HulkPlayerRenderer) {
             return;
@@ -59,7 +59,7 @@ public final class HulkRenderEvents {
      * his scale is still Banner's when the hunched change begins, so in the front view the camera sat inside the
      * hunched body for the first half second. While he changes, it stays as far as for the Hulk he is becoming.
      */
-    @SubscribeEvent
+    @Subscribe
     public static void onCameraDistance(CalculateDetachedCameraDistanceEvent event) {
         if (!(event.getCamera().getEntity() instanceof Player player)) {
             return;
@@ -75,7 +75,7 @@ public final class HulkRenderEvents {
         }
     }
 
-    @SubscribeEvent
+    @Subscribe
     public static void onRenderArm(RenderArmEvent event) {
         AbstractClientPlayer player = event.getPlayer();
         if (!HulkPlayerRenderer.drawsAsHulk(player)) {

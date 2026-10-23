@@ -1,9 +1,13 @@
 package com.kolodkingal.enhanced.client.ironman.nano;
 
-import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
+import com.kolodkingal.enhanced.platform.event.Priority;
+import com.kolodkingal.enhanced.platform.event.Side;
+import com.kolodkingal.enhanced.platform.event.Subscribe;
+import com.kolodkingal.enhanced.platform.event.Subscriber;
+import com.kolodkingal.enhanced.platform.event.client.RenderArmEvent;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -22,11 +26,6 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -325,9 +324,9 @@ public class NanoGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
      * cannon's muzzles on them. The giant shield is drawn in the world before him (third person only: in first person
      * a faint wall would only hide the view).
      */
-    @EventBusSubscriber(modid = Enhanced.MODID, value = Dist.CLIENT)
+    @Subscriber(side = Side.CLIENT)
     public static final class Hooks {
-        @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+        @Subscribe(priority = Priority.LOW, receiveCanceled = true)
         public static void onRenderArm(RenderArmEvent event) {
             AbstractClientPlayer player = event.getPlayer();
             PowerData data = Powers.get(player);
