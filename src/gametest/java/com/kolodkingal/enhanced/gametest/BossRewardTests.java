@@ -209,7 +209,7 @@ public final class BossRewardTests {
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
         BossGifts.add(server, player.getUUID(), new ItemStack(Items.NETHER_STAR, 1));
         BossFights.rest(server, BossKind.APOCALYPSE, 5000L);
-        var data = server.overworld().getData(com.kolodkingal.enhanced.registry.ModAttachments.BOSS_DATA);
+        var data = com.kolodkingal.enhanced.registry.ModAttachments.BOSS_DATA.get(server.overworld());
         check(data.giftsOf(player.getUUID()).size() == 1 && data.restUntil(BossKind.APOCALYPSE) == 5000L, "the overworld holds them");
         check(data.withoutGifts(player.getUUID()).giftsOf(player.getUUID()).isEmpty() && data.withoutGifts(player.getUUID()).restUntil(BossKind.APOCALYPSE) == 5000L,
                 "taking the gifts leaves the rest");

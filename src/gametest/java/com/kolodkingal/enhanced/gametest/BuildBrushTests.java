@@ -325,14 +325,14 @@ public final class BuildBrushTests {
                 check(level.getBlockState(leaf).is(Blocks.OAK_LEAVES), "the crown has not moved: " + leaf);
             }
             List<UndoStep> steps = steps(billy);
-            BuildData data = billy.getData(ModAttachments.BUILD_DATA);
+            BuildData data = ModAttachments.BUILD_DATA.get(billy);
             check(steps.size() == 1 && steps.get(0).changed() > 0 && seen.code() == BuildVerdictPayload.DONE, "one stroke, one step: " + seen);
             check(data.practice() == seen.verdict().changed() && seen.verdict().cost() == seen.verdict().changed(),
                     "his practice and his price are its blocks: " + data.practice() + " / " + seen.verdict().changed());
 
             // He pays at every pulse: with an empty meter his next stroke ends at its first pulse, with the fizzle, and
             // he is told why (not that nothing changed).
-            billy.setData(ModAttachments.BUILD_DATA, BillyMagic.setMeter(data.withPauseUntil(0L), level.getGameTime(), 0));
+            ModAttachments.BUILD_DATA.set(billy, BillyMagic.setMeter(data.withPauseUntil(0L), level.getGameTime(), 0));
             BlockPos elsewhere = abs(f, 5, MEADOW, 15);
             cast(billy, recipe(Spell.LAND).style(LandStyle.LOWER).dab(6).at(elsewhere, Direction.UP).size(radius).build());
             finish(billy);

@@ -107,7 +107,7 @@ public final class StoneLedger {
     public static void taken(ServerPlayer player, StoneKind kind) {
         switch (mode(kind)) {
             case WORLD -> data(player.server).setHolder(kind, player.getUUID());
-            case PLAYER -> player.setData(ModAttachments.STONES, progress(player).withTaken(kind, true));
+            case PLAYER -> ModAttachments.STONES.set(player, progress(player).withTaken(kind, true));
             default -> {
             }
         }
@@ -190,7 +190,7 @@ public final class StoneLedger {
                 }
                 ServerPlayer online = server.getPlayerList().getPlayer(taker);
                 if (online != null) {
-                    online.setData(ModAttachments.STONES, progress(online).withTaken(kind, false));
+                    ModAttachments.STONES.set(online, progress(online).withTaken(kind, false));
                 } else {
                     data(server).owe(taker, kind);
                 }
@@ -202,11 +202,11 @@ public final class StoneLedger {
 
     /** The player's progress, with the bits owed back to him (stones lost while he was away) cleared first. */
     static StoneProgress progress(ServerPlayer player) {
-        StoneProgress progress = player.getData(ModAttachments.STONES);
+        StoneProgress progress = ModAttachments.STONES.get(player);
         int owed = data(player.server).takeOwed(player.getUUID());
         if (owed != 0) {
             progress = new StoneProgress(progress.taken() & ~owed, progress.flags(), progress.snapReadyAt());
-            player.setData(ModAttachments.STONES, progress);
+            ModAttachments.STONES.set(player, progress);
         }
         return progress;
     }

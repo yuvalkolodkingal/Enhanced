@@ -136,7 +136,7 @@ public final class Coronation {
     /** He is Odin. */
     static void crown(ServerPlayer player) {
         Powers.awaken(player, Power.ODIN);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.CROWNED));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.CROWNED));
         ServerLevel level = player.serverLevel();
         OdinAbilities.send(level, player, OdinAbilities.FX_CROWNED, List.of(player.position()), 0);
         Asgardians.bowTo(player);

@@ -35,7 +35,7 @@ public final class Berserker {
 
     /** The player's Wolverine state (both sides; another player's on a client is the empty one). */
     public static WolverineState get(Player player) {
-        return player.getData(ModAttachments.WOLVERINE);
+        return ModAttachments.WOLVERINE.get(player);
     }
 
     /** Whether the player is in the Rage now (the server, or his own client). */
@@ -58,7 +58,7 @@ public final class Berserker {
         data.startCooldown(HeroAbility.WOLVERINE_BERSERKER, now, WolverineAbilities.cfg(
                 WolverineConfig.BERSERK_COOLDOWN, 900));
         int ticks = WolverineAbilities.cfg(WolverineConfig.BERSERK_TICKS, 200);
-        player.setData(ModAttachments.WOLVERINE, get(player).withBerserkUntil(now + ticks));
+        ModAttachments.WOLVERINE.set(player, get(player).withBerserkUntil(now + ticks));
         player.removeEffect(MobEffects.WEAKNESS);
         WolverineAbilities.state(player.getUUID()).raging = true;
         if (data.has(HeroAbility.WOLVERINE_CLAWS)) {

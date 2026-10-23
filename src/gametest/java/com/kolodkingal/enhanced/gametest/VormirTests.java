@@ -136,7 +136,7 @@ public final class VormirTests {
         check(victim.isDeadOrDying(), why + ": he died");
         check(!cliff.items().isEmpty(), why + ": his things fell with him (an ordinary death)");
         check(Powers.power(victim) == power, why + ": he keeps his power");
-        check(!hasStone(seeker) && !seeker.getData(ModAttachments.STONES).has(StoneProgress.SACRIFICED_FOR),
+        check(!hasStone(seeker) && !ModAttachments.STONES.get(seeker).has(StoneProgress.SACRIFICED_FOR),
                 why + ": the seeker gets no stone");
         check(!Sacrifice.awaitsRespawn(victim.getUUID()), why + ": he was not given");
     }
@@ -171,11 +171,11 @@ public final class VormirTests {
             check(helper.getLevel().getEntitiesOfClass(ExperienceOrb.class, AABB.of(cliff.site().bounds())).isEmpty()
                     && friend.experienceLevel == 0, "and his experience is lost, not dropped");
             check(Powers.power(friend) == Power.NONE, "his power is gone");
-            check(friend.getData(ModAttachments.STONES).has(StoneProgress.WAS_SACRIFICED), "he was given");
+            check(ModAttachments.STONES.get(friend).has(StoneProgress.WAS_SACRIFICED), "he was given");
             check(thor.getMainHandItem().is(ModItems.SOUL_STONE.get()), "Thor holds the Soul Stone");
             check(thor.getUUID().equals(StoneLedger.taker(thor.getMainHandItem())), "the stone is stamped as Thor's");
             check(thor.position().distanceTo(cliff.pool()) < 0.6, "Thor wakes in the pool");
-            StoneProgress progress = thor.getData(ModAttachments.STONES);
+            StoneProgress progress = ModAttachments.STONES.get(thor);
             check(progress.has(StoneProgress.SACRIFICED_FOR) && progress.hasTaken(StoneKind.SOUL),
                     "his progress: a soul given, the Soul Stone taken");
             check(VormirTestSite.keeperLines(thor).contains("message.enhanced.vormir.soul_for_soul"),
@@ -632,7 +632,7 @@ public final class VormirTests {
             StonePedestalBlockEntity pedestal = heldPedestal(helper, at);
             check(pedestal.isHeldFor(seeker.getUUID()), "the stone is held for him");
             check(!StoneLedger.mayTake(seeker, StoneKind.SOUL)
-                    && seeker.getData(ModAttachments.STONES).has(StoneProgress.SACRIFICED_FOR),
+                    && ModAttachments.STONES.get(seeker).has(StoneProgress.SACRIFICED_FOR),
                     "the ledger and his progress have it as his");
             List<String> told = messages(seeker);
             check(told.contains("message.enhanced.vormir.held") && told.contains("message.enhanced.vormir.held_how"),
@@ -718,7 +718,7 @@ public final class VormirTests {
         f.pvp(true);
         VormirTestSite cliff = VormirTestSite.build(f);
         ServerPlayer thor = thor(f);
-        thor.setData(ModAttachments.STONES, thor.getData(ModAttachments.STONES).withTaken(StoneKind.SOUL, true));
+        ModAttachments.STONES.set(thor, ModAttachments.STONES.get(thor).withTaken(StoneKind.SOUL, true));
         ServerPlayer friend = friend(f, Power.SPIDER_MAN);
         fall(f, cliff, friend, () -> hit(thor, friend), () -> {
             ordinary(cliff, thor, friend, Power.SPIDER_MAN, "he has one");
@@ -989,7 +989,7 @@ public final class VormirTests {
         ServerPlayer plain = f.player(4.5, TestKit.FLOOR, 16.5);
         ServerPlayer creative = f.player(6.5, TestKit.FLOOR, 16.5, GameType.CREATIVE);
         ServerPlayer had = f.player(3.5, TestKit.FLOOR, 16.5, Power.ODIN);
-        had.setData(ModAttachments.STONES, had.getData(ModAttachments.STONES).withTaken(StoneKind.SOUL, true));
+        ModAttachments.STONES.set(had, ModAttachments.STONES.get(had).withTaken(StoneKind.SOUL, true));
         check(Stonekeeper.lines(thor).equals(List.of(Stonekeeper.WELCOME, Stonekeeper.PRICE, Stonekeeper.CHOOSE)),
                 "to Thor: welcome, the price, choose well");
         check(Stonekeeper.lines(plain).get(2).equals("npc.enhanced.stonekeeper.held"),
@@ -999,7 +999,7 @@ public final class VormirTests {
         VormirTestSite.keeperLines(thor);
         keeper.interact(thor, InteractionHand.MAIN_HAND);
         check(keeper.speaksTo(thor), "a right-click: he speaks");
-        check(thor.getData(ModAttachments.STONES).has(StoneProgress.MET_STONEKEEPER), "Thor has met him");
+        check(ModAttachments.STONES.get(thor).has(StoneProgress.MET_STONEKEEPER), "Thor has met him");
         keeper.interact(thor, InteractionHand.MAIN_HAND);
         f.everyTick(130, tick -> {
             if (tick < 125) {

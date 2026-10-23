@@ -107,12 +107,12 @@ public final class Snap {
 
     /** Whether the player's wait after his last Snap is over. */
     public static boolean ready(ServerPlayer player) {
-        return player.level().getGameTime() >= player.getData(ModAttachments.STONES).snapReadyAt();
+        return player.level().getGameTime() >= ModAttachments.STONES.get(player).snapReadyAt();
     }
 
     /** Game ticks before the player may snap again (0: ready). */
     public static long waitLeft(net.minecraft.world.entity.player.Player player) {
-        return Math.max(0L, player.getData(ModAttachments.STONES).snapReadyAt() - player.level().getGameTime());
+        return Math.max(0L, ModAttachments.STONES.get(player).snapReadyAt() - player.level().getGameTime());
     }
 
     public static void begin(ServerPlayer player) {
@@ -195,7 +195,7 @@ public final class Snap {
         Net.sendToPlayersNear(level, null, player.getX(), player.getY(), player.getZ(), radius + 32.0,
                 new StoneFxPayload(StoneFxPayload.SNAP, player.getId(), List.of(hand), dust.size()));
         cost(player);
-        player.setData(ModAttachments.STONES, player.getData(ModAttachments.STONES).with(StoneProgress.SNAPPED)
+        ModAttachments.STONES.set(player, ModAttachments.STONES.get(player).with(StoneProgress.SNAPPED)
                 .withSnapReadyAt(level.getGameTime() + cooldownTicks()));
         award(player);
         player.displayClientMessage(Component.translatable("message.enhanced.gauntlet.snapped", dust.size())

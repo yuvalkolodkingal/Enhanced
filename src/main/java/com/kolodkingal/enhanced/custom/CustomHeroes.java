@@ -43,11 +43,11 @@ public final class CustomHeroes {
     // ---- reading (both sides) ----
 
     public static CustomHero hero(Player player) {
-        return player.getData(ModAttachments.CUSTOM_HERO);
+        return ModAttachments.CUSTOM_HERO.get(player);
     }
 
     public static CustomState state(Player player) {
-        return player.getData(ModAttachments.CUSTOM_STATE);
+        return ModAttachments.CUSTOM_STATE.get(player);
     }
 
     /** Whether the player is a custom hero now. */
@@ -162,8 +162,8 @@ public final class CustomHeroes {
         if (data.power() == Power.CUSTOM) {
             CustomHeroServer.endPowers(player, data);
         }
-        player.setData(ModAttachments.CUSTOM_HERO, hero);
-        player.syncData(ModAttachments.CUSTOM_HERO);
+        ModAttachments.CUSTOM_HERO.set(player, hero);
+        ModAttachments.CUSTOM_HERO.sync(player);
         CustomState state = state(player);
         state.reset();
         if (data.power() != Power.CUSTOM) {
@@ -292,7 +292,7 @@ public final class CustomHeroes {
         CustomState state = state(player);
         if (state.isDirty()) {
             state.clearDirty();
-            player.syncData(ModAttachments.CUSTOM_STATE);
+            ModAttachments.CUSTOM_STATE.sync(player);
         }
     }
 

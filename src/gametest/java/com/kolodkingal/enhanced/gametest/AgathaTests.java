@@ -592,7 +592,7 @@ public final class AgathaTests {
     public static void agathaWalksTheRoadFromDoorToDoor(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
-        level.setData(ModAttachments.ROAD_DOORS, RoadDoors.EMPTY);
+        ModAttachments.ROAD_DOORS.set(level, RoadDoors.EMPTY);
         BlockPos a = new BlockPos(3, 2, 3);
         BlockPos b = new BlockPos(17, 2, 3);
         helper.setBlock(a, ModBlocks.WITCHES_ROAD_DOOR.get());

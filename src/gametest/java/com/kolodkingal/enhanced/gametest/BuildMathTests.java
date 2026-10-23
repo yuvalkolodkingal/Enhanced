@@ -1166,7 +1166,7 @@ public final class BuildMathTests {
         check(hers != null && hers.hero() == Power.SCARLET_WITCH && !hers.limited() && hers.reach() == 256, "the Scarlet Witch: no limit, reach 256");
         check(Limits.of(magneto) == null && Limits.of(f.player(12.5, TestKit.FLOOR, 12.5)) == null, "Magneto and a powerless player have none");
         check(hers.inWorld(new BlockPos(0, 5000, 0)).getY() == helper.getLevel().getMaxBuildHeight() - 1, "her world ends at the build height");
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(3));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank(3));
         Limits sorcerer = Limits.of(billy);
         check(sorcerer != null && sorcerer.side() == 40 && sorcerer.magicSelect() == 2048, "a Sorcerer: side 40, a double click of 2,048");
         billy.setGameMode(GameType.CREATIVE);

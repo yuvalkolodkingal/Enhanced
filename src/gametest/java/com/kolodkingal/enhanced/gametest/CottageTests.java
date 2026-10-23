@@ -634,20 +634,20 @@ public final class CottageTests {
         long day = Math.floorDiv(fx.level().getDayTime(), 24000L);
         check(AsgardTalk.begin(player, nicky) && "greeting_first".equals(AsgardTalk.currentNode(player)),
                 "Nicky's first hello");
-        check(player.getData(ModAttachments.COTTAGE).has(CottageProgress.MET_NICKY), "they have met");
+        check(ModAttachments.COTTAGE.get(player).has(CottageProgress.MET_NICKY), "they have met");
         int before = player.getInventory().items.stream().mapToInt(s -> s.getCount()).sum();
         check(AsgardTalk.tryChoose(player, nicky.getId(), "cottage_gift")
                 && "gift".equals(AsgardTalk.currentNode(player)),
                 "a gift");
         int after = player.getInventory().items.stream().mapToInt(s -> s.getCount()).sum();
         check(after > before, "he has it");
-        check(player.getData(ModAttachments.COTTAGE).giftsOn(day) == 1, "one today");
+        check(ModAttachments.COTTAGE.get(player).giftsOn(day) == 1, "one today");
         AsgardTalk.end(player);
         nicky.setState(NpcState.IDLE, 0);
         check(AsgardTalk.begin(player, nicky) && AsgardTalk.tryChoose(player, nicky.getId(), "cottage_gift")
                 && "gift_done".equals(AsgardTalk.currentNode(player)), "only one a day");
         AsgardTalk.end(player);
-        player.setData(ModAttachments.COTTAGE, player.getData(ModAttachments.COTTAGE).withLastGiftDay(day - 1));
+        ModAttachments.COTTAGE.set(player, ModAttachments.COTTAGE.get(player).withLastGiftDay(day - 1));
         nicky.setState(NpcState.IDLE, 0);
         check(AsgardTalk.begin(player, nicky) && AsgardTalk.tryChoose(player, nicky.getId(), "cottage_gift")
                 && "gift".equals(AsgardTalk.currentNode(player)), "a new day, a new gift");
@@ -705,7 +705,7 @@ public final class CottageTests {
             check(AsgardTalk.begin(player, agatha) && "scratchy_gone".equals(AsgardTalk.currentNode(player)),
                     "Agatha: Señor Scratchy is gone again");
             check(AsgardTalk.tryChoose(player, agatha.getId(), "cottage_scratchy_yes")
-                    && player.getData(ModAttachments.COTTAGE).has(CottageProgress.SCRATCHY_QUEST), "I'll find him!");
+                    && ModAttachments.COTTAGE.get(player).has(CottageProgress.SCRATCHY_QUEST), "I'll find him!");
             AsgardTalk.end(player);
             CottageKeeper.quick(level, cottage, player);
             check(cottage.scratchyGone(), "far away he is not home");
@@ -716,7 +716,7 @@ public final class CottageTests {
             check(player.getInventory().countItem(Items.EMERALD) == 3, "3 emeralds");
             check(player.getInventory().items.stream().anyMatch(s -> s.is(Items.POTION)
                     && s.get(DataComponents.POTION_CONTENTS).is(Potions.LUCK)), "and a potion of Luck");
-            CottageProgress progress = player.getData(ModAttachments.COTTAGE);
+            CottageProgress progress = ModAttachments.COTTAGE.get(player);
             check(progress.scratchyRun() == run && !progress.has(CottageProgress.SCRATCHY_QUEST), "the run is done");
             cottage.setGone(run);
             check(Scratchy.comeHome(level, cottage, scratchy).isEmpty()

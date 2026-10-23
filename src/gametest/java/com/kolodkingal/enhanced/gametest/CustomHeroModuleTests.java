@@ -105,7 +105,7 @@ public final class CustomHeroModuleTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = hero(f, 10.5, 10.5, PowerModule.FLIGHT, "jet", 5);
         check(Powers.power(player) == Power.CUSTOM, "he is a custom hero");
-        CustomHero hero = player.getData(ModAttachments.CUSTOM_HERO);
+        CustomHero hero = ModAttachments.CUSTOM_HERO.get(player);
         check(hero.name().equals("Tester") && hero.has(PowerModule.FLIGHT), "his definition is on him");
         check(Powers.color(player) == 0x3FA9F5 && Powers.glow(player) == 0xE0F4FF, "his colours are his look's");
         check(player.mayFly(), "Flight lets him fly");
@@ -113,7 +113,7 @@ public final class CustomHeroModuleTests {
         press(player);
         check(player.getAbilities().flying, "R takes off");
         Powers.setPower(player, Power.NONE);
-        check(!player.mayFly() && player.getData(ModAttachments.CUSTOM_HERO).has(PowerModule.FLIGHT), "losing the power keeps the definition");
+        check(!player.mayFly() && ModAttachments.CUSTOM_HERO.get(player).has(PowerModule.FLIGHT), "losing the power keeps the definition");
         helper.succeed();
     }
 

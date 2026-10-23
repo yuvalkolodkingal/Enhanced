@@ -412,7 +412,7 @@ final class BuildTestSupport {
     /** Whether {@code player} is in build mode, as the server and everyone who sees her know it. */
     static boolean building(ServerPlayer player) {
         BuildSession session = BuildSession.existing(player.getUUID());
-        return session != null && session.mode() && player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
+        return session != null && session.mode() && ModAttachments.BUILD_VIEW.getExisting(player).map(BuildView::active).orElse(false);
     }
 
     /** What the server sent a player since the last look: the verdicts, the effects, the action-bar and chat lines. */

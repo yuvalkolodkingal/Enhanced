@@ -41,7 +41,7 @@ public class Enhanced {
         ModItems.ITEMS.register(modBus);
         ModEffects.EFFECTS.register(modBus);
         ModEntities.ENTITIES.register(modBus);
-        ModAttachments.ATTACHMENTS.register(modBus);
+        ModAttachments.init();
         ModParticles.PARTICLES.register(modBus);
         ModSounds.SOUNDS.register(modBus);
         // 3.3: the world structures (the Hydra outposts, Mjolnir's landing sites, the Mutant School).

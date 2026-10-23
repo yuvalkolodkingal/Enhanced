@@ -464,7 +464,7 @@ public final class FalconTests {
         long now = helper.getLevel().getGameTime();
         drone.hurt(helper.getLevel().damageSources().generic(), 50.0F);
         check(drone.isRemoved(), "down, and gone into the pack");
-        FalconState state = sam.getData(ModAttachments.FALCON);
+        FalconState state = ModAttachments.FALCON.get(sam);
         check(!data(sam).toggle(Toggle.REDWING_OUT), "no longer out");
         check(state.redwingDownUntil() == now + 600, "repairs till " + (now + 600) + ": " + state.redwingDownUntil());
         TestKit.sentPackets(sam);

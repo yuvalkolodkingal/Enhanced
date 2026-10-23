@@ -121,7 +121,7 @@ public final class HexRunes {
             }
             READY.put(wanda.getUUID(), now + HexRunesConfig.COOLDOWN.get());
         }
-        level.setData(ModAttachments.HEXES, HexManager.data(level).update(hex.id(), h -> h.withRunes(on, now)));
+        ModAttachments.HEXES.set(level, HexManager.data(level).update(hex.id(), h -> h.withRunes(on, now)));
         glow(level, hex, on);
         wanda.displayClientMessage(Component.translatable(on ? "message.enhanced.hex_runes.on" : "message.enhanced.hex_runes.off")
                 .withStyle(ChatFormatting.RED), true);

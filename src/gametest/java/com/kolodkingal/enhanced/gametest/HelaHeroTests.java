@@ -84,14 +84,14 @@ public final class HelaHeroTests {
         headdress.getItem().inventoryTick(headdress, f.level(), p, 0, true);
         p.tickCount = 20;
         headdress.getItem().inventoryTick(headdress, f.level(), p, 0, true);
-        check(p.getData(ModAttachments.ASGARD).has(AsgardProgress.HELA_VICTOR), "the winner's headdress gives him the right to Gungnir");
+        check(ModAttachments.ASGARD.get(p).has(AsgardProgress.HELA_VICTOR), "the winner's headdress gives him the right to Gungnir");
         headdress.finishUsingItem(f.level(), p);
         check(Powers.is(p, Power.HELA), "held, it made her Hela");
         ServerPlayer other = f.player(8.5, FLOOR, 8.5);
         ItemStack theirs = HelaFight.headdressFor(p.getUUID());
         other.tickCount = 20;
         theirs.getItem().inventoryTick(theirs, f.level(), other, 0, true);
-        check(!other.getData(ModAttachments.ASGARD).has(AsgardProgress.HELA_VICTOR), "someone else's headdress gives no right");
+        check(!ModAttachments.ASGARD.get(other).has(AsgardProgress.HELA_VICTOR), "someone else's headdress gives no right");
         helper.succeed();
     }
 

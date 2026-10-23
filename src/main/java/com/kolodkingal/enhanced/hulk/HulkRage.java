@@ -40,12 +40,12 @@ public final class HulkRage {
 
     /** The player's state (an empty one for anyone who never was the Hulk). */
     public static HulkState get(Player player) {
-        return player.getData(ModAttachments.HULK);
+        return ModAttachments.HULK.get(player);
     }
 
     private static void set(Player player, HulkState state) {
         if (!state.equals(get(player))) {
-            player.setData(ModAttachments.HULK, state);
+            ModAttachments.HULK.set(player, state);
         }
     }
 

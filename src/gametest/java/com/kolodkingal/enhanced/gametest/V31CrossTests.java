@@ -1216,7 +1216,7 @@ public final class V31CrossTests {
         check(BuildTestSupport.building(billy), "Billy is in build mode");
         BlockPos dirt = new BlockPos(11, 2, 10);
         helper.setBlock(dirt, Blocks.DIRT);
-        BuildData data = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData data = ModAttachments.BUILD_DATA.get(billy);
         int meter = BillyMagic.meter(data, level.getGameTime());
         lookAt(billy, Vec3.atCenterOf(helper.absolutePos(dirt)));
         press(billy, 3, false);

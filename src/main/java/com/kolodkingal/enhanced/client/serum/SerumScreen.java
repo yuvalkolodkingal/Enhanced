@@ -110,9 +110,9 @@ public class SerumScreen extends Screen {
         JsonObject json = new JsonObject();
         json.addProperty("power", HEROES[card].getSerializedName());
         json.addProperty("variant", LOOKS[card]);
-        puppet.setData(ModAttachments.POWER, PowerData.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
+        ModAttachments.POWER.set(puppet, PowerData.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
         if (HEROES[card] == Power.CAPTAIN_AMERICA) {
-            puppet.setData(ModAttachments.CAPTAIN, CaptainState.EMPTY.with(CaptainState.BACK, true));
+            ModAttachments.CAPTAIN.set(puppet, CaptainState.EMPTY.with(CaptainState.BACK, true));
         } else if (HEROES[card] == Power.FALCON) {
             puppet.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ModItems.FALCON_EXO_WINGS.get()));
         }

@@ -98,7 +98,7 @@ public final class TestKit {
                 lanes.put(kind, lane);
             }
         }
-        BossData data = server.overworld().getData(ModAttachments.BOSS_DATA);
+        BossData data = ModAttachments.BOSS_DATA.get(server.overworld());
         ScepterRituals.Hold summoning = ScepterRituals.thanosHold();
         fixture.onClose(() -> {
             ScepterRituals.registerThanosHold(summoning);
@@ -117,7 +117,7 @@ public final class TestKit {
                     BossFights.register(kind, lane);
                 }
             }
-            server.overworld().setData(ModAttachments.BOSS_DATA, data);
+            ModAttachments.BOSS_DATA.set(server.overworld(), data);
         });
         return fixture;
     }

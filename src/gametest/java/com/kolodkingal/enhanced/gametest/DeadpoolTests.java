@@ -117,7 +117,7 @@ public final class DeadpoolTests {
     }
 
     static DeadpoolState state(ServerPlayer player) {
-        return player.getData(ModAttachments.DEADPOOL);
+        return ModAttachments.DEADPOOL.get(player);
     }
 
     /** Key {@code ability} pressed and let go, with Sneak or not. */

@@ -427,8 +427,8 @@ public final class AsgardRules {
                 || AsgardDimension.in(player)) {
             return;
         }
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
-        player.setData(ModAttachments.ASGARD, progress.with(AsgardProgress.VISITED)
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
+        ModAttachments.ASGARD.set(player, progress.with(AsgardProgress.VISITED)
                 .withCameFrom(GlobalPos.of(player.level().dimension(), player.blockPosition())));
     }
 

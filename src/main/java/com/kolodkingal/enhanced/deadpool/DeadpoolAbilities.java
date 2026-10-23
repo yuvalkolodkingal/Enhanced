@@ -432,12 +432,12 @@ public final class DeadpoolAbilities {
 
     /** His magazine, reload and Dogpool (the attachment: saved, synced to him). */
     static DeadpoolState data(Player player) {
-        return player.getData(ModAttachments.DEADPOOL);
+        return ModAttachments.DEADPOOL.get(player);
     }
 
     static void setData(Player player, DeadpoolState state) {
         if (!state.equals(data(player))) {
-            player.setData(ModAttachments.DEADPOOL, state);
+            ModAttachments.DEADPOOL.set(player, state);
         }
     }
 

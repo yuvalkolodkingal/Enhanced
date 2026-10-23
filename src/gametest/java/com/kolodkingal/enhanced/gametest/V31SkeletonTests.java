@@ -21,6 +21,8 @@ import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.gametest.BossTestSupport.TestFight;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.attach.AttachKey;
+import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -36,8 +38,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -60,12 +60,10 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.network.payload.SyncAttachmentsPayload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -246,15 +244,15 @@ public final class V31SkeletonTests {
         ServerPlayer stranger = f.player(3.5, FLOOR, 3.5);
         Hex hex = new Hex(UUID.randomUUID(), owner.getUUID(), owner.getGameProfile().getName(),
                 helper.absoluteVec(new Vec3(10.5, FLOOR, 10.5)), 5, Set.of(), false, level.getGameTime(), false);
-        level.setData(ModAttachments.HEXES, HexManager.data(level).with(hex));
-        f.onClose(() -> level.setData(ModAttachments.HEXES, HexManager.data(level).without(hex.id())));
+        ModAttachments.HEXES.set(level, HexManager.data(level).with(hex));
+        f.onClose(() -> ModAttachments.HEXES.set(level, HexManager.data(level).without(hex.id())));
         BlockPos inside = helper.absolutePos(new BlockPos(10, 2, 10));
         BlockPos outside = helper.absolutePos(new BlockPos(18, 2, 18));
 
         check(BlockRights.massEditRefuses(stranger, level, inside), "a stranger is refused inside her Hex");
         check(!BlockRights.massEditRefuses(stranger, level, outside), "not outside it");
         check(!BlockRights.massEditRefuses(owner, level, inside), "and she never is");
-        level.setData(ModAttachments.HEXES, HexManager.data(level).update(hex.id(), h -> h.withAllowed(stranger.getUUID(), true)));
+        ModAttachments.HEXES.set(level, HexManager.data(level).update(hex.id(), h -> h.withAllowed(stranger.getUUID(), true)));
         check(!BlockRights.massEditRefuses(stranger, level, inside), "once she allows him, he is not refused");
         helper.succeed();
     }
@@ -402,8 +400,8 @@ public final class V31SkeletonTests {
         ServerPlayer billy = f.player(9.5, FLOOR, 10.5, Power.BILLY);
         ServerPlayer wanda = f.player(12.5, FLOOR, 10.5, Power.SCARLET_WITCH);
 
-        check(!billy.hasData(ModAttachments.BUILD_DATA) && billy.getData(ModAttachments.BUILD_DATA).equals(BuildData.EMPTY)
-                && billy.getData(ModAttachments.BUILD_VIEW).equals(BuildView.EMPTY), "a player who never built reads as empty");
+        check(!ModAttachments.BUILD_DATA.has(billy) && ModAttachments.BUILD_DATA.get(billy).equals(BuildData.EMPTY)
+                && ModAttachments.BUILD_VIEW.get(billy).equals(BuildView.EMPTY), "a player who never built reads as empty");
         check(BillyRanks.rank(BuildData.EMPTY) == 1 && BillyRanks.meterNow(BuildData.EMPTY, helper.getLevel().getGameTime()) == 512,
                 "empty is rank 1 with a full meter");
 
@@ -421,8 +419,8 @@ public final class V31SkeletonTests {
         check(BuildData.CODEC.parse(NbtOps.INSTANCE, new CompoundTag()).getOrThrow().equals(BuildData.EMPTY), "nothing saved reads as empty");
 
         // A player saved with it, and the same player as 3.0 saved him (without it), loaded again.
-        billy.setData(ModAttachments.BUILD_DATA, data);
-        billy.setData(ModAttachments.BUILD_VIEW, view);
+        ModAttachments.BUILD_DATA.set(billy, data);
+        ModAttachments.BUILD_VIEW.set(billy, view);
         CompoundTag withIt = billy.saveWithoutId(new CompoundTag());
         withIt.remove("UUID");
         check(withIt.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY).contains(Enhanced.id("build_data").toString())
@@ -432,24 +430,24 @@ public final class V31SkeletonTests {
         before31.getCompound(AttachmentHolder.ATTACHMENTS_NBT_KEY).remove(Enhanced.id("build_data").toString());
         ServerPlayer reloaded = f.player(8.5, FLOOR, 8.5);
         reloaded.load(withIt);
-        check(reloaded.getData(ModAttachments.BUILD_DATA).equals(saved), "the saved part comes back: " + reloaded.getData(ModAttachments.BUILD_DATA));
-        check(reloaded.getData(ModAttachments.BUILD_VIEW).equals(BuildView.EMPTY), "build mode is never saved");
+        check(ModAttachments.BUILD_DATA.get(reloaded).equals(saved), "the saved part comes back: " + ModAttachments.BUILD_DATA.get(reloaded));
+        check(ModAttachments.BUILD_VIEW.get(reloaded).equals(BuildView.EMPTY), "build mode is never saved");
         ServerPlayer old = f.player(8.5, FLOOR, 12.5);
         old.load(before31);
-        check(old.getData(ModAttachments.BUILD_DATA).equals(BuildData.EMPTY), "a player saved before 3.1 reads as empty: "
-                + old.getData(ModAttachments.BUILD_DATA));
+        check(ModAttachments.BUILD_DATA.get(old).equals(BuildData.EMPTY), "a player saved before 3.1 reads as empty: "
+                + ModAttachments.BUILD_DATA.get(old));
 
         // Who is sent what, once Wanda sees Billy. (The first sight of a player sends all his synced data, whoever it is
         // for: NeoForge's pairing does not ask the attachment; every change after it goes only where the attachment says.)
         see(helper.getLevel(), wanda, billy);
         TestKit.sentPackets(billy);
         TestKit.sentPackets(wanda);
-        billy.setData(ModAttachments.BUILD_DATA, data.withHistory(5, 0));
-        check(synced(TestKit.sentPackets(billy), ModAttachments.BUILD_DATA.get(), billy.getId()), "Billy is sent his own data");
-        check(!synced(TestKit.sentPackets(wanda), ModAttachments.BUILD_DATA.get(), billy.getId()), "nobody else is");
-        billy.setData(ModAttachments.BUILD_VIEW, view.withActive(false));
-        check(synced(TestKit.sentPackets(billy), ModAttachments.BUILD_VIEW.get(), billy.getId()), "Billy is sent his view");
-        check(synced(TestKit.sentPackets(wanda), ModAttachments.BUILD_VIEW.get(), billy.getId()), "and so is whoever sees him");
+        ModAttachments.BUILD_DATA.set(billy, data.withHistory(5, 0));
+        check(synced(TestKit.sentPackets(billy), ModAttachments.BUILD_DATA, billy.getId()), "Billy is sent his own data");
+        check(!synced(TestKit.sentPackets(wanda), ModAttachments.BUILD_DATA, billy.getId()), "nobody else is");
+        ModAttachments.BUILD_VIEW.set(billy, view.withActive(false));
+        check(synced(TestKit.sentPackets(billy), ModAttachments.BUILD_VIEW, billy.getId()), "Billy is sent his view");
+        check(synced(TestKit.sentPackets(wanda), ModAttachments.BUILD_VIEW, billy.getId()), "and so is whoever sees him");
         helper.succeed();
     }
 
@@ -468,19 +466,9 @@ public final class V31SkeletonTests {
         check(level.getChunkSource().chunkMap.getPlayersWatching(seen).contains(watcher), "the watcher sees the player");
     }
 
-    /** Whether {@code packets} hold a sync of {@code type} for the entity {@code entityId}. */
-    private static boolean synced(List<Object> packets, AttachmentType<?> type, int entityId) {
-        List<Object> all = new ArrayList<>();
-        for (Object packet : packets) {
-            if (packet instanceof ClientboundBundlePacket bundle) {
-                bundle.subPackets().forEach(all::add);
-            } else {
-                all.add(packet);
-            }
-        }
-        return all.stream().anyMatch(packet -> packet instanceof ClientboundCustomPayloadPacket custom
-                && custom.payload() instanceof SyncAttachmentsPayload sync && sync.types().contains(type)
-                && sync.target() instanceof SyncAttachmentsPayload.EntityTarget(int id) && id == entityId);
+    /** Whether {@code packets} hold a sync of {@code key} for the entity {@code entityId}. */
+    private static boolean synced(List<Object> packets, AttachKey<?> key, int entityId) {
+        return packets.stream().anyMatch(packet -> TestHooks.get().isAttachmentSync(packet, key, entityId));
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -594,7 +582,7 @@ public final class V31SkeletonTests {
         BillyAbilities.tick(billy, data);
         check(!data.is(Live.CROWNED), "no crown before he uses his magic");
 
-        billy.setData(ModAttachments.BUILD_VIEW, BuildView.EMPTY.withActive(true));
+        ModAttachments.BUILD_VIEW.set(billy, BuildView.EMPTY.withActive(true));
         BillyAbilities.tick(billy, data);
         check(data.is(Live.CROWNED), "build mode on: the crown forms");
         helper.runAfterDelay(70, () -> {
@@ -602,7 +590,7 @@ public final class V31SkeletonTests {
             check(data.is(Live.CROWNED), "and stays as long as he builds");
 
             AbilityHandler.onKey(billy, 5, true); // The Noise: a spell, so the crown has its three seconds
-            billy.setData(ModAttachments.BUILD_VIEW, BuildView.EMPTY);
+            ModAttachments.BUILD_VIEW.set(billy, BuildView.EMPTY);
             BillyAbilities.tick(billy, data);
             check(data.is(Live.CROWNED), "build mode off right after a spell: the crown keeps its time");
         });

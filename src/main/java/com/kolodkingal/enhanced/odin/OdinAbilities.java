@@ -536,9 +536,9 @@ public final class OdinAbilities {
 
     /** Raises the player's Gungnir bond by one (every older copy of his crumbles) and returns the new bond. */
     public static int nextBond(ServerPlayer player) {
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         int bond = progress.gungnirBond() + 1;
-        player.setData(ModAttachments.ASGARD, progress.withGungnirBond(bond));
+        ModAttachments.ASGARD.set(player, progress.withGungnirBond(bond));
         return bond;
     }
 

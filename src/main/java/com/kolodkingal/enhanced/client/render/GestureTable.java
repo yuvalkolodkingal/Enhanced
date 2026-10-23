@@ -246,7 +246,7 @@ public final class GestureTable {
 
     /** The Hex appears, vanishes, grows or shrinks, or has its allowed list or creature switch changed. */
     private static void hex(HeroAnimState s, AbstractClientPlayer p, ClientLevel level, Memory m, long now, float age) {
-        Optional<Hex> hex = level.getData(ModAttachments.HEXES).byOwner(p.getUUID());
+        Optional<Hex> hex = ModAttachments.HEXES.get(level).byOwner(p.getUUID());
         if (hex.isPresent() && !m.hasHex) {
             if (hex.get().createdAt() >= now - 40) {
                 fire(s, p, GestureRoutes.hex(GestureRoutes.HexChange.RISES), age);
@@ -297,7 +297,7 @@ public final class GestureTable {
             CustomActing.remember(s, p);
         }
         if (data.has(HeroAbility.WANDA_HEX)) {
-            Optional<Hex> hex = level.getData(ModAttachments.HEXES).byOwner(p.getUUID());
+            Optional<Hex> hex = ModAttachments.HEXES.get(level).byOwner(p.getUUID());
             m.hasHex = hex.isPresent();
             m.hexRadius = hex.map(Hex::radius).orElse(0);
             m.hexAllowed = hex.map(h -> h.allowed().size()).orElse(0);

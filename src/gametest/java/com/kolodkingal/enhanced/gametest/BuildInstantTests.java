@@ -81,7 +81,7 @@ public final class BuildInstantTests {
         check(count(f, BIG, Blocks.STONE) == 0, "(undone again)");
 
         BuildMagic.setInstant(wanda, true);
-        check(BuildSession.of(wanda.getUUID()).instant() && wanda.getData(ModAttachments.BUILD_DATA).instant(), "the switch is on, and her data says so");
+        check(BuildSession.of(wanda.getUUID()).instant() && ModAttachments.BUILD_DATA.get(wanda).instant(), "the switch is on, and her data says so");
         check(Seen.of(wanda).said("message.enhanced.build.instant_on"), "she is told it is on");
         cast(wanda, boxSpell(f, Spell.FILL, BIG));
         check(working(wanda) == null, "the fill is not at work any more: it is done");
@@ -97,14 +97,14 @@ public final class BuildInstantTests {
 
         // Turning it off again, with the key's action.
         BuildMagic.action(wanda, BuildActionPayload.INSTANT, BlockPos.ZERO, BlockPos.ZERO, 0);
-        check(!BuildSession.of(wanda.getUUID()).instant() && !wanda.getData(ModAttachments.BUILD_DATA).instant(), "the action turns it off");
+        check(!BuildSession.of(wanda.getUUID()).instant() && !ModAttachments.BUILD_DATA.get(wanda).instant(), "the action turns it off");
         check(Seen.of(wanda).said("message.enhanced.build.instant_off"), "and she is told");
         BuildMagic.action(wanda, BuildActionPayload.INSTANT, BlockPos.ZERO, BlockPos.ZERO, 1);
-        check(BuildSession.of(wanda.getUUID()).instant() && wanda.getData(ModAttachments.BUILD_DATA).instant(), "and on");
+        check(BuildSession.of(wanda.getUUID()).instant() && ModAttachments.BUILD_DATA.get(wanda).instant(), "and on");
 
         // Leaving build mode turns it off.
         BuildMagic.setMode(wanda, false);
-        check(!BuildSession.of(wanda.getUUID()).instant() && !wanda.getData(ModAttachments.BUILD_DATA).instant(), "leaving build mode switches it off");
+        check(!BuildSession.of(wanda.getUUID()).instant() && !ModAttachments.BUILD_DATA.get(wanda).instant(), "leaving build mode switches it off");
         BuildMagic.setInstant(wanda, true);
         check(!BuildSession.of(wanda.getUUID()).instant(), "and it cannot be switched on outside build mode");
         helper.succeed();
@@ -243,7 +243,7 @@ public final class BuildInstantTests {
         check(Limits.of(billy).instantMax() == 0, "his limits have no instant size");
         Seen.of(billy);
         BuildMagic.setInstant(billy, true);
-        check(!BuildSession.of(billy.getUUID()).instant() && !billy.getData(ModAttachments.BUILD_DATA).instant(), "the switch stays off");
+        check(!BuildSession.of(billy.getUUID()).instant() && !ModAttachments.BUILD_DATA.get(billy).instant(), "the switch stays off");
         check(Seen.of(billy).said("message.enhanced.build.instant_wanda"), "he is told it is the Scarlet Witch's alone");
         BuildMagic.action(billy, BuildActionPayload.INSTANT, BlockPos.ZERO, BlockPos.ZERO, 1);
         check(!BuildSession.of(billy.getUUID()).instant(), "the action does not turn it on either");
@@ -260,7 +260,7 @@ public final class BuildInstantTests {
         BuildMagic.setInstant(wanda, true);
         check(BuildSession.of(wanda.getUUID()).instant() && !BuildSession.of(billy.getUUID()).instant(), "hers is hers alone");
         BuildMagic.onPowerChanged(wanda, Power.SCARLET_WITCH, Power.BILLY);
-        check(!BuildSession.of(wanda.getUUID()).instant() && !wanda.getData(ModAttachments.BUILD_DATA).instant(), "a change of power switches it off");
+        check(!BuildSession.of(wanda.getUUID()).instant() && !ModAttachments.BUILD_DATA.get(wanda).instant(), "a change of power switches it off");
         helper.succeed();
     }
 

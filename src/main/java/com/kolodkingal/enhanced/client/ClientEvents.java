@@ -331,7 +331,7 @@ public final class ClientEvents {
      * calls him back to her side); with Shift, he holds his post, or follows her again.
      */
     private static void sendVisionOrder(LocalPlayer player) {
-        Optional<Hex> hex = player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID());
+        Optional<Hex> hex = ModAttachments.HEXES.get(player.level()).byOwner(player.getUUID());
         if (hex.isEmpty()) {
             return;
         }

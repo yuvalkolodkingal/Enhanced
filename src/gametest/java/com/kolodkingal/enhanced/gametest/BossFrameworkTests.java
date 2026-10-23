@@ -574,7 +574,7 @@ public final class BossFrameworkTests {
         long left = BossFights.restLeft(server, BossKind.THANOS);
         check(left > 590 && left <= 600, "the lane's rest begins when the fight ends (" + left + ")");
         check(BossFights.restLeft(server, BossKind.ULTRON) == 0, "and only for that boss");
-        check(server.overworld().getData(ModAttachments.BOSS_DATA).restUntil(BossKind.THANOS) > 0, "and is part of the saved data");
+        check(ModAttachments.BOSS_DATA.get(server.overworld()).restUntil(BossKind.THANOS) > 0, "and is part of the saved data");
         helper.succeed();
     }
 

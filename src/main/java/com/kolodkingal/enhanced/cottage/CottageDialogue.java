@@ -86,7 +86,7 @@ public final class CottageDialogue {
     }
 
     static CottageProgress progress(Ctx ctx) {
-        return ctx.player().getData(ModAttachments.COTTAGE);
+        return ModAttachments.COTTAGE.get(ctx.player());
     }
 
     static boolean has(Ctx ctx, int flag) {
@@ -127,7 +127,7 @@ public final class CottageDialogue {
     static void met(Ctx ctx, int flag) {
         CottageProgress progress = progress(ctx);
         if (!progress.has(flag)) {
-            ctx.player().setData(ModAttachments.COTTAGE, progress.with(flag));
+            ModAttachments.COTTAGE.set(ctx.player(), progress.with(flag));
         }
     }
 
@@ -170,7 +170,7 @@ public final class CottageDialogue {
             met(ctx, CottageProgress.MET_AGATHA);
             Cottages.Cottage cottage = cottage(ctx);
             if (cottage != null && !cottage.scratchyGone() && has(ctx, CottageProgress.SCRATCHY_QUEST)) {
-                ctx.player().setData(ModAttachments.COTTAGE, progress(ctx).without(CottageProgress.SCRATCHY_QUEST));
+                ModAttachments.COTTAGE.set(ctx.player(), progress(ctx).without(CottageProgress.SCRATCHY_QUEST));
             }
         };
         AsgardDialogue.node(role, "greeting").when(AsgardDialogue.ALWAYS).variants(3).onShow(meet).options(answers)
@@ -244,7 +244,7 @@ public final class CottageDialogue {
 
     /** He will look for Señor Scratchy: he sees him glow (within 24 blocks) until he is home. */
     static void acceptQuest(Ctx ctx) {
-        ctx.player().setData(ModAttachments.COTTAGE, progress(ctx).with(CottageProgress.SCRATCHY_QUEST));
+        ModAttachments.COTTAGE.set(ctx.player(), progress(ctx).with(CottageProgress.SCRATCHY_QUEST));
     }
 
     /** Nicky's gift (once a day, {@code giftsPerDay}): a cookie, a flower, or his drawing of you. */
@@ -260,7 +260,7 @@ public final class CottageDialogue {
                     .get(player.getRandom().nextInt(4)));
             default -> CottageGoals.named(Items.PAPER, "item.enhanced.nicky_drawing");
         };
-        player.setData(ModAttachments.COTTAGE, progress(ctx).gifted(day(ctx)));
+        ModAttachments.COTTAGE.set(player, progress(ctx).gifted(day(ctx)));
         Scratchy.give(player, gift);
         if (ctx.npc() != null && player.level() instanceof ServerLevel level) {
             AsgardianEntity nicky = ctx.npc();
@@ -303,7 +303,7 @@ public final class CottageDialogue {
             return;
         }
         player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, blessingTicks(), 0));
-        player.setData(ModAttachments.COTTAGE, progress(ctx).withLastBlessingDay(day(ctx)));
+        ModAttachments.COTTAGE.set(player, progress(ctx).withLastBlessingDay(day(ctx)));
         if (player.level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER, player.getX(), player.getY() + 1.0, player.getZ(), 16,
                     0.4, 0.6, 0.4, 0.0);

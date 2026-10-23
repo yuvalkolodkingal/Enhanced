@@ -50,7 +50,7 @@ public final class CaptainHud implements LayeredDraw.Layer {
     /** The status after an ability's line on his HUD. */
     @Nullable
     public static Component status(LocalPlayer player, PowerData data, int ability, long now) {
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
         switch (ability) {
             case 1 -> {
                 Component shield = shieldLine(player, cs);

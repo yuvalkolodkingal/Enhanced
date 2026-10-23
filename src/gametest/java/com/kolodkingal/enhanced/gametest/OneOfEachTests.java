@@ -248,7 +248,7 @@ public final class OneOfEachTests {
         check(HeimdallPost.touchSocket(player), "the socket answers to its keeper");
         // Others hear who keeps the Bifrost; he may give it back.
         check("greeting".equals(picked(traveller, npc)), "a newcomer is greeted first: " + picked(traveller, npc));
-        traveller.setData(ModAttachments.ASGARD, traveller.getData(ModAttachments.ASGARD).with(AsgardProgress.MET_HEIMDALL));
+        ModAttachments.ASGARD.set(traveller, ModAttachments.ASGARD.get(traveller).with(AsgardProgress.MET_HEIMDALL));
         check("keeper_away".equals(picked(traveller, npc)), "then hears who keeps the Bifrost: " + picked(traveller, npc));
         check(AsgardDialogue.offered(AsgardTalk.context(traveller, npc, Role.HEIMDALL), AsgardDialogue.find(Role.HEIMDALL, "keeper_away"))
                 .stream().anyMatch(o -> o.key().equals(HeimdallTalk.HOME)), "and may still be sent home");

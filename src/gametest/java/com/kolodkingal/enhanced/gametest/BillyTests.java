@@ -184,7 +184,7 @@ public final class BillyTests {
     public static void wandaAndBillyWalkTheRoad(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
-        level.setData(ModAttachments.ROAD_DOORS, RoadDoors.EMPTY);
+        ModAttachments.ROAD_DOORS.set(level, RoadDoors.EMPTY);
         BlockPos a = placeDoor(helper, 3, 3);
         BlockPos b = placeDoor(helper, 17, 3);
         BlockPos c = placeDoor(helper, 17, 17);
@@ -220,7 +220,7 @@ public final class BillyTests {
     public static void aMissingDoorIsSkipped(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerLevel level = helper.getLevel();
-        level.setData(ModAttachments.ROAD_DOORS, RoadDoors.EMPTY);
+        ModAttachments.ROAD_DOORS.set(level, RoadDoors.EMPTY);
         BlockPos a = placeDoor(helper, 3, 3);
         // Listed, but the door is gone (lost without the Road noticing).
         BlockPos lost = helper.absolutePos(new BlockPos(10, 2, 3));

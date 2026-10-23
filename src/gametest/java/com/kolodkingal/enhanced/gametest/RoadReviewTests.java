@@ -452,10 +452,10 @@ public final class RoadReviewTests {
                     check(saved.toString().contains("enhanced:road_stash") && saved.toString().contains("minecraft:diamond"), "the stash is in the player's own save");
                     RoadProgress progress = RoadSave.get(server).progress(player.getUUID());
                     check(progress.data(StructureCopyChallenge.ID).isEmpty(), "and not in the world's save of the Road");
-                    check(!player.getData(ModAttachments.ROAD_STASH).isEmpty(), "(the attachment)");
+                    check(!ModAttachments.ROAD_STASH.get(player).isEmpty(), "(the attachment)");
                     RoadTrials.leave(player, RoadChallenge.End.LEFT);
                     check(player.getInventory().getItem(5).is(Items.DIAMOND) && player.getInventory().getItem(5).getCount() == 7, "he has his diamonds back");
-                    check(player.getData(ModAttachments.ROAD_STASH).isEmpty() && !player.saveWithoutId(new CompoundTag()).toString().contains("enhanced:road_stash"),
+                    check(ModAttachments.ROAD_STASH.get(player).isEmpty() && !player.saveWithoutId(new CompoundTag()).toString().contains("enhanced:road_stash"),
                             "and the stash goes in the same moment, so the two can never be saved apart");
                 })
                 .thenSucceed();
@@ -616,7 +616,7 @@ public final class RoadReviewTests {
         check(empty.progress(UUID.randomUUID()).isBlank() && empty.allocate(UUID.randomUUID(), "parkour", 8) == 0, "and the first cell is cell 0");
         // The attachments a 3.1 player has not got read as empty.
         ServerPlayer player = TestKit.fixture(helper).player(10.5, TestKit.FLOOR, 10.5);
-        check(player.getData(ModAttachments.ROAD_STASH).isEmpty(), "a player without the stash reads as empty");
+        check(ModAttachments.ROAD_STASH.get(player).isEmpty(), "a player without the stash reads as empty");
         check(RoadChallenges.count() >= 1 && new ChunkPos(0, 0).x == 0, "(the trials are there)");
         helper.succeed();
     }

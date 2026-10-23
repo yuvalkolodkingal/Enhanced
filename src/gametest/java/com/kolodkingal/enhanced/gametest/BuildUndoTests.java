@@ -543,14 +543,14 @@ public final class BuildUndoTests {
 
         // rank and meter: Billy's.
         run(server, child, "enhanced build rank " + him + " 4");
-        check(BillyRanks.rank(billy.getData(ModAttachments.BUILD_DATA)) == 1, "a player who is no operator changes no rank");
+        check(BillyRanks.rank(ModAttachments.BUILD_DATA.get(billy)) == 1, "a player who is no operator changes no rank");
         run(server, operator, "enhanced build rank " + him + " 3");
-        BuildData data = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData data = ModAttachments.BUILD_DATA.get(billy);
         long now = server.overworld().getGameTime();
         check(BillyRanks.rank(data) == 3 && BillyMagic.meter(data, now) == 2048, "rank 3 and the meter full at 2,048: " + BillyRanks.rank(data) + ", "
                 + BillyMagic.meter(data, now));
         run(server, operator, "enhanced build meter " + him + " 10");
-        data = billy.getData(ModAttachments.BUILD_DATA);
+        data = ModAttachments.BUILD_DATA.get(billy);
         check(BillyMagic.meter(data, server.overworld().getGameTime()) == 10, "the meter is 10: " + BillyMagic.meter(data, server.overworld().getGameTime()));
         BuildTestSupport.Seen.of(op);
         run(server, operator, "enhanced build rank " + her + " 2");

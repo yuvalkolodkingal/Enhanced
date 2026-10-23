@@ -244,7 +244,7 @@ public final class RoadEndingTests {
                     check(Powers.is(player, Power.BILLY), "Billy awakens");
                     check(genes(player) == 2, "one Gene used up, no more");
                     check(RoadDimension.in(player) && RoadTrials.isInside(player) && RoadEnding.isLeaving(player), "he is still in the Road: the farewell");
-                    BuildData build = player.getData(ModAttachments.BUILD_DATA);
+                    BuildData build = ModAttachments.BUILD_DATA.get(player);
                     check(build.rank() == 1 && build.meter() >= BuildData.FULL, "Billy starts at Build Magic rank 1 with a full meter");
                     check(!HexManager.onTeleport(RoadTestSupport.road(helper), player, player.position().add(500.0, 0.0, 0.0)), "no teleport takes him out early");
                     AbilityHandler.onKey(player, 1, true);

@@ -91,7 +91,7 @@ public final class WitchesRoad {
     // The doors of the Road
 
     public static RoadDoors doors(Level level) {
-        return level.getData(ModAttachments.ROAD_DOORS);
+        return ModAttachments.ROAD_DOORS.get(level);
     }
 
     public static boolean isDoor(BlockState state) {
@@ -110,7 +110,7 @@ public final class WitchesRoad {
         RoadDoors doors = doors(level);
         RoadDoors updated = doors.with(pos);
         if (updated != doors) {
-            level.setData(ModAttachments.ROAD_DOORS, updated);
+            ModAttachments.ROAD_DOORS.set(level, updated);
         }
     }
 
@@ -118,7 +118,7 @@ public final class WitchesRoad {
     public static void removeDoor(ServerLevel level, BlockPos pos) {
         RoadDoors doors = doors(level);
         if (doors.doors().contains(pos)) {
-            level.setData(ModAttachments.ROAD_DOORS, doors.without(pos));
+            ModAttachments.ROAD_DOORS.set(level, doors.without(pos));
         }
         GlobalPos key = GlobalPos.of(level.dimension(), pos.immutable());
         RITUALS.remove(key);

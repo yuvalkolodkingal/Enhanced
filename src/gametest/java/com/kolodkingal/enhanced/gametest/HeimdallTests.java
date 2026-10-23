@@ -124,7 +124,7 @@ public final class HeimdallTests {
     }
 
     private static void won(ServerPlayer player) {
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.WATCH_WON));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.WATCH_WON));
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -182,10 +182,10 @@ public final class HeimdallTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer owner = f.player(10.5, FLOOR, 10.5);
         ItemStack first = HofundBond.give(owner);
-        check(!HofundBond.stale(first, owner.getData(ModAttachments.ASGARD).hofundBond()), "the newest copy is not stale");
+        check(!HofundBond.stale(first, ModAttachments.ASGARD.get(owner).hofundBond()), "the newest copy is not stale");
         ItemStack old = owner.getMainHandItem();
         HofundBond.bind(owner);
-        check(HofundBond.stale(old, owner.getData(ModAttachments.ASGARD).hofundBond()), "a newer bond makes the old copy stale");
+        check(HofundBond.stale(old, ModAttachments.ASGARD.get(owner).hofundBond()), "a newer bond makes the old copy stale");
         owner.tickCount = 10;
         old.inventoryTick(owner.level(), owner, 0, true);
         check(old.isEmpty(), "the stale copy crumbles when it ticks");
@@ -616,7 +616,7 @@ public final class HeimdallTests {
         List<String> node = new ArrayList<>();
         List<String> first = heimdallOffers(player, node);
         check("greeting".equals(node.get(0)) && first.contains(HeimdallTalk.WATCH), "his greeting offers the Watch: " + node + first);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.MET_HEIMDALL));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.MET_HEIMDALL));
         List<String> later = heimdallOffers(player, node);
         check("watch_offer".equals(node.get(1)) && later.contains(HeimdallTalk.WATCH), "and later too: " + node + later);
         helper.succeed();
@@ -649,7 +649,7 @@ public final class HeimdallTests {
             for (Entity shadow : shadows) {
                 shadow.hurt(watcher.damageSources().playerAttack(watcher), 1.0F);
             }
-            AsgardProgress progress = watcher.getData(ModAttachments.ASGARD);
+            AsgardProgress progress = ModAttachments.ASGARD.get(watcher);
             check(!GuardiansWatch.watching(watcher) && progress.has(AsgardProgress.WATCH_WON), "all seven struck: the Watch is won");
             check(HofundBond.hasOwn(watcher), "Heimdall gives him Hofund");
             check(GuardiansWatch.refusal(watcher) != null, "it is not taken twice");
@@ -673,9 +673,9 @@ public final class HeimdallTests {
             for (Entity shadow : shadows) {
                 check(shadow.isRemoved(), "its shadows are gone");
             }
-            check(!watcher.getData(ModAttachments.ASGARD).has(AsgardProgress.WATCH_WON), "nothing won");
+            check(!ModAttachments.ASGARD.get(watcher).has(AsgardProgress.WATCH_WON), "nothing won");
             check("message.enhanced.watch.rest".equals(GuardiansWatch.refusal(watcher)), "he must rest before he tries again");
-            watcher.setData(ModAttachments.ASGARD, watcher.getData(ModAttachments.ASGARD).withWatchReadyAt(0));
+            ModAttachments.ASGARD.set(watcher, ModAttachments.ASGARD.get(watcher).withWatchReadyAt(0));
             f.config(com.kolodkingal.enhanced.config.HeimdallConfig.WATCH_SECONDS, 30);
             check(GuardiansWatch.start(watcher), "rested, he may try again");
             long left = GuardiansWatch.ticksLeft(watcher, watcher.server.overworld().getGameTime());

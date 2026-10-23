@@ -412,10 +412,10 @@ public final class BuildReviewTests {
         BlockPos a2 = abs(f, 6, 2, 6);
         BlockPos b2 = new BlockPos(2_000_000_000, 2_000_000_000, 2_000_000_000);
         BuildMagic.action(wanda, BuildActionPayload.VIEW, a2, b2, Spell.FILL.id() + 1);
-        BuildView first = wanda.getData(ModAttachments.BUILD_VIEW);
+        BuildView first = ModAttachments.BUILD_VIEW.get(wanda);
         check(first.box().isPresent() && first.box().get().min().equals(a), "the first box is shown at once");
         helper.runAfterDelay(GAP, () -> {
-            BuildView later = wanda.getData(ModAttachments.BUILD_VIEW);
+            BuildView later = ModAttachments.BUILD_VIEW.get(wanda);
             check(later.box().isPresent() && later.box().get().min().equals(a2), "and the newest, held back, is shown after: " + later.box());
             BlockPos far = later.box().get().max();
             check(far.getX() <= 29_999_999 && far.getY() <= 319 && far.getZ() <= 29_999_999, "its far corner is clamped to the world: " + far);

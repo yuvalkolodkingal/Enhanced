@@ -41,7 +41,7 @@ public final class DeadpoolHud {
                 yield cooldown;
             }
             case 2 -> {
-                DeadpoolState state = player.getData(ModAttachments.DEADPOOL);
+                DeadpoolState state = ModAttachments.DEADPOOL.get(player);
                 MutableComponent line;
                 if (state.reloadAt() > now) {
                     line = Component.translatable("hud.enhanced.deadpool.reloading").withStyle(ChatFormatting.AQUA);
@@ -60,7 +60,7 @@ public final class DeadpoolHud {
                 yield cooldown == null ? line : cooldown.copy().append(" ").append(line);
             }
             case 5 -> {
-                DeadpoolState state = player.getData(ModAttachments.DEADPOOL);
+                DeadpoolState state = ModAttachments.DEADPOOL.get(player);
                 if (state.dogpool().isPresent() && state.dogpoolUntil() > now) {
                     long left = (state.dogpoolUntil() - now) / 20;
                     String time = String.format(Locale.ROOT, "%d:%02d", left / 60, left % 60);

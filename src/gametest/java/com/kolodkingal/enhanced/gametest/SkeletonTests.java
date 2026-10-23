@@ -639,7 +639,7 @@ public final class SkeletonTests {
     @GameTest(template = ARENA, batch = SKELETON)
     public static void theBossDataStartsEmptyAndTheCodecRoundTrips(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BossData fresh = level.getServer().overworld().getData(ModAttachments.BOSS_DATA);
+        BossData fresh = ModAttachments.BOSS_DATA.get(level.getServer().overworld());
         check(fresh.gifts().isEmpty() && fresh.rest().isEmpty(), "no gift and no rest at the start");
         RegistryOps<Tag> ops = level.registryAccess().createSerializationContext(NbtOps.INSTANCE);
         UUID who = UUID.randomUUID();

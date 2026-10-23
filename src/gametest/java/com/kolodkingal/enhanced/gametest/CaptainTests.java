@@ -306,7 +306,7 @@ public final class CaptainTests {
         press(cap, 1, false);
         ThrownShieldEntity shield = ShieldThrow.flying(cap);
         check(shield != null && cap.getOffhandItem().isEmpty(), "it flies; the hand is empty");
-        check(cap.getData(ModAttachments.CAPTAIN).has(CaptainState.OFF_HAND), "from the off hand");
+        check(ModAttachments.CAPTAIN.get(cap).has(CaptainState.OFF_HAND), "from the off hand");
         press(cap, 1, false);
         check(ShieldThrow.flying(cap) == shield, "no second throw while it flies");
         until(helper, 40, () -> shieldIn(cap, InteractionHand.OFF_HAND), () -> {
@@ -622,12 +622,12 @@ public final class CaptainTests {
     public static void theShieldOnHisBack(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer cap = cap(f, 5.5, 5.5);
-        check(!cap.getData(ModAttachments.CAPTAIN).has(CaptainState.BACK), "in his hand: not on his back");
+        check(!ModAttachments.CAPTAIN.get(cap).has(CaptainState.BACK), "in his hand: not on his back");
         ItemStack shield = cap.getOffhandItem();
         cap.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
         cap.getInventory().setItem(20, shield);
         step(helper, 1, () -> {
-            check(cap.getData(ModAttachments.CAPTAIN).has(CaptainState.BACK), "in his inventory: on his back");
+            check(ModAttachments.CAPTAIN.get(cap).has(CaptainState.BACK), "in his inventory: on his back");
             helper.succeed();
         }, cap);
     }

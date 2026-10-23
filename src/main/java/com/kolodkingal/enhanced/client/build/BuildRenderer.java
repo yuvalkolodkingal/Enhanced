@@ -711,7 +711,7 @@ public final class BuildRenderer {
                 continue;
             }
             Power power = BuildClient.hero(other);
-            BuildView view = other.getExistingData(ModAttachments.BUILD_VIEW).orElse(BuildView.EMPTY);
+            BuildView view = ModAttachments.BUILD_VIEW.getExisting(other).orElse(BuildView.EMPTY);
             if (!BuildClient.isBuilder(power) || !view.active() || view.box().isEmpty()) {
                 continue;
             }
@@ -808,7 +808,7 @@ public final class BuildRenderer {
         if (BuildClient.hero(player) != Power.BILLY) {
             return about ? Component.translatable("hud.enhanced.build.about", number(changed)) : Component.literal(number(changed));
         }
-        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        BuildData data = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);
         long cost = BuildClient.cost(data);
         MutableComponent paid = about ? Component.translatable("hud.enhanced.build.about", number(cost)) : Component.literal(number(cost));
         paid.append(" ✦");

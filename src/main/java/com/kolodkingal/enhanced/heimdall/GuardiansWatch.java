@@ -179,7 +179,7 @@ public final class GuardiansWatch {
      */
     @Nullable
     public static String refusal(ServerPlayer player) {
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         if (watching(player)) {
             return "message.enhanced.watch.already";
         }
@@ -213,7 +213,7 @@ public final class GuardiansWatch {
     public static boolean start(ServerPlayer player) {
         String why = refusal(player);
         if (why != null) {
-            long rest = Math.max(0, player.getData(ModAttachments.ASGARD).watchReadyAt() - now(player));
+            long rest = Math.max(0, ModAttachments.ASGARD.get(player).watchReadyAt() - now(player));
             player.displayClientMessage(Component.translatable(why, (rest + 19) / 20), true);
             return false;
         }
@@ -395,7 +395,7 @@ public final class GuardiansWatch {
             return;
         }
         end(player, watch);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.WATCH_WON).with(AsgardProgress.MET_HEIMDALL));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.WATCH_WON).with(AsgardProgress.MET_HEIMDALL));
         HofundBond.give(player);
         player.serverLevel().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.WATCH_WIN.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
         player.sendSystemMessage(Component.translatable("message.enhanced.watch.won").withStyle(ChatFormatting.GOLD));
@@ -412,7 +412,7 @@ public final class GuardiansWatch {
             return;
         }
         end(player, watch);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).withWatchReadyAt(now(player) + retryTicks()));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).withWatchReadyAt(now(player) + retryTicks()));
         if (!player.hasDisconnected()) {
             player.serverLevel().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.WATCH_LOSE.get(), SoundSource.PLAYERS, 1.2F, 1.0F);
             player.sendSystemMessage(Component.translatable(why).withStyle(ChatFormatting.GRAY));

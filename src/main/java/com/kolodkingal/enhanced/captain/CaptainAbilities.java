@@ -198,10 +198,10 @@ public final class CaptainAbilities {
      * a hand, and none in flight. Everyone who sees him draws it on his back ({@code CapShieldLayer}).
      */
     static void backFlag(ServerPlayer player) {
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
         boolean back = ShieldRules.carriesOnBack(player) && cs.shieldEntity() < 0;
         if (cs.has(CaptainState.BACK) != back) {
-            player.setData(ModAttachments.CAPTAIN, cs.with(CaptainState.BACK, back));
+            ModAttachments.CAPTAIN.set(player, cs.with(CaptainState.BACK, back));
         }
     }
 
@@ -366,9 +366,9 @@ public final class CaptainAbilities {
             state.chargeHit.clear();
         }
         ShieldThrow.dropFlying(player);
-        CaptainState cs = player.getData(ModAttachments.CAPTAIN);
+        CaptainState cs = ModAttachments.CAPTAIN.get(player);
         if (!cs.equals(CaptainState.EMPTY)) {
-            player.setData(ModAttachments.CAPTAIN, CaptainState.EMPTY);
+            ModAttachments.CAPTAIN.set(player, CaptainState.EMPTY);
         }
         data.set(Live.CAP_SLAMMING, false);
         data.set(Live.CAP_CHARGING, false);
@@ -378,7 +378,7 @@ public final class CaptainAbilities {
     static void onGone(ServerPlayer player) {
         PowerData data = Powers.get(player);
         if (STATES.containsKey(player.getUUID()) || data.acts(Power.CAPTAIN_AMERICA)
-                || player.getData(ModAttachments.CAPTAIN).shieldEntity() >= 0) {
+                || ModAttachments.CAPTAIN.get(player).shieldEntity() >= 0) {
             endAll(player, data);
         }
         STATES.remove(player.getUUID());

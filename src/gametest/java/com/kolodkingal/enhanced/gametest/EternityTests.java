@@ -198,7 +198,7 @@ public final class EternityTests {
             assertNear(thor.position().distanceTo(EternityRealm.ARRIVAL), 0.0, 1.0E-6, "at the arrival");
             assertNear(thor.getYRot(), EternityRealm.ARRIVAL_YAW, 1.0E-3, "facing north, toward Eternity");
             check(!be.charging(), "the altar is quiet again");
-            EternityProgress progress = thor.getData(ModAttachments.ETERNITY);
+            EternityProgress progress = ModAttachments.ETERNITY.get(thor);
             check(progress.returnTo().isPresent() && progress.returnTo().get().dimension() == Level.OVERWORLD
                     && progress.visits() == 1, "his way home saved, one visit");
             check(realm.getBlockState(EternityRealm.WISHING_STONE).is(ModBlocks.ETERNITY_ALTAR.get()),
@@ -311,7 +311,7 @@ public final class EternityTests {
         check(Wishes.mayWish(player), "a wish to make");
         EternityRealm.wish(player, EternityWishPayload.ITEM, BuiltInRegistries.ITEM.getKey(Items.DIAMOND));
         check(count(player, Items.DIAMOND) == 64, "64 diamonds: " + count(player, Items.DIAMOND));
-        check(!Wishes.mayWish(player) && player.getData(ModAttachments.ETERNITY).lastWish() == EternityProgress.ITEM,
+        check(!Wishes.mayWish(player) && ModAttachments.ETERNITY.get(player).lastWish() == EternityProgress.ITEM,
                 "his wish is spent");
         check(EternityRealm.goingHome(player), "he goes home in a moment");
         helper.succeed();
@@ -422,7 +422,7 @@ public final class EternityTests {
         EternityRealm.wish(player, EternityWishPayload.ITEM, BuiltInRegistries.ITEM.getKey(Items.EMERALD));
         check(count(player, Items.EMERALD) == 0, "a second wish refused");
         EternityCommand.reset(player.createCommandSourceStack(), player);
-        check(Wishes.mayWish(player) && player.getData(ModAttachments.ETERNITY).visits() == 2,
+        check(Wishes.mayWish(player) && ModAttachments.ETERNITY.get(player).visits() == 2,
                 "reset gives it back (the visits kept)");
         EternityRealm.wish(player, EternityWishPayload.ITEM, BuiltInRegistries.ITEM.getKey(Items.EMERALD));
         check(count(player, Items.EMERALD) == 64, "and he wishes again");
@@ -443,7 +443,7 @@ public final class EternityTests {
         assertNear(player.position().distanceTo(from), 0.0, 1.0E-6, "on the very spot");
         assertNear(player.getYRot(), 37.0, 1.0E-3, "facing the same way");
         assertNear(player.getXRot(), 12.0, 1.0E-3, "looking at the same height");
-        check(player.getData(ModAttachments.ETERNITY).returnTo().isEmpty() && Wishes.mayWish(player),
+        check(ModAttachments.ETERNITY.get(player).returnTo().isEmpty() && Wishes.mayWish(player),
                 "the way home forgotten; leaving costs no wish");
         helper.succeed();
     }
@@ -466,7 +466,7 @@ public final class EternityTests {
         check(Powers.power(player) == Power.LOVE, "she is Love");
         assertNear(player.getMaxHealth(), 32.0, 1.0E-4, "32 health (16 hearts)");
         check(count(player, ModItems.STORMBREAKER.get()) == 1, "with a Stormbreaker");
-        check(player.getData(ModAttachments.ETERNITY).lastWish() == EternityProgress.LOVE, "her wish was Love");
+        check(ModAttachments.ETERNITY.get(player).lastWish() == EternityProgress.LOVE, "her wish was Love");
         // One who already carries the axe gets no second.
         ServerPlayer thor = traveller(f, 6.5, 4.5, Power.THOR);
         thor.getInventory().add(new ItemStack(ModItems.STORMBREAKER.get()));

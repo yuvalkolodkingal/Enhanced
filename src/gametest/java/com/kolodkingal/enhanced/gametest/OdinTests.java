@@ -145,11 +145,11 @@ public final class OdinTests {
     }
 
     private static AsgardProgress progress(ServerPlayer player) {
-        return player.getData(ModAttachments.ASGARD);
+        return ModAttachments.ASGARD.get(player);
     }
 
     private static void flag(ServerPlayer player, int flag) {
-        player.setData(ModAttachments.ASGARD, progress(player).with(flag));
+        ModAttachments.ASGARD.set(player, progress(player).with(flag));
     }
 
     private static long now(ServerPlayer player) {

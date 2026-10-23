@@ -101,9 +101,9 @@ public final class StructureSupply {
         }
         CompoundTag data = new CompoundTag();
         data.put(STASH, stash);
-        CompoundTag all = player.getData(ModAttachments.ROAD_STASH).copy();
+        CompoundTag all = ModAttachments.ROAD_STASH.get(player).copy();
         all.put(challenge, data);
-        player.setData(ModAttachments.ROAD_STASH, all);
+        ModAttachments.ROAD_STASH.set(player, all);
         Map<Item, Integer> amounts = amounts(model, WitchesRoadConfig.STRUCTURE_COPY_SUPPLY_PERCENT.get());
         for (Map.Entry<Item, Integer> entry : amounts.entrySet()) {
             int size = entry.getKey().getDefaultMaxStackSize();
@@ -138,7 +138,7 @@ public final class StructureSupply {
     /** Takes the trial's blocks away from the player and gives him back what was put aside. Does nothing if there is nothing to return. */
     public static void restore(ServerPlayer player, String challenge) {
         strip(player);
-        CompoundTag data = player.getData(ModAttachments.ROAD_STASH).getCompound(challenge);
+        CompoundTag data = ModAttachments.ROAD_STASH.get(player).getCompound(challenge);
         if (!data.contains(STASH, Tag.TAG_LIST)) {
             return;
         }
@@ -157,15 +157,15 @@ public final class StructureSupply {
             }
         }
         // (The inventory and the stash are saved with the player: the stash goes in the same breath as the things come back.)
-        CompoundTag all = player.getData(ModAttachments.ROAD_STASH).copy();
+        CompoundTag all = ModAttachments.ROAD_STASH.get(player).copy();
         all.remove(challenge);
-        player.setData(ModAttachments.ROAD_STASH, all);
+        ModAttachments.ROAD_STASH.set(player, all);
         player.containerMenu.broadcastChanges();
     }
 
     /** Whether the player has things put aside that he has not got back. */
     public static boolean hasStash(ServerPlayer player, String challenge) {
-        return player.getData(ModAttachments.ROAD_STASH).getCompound(challenge).contains(STASH, Tag.TAG_LIST);
+        return ModAttachments.ROAD_STASH.get(player).getCompound(challenge).contains(STASH, Tag.TAG_LIST);
     }
 
     /** Takes every block the trial gave out away from the player (his backpack, armour, off hand, the crafting square, the cursor). */

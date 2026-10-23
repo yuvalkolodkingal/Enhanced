@@ -342,7 +342,7 @@ public final class HealingTests {
         chat(logan);
         zombieBlow(logan, zombie(helper, 9.5, 9.5));
         check(chat(logan).contains("message.enhanced.healing.tip"), "the tip at his first DOWN");
-        check(logan.getData(ModAttachments.HEALING).has(HealingState.TIP_SHOWN), "remembered");
+        check(ModAttachments.HEALING.get(logan).has(HealingState.TIP_SHOWN), "remembered");
         Downed.rise(logan);
         zombieBlow(logan, zombie(helper, 9.5, 9.5));
         check(down(logan) && !chat(logan).contains("message.enhanced.healing.tip"), "not at the second");

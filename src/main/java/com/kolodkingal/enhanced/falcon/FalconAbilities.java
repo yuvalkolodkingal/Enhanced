@@ -435,12 +435,12 @@ public final class FalconAbilities {
 
     /** His Redwing's time and repairs (the attachment: saved, synced to him). */
     static FalconState data(Player player) {
-        return player.getData(ModAttachments.FALCON);
+        return ModAttachments.FALCON.get(player);
     }
 
     static void setData(Player player, FalconState state) {
         if (!state.equals(data(player))) {
-            player.setData(ModAttachments.FALCON, state);
+            ModAttachments.FALCON.set(player, state);
         }
     }
 

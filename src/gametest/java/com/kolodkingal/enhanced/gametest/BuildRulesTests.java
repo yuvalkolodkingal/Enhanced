@@ -235,7 +235,7 @@ public final class BuildRulesTests {
         for (BlockPos pos : BlockPos.betweenClosed(world.minX(), world.minY(), world.minZ(), world.maxX(), world.maxY(), world.maxZ())) {
             before.put(pos.immutable(), level.getBlockState(pos));
         }
-        BuildData meter = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData meter = ModAttachments.BUILD_DATA.get(billy);
         BuildMagic.useClock(() -> 0L); // (its 2 ms are not this test's: a busy test server must not cut it short)
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, box), BuildCastPayload.PREFLIGHT);
@@ -244,7 +244,7 @@ public final class BuildRulesTests {
         check(verdict != null && verdict.code() == BuildVerdictPayload.READY_PARTLY, "a verdict, ready in part: " + seen);
         check(events[0] == 0, "no event was posted: " + events[0]);
         check(before.entrySet().stream().allMatch(entry -> level.getBlockState(entry.getKey()) == entry.getValue()), "the world is as it was");
-        check(billy.getData(ModAttachments.BUILD_DATA).meter() == meter.meter(), "his meter is untouched");
+        check(ModAttachments.BUILD_DATA.get(billy).meter() == meter.meter(), "his meter is untouched");
         check(seen.bar.isEmpty(), "and nothing is said");
         boolean keeps = false;
         boolean body = false;
@@ -284,7 +284,7 @@ public final class BuildRulesTests {
         for (BlockPos pos : BlockPos.betweenClosed(abs(f, 9, 2, 9), abs(f, 11, 2, 11))) {
             check(BossFights.inAnyArena(f.level(), pos), "the box lies in the arena: " + pos);
         }
-        BuildData before = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData before = ModAttachments.BUILD_DATA.get(billy);
         BuildMagic.useClock(() -> 0L);
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, inside), BuildCastPayload.PREFLIGHT);
@@ -302,7 +302,7 @@ public final class BuildRulesTests {
         check(seen.heard("build_fizzle") && !seen.heard("build_cast_billy") && seen.fx.isEmpty(), "it fizzles, with no cast sound and no effect: "
                 + seen.sounds + ", " + seen.fx);
         check(working(billy) == null && steps(billy).isEmpty() && count(f, inside, Blocks.STONE) == 0, "no job, no step, no block");
-        BuildData after = billy.getData(ModAttachments.BUILD_DATA);
+        BuildData after = ModAttachments.BUILD_DATA.get(billy);
         check(after.meter() == before.meter() && after.practice() == before.practice(), "his meter and practice are as they were: " + after);
 
         BoundingBox across = new BoundingBox(0, 3, 0, 20, 3, 4);
@@ -349,7 +349,7 @@ public final class BuildRulesTests {
         check(working(billy) == null && count(f, inside, Blocks.STONE) == 0 && steps(billy).isEmpty(), "and it built nothing");
 
         BuildMagic.useClock(() -> 0L);
-        billy.setData(ModAttachments.BUILD_DATA, billy.getData(ModAttachments.BUILD_DATA).withPauseUntil(0L)); // (the pause after his spell)
+        ModAttachments.BUILD_DATA.set(billy, ModAttachments.BUILD_DATA.get(billy).withPauseUntil(0L)); // (the pause after his spell)
         cast(billy, boxSpell(f, Spell.FILL, inside));
         seen = Seen.of(billy);
         check(working(billy) == null && seen.code() == BuildVerdictPayload.NOTHING_CAN_CHANGE, "with a steady clock it is refused up front: " + seen);

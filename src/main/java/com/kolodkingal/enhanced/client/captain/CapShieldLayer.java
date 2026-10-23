@@ -32,7 +32,7 @@ public class CapShieldLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
 
     /** Whether the player's shield is drawn on his back. */
     public static boolean onBack(AbstractClientPlayer player) {
-        if (player.isInvisible() || !player.getData(ModAttachments.CAPTAIN).has(CaptainState.BACK)) {
+        if (player.isInvisible() || !ModAttachments.CAPTAIN.get(player).has(CaptainState.BACK)) {
             return false;
         }
         if (player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) {

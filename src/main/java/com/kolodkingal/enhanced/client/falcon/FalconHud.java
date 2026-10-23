@@ -43,7 +43,7 @@ public final class FalconHud {
                 yield cooldown;
             }
             case 5 -> {
-                FalconState state = player.getData(ModAttachments.FALCON);
+                FalconState state = ModAttachments.FALCON.get(player);
                 if (data.toggle(Toggle.REDWING_OUT) && state.redwingUntil() > now) {
                     RedwingEntity drone = FalconEffects.drone(player);
                     String health = drone == null ? "?" : String.valueOf(Math.round(drone.getHealth()));

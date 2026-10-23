@@ -276,7 +276,7 @@ public final class BuildClient {
 
     /** The server's word on build mode, followed whenever it changes; also off for anyone who no longer builds. */
     private static void followServer(LocalPlayer player) {
-        boolean now = player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
+        boolean now = ModAttachments.BUILD_VIEW.getExisting(player).map(BuildView::active).orElse(false);
         if (player != seenPlayer) {
             // A new player entity (a respawn, a change of dimension) starts from what the server says now.
             seenPlayer = player;
@@ -934,13 +934,13 @@ public final class BuildClient {
      * and the button show what {@code BuildData.instant} says.
      */
     static void toggleInstant(LocalPlayer player) {
-        boolean on = player.getData(ModAttachments.BUILD_DATA).instant();
+        boolean on = ModAttachments.BUILD_DATA.get(player).instant();
         send(new BuildActionPayload(BuildActionPayload.INSTANT, on ? 0 : 1));
     }
 
     /** Whether the Instant switch is on for the local player (the server's word, synced). */
     public static boolean instant(LocalPlayer player) {
-        return player.getData(ModAttachments.BUILD_DATA).instant();
+        return ModAttachments.BUILD_DATA.get(player).instant();
     }
 
     /** Ctrl + Z (also out of build mode, R42): undo, or stop and take back a working spell, or drop a waiting one. */
@@ -1076,7 +1076,7 @@ public final class BuildClient {
     }
 
     private static int pocketId(LocalPlayer player) {
-        return player.getExistingData(ModAttachments.BUILD_DATA).map(BuildData::pocket).orElse(0);
+        return ModAttachments.BUILD_DATA.getExisting(player).map(BuildData::pocket).orElse(0);
     }
 
     /** Asks the server for the pocket's copy this client lacks (after a relog), now and then while it lacks it. */
@@ -1227,7 +1227,7 @@ public final class BuildClient {
         if (limits == null || !limits.limited()) {
             return false;
         }
-        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        BuildData data = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);
         return cost(data) > BillyMagic.top(data);
     }
 

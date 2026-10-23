@@ -463,7 +463,7 @@ public final class WolverineTests {
         press(logan, 2, false);
         check(Claws.out(data(logan)), "the claws stay out in the Rage");
         // (The Rage made short: it ends in 3 ticks.)
-        logan.setData(ModAttachments.WOLVERINE, Berserker.get(logan).withBerserkUntil(
+        ModAttachments.WOLVERINE.set(logan, Berserker.get(logan).withBerserkUntil(
                 helper.getLevel().getGameTime() + 3));
         step(helper, 6, () -> {
             check(!Berserker.raging(logan), "over");

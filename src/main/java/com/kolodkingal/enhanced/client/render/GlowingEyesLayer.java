@@ -68,7 +68,7 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
 
     /** Whether this player is in build mode, as the server last synced it. */
     private static boolean building(AbstractClientPlayer player) {
-        return player.getExistingData(ModAttachments.BUILD_VIEW).map(BuildView::active).orElse(false);
+        return ModAttachments.BUILD_VIEW.getExisting(player).map(BuildView::active).orElse(false);
     }
 
     @Override

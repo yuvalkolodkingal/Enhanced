@@ -347,10 +347,10 @@ public final class AsgardRealmTests {
             }
             check(AsgardDimension.in(friend), "his friend in the circle comes along");
             check(caller.position().distanceTo(CityPlan.ARRIVAL) < 1.5, "to the Observatory: " + caller.position());
-            AsgardProgress progress = caller.getData(ModAttachments.ASGARD);
+            AsgardProgress progress = ModAttachments.ASGARD.get(caller);
             check(progress.has(AsgardProgress.VISITED) && progress.cameFrom() != null
                     && progress.cameFrom().pos().closerThan(stone, 4), "he has visited, and is remembered where he came from");
-            check(friend.getData(ModAttachments.ASGARD).has(AsgardProgress.VISITED), "so is his friend");
+            check(ModAttachments.ASGARD.get(friend).has(AsgardProgress.VISITED), "so is his friend");
             return true;
         });
     }

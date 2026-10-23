@@ -407,8 +407,8 @@ public final class HelaBossTests {
             check(fight.isOver() && fight.result() == BossEnd.VICTORY, "a blow that would kill her wins");
             check(hela.isAlive() && hela.state() == HelaState.DYING, "she dissolves, she does not die");
             check(hasHeaddress(winner), "the winner has the headdress");
-            check(winner.getData(ModAttachments.ASGARD).has(AsgardProgress.HELA_VICTOR), "and the right to Gungnir");
-            check(!hasHeaddress(idle) && !idle.getData(ModAttachments.ASGARD).has(AsgardProgress.HELA_VICTOR), "nothing for one who did nothing");
+            check(ModAttachments.ASGARD.get(winner).has(AsgardProgress.HELA_VICTOR), "and the right to Gungnir");
+            check(!hasHeaddress(idle) && !ModAttachments.ASGARD.get(idle).has(AsgardProgress.HELA_VICTOR), "nothing for one who did nothing");
             AsgardState s = AsgardState.get(f.level().getServer());
             check(s.odinAwake() && s.helaDefeats() == 1, "Odin wakes, her defeat is counted");
             check(s.sealReadyAt() > f.level().getGameTime(), "the seal rests");
@@ -441,7 +441,7 @@ public final class HelaBossTests {
         HelaEntity hela = fight.boss();
         fight.end(BossEnd.WIPE);
         check(hela.state() == HelaState.LEAVING, "she leaves");
-        check(!hasHeaddress(a) && !a.getData(ModAttachments.ASGARD).has(AsgardProgress.HELA_VICTOR), "no reward");
+        check(!hasHeaddress(a) && !ModAttachments.ASGARD.get(a).has(AsgardProgress.HELA_VICTOR), "no reward");
         long rest = BossFights.restLeft(f.level().getServer(), BossKind.HELA);
         check(rest > 0 && rest <= HelaBossConfig.REST_TICKS.get() / 2, "half a rest: " + rest);
         helper.runAfterDelay(HelaState.LEAVING.ticks + 5, () -> {

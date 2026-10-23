@@ -154,7 +154,7 @@ public class PowerHud implements LayeredDraw.Layer {
                 case 2 -> onOff(data.flying());
                 case 3 -> holding ? active("hud.enhanced.holding") : null;
                 case 4 -> shield(data, now, WandaAbilities.maxShieldStrength(), WandaAbilities.maxShieldTicks());
-                case 5 -> player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID())
+                case 5 -> ModAttachments.HEXES.get(player.level()).byOwner(player.getUUID())
                         .map(hex -> (Component) Component.translatable("hud.enhanced.hex_radius", hex.radius()).withStyle(ChatFormatting.RED))
                         .orElse(null);
                 default -> null;
@@ -198,7 +198,7 @@ public class PowerHud implements LayeredDraw.Layer {
                 .append(Component.translatable("hud.enhanced.build").withStyle(ChatFormatting.WHITE))
                 .append(Component.literal("  ")).append(onOff(BuildClient.buildMode()));
         if (power == Power.BILLY) {
-            BuildData build = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+            BuildData build = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);
             int meter = (int) Math.floor(BillyRanks.meterNow(build, now));
             line.append(Component.literal("  ")).append(Component.translatable("hud.enhanced.build.meter", meter,
                     BillyRanks.meter(BillyRanks.rank(build))).withStyle(s -> s.withColor(Power.BILLY.color)));
@@ -292,7 +292,7 @@ public class PowerHud implements LayeredDraw.Layer {
      * second and range). The numbers grow with his Build Magic rank.
      */
     private static Component hexBeam(LocalPlayer player, PowerData data) {
-        BuildData build = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        BuildData build = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);
         String perSecond = String.format(Locale.ROOT, "%.1f", BillyAbilities.beamDamagePerSecond(build));
         int range = (int) Math.round(BillyAbilities.beamRange(build));
         boolean firing = data.is(Live.BEAMING);

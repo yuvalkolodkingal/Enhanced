@@ -246,7 +246,7 @@ public final class ItemsTests {
             check(data.places().size() == 1 && data.places().get(0).name().equals("Camp") && !data.places().get(0).base(),
                     sorcerers[i] + ": saved as Camp, no formatting, not a base: " + data);
             check(data.places().get(0).dimension() == helper.getLevel().dimension(), sorcerers[i] + ": in this world");
-            check(players[i].getData(ModAttachments.BIFROST).places().isEmpty(), sorcerers[i] + ": the Bifrost's list is not the book's");
+            check(ModAttachments.BIFROST.get(players[i]).places().isEmpty(), sorcerers[i] + ": the Bifrost's list is not the book's");
             camps[i] = players[i].position();
             Vec3 away = helper.absoluteVec(new Vec3(4.5 + 6 * i, FLOOR, 15.5));
             players[i].moveTo(away.x, away.y, away.z);
@@ -507,13 +507,13 @@ public final class ItemsTests {
         // Billy's rank, read through the one accessor: his first rank is 0, his highest 1.
         ServerPlayer billy = f.player(10.5, FLOOR, 10.5, Power.BILLY);
         int max = BillyRanks.maxRank();
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(BillyRanks.MIN_RANK));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank(BillyRanks.MIN_RANK));
         assertNear(WardStrength.billyFraction(billy), 0.0, 1.0E-9, "an Apprentice");
         check(WardStrength.radiusOf(billy) == billyLow, "so his ward is the smallest");
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(max));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank(max));
         assertNear(WardStrength.billyFraction(billy), 1.0, 1.0E-9, "at his highest rank");
         check(WardStrength.radiusOf(billy) == billyHigh, "the largest");
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank((BillyRanks.MIN_RANK + max) / 2));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank((BillyRanks.MIN_RANK + max) / 2));
         double middle = WardStrength.billyFraction(billy);
         check(middle > 0.0 && middle < 1.0 && WardStrength.radiusOf(billy) > billyLow && WardStrength.radiusOf(billy) < billyHigh,
                 "in between in between (" + middle + ")");
@@ -568,10 +568,10 @@ public final class ItemsTests {
         VishantiBook.savePlace(wanda, "Fort", true);
         check(wardOf(level, wanda, "Fort").radius() == 7, "the Scarlet Witch's is larger");
         ServerPlayer billy = holder(f, 10.5, 10.5, Power.BILLY);
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(BillyRanks.MIN_RANK));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank(BillyRanks.MIN_RANK));
         VishantiBook.savePlace(billy, "Fort", true);
         check(wardOf(level, billy, "Fort").radius() == 5, "Billy's, an Apprentice's, is the smallest");
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(BillyRanks.maxRank()));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank(BillyRanks.maxRank()));
         WardManager.refresh(billy);
         check(wardOf(level, billy, "Fort").radius() == 8, "and grows with his Build Magic rank");
 

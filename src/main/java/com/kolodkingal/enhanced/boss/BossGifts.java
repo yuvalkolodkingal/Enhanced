@@ -51,11 +51,11 @@ public final class BossGifts {
     }
 
     static BossData data(MinecraftServer server) {
-        return server.overworld().getData(ModAttachments.BOSS_DATA);
+        return ModAttachments.BOSS_DATA.get(server.overworld());
     }
 
     static void store(MinecraftServer server, BossData data) {
-        server.overworld().setData(ModAttachments.BOSS_DATA, data);
+        ModAttachments.BOSS_DATA.set(server.overworld(), data);
     }
 
     private BossGifts() {

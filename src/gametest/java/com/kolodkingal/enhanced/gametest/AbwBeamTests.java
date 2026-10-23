@@ -71,7 +71,7 @@ public final class AbwBeamTests {
     }
 
     private static void setRank(ServerPlayer billy, int rank) {
-        billy.setData(ModAttachments.BUILD_DATA, BuildData.EMPTY.withRank(rank));
+        ModAttachments.BUILD_DATA.set(billy, BuildData.EMPTY.withRank(rank));
     }
 
     /** Held, it hurts what the crosshair is on, 1.5 every 5 ticks at rank 1; a block stops it; released, it stops. */
@@ -226,7 +226,7 @@ public final class AbwBeamTests {
         release(billy);
         setRank(billy, 4);
         hold(billy);
-        float perHit = BillyAbilities.beamDamagePerSecond(billy.getData(ModAttachments.BUILD_DATA)) * EnhancedConfig.BILLY_BEAM_INTERVAL.get() / 20.0F;
+        float perHit = BillyAbilities.beamDamagePerSecond(ModAttachments.BUILD_DATA.get(billy)) * EnhancedConfig.BILLY_BEAM_INTERVAL.get() / 20.0F;
         PowerTicker.tick(billy);
         assertNear(target.getMaxHealth() - target.getHealth(), perHit, 1.0E-3, "at the top rank it reaches and hits harder: " + perHit);
         check(perHit > 1.5F, "harder than the first rank's 1.5");

@@ -46,7 +46,7 @@ public final class AsgardTalk {
 
     /** The talk context of {@code player} with {@code speaker} of {@code role}. */
     public static AsgardDialogue.Ctx context(ServerPlayer player, Entity speaker, Role role) {
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         return new AsgardDialogue.Ctx(player, speaker, role, progress, AsgardState.get(player.getServer()));
     }
 
@@ -115,9 +115,9 @@ public final class AsgardTalk {
             case VOLSTAGG, FANDRAL, HOGUN -> AsgardProgress.TALKED_WARRIORS;
             default -> 0;
         };
-        AsgardProgress progress = player.getData(ModAttachments.ASGARD);
+        AsgardProgress progress = ModAttachments.ASGARD.get(player);
         if (flag != 0 && !progress.has(flag)) {
-            player.setData(ModAttachments.ASGARD, progress.with(flag));
+            ModAttachments.ASGARD.set(player, progress.with(flag));
         }
     }
 

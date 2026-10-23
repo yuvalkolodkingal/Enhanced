@@ -73,7 +73,7 @@ public final class Limits implements RecipeLimits {
             return wanda(world);
         }
         if (power == Power.BILLY || power == Power.CUSTOM && Powers.get(player).has(HeroAbility.BILLY_BUILD_MAGIC)) {
-            int rank = BillyRanks.rank(player.getData(ModAttachments.BUILD_DATA));
+            int rank = BillyRanks.rank(ModAttachments.BUILD_DATA.get(player));
             return player.isCreative() && !limitsInCreative() ? new Limits(Power.BILLY, rank, false, world) : billy(rank, world);
         }
         return null;

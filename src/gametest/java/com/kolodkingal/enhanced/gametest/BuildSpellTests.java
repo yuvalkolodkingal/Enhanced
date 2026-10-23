@@ -152,9 +152,9 @@ public final class BuildSpellTests {
                 "in Adventure she is told why: " + seen);
 
         BuildMagic.action(wanda, BuildActionPayload.VIEW, abs(f, 3, 2, 3), abs(f, 5, 2, 5), Spell.FILL.id() + 1);
-        check(wanda.getData(ModAttachments.BUILD_VIEW).box().isPresent(), "the others see her box");
+        check(ModAttachments.BUILD_VIEW.get(wanda).box().isPresent(), "the others see her box");
         BuildMagic.action(wanda, BuildActionPayload.MODE, BlockPos.ZERO, BlockPos.ZERO, 0);
-        BuildView view = wanda.getData(ModAttachments.BUILD_VIEW);
+        BuildView view = ModAttachments.BUILD_VIEW.get(wanda);
         check(!building(wanda) && !view.active() && view.box().isEmpty(), "off clears the view: " + view);
         helper.succeed();
     }
@@ -227,7 +227,7 @@ public final class BuildSpellTests {
         BuildScheduler.step(List.of(id), five);
         ServerLevel nether = server.getLevel(Level.NETHER);
         reborn.teleportTo(nether, 0.5, 128.0, 0.5, 0.0F, 0.0F);
-        BuildView view = reborn.getData(ModAttachments.BUILD_VIEW);
+        BuildView view = ModAttachments.BUILD_VIEW.get(reborn);
         check(reborn.level() == nether && mode(id) && view.active() && view.box().isEmpty(),
                 "a change of dimension keeps build mode and lets go of the box");
         finish(ENDLESS, id);
@@ -275,23 +275,23 @@ public final class BuildSpellTests {
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
         BoundingBox box = new BoundingBox(4, 2, 4, 6, 4, 6);
         set(f, new BoundingBox(4, 2, 4, 6, 2, 6), Blocks.STONE);
-        int before = BillyMagic.meter(billy.getData(ModAttachments.BUILD_DATA), time);
+        int before = BillyMagic.meter(ModAttachments.BUILD_DATA.get(billy), time);
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, box));
         finish(billy);
         Seen seen = Seen.of(billy);
-        int after = BillyMagic.meter(billy.getData(ModAttachments.BUILD_DATA), time);
+        int after = BillyMagic.meter(ModAttachments.BUILD_DATA.get(billy), time);
         check(count(f, box, Blocks.STONE) == 27 && seen.code() == BuildVerdictPayload.DONE && seen.verdict().changed() == 18
                 && seen.verdict().cost() == 18, "27 stone, 18 changed: " + seen);
         check(before - after == 18, "his meter is down by exactly 18: " + before + " to " + after);
         // (His pause after a spell is B44's.)
-        billy.setData(ModAttachments.BUILD_DATA, billy.getData(ModAttachments.BUILD_DATA).withPauseUntil(0L));
+        ModAttachments.BUILD_DATA.set(billy, ModAttachments.BUILD_DATA.get(billy).withPauseUntil(0L));
         cast(billy, boxSpell(f, Spell.FILL, box));
         finish(billy);
         seen = Seen.of(billy);
         check(seen.code() == BuildVerdictPayload.NOTHING_CHANGES && seen.said("message.enhanced.build.nothing_changes"),
                 "again: nothing changes: " + seen);
-        check(BillyMagic.meter(billy.getData(ModAttachments.BUILD_DATA), time) == after, "and nothing is paid");
+        check(BillyMagic.meter(ModAttachments.BUILD_DATA.get(billy), time) == after, "and nothing is paid");
         helper.succeed();
     }
 
@@ -573,7 +573,7 @@ public final class BuildSpellTests {
         double farFirst = order.subList(order.size() - tenth, order.size()).stream().mapToDouble(pos -> pos.distSqr(heart)).min().orElseThrow();
         check(nearLast < farFirst, "it grows from its heart: " + nearLast + " < " + farFirst);
 
-        billy.setData(ModAttachments.BUILD_DATA, billy.getData(ModAttachments.BUILD_DATA).withPauseUntil(0L));
+        ModAttachments.BUILD_DATA.set(billy, ModAttachments.BUILD_DATA.get(billy).withPauseUntil(0L));
         cast(billy, recipe(Spell.SHAPE).style(ShapeKind.TOWER).size(2).size2(6).hollow(true).planted(true).at(abs(f, 3, 1, 15), Direction.UP).build());
         finish(billy);
         Set<Integer> layers = new HashSet<>();

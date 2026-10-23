@@ -298,7 +298,7 @@ public final class Bifrost {
                 yield new Target(AsgardDimension.KEY, CityPlan.ARRIVAL, CityPlan.ARRIVAL_YAW);
             }
             case Destination.CameFrom back -> {
-                GlobalPos from = player.getData(ModAttachments.ASGARD).cameFrom();
+                GlobalPos from = ModAttachments.ASGARD.get(player).cameFrom();
                 if (from == null) {
                     player.displayClientMessage(Component.translatable("message.enhanced.bifrost.no_came_from"), true);
                     yield null;
@@ -762,7 +762,7 @@ public final class Bifrost {
 
     /** Where a traveller comes to Asgard from: remembered so that the Heimdall NPC can send him back (lane L1 sets it). */
     public static void rememberCameFrom(ServerPlayer player, GlobalPos from) {
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).withCameFrom(from));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).withCameFrom(from));
     }
 
     /** The traveller logged out or died: his circle is forgotten (PlaceBook cancels the journey itself). */

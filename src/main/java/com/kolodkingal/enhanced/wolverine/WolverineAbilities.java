@@ -357,7 +357,7 @@ public final class WolverineAbilities {
             state.raging = false;
         }
         if (Berserker.raging(player)) {
-            player.setData(ModAttachments.WOLVERINE, Berserker.get(player).withBerserkUntil(0L));
+            ModAttachments.WOLVERINE.set(player, Berserker.get(player).withBerserkUntil(0L));
         }
         Berserker.modifiers(player, false);
         data.set(Live.WOLVERINE_POUNCING, false);

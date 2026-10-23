@@ -314,7 +314,7 @@ public final class AsgardianTests {
         check("greeting_first".equals(picked(player, sif)), "Sif greets a newcomer: " + picked(player, sif));
         check(AsgardTalk.begin(player, sif), "the talk opens");
         check("greeting_first".equals(AsgardTalk.currentNode(player)), "with the first greeting");
-        check(player.getData(ModAttachments.ASGARD).has(AsgardProgress.TALKED_SIF), "and he has talked to Sif");
+        check(ModAttachments.ASGARD.get(player).has(AsgardProgress.TALKED_SIF), "and he has talked to Sif");
         check("greeting".equals(picked(player, sif)), "then the usual greeting");
         check(AsgardTalk.offered(player).containsAll(List.of("train", "trade", "ask_advice")), "training, trades, advice");
         AsgardTalk.end(player);
@@ -328,11 +328,11 @@ public final class AsgardianTests {
         check("greet".equals(picked(player, odin)), "awake, he greets: " + picked(player, odin));
         // Frigga: the first talk, then after Hela the hint to Gungnir.
         check("greeting_first".equals(picked(player, frigga)), "Frigga's first greeting");
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.TALKED_FRIGGA));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.TALKED_FRIGGA));
         check("greeting".equals(picked(player, frigga)), "her usual greeting");
         state.setHelaDefeats(1);
         check("after_hela".equals(picked(player, frigga)), "after Hela falls, the way to Gungnir");
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.GUNGNIR_TAKEN));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.GUNGNIR_TAKEN));
         check("greeting".equals(picked(player, frigga)), "not once Gungnir is his");
         // Hurt, Frigga offers healing.
         player.setHealth(10.0F);
@@ -382,7 +382,7 @@ public final class AsgardianTests {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
         AsgardianEntity hogun = npc(fx, Role.HOGUN, 7.5, 5.5);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.TALKED_WARRIORS));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.TALKED_WARRIORS));
         check(!AsgardTalk.tryChoose(player, hogun.getId(), "about_vault"), "no answer without a talk");
         check(AsgardTalk.begin(player, hogun), "the talk opens");
         check(hogun.state() == NpcState.TALKING && player.getUUID().equals(hogun.talkingWith()), "Hogun stops to talk");
@@ -541,7 +541,7 @@ public final class AsgardianTests {
         TestKit.Fixture fx = TestKit.fixture(helper);
         ServerPlayer player = fx.player(5.5, FLOOR, 5.5);
         AsgardianEntity sif = npc(fx, Role.SIF, 6.5, 5.5);
-        player.setData(ModAttachments.ASGARD, player.getData(ModAttachments.ASGARD).with(AsgardProgress.TALKED_SIF));
+        ModAttachments.ASGARD.set(player, ModAttachments.ASGARD.get(player).with(AsgardProgress.TALKED_SIF));
         check(AsgardTalk.begin(player, sif) && AsgardTalk.tryChoose(player, sif.getId(), "train"), "she offers training");
         check(AsgardTalk.tryChoose(player, sif.getId(), "ready"), "and it begins");
         check(sif.state() == NpcState.SPARRING, "she spars");

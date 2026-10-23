@@ -179,7 +179,7 @@ public final class HulkTests {
     }
 
     static void rage(ServerPlayer player, int rage) {
-        player.setData(ModAttachments.HULK, HulkRage.get(player).withRage(rage));
+        ModAttachments.HULK.set(player, HulkRage.get(player).withRage(rage));
     }
 
     /** Cancels every block break in {@code cells} while the test runs (a claim, as another mod would). */
@@ -349,7 +349,7 @@ public final class HulkTests {
         }
         press(bruce, 5, false);
         check(!HulkForms.changing(bruce) && HulkForms.isHuman(bruce), "no room to Hulk out");
-        bruce.setData(ModAttachments.HULK, HulkRage.get(bruce).withAnger(100));
+        ModAttachments.HULK.set(bruce, HulkRage.get(bruce).withAnger(100));
         step(helper, 10, () -> {
             check(!HulkForms.changing(bruce) && HulkForms.isHuman(bruce), "his anger waits");
             for (int dx = -1; dx <= 1; dx++) {
@@ -357,7 +357,7 @@ public final class HulkTests {
                     helper.setBlock(roof.offset(dx, 0, dz), Blocks.AIR);
                 }
             }
-            bruce.setData(ModAttachments.HULK, HulkRage.get(bruce).withAnger(100));
+            ModAttachments.HULK.set(bruce, HulkRage.get(bruce).withAnger(100));
             step(helper, 6, () -> {
                 check(HulkForms.changing(bruce) || !HulkForms.isHuman(bruce), "with room, his anger Hulks him out");
                 helper.succeed();
@@ -376,8 +376,8 @@ public final class HulkTests {
                 "his heart rate runs 70 to 200");
         ServerPlayer calm = hulk(f, 14.5, 14.5, "banner");
         calm.getInventory().add(new ItemStack(ModItems.GAMMA_INHIBITOR.get()));
-        bruce.setData(ModAttachments.HULK, HulkRage.get(bruce).withAnger(100));
-        calm.setData(ModAttachments.HULK, HulkRage.get(calm).withAnger(100));
+        ModAttachments.HULK.set(bruce, HulkRage.get(bruce).withAnger(100));
+        ModAttachments.HULK.set(calm, HulkRage.get(calm).withAnger(100));
         step(helper, 6, () -> {
             check(HulkForms.changing(bruce), "at 100 he Hulks out by himself");
             check(!HulkForms.changing(calm) && HulkForms.isHuman(calm), "the inhibitor keeps him human");

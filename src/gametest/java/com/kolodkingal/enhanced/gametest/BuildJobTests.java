@@ -281,13 +281,13 @@ public final class BuildJobTests {
         cast(wanda, boxSpell(f, Spell.FILL, first));
         cast(wanda, boxSpell(f, Spell.FILL, second));
         cast(wanda, boxSpell(f, Spell.FILL, dropped));
-        check(BuildScheduler.jobs(wanda.getUUID()).size() == 3 && wanda.getData(ModAttachments.BUILD_DATA).queued() == 2,
-                "one at work, two waiting: " + wanda.getData(ModAttachments.BUILD_DATA).queued());
+        check(BuildScheduler.jobs(wanda.getUUID()).size() == 3 && ModAttachments.BUILD_DATA.get(wanda).queued() == 2,
+                "one at work, two waiting: " + ModAttachments.BUILD_DATA.get(wanda).queued());
         Seen.of(wanda);
         BuildMagic.undo(wanda);
         Seen seen = Seen.of(wanda);
         check(seen.code() == BuildVerdictPayload.DROPPED && seen.said("message.enhanced.build.dropped")
-                && wanda.getData(ModAttachments.BUILD_DATA).queued() == 1, "Ctrl + Z drops the newest waiting spell: " + seen);
+                && ModAttachments.BUILD_DATA.get(wanda).queued() == 1, "Ctrl + Z drops the newest waiting spell: " + seen);
         finish(wanda);
         check(count(f, first, Blocks.STONE) == 9 && count(f, second, Blocks.STONE) == 9, "the other two are done");
         check(count(f, dropped, Blocks.AIR) == 9, "nothing of the dropped spell ever happened");
@@ -358,7 +358,7 @@ public final class BuildJobTests {
             BuildJob job = working(wanda);
             BuildScheduler.step(List.of(wanda.getUUID()), Budget.of(50, 4096, 1));
             wanda.setGameMode(mode);
-            check(!BuildSession.of(wanda.getUUID()).mode() && !wanda.getData(ModAttachments.BUILD_VIEW).active(), mode + ": build mode ends");
+            check(!BuildSession.of(wanda.getUUID()).mode() && !ModAttachments.BUILD_VIEW.get(wanda).active(), mode + ": build mode ends");
             BuildScheduler.step(List.of(wanda.getUUID()), Budget.of(50, 4096, 1));
             check(job.finished() && job.endCode() == BuildVerdictPayload.STOPPED && job.written() == 50,
                     mode + ": the spell stops at its next step: " + job.endCode() + ", " + job.written());

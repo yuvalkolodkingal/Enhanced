@@ -420,24 +420,24 @@ public final class ThorTests {
         ServerPlayer player = f.player(4.5, FLOOR, 4.5);
         ServerLevel level = helper.getLevel();
         ThorAbilities.savePlace(player, "Camp");
-        check(player.getData(ModAttachments.BIFROST).places().isEmpty(), "nothing is saved without Mjolnir or Stormbreaker in hand");
+        check(ModAttachments.BIFROST.get(player).places().isEmpty(), "nothing is saved without Mjolnir or Stormbreaker in hand");
         ThorAbilities.bifrostHome(player);
         check(!Powers.get(player).is(Live.BIFROST), "and the Bifrost doesn't answer");
 
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         ThorAbilities.savePlace(player, "\u00a7cCamp\n");
-        BifrostData data = player.getData(ModAttachments.BIFROST);
+        BifrostData data = ModAttachments.BIFROST.get(player);
         check(data.places().size() == 1 && data.places().get(0).name().equals("Camp"), "saved as Camp (no formatting): " + data);
         check(data.places().get(0).dimension() == level.dimension(), "in this world");
         Vec3 moved = helper.absoluteVec(new Vec3(14.5, FLOOR, 14.5));
         player.moveTo(moved.x, moved.y, moved.z);
         ThorAbilities.savePlace(player, "camp");
-        data = player.getData(ModAttachments.BIFROST);
+        data = ModAttachments.BIFROST.get(player);
         check(data.places().size() == 1 && data.places().get(0).pos().distanceTo(moved) < 1.0E-6, "saving the name again moves it");
         check(data.places().get(0).name().equals("camp"), "under the name as typed this time");
 
         // A place saved earlier on the roof of the Nether.
-        player.setData(ModAttachments.BIFROST, data.with(new BifrostData.Place("Nether roof", Level.NETHER, new Vec3(0.5, 128.0, 0.5), 90.0F)));
+        ModAttachments.BIFROST.set(player, data.with(new BifrostData.Place("Nether roof", Level.NETHER, new Vec3(0.5, 128.0, 0.5), 90.0F)));
         ThorAbilities.bifrostToPlace(player, 1, "Somewhere else");
         check(!Powers.get(player).is(Live.BIFROST), "a place that isn't there any more (the list changed) is ignored");
         ThorAbilities.bifrostToPlace(player, 1, "Nether roof");
@@ -452,9 +452,9 @@ public final class ThorTests {
             check(player.getY() >= 128.0 - 1.0E-6, "standing on the roof of the Nether");
             ThorAbilities.bifrostHome(player);
             check(!Powers.get(player).is(Live.BIFROST), "not again until the Bifrost has gathered its strength");
-            check(player.getData(ModAttachments.BIFROST).cooldown(player.level().getGameTime()) > 0, "its cooldown is running");
+            check(ModAttachments.BIFROST.get(player).cooldown(player.level().getGameTime()) > 0, "its cooldown is running");
             ThorAbilities.forgetPlace(player, 0, "camp");
-            List<BifrostData.Place> left = player.getData(ModAttachments.BIFROST).places();
+            List<BifrostData.Place> left = ModAttachments.BIFROST.get(player).places();
             check(left.size() == 1 && left.get(0).name().equals("Nether roof"), "the camp is forgotten");
             return true;
         });
@@ -830,7 +830,7 @@ public final class ThorTests {
         check(fragments(helper).size() == 3, "one fragment for each of the three zombies, and none for the pig: " + fragments(helper).size());
         PowerTicker.tick(thor);
         check(data.hammerEntityId() != -1 && thor.mayFly(), "it counts as a weapon in flight: he keeps his wings");
-        ItemStack stored = thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).orElse(ItemStack.EMPTY);
+        ItemStack stored = ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).orElse(ItemStack.EMPTY);
         check(ownedBy(stored, thor), "the hammer is kept in his data, owner and all");
         f.everyTick(120, tick -> {
             PowerTicker.tick(thor);
@@ -843,7 +843,7 @@ public final class ThorTests {
             check(pig.getHealth() == pig.getMaxHealth(), "the pig was left alone");
             check(ownedBy(thor.getMainHandItem(), thor), "Mjolnir is back in his hand, and still his");
             check(fragments(helper).isEmpty() && data.hammerEntityId() == -1, "no fragment is left");
-            check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "nothing is kept in his data any more");
+            check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty(), "nothing is kept in his data any more");
             // The cooldown: not again for a while.
             sneakPress(thor, 1);
             check(holdsMjolnir(thor) && fragments(helper).isEmpty(), "it needs to gather itself before it can shatter again");
@@ -912,7 +912,7 @@ public final class ThorTests {
         check(fragments(helper).isEmpty(), "the fragments are gone");
         List<ItemEntity> fallen = mjolnirsOnTheGround(thor);
         check(fallen.size() == 1 && ownedBy(fallen.get(0).getItem(), thor), "Mjolnir lies where he stood, still his");
-        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "nothing is kept in his data");
+        check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty(), "nothing is kept in his data");
         fallen.get(0).discard();
 
         // And he dies.
@@ -942,7 +942,7 @@ public final class ThorTests {
         MjolnirShatter.clear();
         PowerTicker.tick(thor);
         check(holdsMjolnir(thor) && ownedBy(thor.getMainHandItem(), thor), "it is in his hand again, and his");
-        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty(), "and no longer kept in pieces");
+        check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty(), "and no longer kept in pieces");
         helper.succeed();
     }
 
@@ -961,7 +961,7 @@ public final class ThorTests {
         List<ItemEntity> fallen = level.getEntitiesOfClass(ItemEntity.class, new AABB(where, where).inflate(2),
                 e -> e.getItem().is(ModItems.MJOLNIR.get()));
         check(fallen.size() == 1 && ownedBy(fallen.get(0).getItem(), thor), "Mjolnir lies where he stood in the world he left, still his");
-        check(thor.getExistingData(ModAttachments.SHATTERED_MJOLNIR).isEmpty() && Powers.get(thor).hammerEntityId() == -1,
+        check(ModAttachments.SHATTERED_MJOLNIR.getExisting(thor).isEmpty() && Powers.get(thor).hammerEntityId() == -1,
                 "nothing is kept in his data, and no weapon is in flight");
         helper.succeed();
     }

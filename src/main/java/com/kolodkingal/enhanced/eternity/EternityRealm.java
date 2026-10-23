@@ -95,11 +95,11 @@ public final class EternityRealm {
     }
 
     public static EternityProgress progress(ServerPlayer player) {
-        return player.getData(ModAttachments.ETERNITY);
+        return ModAttachments.ETERNITY.get(player);
     }
 
     static void setProgress(ServerPlayer player, EternityProgress progress) {
-        player.setData(ModAttachments.ETERNITY, progress);
+        ModAttachments.ETERNITY.set(player, progress);
     }
 
     // ---- the way in ----

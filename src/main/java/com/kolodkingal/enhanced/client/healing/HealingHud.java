@@ -132,7 +132,7 @@ public final class HealingHud implements LayeredDraw.Layer {
 
     /** The seconds until he rises (at least 1 while he is DOWN). */
     static int secondsLeft(LocalPlayer player, long now) {
-        long until = player.getData(ModAttachments.HEALING).downUntil();
+        long until = ModAttachments.HEALING.get(player).downUntil();
         return (int) Math.max(1, (until - now + 19) / 20);
     }
 
@@ -154,7 +154,7 @@ public final class HealingHud implements LayeredDraw.Layer {
             g.fill(i * sw, 0, (i + 1) * sw, h, color);
             g.fill(w - (i + 1) * sw, 0, w - i * sw, h, color);
         }
-        long until = player.getData(ModAttachments.HEALING).downUntil();
+        long until = ModAttachments.HEALING.get(player).downUntil();
         float total = Math.max(1, Downed.downTicks());
         float done = Mth.clamp(1.0F - (until - now - pt) / total, 0.0F, 1.0F);
         int cx = w / 2;

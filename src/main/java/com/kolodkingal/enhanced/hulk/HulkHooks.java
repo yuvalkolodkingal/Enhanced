@@ -23,7 +23,7 @@ public final class HulkHooks {
      */
     public static void onSnap(ServerPlayer hulk) {
         long until = hulk.level().getGameTime() + 20L * HulkAbilities.cfg(HulkConfig.ARM_BURNED_SECONDS, 600);
-        hulk.setData(ModAttachments.HULK, HulkRage.get(hulk).withArmBurnedUntil(until));
+        ModAttachments.HULK.set(hulk, HulkRage.get(hulk).withArmBurnedUntil(until));
         hulk.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, WEAKNESS_TICKS, 1));
         hulk.displayClientMessage(Component.translatable("message.enhanced.hulk.arm_burned")
                 .withStyle(ChatFormatting.GOLD), true);

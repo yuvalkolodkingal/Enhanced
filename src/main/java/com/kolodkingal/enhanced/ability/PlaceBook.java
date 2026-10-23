@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.platform.attach.AttachKey;
 import com.kolodkingal.enhanced.power.BifrostData;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
@@ -14,14 +15,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 /**
  * The places a player has saved and the journey to one: what the Bifrost (Stormbreaker and Mjolnir, 2.x) and the Book of
@@ -43,21 +42,21 @@ public final class PlaceBook {
         /** 3.6: a sorcerer's Sling Ring (lane L3): its places, and a portal pair to one of them. */
         SLING_RING(ModAttachments.SLING_RING, "sling_ring");
 
-        private final Supplier<AttachmentType<BifrostData>> attachment;
+        private final AttachKey<BifrostData> attachment;
         private final String id;
 
-        Kind(Supplier<AttachmentType<BifrostData>> attachment, String id) {
+        Kind(AttachKey<BifrostData> attachment, String id) {
             this.attachment = attachment;
             this.id = id;
         }
 
         /** This player's places in this book. */
         public BifrostData data(Player player) {
-            return player.getData(attachment.get());
+            return attachment.get(player);
         }
 
         public void set(Player player, BifrostData data) {
-            player.setData(attachment.get(), data);
+            attachment.set(player, data);
         }
 
         /** The lang key {@code message.enhanced.<book>.<key>}. */

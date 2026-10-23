@@ -29,7 +29,7 @@ public final class CottageClient {
             return false;
         }
         Player me = Minecraft.getInstance().player;
-        return me != null && me.getData(ModAttachments.COTTAGE).has(CottageProgress.SCRATCHY_QUEST)
+        return me != null && ModAttachments.COTTAGE.get(me).has(CottageProgress.SCRATCHY_QUEST)
                 && me.distanceToSqr(entity) <= Scratchy.GLOW_RANGE * Scratchy.GLOW_RANGE;
     }
 

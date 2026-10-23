@@ -84,11 +84,11 @@ public final class Downed {
     // ---- the state ----
 
     public static HealingState state(ServerPlayer player) {
-        return player.getData(ModAttachments.HEALING);
+        return ModAttachments.HEALING.get(player);
     }
 
     static void setState(ServerPlayer player, HealingState state) {
-        player.setData(ModAttachments.HEALING, state);
+        ModAttachments.HEALING.set(player, state);
     }
 
     /** The game time he rises at, or 0 when he is not DOWN. */

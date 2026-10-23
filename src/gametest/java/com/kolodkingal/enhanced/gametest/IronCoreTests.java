@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.ironman.SuitPhases;
 import com.kolodkingal.enhanced.item.ArcReactorItem;
 import com.kolodkingal.enhanced.item.IronSuitItem;
+import com.kolodkingal.enhanced.platform.neoforge.NeoAttach;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -514,12 +515,12 @@ public final class IronCoreTests {
                     payload = sync;
                 }
             }
-            check(payload != null && payload.types().contains(ModAttachments.IRON_MAN.get()),
+            check(payload != null && payload.types().contains(NeoAttach.typeOf(ModAttachments.IRON_MAN)),
                     "his state is in the first sync");
             ServerPlayer copy = f.player(12.5, FLOOR, 5.5);
             AttachmentSync.receiveSyncedDataAttachments(copy, helper.getLevel().registryAccess(), payload.types(),
                     payload.syncPayload());
-            IronManState seen = copy.getData(ModAttachments.IRON_MAN);
+            IronManState seen = ModAttachments.IRON_MAN.get(copy);
             check(seen.phase() == IronManState.UP && seen.phaseStart() == start && seen.phaseKind() == SuitKind.MARK_3,
                     "the watcher draws the UP from its start: " + seen);
             helper.succeed();

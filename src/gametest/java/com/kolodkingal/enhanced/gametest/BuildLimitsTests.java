@@ -129,7 +129,7 @@ public final class BuildLimitsTests {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withMeter(100.0, time));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withMeter(100.0, time));
         BoundingBox small = new BoundingBox(1, 2, 1, 7, 5, 5);
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, small));
@@ -216,7 +216,7 @@ public final class BuildLimitsTests {
         TestKit.Fixture f = TestKit.bossFixture(helper);
         long time = now(f);
         ServerPlayer billy = builder(f, Power.BILLY, 0.5, 0.5, Blocks.STONE);
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withPractice(1990L));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withPractice(1990L));
         Seen.of(billy);
         cast(billy, boxSpell(f, Spell.FILL, new BoundingBox(2, 2, 2, 6, 2, 5)));
         finish(billy);
@@ -359,7 +359,7 @@ public final class BuildLimitsTests {
         finish(billy);
         BuildMagic.undo(billy);
         finish(billy);
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withMeter(10.0, time));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withMeter(10.0, time));
         Seen.of(billy);
         BuildMagic.redo(billy);
         Seen seen = Seen.of(billy);
@@ -663,12 +663,12 @@ public final class BuildLimitsTests {
     }
 
     private static BuildData data(ServerPlayer player) {
-        return player.getData(ModAttachments.BUILD_DATA);
+        return ModAttachments.BUILD_DATA.get(player);
     }
 
     /** Billy's pause after his last spell is over (the test's time stands still while it runs). */
     private static void unpause(ServerPlayer billy) {
-        billy.setData(ModAttachments.BUILD_DATA, data(billy).withPauseUntil(0L));
+        ModAttachments.BUILD_DATA.set(billy, data(billy).withPauseUntil(0L));
     }
 
     /** The builder floats above what the test builds (nobody ticks her, so she does not fall). */

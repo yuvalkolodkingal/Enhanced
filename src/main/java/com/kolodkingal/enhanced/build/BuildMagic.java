@@ -355,7 +355,7 @@ public final class BuildMagic {
     private static int queueRefusal(ServerPlayer player, Limits limits) {
         UUID id = player.getUUID();
         if (limits.limited()) {
-            BuildData data = player.getData(ModAttachments.BUILD_DATA);
+            BuildData data = ModAttachments.BUILD_DATA.get(player);
             if (BuildScheduler.working(id) != null || BillyMagic.paused(data, player.server.overworld().getGameTime())) {
                 return BuildVerdictPayload.WAIT;
             }
@@ -572,7 +572,7 @@ public final class BuildMagic {
             return;
         }
         session.setMode(true);
-        player.setData(ModAttachments.BUILD_VIEW, player.getData(ModAttachments.BUILD_VIEW).withActive(true));
+        ModAttachments.BUILD_VIEW.set(player, ModAttachments.BUILD_VIEW.get(player).withActive(true));
         BuildSounds.buildModeOn(player);
         player.displayClientMessage(Component.translatable("message.enhanced.build.on", Component.keybind("key.enhanced.build_magic")), true);
     }
@@ -618,13 +618,13 @@ public final class BuildMagic {
             session.setInstant(false);
         }
         // (A player who never built has no view, and is given none.)
-        BuildView view = player.getExistingData(ModAttachments.BUILD_VIEW).orElse(null);
+        BuildView view = ModAttachments.BUILD_VIEW.getExisting(player).orElse(null);
         if (view != null && view.active()) {
-            player.setData(ModAttachments.BUILD_VIEW, view.withActive(false));
+            ModAttachments.BUILD_VIEW.set(player, view.withActive(false));
         }
-        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(null);
+        BuildData data = ModAttachments.BUILD_DATA.getExisting(player).orElse(null);
         if (data != null && (data.momNear() || data.instant())) {
-            player.setData(ModAttachments.BUILD_DATA, data.withMomNear(false).withInstant(false));
+            ModAttachments.BUILD_DATA.set(player, data.withMomNear(false).withInstant(false));
         }
         if (was && say) {
             player.displayClientMessage(Component.translatable("message.enhanced.build.off"), true);
@@ -652,7 +652,7 @@ public final class BuildMagic {
 
     private static void showView(ServerPlayer player, BuildSession session, BlockPos a, BlockPos b, int value, long now) {
         session.viewed(now);
-        BuildView view = player.getData(ModAttachments.BUILD_VIEW);
+        BuildView view = ModAttachments.BUILD_VIEW.get(player);
         Spell spell = value == 0 ? view.spell() : Spell.byId(value - 1);
         Optional<BuildView.Box> box = Optional.empty();
         Limits limits = Limits.of(player);
@@ -664,7 +664,7 @@ public final class BuildMagic {
         }
         BuildView next = view.withSpell(spell, box);
         if (!next.equals(view)) {
-            player.setData(ModAttachments.BUILD_VIEW, next);
+            ModAttachments.BUILD_VIEW.set(player, next);
         }
     }
 
@@ -847,7 +847,7 @@ public final class BuildMagic {
             // Billy pays again for what the redo does (D-B 12.2), or it is refused: whole or nothing.
             mom = BillyMagic.mom(player);
             price = BillyMagic.cost(step.undone(), mom != null);
-            BuildData data = player.getData(ModAttachments.BUILD_DATA);
+            BuildData data = ModAttachments.BUILD_DATA.get(player);
             long time = player.server.overworld().getGameTime();
             int verdict = BillyMagic.verdict(data, time, price);
             if (verdict != SpellPlanner.NONE) {
@@ -855,7 +855,7 @@ public final class BuildMagic {
                         false);
                 return;
             }
-            player.setData(ModAttachments.BUILD_DATA, BillyMagic.pay(data, time, price));
+            ModAttachments.BUILD_DATA.set(player, BillyMagic.pay(data, time, price));
         }
         BuildJob job = BuildJob.replay(player, limits, level, step, true, false, BuildScheduler.loaded(id, level));
         if (limits.limited()) {
@@ -903,7 +903,7 @@ public final class BuildMagic {
             return;
         }
         long time = server.overworld().getGameTime();
-        BuildData data = online.getData(ModAttachments.BUILD_DATA);
+        BuildData data = ModAttachments.BUILD_DATA.get(online);
         int amount = (int) Math.min(Integer.MAX_VALUE, Math.abs(back));
         if (back > 0) {
             data = BillyMagic.refund(data, time, amount);
@@ -921,7 +921,7 @@ public final class BuildMagic {
         if (pause >= 0) {
             data = BillyMagic.pauseAfter(data, time, pause);
         }
-        online.setData(ModAttachments.BUILD_DATA, data);
+        ModAttachments.BUILD_DATA.set(online, data);
         if (rankedUp) {
             rankedUp(online, data.rank());
         }
@@ -973,9 +973,9 @@ public final class BuildMagic {
             return;
         }
         boolean near = BillyMagic.mom(player) != null;
-        BuildData data = player.getData(ModAttachments.BUILD_DATA);
+        BuildData data = ModAttachments.BUILD_DATA.get(player);
         if (data.momNear() != near) {
-            player.setData(ModAttachments.BUILD_DATA, data.withMomNear(near));
+            ModAttachments.BUILD_DATA.set(player, data.withMomNear(near));
         }
     }
 
@@ -1012,8 +1012,8 @@ public final class BuildMagic {
      * which then draws its ghost; a client that lacks it later asks for it ({@code POCKET}).
      */
     static void pocketTaken(ServerPlayer player, Pocket pocket) {
-        BuildData data = player.getData(ModAttachments.BUILD_DATA);
-        player.setData(ModAttachments.BUILD_DATA, data.withPocket(pocket.id(), new Vec3i(pocket.sizeX(), pocket.sizeY(), pocket.sizeZ())));
+        BuildData data = ModAttachments.BUILD_DATA.get(player);
+        ModAttachments.BUILD_DATA.set(player, data.withPocket(pocket.id(), new Vec3i(pocket.sizeX(), pocket.sizeY(), pocket.sizeZ())));
         BuildSession.of(player.getUUID()).setPocketStream(pocket.stream());
     }
 
@@ -1082,13 +1082,13 @@ public final class BuildMagic {
         UndoHistory history = UndoHistory.existing(id);
         BuildJob working = BuildScheduler.working(id);
         // (A player who never built has no data, and is given none while there is nothing to show.)
-        BuildData data = player.getExistingData(ModAttachments.BUILD_DATA).orElse(BuildData.EMPTY);
+        BuildData data = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);
         BuildSession session = BuildSession.existing(id);
         BuildData next = data.withHistory(history == null ? 0 : history.undoCount(), history == null ? 0 : history.redoCount())
                 .withWork(working != null, BuildScheduler.waiting(id), working == null ? 0 : working.permille())
                 .withInstant(session != null && session.instant());
         if (!next.equals(data)) {
-            player.setData(ModAttachments.BUILD_DATA, next);
+            ModAttachments.BUILD_DATA.set(player, next);
         }
     }
 

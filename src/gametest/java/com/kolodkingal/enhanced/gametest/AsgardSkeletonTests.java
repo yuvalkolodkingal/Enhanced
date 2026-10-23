@@ -354,7 +354,7 @@ public final class AsgardSkeletonTests {
         ServerPlayer traveller = f.player(5.5, FLOOR, 5.5);
         traveller.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         Vec3 there = helper.absoluteVec(new Vec3(14.5, FLOOR, 14.5));
-        traveller.setData(ModAttachments.BIFROST, BifrostData.EMPTY.with(new BifrostData.Place("There", helper.getLevel().dimension(), there, 0.0F)));
+        ModAttachments.BIFROST.set(traveller, BifrostData.EMPTY.with(new BifrostData.Place("There", helper.getLevel().dimension(), there, 0.0F)));
         ServerPlayer inside = f.player(5.5, FLOOR, 7.5);
         ServerPlayer sneaking = f.player(3.5, FLOOR, 4.5);
         sneaking.setShiftKeyDown(true);
@@ -398,7 +398,7 @@ public final class AsgardSkeletonTests {
         ServerPlayer traveller = f.player(5.5, FLOOR, 5.5);
         traveller.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.STORMBREAKER.get()));
         Vec3 there = helper.absoluteVec(new Vec3(14.5, FLOOR, 14.5));
-        traveller.setData(ModAttachments.BIFROST, BifrostData.EMPTY.with(new BifrostData.Place("There", helper.getLevel().dimension(), there, 0.0F)));
+        ModAttachments.BIFROST.set(traveller, BifrostData.EMPTY.with(new BifrostData.Place("There", helper.getLevel().dimension(), there, 0.0F)));
         ServerPlayer sneaking = f.player(5.5, FLOOR, 7.5);
         sneaking.setShiftKeyDown(true);
         ServerPlayer standing = f.player(7.5, FLOOR, 5.5);

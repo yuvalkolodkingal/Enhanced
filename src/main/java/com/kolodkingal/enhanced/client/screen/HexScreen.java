@@ -72,7 +72,7 @@ public class HexScreen extends Screen {
     }
 
     private static boolean ownsHex(Player player) {
-        return player.level().getData(ModAttachments.HEXES).byOwner(player.getUUID()).isPresent();
+        return ModAttachments.HEXES.get(player.level()).byOwner(player.getUUID()).isPresent();
     }
 
     private Optional<Hex> hex() {
@@ -80,7 +80,7 @@ public class HexScreen extends Screen {
         if (mc.level == null || mc.player == null) {
             return Optional.empty();
         }
-        return mc.level.getData(ModAttachments.HEXES).byOwner(mc.player.getUUID());
+        return ModAttachments.HEXES.get(mc.level).byOwner(mc.player.getUUID());
     }
 
     private List<PlayerInfo> otherPlayers() {

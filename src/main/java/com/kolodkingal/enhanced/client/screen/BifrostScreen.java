@@ -87,7 +87,7 @@ public class BifrostScreen extends Screen {
 
     private static BifrostData data() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return player == null ? BifrostData.EMPTY : player.getData(ModAttachments.BIFROST);
+        return player == null ? BifrostData.EMPTY : ModAttachments.BIFROST.get(player);
     }
 
     /**

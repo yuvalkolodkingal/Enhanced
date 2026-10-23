@@ -286,7 +286,7 @@ public final class WorldEffectsRenderer {
         for (ShownHex shown : SHOWN_HEXES.values()) {
             shown.gone = true;
         }
-        for (Hex hex : level.getData(ModAttachments.HEXES).hexes()) {
+        for (Hex hex : ModAttachments.HEXES.get(level).hexes()) {
             ShownHex shown = SHOWN_HEXES.computeIfAbsent(hex.id(), id -> new ShownHex());
             if (shown.hex == null) {
                 shown.radius = hex.radius();

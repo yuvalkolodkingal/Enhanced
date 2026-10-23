@@ -236,10 +236,10 @@ public final class BuildCommands {
             return 0;
         }
         long time = source.getServer().overworld().getGameTime();
-        BuildData data = target.getData(ModAttachments.BUILD_DATA);
+        BuildData data = ModAttachments.BUILD_DATA.get(target);
         if (rank > 0) {
             data = BillyMagic.setRank(data, time, rank);
-            target.setData(ModAttachments.BUILD_DATA, data);
+            ModAttachments.BUILD_DATA.set(target, data);
             source.sendSuccess(() -> Component.translatable("commands.enhanced.build.rank_set", target.getDisplayName(), rank), true);
         }
         BuildData now = data;
@@ -254,8 +254,8 @@ public final class BuildCommands {
             return 0;
         }
         long time = source.getServer().overworld().getGameTime();
-        BuildData data = BillyMagic.setMeter(target.getData(ModAttachments.BUILD_DATA), time, value);
-        target.setData(ModAttachments.BUILD_DATA, data);
+        BuildData data = BillyMagic.setMeter(ModAttachments.BUILD_DATA.get(target), time, value);
+        ModAttachments.BUILD_DATA.set(target, data);
         int meter = BillyMagic.meter(data, time);
         source.sendSuccess(() -> Component.translatable("commands.enhanced.build.meter", target.getDisplayName(), meter), true);
         return meter;

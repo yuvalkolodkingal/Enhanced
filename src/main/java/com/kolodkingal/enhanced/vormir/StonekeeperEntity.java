@@ -124,7 +124,7 @@ public class StonekeeperEntity extends PathfinderMob {
         }
         if (player instanceof ServerPlayer server && !speeches.containsKey(server.getUUID())) {
             speeches.put(server.getUUID(), new Speech(Stonekeeper.lines(server), level().getGameTime()));
-            server.setData(ModAttachments.STONES, server.getData(ModAttachments.STONES)
+            ModAttachments.STONES.set(server, ModAttachments.STONES.get(server)
                     .with(StoneProgress.MET_STONEKEEPER));
             getLookControl().setLookAt(player);
         }

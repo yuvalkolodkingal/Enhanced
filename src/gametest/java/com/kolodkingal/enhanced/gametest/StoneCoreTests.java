@@ -415,7 +415,7 @@ public final class StoneCoreTests {
         ServerPlayer thor = f.player(9.5, FLOOR, 9.5, Power.THOR);
         ServerPlayer loki = f.player(11.5, FLOOR, 11.5, Power.LOKI);
         check(take(helper, thor, pos) && carries(thor, StoneKind.TIME), "Thor takes the Time Stone");
-        check(thor.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "the ledger marks him");
+        check(ModAttachments.STONES.get(thor).hasTaken(StoneKind.TIME), "the ledger marks him");
         check(thor.getUUID().equals(StoneLedger.taker(thor.getMainHandItem())), "the stone carries his name");
         StonePedestalBlockEntity be = (StonePedestalBlockEntity) helper.getLevel().getBlockEntity(pos);
         check(be != null && !be.shows(thor.getUUID(), StoneKind.TIME) && be.shows(loki.getUUID(), StoneKind.TIME),
@@ -452,19 +452,19 @@ public final class StoneCoreTests {
         level.addFreshEntity(falling);
         falling.tick();
         check(falling.isRemoved(), "the stone fell out of the world");
-        check(!thor.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "Thor may take the Time Stone again");
+        check(!ModAttachments.STONES.get(thor).hasTaken(StoneKind.TIME), "Thor may take the Time Stone again");
         ItemStack soulStone = stone(StoneKind.SOUL);
         StoneLedger.stamp(soulStone, thor.getUUID());
         ItemEntity killed = new ItemEntity(level, at.x, at.y, at.z, soulStone);
         level.addFreshEntity(killed);
-        check(thor.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL), "the Soul Stone still counts");
+        check(ModAttachments.STONES.get(thor).hasTaken(StoneKind.SOUL), "the Soul Stone still counts");
         killed.kill();
-        check(!thor.getData(ModAttachments.STONES).hasTaken(StoneKind.SOUL), "killed: it is free again");
+        check(!ModAttachments.STONES.get(thor).hasTaken(StoneKind.SOUL), "killed: it is free again");
         check(take(helper, thor, time), "and he takes the Time Stone once more");
         ItemStack gauntlet = gauntletWith(StoneKind.TIME);
         StoneLedger.putInGauntletOf(gauntlet, StoneKind.TIME, thor.getUUID());
         StoneLedger.destroyed(gauntlet);
-        check(!thor.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "a destroyed Gauntlet frees its stones");
+        check(!ModAttachments.STONES.get(thor).hasTaken(StoneKind.TIME), "a destroyed Gauntlet frees its stones");
         helper.succeed();
     }
 
@@ -493,9 +493,9 @@ public final class StoneCoreTests {
         check(loki.getUUID().equals(StoneLedger.taker(back)), "so does the stone taken back out of it");
         loki.inventoryMenu.getCraftSlots().clearContent();
         StoneLedger.destroyed(new ItemStack(ModItems.EYE_OF_AGAMOTTO.get()));
-        check(loki.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "an Eye that held no site stone: nothing");
+        check(ModAttachments.STONES.get(loki).hasTaken(StoneKind.TIME), "an Eye that held no site stone: nothing");
         StoneLedger.destroyed(eye);
-        check(!loki.getData(ModAttachments.STONES).hasTaken(StoneKind.TIME), "the destroyed Eye frees the Time Stone");
+        check(!ModAttachments.STONES.get(loki).hasTaken(StoneKind.TIME), "the destroyed Eye frees the Time Stone");
         helper.succeed();
     }
 
@@ -508,7 +508,7 @@ public final class StoneCoreTests {
         SiteStoneLootFunction function = new SiteStoneLootFunction(List.of(), StoneKind.POWER);
         check(function.apply(new ItemStack(ModItems.THE_ORB.get()), opener(helper, thor)).is(ModItems.THE_ORB.get()),
                 "the first chest gives Thor the Orb");
-        check(thor.getData(ModAttachments.STONES).hasTaken(StoneKind.POWER), "the ledger counts it");
+        check(ModAttachments.STONES.get(thor).hasTaken(StoneKind.POWER), "the ledger counts it");
         ItemStack second = function.apply(new ItemStack(ModItems.THE_ORB.get()), opener(helper, thor));
         check(second.is(Items.PAPER), "a second chest gives him a note");
         check(second.getHoverName().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
@@ -709,7 +709,7 @@ public final class StoneCoreTests {
         TestKit.assertNear(thor.getHealth(), 2.0, 0.01, "the cost: Thor at 2 health");
         check(thor.hasEffect(MobEffects.WEAKNESS) && thor.getEffect(MobEffects.WEAKNESS).getAmplifier() == 1,
                 "and Weakness II");
-        StoneProgress progress = thor.getData(ModAttachments.STONES);
+        StoneProgress progress = ModAttachments.STONES.get(thor);
         check(progress.has(StoneProgress.SNAPPED), "the flag of the first Snap");
         check(progress.snapReadyAt() == level.getGameTime() + 24000, "a day before the next");
         check(!Snap.mayCharge(thor, InfinityGauntletItem.contents(gauntlet)), "so it may not charge again");

@@ -63,7 +63,7 @@ public final class HeimdallServer implements HeroServer {
      * Hofund bound to him; as the worthy become Thor holding their Mjolnir.
      */
     public static boolean awakens(ServerPlayer player, PowerData data) {
-        return data.power() == Power.NONE && player.getData(ModAttachments.ASGARD).has(AsgardProgress.WATCH_WON)
+        return data.power() == Power.NONE && ModAttachments.ASGARD.get(player).has(AsgardProgress.WATCH_WON)
                 && HofundBond.holdsOwn(player);
     }
 
