@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.healing;
 
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.config.HealingConfig;
+import com.kolodkingal.enhanced.mixin.MobEffectInstanceAccessor;
 import com.kolodkingal.enhanced.network.HealingFxPayload;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
@@ -11,9 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.neoforged.fml.util.ObfuscationReflectionHelper;
 
-import java.lang.reflect.Field;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Suppression {
     /** Those whose healing poison has switched off, as the server last told them (the edges of {@link #tick}). */
     private static final Set<UUID> OFF = ConcurrentHashMap.newKeySet();
-    private static final Field DURATION = ObfuscationReflectionHelper.findField(MobEffectInstance.class, "duration");
 
     private Suppression() {
     }
@@ -59,11 +57,7 @@ public final class Suppression {
         if (!HealingFactor.active(player) || !shrugs(added.getEffect()) || added.isInfiniteDuration()) {
             return;
         }
-        try {
-            DURATION.setInt(added, shrunk(added.getDuration(), shrugFactor()));
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
+        ((MobEffectInstanceAccessor) added).enhanced$setDuration(shrunk(added.getDuration(), shrugFactor()));
     }
 
     /** Whether the server has told {@code player} that his healing is off. */

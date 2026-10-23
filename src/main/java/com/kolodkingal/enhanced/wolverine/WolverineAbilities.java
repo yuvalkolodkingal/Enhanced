@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.healing.HealingBurst;
 import com.kolodkingal.enhanced.healing.HealingFactor;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -33,7 +34,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -271,7 +271,7 @@ public final class WolverineAbilities {
                 * k, on);
         setModifier(player, Attributes.JUMP_STRENGTH, BODY_JUMP, cfg(WolverineConfig.JUMP_BONUS, 0.15) * k, on);
         setModifier(player, Attributes.SAFE_FALL_DISTANCE, BODY_SAFE_FALL, cfg(WolverineConfig.SAFE_FALL, 4.0) * k, on);
-        setModifier(player, NeoForgeMod.SWIM_SPEED, BODY_SWIM, -0.5, on && Adamantium.heavy(),
+        setModifier(player, Platform.get().attributes().swimSpeed(), BODY_SWIM, -0.5, on && Adamantium.heavy(),
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         if (!on) {
             Berserker.modifiers(player, false);

@@ -4,6 +4,7 @@
   "package": "com.kolodkingal.enhanced.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MobEffectInstanceAccessor",
     "PlayerMixin",
     "TamableAnimalMixin"
   ],

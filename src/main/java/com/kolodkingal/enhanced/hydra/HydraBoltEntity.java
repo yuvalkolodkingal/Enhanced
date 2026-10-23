@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.network.HydraFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.net.Net;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -29,7 +30,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -129,7 +129,7 @@ public class HydraBoltEntity extends ThrowableProjectile implements ShieldCost {
         AABB probe = getBoundingBox().inflate(0.2);
         for (Entity target : level().getEntities(this, probe, this::canHitEntity)) {
             EntityHitResult hit = new EntityHitResult(target, position());
-            if (!EventHooks.onProjectileImpact(this, hit)) {
+            if (!Platform.get().hooks().projectileImpactCancelled(this, hit)) {
                 hitTargetOrDeflectSelf(hit);
             }
             if (isRemoved()) {
