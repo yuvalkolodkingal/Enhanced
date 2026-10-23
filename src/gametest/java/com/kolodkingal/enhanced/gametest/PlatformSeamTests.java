@@ -15,7 +15,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -49,22 +51,28 @@ public final class PlatformSeamTests {
         helper.succeed();
     }
 
-    /** S5-2: a zombie with water over his eyes can drown in it; one on the dry floor cannot. */
+    /**
+     * S5-2: a pig with water over its eyes can drown in it; one on the dry floor cannot; a zombie under water cannot
+     * (it breathes there: on NeoForge water's drowning rule asks {@code canBreatheUnderwater}).
+     */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void waterAtTheEyesDrowns(GameTestHelper helper) {
-        for (int x = 3; x <= 5; x++) {
+        for (int x = 3; x <= 7; x++) {
             for (int y = 2; y <= 5; y++) {
                 for (int z = 3; z <= 5; z++) {
                     helper.setBlock(new BlockPos(x, y, z), Blocks.WATER);
                 }
             }
         }
-        Zombie wet = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(4, 2, 4));
-        Zombie dry = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(14, 2, 14));
+        Pig wet = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new BlockPos(4, 2, 4));
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new BlockPos(6, 2, 4));
+        Pig dry = TestKit.spawnWithNoFreeWill(helper, EntityType.PIG, new BlockPos(14, 2, 14));
         var hooks = Platform.get().hooks();
         helper.succeedWhen(() -> {
-            check(hooks.drownsInFluidAtEyes(wet), "water over his eyes");
-            check(!hooks.drownsInFluidAtEyes(dry), "air at his eyes");
+            check(wet.isEyeInFluid(FluidTags.WATER) && zombie.isEyeInFluid(FluidTags.WATER), "both under water");
+            check(hooks.drownsInFluidAtEyes(wet), "the pig, water over its eyes");
+            check(!hooks.drownsInFluidAtEyes(zombie), "the zombie breathes under water");
+            check(!hooks.drownsInFluidAtEyes(dry), "air at the dry pig's eyes");
         });
     }
 

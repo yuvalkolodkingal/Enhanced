@@ -54,8 +54,8 @@ public interface LoaderHooks {
 
     /**
      * Whether the fluid at {@code entity}'s eyes is one it can drown in (water; other mods' fluids by their own rule).
-     * Whether it breathes under water anyway ({@code canBreatheUnderwater}) is not asked. NeoForge:
-     * {@code getEyeInFluidType()} is not air and {@code canDrownInFluidType} of it.
+     * In water this already answers false for an entity that breathes there ({@code canBreatheUnderwater}: a zombie,
+     * a fish). NeoForge: {@code getEyeInFluidType()} is not air and {@code canDrownInFluidType} of it.
      */
     boolean drownsInFluidAtEyes(LivingEntity entity);
 }
