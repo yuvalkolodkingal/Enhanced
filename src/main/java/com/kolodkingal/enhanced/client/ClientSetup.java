@@ -675,6 +675,8 @@ public final class ClientSetup {
      * here, which is the order NeoForge called the old registration listeners in (docs/port/listener-order.txt).
      */
     public static void register(ClientRegistrar registrar) {
+        // Development only (-Denhanced.bridgeSelfTest=true): the self-test of the client's event bridges.
+        BridgeSelfTest.install(registrar);
         // HUD layers: Vormir's, the Stones', Heimdall's, then the mod's own (below).
         com.kolodkingal.enhanced.client.vormir.VormirClient.Setup.register(registrar);
         com.kolodkingal.enhanced.client.stones.StoneClient.Setup.register(registrar);
