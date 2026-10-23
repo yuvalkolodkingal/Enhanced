@@ -3,13 +3,16 @@ package com.kolodkingal.enhanced.build;
 import com.kolodkingal.enhanced.registry.ModTags;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -64,6 +67,9 @@ public final class LandBrush {
 
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();
     private static final BlockState WATER = Blocks.WATER.defaultBlockState();
+    /** The loaders' common tag of ores ({@code c:ores}, NeoForge's {@code Tags.Blocks.ORES}). */
+    private static final TagKey<Block> ORES =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "ores"));
     /** The disc's columns per radius, nearest the middle first (each packed {@code dx << 16 | dz & 0xFFFF}). */
     private static final Map<Integer, int[]> DISCS = new ConcurrentHashMap<>();
 
@@ -533,7 +539,7 @@ public final class LandBrush {
          * and not an ore (a column never copies one).
          */
         private boolean plain(BlockState state, int x, int y, int z) {
-            return MagicSelect.isGround(state) && !state.is(Tags.Blocks.ORES) && !state.is(ModTags.BUILD_UNCONJURABLE) && !state.hasBlockEntity()
+            return MagicSelect.isGround(state) && !state.is(ORES) && !state.is(ModTags.BUILD_UNCONJURABLE) && !state.hasBlockEntity()
                     && !SpellMath.untouchable(state, level, pos.set(x, y, z));
         }
     }

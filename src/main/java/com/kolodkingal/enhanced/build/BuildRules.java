@@ -6,6 +6,8 @@ import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
+import com.kolodkingal.enhanced.platform.ItemAccess;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.registry.ModEffects;
 import com.kolodkingal.enhanced.registry.ModTags;
 import com.kolodkingal.enhanced.ultron.SokoviaRecovery;
@@ -42,8 +44,6 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -298,7 +298,8 @@ public final class BuildRules {
         if (entity instanceof CampfireBlockEntity campfire) {
             return campfire.getItems().stream().anyMatch(stack -> !stack.isEmpty());
         }
-        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, entity.getBlockState(), entity, null);
+        ItemAccess.Slots handler = Platform.get().itemAccess()
+                .blockSlots(level, pos, entity.getBlockState(), entity, null);
         if (handler != null) {
             for (int slot = 0; slot < handler.getSlots(); slot++) {
                 if (!handler.getStackInSlot(slot).isEmpty()) {
@@ -336,7 +337,8 @@ public final class BuildRules {
             campfire.clearContent();
             return;
         }
-        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, entity.getBlockState(), entity, null);
+        ItemAccess.Slots handler = Platform.get().itemAccess()
+                .blockSlots(level, pos, entity.getBlockState(), entity, null);
         if (handler != null) {
             for (int slot = 0; slot < handler.getSlots(); slot++) {
                 ItemStack taken = handler.extractItem(slot, Integer.MAX_VALUE, false);

@@ -11,6 +11,7 @@ import com.kolodkingal.enhanced.block.XDoorRoundBlock;
 import com.kolodkingal.enhanced.config.SchoolLabConfig;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModBlocks;
 import com.kolodkingal.enhanced.registry.ModItems;
 import com.kolodkingal.enhanced.school.LabBuilder;
@@ -344,7 +345,7 @@ public final class LabTests {
         check(!CureStationBlock.fill(level, abs, player, InteractionHand.MAIN_HAND), "not again so soon");
         check(count(player, ModItems.MUTANT_CURE.get()) == 1 && count(player, Items.GLASS_BOTTLE) == 1,
                 "nothing used");
-        player.getPersistentData().putLong(CureStationBlock.LAST, level.getGameTime() - 1200);
+        ModAttachments.PERSISTENT_DATA.get(player).putLong(CureStationBlock.LAST, level.getGameTime() - 1200);
         check(CureStationBlock.fill(level, abs, player, InteractionHand.MAIN_HAND), "after the cooldown, again");
         check(count(player, ModItems.MUTANT_CURE.get()) == 2 && count(player, Items.GLASS_BOTTLE) == 0, "two cures");
         ServerPlayer empty = f.player(11.5, 2, 12.5);

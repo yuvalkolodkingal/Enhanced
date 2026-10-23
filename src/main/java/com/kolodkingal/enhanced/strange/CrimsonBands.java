@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.config.StrangeConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.StrangeFxPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -18,7 +19,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -129,7 +129,7 @@ public final class CrimsonBands {
         if (HELD.isEmpty()) {
             return;
         }
-        var server = ServerLifecycleHooks.getCurrentServer();
+        var server = Platform.get().currentServer();
         if (server == null) {
             HELD.clear();
             return;

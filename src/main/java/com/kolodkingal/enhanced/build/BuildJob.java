@@ -12,10 +12,13 @@ import com.kolodkingal.enhanced.build.SpellPlanner.Setup;
 import com.kolodkingal.enhanced.config.BuildConfig;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
+import com.kolodkingal.enhanced.mixin.ChunkMapInvoker;
+import com.kolodkingal.enhanced.mixin.HangingEntityInvoker;
 import com.kolodkingal.enhanced.network.BuildCastPayload;
 import com.kolodkingal.enhanced.network.BuildFxPayload;
 import com.kolodkingal.enhanced.network.BuildVerdictPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.registry.ModTicketTypes;
 import com.kolodkingal.enhanced.ultron.SokoviaJob;
@@ -33,7 +36,6 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ChunkHolder;
-import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -56,11 +58,8 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.util.ObfuscationReflectionHelper;
-import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -163,9 +162,6 @@ public final class BuildJob {
     private static final long MAX_COLUMNS = 1_000_000L;
     /** The most chunks of a plan's box asked one by one at the cast; a bigger box takes the level's loaded chunks. */
     private static final int ASKED_CHUNKS = 65_536;
-    private static final Method GET_CHUNKS = ObfuscationReflectionHelper.findMethod(ChunkMap.class, "getChunks");
-    /** {@code HangingEntity.setDirection}, which is protected: a frame a Move turns. */
-    private static final Method SET_DIRECTION = ObfuscationReflectionHelper.findMethod(HangingEntity.class, "setDirection", Direction.class);
     /** The most blocks a body in new blocks is lifted (D-B 11.8). */
     private static final int LIFT_UP = 64;
     /** The farthest a body with no room above is moved aside. */
@@ -413,7 +409,7 @@ public final class BuildJob {
 
     /** The same for a player who is not online (an operator's undo): his profile acts. */
     public static BuildJob replay(GameProfile profile, Limits limits, ServerLevel level, UndoStep step, boolean redo) {
-        ServerPlayer actor = FakePlayerFactory.get(level, profile);
+        ServerPlayer actor = Platform.get().fakePlayer(level, profile);
         return new BuildJob(redo ? Kind.REDO : Kind.UNDO, profile.getId(), profile, level, limits.hero(), limits, 0, 0, null, actor.position(), step,
                 false, level::hasChunk, step.chunks(), actor, null).startReplay();
     }
@@ -527,15 +523,10 @@ public final class BuildJob {
     }
 
     /** Every chunk the level holds now ({@code ChunkMap.getChunks}, which is not public). */
-    @SuppressWarnings("unchecked")
     private static List<ChunkPos> loadedChunks(ServerLevel level) {
         List<ChunkPos> all = new ArrayList<>();
-        try {
-            for (ChunkHolder holder : (Iterable<ChunkHolder>) GET_CHUNKS.invoke(level.getChunkSource().chunkMap)) {
-                all.add(holder.getPos());
-            }
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Build Magic cannot list the loaded chunks", e);
+        for (ChunkHolder holder : ((ChunkMapInvoker) level.getChunkSource().chunkMap).enhanced$getChunks()) {
+            all.add(holder.getPos());
         }
         return all;
     }
@@ -994,7 +985,7 @@ public final class BuildJob {
     /** The caster while he is online and alive; else a fake player of his profile (10.3). */
     private ServerPlayer actor() {
         ServerPlayer online = online();
-        return online != null && online.isAlive() ? online : FakePlayerFactory.get(level, profile);
+        return online != null && online.isAlive() ? online : Platform.get().fakePlayer(level, profile);
     }
 
     private @Nullable ServerPlayer online() {
@@ -2494,11 +2485,7 @@ public final class BuildJob {
     private static void hang(HangingEntity hanging, BlockPos at, Direction facing) {
         hanging.setPos(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5);
         if (hanging.getDirection() != facing) {
-            try {
-                SET_DIRECTION.invoke(hanging, facing);
-            } catch (ReflectiveOperationException e) {
-                throw new IllegalStateException("Build Magic cannot turn a frame", e);
-            }
+            ((HangingEntityInvoker) hanging).enhanced$setDirection(facing);
         }
         ServerChunkCache chunks = ((ServerLevel) hanging.level()).getChunkSource();
         chunks.removeEntity(hanging);

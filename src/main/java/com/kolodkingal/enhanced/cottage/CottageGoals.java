@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.asgard.npc.NpcState;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.hydra.HydraGarrison;
 import com.kolodkingal.enhanced.power.Power;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -211,7 +212,7 @@ public final class CottageGoals {
         npc.moveTo(seat.getX() + 0.5, seat.getY() + top, seat.getZ() + 0.5, yaw, 0.0F);
         npc.setYHeadRot(yaw);
         npc.setYBodyRot(yaw);
-        npc.getPersistentData().putFloat(SEAT_YAW, yaw);
+        ModAttachments.PERSISTENT_DATA.get(npc).putFloat(SEAT_YAW, yaw);
         npc.setState(NpcState.SITTING, ticks);
     }
 
@@ -339,9 +340,9 @@ public final class CottageGoals {
                     npc.getNavigation().moveTo(at.x, at.y, at.z, 0.8);
                 }
             }
-            long until = npc.getPersistentData().getLong(FLOWER_UNTIL);
+            long until = ModAttachments.PERSISTENT_DATA.get(npc).getLong(FLOWER_UNTIL);
             if (until > 0 && level.getGameTime() >= until) {
-                npc.getPersistentData().remove(FLOWER_UNTIL);
+                ModAttachments.PERSISTENT_DATA.get(npc).remove(FLOWER_UNTIL);
                 if (npc.getMainHandItem().is(Items.POPPY)) {
                     npc.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
                 }
@@ -364,7 +365,7 @@ public final class CottageGoals {
 
         @Override
         public boolean canUse() {
-            return npc.state() == NpcState.SITTING && npc.getPersistentData().contains(SEAT_YAW);
+            return npc.state() == NpcState.SITTING && ModAttachments.PERSISTENT_DATA.get(npc).contains(SEAT_YAW);
         }
 
         @Override
@@ -379,7 +380,7 @@ public final class CottageGoals {
 
         @Override
         public void tick() {
-            float yaw = npc.getPersistentData().getFloat(SEAT_YAW);
+            float yaw = ModAttachments.PERSISTENT_DATA.get(npc).getFloat(SEAT_YAW);
             npc.setYRot(yaw);
             npc.setYBodyRot(yaw);
             net.minecraft.world.entity.player.Player near = npc.level().getNearestPlayer(npc.getX(), npc.getY(),
@@ -397,7 +398,7 @@ public final class CottageGoals {
         @Override
         public void stop() {
             if (npc.state() != NpcState.SITTING) {
-                npc.getPersistentData().remove(SEAT_YAW);
+                ModAttachments.PERSISTENT_DATA.get(npc).remove(SEAT_YAW);
             }
         }
     }
@@ -733,7 +734,7 @@ public final class CottageGoals {
             npc.swing(InteractionHand.MAIN_HAND);
             npc.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
             nicky.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.POPPY));
-            nicky.getPersistentData().putLong(FLOWER_UNTIL, level.getGameTime() + 600);
+            ModAttachments.PERSISTENT_DATA.get(nicky).putLong(FLOWER_UNTIL, level.getGameTime() + 600);
             level.sendParticles(ParticleTypes.HEART, nicky.getX(), nicky.getY() + 1.4, nicky.getZ(), 2, 0.2, 0.1, 0.2,
                     0.0);
             activity = null;

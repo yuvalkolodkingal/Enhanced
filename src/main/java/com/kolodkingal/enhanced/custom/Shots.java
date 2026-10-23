@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.hex.Hex;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceKey;
@@ -18,7 +19,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public final class Shots {
         Vec3 end = hit.getLocation();
         LivingEntity target = null;
         if (hit instanceof EntityHitResult entityHit) {
-            Entity e = entityHit.getEntity() instanceof PartEntity<?> part ? part.getParent() : entityHit.getEntity();
+            Entity e = Platform.get().parts().root(entityHit.getEntity());
             target = e instanceof LivingEntity living ? living : null;
         }
         Vec3 cut = hexCut(player.serverLevel(), from, end);
