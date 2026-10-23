@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.stones;
 
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.Raycasts;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.thanos.StonePowers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +13,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.entity.PartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
@@ -54,7 +54,7 @@ public final class StoneAim {
         if (entity instanceof LivingEntity living) {
             return living;
         }
-        return entity instanceof PartEntity<?> part && part.getParent() instanceof LivingEntity parent ? parent : null;
+        return Platform.get().parts().parentOf(entity) instanceof LivingEntity parent ? parent : null;
     }
 
     /** A creature a single, aimed stone may strike: not untouchable or an ally; a player only with PvP. */

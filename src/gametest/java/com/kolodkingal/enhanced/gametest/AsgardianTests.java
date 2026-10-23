@@ -18,6 +18,7 @@ import com.kolodkingal.enhanced.asgard.npc.DefendAsgardGoal;
 import com.kolodkingal.enhanced.asgard.npc.NpcState;
 import com.kolodkingal.enhanced.asgard.npc.Role;
 import com.kolodkingal.enhanced.config.AsgardConfig;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -47,12 +48,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforgespi.locating.IModFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -398,10 +398,10 @@ public final class AsgardianTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everyLineAndAnswerIsInEnglishAndHebrew(GameTestHelper helper) throws IOException {
-        IModFile mod = ModList.get().getModFileById(Enhanced.MODID).getFile();
         List<String> missing = new ArrayList<>();
         for (String name : List.of("en_us", "he_il")) {
-            JsonObject lang = JsonParser.parseString(Files.readString(mod.findResource("assets", Enhanced.MODID, "lang", name + ".json"),
+            Path file = Platform.get().modResource("assets/" + Enhanced.MODID + "/lang/" + name + ".json").orElseThrow();
+            JsonObject lang = JsonParser.parseString(Files.readString(file,
                     StandardCharsets.UTF_8)).getAsJsonObject();
             for (String key : AsgardDialogue.langKeys()) {
                 if (!lang.has(key)) {

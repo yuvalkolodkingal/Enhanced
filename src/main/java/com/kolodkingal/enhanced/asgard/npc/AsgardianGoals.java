@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.asgard.AsgardState;
 import com.kolodkingal.enhanced.asgard.CityPlan;
 import com.kolodkingal.enhanced.asgard.FeastHall;
+import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -119,12 +120,12 @@ final class AsgardianGoals {
         npc.moveTo(at.x, at.y, at.z, yaw, 0.0F);
         npc.setYHeadRot(yaw);
         npc.setYBodyRot(yaw);
-        npc.getPersistentData().putFloat(SEAT_YAW, yaw);
+        ModAttachments.PERSISTENT_DATA.get(npc).putFloat(SEAT_YAW, yaw);
         net.minecraft.nbt.ListTag where = new net.minecraft.nbt.ListTag();
         where.add(net.minecraft.nbt.DoubleTag.valueOf(at.x));
         where.add(net.minecraft.nbt.DoubleTag.valueOf(at.y));
         where.add(net.minecraft.nbt.DoubleTag.valueOf(at.z));
-        npc.getPersistentData().put(SEAT_AT, where);
+        ModAttachments.PERSISTENT_DATA.get(npc).put(SEAT_AT, where);
         npc.setState(state, ticks);
     }
 
@@ -677,12 +678,12 @@ final class AsgardianGoals {
             }
             long now = npc.level().getGameTime();
             boolean feast = feast();
-            boolean invited = npc.getPersistentData().getBoolean(FeastHall.INVITED);
+            boolean invited = ModAttachments.PERSISTENT_DATA.get(npc).getBoolean(FeastHall.INVITED);
             if (!invited && (now < nextTry || !feast && (npc.role() != Role.VOLSTAGG
                     || npc.getRandom().nextInt(30) != 0))) {
                 return false;
             }
-            npc.getPersistentData().remove(FeastHall.INVITED);
+            ModAttachments.PERSISTENT_DATA.get(npc).remove(FeastHall.INVITED);
             nextTry = now + (feast ? 100 : 400 + npc.getRandom().nextInt(400));
             seat = choose();
             return seat != null && npc.distanceToSqr(Vec3.atBottomCenterOf(seat.pos())) < 40.0 * 40.0;
@@ -803,7 +804,7 @@ final class AsgardianGoals {
         @Override
         public boolean canUse() {
             return (npc.state() == NpcState.SITTING || npc.state() == NpcState.DINING)
-                    && npc.getPersistentData().contains(SEAT_YAW);
+                    && ModAttachments.PERSISTENT_DATA.get(npc).contains(SEAT_YAW);
         }
 
         @Override
@@ -813,11 +814,12 @@ final class AsgardianGoals {
 
         @Override
         public void tick() {
-            float yaw = npc.getPersistentData().getFloat(SEAT_YAW);
+            float yaw = ModAttachments.PERSISTENT_DATA.get(npc).getFloat(SEAT_YAW);
             npc.setYRot(yaw);
             npc.setYBodyRot(yaw);
             // He stays on his seat: one walking past (along the benches behind the high table) slips by, not shoves him.
-            net.minecraft.nbt.ListTag where = npc.getPersistentData().getList(SEAT_AT, net.minecraft.nbt.Tag.TAG_DOUBLE);
+            net.minecraft.nbt.ListTag where = ModAttachments.PERSISTENT_DATA.get(npc)
+                    .getList(SEAT_AT, net.minecraft.nbt.Tag.TAG_DOUBLE);
             if (where.size() == 3) {
                 Vec3 at = new Vec3(where.getDouble(0), where.getDouble(1), where.getDouble(2));
                 if (npc.position().distanceToSqr(at) > 0.0025) {
@@ -841,8 +843,8 @@ final class AsgardianGoals {
         @Override
         public void stop() {
             if (npc.state() != NpcState.SITTING && npc.state() != NpcState.DINING) {
-                npc.getPersistentData().remove(SEAT_YAW);
-                npc.getPersistentData().remove(SEAT_AT);
+                ModAttachments.PERSISTENT_DATA.get(npc).remove(SEAT_YAW);
+                ModAttachments.PERSISTENT_DATA.get(npc).remove(SEAT_AT);
             }
         }
     }

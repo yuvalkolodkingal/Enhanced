@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.config.SoulStoneConfig;
 import com.kolodkingal.enhanced.config.StonesConfig;
 import com.kolodkingal.enhanced.config.StonesConfig.Uniqueness;
 import com.kolodkingal.enhanced.item.InfinityStoneItem;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.registry.ModAttachments;
 import com.kolodkingal.enhanced.registry.ModDataComponents;
 import com.kolodkingal.enhanced.registry.ModItems;
@@ -22,7 +23,6 @@ import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -119,7 +119,7 @@ public final class StoneLedger {
      * ledger's own watches.
      */
     public static void destroyed(ItemStack stack) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = Platform.get().currentServer();
         if (server == null || stack.isEmpty() || !returnLost()) {
             return;
         }
