@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -21,9 +22,10 @@ import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.Nullable;
 
-/** The loader hooks on NeoForge: {@code EventHooks}, {@code CommonHooks} and the item abilities. */
+/** The loader hooks on NeoForge: {@code EventHooks}, {@code CommonHooks}, the item abilities and fluid types. */
 final class NeoHooks implements LoaderHooks {
     @Override
     public boolean blockPlaceCancelled(@Nullable Entity placer, Level level, BlockPos pos, Direction against) {
@@ -56,5 +58,11 @@ final class NeoHooks implements LoaderHooks {
     @Override
     public boolean isShield(ItemStack stack) {
         return !stack.isEmpty() && stack.canPerformAction(ItemAbilities.SHIELD_BLOCK);
+    }
+
+    @Override
+    public boolean drownsInFluidAtEyes(LivingEntity entity) {
+        FluidType eyes = entity.getEyeInFluidType();
+        return !eyes.isAir() && entity.canDrownInFluidType(eyes);
     }
 }
