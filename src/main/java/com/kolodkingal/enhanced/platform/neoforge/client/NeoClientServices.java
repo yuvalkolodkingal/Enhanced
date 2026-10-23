@@ -4,7 +4,17 @@ import com.kolodkingal.enhanced.platform.client.ClientServices;
 import com.kolodkingal.enhanced.platform.client.KeyContext;
 import com.kolodkingal.enhanced.platform.client.KeyMod;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyModifier;
@@ -13,6 +23,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * The client services on NeoForge. Key contexts: {@link KeyContext#IN_GAME}, {@code UNIVERSAL} and {@code GUI} ARE
@@ -20,7 +31,8 @@ import java.util.Objects;
  * is wrapped once in an {@link IKeyConflictContext} whose {@code isActive} is the context's and whose
  * {@code conflicts(o)} asks the context about {@code o} seen as a {@code KeyContext} (NeoForge's three as the
  * constants, a wrapped context as itself, another mod's context as a stand-in that answers with that context's own
- * {@code conflicts}). {@link KeyMod} is {@link KeyModifier}.
+ * {@code conflicts}). {@link KeyMod} is {@link KeyModifier}. Batched block models: the model's {@link ModelData} and
+ * render types, as the mod's meshes drew them before.
  */
 public final class NeoClientServices implements ClientServices {
     private static final Map<KeyContext, Adapter> ADAPTERS = Collections.synchronizedMap(new IdentityHashMap<>());
@@ -42,6 +54,17 @@ public final class NeoClientServices implements ClientServices {
     @Override
     public boolean conflicts(KeyContext.Vanilla context, KeyContext other) {
         return toNeo(context).conflicts(other == null ? null : toNeo(other));
+    }
+
+    @Override
+    public void renderBatched(BlockRenderDispatcher dispatcher, BlockState state, BlockPos pos, BlockAndTintGetter view,
+                              PoseStack pose, boolean checkSides, RandomSource random,
+                              Function<RenderType, VertexConsumer> bufferFor) {
+        BakedModel model = dispatcher.getBlockModel(state);
+        ModelData data = model.getModelData(view, pos, state, ModelData.EMPTY);
+        for (RenderType type : model.getRenderTypes(state, random, data)) {
+            dispatcher.renderBatched(state, pos, view, pose, bufferFor.apply(type), checkSides, random, data, type);
+        }
     }
 
     /** NeoForge's context for {@code context} (the same object every time). */
