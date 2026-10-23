@@ -163,17 +163,10 @@ public final class CustomTechTests {
         return helper.absoluteVec(new Vec3(x, y, z));
     }
 
-    /**
-     * Offers a blow to the damage chain as it would come to the target: whether it was stopped. TODO(port L2): post the
-     * common event ({@code Events.post(new LivingIncomingDamageEvent(target, source, amount)).isCanceled()}) once the
-     * Chaos Shield's handler ({@code ApocalypseEvents}, L2) is a {@code @Subscribe} handler; until then only NeoForge's
-     * bus reaches it (and, through the bridge, every handler already moved).
-     */
+    /** Offers a blow to the damage chain as it would come to the target: whether it was stopped. */
     private static boolean stopped(ServerPlayer target, DamageSource source, float amount) {
-        var event = new net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent(target,
-                new net.neoforged.neoforge.common.damagesource.DamageContainer(source, amount));
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event);
-        return event.isCanceled();
+        return com.kolodkingal.enhanced.platform.event.Events.post(
+                new com.kolodkingal.enhanced.platform.event.LivingIncomingDamageEvent(target, source, amount)).isCanceled();
     }
 
     // ------------------------------------------------------------------------------------------------------------
