@@ -7,9 +7,9 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ironman.SuitKind;
 import com.kolodkingal.enhanced.ironman.SuitParts;
 import com.kolodkingal.enhanced.ironman.SuitTimelines;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.fml.ModList;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,15 +37,15 @@ public final class SuitArtTests {
             "eternity_altar", "eternity_mirror");
     private static final int STEPS = 400;
 
+    /** A file of the mod's assets, or null if there is none. */
     private static Path file(String path) {
-        return ModList.get().getModFileById(Enhanced.MODID).getFile()
-                .findResource(("assets/" + Enhanced.MODID + "/" + path).split("/"));
+        return Platform.get().modResource("assets/" + Enhanced.MODID + "/" + path).orElse(null);
     }
 
     /** A PNG's width and height, from its header. */
     private static int[] size(String path) throws IOException {
         Path f = file(path);
-        check(Files.isRegularFile(f), path + " exists");
+        check(f != null && Files.isRegularFile(f), path + " exists");
         byte[] b = Files.readAllBytes(f);
         check(b.length > 24 && b[1] == 'P' && b[2] == 'N' && b[3] == 'G', path + " is a PNG");
         return new int[] {readInt(b, 16), readInt(b, 20)};
@@ -57,7 +57,7 @@ public final class SuitArtTests {
 
     private static JsonObject json(String path) throws IOException {
         Path f = file(path);
-        check(Files.isRegularFile(f), path + " exists");
+        check(f != null && Files.isRegularFile(f), path + " exists");
         return JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
     }
 

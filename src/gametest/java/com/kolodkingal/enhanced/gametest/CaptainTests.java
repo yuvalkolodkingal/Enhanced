@@ -15,6 +15,7 @@ import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
@@ -668,8 +669,8 @@ public final class CaptainTests {
     /** His preset reads, is his hero's, and fits 60 points with no note (the integrator lists it in HEROES). */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void hisPresetFitsSixtyPoints(GameTestHelper helper) throws java.io.IOException {
-        java.nio.file.Path file = net.neoforged.fml.ModList.get().getModFileById(Enhanced.MODID).getFile()
-                .findResource("assets", Enhanced.MODID, "hero_presets", "captain_america.json");
+        java.nio.file.Path file = Platform.get().modResource("assets/" + Enhanced.MODID
+                + "/hero_presets/captain_america.json").orElseThrow();
         String json = java.nio.file.Files.readString(file, java.nio.charset.StandardCharsets.UTF_8);
         com.kolodkingal.enhanced.custom.HeroPresets.Preset preset =
                 com.kolodkingal.enhanced.custom.HeroPresets.read("captain_america", json);
