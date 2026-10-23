@@ -14,7 +14,7 @@ English: [Music](Music)
 
 הכללים לא השתנו: הוא מנגן כל עוד **זמן קוויקסילבר** פועל (בריצה או בעמידה; מהירות-על לבדה לא מנגנת כלום), לכל מי שקרוב מספיק כדי להיתפס בהילוך האיטי, ורק כשהווקמן שלו דלוק (**התכופפות + R**). ראו [קוויקסילבר](Quicksilver-HE).
 
-**רוצים את *Sweet Dreams* בחזרה?** הוא עדיין במוד. בהגדרות של המשחק שלכם, **`config/enhanced-client.toml`**, בקטע `[music]`, כותבים `quicksilverSong = "sweet_dreams"` (ברירת המחדל היא `"theme"`). גם מסך **Mods ← Enhanced ← Config** במשחק מציע את זה. זה משנה רק את המשחק שלכם.
+**רוצים את *Sweet Dreams*?** מאז 3.8.4 הוא כבר לא נמצא בתוך המוד, אבל אפשר לנגן עותק משלכם: שימו אותו בתיקייה **`config/enhanced/music/`** בשם `sweet_dreams.mp3` (או `.ogg` או `.wav`), ובהגדרות של המשחק שלכם, **`config/enhanced-client.toml`**, בקטע `[music]`, כתבו `quicksilverSong = "sweet_dreams"` (ברירת המחדל היא `"theme"`). גם מסך **Mods ← Enhanced ← Config** במשחק מציע את זה. זה משנה רק את המשחק שלכם. בלי הקובץ הוא מנגן את *Silver Hours*, והמשחק אומר לכם פעם אחת איפה לשים אותו.
 
 ### ספיד: "Westview Blur"
 
@@ -72,7 +72,7 @@ English: [Music](Music)
 **מה מתנגן** (הראשון שקיים):
 
 * חלק של הדרך: `witches_road_<part>.ogg` ← `witches_road.ogg` ← `music.ogg` ← השיר של המוד;
-* קוויקסילבר: `quicksilver.ogg` ← `music.ogg` ← השיר שלו (או *Sweet Dreams*, אם השחקן בחר בו);
+* קוויקסילבר: `quicksilver.ogg` ← `music.ogg` ← השיר שלו;
 * ספיד: `speed.ogg` ← `music.ogg` ← השיר שלו.
 
 ### הקבצים
@@ -95,13 +95,14 @@ English: [Music](Music)
 * התיקייה **`config/enhanced/music/`** בתיקיית המיינקראפט שלכם (המוד יוצר אותה, עם `README.txt`), כמו קודם. כל `.mp3`, `.ogg` או `.wav`.
 * **חדש:** קבצים בשם של המוזיקה: `quicksilver.*`, `speed.*`, `witches_road.*` ו-`witches_road_<part>.*` (אותם חלקים כמו למעלה).
 * **כמו קודם:** כל קובץ שיר אחר שם (`my song.mp3`, `music.mp3`...) הוא של קוויקסילבר; אם יש כמה, הראשון לפי סדר האלף-בית.
+* **`sweet_dreams.*`** (3.8.4): העותק שלכם של *Sweet Dreams*. עם `quicksilverSong = "sweet_dreams"` הוא מתנגן לקוויקסילבר לפני כל קובץ אחר.
 * השירים שלכם מתנגנים רק במשחק שלכם. **השיר שלכם קודם לשל העולם, ושל העולם קודם לשל המוד.**
 
 ## אפשרויות
 
 | איפה | אפשרות | ברירת מחדל | מה היא עושה |
 |---|---|---|---|
-| לקוח (`enhanced-client.toml`, `[music]`) | `quicksilverSong` | `theme` | השיר המובנה של קוויקסילבר: `theme` ("Silver Hours") או `sweet_dreams`. |
+| לקוח (`enhanced-client.toml`, `[music]`) | `quicksilverSong` | `theme` | השיר של קוויקסילבר: `theme` ("Silver Hours") או `sweet_dreams` (העותק שלכם, `sweet_dreams.*` בתיקייה `config/enhanced/music/`; בלעדיו, "Silver Hours"). |
 | לקוח (`enhanced-client.toml`, `[music]`) | `ignoreServerMusic` | `false` | לא להוריד ולא לנגן את השירים של העולם. |
 | שרת (`[music]`) | `enabled` | `true` | לשלוח לשחקנים את השירים מתיקיית המוזיקה של העולם. |
 | שרת (`[music]`) | `maxFileKB` | `8192` | השיר הכי גדול שנשלח, ב-KB (16 עד 65536). |

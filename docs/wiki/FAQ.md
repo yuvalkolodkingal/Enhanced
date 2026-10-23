@@ -752,13 +752,13 @@ When you raise a Hex as the Scarlet Witch, a Vision appears at your side. Look a
 
 ## Music and sharing
 
-### Why is the mod for personal use only?
+### Where is *Sweet Dreams*?
 
-Quicksilver's Walkman can play *Sweet Dreams (Are Made of This)* by Eurythmics (since 3.5 only if you choose it), and the recording is built into the mod. It is copyrighted, so the repository and the jars built from it are for personal use only. Keep the repository private and do not share the jar publicly.
+Since 3.8.4 *Sweet Dreams (Are Made of This)* by Eurythmics is no longer built into the mod. If you want Quicksilver to play it, put your own copy in `config/enhanced/music/` in your Minecraft folder as `sweet_dreams.mp3` (or `.ogg` or `.wav`) and set the client option `quicksilverSong = "sweet_dreams"`. Without the file he plays his own theme, *Silver Hours*, and the game tells you once where to put it. See [Music](Music).
 
 ### Can I change Quicksilver's song?
 
-Yes. Since 3.5 he plays his own theme, *Silver Hours*; the client option `quicksilverSong = "sweet_dreams"` brings *Sweet Dreams* back. For a song of your own, put an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/` in your Minecraft folder (the mod creates the folder the first time it starts): `quicksilver.mp3`, or any name (the first in alphabetical order). See [Music](Music).
+Yes. Since 3.5 he plays his own theme, *Silver Hours*; the client option `quicksilverSong = "sweet_dreams"` plays your own copy of *Sweet Dreams* (see above). For a song of your own, put an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/` in your Minecraft folder (the mod creates the folder the first time it starts): `quicksilver.mp3`, or any name (the first in alphabetical order). See [Music](Music).
 
 ### Can my server give everyone the same song?
 

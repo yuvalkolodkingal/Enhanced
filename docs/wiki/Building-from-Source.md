@@ -27,7 +27,7 @@ The GameTests (`./gradlew runGameTestServer`) start a server, run the mod's in-g
 
 GitHub Actions (`.github/workflows/build.yml`) runs the same build and the GameTests on every push and pull request, and publishes a release for every push to `main` (or a `v*` tag). The jar of the newest build is the one marked *Latest* on the [Releases](https://github.com/yuvalkolodkingal/enhanced/releases) page.
 
-The jar contains a copyrighted song, so builds are for personal use only (see [Credits](Credits)).
+Since 3.8.4 *Sweet Dreams (Are Made of This)* is no longer built into the jar; a player can put their own copy in `config/enhanced/music/` (see [Music](Music)).
 
 ## Where things are
 

@@ -36,11 +36,11 @@ Put the same jar in the `mods` folder of a NeoForge 21.1 server and start it. Pl
 
 ## Updating
 
-Replace the old jar in the `mods` folder with the new one (on the client and on the server). Your hero, your look and your saved Bifrost places are saved with the player. **3.8 needs the server and every player updated together** (network protocol 12; 3.8.1 is protocol 13, so update 3.8.0 to 3.8.1 on the server and every player together too): a 3.7 player cannot join a 3.8 server, or the other way round. (3.7, 3.7.1 and 3.7.2 were protocol 11, 3.6 and 3.6.1 were 10, 3.5 was 9.) Worlds of 3.7 open in 3.8 with every hero as they left them: every Avengers Tower gets its [armoury](Structures#the-armoury-38) when a player first comes near, and the Shrines of the Cosmic Entities appear in End islands not explored yet. (From 3.6 to 3.7, every Mutant School got its [lower lab](Mutant-School-Lab) when a player first came near, and Agatha's Cottages appeared in land not explored yet.) (From 3.5 to 3.6, the new places appeared in land not explored yet, and every Infinity Gauntlet already in the world stayed Thanos's Gauntlet.)
+Replace the old jar in the `mods` folder with the new one (on the client and on the server). Your hero, your look and your saved Bifrost places are saved with the player. **3.8 needs the server and every player updated together** (network protocol 12; 3.8.1 is protocol 13, so update 3.8.0 to 3.8.1 on the server and every player together too; 3.8.1 to 3.8.4 are all protocol 13 and play together): a 3.7 player cannot join a 3.8 server, or the other way round. (3.7, 3.7.1 and 3.7.2 were protocol 11, 3.6 and 3.6.1 were 10, 3.5 was 9.) Worlds of 3.7 open in 3.8 with every hero as they left them: every Avengers Tower gets its [armoury](Structures#the-armoury-38) when a player first comes near, and the Shrines of the Cosmic Entities appear in End islands not explored yet. (From 3.6 to 3.7, every Mutant School got its [lower lab](Mutant-School-Lab) when a player first came near, and Agatha's Cottages appeared in land not explored yet.) (From 3.5 to 3.6, the new places appeared in land not explored yet, and every Infinity Gauntlet already in the world stayed Thanos's Gauntlet.)
 
-## Personal use only
+## Quicksilver's song
 
-Quicksilver's Walkman can play *Sweet Dreams (Are Made of This)* by Eurythmics (since 3.5 only if you choose it; his own theme plays by default), and the recording is built into the jar. It is copyrighted, so the repository and the jars built from it are for personal use only. Keep the repository private and do not share the jar publicly.
+Quicksilver's Walkman plays his own theme, *Silver Hours*. Since 3.8.4 *Sweet Dreams (Are Made of This)* by Eurythmics is no longer built into the jar: to hear it, put your own copy in `config/enhanced/music/` as `sweet_dreams.mp3` (or `.ogg` or `.wav`) and set the client option `quicksilverSong = "sweet_dreams"`. See [Music](Music).
 
 ## Troubleshooting
 
