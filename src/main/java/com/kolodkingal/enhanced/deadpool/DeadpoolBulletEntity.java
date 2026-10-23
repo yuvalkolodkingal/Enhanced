@@ -99,7 +99,7 @@ public class DeadpoolBulletEntity extends ThrowableProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide || isRemoved()) {
+        if (level().isClientSide() || isRemoved()) {
             return;
         }
         if (!isInWater()) {

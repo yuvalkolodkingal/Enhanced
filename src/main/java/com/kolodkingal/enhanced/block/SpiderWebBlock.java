@@ -42,7 +42,7 @@ public class SpiderWebBlock extends WebBlock {
 
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        if (!level.isClientSide && !state.is(oldState.getBlock())) {
+        if (!level.isClientSide() && !state.is(oldState.getBlock())) {
             // (A tick scheduled for this cell and block before it went in is kept: a second one for the same place is ignored.)
             level.scheduleTick(pos, this, SpiderConfig.WEB_BLOCK_TICKS.get());
         }

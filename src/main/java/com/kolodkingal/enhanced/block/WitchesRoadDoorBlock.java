@@ -63,7 +63,7 @@ public class WitchesRoadDoorBlock extends Block {
         if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer) {
             WitchesRoad.use(serverLevel, pos, serverPlayer);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override

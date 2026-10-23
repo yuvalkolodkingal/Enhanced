@@ -111,7 +111,7 @@ public class InfinityStoneItem extends Item {
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         Level level = entity.level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (entity.getAge() != -32768) {
                 entity.setUnlimitedLifetime();
             }

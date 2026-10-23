@@ -152,7 +152,7 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (!event.getLevel().isClientSide) {
+        if (!event.getLevel().isClientSide()) {
             SlowMotion.onJoin(event.getEntity());
             MagnetoAbilities.onJoin(event.getEntity());
             Telekinesis.onJoin(event.getEntity());
@@ -243,7 +243,7 @@ public final class CommonEvents {
 
     @SubscribeEvent
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide) {
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
             return;
         }
         DamageSource source = event.getSource();
@@ -419,7 +419,7 @@ public final class CommonEvents {
     /** A slowed projectile gets its full speed back the moment it hits someone, so it hits as hard as it would have. */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onSlowedProjectileImpact(ProjectileImpactEvent event) {
-        if (!event.getProjectile().level().isClientSide && event.getRayTraceResult() instanceof EntityHitResult) {
+        if (!event.getProjectile().level().isClientSide() && event.getRayTraceResult() instanceof EntityHitResult) {
             SlowMotion.unslow(event.getProjectile());
         }
     }
@@ -427,7 +427,7 @@ public final class CommonEvents {
     @SubscribeEvent
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
-        if (projectile.level().isClientSide || !(event.getRayTraceResult() instanceof EntityHitResult hit)
+        if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)
                 || !(hit.getEntity() instanceof ServerPlayer player) || projectile.getOwner() == player) {
             return;
         }
@@ -495,7 +495,7 @@ public final class CommonEvents {
     public static void onChorusFruit(EntityTeleportEvent.ChorusFruit event) {
         if (MjolnirPin.isPinned(event.getEntityLiving())) {
             event.setCanceled(true);
-        } else if (!event.getEntityLiving().level().isClientSide) {
+        } else if (!event.getEntityLiving().level().isClientSide()) {
             HexManager.rememberTeleportStart(event.getEntityLiving());
         }
     }
@@ -504,7 +504,7 @@ public final class CommonEvents {
     public static void onEnderTeleport(EntityTeleportEvent.EnderEntity event) {
         if (MjolnirPin.isPinned(event.getEntityLiving())) {
             event.setCanceled(true);
-        } else if (!event.getEntityLiving().level().isClientSide) {
+        } else if (!event.getEntityLiving().level().isClientSide()) {
             HexManager.rememberTeleportStart(event.getEntityLiving());
         }
     }

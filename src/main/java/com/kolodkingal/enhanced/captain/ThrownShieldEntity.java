@@ -157,7 +157,7 @@ public class ThrownShieldEntity extends Projectile {
     public void tick() {
         super.tick();
         Vec3 from = position();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             // The server sends the real position every tick; meanwhile keep it moving smoothly, a faint trail behind.
             setPos(from.add(getDeltaMovement()));
             level().addParticle(new EnergyParticleOptions(tickCount % 2 == 0 ? 0xE8EEF5 : 0x6FA0FF, 0.45F),

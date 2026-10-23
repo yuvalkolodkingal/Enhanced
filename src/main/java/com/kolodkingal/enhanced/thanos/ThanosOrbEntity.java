@@ -59,7 +59,7 @@ public class ThanosOrbEntity extends Projectile implements ShieldCost, BossHooks
     public void tick() {
         super.tick();
         Vec3 from = position();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             setPos(from.add(getDeltaMovement()));
             return;
         }

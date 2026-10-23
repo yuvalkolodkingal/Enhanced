@@ -63,7 +63,7 @@ public class ArcReactorItem extends Item {
             return InteractionResultHolder.consume(stack);
         }
         if (refuses(player)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.displayClientMessage(Component.translatable("message.enhanced.iron_man.reactor_refused")
                         .withStyle(ChatFormatting.GRAY), true);
             }
@@ -134,7 +134,7 @@ public class ArcReactorItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (level.isClientSide || !(entity instanceof ServerPlayer player) || refuses(player)
+        if (level.isClientSide() || !(entity instanceof ServerPlayer player) || refuses(player)
                 || Powers.power(player) == Power.IRON_MAN) {
             return stack;
         }

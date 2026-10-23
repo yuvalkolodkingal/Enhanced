@@ -100,7 +100,7 @@ public class StonekeeperEntity extends PathfinderMob {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         if (home == null) {
@@ -128,7 +128,7 @@ public class StonekeeperEntity extends PathfinderMob {
                     .with(StoneProgress.MET_STONEKEEPER));
             getLookControl().setLookAt(player);
         }
-        return InteractionResult.sidedSuccess(level().isClientSide);
+        return InteractionResult.sidedSuccess(level().isClientSide());
     }
 
     /** Each line of each speech when it is due; a listener who has left ends his. */

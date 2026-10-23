@@ -235,7 +235,7 @@ public class HelaEntity extends Monster implements BossHooks {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return false;
         }
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {

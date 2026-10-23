@@ -48,7 +48,7 @@ public final class BossEvents {
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (!event.getLevel().isClientSide && BossFights.isOrphan(event.getEntity())) {
+        if (!event.getLevel().isClientSide() && BossFights.isOrphan(event.getEntity())) {
             event.setCanceled(true);
         }
     }

@@ -47,7 +47,7 @@ public final class VormirEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         Entity by = event.getSource().getEntity();
-        if (by != null && !event.getEntity().level().isClientSide) {
+        if (by != null && !event.getEntity().level().isClientSide()) {
             VormirTracker.credit(event.getEntity(), by);
         }
     }
@@ -67,7 +67,7 @@ public final class VormirEvents {
     @SubscribeEvent
     public static void onDetonate(ExplosionEvent.Detonate event) {
         Entity by = event.getExplosion().getIndirectSourceEntity();
-        if (by == null || event.getLevel().isClientSide) {
+        if (by == null || event.getLevel().isClientSide()) {
             return;
         }
         for (Entity entity : event.getAffectedEntities()) {
@@ -79,7 +79,7 @@ public final class VormirEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onDeath(LivingDeathEvent event) {
-        if (!event.isCanceled() && !event.getEntity().level().isClientSide) {
+        if (!event.isCanceled() && !event.getEntity().level().isClientSide()) {
             Sacrifice.onDeath(event.getEntity(), event.getSource());
         }
     }

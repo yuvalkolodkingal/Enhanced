@@ -113,7 +113,7 @@ public final class DeadpoolEvents {
 
     @SubscribeEvent
     public static void onTarget(LivingChangeTargetEvent event) {
-        if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide) {
+        if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide()) {
             return;
         }
         if (Taunt.keepsOff(mob, event.getNewAboutToBeSetTarget(), mob.level().getGameTime())) {

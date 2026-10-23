@@ -53,7 +53,7 @@ public class HydraBlasterItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!enabled()) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.displayClientMessage(Component.translatable("message.enhanced.hydra.blaster_off"), true);
             }
             return InteractionResultHolder.fail(stack);
@@ -68,7 +68,7 @@ public class HydraBlasterItem extends Item {
                     : EquipmentSlot.OFFHAND);
         }
         player.swing(hand);
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     /** One bolt from {@code shooter}'s hand where he looks. */

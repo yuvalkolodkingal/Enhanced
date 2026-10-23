@@ -258,7 +258,7 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         setAirSupply(getMaxAirSupply());
@@ -379,7 +379,7 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
     /** He falls: he fades, and Wanda starts to rebuild him. Not a death: nothing dropped, no body. */
     @Override
     public void die(DamageSource source) {
-        if (level().isClientSide || isRemoved()) {
+        if (level().isClientSide() || isRemoved()) {
             return;
         }
         fade();
@@ -390,7 +390,7 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
     @Override
     public void onAddedToLevel() {
         super.onAddedToLevel();
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             HexVisions.joined(this);
         }
     }
@@ -398,7 +398,7 @@ public class HexVisionEntity extends PathfinderMob implements OwnableEntity {
     @Override
     public void onRemovedFromLevel() {
         super.onRemovedFromLevel();
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             HexVisions.left(this);
         }
     }

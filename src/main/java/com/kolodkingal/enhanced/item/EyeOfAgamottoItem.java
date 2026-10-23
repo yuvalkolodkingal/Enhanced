@@ -47,7 +47,7 @@ public class EyeOfAgamottoItem extends Item {
         if (player instanceof ServerPlayer server) {
             EyeOfAgamotto.use(server, stack, server.isShiftKeyDown());
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     /** Set round a site's Time Stone, the Eye carries who took that stone (3.6, integration: the stones' ledger). */
@@ -76,7 +76,7 @@ public class EyeOfAgamottoItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (!level.isClientSide && entity instanceof ServerPlayer player) {
+        if (!level.isClientSide() && entity instanceof ServerPlayer player) {
             EyeOfAgamotto.awaken(player, stack);
         }
         return stack;
@@ -84,7 +84,7 @@ public class EyeOfAgamottoItem extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (!level.isClientSide && entity instanceof ServerPlayer player) {
+        if (!level.isClientSide() && entity instanceof ServerPlayer player) {
             EyeOfAgamotto.inventoryTick(stack, player);
         }
     }

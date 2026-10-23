@@ -126,7 +126,7 @@ public final class PhoenixEvents {
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent event) {
         LivingEntity dead = event.getEntity();
-        if (dead.level().isClientSide) {
+        if (dead.level().isClientSide()) {
             return;
         }
         if (dead instanceof Mob) {

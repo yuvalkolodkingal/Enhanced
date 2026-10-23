@@ -330,7 +330,7 @@ public class UltronEntity extends Monster implements BossHooks {
      */
     @Override
     public void setHealth(float health) {
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             UltronFight fight = fight();
             if (fight != null) {
                 DamageSource source = hurtSource;

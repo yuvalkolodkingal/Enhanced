@@ -47,7 +47,7 @@ public final class ThanosEvents {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onStoneDamage(LivingIncomingDamageEvent event) {
         LivingEntity victim = event.getEntity();
-        if (victim.level().isClientSide || event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+        if (victim.level().isClientSide() || event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return;
         }
         if (victim.hasEffect(ModEffects.SOULWORLD)) {
@@ -68,7 +68,7 @@ public final class ThanosEvents {
     /** A projectile about to hit Thanos while the Reality Veil is drawn is a bubble that pops instead. */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
-        if (!event.getProjectile().level().isClientSide && event.getRayTraceResult() instanceof EntityHitResult hit
+        if (!event.getProjectile().level().isClientSide() && event.getRayTraceResult() instanceof EntityHitResult hit
                 && hit.getEntity() instanceof ServerPlayer player && ThanosAbilities.veilTakes(player, event.getProjectile())) {
             event.setCanceled(true);
         }

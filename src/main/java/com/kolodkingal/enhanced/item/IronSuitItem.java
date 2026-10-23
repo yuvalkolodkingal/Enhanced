@@ -72,16 +72,16 @@ public class IronSuitItem extends ArmorItem {
             return InteractionResultHolder.pass(stack);
         }
         if (!IronSuits.mayWear(player)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.displayClientMessage(Component.translatable("message.enhanced.iron_man.only_iron_man")
                         .withStyle(ChatFormatting.GRAY), true);
             }
             return InteractionResultHolder.fail(stack);
         }
-        if (!level.isClientSide && player instanceof ServerPlayer server) {
+        if (!level.isClientSide() && player instanceof ServerPlayer server) {
             SuitControl.putOn(server, kind, stack, false);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     @Override

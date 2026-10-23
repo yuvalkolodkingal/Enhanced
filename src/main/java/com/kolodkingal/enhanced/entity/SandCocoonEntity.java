@@ -230,7 +230,7 @@ public class SandCocoonEntity extends Entity {
     /** The cocoon that holds this creature (server side), or null. */
     @Nullable
     public static SandCocoonEntity cocoonOf(Entity victim) {
-        if (victim.level().isClientSide) {
+        if (victim.level().isClientSide()) {
             return null;
         }
         for (SandCocoonEntity cocoon : victim.level().getEntitiesOfClass(SandCocoonEntity.class, victim.getBoundingBox().inflate(2.0),
@@ -244,7 +244,7 @@ public class SandCocoonEntity extends Entity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide || isRemoved()) {
+        if (level().isClientSide() || isRemoved()) {
             return false;
         }
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {

@@ -130,7 +130,7 @@ public final class StoneEvents {
     /** A projectile about to hit a holder of the Reality Stone is a bubble instead. */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
-        if (!event.getProjectile().level().isClientSide && event.getRayTraceResult() instanceof EntityHitResult hit
+        if (!event.getProjectile().level().isClientSide() && event.getRayTraceResult() instanceof EntityHitResult hit
                 && hit.getEntity() instanceof ServerPlayer player
                 && RealityBubbles.catches(player, event.getProjectile())) {
             event.setCanceled(true);

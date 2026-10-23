@@ -64,7 +64,7 @@ public class FrightenedEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(LivingEntity creature, int amplifier) {
-        if (creature.level().isClientSide || !(creature instanceof PathfinderMob mob)) {
+        if (creature.level().isClientSide() || !(creature instanceof PathfinderMob mob)) {
             return true;
         }
         Entity from = feared(creature);

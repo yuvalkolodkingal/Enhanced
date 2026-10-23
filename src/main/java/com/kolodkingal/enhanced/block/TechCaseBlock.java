@@ -106,7 +106,7 @@ public class TechCaseBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
         Armoury.takeFromCase((ServerLevel) level, pos, player);
@@ -120,11 +120,11 @@ public class TechCaseBlock extends BaseEntityBlock {
         if (!player.isCreative() || stack.isEmpty() || state.getValue(GENERATED)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof TechCaseBlockEntity box) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof TechCaseBlockEntity box) {
             box.setShown(stack, stack.is(ModItems.VIBRANIUM_SHIELD.get()) ? TechCaseBlockEntity.Rule.CAPTAIN_ONLY
                     : TechCaseBlockEntity.Rule.ANYONE);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
     /** The lid closes after a take. */

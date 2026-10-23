@@ -52,7 +52,7 @@ public abstract class AwakeningItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (Powers.power(player).hasPowers()) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.displayClientMessage(alreadyPowered(), true);
             }
             // The click is spent on the refusal: the game must not go on to use what the other hand holds (Loki's
@@ -75,7 +75,7 @@ public abstract class AwakeningItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (level.isClientSide || !(entity instanceof ServerPlayer player) || Powers.power(player).hasPowers()) {
+        if (level.isClientSide() || !(entity instanceof ServerPlayer player) || Powers.power(player).hasPowers()) {
             return stack;
         }
         awaken(player);

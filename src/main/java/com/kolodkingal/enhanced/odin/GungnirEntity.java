@@ -109,7 +109,7 @@ public class GungnirEntity extends Projectile implements ShieldCost {
     public void tick() {
         super.tick();
         Vec3 from = position();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             // The server sends the real position every tick; meanwhile it keeps moving smoothly, shedding golden motes.
             setPos(from.add(getDeltaMovement()));
             if (random.nextInt(2) == 0) {

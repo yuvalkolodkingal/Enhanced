@@ -198,11 +198,11 @@ public final class Bifrost {
             if (player instanceof ServerPlayer server) {
                 toLook(server);
             }
-        } else if (level.isClientSide) {
+        } else if (level.isClientSide()) {
             // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
             BifrostScreen.open();
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     // ---- the journeys ----

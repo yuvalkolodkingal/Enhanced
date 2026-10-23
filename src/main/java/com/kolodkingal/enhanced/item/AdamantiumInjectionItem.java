@@ -69,7 +69,7 @@ public class AdamantiumInjectionItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (refuses(player)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 String key = Powers.power(player) == Power.DEADPOOL ? "message.enhanced.wolverine.injection_deadpool"
                         : "message.enhanced.wolverine.injection_hero";
                 player.displayClientMessage(Component.translatable(key).withStyle(ChatFormatting.GRAY), true);
@@ -78,7 +78,7 @@ public class AdamantiumInjectionItem extends Item {
             return InteractionResultHolder.consume(stack);
         }
         player.startUsingItem(hand);
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ADAMANTIUM_CLANK.get(),
                     SoundSource.PLAYERS, 0.4F, 1.6F);
         }
@@ -118,7 +118,7 @@ public class AdamantiumInjectionItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (level.isClientSide || !(entity instanceof ServerPlayer player) || refuses(player)) {
+        if (level.isClientSide() || !(entity instanceof ServerPlayer player) || refuses(player)) {
             return stack;
         }
         inject(player);

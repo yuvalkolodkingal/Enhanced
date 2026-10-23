@@ -230,7 +230,7 @@ public final class SlowMotion {
             return false;
         }
         // Clients let creatures tick so their movement between server updates stays smooth.
-        if (entity.level().isClientSide && entity instanceof LivingEntity) {
+        if (entity.level().isClientSide() && entity instanceof LivingEntity) {
             return false;
         }
         return Math.floorMod(entity.tickCount + entity.getId(), factorOf(entity)) != 0;
@@ -363,7 +363,7 @@ public final class SlowMotion {
     private static void release(Projectile projectile, boolean speedUp) {
         CompoundTag tag = projectile.getPersistentData().getCompound(SLOWED_TAG);
         projectile.getPersistentData().remove(SLOWED_TAG);
-        if (!projectile.level().isClientSide) {
+        if (!projectile.level().isClientSide()) {
             Net.sendToPlayersTrackingEntity(projectile, new SlowedProjectilePayload(projectile.getId(), 0));
         }
         int factor = Math.max(1, tag.getInt("Factor"));

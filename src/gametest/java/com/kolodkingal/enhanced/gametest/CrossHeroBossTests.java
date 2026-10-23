@@ -183,7 +183,7 @@ public final class CrossHeroBossTests {
 
         @Override
         public void accept(EntityTickEvent.Post event) {
-            if (!event.getEntity().level().isClientSide) {
+            if (!event.getEntity().level().isClientSide()) {
                 counts.computeIfPresent(event.getEntity().getId(), (id, n) -> n + 1);
             }
         }

@@ -64,7 +64,7 @@ public class TechCaseBlockEntity extends BlockEntity {
         this.shown = stack.copyWithCount(stack.isEmpty() ? 0 : 1);
         this.rule = rule;
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }

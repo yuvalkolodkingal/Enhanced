@@ -83,7 +83,7 @@ public class CerebroConsoleBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (level.isClientSide || !(player instanceof ServerPlayer server)) {
+        if (level.isClientSide() || !(player instanceof ServerPlayer server)) {
             return InteractionResult.SUCCESS;
         }
         return CerebroRoom.useConsole(server, pos);

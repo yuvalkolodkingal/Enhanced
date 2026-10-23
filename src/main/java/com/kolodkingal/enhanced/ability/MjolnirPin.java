@@ -79,7 +79,7 @@ public final class MjolnirPin {
         if (!(entity instanceof LivingEntity target) || player.isSpectator()) {
             return null;
         }
-        boolean client = player.level().isClientSide;
+        boolean client = player.level().isClientSide();
         MjolnirPinEntity pin = pinOf(target);
         if (pin != null) {
             if (player instanceof ServerPlayer lifter) {
@@ -167,7 +167,7 @@ public final class MjolnirPin {
     /** The hammer lying on {@code target}, or null if it is not pinned. Works on both sides. */
     @Nullable
     public static MjolnirPinEntity pinOf(Entity target) {
-        if (target.level().isClientSide) {
+        if (target.level().isClientSide()) {
             return target.level().getEntitiesOfClass(MjolnirPinEntity.class, target.getBoundingBox().inflate(1.0),
                     p -> p.targetEntityId() == target.getId()).stream().findFirst().orElse(null);
         }
@@ -194,7 +194,7 @@ public final class MjolnirPin {
 
     /** Whether Mjolnir lies on this entity (server side). */
     public static boolean isPinned(Entity entity) {
-        return !entity.level().isClientSide && pinOf(entity) != null;
+        return !entity.level().isClientSide() && pinOf(entity) != null;
     }
 
     /** The owner lifts the hammer off {@code target}, into their hand; anyone else finds it will not budge. */
@@ -321,7 +321,7 @@ public final class MjolnirPin {
     /** A pinned creature that is not a player (players move themselves: {@link #tickPlayer}). */
     @Nullable
     private static MjolnirPinEntity pinnedCreature(Entity entity) {
-        if (BY_TARGET.isEmpty() || entity.level().isClientSide || !(entity instanceof LivingEntity) || entity instanceof Player) {
+        if (BY_TARGET.isEmpty() || entity.level().isClientSide() || !(entity instanceof LivingEntity) || entity instanceof Player) {
             return null;
         }
         return pinOf(entity);

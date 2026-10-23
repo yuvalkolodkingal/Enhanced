@@ -367,7 +367,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
 
     /** Whether he fights for someone else now (the Scepter, the Mind Stone). */
     public boolean isTurned() {
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return entityData.get(DATA_TURNED);
         }
         return turnedById != null && turnedUntil > level().getGameTime();
@@ -499,7 +499,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
     public void setTarget(@Nullable LivingEntity target) {
         LivingEntity old = getTarget();
         super.setTarget(target);
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         LivingEntity now = getTarget();
@@ -854,13 +854,13 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!level().isClientSide && blocksWithShield(source)) {
+        if (!level().isClientSide() && blocksWithShield(source)) {
             level().playSound(null, getX(), getY(), getZ(), ModSounds.HYDRA_SHIELD_BLOCK.get(), SoundSource.HOSTILE,
                     1.0F, 0.9F + random.nextFloat() * 0.2F);
             return false;
         }
         boolean hurt = super.hurt(source, amount);
-        if (hurt && !level().isClientSide && source.getEntity() instanceof LivingEntity attacker && isAlive()) {
+        if (hurt && !level().isClientSide() && source.getEntity() instanceof LivingEntity attacker && isAlive()) {
             HydraSenses.heard((ServerLevel) level(), position());
         }
         return hurt;
@@ -892,7 +892,7 @@ public class HydraSoldierEntity extends Monster implements SteeredShooter {
 
     @Override
     public void remove(RemovalReason reason) {
-        if (!level().isClientSide && reason == RemovalReason.DISCARDED && level() instanceof ServerLevel level) {
+        if (!level().isClientSide() && reason == RemovalReason.DISCARDED && level() instanceof ServerLevel level) {
             HydraGarrison.discarded(level, this);
         }
         super.remove(reason);

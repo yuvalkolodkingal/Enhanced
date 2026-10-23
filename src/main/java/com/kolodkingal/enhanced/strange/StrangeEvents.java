@@ -62,7 +62,7 @@ public final class StrangeEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         LivingEntity victim = event.getEntity();
-        if (victim.level().isClientSide) {
+        if (victim.level().isClientSide()) {
             return;
         }
         float amount = SeraphimShield.harm(victim, event.getSource(), event.getAmount());
@@ -81,7 +81,7 @@ public final class StrangeEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
-        if (projectile.level().isClientSide || !(event.getRayTraceResult() instanceof EntityHitResult hit)
+        if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)
                 || !(hit.getEntity() instanceof ServerPlayer player) || projectile.getOwner() == player) {
             return;
         }
@@ -120,14 +120,14 @@ public final class StrangeEvents {
     @SubscribeEvent
     public static void onDetonate(ExplosionEvent.Detonate event) {
         Level level = event.getLevel();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             event.getAffectedBlocks().removeIf(pos -> MirrorDimension.shields(level, pos));
         }
     }
 
     @SubscribeEvent
     public static void onExplosionKnockback(ExplosionKnockbackEvent event) {
-        if (event.getAffectedEntity() instanceof LivingEntity living && !living.level().isClientSide
+        if (event.getAffectedEntity() instanceof LivingEntity living && !living.level().isClientSide()
                 && SeraphimShield.shelters(living)) {
             event.setKnockbackVelocity(Vec3.ZERO);
         }
@@ -152,7 +152,7 @@ public final class StrangeEvents {
 
     @SubscribeEvent
     public static void onGrief(EntityMobGriefingEvent event) {
-        if (event.getEntity() != null && !event.getEntity().level().isClientSide
+        if (event.getEntity() != null && !event.getEntity().level().isClientSide()
                 && MirrorDimension.shields(event.getEntity().level(), event.getEntity().blockPosition())) {
             event.setCanGrief(false);
         }

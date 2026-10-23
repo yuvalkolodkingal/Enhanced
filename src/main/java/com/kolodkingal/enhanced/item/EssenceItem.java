@@ -61,14 +61,14 @@ public class EssenceItem extends AwakeningItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (Powers.is(player, Power.APOCALYPSE)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.displayClientMessage(Component.translatable("message.enhanced.essence.already_apocalypse"), true);
             }
             // (The click is spent on the refusal, so the other hand's item is not used instead.)
             return InteractionResultHolder.consume(player.getItemInHand(hand));
         }
         InteractionResultHolder<ItemStack> result = super.use(level, player, hand);
-        if (!level.isClientSide && player.isUsingItem()) {
+        if (!level.isClientSide() && player.isUsingItem()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ESSENCE_TRANSFER.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
         }
         return result;

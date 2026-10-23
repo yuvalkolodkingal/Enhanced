@@ -85,7 +85,7 @@ public class HulkBoulderEntity extends ThrowableProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide && tickCount > LIFETIME) {
+        if (!level().isClientSide() && tickCount > LIFETIME) {
             shatter(position());
         }
     }
@@ -113,7 +113,7 @@ public class HulkBoulderEntity extends ThrowableProjectile {
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!level().isClientSide && isAlive()) {
+        if (!level().isClientSide() && isAlive()) {
             Vec3 at = result.getLocation();
             if (result instanceof EntityHitResult hit) {
                 at = hit.getEntity().position().add(0, hit.getEntity().getBbHeight() * 0.5, 0);

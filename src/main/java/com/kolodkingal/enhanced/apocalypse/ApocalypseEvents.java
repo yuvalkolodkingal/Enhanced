@@ -64,7 +64,7 @@ public final class ApocalypseEvents {
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && !player.level().isClientSide) {
+        if (event.getEntity() instanceof ServerPlayer player && !player.level().isClientSide()) {
             ApocalypseGuard.guard(player, event);
         }
     }
@@ -78,7 +78,7 @@ public final class ApocalypseEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onFriendlyFire(LivingIncomingDamageEvent event) {
         LivingEntity victim = event.getEntity();
-        if (!victim.level().isClientSide && sameSide(victim, event.getSource().getEntity())) {
+        if (!victim.level().isClientSide() && sameSide(victim, event.getSource().getEntity())) {
             event.setCanceled(true);
         }
     }
@@ -87,7 +87,7 @@ public final class ApocalypseEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onChangeTarget(LivingChangeTargetEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!entity.level().isClientSide && sameSide(entity, event.getNewAboutToBeSetTarget())) {
+        if (!entity.level().isClientSide() && sameSide(entity, event.getNewAboutToBeSetTarget())) {
             event.setCanceled(true);
         }
     }
@@ -118,7 +118,7 @@ public final class ApocalypseEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
-        if (projectile.level().isClientSide || !(event.getRayTraceResult() instanceof EntityHitResult hit)) {
+        if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)) {
             return;
         }
         if (hit.getEntity() instanceof ServerPlayer hero) {
@@ -142,7 +142,7 @@ public final class ApocalypseEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
-        if (!event.getLevel().isClientSide && entity instanceof Husk && Horsemen.kindOf(entity) != null && BossFights.fightOf(entity) == null) {
+        if (!event.getLevel().isClientSide() && entity instanceof Husk && Horsemen.kindOf(entity) != null && BossFights.fightOf(entity) == null) {
             event.setCanceled(true);
         }
     }

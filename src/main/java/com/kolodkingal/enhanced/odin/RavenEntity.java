@@ -122,7 +122,7 @@ public class RavenEntity extends Mob implements OwnableEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         ServerLevel level = (ServerLevel) level();

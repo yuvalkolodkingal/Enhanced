@@ -80,7 +80,7 @@ public final class AgathaEvents {
     @SubscribeEvent
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
-        if (projectile.level().isClientSide || !(event.getRayTraceResult() instanceof EntityHitResult hit)) {
+        if (projectile.level().isClientSide() || !(event.getRayTraceResult() instanceof EntityHitResult hit)) {
             return;
         }
         if (hit.getEntity() instanceof ServerPlayer agatha && projectile.getOwner() != agatha && AgathaShield.isUp(agatha)

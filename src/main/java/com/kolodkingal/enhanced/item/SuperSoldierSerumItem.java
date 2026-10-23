@@ -30,7 +30,7 @@ public class SuperSoldierSerumItem extends Item {
         if (player instanceof ServerPlayer server) {
             SerumServer.open(server, hand);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     /** The Vita-Ray blue liquid glows. */

@@ -21,7 +21,7 @@ public final class DarkholdEvents {
     @SubscribeEvent
     public static void onMarkedDamage(LivingIncomingDamageEvent event) {
         LivingEntity target = event.getEntity();
-        if (target.level().isClientSide) {
+        if (target.level().isClientSide()) {
             return;
         }
         float factor = DarkholdBook.markedFactor(target, event.getSource().getEntity());

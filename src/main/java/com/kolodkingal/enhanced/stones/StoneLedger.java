@@ -244,7 +244,7 @@ public final class StoneLedger {
      * the grid still holds the ingredients).
      */
     public static void carryTaker(ItemStack crafted, Player player, Predicate<ItemStack> from) {
-        if (player.level().isClientSide || crafted.isEmpty()) {
+        if (player.level().isClientSide() || crafted.isEmpty()) {
             return;
         }
         for (Slot slot : player.containerMenu.slots) {

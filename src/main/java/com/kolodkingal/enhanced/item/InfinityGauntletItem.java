@@ -175,7 +175,7 @@ public class InfinityGauntletItem extends AwakeningItem {
      */
     @Override
     public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int remaining) {
-        if (level.isClientSide || !(entity instanceof ServerPlayer player)) {
+        if (level.isClientSide() || !(entity instanceof ServerPlayer player)) {
             return;
         }
         if (!contents(stack).titan()) {

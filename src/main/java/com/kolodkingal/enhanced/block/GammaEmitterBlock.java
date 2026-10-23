@@ -67,7 +67,7 @@ public class GammaEmitterBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
             BlockHitResult hit) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
         if (level.getBlockEntity(pos) instanceof GammaEmitterBlockEntity emitter) {
@@ -80,7 +80,7 @@ public class GammaEmitterBlock extends BaseEntityBlock {
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbor, BlockPos from,
             boolean moving) {
         super.neighborChanged(state, level, pos, neighbor, from, moving);
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
         boolean powered = level.hasNeighborSignal(pos);
@@ -103,6 +103,6 @@ public class GammaEmitterBlock extends BaseEntityBlock {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
             BlockEntityType<T> type) {
         return createTickerHelper(type, ModBlockEntities.GAMMA_EMITTER.get(),
-                level.isClientSide ? GammaEmitterBlockEntity::clientTick : GammaEmitterBlockEntity::serverTick);
+                level.isClientSide() ? GammaEmitterBlockEntity::clientTick : GammaEmitterBlockEntity::serverTick);
     }
 }

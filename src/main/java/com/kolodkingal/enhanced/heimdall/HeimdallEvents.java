@@ -24,7 +24,7 @@ public final class HeimdallEvents {
     /** A shadow of a Watch: its watcher's blow strikes it, anyone else's (and anything else) does nothing. */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onShadowHurt(LivingIncomingDamageEvent event) {
-        if (event.getEntity().level().isClientSide || GuardiansWatch.watcherOf(event.getEntity()) == null) {
+        if (event.getEntity().level().isClientSide() || GuardiansWatch.watcherOf(event.getEntity()) == null) {
             return;
         }
         DamageSource source = event.getSource();
@@ -41,7 +41,7 @@ public final class HeimdallEvents {
      */
     @SubscribeEvent
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        if (event.getEntity().level().isClientSide) {
+        if (event.getEntity().level().isClientSide()) {
             return;
         }
         if (HeimdallAbilities.warded(event.getEntity()) && !event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
@@ -57,7 +57,7 @@ public final class HeimdallEvents {
     /** His body: a fall shorter than {@link HeimdallAbilities#SAFE_FALL} blocks does him no harm. */
     @SubscribeEvent
     public static void onFall(LivingFallEvent event) {
-        if (event.getEntity() instanceof Player player && !player.level().isClientSide
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide()
                 && Powers.get(player).has(HeroAbility.HEIMDALL_BODY) && event.getDistance() < HeimdallAbilities.SAFE_FALL) {
             event.setDamageMultiplier(0.0F);
         }

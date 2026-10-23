@@ -42,7 +42,7 @@ public class NanoArcReactorItem extends ArmorItem {
             return super.use(level, player, hand);
         }
         if (ArcReactorItem.refuses(player)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.displayClientMessage(Component.translatable("message.enhanced.iron_man.reactor_refused")
                         .withStyle(ChatFormatting.GRAY), true);
             }
@@ -74,7 +74,7 @@ public class NanoArcReactorItem extends ArmorItem {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (level.isClientSide || !(entity instanceof ServerPlayer player) || ArcReactorItem.refuses(player)
+        if (level.isClientSide() || !(entity instanceof ServerPlayer player) || ArcReactorItem.refuses(player)
                 || Powers.power(player) == Power.IRON_MAN) {
             return stack;
         }

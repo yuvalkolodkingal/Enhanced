@@ -34,7 +34,7 @@ public class CerebroConsoleBlockEntity extends BlockEntity {
         }
         this.inUse = inUse;
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }

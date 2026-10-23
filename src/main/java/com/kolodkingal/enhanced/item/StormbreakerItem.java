@@ -44,7 +44,7 @@ public class StormbreakerItem extends AxeItem {
     /** A dropped Stormbreaker never despawns (but {@code /give}'s look-alike still vanishes). */
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-        if (!entity.level().isClientSide && entity.tickCount == 1 && !ThorAbilities.isFakeDrop(entity)) {
+        if (!entity.level().isClientSide() && entity.tickCount == 1 && !ThorAbilities.isFakeDrop(entity)) {
             entity.setUnlimitedLifetime();
         }
         return false;

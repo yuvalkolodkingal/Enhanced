@@ -34,7 +34,7 @@ public final class TelekinesisEvents {
      */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        if (event.getEntity().level().isClientSide || !Telekinesis.isSpared(event.getEntity())
+        if (event.getEntity().level().isClientSide() || !Telekinesis.isSpared(event.getEntity())
                 || !EnhancedConfig.TELEKINESIS_SPARES_FRIENDS.get()) {
             return;
         }
@@ -63,7 +63,7 @@ public final class TelekinesisEvents {
      */
     @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (!event.getLevel().isClientSide) {
+        if (!event.getLevel().isClientSide()) {
             BossGrip.onJoin(event.getEntity());
         }
     }

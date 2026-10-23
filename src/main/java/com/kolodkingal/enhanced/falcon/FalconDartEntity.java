@@ -68,7 +68,7 @@ public class FalconDartEntity extends ThrowableProjectile {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             Vec3 at = position();
             level().addParticle(new EnergyParticleOptions(FalconAbilities.RED, 0.45F), at.x, at.y, at.z, 0, 0, 0);
             return;

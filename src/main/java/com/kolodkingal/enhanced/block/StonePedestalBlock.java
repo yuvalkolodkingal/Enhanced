@@ -142,7 +142,7 @@ public class StonePedestalBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
                                                                   BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ModBlockEntities.STONE_PEDESTAL.get(),
+        return level.isClientSide() ? null : createTickerHelper(type, ModBlockEntities.STONE_PEDESTAL.get(),
                 StonePedestalBlockEntity::serverTick);
     }
 
@@ -154,10 +154,10 @@ public class StonePedestalBlock extends BaseEntityBlock {
                 || !player.isCreative()) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.setBlock(pos, state.setValue(STONE, Stone.of(stone.kind)), Block.UPDATE_ALL);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -167,7 +167,7 @@ public class StonePedestalBlock extends BaseEntityBlock {
         if (kind == null) {
             return InteractionResult.PASS;
         }
-        if (level.isClientSide || !(player instanceof ServerPlayer server)) {
+        if (level.isClientSide() || !(player instanceof ServerPlayer server)) {
             return InteractionResult.SUCCESS;
         }
         take(server, (ServerLevel) level, pos, state, kind);

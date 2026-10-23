@@ -39,7 +39,7 @@ public class StoneLocatorItem extends Item {
                 return InteractionResultHolder.fail(stack);
             }
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     /** In a hand (server): read every {@link StoneLocator#READ_TICKS} ticks. */

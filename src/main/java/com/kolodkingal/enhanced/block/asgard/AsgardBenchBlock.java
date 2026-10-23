@@ -53,9 +53,9 @@ public class AsgardBenchBlock extends HorizontalDirectionalBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && !player.isShiftKeyDown()) {
+        if (!level.isClientSide() && !player.isShiftKeyDown()) {
             SeatEntity.sit(player, Vec3.atBottomCenterOf(pos).add(0, SEAT_HEIGHT, 0), pos);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 }

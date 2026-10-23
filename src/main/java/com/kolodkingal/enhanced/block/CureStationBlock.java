@@ -97,7 +97,7 @@ public class CureStationBlock extends Block {
         if (!stack.is(Items.GLASS_BOTTLE)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return ItemInteractionResult.SUCCESS;
         }
         fill(level, pos, player, hand);
@@ -137,9 +137,9 @@ public class CureStationBlock extends Block {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             player.displayClientMessage(Component.translatable("message.enhanced.school_lab.cure_station"), false);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 }

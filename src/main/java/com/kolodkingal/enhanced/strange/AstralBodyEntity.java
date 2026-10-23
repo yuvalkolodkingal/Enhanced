@@ -80,7 +80,7 @@ public class AstralBodyEntity extends PathfinderMob {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide || amount <= 0.0F) {
+        if (level().isClientSide() || amount <= 0.0F) {
             return false;
         }
         if (isInvulnerableTo(source)) {

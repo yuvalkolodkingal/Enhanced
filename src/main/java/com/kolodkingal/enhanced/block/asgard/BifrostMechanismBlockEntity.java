@@ -34,7 +34,7 @@ public class BifrostMechanismBlockEntity extends BlockEntity {
     public void spin(long gameTime) {
         spinStart = gameTime;
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }

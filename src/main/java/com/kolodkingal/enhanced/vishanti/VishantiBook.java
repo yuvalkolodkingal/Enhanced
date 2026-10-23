@@ -62,11 +62,11 @@ public final class VishantiBook {
             if (readable(server, true) && server.isShiftKeyDown()) {
                 travelToBase(server);
             }
-        } else if (level.isClientSide && !player.isShiftKeyDown() && WardStrength.isSorcerer(player) && enabled() && !HexRunes.silences(player)) {
+        } else if (level.isClientSide() && !player.isShiftKeyDown() && WardStrength.isSorcerer(player) && enabled() && !HexRunes.silences(player)) {
             // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
             VishantiScreen.open();
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     // ---- the rules ----

@@ -169,7 +169,7 @@ public class LokiIllusionEntity extends PathfinderMob {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         if (tickCount >= lifetime) {
@@ -194,7 +194,7 @@ public class LokiIllusionEntity extends PathfinderMob {
     /** One touch is enough: anything that hurts an illusion makes it dissolve. */
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (level().isClientSide || isRemoved() || isInvulnerableTo(source)) {
+        if (level().isClientSide() || isRemoved() || isInvulnerableTo(source)) {
             return false;
         }
         dissolve(source.getSourcePosition());

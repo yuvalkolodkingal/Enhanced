@@ -75,7 +75,7 @@ public final class VormirTracker {
      * none at all (null) changes nothing.
      */
     public static void credit(LivingEntity victim, @Nullable Entity pusher) {
-        if (pusher == null || victim.level().isClientSide || pusher == victim) {
+        if (pusher == null || victim.level().isClientSide() || pusher == victim) {
             return;
         }
         UUID who = creditor(pusher);
@@ -120,7 +120,7 @@ public final class VormirTracker {
      * and no credit is given; the seeker is still told why his sacrifice did not count).
      */
     public static void attempt(LivingEntity victim, Player attacker) {
-        if (!victim.level().isClientSide && victim != attacker) {
+        if (!victim.level().isClientSide() && victim != attacker) {
             ATTEMPTS.put(victim.getUUID(), new Credit(attacker.getUUID(), victim.level().getGameTime()));
         }
     }
@@ -145,7 +145,7 @@ public final class VormirTracker {
      * or down in the pit): a pet does not teleport to its owner then.
      */
     public static boolean falling(Entity entity) {
-        if (!(entity instanceof LivingEntity living) || entity.level().isClientSide) {
+        if (!(entity instanceof LivingEntity living) || entity.level().isClientSide()) {
             return false;
         }
         Departure gone = DEPARTURES.get(entity.getUUID());

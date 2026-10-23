@@ -110,7 +110,7 @@ public class NecroswordEntity extends ThrowableProjectile implements ShieldCost 
             // Hanging point down, trembling a little (the client draws it): nothing moves and nothing hits yet.
             baseTick();
             setDeltaMovement(Vec3.ZERO);
-            if (!level().isClientSide) {
+            if (!level().isClientSide()) {
                 entityData.set(DATA_HANG, hang - 1);
                 if (hang == 1) {
                     setDeltaMovement(0.0, -FALL_SPEED, 0.0);
@@ -122,7 +122,7 @@ public class NecroswordEntity extends ThrowableProjectile implements ShieldCost 
             return;
         }
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (random.nextInt(2) == 0) {
                 level().addParticle(new EnergyParticleOptions(HelaRules.GREEN, 0.5F), getX(), getY(), getZ(), 0.0, 0.0, 0.0);
             }
@@ -154,7 +154,7 @@ public class NecroswordEntity extends ThrowableProjectile implements ShieldCost 
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (level().isClientSide || !(result.getEntity() instanceof LivingEntity victim)) {
+        if (level().isClientSide() || !(result.getEntity() instanceof LivingEntity victim)) {
             return;
         }
         LivingEntity owner = getOwner() instanceof LivingEntity living ? living : null;
@@ -166,7 +166,7 @@ public class NecroswordEntity extends ThrowableProjectile implements ShieldCost 
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             level().playSound(null, getX(), getY(), getZ(), ModSounds.NECROSWORD_HIT.get(), SoundSource.HOSTILE, 0.6F, 0.7F);
             shatter(true);
         }

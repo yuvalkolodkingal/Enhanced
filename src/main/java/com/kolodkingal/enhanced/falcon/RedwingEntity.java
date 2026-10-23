@@ -124,7 +124,7 @@ public class RedwingEntity extends PathfinderMob {
     public void tick() {
         noPhysics = true;
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             if (tickCount % 3 == 0) {
                 Vec3 back = Vec3.directionFromRotation(0.0F, getYRot()).scale(-0.3);
                 level().addParticle(new EnergyParticleOptions(FalconAbilities.RED, 0.35F), getX() + back.x,

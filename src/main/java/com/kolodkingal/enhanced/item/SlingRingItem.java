@@ -36,11 +36,11 @@ public class SlingRingItem extends Item {
             if (server.isShiftKeyDown()) {
                 SlingRingActions.save(server, "");
             }
-        } else if (level.isClientSide && !player.isShiftKeyDown() && SlingRingActions.isSorcerer(player)) {
+        } else if (level.isClientSide() && !player.isShiftKeyDown() && SlingRingActions.isSorcerer(player)) {
             // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
             SlingRingScreen.open();
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     @Override

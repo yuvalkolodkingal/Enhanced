@@ -122,7 +122,7 @@ public class SuitDisplayBlock extends BaseEntityBlock {
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
             ItemStack stack) {
-        if (!level.isClientSide && level.getBlockState(pos.above()).canBeReplaced()) {
+        if (!level.isClientSide() && level.getBlockState(pos.above()).canBeReplaced()) {
             level.setBlock(pos.above(), state.setValue(HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
         }
     }
@@ -141,7 +141,7 @@ public class SuitDisplayBlock extends BaseEntityBlock {
     /** A Creative player breaking the upper half takes the lower one with it, dropping nothing (as a door). */
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && player.isCreative() && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
+        if (!level.isClientSide() && player.isCreative() && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
             BlockPos below = pos.below();
             BlockState lower = level.getBlockState(below);
             if (lower.is(this) && lower.getValue(HALF) == DoubleBlockHalf.LOWER) {
@@ -160,7 +160,7 @@ public class SuitDisplayBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hit) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
         Armoury.takeSuit((ServerLevel) level, lower(state, pos), player);
@@ -175,10 +175,11 @@ public class SuitDisplayBlock extends BaseEntityBlock {
         if (kind == null || !player.isCreative() || state.getValue(GENERATED)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (!level.isClientSide && level.getBlockEntity(lower(state, pos)) instanceof SuitDisplayBlockEntity display) {
+        if (!level.isClientSide() && level.getBlockEntity(lower(state,
+                pos)) instanceof SuitDisplayBlockEntity display) {
             display.setKind(kind);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override

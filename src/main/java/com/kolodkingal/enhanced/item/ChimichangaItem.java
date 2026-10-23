@@ -32,7 +32,7 @@ public class ChimichangaItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), ModSounds.CHIMICHANGA_MUNCH.get(),
                     SoundSource.PLAYERS, 0.8F, 1.15F);
             if (entity instanceof ServerPlayer player

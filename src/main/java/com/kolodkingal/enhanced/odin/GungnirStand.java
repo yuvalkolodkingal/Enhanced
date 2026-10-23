@@ -59,7 +59,7 @@ public final class GungnirStand {
         if (player instanceof ServerPlayer server) {
             take(server, pos);
         }
-        return InteractionResult.sidedSuccess(player.level().isClientSide);
+        return InteractionResult.sidedSuccess(player.level().isClientSide());
     }
 
     /** The server's side of a click on the stand at {@code pos}. */

@@ -94,7 +94,7 @@ public final class CaptainEvents {
 
     @SubscribeEvent
     public static void onIncomingResistance(LivingIncomingDamageEvent event) {
-        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide) {
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
             return;
         }
         if (event.getSource().is(DamageTypeTags.BYPASSES_EFFECTS)) {

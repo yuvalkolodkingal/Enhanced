@@ -106,7 +106,7 @@ public class NanoDroneEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
         ServerPlayer owner = owner() instanceof ServerPlayer p ? p : null;
@@ -182,7 +182,7 @@ public class NanoDroneEntity extends Entity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!level().isClientSide && !isInvulnerableTo(source)) {
+        if (!level().isClientSide() && !isInvulnerableTo(source)) {
             entityData.set(FLICKER, tickCount);
         }
         return false;

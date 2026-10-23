@@ -73,7 +73,7 @@ public class OdinThroneBlock extends HorizontalDirectionalBlock {
         if (player instanceof ServerPlayer server && !player.isShiftKeyDown()) {
             sit(server, pos);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     /** Seats the player on the throne at {@code pos} and tells the coronation (also when he already sits there). */

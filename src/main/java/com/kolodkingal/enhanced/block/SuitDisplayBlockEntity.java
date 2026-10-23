@@ -45,7 +45,7 @@ public class SuitDisplayBlockEntity extends BlockEntity {
     public void setKind(@Nullable SuitKind kind) {
         this.kind = kind;
         setChanged();
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
