@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.platform.CommonTags;
 import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.platform.test.TestHooks;
@@ -78,6 +79,23 @@ public final class PlatformSeamTests {
         check(Powers.get(copy).power() == Power.NONE, "the copy has no power yet");
         packets.forEach(p -> hooks.receiveSync(p, copy));
         check(Powers.get(copy).power() == Power.SCARLET_WITCH, "the replay gives the copy her power");
+        helper.succeed();
+    }
+
+    /** CommonTags: the convention tags hold what NeoForge's did (glass, panes, the ores and their ground). */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theConventionTagsHoldTheirBlocks(GameTestHelper helper) {
+        check(Blocks.GLASS.defaultBlockState().is(CommonTags.Blocks.GLASS_BLOCKS), "glass");
+        check(Blocks.RED_STAINED_GLASS.defaultBlockState().is(CommonTags.Blocks.GLASS_BLOCKS), "stained glass");
+        check(Blocks.GLASS_PANE.defaultBlockState().is(CommonTags.Blocks.GLASS_PANES), "a glass pane");
+        check(!Blocks.STONE.defaultBlockState().is(CommonTags.Blocks.GLASS_BLOCKS), "stone is no glass");
+        check(Blocks.IRON_ORE.defaultBlockState().is(CommonTags.Blocks.ORES), "iron ore is an ore");
+        check(!Blocks.STONE.defaultBlockState().is(CommonTags.Blocks.ORES), "stone is no ore");
+        check(Blocks.IRON_ORE.defaultBlockState().is(CommonTags.Blocks.ORES_IN_GROUND_STONE), "iron ore, in stone");
+        check(Blocks.DEEPSLATE_IRON_ORE.defaultBlockState().is(CommonTags.Blocks.ORES_IN_GROUND_DEEPSLATE),
+                "deepslate iron ore, in deepslate");
+        check(Blocks.NETHER_GOLD_ORE.defaultBlockState().is(CommonTags.Blocks.ORES_IN_GROUND_NETHERRACK),
+                "nether gold ore, in netherrack");
         helper.succeed();
     }
 }
