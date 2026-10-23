@@ -18,9 +18,10 @@ public final class ModNetwork {
      * (Asgard), once for 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra), once for 3.7 (Wolverine,
      * Deadpool, the healing factor, the X-Men lower lab, the amplified Cerebro and the Stone Locator), and once for 3.8
      * (the serum, Captain America, Red Hulk, Iron Man, Falcon, the tower's armoury, Eternity and Love; the momentary
-     * states in two words).
+     * states in two words), and once for 3.9 (the mod's own config files: the server's settings travel to a player
+     * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once).
      */
-    public static final String PROTOCOL_VERSION = "13";
+    public static final String PROTOCOL_VERSION = "14";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
