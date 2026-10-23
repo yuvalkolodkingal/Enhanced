@@ -188,6 +188,31 @@ public final class MusicTests {
         helper.succeed();
     }
 
+    /**
+     * 3.8.4: "Sweet Dreams" is no longer built in. quicksilverSong = sweet_dreams plays the player's own
+     * sweet_dreams.* first, then his quicksilver.* (or any other song); with none, Quicksilver's own Silver Hours.
+     */
+    @GameTest(template = ARENA, batch = BATCH)
+    public static void sweetDreamsIsYourOwnCopyOrSilverHours(GameTestHelper helper) {
+        check(MusicTracks.resolvePersonal("quicksilver", List.of(), true).isEmpty(), "no files: nothing of his own");
+        check(MusicTracks.resolvePersonal("quicksilver", List.of("README.txt", "sweet_dreams.flac", "speed.ogg"), true)
+                .isEmpty(), "nor with only a README, a kind of file it cannot play, or Speed's song");
+        check(SpeedsterTracks.builtInSong(MusicTracks.QUICKSILVER) == ModSounds.MUSIC_QUICKSILVER.get(),
+                "so Silver Hours plays, Quicksilver's own song");
+        check(SpeedsterTracks.builtInSong(MusicTracks.SPEED) == ModSounds.MUSIC_SPEED.get(), "(Speed's is still his)");
+        check(MusicTracks.resolvePersonal("quicksilver", List.of("a.mp3", "quicksilver.ogg", "Sweet_Dreams.MP3"), true)
+                .equals(Optional.of("Sweet_Dreams.MP3")), "his own copy of Sweet Dreams first (any case)");
+        check(MusicTracks.resolvePersonal("quicksilver", List.of("sweet_dreams.wav", "sweet_dreams.ogg"), true)
+                .equals(Optional.of("sweet_dreams.ogg")), "the first in order");
+        check(MusicTracks.resolvePersonal("quicksilver", List.of("quicksilver.mp3"), true)
+                .equals(Optional.of("quicksilver.mp3")), "else his quicksilver.*, as before");
+        check(MusicTracks.resolvePersonal("quicksilver", List.of("a.mp3", "quicksilver.ogg", "sweet_dreams.mp3"), false)
+                .equals(Optional.of("quicksilver.ogg")), "with theme chosen, quicksilver.* still wins");
+        check(MusicTracks.resolvePersonal("speed", List.of("sweet_dreams.mp3"), true).isEmpty(),
+                "Sweet Dreams is never Speed's");
+        helper.succeed();
+    }
+
     /** What is an Ogg Vorbis file and what is not. */
     @GameTest(template = ARENA, batch = BATCH)
     public static void onlyOggVorbisPasses(GameTestHelper helper) {

@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.music;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.music.MusicTracks;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.JOrbisAudioStream;
@@ -40,6 +41,11 @@ public final class CustomMusic {
             Any other song file here (say "my song.mp3") is Quicksilver's, as before 3.5;
             if there is more than one, the first in alphabetical order is used.
 
+            "Sweet Dreams (Are Made of This)" is no longer built into the mod. If you chose
+            quicksilverSong = "sweet_dreams" (config/enhanced-client.toml, [music]), put your
+            own copy here as sweet_dreams.mp3 (or .ogg or .wav). Without it Quicksilver plays
+            his own song, Silver Hours.
+
             Your songs win over the songs of a server or world (which it sends to you and
             keeps in config/enhanced/music_cache). Changes are picked up the next time the
             music starts. Remove a file to go back to the usual music.
@@ -76,7 +82,7 @@ public final class CustomMusic {
         } catch (IOException e) {
             return Optional.empty();
         }
-        return MusicTracks.resolvePersonal(track, names).map(folder::resolve);
+        return MusicTracks.resolvePersonal(track, names, EnhancedClientConfig.sweetDreams()).map(folder::resolve);
     }
 
     /** Opens a song file (by its extension) as a looping (or one-shot) stream the sound engine can play. */

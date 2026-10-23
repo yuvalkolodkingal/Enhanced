@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.music;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.registry.ModSounds;
+import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -41,6 +43,14 @@ public final class SpeedsterTracks {
             return MusicTracks.SPEED;
         }
         return null;
+    }
+
+    /**
+     * The mod's own song for a Walkman track: Speed's, or Quicksilver's "Silver Hours". Since 3.8.4 that is also what
+     * plays when the player chose quicksilverSong = sweet_dreams but has no copy of his own in config/enhanced/music.
+     */
+    public static SoundEvent builtInSong(String track) {
+        return MusicTracks.SPEED.equals(track) ? ModSounds.MUSIC_SPEED.get() : ModSounds.MUSIC_QUICKSILVER.get();
     }
 
     private SpeedsterTracks() {

@@ -8,9 +8,10 @@ import com.kolodkingal.enhanced.music.SpeedsterTracks;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
-import com.kolodkingal.enhanced.registry.ModSounds;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -29,9 +30,10 @@ import java.util.UUID;
  * The speedsters' Walkman (3.5; Quicksilver's alone until then). While a speedster with his Walkman on is near, his song
  * plays for everyone close enough to be caught in his slow motion ({@link SpeedsterTracks}: Quicksilver in Quicksilver Time;
  * Speed running with his Super Speed, or in his slow time), and fades out when he stops. Quicksilver's song is his own theme
- * (or "Sweet Dreams (Are Made of This)", the client option quicksilverSong), Speed's his; the player's own song or the
- * world's plays instead if there is one ({@link MusicSources}). The nearest speedster's song plays (the listener's own first),
- * and a change of song crossfades. It is a Jukebox/Note Blocks sound, and the game's own music waits while it plays.
+ * (or, with the client option quicksilverSong, the player's own copy of "Sweet Dreams": 3.8.4), Speed's his; the
+ * player's own song or the world's plays instead if there is one ({@link MusicSources}). The nearest speedster's song
+ * plays (the listener's own first), and a change of song crossfades. It is a Jukebox/Note Blocks sound, and the game's
+ * own music waits while it plays.
  */
 public final class SpeedsterMusic {
     /** How long Speed still counts as running after he stops for a moment (2 seconds), so his song does not stutter. */
@@ -54,6 +56,8 @@ public final class SpeedsterMusic {
     private static MusicSources.Source lastSource;
     private static int lastResolved;
     private static int ticks;
+    /** Whether the player was told this game that "Sweet Dreams" is no longer built in (3.8.4). */
+    private static boolean sweetDreamsHinted;
 
     static void tick(Minecraft mc) {
         ticks++;
@@ -73,6 +77,7 @@ public final class SpeedsterMusic {
             if (playing == null || !mc.getSoundManager().isActive(playing)) {
                 playing = new Theme(source(want, false));
                 mc.getSoundManager().play(playing);
+                hintSweetDreams(listener, playing.source());
             }
             playing.fadeIn();
             heard |= mc.getSoundManager().isActive(playing);
@@ -107,12 +112,22 @@ public final class SpeedsterMusic {
         return lastSource;
     }
 
-    /** The mod's own song for a track. */
+    /** The mod's own song for a track (Quicksilver's is always his own since 3.8.4). */
     static SoundEvent builtIn(String track) {
-        if (MusicTracks.SPEED.equals(track)) {
-            return ModSounds.MUSIC_SPEED.get();
+        return SpeedsterTracks.builtInSong(track);
+    }
+
+    /**
+     * 3.8.4: "Sweet Dreams" is no longer in the mod. When a player who chose it hears Quicksilver's own song instead
+     * (he has no copy in config/enhanced/music), he is told once per game where to put his own copy.
+     */
+    private static void hintSweetDreams(LocalPlayer listener, MusicSources.Source source) {
+        if (!sweetDreamsHinted && MusicTracks.QUICKSILVER.equals(source.track())
+                && source.kind() == MusicSources.Kind.BUILT_IN && EnhancedClientConfig.sweetDreams()) {
+            sweetDreamsHinted = true;
+            listener.displayClientMessage(Component.translatable("message.enhanced.quicksilver.sweet_dreams_missing")
+                    .withStyle(ChatFormatting.GRAY), false);
         }
-        return EnhancedClientConfig.sweetDreams() ? ModSounds.QUICKSILVER_THEME.get() : ModSounds.MUSIC_QUICKSILVER.get();
     }
 
     /**

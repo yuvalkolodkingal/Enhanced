@@ -31,6 +31,13 @@ public final class MusicTracks {
     /** The Road's version for the end of the Road (its stage is {@link EndingHall#ID}, "road_end"). */
     public static final String ROAD_ENDING = "ending";
 
+    /**
+     * The name of a player's own copy of "Sweet Dreams (Are Made of This)" in his folder ({@code sweet_dreams.mp3},
+     * .ogg or .wav). Since 3.8.4 the recording is no longer in the mod, and the client option quicksilverSong =
+     * sweet_dreams plays this file for Quicksilver first (see {@link #resolvePersonal(String, Collection, boolean)}).
+     */
+    public static final String SWEET_DREAMS = "sweet_dreams";
+
     /** What a track's name may be: lower-case letters, digits and underscores. */
     private static final Pattern NAME = Pattern.compile("[a-z0-9_]{1,64}");
     /** The kinds of file a player's own folder may hold (the server's takes Ogg Vorbis only). */
@@ -100,10 +107,26 @@ public final class MusicTracks {
      * Files of other kinds (README.txt) are left alone.
      */
     public static Optional<String> resolvePersonal(String track, Collection<String> fileNames) {
+        return resolvePersonal(track, fileNames, false);
+    }
+
+    /**
+     * As {@link #resolvePersonal(String, Collection)}; with {@code sweetDreams} (the player chose quicksilverSong =
+     * sweet_dreams, 3.8.4), Quicksilver's song is his own copy {@code sweet_dreams.*} first, then the usual one
+     * ({@code quicksilver.*} or any other song). Empty when he has none: then Quicksilver's own song plays.
+     */
+    public static Optional<String> resolvePersonal(String track, Collection<String> fileNames, boolean sweetDreams) {
         List<String> songs = fileNames.stream()
                 .filter(f -> PERSONAL_TYPES.contains(extension(f)))
                 .sorted(Comparator.comparing((String f) -> f.toLowerCase(Locale.ROOT)))
                 .toList();
+        if (sweetDreams && track.equals(QUICKSILVER)) {
+            for (String file : songs) {
+                if (baseName(file).equals(SWEET_DREAMS)) {
+                    return Optional.of(file);
+                }
+            }
+        }
         for (String name : chain(track)) {
             if (name.equals(FALLBACK)) {
                 continue;
