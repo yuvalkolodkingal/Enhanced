@@ -13,12 +13,14 @@ import java.util.regex.Pattern;
 public final class TestFilter {
     public static final String PROPERTY = "enhanced.tests";
 
+    private final List<String> globs = new ArrayList<>();
     private final List<Pattern> patterns = new ArrayList<>();
 
     private TestFilter(String globs) {
         for (String glob : globs.split(",")) {
             String trimmed = glob.trim();
             if (!trimmed.isEmpty()) {
+                this.globs.add(trimmed);
                 patterns.add(Pattern.compile(toRegex(trimmed), Pattern.CASE_INSENSITIVE));
             }
         }
@@ -68,6 +70,6 @@ public final class TestFilter {
 
     @Override
     public String toString() {
-        return patterns.isEmpty() ? "all" : patterns.toString();
+        return patterns.isEmpty() ? "all" : String.join(",", globs);
     }
 }
