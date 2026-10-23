@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.captain;
 import com.kolodkingal.enhanced.config.CaptainConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.VibraniumShieldItem;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -13,7 +14,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ItemAbilities;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -32,8 +32,7 @@ public final class ShieldRules {
 
     /** Whether the stack is a shield of any kind (the Vibranium Shield, vanilla's, a mod's): what a throw may throw. */
     public static boolean isShield(ItemStack stack) {
-        // TODO(port seam): a platform "is a shield" (NeoForge ItemAbilities.SHIELD_BLOCK; notes l5.md, seam S5-1)
-        return !stack.isEmpty() && stack.canPerformAction(ItemAbilities.SHIELD_BLOCK);
+        return Platform.get().hooks().isShield(stack);
     }
 
     /** Whether the player is Captain America as far as the shield goes: the hero, or a custom hero who throws it. */

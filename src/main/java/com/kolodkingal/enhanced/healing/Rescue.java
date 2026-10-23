@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.boss.BossFight;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.HealingConfig;
 import com.kolodkingal.enhanced.network.HealingFxPayload;
+import com.kolodkingal.enhanced.platform.Platform;
 import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.portal.DimensionTransition;
-import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
@@ -51,9 +51,7 @@ public final class Rescue {
         if (feet.is(BlockTags.FIRE) || feet.is(Blocks.POWDER_SNOW)) {
             return true;
         }
-        // TODO(port seam): a platform "can drown in the fluid at his eyes" (NeoForge FluidType; notes l5.md, S5-2)
-        FluidType eyes = player.getEyeInFluidType();
-        return !eyes.isAir() && player.canDrownInFluidType(eyes) && !player.canBreatheUnderwater();
+        return Platform.get().hooks().drownsInFluidAtEyes(player) && !player.canBreatheUnderwater();
     }
 
     /**

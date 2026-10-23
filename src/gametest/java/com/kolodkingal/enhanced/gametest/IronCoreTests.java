@@ -19,8 +19,8 @@ import com.kolodkingal.enhanced.ironman.SuitPhases;
 import com.kolodkingal.enhanced.item.ArcReactorItem;
 import com.kolodkingal.enhanced.item.IronSuitItem;
 import com.kolodkingal.enhanced.platform.Platform;
-import com.kolodkingal.enhanced.platform.neoforge.NeoAttach;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
+import com.kolodkingal.enhanced.platform.test.TestHooks;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -33,7 +33,6 @@ import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,10 +42,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
-import net.neoforged.neoforge.attachment.AttachmentSync;
-import net.neoforged.neoforge.network.payload.SyncAttachmentsPayload;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
@@ -503,21 +499,11 @@ public final class IronCoreTests {
         long start = state(tony).phaseStart();
         step(helper, 10, () -> {
             ServerPlayer watcher = f.player(9.5, FLOOR, 5.5);
-            List<Object> packets = new ArrayList<>();
-            // TODO(port seam): TestHooks for an attachment's first sync to a watcher and its receipt (l5.md, S5-3)
-            AttachmentSync.syncInitialEntityAttachments(tony, watcher, packets::add);
-            SyncAttachmentsPayload payload = null;
-            for (Object p : packets) {
-                if (p instanceof ClientboundCustomPayloadPacket custom
-                        && custom.payload() instanceof SyncAttachmentsPayload sync) {
-                    payload = sync;
-                }
-            }
-            check(payload != null && payload.types().contains(NeoAttach.typeOf(ModAttachments.IRON_MAN)),
-                    "his state is in the first sync");
+            List<Object> packets = TestHooks.get().initialSyncPackets(tony, watcher);
+            check(packets.stream().anyMatch(p -> TestHooks.get().isAttachmentSync(p, ModAttachments.IRON_MAN,
+                    tony.getId())), "his state is in the first sync");
             ServerPlayer copy = f.player(12.5, FLOOR, 5.5);
-            AttachmentSync.receiveSyncedDataAttachments(copy, helper.getLevel().registryAccess(), payload.types(),
-                    payload.syncPayload());
+            packets.forEach(p -> TestHooks.get().receiveSync(p, copy));
             IronManState seen = ModAttachments.IRON_MAN.get(copy);
             check(seen.phase() == IronManState.UP && seen.phaseStart() == start && seen.phaseKind() == SuitKind.MARK_3,
                     "the watcher draws the UP from its start: " + seen);
