@@ -728,6 +728,12 @@ The reward of the fight. Every fighter who stayed a minute and hurt him or his s
 
 With PvP off the Sand Wave, the Entomb and the Sandstorm never hurt, hold or slow a player (mobs are always affected); the shield, the portal and Power Bestowal still work. See [Apocalypse](Apocalypse#becoming-apocalypse-the-hero).
 
+## Other mods
+
+### Lithium causes visual bugs with Enhanced. What do I do?
+
+Lithium causes visual bugs with Enhanced. Remove Lithium when you play Enhanced: the looks and the effects may not show correctly while it is installed. See [Installation](Installation).
+
 ## Abilities and keys
 
 ### The keys do nothing.
