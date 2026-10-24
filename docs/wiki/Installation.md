@@ -55,3 +55,4 @@ Quicksilver's Walkman plays his own theme, *Silver Hours*. Since 3.8.4 *Sweet Dr
 | The keys do nothing | Keys work only for a hero, with no screen open. See [Becoming a Hero](Becoming-a-Hero), and check the bindings under *Options, Controls, Enhanced Powers*. |
 | I cannot lift Mjolnir | See the [FAQ](FAQ) and [Thor](Thor). |
 | Quicksilver's song does not play | The song plays for as long as Quicksilver Time is on (press R), whether Quicksilver runs or not, and **Sneak + R** turns the Walkman on and off. Super Speed (G) alone plays no song. A song of your own must be an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/`. See [Music](Music). |
+| Lithium makes the heroes and effects look wrong | **Lithium causes visual bugs with Enhanced.** Remove Lithium when you play Enhanced: the looks and the effects may not show correctly while it is installed. |

@@ -69,6 +69,7 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Minecraft** 1.21.1
 * **Mod loader** NeoForge 21.1.x
 * **Install it on** the client, plus the server for multiplayer
+* **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
 
 ## Becoming a hero
 
