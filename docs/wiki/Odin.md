@@ -4,6 +4,8 @@ The Allfather (3.5), king of Asgard, as in the *Thor* films: the spear **Gungnir
 
 Hebrew: [עברית](Odin-HE)
 
+![The Throne of Asgard](images/093-odin-asgard-throne.png)
+
 ## The quick version
 
 * **How:** beat [Hela](Hela) in Asgard's throne room. Her first defeat wakes Odin and opens the **vault** under the throne room. Take **Gungnir** from its stand there, then, with no power, **sit on the Throne of Asgard holding your Gungnir**: you are crowned Odin.
@@ -21,6 +23,8 @@ Hebrew: [עברית](Odin-HE)
 
 ## Gungnir
 
+![Odin and Heimdall at the Bifrost observatory](images/086-odin-and-heimdall-bifrost-observatory.png)
+
 The spear of the Allfather: long, gold, with a winged blade.
 
 * **For anyone:** a spear that hits for **9**, reaches **one block further** than your arm, and never breaks or burns. Anyone can fight with somebody else's Gungnir.
@@ -35,6 +39,10 @@ The spear of the Allfather: long, gold, with a winged blade.
 
 ## Abilities
 
+![Odin's golden shield](images/108-golden-shield.png)
+
+![Odin's golden shield in the desert](images/109-golden-shield-desert.png)
+
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | **R** | Gungnir Blast | A **golden bolt** from Gungnir's tip, straight to what he looks at (up to 48 blocks): **12** damage to the first creature and half to those within 1.5 blocks of it. A shield in the way stops it. Needs Gungnir in his hand ("Gungnir is not in your hand"); with no Gungnir of his own anywhere, R calls a new one. Cooldown about a second. **Sneak + R: Gungnir Throw**: the spear flies up to 40 blocks, through two creatures, **16** damage each, and comes back to his hand through walls. **R** again calls it back early. Cooldown 3 seconds. |
@@ -48,6 +56,8 @@ The spear of the Allfather: long, gold, with a winged blade.
 Odin opens the Bifrost with his Gungnir, as any owner does (use the spear): the same screen, the same cooldown, the same [circle](Asgard#the-bifrost-takes-everyone-in-its-circle). A banished player goes home by it too.
 
 ## Looks
+
+![Odin's golden shield with a hero in the desert](images/110-golden-shield-hero-desert.png)
 
 Press **H** to switch. See [Looks](Looks).
 

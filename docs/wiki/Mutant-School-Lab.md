@@ -4,6 +4,8 @@ Under every [Mutant School](Structures#the-mutant-school), deep below the old Ce
 
 Hebrew: [עברית](Mutant-School-Lab-HE)
 
+![Professor X in the lab](images/048-professor-x-mutant-school-lab.png)
+
 ## The quick version
 
 * **Find a school:** `/locate structure enhanced:mutant_school`. The lab is already there under it, old school or new.
@@ -26,6 +28,8 @@ The lab's blocks (the secret shelves, the lift's pads, the X-doors, the rack, th
 
 ## The secret entrance
 
+![Professor X at the Mutant School](images/047-professor-x-mutant-school.png)
+
 * **The shelves.** In the Professor's study (the west wing: bookshelves, a fireplace, a desk and a chess table), the four bookshelves of the west wall **just north of the fireplace** look like any bookshelf. **Right-click** one and both columns **swing open** with a creak and a click. They close by themselves after 5 seconds, once nobody stands in the nook behind them.
 * **The hint.** The study's lectern holds a book, **The Professor's notes**: "The lower levels are for X-Men only. The two shelves north of the fireplace know the way down: open them, stand on the X and hold Sneak. — C.X." Its second page lists what is below. (Only if the lectern was empty.)
 * **Who may open them:** everyone, unless the server says only the X-Men (`school_lab.openToAll`): then only Professor X, Cyclops, Wolverine, the Phoenix, Magneto, Quicksilver, Deadpool and operators. Anyone else hears "The shelf does not move. Only the X-Men know the way."
@@ -37,6 +41,8 @@ Behind the shelves the floor is two **elevator pads** with an X on them. **Stand
 The lift takes only you: not a pet, and not while you ride a horse; mobs never ride it. If someone broke the study's pad in Creative, the lift up takes you outside the school's front door instead: you are never stuck.
 
 ## The rooms
+
+![Wolverine at the Mutant School](images/049-wolverine-mutant-school.png)
 
 **The upper level:**
 
@@ -62,6 +68,8 @@ Hank's white bench in the medical bay. **Right-click it with a glass bottle**: i
 **The Mutant Cure** (since 3.3.1) is an injector: **hold right-click for 2 seconds** and your power is gone for good, as an operator's `/enhanced power set <player> none` does. On another player: right-click him and hold, as an operator, or anyone while PvP is on. It can also be crafted (a glass bottle, a milk bucket, an echo shard and an iron nugget, any order). See [Items and Crafting](Items-and-Crafting#mutant-cure-331). A hero who wants to be [Wolverine](Wolverine) needs it first: the adamantium is refused to anyone who already has a power.
 
 ## The Weapon X rack and pod
+
+![Deadpool](images/053-deadpool.png)
 
 * **The Weapon X rack** holds three Adamantium Injections. Right-click it: **one injection for each player** from each rack ("You already took an injection from this rack."). With no power, hold one for 3 seconds and you are [Wolverine](Wolverine#becoming-wolverine-the-adamantium-injection).
 * **The Weapon X Pod**: with no power, **step inside and right-click it**: the hatch shuts, 5 seconds of "treatment", and you come out [Deadpool](Deadpool#becoming-deadpool-the-weapon-x-pod). Sneak or step out to stop. It works for everyone, again and again.

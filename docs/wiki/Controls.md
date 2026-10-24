@@ -2,6 +2,8 @@
 
 Every hero has five abilities (Doctor Strange has a sixth, on **Y**). They are bound to the keys **R, G, V, B, N**, in that order: ability 1 is **R**, ability 2 is **G**, ability 3 is **V**, ability 4 is **B** and ability 5 is **N**. The same keys work for every hero, and each key triggers the ability with the same number in that hero's list. Keys work only when you are a hero, no screen is open and you are not a Spectator.
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## All keys, per hero
 
 | Hero | **R** | **G** | **V** | **B** | **N** |
@@ -56,6 +58,8 @@ The Scarlet Witch has one more key. **Z** is her order to the Vision her Hex rai
 
 ## Doctor Strange's Eye: Y (3.6)
 
+![Doctor Strange and the Eye of Agamotto](images/059-doctor-strange-eye-of-agamotto.png)
+
 Doctor Strange's sixth key is **Y**, the same key as Build Magic: **the Eye of Agamotto**. It needs the Eye with him.
 
 * **Y**: **Slow Time** on or off (the Time Stone's: creatures round him move three times slower, up to 10 seconds).
@@ -64,6 +68,8 @@ Doctor Strange's sixth key is **Y**, the same key as Build Magic: **the Eye of A
 Its line on the HUD is `[Y]`: `no Eye`, `time slowed 7s`, `recharging 40%` or `ready`. A custom hero with the Eye's ability uses **Y** for it; a hero has at most one **Y** (the Eye or a Build Magic). See [Doctor Strange](Doctor-Strange).
 
 ## The Infinity Gauntlet: J (3.6)
+
+![The Infinity Stones](images/114-infinity-stones.png)
 
 With a crafted **Infinity Gauntlet** in your hand:
 
@@ -74,6 +80,8 @@ With a crafted **Infinity Gauntlet** in your hand:
 The same goes for a bare stone in your hand (no J needed). **J** is also Spider-Man's Web Assist: each answers only for its own player. See [Infinity Stones](Infinity-Stones#the-infinity-gauntlet).
 
 ## Build Magic: Y
+
+![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)
 
 The Scarlet Witch and Billy have one more key: **Y**, for [Build Magic](Build-Magic). It is the sixth line of your hero panel (`[Y] Build Magic  OFF`). It does nothing for any other hero.
 
@@ -334,9 +342,6 @@ With telekinesis, pressing the key again **launches** what you hold.
 ## The HUD
 
 The top-left corner of the screen always shows your hero, each ability with its key, its cooldown, whether a toggle is on, and your resources (for example the iron shards Magneto has stored). The Scarlet Witch and Billy have a **sixth line**, `[Y] Build Magic  ON/OFF` (Billy's also shows his magic meter, `✦ 372/512`), and Magneto's first line shows `pull 4.9s` while the Magnetic Pull recharges. Billy's Hex Beam line shows its damage and reach (`6.0 dmg/s, 20 blocks`), and the Scarlet Witch's Chaos Shield line shows "∞ unlimited". **3.3:** while Billy's Hex Barrier is up its line shows a bar and its health (`41/60`) and a big bar sits under the crosshair; a sorcerer held by the Hex Runes sees a red line above the action bar, "The Hex Runes hold your powers"; Professor X's screen gets blue edges and a line with whose mind he is in while he steers a body (and the one he steers gets violet edges and "Professor X controls your body!"), and Cerebro's list; a custom hero's panel is drawn in his own colours with his name. **3.4:** a custom hero's panel also has a `[⇧R]` line under a key for its Sneak box, and shows whether each of his heroes' switches is on and his shields' strength. **3.5:** Heimdall's panel shows the Sight (and how many players are far away), the blow of his combo and the Ward's seconds, and lists the players of the other worlds while the Sight is on; Odin's shows Gungnir in flight, his ravens and the Odinsleep; Hela's shows her form, her risen dead and the Grasp. **3.6:** Doctor Strange's shows his whip's lash, his Shield and Dome, the spirit's time, the Mirror and the portals, and a sixth line `[Y]` for the Eye; the Hulk's shows his **rage bar**, or Banner's **heart rate**; and anyone who carries Infinity Stones sees a little gem for each **right of the hotbar**, with its cooldown, and the red countdown of a stone that burns. **3.7:** Wolverine and Deadpool have a line for the [healing factor](Healing-Factor#the-hud) under their panel ("Healing factor: ON (+1.0/s)", red when poisoned, and "Healing… 3" with a ring over the crosshair while they are down); Wolverine's shows his combo, his claws, the Rage's red bar and Track's arrow and distance; Deadpool's his cut, the Parry, his magazine ("16/16"), his chimichangas and Dogpool's time and health; and a **Stone Locator** in your hand puts a line over the hotbar: "Soul Stone · 810 blocks · north-east". **3.8:** Captain America's shows his shield ("Shield: on your back", "flying (2 bounces left)"), his combo and Assemble's seconds, and "Super-soldier: Speed II · Strength II · Resistance I"; Red Hulk's his **Anger bar** (red to white-hot), Ross's hint and the Super Jump's charge ring round the crosshair; Iron Man's a suit panel with the **suit energy** bar, the suit's durability and its warnings ("No reactor!", "Suit offline!"), and in first person the **helmet frame** with altitude and speed; Falcon's his wings, the glide, the Wing Shield and Redwing; Love's her axe and her eyes.
-
-![Magneto's HUD](images/magneto-back.png)
-
 ## Rebinding keys
 
 All twenty keys are in the game's key settings: **Options, Controls, Key Binds, Enhanced Powers**. They are named *Ability 1* to *Ability 5*, *Change Look*, *Vision, That One! (Scarlet Witch)*, *Web Assist (Spider-Man)* (**J**, 3.3), *Stone Wheel (Infinity Gauntlet)* (**J**, 3.6) and eleven *Build Magic* keys (the first is *Build Magic (Scarlet Witch, Billy, a hero you made with it)*, which is **Y**, and is Doctor Strange's Eye too; the last is *Build Magic: Instant (Scarlet Witch)*, **Ctrl + I**). Rebinding changes the key, not the ability order: *Ability 3* always triggers the third ability in your hero's list.

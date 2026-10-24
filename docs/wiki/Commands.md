@@ -39,6 +39,8 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 
 ## Asgard: /enhanced asgard
 
+![The palace of Asgard](images/092-asgard-palace.png)
+
 (3.5) For [Asgard](Asgard):
 
 | Command | Effect |
@@ -52,6 +54,8 @@ Asgard has no portal: an operator can also use `/tp` or `/execute in enhanced:as
 
 ## Music: /enhanced music
 
+![A speed run across the map](images/018-tommy-speed-run.png)
+
 (3.5) For [a world's own music](Music#a-worlds-own-music-servers), the songs in `<world>/serverconfig/enhanced/music/`:
 
 | Command | Effect |
@@ -60,6 +64,8 @@ Asgard has no portal: an operator can also use `/tp` or `/execute in enhanced:as
 | `/enhanced music list` | Shows the folder, each song (its size and the start of its hash) and every file that was left out, with the reason (not Ogg Vorbis, too big, an unknown name, empty). |
 
 ## Structures: /enhanced structure
+
+![A cabin on the Witches' Road](images/043-witches-road-cabin.png)
 
 | Command | Effect |
 |---|---|
@@ -75,6 +81,8 @@ To **find** a structure, use the game's own `/locate structure <id>`: `enhanced:
 
 ## The Avengers (3.8)
 
+![The Avengers Tower from outside](images/085-avengers-tower-exterior.png)
+
 | Command | Effect |
 |---|---|
 | `/enhanced serum open <player>` | Opens the [Super Soldier Serum](Super-Soldier-Serum)'s choice for a player who holds no serum: Captain America, Red Hulk or Falcon (Falcon still only with the Exo-Wings). Nothing is used up. "Opened the serum's choice for Eilon." |
@@ -84,6 +92,8 @@ To **find** a structure, use the game's own `/locate structure <id>`: `enhanced:
 `/enhanced structure refit_tower` (above) refits an old Avengers Tower. Iron Man's suits, the reactors, the serum, the shield and the wings can also be given with `/give` (`enhanced:iron_man_mark_85`, `enhanced:arc_reactor`, `enhanced:special_soldier_serum`, `enhanced:vibranium_shield`, `enhanced:falcon_exo_wings`...).
 
 ## Build Magic: /enhanced build
+
+![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)
 
 The `build` commands are for the operator who looks after the builders: they use the same safe rules as the heroes' own Ctrl + Z. `rank`, `meter`, `forget` and `stop <player>` name a player who is **online** (as in `/tp`). `undo` and `history` also take a player who is **offline**: give a name the server has seen (it is in its `usercache.json`) or paste his UUID; anything else is refused. His history is read from the disk the first time it is asked for, and his profile acts for him, so he need not be there. The history itself is on the disk, and a step that is no longer in memory is read back as needed.
 

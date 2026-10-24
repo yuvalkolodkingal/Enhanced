@@ -4,6 +4,8 @@ Scott Summers, the leader of the X-Men. His eyes fire a red blast of pure force 
 
 Hebrew: [עברית](Cyclops-HE)
 
+![Cyclops](images/045-cyclops.png)
+
 ## Becoming Cyclops
 
 Find his **Ruby-Quartz Glasses** and **put them on** (the head slot, like a helmet) with no power: "The ruby quartz holds it back", and you are Cyclops, in the *X-Men: Apocalypse* suit. Everyone on the server is told.
@@ -19,6 +21,8 @@ Find his **Ruby-Quartz Glasses** and **put them on** (the head slot, like a helm
 * He is a **mutant without telepathy**: [Professor X](Professor-X) can hear his thoughts and take over his body (with PvP on).
 
 ## Abilities
+
+![Cyclops's optic blast](images/046-cyclops-optic-blast.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
@@ -41,6 +45,8 @@ The moment the glasses leave his head, **in any way** (Sneak + N, dragged out of
 * He holds both hands to his temples and trembles while it pours out; his eyes blaze.
 
 ## Looks
+
+![Cyclops in the classic suit](images/044-cyclops-classic-suit.png)
 
 | Look | Id | What it is |
 |---|---|---|

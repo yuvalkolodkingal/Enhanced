@@ -4,6 +4,8 @@ Sam Wilson (3.8), the Falcon of *The Winter Soldier* and *Endgame*: a soldier wh
 
 Hebrew: [עברית](Falcon-HE)
 
+![Falcon in flight](images/072-falcon-flight.png)
+
 ## The quick version
 
 * **How:** take the **Falcon Exo-Wings** from the top of the [Avengers Tower](Structures#avengers-tower), carry them, then use a **[Super Soldier Serum](Super-Soldier-Serum)** and choose **Falcon**. **Wear the wings on your chest.**
@@ -12,6 +14,8 @@ Hebrew: [עברית](Falcon-HE)
 * With the wings on, he takes **no fall damage**, and flying into a wall doesn't hurt.
 
 ## Becoming Falcon
+
+![Falcon and Redwing](images/071-falcon-exo-wings-redwing.png)
 
 1. Climb the [Avengers Tower](Structures#avengers-tower) to the **observation deck**, its highest room (the door says **OBSERVATION deck**). Between two end rods stands a glass **Tech Case** with the wings turning inside and the sign "FALCON / Exo-Wings". **Right-click it**: the **Falcon Exo-Wings** are yours. One pair for each player, so you and your brother both get yours.
 2. Take a [Super Soldier Serum](Super-Soldier-Serum) from the tower's lab. With the wings **anywhere in your inventory**, use the serum: the **Falcon** card is open (without the wings it is locked). Choose it: you are Falcon ("Wings out!").
@@ -22,6 +26,8 @@ Or **Choose a Hero** in the [Hero Creator](Hero-Creator) (it gives a pair, on yo
 **Losing it:** the Mutant Cure, `/enhanced power set <player> none`, another serum choice, an [Arc Reactor](Iron-Man#becoming-iron-man-the-arc-reactors), [Eternity's](Eternity) Love, being sacrificed at Vormir, or choosing another hero. The wings stay an item: on anyone else's back they are a chest plate with folded wings.
 
 ## The Exo-Wings
+
+![Falcon's Exo-Wings](images/073-falcon-exo-wings.png)
 
 A back pack with two jet nozzles and two wings of **segmented metal feathers**, five panels a wing. They are worn on the **chest slot** and give **6 armour** (an iron chestplate's, and a little toughness). They can't be crafted. They wear like an elytra while he glides and when he is hit; mend them with **iron ingots on an anvil** ("Your Exo-Wings are broken. Mend them with iron on an anvil."). Broken wings don't fly.
 

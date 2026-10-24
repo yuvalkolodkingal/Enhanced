@@ -2,6 +2,8 @@
 
 The telepath who carries the Phoenix. She reads the mind of whoever she looks at (and sees what they carry), senses every mind around her through the walls, flies, lifts things and blocks with her mind, takes over a creature for a while, freezes everyone around her in a field of the mind, and, when she lets the cosmic fire go, charges the **Phoenix Burst**: a wave of golden-orange fire in the shape of a firebird that spreads in every direction. Telepathy and telekinesis are **violet**, the fire of the Phoenix is **gold and orange**, so you can always tell which one she is using.
 
+![The Phoenix's burst](images/030-phoenix-burst.png)
+
 ## The quick version
 
 Four tricks, in plain words. (**Sneak** is the Shift key, unless you changed it. Everyone nearby sees all of them.)
@@ -12,6 +14,8 @@ Four tricks, in plain words. (**Sneak** is the Shift key, unless you changed it.
 * **Hold N: charge the Phoenix Burst.** You rise in flames and a firebird forms behind you, bigger and brighter the longer you hold (three seconds is a full charge). Let go and a wave of cosmic fire spreads out from you in every direction and hurts the monsters it reaches. Let go too early and nothing happens. Then you are drained for five seconds and have to wait 90 seconds.
 
 ## Becoming the Phoenix
+
+![Phoenix, first look](images/031-phoenix-look-1.png)
 
 The Phoenix has no recipe. She wakes when a player with no power uses the **Phoenix Ember**, a spark of the cosmic fire, a very rare find in chests:
 
@@ -38,6 +42,8 @@ Let go early and the flames sputter out, and nothing is used up. A hero who trie
 * Everything else about her is an ordinary player's: 20 health, no extra armour.
 
 ## Abilities
+
+![Phoenix, second look](images/032-phoenix-look-2.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|

@@ -4,6 +4,8 @@ En Sabah Nur, "the first mutant", worshipped as a god for five thousand years, b
 
 Hebrew: [עברית](Apocalypse-HE)
 
+![The Phoenix's burst](images/030-phoenix-burst.png)
+
 ## The quick version
 
 * **To wake him** you need a **Capstone** (a Nether Star, five Gold Blocks and a Lapis Block), **sand under your feet, daylight and open sky**, and **a Scarlet Witch or a Phoenix within 64 blocks**: without one nobody could break his shield, so he does not wake. **Sneak + right-click** the sand with the Capstone.

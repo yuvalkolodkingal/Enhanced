@@ -2,6 +2,8 @@
 
 Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Crafting), which also lists where the rare items are found.
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## The rules
 
 | Rule | Detail |
@@ -44,6 +46,8 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once (since 3.4 with that hero's items), or make your own. |
 
 ## Step by step
+
+![The Scepter and the Tesseract](images/115-artifacts-scepter-tesseract.png)
 
 ### Magneto
 

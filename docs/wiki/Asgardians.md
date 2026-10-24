@@ -4,7 +4,11 @@ The people of [Asgard](Asgard) (3.5): Heimdall at his post, Odin and Frigga, Sif
 
 Hebrew: [עברית](Asgardians-HE)
 
+![Heimdall's dialogue](images/087-heimdall-dialogue.png)
+
 ## Who lives in Asgard
+
+![Heimdall](images/088-heimdall.png)
 
 | Who | Where | What they do |
 |---|---|---|
@@ -34,6 +38,8 @@ The Asgardians' words follow. Where they used to say the Allfather sleeps, they 
 The same rule holds for any Asgardian whose hero can be played. Today that is Odin only: **Heimdall is the exception**, he stays and shares his post with a player who is Heimdall ([Heimdall's post](Heimdall#two-guardians-heimdalls-post-351)). If two players are Odin, the lines name both.
 
 ## Talking
+
+![Frigga's dialogue](images/094-frigga-dialogue.png)
 
 * **Right-click** an Asgardian (within 6 blocks) to talk. A screen shows who speaks, his line, and up to **three answers**: click one, or press **1**, **2** or **3**. **Farewell** or **Esc** ends the talk. In Hebrew everything reads right to left.
 * While you talk, he stops and faces you, and a speech bubble shows over his head for everyone.
@@ -74,6 +80,8 @@ Ask Sif *Can I train with you?* and answer *I'm ready!*: a duel of **60 seconds*
 * They never leave Asgard: no Bifrost and no portal takes a city Asgardian away.
 
 ## Fighting alongside you
+
+![A duel in Asgard](images/024-asgard-night-duel.png)
 
 * **The warriors** (Heimdall, Sif, Valkyrie, the Warriors Three and the Einherjar) fight **Hela's army** first, then any **monster** going after a player near them, and **Hela herself** when no berserker is near. When Hela fights in the throne room, the warriors come from the whole city to the hall.
 * **The citizens** run from Hela's army and from monsters.

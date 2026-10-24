@@ -7,6 +7,8 @@ Wanda and Billy can **build with their magic**, the way builders do with Axiom o
 
 The two heroes have the same **eleven spells** and the same keys. What differs is *how big*.
 
+![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)
+
 ## Press Y
 
 **Y** is the Build Magic key. It is the sixth line of your hero panel in the top-left corner: **`[Y] Build Magic  OFF`**.
@@ -21,6 +23,8 @@ Build mode turns off by itself when you die or respawn, change your power, go to
 Xaero's Minimap also uses **Y** by default. Rebind one of the two in *Options, Controls, Key Binds* (Build Magic is in *Enhanced Powers*).
 
 ## The Spell Wheel
+
+![Build Magic: choosing a spell](images/007-scarlet-witch-build-magic-selection.png)
 
 Hold **Y** and a ring of eleven pictures opens round your crosshair, one for each spell, clockwise from the top: Fill, Vanish, Change, Paint, Pull & Push, Shapes, Copy, Move, Repeat, Land and Grow. Point at one and its name and a line about it appear in the middle. The game does not pause, so everyone can still see you.
 
@@ -201,6 +205,8 @@ Grow works on whole blocks only: chests, furnaces and anything else that holds t
 Every one of these can be switched off in *Mods, Enhanced, Config, Build Magic* (see [Server Configuration](Server-Configuration#client-options-animations-effects-and-looks)).
 
 ## Billy: an apprentice who learns
+
+![Billy, first look](images/020-billy-look-1.png)
 
 Billy has every spell from the first minute. What grows is **how big**.
 

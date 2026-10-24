@@ -4,6 +4,8 @@ A **look** is one of a hero's outfits. Each look has its own skin, its own cape 
 
 Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, since 3.6 Doctor Strange and the Hulk, since 3.7 Wolverine and Deadpool, and since 3.8 Captain America, Red Hulk, Falcon and Love have several looks (Iron Man's look is his suit: for him **H** is the suit key, see [Iron Man](Iron-Man#h-suiting-up)). A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## Switching looks
 
 * Press **H** (the *Change Look* key) for the next look. **Sneak + H** goes back to the previous one. The looks cycle round, in the order of the lists below.
@@ -16,6 +18,12 @@ Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apoca
 Every look list of the newer heroes ends with **Your own skin**: the hero's powers and energy colours, in your own Minecraft skin. (Vision's two looks are both outfits.)
 
 ## Every hero's looks
+
+![Billy, first look](images/020-billy-look-1.png)
+
+![Billy, second look](images/021-billy-look-2.png)
+
+![Billy, third look](images/022-billy-look-3.png)
 
 ### Vision ([page](Vision))
 

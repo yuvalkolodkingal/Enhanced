@@ -4,6 +4,8 @@ Thor's daughter (3.8), from the end of *Thor: Love and Thunder*: the girl Eterni
 
 Hebrew: [עברית](Love-HE)
 
+![Love at the Shrine of Eternity](images/101-love-eternity-shrine.png)
+
 ## The quick version
 
 * **How:** reach [Eternity](Eternity) (a key of the Bifrost on the altar of the Shrine of the Cosmic Entities, in the End) and choose **Become Love**. You get a Stormbreaker too.
@@ -24,6 +26,8 @@ Hebrew: [עברית](Love-HE)
 
 ## Abilities
 
+![Love at the Shrine, second view](images/102-love-eternity-shrine-2.png)
+
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | **R** | Axe Throw | **Only with Stormbreaker in hand.** She throws it as Thor does: it smashes what it meets on its way, turns at a wall or at its range, and **flies back to her hand**. Press **R** again while it flies and it turns home at once; with the axe in her bag, **R** brings it to her hand. Its blow is Stormbreaker's. **Sneak + R: Thunder Strike**: a bolt of lightning comes down on the block she looks at (up to 48 blocks): **8** to every creature within 2 blocks of it. Blocks don't catch fire (unless a server allows it: `love.strikeSetsFire` with `mobGriefing`). Look at the ground or a wall: "Look at the ground or a wall to call the lightning." It has its own cooldown of 5 seconds, so the axe throw stays quick. |
@@ -35,6 +39,8 @@ Hebrew: [עברית](Love-HE)
 With PvP off, her abilities don't hurt players. Everything she pushes at the edge of the [Vormir Cliff](Vormir) counts as her push.
 
 ## Looks
+
+![Love at the Shrine, third view](images/103-love-eternity-shrine-3.png)
 
 | Look | Id | What it is |
 |---|---|---|

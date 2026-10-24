@@ -6,12 +6,14 @@ Original hero concepts by Eilon Kolodkin-Gal. This wiki is the player's guide. T
 
 Hebrew: [עברית, דף הבית](Home-HE)
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 | | | |
 |---|---|---|
-| ![Magneto](images/magneto.png) | ![Scarlet Witch](images/scarlet-witch.png) | ![The Hex](images/hex.png) |
+| ![Magneto](images/013-magneto-magnetic-shield.png) | ![Scarlet Witch](images/001-scarlet-witch-flight-avengers-tower.png) | ![The Hex](images/005-scarlet-witch-hex-barrier.png) |
 | Magneto | Scarlet Witch | The Hex |
-| ![Quicksilver](images/quicksilver.png) | ![Vision](images/vision.png) | ![Quicksilver running](images/quicksilver-run.png) |
-| Quicksilver | Vision | Quicksilver Time |
+| ![Quicksilver](images/014-quicksilver-mutant-school.png) | ![Vision](images/008-vision.png) | ![Wolverine](images/051-wolverine-adamantium-claws.png) |
+| Quicksilver | Vision | Wolverine |
 
 ## The heroes
 

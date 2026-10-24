@@ -2,6 +2,8 @@
 
 The mod's source is at [github.com/yuvalkolodkingal/enhanced](https://github.com/yuvalkolodkingal/enhanced). It is a NeoForge 1.21.1 mod written in Java 21, built with Gradle.
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## What you need
 
 * **Java 21** (a JDK).

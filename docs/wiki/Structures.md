@@ -4,6 +4,8 @@ Three places of the films are built into the world in 3.3, each with the item of
 
 Hebrew: [עברית](Structures-HE)
 
+![A house in Westview](images/015-westview-house.png)
+
 ## Finding them
 
 * The structures of 3.3 and 3.5 are in the **Overworld** only, in the biomes listed below, and only on fairly **level, dry ground** (a site on a slope, or over water, is skipped). So they are rarer than their spacing alone says: in test worlds the nearest outpost was about 870 and 1,470 blocks from the spawn, and the nearest school about 2,000.
@@ -26,6 +28,8 @@ Hebrew: [עברית](Structures-HE)
 
 ## A Hydra outpost
 
+![Captain America at a Hydra outpost](images/069-captain-america-hydra-outpost.png)
+
 A small Hydra base behind a fence of posts and iron bars, with a gate between two lanterns and signs that say "HYDRA / Restricted Area / Keep Out!". Round a yard of gravel and stone stand a concrete **bunker** with blackstone pillars and a red band, Hydra banners (black, with a red skull and tentacles), a **watchtower**, a **helipad**, a truck, crates and sandbags. Inside: a barracks with three beds, a command room with consoles and a map table, and on the roof a control room with a radio mast and a dish. A stair goes down to the cellar: a **lab** with brewing stands, a cauldron and a glass containment tube, and **the vault**: behind iron bars and an iron door, a chest on a pedestal lit blue from below.
 
 * **The vault's chest always holds Loki's Scepter**: exactly one in every outpost, with some gold, iron, emeralds, ender pearls, bottles o' enchanting, a diamond or amethyst.
@@ -44,6 +48,8 @@ A place hit from the sky, as in New Mexico in *Thor*: a bowl with a radius of 9 
 
 ## The Mutant School
 
+![Professor X at the Mutant School](images/047-professor-x-mutant-school.png)
+
 Xavier's School for Gifted Youngsters: a grey stone mansion with mossy and cracked stone, slate roofs and chimneys, and a crenellated tower over the door with the school's banner (black, with a golden ring and an X). Its grounds have hedges and flowers, a gravel drive round a fountain, a gate with the sign "Xavier's School for Gifted Youngsters", a basketball court and a garden with a pond.
 
 Inside are the entrance hall (double height, a red carpet, a grand staircase, a chandelier), a dining table, a classroom with desks and a blackboard, the library gallery, two dormitories, and:
@@ -59,6 +65,8 @@ An operator can also build or check a school's lower lab: **`/enhanced structure
 
 ## The Bifrost Rune Stones
 
+![The Bifrost beam at night](images/091-bifrost-beam-night.png)
+
 A **Bifrost site** (3.5) is a place where the Bifrost has touched the ground many times: a ring of standing stones round a circle of Bifrost runes burned into the earth, and in the middle the **Bifrost Rune Stone**, which can't be broken.
 
 * **Right-click the rune stone** with no power, no key, nothing: you call "Heimdall! Open the Bifrost!", the Bifrost gathers round you for 3 seconds, and takes you, and everyone in its circle, to Heimdall's Observatory in [Asgard](Asgard).
@@ -68,6 +76,8 @@ A **Bifrost site** (3.5) is a place where the Bifrost has touched the ground man
 See [Asgard](Asgard#the-bifrost-rune-stones-for-players-with-no-power).
 
 ## The stone sites (3.6)
+
+![A Thanos stone site](images/104-thanos-stone-site.png)
 
 Four new places hold the [Infinity Stones](Infinity-Stones) (or their vessels). They generate in **new chunks** only, so in an old world explore land you have not been to. **`/locate structure`** gives the corner of the chunk where the site starts: a Sanctum or a tower stands round the middle of that chunk (8 blocks in from the corner), and an End tunnel's arch is on the edge of the island, up to 40 blocks away. A server can stop new ones with the `stone_sites.*` options; sites already built stay.
 
@@ -138,6 +148,8 @@ An operator can do it at once, or check it: **`/enhanced structure refit_tower`*
 The fifth home is not a structure: **the Reality Stone** floats on a pedestal in Odin's vault under Asgard's throne room, a red swirling orb (the Aether), placed when the vault opens after [Hela](Hela)'s first defeat (so an Asgard of 3.5 gets it too). Hogun warns you: "Beside the spear sleeps the Aether, red as blood. Do not wake it."
 
 ## Agatha's Cottage (3.7)
+
+![Agatha's cottage](images/037-agatha-cottage.png)
 
 `/locate structure enhanced:agatha_cottage`. A crooked two-storey cottage in the woods, with a purple door, a leaning chimney, a porch with rocking chairs and a picket fence: the home of **Agatha Harkness**, her son **Nicky** and **Rio Vidal, the Green Witch**, living happily together (the happy ending Eilon's mom asked for). Inside: the kitchen and the family table, the living room, three bedrooms and Agatha's study (its chest always holds the **Darkhold** and enchanted books), a cosy cellar with a working **Witches' Road door**, and at the back Rio's garden, a greenhouse and **Señor Scratchy**'s hutch. The family talk to you, trade, give gifts and blessings, and ask you to find the rabbit when he runs off. See [Agatha's Cottage](Agathas-Cottage).
 

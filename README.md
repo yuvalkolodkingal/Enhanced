@@ -56,15 +56,15 @@ number, is in [docs/DESIGN.md](docs/DESIGN.md) (Hebrew: [docs/DESIGN.he.md](docs
 **Download:** every push to `main` builds the mod, runs the in-game tests and publishes the jar
 on the [Releases](../../releases) page. The newest build is always marked *Latest*.
 
-![The heroes](docs/screenshots/all-heroes.png)
+![The heroes](docs/screenshots/000-enhanced-heroes-roster.png)
 
 | Magneto | Scarlet Witch | The Hex |
 |---|---|---|
-| ![Magneto](docs/screenshots/magneto.png) | ![Scarlet Witch](docs/screenshots/scarlet-witch.png) | ![The Hex](docs/screenshots/hex.png) |
+| ![Magneto](docs/screenshots/013-magneto-magnetic-shield.png) | ![Scarlet Witch](docs/screenshots/001-scarlet-witch-flight-avengers-tower.png) | ![The Hex](docs/screenshots/005-scarlet-witch-hex-barrier.png) |
 
-| Quicksilver | Vision | Quicksilver Time |
+| Quicksilver | Vision | Wolverine |
 |---|---|---|
-| ![Quicksilver](docs/screenshots/quicksilver.png) | ![Vision](docs/screenshots/vision.png) | ![Quicksilver Time](docs/screenshots/quicksilver-run.png) |
+| ![Quicksilver](docs/screenshots/014-quicksilver-mutant-school.png) | ![Vision](docs/screenshots/008-vision.png) | ![Wolverine](docs/screenshots/051-wolverine-adamantium-claws.png) |
 
 * **Minecraft** 1.21.1
 * **Mod loader** NeoForge 21.1.x
@@ -261,16 +261,15 @@ without their armour, which still protects them), and since 3.7 *Deadpool's joke
 
 ## Screenshots
 
-![The Scarlet Witch](docs/screenshots/scarlet-witch-sheet.png)
+![Scarlet Witch and Vision in the Hex](docs/screenshots/004-scarlet-witch-and-vision-the-hex.png)
 
 | | |
 |---|---|
-| ![Lifting an Iron Golem](docs/screenshots/magneto-telekinesis.png) Magneto lifting an Iron Golem | ![Disarm](docs/screenshots/magneto-disarm.png) Ripping a zombie's iron gear off |
-| ![Chaos Beam](docs/screenshots/chaos-beam.png) The Chaos Beam | ![Chaos Shield](docs/screenshots/chaos-shield.png) The Chaos Shield |
-| ![Awakening](docs/screenshots/mind-stone-awakening.png) Touching the Mind Stone with the gene | ![Hex Control](docs/screenshots/hex-control.png) Wanda's Hex Control screen |
-| ![Flight](docs/screenshots/scarlet-witch-flight.png) Red energy around Wanda's hands in flight | ![Quicksilver Time](docs/screenshots/quicksilver-time.png) Quicksilver Time: sand and arrows hang in the air |
-| ![Running past](docs/screenshots/quicksilver-run.png) Quicksilver running past, as another player sees him | ![Mind Stone beam](docs/screenshots/mind-stone-beam.png) Vision's Mind Stone beam |
-| ![Phasing](docs/screenshots/vision-phase.png) Vision phasing through a wall | ![Disguise](docs/screenshots/vision-disguise.png) Vision and his WandaVision human disguise |
+| ![The Chaos Beam](docs/screenshots/002-scarlet-witch-chaos-beam.png) The Chaos Beam | ![The Hex Barrier](docs/screenshots/005-scarlet-witch-hex-barrier.png) The Hex Barrier |
+| ![Build Magic](docs/screenshots/006-scarlet-witch-build-magic.png) Build Magic: the spell hints on the HUD | ![Vision's Mind Stone beam](docs/screenshots/009-vision-mind-stone-beam.png) Vision's Mind Stone beam |
+| ![Vision phasing](docs/screenshots/010-vision-phasing.png) Vision phasing through a wall | ![Magneto's magnetic shield](docs/screenshots/013-magneto-magnetic-shield.png) Magneto's magnetic shield |
+| ![Thor's lightning](docs/screenshots/026-thor-lightning.png) Thor's lightning | ![Iron Man's repulsor beam](docs/screenshots/081-iron-man-repulsor-beam.png) Iron Man's repulsor beam |
+| ![Ultron's army](docs/screenshots/112-ultron-army.png) Ultron's army | ![Thanos's armour](docs/screenshots/105-thanos-armour.png) Thanos's armour |
 
 ## Quicksilver's song
 

@@ -4,6 +4,8 @@ The First Avenger (3.8): the super-soldier the **[Super Soldier Serum](Super-Sol
 
 Hebrew: [עברית](Captain-America-HE)
 
+![Captain America at a Hydra outpost](images/069-captain-america-hydra-outpost.png)
+
 ## The quick version
 
 * **How:** use a **[Super Soldier Serum](Super-Soldier-Serum)** (in the lab of the Avengers Tower) and choose **Captain America**. You get a Vibranium Shield too.
@@ -31,6 +33,8 @@ The super-soldier's **Speed II, Strength II and Resistance I**, the mod's way: t
 His HUD says it: "Super-soldier: Speed II · Strength II · Resistance I".
 
 ## The Vibranium Shield
+
+![Captain America and the Vibranium Shield](images/070-captain-america-vibranium-shield.png)
 
 A round shield, red and silver rings round a blue centre with a white star, a leather strap behind. It is **unbreakable**, fire can't burn it, and it can't be crafted.
 

@@ -4,6 +4,8 @@ The Goddess of Death (3.5), Odin's first-born, as in *Thor: Ragnarok*: black nec
 
 Hebrew: [עברית](Hela-HE)
 
+![Hela](images/095-hela.png)
+
 ## The quick version
 
 * **Calling her:** in Asgard's throne room, right-click **Hela's Seal** in the wall behind the Throne of Asgard, then right-click it again within 5 seconds to break it.
@@ -12,6 +14,8 @@ Hebrew: [עברית](Hela-HE)
 
 ## Calling Hela
 
+![Hela in the palace of Asgard](images/096-hela-asgard-palace.png)
+
 * **Hela's Seal** is a block in the north wall of the throne room, behind the throne. Right-click it: "Hela's Seal. Break it, and the Goddess of Death returns. (Click again to break it.)" A second click **within 5 seconds** breaks it and the fight begins.
 * Not in Creative or Spectator mode ("Hela will not come for a player in Creative or Spectator mode").
 * **The seal heals** after a fight: 20 minutes after she is beaten, 10 after a fight that ends any other way ("The seal is still healing (12 more minutes)").
@@ -19,6 +23,10 @@ Hebrew: [עברית](Hela-HE)
 * A server can stop the seal calling her (`hela_boss.summonEnabled`). An operator can always start the fight with `/enhanced boss start hela force`, from anywhere and in any mode: it happens in Asgard's throne room. (Without `force`, the command follows the seal's rules.)
 
 ## The fight
+
+![Hela and her army](images/097-hela-and-her-army.png)
+
+![Hela's berserkers](images/098-hela-berserkers.png)
 
 **The arena** is the throne room (34 blocks round its middle): a wall keeps the fighters in, and nothing of the hall can be broken. The murals on the ceiling crack, one after another, to show Hela's conquests. Black-green smoke pours from the seal, and **she forms on the dais** (about 6 seconds), her headdress growing, and flings her arms wide: "So this is the house my father built on my silence."
 
@@ -75,6 +83,10 @@ Everyone who did at least **2% of her health** in damage, or struck the last blo
 A player with no power chooses by what he does: hold the Headdress and be Hela, or take Gungnir to the throne and be Odin.
 
 ## Becoming Hela: the hero
+
+![Hela's dark magic](images/099-hela-dark-magic.png)
+
+![Hela's Fenris Wolf](images/100-hela-fenris-wolf.png)
 
 Hold **Hela's Headdress** with **no power** for **3 seconds**. Black smoke rises, the antlers grow from your hood, and you are **Hela**: "The Goddess of Death returns."
 

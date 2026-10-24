@@ -4,6 +4,8 @@ Two old books of magic can be crafted in survival: the **Book of the Vishanti**,
 
 Hebrew: [עברית](Sorcerers-Books-HE)
 
+![Books in item frames](images/116-item-frames-books.png)
+
 ## Who is a sorcerer?
 
 | Hero | Sorcerer? | Strength of the ward |
@@ -73,6 +75,8 @@ The screen has a **name field** ("Name this place"), a **Save here** button (Ent
 * **Operators:** `/enhanced ward list` lists every ward (whose, where, how far it reaches), and `/enhanced ward remove <player>` takes away every ward of a player (their bases stay as plain places). The player can be an online player, a selector, or the name or id of someone who is offline or gone: the wards go by id alone, and a wiped book loses its wards at the next login too.
 
 ## The Darkhold
+
+![Hela's dark magic](images/099-hela-dark-magic.png)
 
 *"Agatha's book of dark magic: it corrupts whoever reads it."*
 

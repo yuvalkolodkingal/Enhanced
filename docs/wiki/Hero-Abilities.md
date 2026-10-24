@@ -4,6 +4,8 @@ Since 3.4 every ability of every hero of the mod is a power a [custom hero](Hero
 
 Hebrew: [עברית](Hero-Abilities-HE)
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## How to read the tables
 
 * **Ability (id)**: its name in the game, and the id a hero file uses (`thor.lightning`; the Scarlet Witch's are `wanda.*`, Spider-Man's `spider.*`, Professor X's `xavier.*`).
@@ -365,6 +367,8 @@ New in 3.8. See [Love](Love) for the full story of each ability.
 | **Daughter of Thor** `love.body` | no key (always on) | — | 2 a point | 16 hearts; **worthy of Mjolnir**. |
 
 ## The Infinity Stones (3.6)
+
+![The Infinity Stones](images/114-infinity-stones.png)
 
 Each Infinity Stone is a **stone row**: put it on any key, and Sneak + that key is its second power. A stone row works **only while your hero carries that stone and may use it**: the stone itself (only a god's ability lets a hero hold the Reality, Power and Soul Stones: see [Infinity Stones](Infinity-Stones#who-may-hold-a-stone)), a Gauntlet with it that he may wield, or its vessel (Loki's Scepter, the Tesseract, the Eye of Agamotto). Without it the key says "You do not carry the Mind Stone." The Time Stone answers only a sorcerer. The card shows **Needs the stone**. The numbers follow the stone's own (`[mind_stone]`...), its strength and `custom_hero.cooldownScale`. A server can switch them off (`custom_hero.stoneRows`).
 

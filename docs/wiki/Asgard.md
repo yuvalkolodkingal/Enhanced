@@ -4,6 +4,8 @@
 
 Hebrew: [עברית](Asgard-HE)
 
+![The palace of Asgard](images/092-asgard-palace.png)
+
 ## The quick version
 
 * **Getting there:** open the **Bifrost** and choose **Asgard** at the top of its screen. The Bifrost answers Mjolnir, Stormbreaker, **Hofund** (Heimdall's sword), your own **Gungnir**, and the heroes Heimdall and Odin. With no power and none of those, find a **Bifrost Rune Stone** in the Overworld and right-click it.
@@ -13,6 +15,8 @@ Hebrew: [עברית](Asgard-HE)
 * **What to do there:** meet [the Asgardians](Asgardians), take [Heimdall's](Heimdall) **Guardian's Watch**, break **Hela's Seal** behind the throne and fight [Hela](Hela), then take **Gungnir** and become [Odin](Odin).
 
 ## Only the Bifrost
+
+![Odin and Heimdall at the Bifrost observatory](images/086-odin-and-heimdall-bifrost-observatory.png)
 
 No portal leads to Asgard or out of it. A Nether portal cannot be lit there, the [Book of the Vishanti](Sorcerers-Books) can neither save a place in Asgard nor travel to or from it ("The Vishanti cannot reach the Realm Eternal."), and the Tesseract's own jump, a Sling Ring and other mods' teleports are turned back: "Only the Bifrost reaches Asgard." (An operator's `/tp` and `/execute in` still work.)
 
@@ -55,6 +59,10 @@ Somewhere in the Overworld, in **plains, meadows, snowy plains, taigas, windswep
 
 ## The Bifrost takes everyone in its circle
 
+![The Bifrost bridge](images/089-heimdall-bifrost-bridge.png)
+
+![Arriving through the Bifrost](images/090-bifrost-arrival.png)
+
 Since 3.5 **every** Bifrost, Thor's too, carries everyone who stands inside the **circle of runes** it burns into the ground (radius 3.2 blocks: the circle you see), not only the one who opened it:
 
 * **Who goes:** every player and every creature whose feet are inside the circle (and no more than 3 blocks above or below it): your friends, your pets, villagers, a horse with its rider (both go, and he is riding it again when they land), dropped items, boats and minecarts. The nearest 64 at most.
@@ -65,6 +73,8 @@ Since 3.5 **every** Bifrost, Thor's too, carries everyone who stands inside the 
 * A server can change the circle with `bifrost.groupRadius` (0 to 16; **0** = only the opener goes, as before 3.5). See [Server Configuration](Server-Configuration#the-bifrost).
 
 ## The city
+
+![The Throne of Asgard](images/093-odin-asgard-throne.png)
 
 You arrive facing north, toward the city. The map, from the edge of the world to the palace:
 
@@ -114,6 +124,8 @@ Asgard is made to be explored safely.
 | **Closed Asgard** | If a server closes Asgard (`asgard.enabled` false), the Bifrost doesn't offer it, the rune stones fizzle, nobody can go in (operators can still `/tp`), and a player who logs in there is sent to his respawn point. Leaving is always allowed. |
 
 ## Things to do
+
+![A duel in Asgard](images/024-asgard-night-duel.png)
 
 1. **Meet the Asgardians**: Heimdall, Frigga, Sif, Valkyrie, the Warriors Three and the people of the city. They talk, give hints, trade and fight beside you. See [Asgardians](Asgardians).
 2. **Take the Guardian's Watch** in the Observatory, win **Hofund**, and become [Heimdall](Heimdall).

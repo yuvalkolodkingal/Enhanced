@@ -4,6 +4,8 @@ The mod's music (3.5): the Walkman songs of the speedsters, the Witches' Road's 
 
 Hebrew: [עברית](Music-HE)
 
+![A speed run across the map](images/018-tommy-speed-run.png)
+
 ## The Walkman: Quicksilver and Speed
 
 ### Quicksilver: "Silver Hours"
@@ -32,6 +34,8 @@ See [Tommy](Tommy).
 
 ## The Witches' Road: a version of the ballad for every part
 
+![A cabin on the Witches' Road](images/043-witches-road-cabin.png)
+
 The [Witches' Road](Witches-Road) plays its ballad (the mod's own tune of 3.3) in a different version at every part of the Road, as the *Ballad of the Witches' Road* has many versions in the show. 3.5 adds a sixth, for the **choice**:
 
 | Part | When | Version |
@@ -46,6 +50,8 @@ The [Witches' Road](Witches-Road) plays its ballad (the mod's own tune of 3.3) i
 The music crossfades (2 seconds) from one part to the next and fades out (3 seconds) when you leave the Road. It plays on the **Music** slider.
 
 ## Asgard, the Watch and Hela
+
+![The palace of Asgard](images/092-asgard-palace.png)
 
 [Asgard](Asgard) has three pieces of its own (*Realm Eternal*, *The Golden Halls*, *Edge of the Realms*) and its own air (wind, a far hum, chimes); [Heimdall's](Heimdall) **Guardian's Watch** has a tense theme of hourglass ticks, pizzicato and his horn call; and the fight with [Hela](Hela) has a battle theme in three layers, one for each phase. All original.
 

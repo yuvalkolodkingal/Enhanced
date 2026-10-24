@@ -4,6 +4,8 @@ Since 3.6 every [Hydra outpost](Structures#a-hydra-outpost) is guarded by **Hydr
 
 Hebrew: [עברית](Hydra-Soldiers-HE)
 
+![Captain America at a Hydra outpost](images/069-captain-america-hydra-outpost.png)
+
 ## The quick version
 
 * **Where:** every Hydra outpost, the old ones of 3.3 too. They appear when a player comes within 64 blocks.

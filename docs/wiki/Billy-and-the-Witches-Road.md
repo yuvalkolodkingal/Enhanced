@@ -2,6 +2,8 @@
 
 Billy Maximoff (Wiccan), Wanda's other son. In *WandaVision* he hears every thought around him and freezes a squad of S.W.O.R.D. soldiers; in *Agatha All Along* his own chaos magic makes the Witches' Road real. In the mod, the Road is a door, three trials behind it, and the way to become Billy (or Tommy).
 
+![A cabin on the Witches' Road](images/043-witches-road-cabin.png)
+
 ## The Witches' Road Door
 
 **Crafting:**
@@ -36,6 +38,8 @@ Without a gene the door won't open ("The Road only opens for witch blood"). A he
 The **Scarlet Witch** and **Billy** (whose magic made the Road), and, in 3.3, **[Agatha](Agatha)** (who led the coven down it), can travel it. Right-clicking a door without a gene opens it and takes them to the **next Witches' Road door** in the same dimension (in the order the doors were placed, going round), arriving on it in a column of light. A door that is gone is skipped. Whatever they hold with telekinesis stays behind, and the Hex wall is respected. Cooldown 3 seconds.
 
 ## Billy's abilities
+
+![Billy, first look](images/020-billy-look-1.png)
 
 Billy's magic is blue with a white-hot core, crackling and branching like a Tesla coil.
 
@@ -73,6 +77,10 @@ Hold **Sneak** and press **B** (plain **B** is still the Freeze) and a tall **pl
 
 ## Build Magic
 
+![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)
+
+![Build Magic: choosing a spell](images/007-scarlet-witch-build-magic-selection.png)
+
 Billy builds too: press **Y**, click two corners and right-click, and a house grows out of the ground; **Ctrl + Z** takes it back. But he is an **apprentice who learns**. His spells cost *magic*, one point a block, from a meter that refills all the time, and the meter, how big he can build and how far he reaches grow with practice (every block he builds), through **ten ranks**, from Apprentice to Chaos Master:
 
 | Rank | Practice | Meter | Refills | Longest side | Reach | Undos |
@@ -94,6 +102,10 @@ He has all eleven spells from the first minute; what grows is how big. Ranks 1 t
 
 ## Looks
 
+![Billy, second look](images/021-billy-look-2.png)
+
+![Billy, third look](images/022-billy-look-3.png)
+
 *Wiccan* (*Agatha All Along*), *Teen* (on the Witches' Road), *Halloween* (his *WandaVision* costume), *Wiccan (comics)*, and *Your own skin*. Press **H** to switch. See [Looks](Looks).
 
 ## The Infinity Stones (3.6)
@@ -101,6 +113,10 @@ He has all eleven spells from the first minute; what grows is how big. Ranks 1 t
 Billy is a sorcerer: he may hold and use the **Time Stone** (Slow Time; Sneak: Rewind; on a crop it grows), and the **Eye of Agamotto** gives him the same powers. The other stones are too strong for him. The **Sling Ring** answers him too. See [Infinity Stones](Infinity-Stones) and [Doctor Strange](Doctor-Strange#the-eye-for-everyone-else).
 
 ## Against Wolverine and Deadpool (3.7)
+
+![Wolverine's adamantium claws](images/051-wolverine-adamantium-claws.png)
+
+![Deadpool](images/053-deadpool.png)
 
 Billy's **chaos magic** (the Hex Bolt and the Hex Beam) is one of the few things a [healing factor](Healing-Factor) can't stop: it defeats Wolverine and Deadpool, where anything else only knocks them down. He may use the [Cerebro console](Mutant-School-Lab#cerebro) too. At [Agatha's Cottage](Agathas-Cottage), Agatha calls him "Teen", and Nicky wants a spell.
 

@@ -2,6 +2,8 @@
 
 Tom Holland's Peter Parker, the friendly neighbourhood Spider-Man. He cannot fly: he goes everywhere by **web**. He webs creatures and rolls them up, bursts a nova of webs in every direction, **zips** to the point he looks at (then the web vanishes and he zips on to the next wall), **swings** on a web, **sticks to walls and ceilings and walks on them**, feels danger coming, and wears one of three suits: the **Homemade Suit** of *Homecoming*, the **Iron Spider** with its four mechanical legs and Instant Kill, or the **Brand New Day** suit with organic webs. A fifth power, from *Spider-Man: Brand New Day*, turns his eyes black and makes him much faster and stronger for a while, at a price.
 
+![Spider-Man in the Iron Spider suit](images/033-spider-man-iron-spider.png)
+
 ## The quick version
 
 Four tricks, in plain words. (**Sneak** is the Shift key, unless you changed it. Everyone nearby sees all of them.)
@@ -43,6 +45,10 @@ Drink milk and the bite is cured: nothing happens ("The bite fades"), and the sp
 
 ## The three suits
 
+![Spider-Man in the homemade suit](images/035-spider-man-homemade-suit.png)
+
+![Spider-Man in the homemade suit, second view](images/036-spider-man-homemade-suit-2.png)
+
 Press **H** to change suit (**Sneak + H** goes back). The suits are looks (see [Looks](Looks)), but Spider-Man is the one hero whose looks **are not all the same**: they differ in **protection**, and only the Iron Spider has **B**.
 
 | Suit | Id | Protection | What it is |
@@ -63,6 +69,8 @@ For scale, a full diamond set is 20 armor and 8 toughness. Nothing is worn: the 
 * **Hunger is the only resource.** There is no web fluid: every ability costs a little food (none in Creative).
 
 ## Abilities
+
+![Spider-Man in the Avengers Tower hall](images/034-spider-man-avengers-tower-hall.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|

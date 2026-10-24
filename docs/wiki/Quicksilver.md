@@ -2,7 +2,7 @@
 
 Peter Maximoff, the fastest man alive, as in the X-Men films: everything around him slows down, he speeds up, and the world starts playing his song (since 3.5 his own theme, *Silver Hours*; or your own copy of *Sweet Dreams (Are Made of This)*). Or he can just be fast himself, and leave the world alone.
 
-![Quicksilver](images/quicksilver.png)
+![Quicksilver at the Mutant School](images/014-quicksilver-mutant-school.png)
 
 ## Becoming Quicksilver
 
@@ -32,6 +32,8 @@ In 3.3 Quicksilver's two powers are **separate**: **R** slows time, **G** makes 
 
 ## Quicksilver Time (R)
 
+![Super speed](images/016-tommy-super-speed.png)
+
 **Press R and time slows down around him, whether he runs or not.** He can stand still, walk, mine, build, fight or eat in the middle of it.
 
 * Everything within **32 blocks** runs **5 times slower**: monsters, animals, villagers, falling blocks, TNT fuses, dropped items, smoke, sparks and splashes, and **arrows and thrown things, which hang in the air** and crawl forward. An arrow that finally lands still hits as hard as it would have.
@@ -39,9 +41,6 @@ In 3.3 Quicksilver's two powers are **separate**: **R** slows time, **G** makes 
 * **The world starts playing his song.** Everyone near him hears his theme, *Silver Hours* (3.5; or your own *Sweet Dreams*, see [below](#the-song-and-your-own-music)), from his Walkman for as long as Quicksilver Time is on (if his Walkman is on: **Sneak + R**). It fades in when he turns Quicksilver Time on, keeps playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
 * A cool grey-blue shade at the edges of the screen, and a tint of the world, show that time is slowed; everyone inside his zone sees it. (Inside [Tommy](Tommy)'s slow time it is teal.)
 * **Cost:** hunger, at half the rate of running while he does not run. When the hunger bar is empty, Quicksilver Time switches itself off (with a message) and can't be switched on again until he has eaten. Creative players never run out.
-
-![Quicksilver Time: sand and arrows hang in the air](images/quicksilver-time.png)
-
 ## Super Speed (G)
 
 **Press G and he runs.** With Super Speed on, **sprinting** is super speed:
@@ -51,9 +50,6 @@ In 3.3 Quicksilver's two powers are **separate**: **R** slows time, **G** makes 
 * With **Wall & Water Run** on (**B**) he runs across water and **up walls and along ceilings**: see [below](#running-up-walls-and-across-ceilings).
 * **Cost:** hunger only while he runs, at the full rate (running inside his own Quicksilver Time costs the same, not more). With an empty hunger bar he can't run, but Super Speed stays on.
 * Quicksilver Time and Super Speed start off, and both are saved with the player.
-
-![Quicksilver running past, as another player sees him](images/quicksilver-run.png)
-
 ## Doing everything faster
 
 While Quicksilver Time **or** Super Speed (or both) is on, Quicksilver does everything **4 times as fast**, whether he runs or not:
@@ -81,6 +77,10 @@ The movement speed bonus and the step-up still need **sprinting**, so he can sti
 The Dash Strike and the Pebble Barrage hurt players only with PvP on, and do not cross a Hex wall.
 
 ## Running up walls and across ceilings
+
+![A speed run across the map](images/018-tommy-speed-run.png)
+
+![A speed run at sunset](images/019-tommy-speed-run-sunset.png)
 
 *The speedster way, not the spider's: he does not cling, he runs, and only as long as he is fast.* (3.3, Quicksilver and Tommy.)
 

@@ -1,5 +1,7 @@
 # Credits
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## The mod
 
 * **Hero concepts:** Eilon Kolodkin-Gal. The original ideas for Magneto, the Scarlet Witch (and the Hex), and Quicksilver's slow-motion run to *Sweet Dreams* are his.

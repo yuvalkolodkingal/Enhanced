@@ -2,6 +2,8 @@
 
 The God of Mischief, the Loki of the MCU films and series: a master of daggers, illusions and escapes, and, underneath it all, a Frost Giant. In the mod he walks (he does not fly), and his five tricks are the same in every look.
 
+![Loki in Asgard](images/023-loki-asgard.png)
+
 ## Becoming Loki: the Tesseract
 
 In *Avengers: Endgame* the 2012 Loki grabs the Tesseract and vanishes in a blue swirl. That escape is how a player becomes Loki.
@@ -22,6 +24,8 @@ In *Avengers: Endgame* the 2012 Loki grabs the Tesseract and vanishes in a blue 
 * **Heroes use it as a jump.** A hero (Loki included) who uses the Tesseract is not changed: the Space Stone takes them to the block they look at, up to 48 blocks away, standing on top of it if there is room. The cube then needs 5 seconds before it can be used again, and a Hex wall they are not allowed through still stops them.
 
 ## Loki's Scepter
+
+![The Scepter and the Tesseract](images/115-artifacts-scepter-tesseract.png)
 
 Anyone can swing **Loki's Scepter** (in 3.3 it is kept in the vault of every [Hydra outpost](Structures#a-hydra-outpost), and found nowhere else: see [Items and Crafting](Items-and-Crafting#lokis-scepter)): 8 attack damage, and it never breaks. In the films the Mind Stone in it takes over the mind of whoever it touches. That is too strong for the game, so here a melee hit **confuses**:
 
@@ -48,6 +52,8 @@ Loki has four looks, and **H** switches between them (**Sneak + H** goes back). 
 | **Your own skin** | Loki's powers and magic colours, in your own Minecraft skin. |
 
 ## Abilities
+
+![A duel in Asgard](images/024-asgard-night-duel.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|

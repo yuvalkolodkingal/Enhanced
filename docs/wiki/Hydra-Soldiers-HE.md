@@ -6,6 +6,8 @@
 
 English: [Hydra Soldiers](Hydra-Soldiers)
 
+![קפטן אמריקה בבסיס של הידרה](images/069-captain-america-hydra-outpost.png)
+
 ## הגרסה הקצרה
 
 * **איפה:** בכל מוצב של הידרה, גם בישנים של 3.3. הם מופיעים כששחקן מתקרב ל-64 בלוקים.

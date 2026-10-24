@@ -4,6 +4,8 @@ Charles Xavier, the greatest telepath on Earth and the founder of the X-Men. He 
 
 Hebrew: [עברית](Professor-X-HE)
 
+![Professor X at the Mutant School](images/047-professor-x-mutant-school.png)
+
 ## Becoming Professor X
 
 1. Get **Professor X's Wheelchair**. Craft it (the recipe is below and on [Items and Crafting](Items-and-Crafting#professor-xs-wheelchair)), or find it in the [Mutant School](Structures#the-mutant-school), in a chest in the Professor's study (always one).
@@ -25,6 +27,8 @@ I = Iron Ingot
 The recipe appears in your recipe book when you pick up an Eye of Ender.
 
 ## His body and his chair
+
+![Professor X in the lab](images/048-professor-x-mutant-school-lab.png)
 
 * A normal body: 20 health, no flight. His power is the mind.
 * **The old Professor X sits in his wheelchair all the time**: a steel frame, black leather, two big spoked wheels with tyres that roll as he moves (and turn against each other when he turns on the spot), small casters and a footrest. He sits with his legs forward and his forearms on the armrests. The chair is not drawn while he swims, sleeps, glides with an elytra, rides or is a Spectator. It is part of him, not something to ride: there is nothing to dismount.

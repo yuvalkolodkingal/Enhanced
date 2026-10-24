@@ -4,6 +4,8 @@ Stephen Strange, Master of the Mystic Arts and Sorcerer Supreme (3.6), as in *Do
 
 Hebrew: [עברית](Doctor-Strange-HE)
 
+![Doctor Strange](images/058-doctor-strange.png)
+
 ## The quick version
 
 * **How:** with **no power**, hold the **Eye of Agamotto** (right-click and keep holding) for **3 seconds**. The Eye is made from the [Time Stone](Infinity-Stones#the-time-stone-green-sorcerers-only) and 8 gold blocks.
@@ -11,6 +13,8 @@ Hebrew: [עברית](Doctor-Strange-HE)
 * He is a **sorcerer**: the Book of the Vishanti and the Darkhold answer him, a Hex's Runes hold him, and he may hold and use the Time Stone.
 
 ## Becoming Doctor Strange: the Eye of Agamotto
+
+![Doctor Strange and the Eye of Agamotto](images/059-doctor-strange-eye-of-agamotto.png)
 
 1. **Get the Time Stone** from the top floor of a **Sanctum Sanctorum** ([Structures](Structures#the-sanctum-sanctorum)). Only a god, the Scarlet Witch, the Phoenix or a sorcerer can take it from its pedestal.
 2. **Craft the Eye of Agamotto:** 8 gold blocks round the Time Stone. (Whoever crafts it must be able to hold the stone; he can then give the Eye to a friend.)
@@ -31,6 +35,8 @@ You also become Doctor Strange with **Choose a Hero** in the [Hero Creator](Hero
 So **Billy and Agatha get the Time Stone's powers** through the Eye. A sorcerer can also use the Eye **on a crop, a sapling or a baby animal**, as the Time Stone: it grows (Sneak: a crop grows back). The Eye recharges with the Time Stone: its sweep on the hotbar shows when. Inside a Hex whose Runes hold sorcerers: "The runes hold the Eye shut". Losing the Eye does **not** take Strange's power, only his **Y**.
 
 ## Abilities
+
+![A Doctor Strange portal](images/060-doctor-strange-portal.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|

@@ -4,6 +4,8 @@
 
 Hebrew: [עברית](Healing-Factor-HE)
 
+![Wolverine in the classic suit](images/050-wolverine-classic-suit.png)
+
 ## The quick version
 
 * **Who has it:** [Wolverine](Wolverine), [Deadpool](Deadpool), and a [custom hero](Hero-Creator) with Wolverine's or Deadpool's body.
@@ -13,6 +15,8 @@ Hebrew: [עברית](Healing-Factor-HE)
 * **Healing Burst** (**Sneak + B**): half his health back at once.
 
 ## How fast he heals
+
+![Wolverine's adamantium claws](images/051-wolverine-adamantium-claws.png)
 
 | What | How much |
 |---|---|
@@ -73,6 +77,8 @@ When one of them gets through, everyone near hears it in gold, before the usual 
 The HUD's healing icon turns **red and crossed out**: "Healing factor OFF — poisoned!", with a hiss and a sour tone; a bright chime when it comes back. Poison comes from Poison potions (also splash and lingering), arrows of Poison, cave spiders, bees, pufferfish, witches' potions and suspicious stew. So the way for a friend (with PvP on) to beat a Wolverine is a **splash potion of Poison**, then a sword.
 
 ## The Healing Burst
+
+![Wolverine's berserker rage](images/052-wolverine-berserker-rage.png)
 
 **Sneak + B** for both heroes (Wolverine's **Healing Burst**, Deadpool's **Chimichanga Break**): **half his health back at once** and the bad effects gone (not Poison). A soft green-white shimmer. Cooldown 20 seconds. Refused while poisoned, and then nothing is spent. Deadpool with a [chimichanga](Deadpool#the-chimichanga) in his bag eats it: **all his health** back and Absorption II for 30 seconds.
 

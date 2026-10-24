@@ -4,6 +4,8 @@ In *Agatha All Along* the Witches' Road is a place of trials that only a witch's
 
 Hebrew: [עברית](Witches-Road-HE)
 
+![A cabin on the Witches' Road](images/043-witches-road-cabin.png)
+
 ## The quick version
 
 * **To start** you need a **Scarlet Witch Gene** and a [Witches' Road Door](Items-and-Crafting#witches-road-door) (it is on [Billy and the Witches' Road](Billy-and-the-Witches-Road#seeking-the-road-becoming-billy-or-tommy)). You must have **no power** and be in **Survival** mode. Right-click the door with the Gene in your hand, and press **Walk the Road**.
@@ -119,6 +121,8 @@ There are **five kinds of building**: a **hut** (a gabled cottage), a **tower** 
 *Tips about the boat on ice:* it slides like a puck and its top speed on packed ice is about 40 blocks a second. Steering turns the boat, not the way it moves, so start your turn early and let go of **W** for a sharp curve. A boat does not climb anything. Rough snow slows it a lot (and is a way to brake before a hairpin). Keep to the middle, and do not be afraid of the checkpoints: they are free.
 
 ## The end of the Road
+
+![Billy, first look](images/020-billy-look-1.png)
 
 After the third gate you step into the **end hall**: a round hall of dark oak and amethyst, with a dais in the middle, in a place of its own. The title says "The Road's End", the Road speaks, the light gathers over the dais for three seconds, and then the Road asks once more, "Seekest thou the Road?" and the choice screen opens. It shows the same two roads as the door gave in 3.1:
 

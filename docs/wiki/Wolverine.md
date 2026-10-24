@@ -4,6 +4,8 @@ Logan (3.7), the mutant whose **healing factor** let the Weapon X program bond *
 
 Hebrew: [עברית](Wolverine-HE)
 
+![Wolverine at the Mutant School](images/049-wolverine-mutant-school.png)
+
 ## The quick version
 
 * **How:** in the [X-Men lower lab](Mutant-School-Lab) under every Mutant School, take an **Adamantium Injection** from the **Weapon X rack**, and with **no power** hold right-click on it for 3 seconds.
@@ -12,6 +14,8 @@ Hebrew: [עברית](Wolverine-HE)
 * He doesn't fly: he leaps, climbs and runs (20% faster than anyone).
 
 ## Becoming Wolverine: the Adamantium Injection
+
+![Wolverine's adamantium claws](images/051-wolverine-adamantium-claws.png)
 
 1. Find a **Mutant School** (`/locate structure enhanced:mutant_school`) and go down to its **lower lab**: the two bookshelves north of the fireplace in the Professor's study open, and the lift is behind them. See [The X-Men lower lab](Mutant-School-Lab).
 2. In the **Weapon X lab** on the lower level, right-click the **Weapon X rack**: it gives you an **Adamantium Injection**. Each rack gives **one to each player**, so two brothers each get one ("You already took an injection from this rack.").
@@ -46,6 +50,8 @@ You also become Wolverine with **Choose a Hero** in the [Hero Creator](Hero-Crea
 
 ## Abilities
 
+![Wolverine's berserker rage](images/052-wolverine-berserker-rage.png)
+
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | **R** | Claw Slash | The claws pop out if they are in, and he slashes the nearest creature in front of him (a 60° cone, 3.5 blocks): **6**, **6**, then a cross-slash of **9** that hits up to three creatures in front and knocks them back. Half a second between slashes; after a second and a half without one, the combo starts again. **Sneak + R: Spin Slash**: a full turn with both fists out, **7** to everyone within 3 blocks he may hurt, and arrows flying at him are knocked down. Cooldown 4 seconds. |
@@ -57,6 +63,8 @@ You also become Wolverine with **Choose a Hero** in the [Hero Creator](Hero-Crea
 With PvP off, his abilities don't hurt players. Everything he pushes at the edge of the [Vormir Cliff](Vormir) counts as his push.
 
 ## Looks
+
+![Wolverine in the classic suit](images/050-wolverine-classic-suit.png)
 
 | Look | Id | What it is |
 |---|---|---|

@@ -4,6 +4,8 @@ Bruce Banner (3.6), whose gamma accident made him **the Hulk**, the strongest on
 
 Hebrew: [עברית](Hulk-HE)
 
+![The Hulk in containment](images/061-hulk-containment.png)
+
 ## The quick version
 
 * **How:** craft a **Gamma Emitter**, place it, click it, and with **no power** stand in its green beam for 3 seconds. You become Bruce Banner, and Hulk out at once.
@@ -22,6 +24,8 @@ A Hulk who stands in the beam is **healed** (2 health a second) and gets angrier
 You also become the Hulk with **Choose a Hero** in the [Hero Creator](Hero-Creator), or with `/enhanced power set <player> hulk` (and a look: `ragnarok`, `brand_new_day` or `banner`).
 
 ## His forms
+
+![The Hulk in containment, second view](images/062-hulk-containment-2.png)
 
 | Look | Id | What it is |
 |---|---|---|

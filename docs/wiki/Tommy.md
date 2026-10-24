@@ -2,11 +2,15 @@
 
 Tommy Maximoff (Speed), Wanda's speedster son from *WandaVision*. His speed showed up on Halloween night ("Chip off the old Maximoff block! You've got super speed!"), and in the Battle of Westview he crossed the street as a teal-green ghost and disarmed a whole S.W.O.R.D. squad.
 
+![Tommy, close up](images/017-tommy-close-up.png)
+
 ## Becoming Tommy
 
 Through the Witches' Road, with a Scarlet Witch Gene: craft and place a **Witches' Road Door**, open it holding the gene, walk the three trials of [The Witches' Road](Witches-Road), and choose **Tommy: Speed** at the end of the Road. The whole ritual is on [Billy and the Witches' Road](Billy-and-the-Witches-Road), and the first steps are on [Becoming a Hero](Becoming-a-Hero).
 
 ## Super speed and slow time
+
+![Super speed](images/016-tommy-super-speed.png)
 
 Tommy's speed leaves a translucent teal-green ghost trail and afterimages, low along the ground, like in the Battle of Westview. In 3.3 he has **two separate powers**, like [Quicksilver](Quicksilver): **G** makes him run, and **R** slows the world (new). Use either one alone, or both together.
 
@@ -16,6 +20,8 @@ Tommy's speed leaves a translucent teal-green ghost trail and afterimages, low a
 * **Like his uncle** (3.6.1): everything Quicksilver does on his feet, Tommy does too: super speed, stepping up whole blocks, no fall damage while running, walls, ceilings and water, the running pose and the trail (his own teal one), and **faster swimming** while his Super Speed or Slow Time is on.
 
 ## His Walkman: "Westview Blur" (3.5)
+
+![A speed run across the map](images/018-tommy-speed-run.png)
 
 Tommy has a Walkman of his own, with **his own theme, *Westview Blur***: bright, fast original synth-pop. It plays for everyone near him while he **runs with Super Speed** and while his **Slow Time** is on. When he stops running it keeps going for 2 seconds, then fades out, and if he runs again within 10 seconds it carries on where it was. He has no Walkman key: it is on. A server can give him another song (`speed.ogg` in the world's music folder), and you can play your own (`speed.mp3` in `config/enhanced/music/`). See [Music](Music).
 
@@ -32,6 +38,8 @@ Tommy has a Walkman of his own, with **his own theme, *Westview Blur***: bright,
 Tommy does not fly. The Dash Strike and the Sonic Boom hurt players only with PvP on.
 
 ## Looks
+
+![A speed run at sunset](images/019-tommy-speed-run-sunset.png)
 
 *Halloween* (his WandaVision costume, a mini-Quicksilver: silver hair teased up, a blue tee with a silver lightning bolt), *Battle of Westview* (the green track jacket), *Speed* (the comics costume, green and white with amber goggles), and *Your own skin*. Press **H** to switch. See [Looks](Looks).
 

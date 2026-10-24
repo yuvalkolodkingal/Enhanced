@@ -4,6 +4,8 @@ A glass vial of glowing blue serum in a steel cage (3.8): Dr. Erskine's formula 
 
 Hebrew: [עברית](Super-Soldier-Serum-HE)
 
+![Captain America and the Vibranium Shield](images/070-captain-america-vibranium-shield.png)
+
 ## The quick version
 
 * **Where:** in the **lab** of the [Avengers Tower](Structures#avengers-tower), on the workbench between the brewing stands, in a glass **Tech Case** with the sign "Project Rebirth". Right-click the case: one serum for each player.
@@ -58,6 +60,8 @@ When you choose:
 
 ## Why is Falcon locked?
 
+![Falcon and Redwing](images/071-falcon-exo-wings-redwing.png)
+
 Sam Wilson is not a super-soldier: his wings are his power. So the serum's Falcon card **needs the wings**: it is grey with a padlock and says **"Needs the Falcon Exo-Wings (the top of the Avengers Tower)."** until you carry a pair of **Falcon Exo-Wings** anywhere: in your inventory, in your off hand or on your chest.
 
 The wings are in the **observation deck**, the highest room of the [Avengers Tower](Structures#avengers-tower), in a Tech Case between two end rods, with the sign "FALCON / Exo-Wings". One pair for each player. Take them, use the serum again, and the Falcon card is open.
@@ -84,6 +88,8 @@ Dying, logging out or changing dimension forgets an open choice. Spectators can'
 `/enhanced serum open <player>` opens the choice for a player without any serum: nothing is used up. See [Commands](Commands#the-avengers-38).
 
 ## The advancement
+
+![Captain America at a Hydra outpost](images/069-captain-america-hydra-outpost.png)
 
 **Super-soldier** ("Find a Super Soldier Serum") is the first advancement of the new **Avengers** tab.
 

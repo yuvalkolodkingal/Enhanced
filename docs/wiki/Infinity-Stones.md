@@ -4,6 +4,8 @@ The six Infinity Stones of the films (3.6) are real items now: the **Space**, **
 
 Hebrew: [עברית](Infinity-Stones-HE)
 
+![The Infinity Stones](images/114-infinity-stones.png)
+
 ## The quick version
 
 * **Where:** Reality in [Asgard](Asgard)'s vault; Mind inside **Loki's Scepter** (from a Hydra outpost); Space inside the **Tesseract** (Avengers Tower); Time in the **Sanctum Sanctorum**; Power in **the Orb**, in an **End tunnel**; Soul at the **Vormir Cliff** in the Nether, for a sacrifice ([Vormir](Vormir)): anyone can earn it there (3.6.1); one who may not hold it bare finds it on a pedestal by the pool, held for him.
@@ -54,6 +56,8 @@ The Time Stone **answers only a sorcerer**. Thor, Heimdall, Odin, Hela and the P
 
 ## The vessels
 
+![The Scepter and the Tesseract](images/115-artifacts-scepter-tesseract.png)
+
 The vessels let other heroes, and players with no power, use three of the stones. They never burn anyone.
 
 | Vessel | Stone | Who can use it | How |
@@ -76,6 +80,8 @@ The vessels let other heroes, and players with no power, use three of the stones
 Someone has to hold the Time Stone to craft the Eye, so a god, the Scarlet Witch, the Phoenix or a sorcerer makes it, and can give it to a friend with no power. The Eye shares the Time Stone's cooldown: its sweep on the hotbar shows when it is ready again.
 
 ## What each stone does
+
+![The Space Stone in the inventory](images/113-ultron-inventory-space-stone.png)
 
 Every stone has its own cooldown, shared by its two uses, and costs a little hunger (with an empty food bar it does nothing). A hand held by Billy's Freeze, a body turned to stone, the Time Lock or Mjolnir's pin can't use a stone ("The stones will not answer while you are held"). A switch that is on (Slow Time) can always be turned off. Only one beam or drain at a time.
 

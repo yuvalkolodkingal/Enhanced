@@ -41,6 +41,8 @@
 
 ## אסגרד: /enhanced asgard
 
+![ארמון אסגרד](images/092-asgard-palace.png)
+
 (3.5) בשביל [אסגרד](Asgard-HE):
 
 | פקודה | מה היא עושה |
@@ -54,6 +56,8 @@
 
 ## מוזיקה: /enhanced music
 
+![ריצת מהירות על פני המפה](images/018-tommy-speed-run.png)
+
 (3.5) בשביל [המוזיקה של העולם עצמו](Music-HE#המוזיקה-של-העולם-עצמו-שרתים), השירים שבתיקייה `<world>/serverconfig/enhanced/music/`:
 
 | פקודה | מה היא עושה |
@@ -62,6 +66,8 @@
 | `/enhanced music list` | מראה את התיקייה, כל שיר (הגודל ותחילת ה-hash שלו) וכל קובץ שלא נכלל, עם הסיבה (לא Ogg Vorbis, גדול מדי, שם לא מוכר, ריק). |
 
 ## מבנים: /enhanced structure
+
+![בקתה על דרך המכשפות](images/043-witches-road-cabin.png)
 
 | פקודה | מה היא עושה |
 |---|---|
@@ -77,6 +83,8 @@
 
 ## הנוקמים (3.8)
 
+![מגדל הנוקמים מבחוץ](images/085-avengers-tower-exterior.png)
+
 | פקודה | מה היא עושה |
 |---|---|
 | `/enhanced serum open <player>` | פותחת את הבחירה של [סרום חייל העל](Super-Soldier-Serum-HE) לשחקן שלא מחזיק סרום: קפטן אמריקה, האלק האדום או פלקון (פלקון עדיין רק עם כנפי האקסו). שום דבר לא נגמר. "נפתחה בחירת הסרום בשביל Eilon." |
@@ -86,6 +94,8 @@
 `/enhanced structure refit_tower` (למעלה) משדרגת מגדל נוקמים ישן. את החליפות של איירון מן, הכורים, הסרום, המגן והכנפיים אפשר לתת גם עם `/give` (`enhanced:iron_man_mark_85`, `enhanced:arc_reactor`, `enhanced:special_soldier_serum`, `enhanced:vibranium_shield`, `enhanced:falcon_exo_wings`...).
 
 ## קסם בנייה: /enhanced build
+
+![קסם בנייה: הרמזים במסך](images/006-scarlet-witch-build-magic.png)
 
 פקודות `build` הן למפעיל שדואג לבונים: הן משתמשות באותם כללים בטוחים כמו ה-Ctrl + Z של הגיבורים עצמם. `rank`, `meter`, `forget` ו-`stop <player>` נותנות שם של שחקן **מחובר** (כמו ב-`/tp`). `undo` ו-`history` מקבלות גם שחקן **שאינו מחובר**: נותנים שם שהשרת הכיר (הוא ב-`usercache.json` שלו) או מדביקים את ה-UUID שלו; כל דבר אחר נדחה. ההיסטוריה שלו נקראת מהדיסק בפעם הראשונה שמבקשים אותה, והפרופיל שלו פועל במקומו, כך שהוא לא צריך להיות שם. ההיסטוריה עצמה בדיסק, וצעד שכבר לא בזיכרון נקרא בחזרה לפי הצורך.
 

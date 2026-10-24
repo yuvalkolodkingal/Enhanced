@@ -6,6 +6,8 @@ Hebrew: [עברית](Thanos-HE)
 
 This page is about fighting him. The first thing to know: the fight is on a **clock**. He starts with one Infinity Stone, and **every 90 seconds of fighting he takes another**, up to five. Every stone gives him new moves, and he never gets the sixth, the Mind Stone: it is not in his hand.
 
+![Thanos's armour](images/105-thanos-armour.png)
+
 ## Calling him
 
 Hold **the Tesseract in one hand and Loki's Scepter in the other** (either hand) and **hold right-click for five seconds**. A spiral of the Space Stone's blue and another of the Mind Stone's gold rise round you, a bell tolls every second and the action bar counts the stones. Let go, swap an item out of a hand, or die, and it is cancelled. **Neither item is used up**, ever.
@@ -37,6 +39,8 @@ An operator can call him anywhere with `/enhanced boss start thanos force` (see 
 
 ## The clock of stones
 
+![A Thanos stone site](images/104-thanos-stone-site.png)
+
 | Stone | When (of combat) | Colour | New moves |
 |---|---|---|---|
 | **Power** | at the start | purple | Power Blast, Overload, Titan Shockwave, Power Pulse |
@@ -51,6 +55,8 @@ An operator can call him anywhere with `/enhanced boss start thanos force` (see 
 * Every stone after the first makes everything he does **6 percent** stronger, and he rests a little less between moves.
 
 ## His moves
+
+![The End stone site](images/106-the-end-stone-site.png)
 
 Every move has a **tell**: a ring on the ground, a line from his hand, a glow. Watch for it. The numbers are damage at the default settings.
 
@@ -85,6 +91,8 @@ Every move has a **tell**: a ring on the ground, a line from his hand, a glow. W
 * Nobody is forced to stay: there are no walls round the arena, and **the world is never changed** (no block is ever broken or placed, unless the server turned *blockDamage* on).
 
 ## What you see and hear
+
+![The End stone site, second view](images/107-the-end-stone-site-2.png)
 
 * **The bar** shows his health in the colour of his newest stone, a gold tick where each armour plate will break, and under it six sockets: a lit gem for each stone he holds, a ring filling toward the next ("Space Stone in 0:42"), and a dark socket outlined in yellow that never fills.
 * **Every move shows itself first**: a ring closing on the ground where it will land, a line from his hand that whitens as the aim locks, a portal, a falling star. The colour is the stone's: gold for the sword and the fist, purple for Power, blue for Space, red for Reality, orange for Soul, green for Time.

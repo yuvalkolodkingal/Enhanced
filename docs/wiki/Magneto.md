@@ -2,7 +2,7 @@
 
 The Master of Magnetism. He lifts anything with metal in it, tears metal blocks out of the ground, pulls the metal out of everything around him (the ore in the rock included) into his inventory, fires a machine-gun stream of iron shrapnel, strips his enemies of their armor and weapons, and catches arrows in mid-air. In the X-Men films his power has no glow at all: metal just moves, and so it does here.
 
-![Magneto](images/magneto.png)
+![Magneto's magnetic shield](images/013-magneto-magnetic-shield.png)
 
 ## Becoming Magneto
 
@@ -44,9 +44,6 @@ While the helmet is worn by Magneto:
 * **Launch:** launched targets fly at high speed (2.6 blocks per tick by default). When they slam into a wall or the floor they take heavy impact damage (up to 16) and hurt any creature they crash into (up to 6 damage).
 * One target at a time. The hold breaks automatically if the target dies, leaves the dimension or gets more than 48 blocks away, or when a held Vision phases. A held *player* is released after 30 seconds, so nobody is trapped forever. **With PvP off (or a teammate), a player or someone's pet you let go of or throw is not hurt by the fall or the landing**, and you cannot grab the same player again for 3 seconds (this is so for every telekinesis, Wanda's, Billy's and the Phoenix's too).
 * **Bosses.** Ultron, Thanos and Apocalypse can be held as bosses, **1.5 times as long as Wanda holds them**: 4.5 seconds for Ultron's bodies (vibranium is metal), 3 seconds for Thanos, 4.5 for Apocalypse while he wears his armor (never while his shield is up, and not in his true form). Then they break free and nobody can hold them again for 12 seconds. **Thanos's sword in flight can be caught, and it tears free after 3 seconds.** The Wither, the Warden, the Elder Guardian and the Ender Dragon are not metal. See [Ultron](Ultron), [Thanos](Thanos) and [Apocalypse](Apocalypse).
-
-![Magneto lifting an Iron Golem](images/magneto-telekinesis.png)
-
 ### The Magnetic Pull (Sneak + R)
 
 **When R isn't holding anything, press Sneak + R.** Magneto's arms fly wide, then his fists come in to his chest. A ring spreads out 8 blocks round him, and everything metal there flies to his hand along lines of force and goes **straight into his inventory** (what doesn't fit drops at his feet). "The metal comes to you (23)."
@@ -98,9 +95,6 @@ While the helmet is worn by Magneto:
 * A copy of Loki **dissolves**: there is no real metal on it. What a creature never drops (the Horsemen's iron) **crumbles** instead of falling.
 * **On Thanos** it wrenches off one plate of his gold armor (at most once in 6 seconds, like a slam; never while he arrives or dies).
 * Cooldown: 3 seconds.
-
-![Ripping a zombie's iron gear off](images/magneto-disarm.png)
-
 ### 4. Magnetic Shield
 
 * Toggle on and off. While it is on it works automatically.
@@ -121,5 +115,3 @@ While the helmet is worn by Magneto:
 ## Numbers you can change
 
 Server owners can change Magneto's flight speed, telekinesis range, throw speed, shrapnel damage, piercing and fire rate, the strip's range and cooldown, the shield's reflect chance, how far and how hard a metal block R tears out, and every number of the Magnetic Pull: its radius, how many things it takes and how fast, its recharge and hunger, the cone, and whether it takes from storage and from players. They are the `magneto.*` options on [Server Configuration](Server-Configuration). Which items and blocks count as metal is decided by datapack tags, described there too. Build Magic's `build_magic.allArenasProtected` and `build_magic.hexIsAClaim` also decide where the pull may work.
-
-![Magneto's abilities on the HUD](images/magneto-back.png)

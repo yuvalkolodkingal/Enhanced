@@ -4,7 +4,11 @@ Agatha Harkness, the witch of *WandaVision* and *Agatha All Along*: "it was Agat
 
 Hebrew: [עברית](Agatha-HE)
 
+![Agatha's cottage](images/037-agatha-cottage.png)
+
 ## Becoming Agatha
+
+![Agatha and Nicky](images/038-agatha-and-nicky.png)
 
 1. Get the **Darkhold**. It is crafted (netherite scrap, a wither rose, echo shards, a book and a wither skeleton skull): the recipe is on [Items and Crafting](Items-and-Crafting#darkhold) and [The Sorcerers' Books](Sorcerers-Books#the-darkhold).
 2. With **no power**, hold it and **hold right-click (use) for 3 seconds**. Violet motes spiral into you and the book's whispers rise. Let go early and nothing happens: the whispers fade with a sigh.
@@ -58,6 +62,8 @@ Press **H** to switch. See [Looks](Looks).
 Agatha is a sorceress: she may hold and use the **Time Stone** (Slow Time; Sneak: Rewind; on a crop it grows), and the **Eye of Agamotto** gives her the same powers. The other stones are too strong for her. The **Sling Ring** answers her too. See [Infinity Stones](Infinity-Stones) and [Doctor Strange](Doctor-Strange#the-eye-for-everyone-else).
 
 ## Agatha's Cottage (3.7)
+
+![The cottage garden](images/040-agatha-cottage-garden.png)
 
 In the woods stands [Agatha's Cottage](Agathas-Cottage), where Agatha lives happily with her son **Nicky** and **Rio, the Green Witch**. There is only one Agatha: **while you are Agatha**, the cottage's Agatha is away on the Road, and Nicky runs to you: "Mom! You're home!" The cottage's cellar has a Witches' Road door, and Agatha's study chest always holds a Darkhold.
 

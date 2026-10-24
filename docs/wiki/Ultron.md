@@ -2,6 +2,8 @@
 
 The artificial intelligence that woke up inside the Mind Stone and decided that peace meant a world without people. *"I'm here to help."* In Enhanced Ultron is two things. He is a **boss**, the biggest fight in the mod: a flying robot with five attacks you can see coming, an army of Sentries, a piece of ground that tears loose and rises into the sky, and a body that is replaced every time you destroy it. And for the players who beat him he is a **hero**: plasma from the fingertips, flight on anti-gravity palms, gravity that pulls and slams, uploads into drones, and an army of Sentries of your own. There is no other way to become Ultron.
 
+![Ultron's sentry army](images/111-ultron-sentry-army.png)
+
 ## The quick version
 
 * **Wake him.** Craft the **Ultron Program**, hold it in one hand and **Loki's Scepter** in the other, look at open, level ground and **Sneak + right-click**. Scrap spirals up out of the ground and in six seconds Ultron stands there among six Sentries. (**Sneak** is the Shift key, unless you changed it.)
@@ -60,6 +62,8 @@ Nothing built on the ground is a problem, and nothing built there is touched: se
 Operators can start a fight without the Program or the Scepter: [Commands](Commands).
 
 ## The fight
+
+![Ultron's army](images/112-ultron-army.png)
 
 ### The shape of the fight
 
@@ -178,6 +182,8 @@ From the ritual until the fight is over, the arena (the island, the pit and the 
 | **Phoenix** | Cannot read or control the bodies, but she can possess a Sentry for 15 seconds (it still counts as alive). |
 
 ## Ultron's Core
+
+![The Space Stone in the inventory](images/113-ultron-inventory-space-stone.png)
 
 *"The heart Wanda tore out. It still hums."* When Ultron is destroyed, **every fighter** who was there for at least **60 seconds** and hurt him or his Sentries gets one **Ultron's Core**, and so does whoever struck the last blow, whatever their time or damage. Each also gets 1,500 experience points. Creative players do not get one (unless the server turns on `boss.creativeGetsReward`), and Spectators never do.
 

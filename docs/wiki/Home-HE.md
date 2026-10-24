@@ -8,12 +8,14 @@
 
 English: [Home](Home)
 
+![כל הגיבורים במסדר אחד](images/000-enhanced-heroes-roster.png)
+
 | | | |
 |---|---|---|
-| ![מגנטו](images/magneto.png) | ![מכשפת השני](images/scarlet-witch.png) | ![ההקס](images/hex.png) |
+| ![מגנטו](images/013-magneto-magnetic-shield.png) | ![מכשפת השני](images/001-scarlet-witch-flight-avengers-tower.png) | ![ההקס](images/005-scarlet-witch-hex-barrier.png) |
 | מגנטו | מכשפת השני | ההקס |
-| ![קוויקסילבר](images/quicksilver.png) | ![ויז'ן](images/vision.png) | ![קוויקסילבר רץ](images/quicksilver-run.png) |
-| קוויקסילבר | ויז'ן | זמן קוויקסילבר |
+| ![קוויקסילבר](images/014-quicksilver-mutant-school.png) | ![ויז'ן](images/008-vision.png) | ![וולברין](images/051-wolverine-adamantium-claws.png) |
+| קוויקסילבר | ויז'ן | וולברין |
 
 ## הגיבורים
 

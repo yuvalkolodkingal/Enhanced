@@ -15,6 +15,8 @@ The mod has no server option for anything that is not listed here. Everything el
 
 ## Magneto
 
+![Magneto's magnetic shield](images/013-magneto-magnetic-shield.png)
+
 Section `[magneto]`. The hero's page is [Magneto](Magneto).
 
 | Option | Default | Allowed values | Meaning |
@@ -52,6 +54,8 @@ Section `[magneto]`. The hero's page is [Magneto](Magneto).
 | `magneto.telekinesisPlayerRegripTicks` | `60` | 0 to 1200 | Every telekinesis: after letting go of a player, the same hero cannot grip that player again for this many ticks (60 = 3 seconds). |
 
 ## Scarlet Witch (and the Hex)
+
+![The Hex Barrier around Wanda](images/005-scarlet-witch-hex-barrier.png)
 
 Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 
@@ -95,6 +99,8 @@ Section `[hex_vision]`. When Wanda raises a Hex, a Vision appears to fight at he
 
 ## Hex Runes
 
+![Scarlet Witch and Vision in the Hex](images/004-scarlet-witch-and-vision-the-hex.png)
+
 Section `[hex_runes]` (3.3). The page is [Scarlet Witch](Scarlet-Witch#hex-runes): from her Hex Control screen the Scarlet Witch inscribes runes on the four walls of her Hex, and while they glow every other sorcerer inside it (Agatha, Loki, Billy, another Scarlet Witch, and anyone holding the Darkhold or the Book of the Vishanti) cannot use powers.
 
 | Option | Default | Allowed values | Meaning |
@@ -105,6 +111,8 @@ Section `[hex_runes]` (3.3). The page is [Scarlet Witch](Scarlet-Witch#hex-runes
 
 ## Vision
 
+![Vision](images/008-vision.png)
+
 Section `[vision]`. The hero's page is [Vision](Vision).
 
 | Option | Default | Allowed values | Meaning |
@@ -113,6 +121,8 @@ Section `[vision]`. The hero's page is [Vision](Vision).
 | `vision.mindStoneBeamDamage` | `6.0` | 0.0 to 100.0 | Damage per hit of the Mind Stone beam (two hits per second at most). The beam's range is `scarlet_witch.chaosBeamRange`. |
 
 ## Quicksilver
+
+![Quicksilver at the Mutant School](images/014-quicksilver-mutant-school.png)
 
 Section `[quicksilver]`. The hero's page is [Quicksilver](Quicksilver).
 
@@ -125,6 +135,8 @@ Section `[quicksilver]`. The hero's page is [Quicksilver](Quicksilver).
 | `quicksilver.actionSpeed` | `4.0` | 1.0 to 10.0 | While Quicksilver Time or Super Speed is on he mines, attacks, eats, drinks, draws bows, loads crossbows, swims and places blocks this many times as fast (4.0 = four times as fast). |
 
 ## Billy (Wiccan)
+
+![Billy, first look](images/020-billy-look-1.png)
 
 Section `[billy]`. The hero's page is [Billy](Billy-and-the-Witches-Road). His block lifting (3.1), his Hex Beam and his Hex Barrier (3.2) are here; his Build Magic numbers are in [Build Magic](#build-magic).
 

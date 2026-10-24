@@ -4,6 +4,8 @@ Eilon's idea (3.7): **you must already have one Infinity Stone.** The **Stone Lo
 
 Hebrew: [עברית](Stone-Locator-HE)
 
+![The Infinity Stones](images/114-infinity-stones.png)
+
 ## The quick version
 
 * **Craft it** with 4 netherite blocks, 3 diamond blocks, a wither skeleton skull and **an Infinity Stone in the middle**. **The stone comes back** to you.
@@ -12,6 +14,8 @@ Hebrew: [עברית](Stone-Locator-HE)
 * **It spins** when what you look for isn't in this world. See [why](#why-is-it-spinning).
 
 ## The recipe
+
+![Books in item frames](images/116-item-frames-books.png)
 
 ```
 N K N
@@ -32,6 +36,8 @@ S = an Infinity Stone, or a stone's vessel
 **Anyone** may hold and use the Locator: the stone's energy is in the device now. It doesn't stack, and it doesn't burn.
 
 ## What it points to
+
+![The Scepter and the Tesseract](images/115-artifacts-scepter-tesseract.png)
 
 **The stones you haven't got.** A stone counts as *got* when you **carry** it, in any form: the bare stone, in a Gauntlet, in its vessel, inside the Orb. The four stones of the sites (Reality, Time, Power, Soul) also count as got when the server's [ledger](Infinity-Stones#how-many-stones-the-ledger) **won't give it to you again** (you took that one before). Of the ones you lack, the needle points to the **nearest site**.
 

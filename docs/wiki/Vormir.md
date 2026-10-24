@@ -4,6 +4,8 @@ The Soul Stone (3.6) is not found in a chest or on a pedestal. As on Vormir in *
 
 Hebrew: [עברית](Vormir-HE)
 
+![The End stone site](images/106-the-end-stone-site.png)
+
 ## The quick version
 
 * **Where:** a **Vormir Cliff**, a tall pinnacle of blackstone and basalt in a **soul sand valley** or the **basalt deltas** of the Nether. `/locate structure enhanced:vormir_cliff` finds one.
@@ -22,6 +24,8 @@ A pinnacle of blackstone and basalt rises from the floor of a great Nether caver
 
 ## The Stonekeeper
 
+![The End stone site, second view](images/107-the-end-stone-site-2.png)
+
 A hooded figure in a ragged dark robe, floating a little over the summit floor, his eyes glowing under the hood. He can't be hurt, pushed or moved; he is always put back in his place. Right-click him and he speaks, three lines:
 
 1. "Welcome to the summit. I am the keeper of the stone."
@@ -31,6 +35,8 @@ A hooded figure in a ragged dark robe, floating a little over the summit floor, 
 His third line tells you if something is wrong, or what to know: "Your hands cannot hold it bare. Pay the price, and it will wait for you here." (you are not a Bearer: you can still earn it, see below), "You already carry a soul.", "The stone has been taken.", "The stone sleeps. No soul is asked of you today." (the sacrifice is switched off), "One who cannot fall cannot give to the fall." (Creative), "Only a creature you love may be given here." (players can't be given on this server), "Here no one may harm another. The stone stays where it is." (PvP is off).
 
 ## The sacrifice, step by step
+
+![A Thanos stone site](images/104-thanos-stone-site.png)
 
 1. **Go up** to the summit with the one you will give: a friend, or a tamed pet of yours (a wolf, a cat, a parrot, a horse...).
 2. **They stand on the edge**: on the low lip itself, or the strip behind it.

@@ -4,6 +4,8 @@ Thaddeus "Thunderbolt" Ross as the Red Hulk of *Captain America: Brave New World
 
 Hebrew: [עברית](Red-Hulk-HE)
 
+![Red Hulk](images/063-red-hulk.png)
+
 ## The quick version
 
 * **How:** use a **[Super Soldier Serum](Super-Soldier-Serum)** (in the lab of the Avengers Tower) and choose **Red Hulk**.
@@ -31,6 +33,8 @@ Only as Red Hulk, not as Ross:
 
 ## Anger
 
+![Red Hulk's anger burst](images/068-red-hulk-anger-burst.png)
+
 His **Anger** goes from 0 to 100, and everyone can see it: his skin's cracks glow brighter as it rises, steam pours off his shoulders from 75, and from 90 he pulses with heat.
 
 * **It fills** when he is hurt (**3 for each health** he loses) and when he hurts someone (**1 for each health** he deals); the Roar adds 10, and the Energy Absorb 2 for each health it soaks.
@@ -39,6 +43,12 @@ His **Anger** goes from 0 to 100, and everyone can see it: his skin's cracks glo
 * **Ross** gets angry too, at half the rate, and at 100 **he turns into Red Hulk** (if there is room) instead of bursting.
 
 ## Abilities
+
+![Red Hulk's ground smash](images/064-red-hulk-ground-smash.png)
+
+![Red Hulk's leap](images/065-red-hulk-leap.png)
+
+![Red Hulk's heat wave](images/067-red-hulk-heat-wave.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
@@ -51,6 +61,8 @@ His **Anger** goes from 0 to 100, and everyone can see it: his skin's cracks glo
 With PvP off, his abilities don't hurt players. Everything he pushes at the edge of the [Vormir Cliff](Vormir) counts as his push.
 
 ## Looks
+
+![Red Hulk, close up](images/066-red-hulk-close-up.png)
 
 | Look | Id | What it is |
 |---|---|---|

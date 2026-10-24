@@ -4,6 +4,8 @@ The **Hero Creator** is a Creative-mode item that opens a screen where you can *
 
 Hebrew: [עברית](Hero-Creator-HE)
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## What's new in 3.8
 
 * **Captain America, Red Hulk, Iron Man, Falcon and Love**: their twenty-seven abilities are cards, and so are their eighteen Sneak variants (Ricochet Throw, Super-Soldier Leap, Shield Bash, Inspire, Flip Kick; Grab & Slam, Roar, Bound, Energy Absorb; Energy Blades, Lightning Refocuser, Nanotech Drones; Wrist Rocket, Boost Climb, Wing Slash, Redwing Strike; Thunder Strike, Bifrost to where you look): **221 cards** in all. Ready-made heroes: *Captain America-like*, *Red Hulk-like*, *Iron Man-like*, *Falcon-like* and *Love-like*.
@@ -62,6 +64,8 @@ Hebrew: [עברית](Hero-Creator-HE)
 * Right-click it to open the screen. Its first page has three big buttons: **Choose a Hero**, **Create My Hero** (**Edit My Hero** once you are one) and **Stop Being a Hero**.
 
 ## Choose a Hero
+
+![Scarlet Witch flying past the Avengers Tower](images/001-scarlet-witch-flight-avengers-tower.png)
 
 A card for every hero of the mod, with the hero's face drawn from its skin (scroll for more). Click a hero to see its looks, pick one and press **Become!**: you are that hero at once, with the title and the announcement, as if you had earned it. A server can turn this page off (`custom_hero.allowChooseExisting`). Between two heroes made or chosen you wait 2 seconds (`custom_hero.applyCooldownTicks`).
 

@@ -2,6 +2,8 @@
 
 The God of Thunder. *"Whosoever holds this hammer, if he be worthy, shall possess the power of Thor."* Thor throws Mjolnir and calls it back, flies by spinning it, fires lightning from his hand (twice as strong through Mjolnir, stronger still through Stormbreaker), shatters Mjolnir into fragments that strike his enemies, and opens the Bifrost to take himself, or anyone who holds his weapons, anywhere in any dimension. With Mjolnir he can also pin someone down.
 
+![Thor's lightning](images/026-thor-lightning.png)
+
 ## The quick version
 
 Three tricks, in plain words. (**Sneak** is the Shift key, unless you changed it. Everyone nearby sees all three.)
@@ -11,6 +13,8 @@ Three tricks, in plain words. (**Sneak** is the Shift key, unless you changed it
 * **Sneak + right-click a creature or player with Mjolnir: pin them down.** You put Mjolnir on their chest and they are stuck: they can't walk, jump, fly or teleport, but they can still look around. To let them go, right-click them again (without Sneak). Only Mjolnir's owner can pin someone, and only its owner can lift it off again. It lets go by itself after a minute. The big bosses can't be pinned.
 
 ## Mjolnir
+
+![Thor at the Shrine of Eternity](images/025-thor-eternity-shrine.png)
 
 **Forging Mjolnir.** "Forged in the heart of a dying star, from the sacred metal of Uru":
 
@@ -129,10 +133,16 @@ Both are drawn big, as in the films, wherever you see them: in Thor's fist, in f
 
 ## The Asgardian body
 
+![Thor in flight, second look](images/028-thor-flight-look-2.png)
+
+![Thor in flight, third look](images/029-thor-flight-look-3.png)
+
 * **Max health 30** (15 hearts), **6 armor**, half knockback.
 * Lightning never hurts or burns Thor. With Mjolnir or Stormbreaker in hand he takes no fall damage.
 
 ## Abilities
+
+![Thor in flight](images/027-thor-flight.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|
@@ -145,6 +155,8 @@ Both are drawn big, as in the films, wherever you see them: in Thor's fist, in f
 All of Thor's lightning is the MCU's: a white-hot core, electric blue and a deep blue halo.
 
 ## The Bifrost and its saved places
+
+![The Bifrost bridge](images/089-heimdall-bifrost-bridge.png)
 
 * **The Bifrost answers the weapon, not the power.** Thor calls it with **N**. Anyone else holding **Mjolnir or Stormbreaker** calls it by **using the weapon** (right-click). With neither in hand it doesn't come. Since 3.5 it answers **Hofund** (anyone's), the owner of a **Gungnir**, and the heroes [Heimdall](Heimdall) and [Odin](Odin) too: see [Asgard](Asgard#the-keys-of-the-bifrost).
 * **The Bifrost screen** shows:

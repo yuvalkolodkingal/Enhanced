@@ -4,6 +4,8 @@
 
 קוד המקור של המוד נמצא ב-[github.com/yuvalkolodkingal/enhanced](https://github.com/yuvalkolodkingal/enhanced). זה מוד של NeoForge 1.21.1 שכתוב בג'אווה 21 ונבנה עם Gradle.
 
+![כל הגיבורים במסדר אחד](images/000-enhanced-heroes-roster.png)
+
 ## מה צריך
 
 * **ג'אווה 21** (JDK).

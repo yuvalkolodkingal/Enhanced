@@ -4,6 +4,8 @@ Eilon's request (3.7): **"Every time you die, you meet Death, and she lets you s
 
 Hebrew: [עברית](Meeting-Death-HE)
 
+![The screen when you meet Death](images/042-rio-vidal-death-screen.png)
+
 ## The screen
 
 When you die, the screen fades into a **green clearing**: vines overhead, grass and little flowers underfoot, mist drifting by, leaves and petals falling (never on her: the grass at her feet has no flowers, and the petals fade away before they reach her, 3.8.2). **Rio** stands on the left, tall and calm, her eyes following your mouse, **in her Death look** (3.7.2): a dark green-black gown with leaves and veins of decay in the cloth and a ragged hem of dead leaves, a long hood that frames her pale face and dark lips and falls down her back, and over the hood a **crown of thin dark branches** with a few dead leaves, as the Green Witch is when she is Death. **She wears no flowers** (3.8.2, Eilon: "in the series she had no flowers"): the crown's tips are dead twigs, not pale blossoms, and her look is all dark green-black, moss and dead leaves. At home in [Agatha's Cottage](Agathas-Cottage) she keeps her gardener's clothes. On the right:
@@ -16,6 +18,8 @@ When you die, the screen fades into a **green clearing**: vines overhead, grass 
 Nothing scary, nothing gory. As on the usual screen, the buttons wake after a second (so a click meant for the fight doesn't choose for you) and **Esc** doesn't close it. Her soft harp of blessing plays when she appears.
 
 ## The two roads
+
+![A cabin on the Witches' Road](images/043-witches-road-cabin.png)
 
 | Road | Where you wake |
 |---|---|

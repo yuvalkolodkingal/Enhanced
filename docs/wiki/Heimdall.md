@@ -4,6 +4,8 @@ The Guardian of the Bifrost (3.5), as in the *Thor* films: he stands in his Obse
 
 Hebrew: [עברית](Heimdall-HE)
 
+![Heimdall](images/088-heimdall.png)
+
 ## The quick version
 
 * **How:** go to [Asgard](Asgard), talk to Heimdall in the Observatory and **Take the Watch**: find and strike seven Shadows of Hela in the city in three minutes. Win, and he gives you **Hofund**. With no power, **hold your own Hofund** and you become Heimdall.
@@ -23,6 +25,8 @@ Hebrew: [עברית](Heimdall-HE)
 
 ## Two guardians: Heimdall's post (3.5.1)
 
+![Heimdall's dialogue](images/087-heimdall-dialogue.png)
+
 There is one of each character in Asgard (see [Asgardians](Asgardians#one-of-each-character)), but **Heimdall is the exception**: when you are Heimdall, the Heimdall of the Observatory **stays**, and shares his watch with you.
 
 * **When:** the first time you come near him as Heimdall (within 6 blocks), and again whenever you talk to him after that, he **hands you his post**: "We are both guardians of Asgard. Keep the Bifrost for me a while: my socket answers to you now. I will rest my eyes over there."
@@ -36,6 +40,8 @@ There is one of each character in Asgard (see [Asgardians](Asgardians#one-of-eac
 * One keeper at a time: a second Heimdall waits until the post is free.
 
 ## Hofund
+
+![The Bifrost bridge](images/089-heimdall-bifrost-bridge.png)
 
 Heimdall's sword: a long golden broadsword.
 
@@ -51,6 +57,8 @@ Heimdall's sword: a long golden broadsword.
 * He doesn't fly; the Bifrost is how he travels.
 
 ## Abilities
+
+![Odin and Heimdall at the Bifrost observatory](images/086-odin-and-heimdall-bifrost-observatory.png)
 
 | # | Key | Ability | How it works |
 |---|---|---|---|

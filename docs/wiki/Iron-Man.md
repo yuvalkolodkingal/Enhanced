@@ -4,6 +4,8 @@ Tony Stark (3.8): a genius whose power is his **suits**. Press an **Arc Reactor*
 
 Hebrew: [עברית](Iron-Man-HE)
 
+![Iron Man's suits on display at the Avengers Tower](images/074-iron-man-suit-display-avengers-tower.png)
+
 ## The quick version
 
 * **Become Iron Man:** take an **Arc Reactor** from Tony's desk in the tower's workshop and **hold right-click for 2 seconds**: it goes into your chest. (Or wear the **Nano Arc Reactor** on your chest.) Your old hero is replaced.
@@ -14,6 +16,8 @@ Hebrew: [עברית](Iron-Man-HE)
 * Without a suit, Tony has no powers: "You need a suit."
 
 ## Becoming Iron Man: the Arc Reactors
+
+![The Avengers Tower from outside](images/085-avengers-tower-exterior.png)
 
 There are two reactors. Both are on **Tony's desk** in Iron Man's workshop, each in a glass **Tech Case** behind the sign "Arc Reactors": right-click a case to take it (one of each for each player).
 
@@ -41,6 +45,10 @@ N = Nether Star        E = Echo Shard
 
 ## The six suits
 
+![The suit display, second view](images/075-iron-man-suit-display-2.png)
+
+![Iron Man's workshop](images/076-iron-man-workshop.png)
+
 Every suit stands on a **Suit Display** in Iron Man's workshop (the floor whose door says **IRON MAN workshop**): the Mark 1, 3, 5, 50 and 85 in a row along the north wall under their signs, the Hulkbuster in its own bay south of the desk. **Right-click a display**: its suit is yours, **one of each per player** ("You already took the Mark 3 from this display."). The suit stays on show for the next player.
 
 | Suit | How it is worn | Armour | Flight | Its moves |
@@ -59,6 +67,8 @@ Every suit stands on a **Suit Display** in Iron Man's workshop (the floor whose 
 * Suits, housings and reactors are items: they drop when you die, under the usual rules.
 
 ## H: suiting up
+
+![The Hulkbuster suit](images/077-iron-man-hulkbuster.png)
 
 For Iron Man the Change Look key, **H**, is the suit key:
 
@@ -103,6 +113,10 @@ One **blue bar** (0 to 100) for all your suits (it is the reactor's charge, so i
 
 ## Flight
 
+![Iron Man in flight](images/080-iron-man-flight.png)
+
+![The Hulkbuster in flight](images/084-iron-man-hulkbuster-flight.png)
+
 Press **G** (or double-tap Space) in a suit that flies: the Mark 3, 5, 50, 85 and the Hulkbuster. You hover upright with your palms down, and fly fast lying flat with your arms along your body, with blue-white flames from your palms and boots that everyone sees, and the soft roar of the thrusters.
 
 | Suit | Speed | Energy a second |
@@ -116,6 +130,14 @@ Press **G** (or double-tap Space) in a suit that flies: the Mark 3, 5, 50, 85 an
 A suit **won't fly** when: it is the **Mark 1** (its G is the Rocket Boost); it doesn't work (no reactor, broken, or a nanotech suit without the Nano Arc Reactor on your chest); a suit-up is playing; the **energy is empty**; or you are bracing (Mark 1), holding a creature (Hulkbuster) or charging the Nano Cannon (Mark 50).
 
 ## The moves of each suit
+
+![The repulsor beam](images/081-iron-man-repulsor-beam.png)
+
+![The defence shield](images/082-iron-man-defence-shield.png)
+
+![The Hulkbuster suit, second view](images/083-iron-man-hulkbuster-suit.png)
+
+![The Hulkbuster, close up](images/079-iron-man-hulkbuster-close-up.png)
 
 The damage of every move goes only to creatures it may hurt (with PvP off, never to players). Small booms **never break blocks** (unless a server allows it: `iron_man.boomsBreakBlocks` with `mobGriefing`).
 

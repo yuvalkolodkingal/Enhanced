@@ -2,7 +2,7 @@
 
 Wanda Maximoff. Chaos magic in a crimson tangle of energy, with hot pink highlights and eyes that glow red: a beam, a shield, telekinesis, fast flight, and the Hex, a giant dome that only she controls.
 
-![The Scarlet Witch](images/scarlet-witch-sheet.png)
+![Scarlet Witch and Vision in the Hex](images/004-scarlet-witch-and-vision-the-hex.png)
 
 ## Becoming the Scarlet Witch
 
@@ -18,9 +18,6 @@ Wanda Maximoff. Chaos magic in a crimson tangle of energy, with hot pink highlig
 **The Tesseract works too.** Hold the gene in one hand and use the **Tesseract** with the other, instead of the scepter: you awaken as the Scarlet Witch in exactly the same way (the gene is used up, Wanda's Crown appears, everyone on the server gets the message). The Tesseract is not used up and you are not taken anywhere. Without a gene it makes you [Loki](Loki), and a hero who uses it is simply taken to the block they look at.
 
 The scepter is also a strong melee weapon (8 attack damage, never breaks). In the films it takes over the mind of whoever it touches; that would be too strong here, so a hit only **confuses**: a player gets **Nausea** for 8 seconds and **Slowness I** for 3, and any other creature is **Confused** for 6 seconds. A confused creature forgets its target, can't pick a new one and stumbles about aimlessly, with small blue-green sparks swirling round its head. The Ender Dragon, the Wither and the Warden are immune. See [Loki](Loki).
-
-![Touching the Mind Stone with the gene](images/mind-stone-awakening.png)
-
 There is a second way to become a witch's child: the [Witches' Road Door](Billy-and-the-Witches-Road) turns you into Tommy or Billy, and the Scarlet Witch herself can travel the Road.
 
 ## Wanda's Crown: the transformation
@@ -46,6 +43,12 @@ On anyone else the crown is just a crown.
 
 ## Abilities
 
+![Scarlet Witch flying past the Avengers Tower](images/001-scarlet-witch-flight-avengers-tower.png)
+
+![The Chaos Beam](images/002-scarlet-witch-chaos-beam.png)
+
+![The Chaos Beam up close](images/003-scarlet-witch-chaos-beam-close.png)
+
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | **R** (hold) | Chaos Energy Beam | A glowing, crackling red beam from Wanda's hand. |
@@ -60,16 +63,10 @@ On anyone else the crown is just a crown.
 * **Range:** 32 blocks. The beam stops at the first creature or block.
 * **Damage:** **2.5 hearts (5 HP) per hit** for as long as the beam stays on the target. Minecraft lets a creature be hurt at most twice per second, so a target takes about 5 hearts per second. The Ender Dragon (100 hearts) survives about 20 seconds of beam if every hit lands on its head, and roughly twice as long on its body or wings: strong, but not a one-shot.
 * **Debuff:** every creature it hits gets **Nausea** for 5 seconds. (Magneto's helmet blocks this, but not the damage.)
-
-![The Chaos Beam](images/chaos-beam.png)
-
 ### 2. Enhanced Flight
 
 * Survival flight. Fast (0.09, almost twice Creative's speed) but always controllable. You can also double-tap **Space**.
 * While she flies, two glowing red energy auras swirl around Wanda's hands, trailing red sparks.
-
-![Red energy around Wanda's hands in flight](images/scarlet-witch-flight.png)
-
 ### 3. Telekinesis
 
 * **Targets:** any monster, animal, villager, player, dropped item, minecart or falling block within 32 blocks. **Ultron, Thanos and Apocalypse, and the Wither, the Warden and the Elder Guardian, are held as bosses**: for 3 seconds, then they break free, and nobody can take hold of them again for 12 seconds (see each boss's page). The Ender Dragon is too vast to hold. Apocalypse's shield turns every other power away, but not hers: **mind power gets through**.
@@ -98,15 +95,9 @@ A held boss does nothing and can't be carried out of his arena. A boss you throw
 * **Explosion damage is reduced by 75%.** The 75% the shield takes away is what wears it down. If less strength is left than that, the shield shatters and the rest gets through.
 * **Cost:** none while it is unlimited. With the old rules it burns hunger quickly while held (about 1 food point every 2 seconds), while it forms too, and when the hunger bar is empty the shield collapses and has to recharge.
 * **HUD:** while it forms it shows "forming". Once it is up it shows "∞ unlimited" (with the old rules: what is left of its strength, green, then yellow, then red, and the seconds it can still be held, and after it drops the cooldown, and the sphere flickers as it weakens or when its time is nearly up). Her arms gather across her chest while it forms and are thrown open as it completes (let go of earlier, she only lowers them).
-
-![The Chaos Shield](images/chaos-shield.png)
-
 ### 5. The Hex
 
 Press **N** to raise the Hex: a **giant red energy dome**, radius 32 blocks (adjustable from 8 to 96), centred on where Wanda stands. It rises over a couple of seconds. From outside it looks like the Westview Hex: a raspberry-red wall of glowing TV-static bricks and scanlines that tints the sky behind it.
-
-![The Hex](images/hex.png)
-
 * One Hex per Wanda. It is saved with the world and collapses if Wanda dies.
 * **Only Wanda decides who may enter or leave.** In 3.3 her allow list is **the one rule for coming in**, for players and creatures alike: anyone she has not allowed meets the price of the wall (below), however they try to get in.
 * **No power gets through the wall from outside** (3.3): see [The wall keeps powers out](#the-wall-keeps-powers-out).
@@ -123,9 +114,6 @@ Press **N** again, while you have a Hex, to open the **Hex Control** screen:
 * Dissolve the Hex (or press **Sneak + N**).
 
 The screen reminds you that anyone you have not allowed has a 95% chance to die crossing the wall.
-
-![Wanda's Hex Control screen](images/hex-control.png)
-
 #### The price of the Hex wall
 
 When any creature or player **without powers** crosses the wall without Wanda's permission:
@@ -185,16 +173,19 @@ You are in control of the Hex, and in *WandaVision* Vision starts to come apart 
   * **Look at nothing and press Z**: he comes back to your side.
   * **Sneak + Z**: he holds his post where he is, or follows you again. The Hex Control screen has the same choice as a button, *Vision: follows you / holds his post*, and the Hex remembers it.
 * **If he falls** he fades to nothing, and you **rebuild him 60 seconds later** while the Hex stands. He fades away when the Hex dissolves, and when you leave (log out or change dimension); your Hex raises him again when you are back. Nothing of him is saved.
-
-![The Vision of the Hex](images/hex-vision.png)
-
 ## Build Magic
+
+![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)
+
+![Build Magic: choosing a spell](images/007-scarlet-witch-build-magic-selection.png)
 
 Wanda can **build with her magic**: press **Y** and click two corners to fill, empty, change or paint them, double-click a whole tree or house, copy a castle and stamp it somewhere else, raise hills, swell a rock into a boulder and make flowers bloom. **Her magic has no limit** (only the server's safety keeps the game running smoothly), she points as far as 256 blocks, **and inside her own Hex her spells go twice as fast.** **Ctrl + Z** takes it all back, even tomorrow. And when she stands near Billy, his spells cost half. See [Build Magic](Build-Magic).
 
 **The Instant level (3.2).** In build mode, **Ctrl + I** (or the *Instant* button in the Spell Wheel, under Redo) switches Wanda to *Instant*: a gold badge "⚡ Instant" shows, and every spell, **Ctrl + Z** and **Ctrl + Y** write **all their blocks in the same moment**, with no growing, no ripple and no waiting; a flash of light and sparks on the box show that it is done. Up to 250,000 blocks a spell (`build_magic_wanda.instantMaxBlocks`; a bigger one goes at normal speed and she is told), and never for longer than 5 seconds of the server's time (`instantMaxMillis`): a spell that takes longer finishes at normal speed. The server stands still while it writes, so a big Instant spell is a moment of stillness, not a lag. Every rule is the same as for any spell: arenas, claims, Hexes, loaded chunks, the undo history. It turns itself off when she leaves build mode or changes power; Billy is told "Instant is the Scarlet Witch's magic alone". See [Build Magic](Build-Magic#the-instant-level-ctrl--i).
 
 ## Chaos magic breaks the Hex Barrier
+
+![The Hex Barrier around Wanda](images/005-scarlet-witch-hex-barrier.png)
 
 Billy's [Hex Barrier](Billy-and-the-Witches-Road#the-hex-barrier-sneak--b-held) stops everything from the front, but **the powers of a Scarlet Witch wear it down** (chaos magic; only dark magic does too), each by its damage, until it shatters: her Chaos Beam, her telekinetic grip, what she throws. (Before 3.3.1 they shattered it at once.)
 

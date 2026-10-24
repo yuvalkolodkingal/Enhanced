@@ -4,6 +4,8 @@ Eilon's mom asked for this one (3.7): **a happy ending in this multiverse.** In 
 
 Hebrew: [עברית](Agathas-Cottage-HE)
 
+![Agatha's cottage](images/037-agatha-cottage.png)
+
 ## Finding it
 
 * In **forests**: forest, birch forest, old growth birch forest, flower forest and dark forest, in the Overworld. `/locate structure enhanced:agatha_cottage` finds one.
@@ -12,6 +14,10 @@ Hebrew: [עברית](Agathas-Cottage-HE)
 * No monsters spawn in the cottage's grounds.
 
 ## The cottage
+
+![The cottage garden](images/040-agatha-cottage-garden.png)
+
+![The cottage basement](images/041-agatha-cottage-basement.png)
 
 A crooked two-storey cottage: a dark oak frame with white plaster, a steep plum-coloured roof, a leaning stone chimney with a curl of smoke, round windows, a **purple front door**, ivy, a porch with two **rocking chairs**, lanterns, and a white picket fence with a gate. The sign: "~ Home of ~ / Agatha, Nicky / & Rio", and "Welcome!" on the gate.
 
@@ -28,6 +34,8 @@ The chairs, the porch's rocking chairs and the bench are real seats: right-click
 Eilon's wish: Agatha keeps **her book** at home. The chest in her study corner upstairs **always holds the [Darkhold](Sorcerers-Books#the-darkhold)**, and **3 to 5 enchanted books**: Protection, Unbreaking, Sharpness, Feather Falling, Efficiency or Fire Protection, at levels 2 to 4 (Unbreaking 2 or 3). A player with no power who **holds right-click on the Darkhold for 3 seconds** becomes [Agatha](Agatha)... and then see [One of each](#one-of-each-when-you-are-agatha).
 
 ## Who lives there
+
+![Agatha and Nicky](images/038-agatha-and-nicky.png)
 
 | Who | What she or he is like |
 |---|---|
@@ -50,6 +58,8 @@ Eilon's wish: Agatha keeps **her book** at home. The chest in her study corner u
 | **Night** | asleep in their beds (a lantern stays lit); talk to one and you get "Zzz..." | | |
 
 ## Talking to them
+
+![Nicky's dialogue](images/039-nicky-dialogue.png)
 
 **Right-click** one to talk: their line and up to three answers, in English or Hebrew, as with the [Asgardians](Asgardians#talking).
 

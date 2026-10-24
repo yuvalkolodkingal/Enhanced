@@ -4,6 +4,8 @@ From *Thor: Love and Thunder* (3.8, Eilon's idea): **Eternity**, the cosmic bein
 
 Hebrew: [עברית](Eternity-HE)
 
+![Love at the Shrine of Eternity](images/101-love-eternity-shrine.png)
+
 ## The quick version
 
 1. **Get a key of the Bifrost:** [Stormbreaker](Thor#stormbreaker) (anyone can craft and hold it), your own claimed [Mjolnir](Thor#mjolnir), [Hofund](Heimdall) or your own [Gungnir](Odin).
@@ -37,6 +39,8 @@ By the stair, a lectern holds the book **"The Cosmic Entities"**: a page about e
 
 ## The way in: the altar
 
+![Love at the Shrine, second view](images/102-love-eternity-shrine-2.png)
+
 * **Right-click the altar** with a **key of the Bifrost** in either hand: **Stormbreaker**, **Mjolnir**, **Hofund** or **Gungnir** (Gungnir only if it is your own). The key **stays in your hand**; a glowing copy of it **floats up over the altar and spins**, faster and faster, in a violet column of light, while stars rise from it.
 * **Stay by the altar for 3 seconds** with the key in your hand. **Sneaking**, walking more than 3 blocks away, letting go of the key, leaving or dying stops it ("The key stops floating. The way to Eternity closes." / "Stay by the altar while it calls Eternity.").
 * Then **you alone** are taken (not your pets, not what you ride): a white flash, and you arrive in Eternity's realm.
@@ -59,6 +63,8 @@ A world of its own: **white and silent**, a pale sky with soft grey cloud bands,
 * The client options `eternityReflections` (the mirror's reflections; off for slow computers) and `eternityFog` (the white mist) are yours to change. See [Server Configuration](Server-Configuration#client-options-animations-effects-and-looks).
 
 ## The wish
+
+![Love at the Shrine, third view](images/103-love-eternity-shrine-3.png)
 
 Eternity's screen has two big choices, and **Leave**:
 

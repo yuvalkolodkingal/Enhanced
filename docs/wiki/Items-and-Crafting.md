@@ -2,6 +2,8 @@
 
 Every item you can use is in the **Enhanced** creative tab. Thirteen are crafted, five more are found in chests (or dropped), three more are the rewards of the bosses, and one, the [Hero Creator](#hero-creator), is for Creative mode only. The Radioactive Spider and Professor X's Wheelchair are both: you can craft them and find them. Since 3.6 there are also [the Infinity Stones and their vessels](#the-infinity-stones-and-their-vessels-36), Doctor Strange's [Eye of Agamotto](#eye-of-agamotto-36) and [Sling Ring](#sling-ring-36), the Hulk's [Gamma Emitter](#gamma-emitter-36) and [Hydra's gear](#hydras-gear-36). Since 3.7: the [Mutant Cure](#mutant-cure-331) (it is older, from 3.3.1, but now has a home), Deadpool's [chimichanga](#chimichanga-37), the [Stone Locator](#stone-locator-37), and the [Adamantium Injection](#adamantium-injection-37), found in the X-Men's lab. Since 3.8: [the Avengers' gear](#the-avengers-gear-38), found in the Avengers Tower (the Super Soldier Serum, the Vibranium Shield, the Falcon Exo-Wings, the two Arc Reactors and Iron Man's six suits). In the recipe grids below, `.` is an empty slot, and the recipes are **shaped**: the items must sit exactly as drawn.
 
+![Books in item frames](images/116-item-frames-books.png)
+
 ## Crafted items
 
 | Item | Becomes | Recipe book unlock |
@@ -313,6 +315,8 @@ The middle takes **any Infinity Stone** or a vessel of one (Loki's Scepter, the 
 
 ## Items found in the world
 
+![The Scepter and the Tesseract](images/115-artifacts-scepter-tesseract.png)
+
 These six are never crafted (the Adamantium Injection, only on a server that switches its recipe on). Each chance is **per chest generated** (or per kill, for the mobs): a chest of that kind has that chance to hold the item.
 
 ### Scarlet Witch Gene
@@ -414,6 +418,8 @@ The heart Wanda tore out, in a cage of three gunmetal bars: a glowing red-orange
 
 ## The Infinity Stones and their vessels (3.6)
 
+![The Space Stone in the inventory](images/113-ultron-inventory-space-stone.png)
+
 The six [Infinity Stones](Infinity-Stones) are items: the **Space**, **Mind**, **Reality**, **Power**, **Time** and **Soul Stones**. Epic, they don't stack, never burn, never despawn and can't be blown up. Only a god, the Scarlet Witch or the Phoenix may hold a bare stone (a sorcerer the Time Stone, Vision the Mind Stone); in anyone else's inventory it burns after 10 seconds and jumps out.
 
 | Item | Where it comes from |
@@ -438,6 +444,8 @@ The six [Infinity Stones](Infinity-Stones) are items: the **Space**, **Mind**, *
 * **Hydra Soldier** and **Hydra Officer Spawn Eggs**: in the creative tab.
 
 ## The items of Asgard (3.5)
+
+![Loki in Asgard](images/023-loki-asgard.png)
 
 None of these can be crafted. [Asgard](Asgard) keeps all three weapons for you if you die there.
 

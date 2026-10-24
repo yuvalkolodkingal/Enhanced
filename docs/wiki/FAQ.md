@@ -1,5 +1,7 @@
 # FAQ
 
+![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
+
 ## Becoming a hero
 
 ### How do I become a hero?
@@ -51,6 +53,8 @@ Mjolnir can't pin the bosses (the Ender Dragon, the Wither and the Warden), play
 
 ## Build Magic
 
+![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)
+
 ### Can Billy build as big as Wanda?
 
 Not at first. Wanda's magic has no limit; Billy's is an apprentice's: a meter of 512 blocks that refills 16 a second, 24 blocks on a side, 24 blocks of reach, 10 undos, one spell at a time. It grows as he practises (every block he builds counts) through ten ranks, up to the Chaos Master, whose meter is 64 times as big (and whose Hex Beam is twice as strong). Near a Scarlet Witch his spells cost half. See [Build Magic](Build-Magic#billy-an-apprentice-who-learns).
@@ -72,6 +76,8 @@ It is built not to. Every spell is cut into small slices, and all the spells of 
 Build Magic uses Ctrl + Z, Ctrl + Y, Ctrl + R, Ctrl + F, Ctrl + C, Ctrl + X and Ctrl + V, and Minecraft's Controls screen marks a key as clashing when it shares a key with another, even though the game sends each press to the right place (Ctrl + Z of a witch never reaches Wanda's Z). So you will see red marks on those keys and on the keys they share (Sprint, Swap Item With Offhand, the toolbar keys, and the mod's **R**, **V**, **Z** and **Y**). It is only the screen being careful. See [Controls](Controls#build-magic-y).
 
 ## The Witches' Road, the books and the new powers
+
+![A cabin on the Witches' Road](images/043-witches-road-cabin.png)
 
 ### I opened the Witches' Road Door and it did not ask me to choose Billy or Tommy. Why?
 
@@ -226,6 +232,8 @@ The flight style is only how your hero looks in the air. To fly, your hero needs
 The server file was written by 3.3, and the game never rewrites a value already in the file. Set `custom_hero.budget = 90` and `maxPowers = 10`, or delete the two lines. See [Server Configuration](Server-Configuration#the-hero-creator).
 
 ## Asgard and its heroes (3.5)
+
+![The palace of Asgard](images/092-asgard-palace.png)
 
 ### How do I get to Asgard?
 

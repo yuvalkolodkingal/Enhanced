@@ -4,6 +4,8 @@ Wade Wilson (3.7), the mercenary with a mouth, two katanas, two pistols, a glitc
 
 Hebrew: [עברית](Deadpool-HE)
 
+![Deadpool](images/053-deadpool.png)
+
 ## The quick version
 
 * **How:** in the [X-Men lower lab](Mutant-School-Lab), with **no power**, step into the **Weapon X Pod** and right-click it. Five seconds later you are Deadpool.
@@ -32,6 +34,10 @@ You also become Deadpool with **Choose a Hero** in the [Hero Creator](Hero-Creat
 
 ## Abilities
 
+![Deadpool with katanas](images/054-deadpool-katanas.png)
+
+![Deadpool with pistols](images/055-deadpool-pistols.png)
+
 | # | Key | Ability | How it works |
 |---|---|---|---|
 | 1 | **R** | Katanas | Both swords on the first creature in front of him (a 70° cone, 3.5 blocks): **5**, **5**, then an X-cut of **8** that sweeps up to three. A cut every 8 ticks; after a second and a half without one, the combo starts again. **Sneak + R, held: Parry**: the swords spin in front of him, and arrows, bolts and fireballs coming from the front **bounce off the way he looks** (beams don't); a blow from the front loses 60%. At most 4 seconds, then **R** rests 3 seconds. |
@@ -44,6 +50,8 @@ With PvP off, his abilities don't hurt players.
 
 ## His jokes
 
+![Deadpool and his pet](images/056-deadpool-and-pet.png)
+
 Deadpool talks. His lines pop up in a **speech bubble** over his head for everyone within 24 blocks, each player in their own language, and in his own action bar: when he taunts, goes down ("Nap time..."), rises ("Ow. Okay. I'm fine. Totally fine."), glitches, calls Dogpool, eats a chimichanga ("Best. Snack. Ever."), is poisoned ("Ugh, poison! My healing just went on a coffee break."), meets a Wolverine ("Nice claws. Do they come in pink?"), lies down next to another healer ("We could do this all day. And we will."), and now and then to *you* ("Hi, whoever is holding the mouse!"). Forty-two lines, at most one every 10 seconds (the Taunt's always). The client option `deadpoolLines` hides them for you, and a server can turn them off (`deadpool.linesEnabled`).
 
 [Professor X](Professor-X) hears his thoughts: "Did I leave the oven on?", "Note to self: buy more chimichangas." And Dogpool's: "Ball? BALL?"
@@ -53,6 +61,8 @@ Deadpool talks. His lines pop up in a **speech bubble** over his head for everyo
 A crunchy, warm snack, and Deadpool's favourite. Anyone can eat it (**4 drumsticks**). Crafted from a **bread**, a **cooked beef, porkchop or chicken** and a **carrot** (any order): **two** chimichangas. Found in the kitchen chest of [Agatha's Cottage](Agathas-Cottage) too. Deadpool's **Chimichanga Break** eats one for a bigger heal. The advancement **Maximum Snacks** is for eating one.
 
 ## Looks
+
+![Deadpool in the alternate suit](images/057-deadpool-alt-suit.png)
 
 | Look | Id | What it is |
 |---|---|---|
