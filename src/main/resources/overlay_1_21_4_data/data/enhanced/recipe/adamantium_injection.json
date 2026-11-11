@@ -1,0 +1,18 @@
+{
+  "type": "enhanced:adamantium_injection",
+  "category": "misc",
+  "pattern": [
+    "INI",
+    "NEN",
+    "INI"
+  ],
+  "key": {
+    "I": "minecraft:iron_block",
+    "N": "minecraft:netherite_ingot",
+    "E": "minecraft:echo_shard"
+  },
+  "result": {
+    "id": "enhanced:adamantium_injection",
+    "count": 1
+  }
+}

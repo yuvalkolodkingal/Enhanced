@@ -23,7 +23,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
+//#if <1.21.4
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+//#endif
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -91,7 +93,11 @@ public final class NeoRegistrars implements RegService {
     @Override
     public Item spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight,
                          Item.Properties properties) {
+        //#if >=1.21.4
+        //$$ return new net.minecraft.world.item.SpawnEggItem(type.get(), properties);
+        //#else
         return new DeferredSpawnEggItem(type, background, highlight, properties);
+        //#endif
     }
 
     // ---- the entries: NeoForge's holders, as the mod's types ----
@@ -242,12 +248,20 @@ public final class NeoRegistrars implements RegService {
 
         @Override
         public <I extends Item> ItemEntry<I> register(String name, Supplier<? extends I> factory) {
+            //#if >=1.21.4
+            //$$ return item(deferred.register(name, () -> com.kolodkingal.enhanced.compat.Ids.item(getNamespace(), name, factory)));
+            //#else
             return item(deferred.register(name, factory));
+            //#endif
         }
 
         @Override
         public <I extends Item> ItemEntry<I> register(String name, Function<ResourceLocation, ? extends I> factory) {
+            //#if >=1.21.4
+            //$$ return item(deferred.register(name, rl -> com.kolodkingal.enhanced.compat.Ids.item(getNamespace(), name, () -> factory.apply(rl))));
+            //#else
             return item(deferred.register(name, factory));
+            //#endif
         }
 
         @Override
@@ -300,12 +314,20 @@ public final class NeoRegistrars implements RegService {
 
         @Override
         public <B extends Block> BlockEntry<B> register(String name, Supplier<? extends B> factory) {
+            //#if >=1.21.4
+            //$$ return block(deferred.register(name, () -> com.kolodkingal.enhanced.compat.Ids.block(getNamespace(), name, factory)));
+            //#else
             return block(deferred.register(name, factory));
+            //#endif
         }
 
         @Override
         public <B extends Block> BlockEntry<B> register(String name, Function<ResourceLocation, ? extends B> factory) {
+            //#if >=1.21.4
+            //$$ return block(deferred.register(name, rl -> com.kolodkingal.enhanced.compat.Ids.block(getNamespace(), name, () -> factory.apply(rl))));
+            //#else
             return block(deferred.register(name, factory));
+            //#endif
         }
 
         @Override

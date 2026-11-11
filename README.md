@@ -66,8 +66,8 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 |---|---|---|
 | ![Quicksilver](docs/screenshots/014-quicksilver-mutant-school.png) | ![Vision](docs/screenshots/008-vision.png) | ![Wolverine](docs/screenshots/051-wolverine-adamantium-claws.png) |
 
-* **Minecraft** 1.21.1
-* **Mod loader** NeoForge 21.1.x
+* **Minecraft** 1.21.1 or 1.21.4 (the same jar)
+* **Mod loader** NeoForge 21.1.x or 21.4.x
 * **Install it on** the client, plus the server for multiplayer
 * **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
 
@@ -299,7 +299,7 @@ push and pull request, and publishes a release for every push to `main` (or a `v
 ```
 
 To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a NeoForge
-1.21.1 instance.
+1.21.1 or 1.21.4 instance (the jar holds a copy of the mod for each; see [docs/MULTIVERSION.md](docs/MULTIVERSION.md)).
 
 How the heroes and bosses of 3.0 hang on the shared code (the plug-ins, the event priorities, the
 boss framework and its rules) is in [docs/HEROES-AND-BOSSES.md](docs/HEROES-AND-BOSSES.md).

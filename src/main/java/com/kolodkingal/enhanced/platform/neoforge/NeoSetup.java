@@ -14,6 +14,10 @@ public final class NeoSetup {
         platform.neoAttach().register.register(modBus);
         modBus.addListener(RegisterPayloadHandlersEvent.class, platform.neoNet()::register);
         modBus.addListener(EntityAttributeCreationEvent.class, platform.neoRegistrars()::createAttributes);
+        //#if >=1.21.4
+        //$$ modBus.addListener(RegisterPayloadHandlersEvent.class, com.kolodkingal.enhanced.compat.AttachSync::registerPayload);
+        //$$ net.neoforged.neoforge.common.NeoForge.EVENT_BUS.register(com.kolodkingal.enhanced.compat.AttachSync.class);
+        //#endif
     }
 
     private NeoSetup() {

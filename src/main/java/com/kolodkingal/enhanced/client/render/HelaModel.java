@@ -127,9 +127,11 @@ public class HelaModel extends PlayerModel<HelaEntity> {
         return angle;
     }
 
+    //#if <1.21.4
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
         int a = Math.round(((color >>> 24) & 0xFF) * alpha);
         super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, (a << 24) | (color & 0xFFFFFF));
     }
+    //#endif
 }

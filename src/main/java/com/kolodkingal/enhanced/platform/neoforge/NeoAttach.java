@@ -26,7 +26,13 @@ public final class NeoAttach implements AttachService {
 
     @Override
     public <T> AttachKey.Handle<T> register(Attach.Spec<T> spec) {
-        return new Handle<>(register.register(spec.id().getPath(), () -> type(spec)));
+        Handle<T> handle = new Handle<>(register.register(spec.id().getPath(), () -> type(spec)));
+        //#if >=1.21.4
+        //$$ if (spec.syncCodec() != null) {
+        //$$     com.kolodkingal.enhanced.compat.AttachSync.add(handle::type, spec.syncCodec(), spec.syncTo() == SyncTo.SELF);
+        //$$ }
+        //#endif
+        return handle;
     }
 
     @Override
@@ -51,6 +57,7 @@ public final class NeoAttach implements AttachService {
         if (spec.copyOnDeath()) {
             builder.copyOnDeath();
         }
+        //#if <1.21.4
         if (spec.syncCodec() != null) {
             if (spec.syncTo() == SyncTo.SELF) {
                 builder.sync((holder, to) -> holder == to, spec.syncCodec());
@@ -58,6 +65,7 @@ public final class NeoAttach implements AttachService {
                 builder.sync(spec.syncCodec());
             }
         }
+        //#endif
         return builder.build();
     }
 
@@ -105,7 +113,11 @@ public final class NeoAttach implements AttachService {
 
         @Override
         public void sync(Object holder) {
+            //#if >=1.21.4
+            //$$ com.kolodkingal.enhanced.compat.AttachSync.send(holder, type.get());
+            //#else
             holder(holder).syncData(type.get());
+            //#endif
         }
     }
 

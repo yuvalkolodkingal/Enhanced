@@ -1,0 +1,35 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": "gui",
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/vibranium_shield_icon"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:condition",
+      "property": "minecraft:using_item",
+      "on_true": {
+        "type": "minecraft:special",
+        "base": "enhanced:item/vibranium_shield_blocking",
+        "model": {
+          "type": "enhanced:legacy",
+          "id": "enhanced:vibranium_shield"
+        }
+      },
+      "on_false": {
+        "type": "minecraft:special",
+        "base": "enhanced:item/vibranium_shield_held",
+        "model": {
+          "type": "enhanced:legacy",
+          "id": "enhanced:vibranium_shield"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "mixins": [
+    "BlockPropertiesMixin",
+    "FoodDataAccessor",
+    "ItemPropertiesMixin"
+  ],
+  "client": [
+    "client.ModelPartAccessor"
+  ]
+}

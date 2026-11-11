@@ -1,0 +1,46 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "enhanced:item/gauntlet/base",
+    "layer1": "enhanced:item/gauntlet/socket_power",
+    "layer2": "enhanced:item/gauntlet/socket_reality",
+    "layer3": "enhanced:item/gauntlet/socket_soul",
+    "layer4": "enhanced:item/gauntlet/socket_time"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0,
+        0,
+        0
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

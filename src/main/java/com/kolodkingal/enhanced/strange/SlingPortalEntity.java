@@ -142,4 +142,11 @@ public class SlingPortalEntity extends Entity {
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
     }
+
+    //#if >=1.21.4
+    //$$ @Override
+    //$$ public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+    //$$     return false;
+    //$$ }
+    //#endif
 }

@@ -1,0 +1,297 @@
+# Names that changed between 1.21.1 and 1.21.4 and mean the same (regex => replacement), applied to the 1.21.4 copy.
+# (first) the first-person arm: 1.21.4 draws it from the model's rest pose, with no render state
+(?:[\w.]+)\.attackTime = 0\.0F;\s*(\w+)\.crouching = false;\s*\1\.swimAmount = 0\.0F; => // (attackTime, crouching, swimAmount: the render state's from 1.21.2)
+\b(\w+)\.setupAnim\(player, 0\.0F, 0\.0F, 0\.0F, 0\.0F, 0\.0F\); => $1.resetPose();
+# (first) living entities' invulnerability takes the level
+public boolean isInvulnerableTo\(DamageSource source\) => public boolean isInvulnerableTo(net.minecraft.server.level.ServerLevel invLevel, DamageSource source)
+\bsuper\.isInvulnerableTo\(source\) => super.isInvulnerableTo(invLevel, source)
+\bMobSpawnType\b => EntitySpawnReason
+\bRelativeMovement\b => Relative
+\bUseAnim\b => ItemUseAnimation
+\bgetMinBuildHeight\(\) => getMinY()
+\bregistryOrThrow\( => lookupOrThrow(
+\bFastColor\.ARGB32\b => ARGB
+\bnet\.minecraft\.util\.FastColor\b => net.minecraft.util.ARGB
+\bgetMaxBuildHeight\(\) - 1\b => getMaxY()
+# entities: hurt became hurtServer (server only) and hurtOrSimulate; create takes a spawn reason
+public boolean hurt\((?:net\.minecraft\.world\.damagesource\.)?DamageSource (\w+), float (\w+)\) => public boolean hurtServer(net.minecraft.server.level.ServerLevel hurtLevel, net.minecraft.world.damagesource.DamageSource $1, float $2)
+\bsuper\.hurt\( => super.hurtServer(hurtLevel, 
+(?<!super|\b[A-Z]\w{0,60})\.hurt\((?!\)) => .hurtOrSimulate(
+\.create\(((?:\w+\.)?(?:level|serverLevel)(?:\(\))?(?:\.getLevel\(\))?)\) => .create($1, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED)
+# registries
+\bgetHolderOrThrow\( => getOrThrow(
+\bstructures\.get\( => structures.getValue(
+(lookupOrThrow\((?:net\.minecraft\.core\.registries\.)?Registries\.STRUCTURE\))\.get\( => $1.getValue(
+\bnet\.minecraft\.world\.item\.armortrim\.TrimPattern\b => net.minecraft.world.item.equipment.trim.TrimPattern
+# entity types are built with their registry key
+\.build\("(\w+)"\)\) => .build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, com.kolodkingal.enhanced.Enhanced.id("$1"))))
+# items: use() returns an InteractionResult that may carry the stack
+\bimport net\.minecraft\.world\.InteractionResultHolder; => import net.minecraft.world.InteractionResult;
+(?:net\.minecraft\.world\.)?InteractionResultHolder<ItemStack> => net.minecraft.world.InteractionResult
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.sidedSuccess\((\w+), [^;]*\); => net.minecraft.world.InteractionResult.SUCCESS.heldItemTransformedTo($1);
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.(?:success|consume)\((\w+)\) => net.minecraft.world.InteractionResult.SUCCESS.heldItemTransformedTo($1)
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.pass\(\w+\) => net.minecraft.world.InteractionResult.PASS
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.fail\(\w+\) => net.minecraft.world.InteractionResult.FAIL
+\bInteractionResult\.sidedSuccess\([^;]*\); => InteractionResult.SUCCESS;
+\.getCooldowns\(\)\.addCooldown\(this, => .getCooldowns().addCooldown(new net.minecraft.world.item.ItemStack(this),
+# effects tick on the server, with its level
+public boolean applyEffectTick\(LivingEntity (\w+), int (\w+)\) => public boolean applyEffectTick(net.minecraft.server.level.ServerLevel effectLevel, LivingEntity $1, int $2)
+# blocks
+\bRenderShape\.ENTITYBLOCK_ANIMATED\b => RenderShape.INVISIBLE
+public ItemStack getCloneItemStack\(LevelReader (\w+), BlockPos (\w+), BlockState (\w+)\) => protected ItemStack getCloneItemStack(LevelReader $1, BlockPos $2, BlockState $3, boolean includeData)
+setBackground\(InventoryMenu\.BLOCK_ATLAS, => setBackground(
+\.getExperience\(\) => .experience()
+# entities
+(?<![\w.])spawnAtLocation\( => spawnAtLocation((net.minecraft.server.level.ServerLevel) level(), 
+public boolean doHurtTarget\(Entity (\w+)\) => public boolean doHurtTarget(net.minecraft.server.level.ServerLevel hurtLevel, Entity $1)
+\bsuper\.doHurtTarget\( => super.doHurtTarget(hurtLevel, 
+(?<![\w.])doHurtTarget\((\w+(?:\(\))?)\) => doHurtTarget((net.minecraft.server.level.ServerLevel) level(), $1)
+\bisInvulnerableTo\(source\) => isInvulnerableTo((net.minecraft.server.level.ServerLevel) level(), source)
+protected void dropEquipment\(\) => protected void dropEquipment(net.minecraft.server.level.ServerLevel dropLevel)
+\bsuper\.dropEquipment\(\) => super.dropEquipment(dropLevel)
+\bSoundEvents\.GENERIC_EAT\b => SoundEvents.GENERIC_EAT.value()
+\bIngredient\.of\((ModTags\.\w+)\) => Ingredient.of(net.minecraft.core.registries.BuiltInRegistries.ITEM.getOrThrow($1))
+\b(?!nodeEvaluator\b)(\w+)\.setCanPassDoors\( => $1.getNodeEvaluator().setCanPassDoors(
+(new NearestAttackableTargetGoal<>\(this, \w+\.class, \d+, \w+, \w+,\s*)(\w+) -> => $1($2, targetLevel) ->
+# client
+\bgetTimer\(\) => getDeltaTracker()
+\bgetToasts\(\) => getToastManager()
+RenderSystem\.setShader\(GameRenderer::getPositionTexColorShader\) => RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX_COLOR)
+RenderSystem\.setShader\(GameRenderer::getPositionColorShader\) => RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_COLOR)
+\bRenderType\.entityTranslucentCull\( => RenderType.itemEntityTranslucentCull(
+\bSkyType\.NORMAL\b => SkyType.OVERWORLD
+\bATTACHMENT_TYPES\.get\( => ATTACHMENT_TYPES.getValue(
+# GuiGraphics.blit takes the render type first; the texture size after the region
+\b(\w+)\.blit\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => $1.blit(net.minecraft.client.renderer.RenderType::guiTextured, $2, $3, $4, $7, $8, $5, $6, $9, $10, $11, $12)
+\b(\w+)\.blit\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => $1.blit(net.minecraft.client.renderer.RenderType::guiTextured, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+\b(\w+)\.blit\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => $1.blit(net.minecraft.client.renderer.RenderType::guiTextured, $2, $3, $4, $5, $6, $7, $8, 256, 256)
+\.create\((p\.serverLevel\(\))\) => .create($1, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED)
+\bnew GameRules\(\) => new GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS)
+# renderers and models written against 1.21.1 (compat/Legacy*: posed and drawn from the render state's entity)
+\bextends HierarchicalModel<(\w+)> => extends com.kolodkingal.enhanced.compat.LegacyModel<$1>
+\bextends PlayerModel<(\w+)> => extends com.kolodkingal.enhanced.compat.LegacyPlayerModel<$1>
+\bextends EntityRenderer<(\w+)> => extends com.kolodkingal.enhanced.compat.LegacyEntityRenderer<$1>
+\bextends MobRenderer<(\w+), ([\w.]+(?:<\w+>)?)> => extends com.kolodkingal.enhanced.compat.LegacyMobRenderer<$1, $2>
+\bextends LivingEntityRenderer<(\w+), ([\w.]+(?:<\w+>)?)> => extends com.kolodkingal.enhanced.compat.LegacyLivingRenderer<$1, $2>
+\bextends HumanoidMobRenderer<(\w+), ([\w.]+(?:<\w+>)?)> => extends com.kolodkingal.enhanced.compat.LegacyHumanoidRenderer<$1, $2>
+\bRenderLayer<\w+, PlayerModel<\w+>> => RenderLayer<net.minecraft.client.renderer.entity.state.PlayerRenderState, PlayerModel>
+\b(RenderLayer(?:Parent)?)<(?!net\.minecraft\.client\.renderer\.entity\.state\.)\w+,\s*([\w.]+(?:<\w+>)?)> => $1<net.minecraft.client.renderer.entity.state.PlayerRenderState, $2>
+\bRenderLayerParent<\w+, PlayerModel<\w+>> => RenderLayerParent<net.minecraft.client.renderer.entity.state.PlayerRenderState, PlayerModel>
+public void render\(PoseStack (\w+), MultiBufferSource (\w+), int (\w+), ([A-Z]) (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+)\) \{ => public void render(PoseStack $1, MultiBufferSource $2, int $3, net.minecraft.client.renderer.entity.state.PlayerRenderState layerState, float $10, float $11) {\n        $4 $5 = com.kolodkingal.enhanced.compat.RenderBridge.entityAs(layerState);\n        if ($5 == null) {\n            return;\n        }\n        float $6 = layerState.walkAnimationPos, $7 = layerState.walkAnimationSpeed, $8 = layerState.partialTick, $9 = layerState.ageInTicks;
+public void render\(PoseStack (\w+), MultiBufferSource (\w+), int (\w+), (\w+) (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+),\s*float (\w+)\) \{ => public void render(PoseStack $1, MultiBufferSource $2, int $3, net.minecraft.client.renderer.entity.state.PlayerRenderState layerState, float $10, float $11) {\n        if (!(com.kolodkingal.enhanced.compat.RenderBridge.entity(layerState) instanceof $4 $5)) {\n            return;\n        }\n        float $6 = layerState.walkAnimationPos, $7 = layerState.walkAnimationSpeed, $8 = layerState.partialTick, $9 = layerState.ageInTicks;
+\b(shell|uniform|helmet)\.setupAnim\(\w+, \w+, \w+, \w+, \w+, \w+\); => $1.setupAnim(layerState);
+\bnew PlayerModel<>\( => new PlayerModel(
+\bnet\.minecraft\.world\.item\.armortrim\.ArmorTrim\b => net.minecraft.world.item.equipment.trim.ArmorTrim
+\bPlayerModel<[\w.?]+> => PlayerModel
+# the humanoid model's per-entity fields moved to the render state (RenderBridge.pose: the player being posed)
+\b(?:m|model)\.(rightArmPose|leftArmPose|attackTime)\b => com.kolodkingal.enhanced.compat.RenderBridge.pose.$1
+\b(?:m|model)\.crouching\b => com.kolodkingal.enhanced.compat.RenderBridge.pose.isCrouching
+\bmodel\.riding = => com.kolodkingal.enhanced.compat.RenderBridge.pose.isPassenger =
+\b(?:net\.minecraft\.client\.renderer\.entity\.)?LivingEntityRenderer\.getOverlayCoords\((\w+), 0\.0F\) => net.minecraft.client.renderer.texture.OverlayTexture.pack(net.minecraft.client.renderer.texture.OverlayTexture.u(0.0F), net.minecraft.client.renderer.texture.OverlayTexture.v($1.hurtTime > 0 || $1.deathTime > 0))
+\bcontext\.getItemRenderer\(\) => net.minecraft.client.Minecraft.getInstance().getItemRenderer()
+\bimport net\.minecraft\.client\.model\.HierarchicalModel; => // (HierarchicalModel is gone from 1.21.2: compat.LegacyModel)
+# armour: materials are records in item.equipment (registry/ModArmorMaterials is 1.21.4's own), ArmorItem.Type is ArmorType
+\bimport net\.minecraft\.world\.item\.ArmorMaterial; => import net.minecraft.world.item.equipment.ArmorMaterial;
+\bnet\.minecraft\.world\.item\.ArmorMaterial\b => net.minecraft.world.item.equipment.ArmorMaterial
+\bArmorItem\.Type\b => net.minecraft.world.item.equipment.ArmorType
+Holder<ArmorMaterial> material, Type type, => Holder<ArmorMaterial> material, net.minecraft.world.item.equipment.ArmorType type,
+\bsuper\(material, type, properties\) => super(material.value(), type, properties)
+\bsuper\(material, Type\.CHESTPLATE, properties\) => super(material.value(), net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, properties)
+\bArmorMaterial\.Layer layer\b => Object layer
+\bBlockEntityType\.Builder\.of\(([^;]*?)\)\.build\(null\) => new BlockEntityType<>($1)
+# DimensionTransition is TeleportTransition (same constructor), and the events' getters with it
+DimensionTransition => TeleportTransition
+\bimport net\.minecraft\.world\.level\.block\.state\.properties\.DirectionProperty; => import net.minecraft.world.level.block.state.properties.EnumProperty;
+\bDirectionProperty\b => EnumProperty<net.minecraft.core.Direction>
+\.getMaxBuildHeight\(\) => .getMaxY() + 1
+# block use with an item: ItemInteractionResult is InteractionResult
+\bItemInteractionResult\.PASS_TO_DEFAULT_BLOCK_INTERACTION\b => InteractionResult.TRY_WITH_EMPTY_HAND
+\bItemInteractionResult\.SKIP_DEFAULT_BLOCK_INTERACTION\b => InteractionResult.SUCCESS
+\bItemInteractionResult\.sidedSuccess\((?:[^;()]|\([^()]*\))*\) => InteractionResult.SUCCESS
+\bimport net\.minecraft\.world\.ItemInteractionResult; => import net.minecraft.world.InteractionResult;
+\bItemInteractionResult\b => InteractionResult
+# movement input: client.player.Input is ClientInput, its keys an immutable record (compat.Inputs sets one)
+\bimport net\.minecraft\.client\.player\.Input; => import net.minecraft.client.player.ClientInput;
+\bInput input = event\.getInput\(\) => ClientInput input = event.getInput()
+\binput\.(up|down|left|right|jumping|shiftKeyDown) = (false|true); => com.kolodkingal.enhanced.compat.Inputs.set(input, "$1", $2);
+\binput\.jumping\b => input.keyPresses.jump()
+\binput\.shiftKeyDown\b => input.keyPresses.shift()
+\binput\.up\b => input.keyPresses.forward()
+\binput\.down\b => input.keyPresses.backward()
+(private final |MovementInputUpdateEvent\(Player entity, )Input input\b => $1ClientInput input
+\bpublic Input getInput\(\) => public ClientInput getInput()
+# entity methods that take the server level
+public boolean canChangeDimensions\( => public boolean canTeleport(
+protected int getBaseExperienceReward\(\) => protected int getBaseExperienceReward(net.minecraft.server.level.ServerLevel xpLevel)
+protected void customServerAiStep\(\) => protected void customServerAiStep(net.minecraft.server.level.ServerLevel aiLevel)
+\bsuper\.customServerAiStep\(\) => super.customServerAiStep(aiLevel)
+protected void actuallyHurt\(DamageSource (\w+), float (\w+)\) => protected void actuallyHurt(net.minecraft.server.level.ServerLevel hurtLevel2, DamageSource $1, float $2)
+\bsuper\.actuallyHurt\( => super.actuallyHurt(hurtLevel2, 
+# items: releaseUsing returns whether the use's after-effects apply (false: none, as before)
+public void releaseUsing\(ItemStack (\w+), Level (\w+), LivingEntity (\w+), int (\w+)\) \{ => public boolean releaseUsing(ItemStack $1, Level $2, LivingEntity $3, int $4) {\n        legacyReleaseUsing($1, $2, $3, $4);\n        return false;\n    }\n\n    private void legacyReleaseUsing(ItemStack $1, Level $2, LivingEntity $3, int $4) {
+# repair and enchanting are item components now: the old methods stay, uncalled
+@Override(\s+public boolean (?:isValidRepairItem|isEnchantable)\b) => $1
+# a server player's teleport to another level: relative flags and the camera
+\.teleportTo\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => .teleportTo($1, $2, $3, $4, java.util.Set.of(), $5, $6, true)
+# models that are not an entity's draw their parts themselves (compat.LegacyPlainModel); entity models draw their root
+\bextends Model \{ => extends com.kolodkingal.enhanced.compat.LegacyPlainModel {
+\bextends EntityModel<(?!\w*RenderState>)(\w+)> => extends com.kolodkingal.enhanced.compat.LegacyModel<$1>
+@Override\s+public void renderToBuffer\(PoseStack (\w+), VertexConsumer (\w+), int (\w+), int (\w+), int (\w+)\) \{\s+root\.render\(\1, \2, \3, \4, \5\);\s+\} => // (renderToBuffer: the model's root, drawn by Model itself from 1.21.2)
+(?s)(extends com\.kolodkingal\.enhanced\.compat\.LegacyModel<[^{]*\{.*?\n\s*(?:public |protected |)\w+\(ModelPart (\w+)\) \{)(?!\s*(?:super|this)\() => $1\n        super($2);
+# dust particles take 0xRRGGBB
+\bDust(ParticleOptions|ColorTransitionOptions)\(((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+), => Dust$1(com.kolodkingal.enhanced.compat.Colors.rgb($2),
+# images: getPixel/setPixel are ARGB (the old RGBA ones were ABGR)
+\b(\w+)\.getPixelRGBA\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => net.minecraft.util.ARGB.toABGR($1.getPixel($2, $3))
+\b(\w+)\.setPixelRGBA\(((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+)\) => $1.setPixel($2, $3, net.minecraft.util.ARGB.fromABGR($4))
+\.changeDimension\( => .teleport(
+# cooldowns are per stack (its cooldown group)
+\.getCooldowns\(\)\.(addCooldown|isOnCooldown|getCooldownPercent)\((?!stack\b|this\b|new\b)((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)(?=[,)]) => .getCooldowns().$1(new net.minecraft.world.item.ItemStack($2)
+# player layers with their own player model: posed from the layer's render state
+\bmodel\.prepareMobModel\(\w+, \w+, \w+, \w+\); => // (prepareMobModel: gone from 1.21.2)
+\bmodel\.setupAnim\(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch\); => model.setupAnim(com.kolodkingal.enhanced.compat.RenderBridge.state(player));
+\b((?:\w+\.)?(?:getParentModel\(\)|model))\.renderCloak\( => com.kolodkingal.enhanced.compat.Capes.render($1, 
+new ItemInHandLayer<>\(this, context\.getItemInHandRenderer\(\)\) => new ItemInHandLayer<>(this)
+new CustomHeadLayer<>\(this, context\.getModelSet\(\), context\.getItemInHandRenderer\(\)\) => new CustomHeadLayer<>(this, context.getModelSet())
+(new HumanoidArmorLayer<>\(this,[^;]*?), context\.getModelManager\(\)\) => $1, context.getEquipmentRenderer())
+\b(?:g|graphics|guiGraphics)\.bufferSource\(\) => net.minecraft.client.Minecraft.getInstance().renderBuffers().bufferSource()
+\b(g|graphics|guiGraphics)\.setColor\( => $1.flush();\n        com.mojang.blaze3d.systems.RenderSystem.setShaderColor(
+(?m)^([ \t]*)noCulling = true; => $1// (noCulling: the renderer's affectedByCulling from 1.21.2)
+# misc. renames and new parameters
+\bPiglinAi\.angerNearbyPiglins\((\w+), => PiglinAi.angerNearbyPiglins((net.minecraft.server.level.ServerLevel) $1.level(), $1,
+\.getNormal\(\)(?=\)|\.get[XYZ]|;) => .getUnitVec3i()
+\bDirection\.getNearest\( => Direction.getApproximateNearest(
+\bDirection\.fromDelta\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => Direction.getNearest($1, $2, $3, null)
+\.getMinSection\(\) => .getMinSectionY()
+\.getMaxSection\(\) => .getMaxSectionY() + 1
+\.getFilterFlag\(\) => .getFilterBit(0)
+\b(\w+)\.doHurtTarget\((\w+)\) => $1.doHurtTarget((net.minecraft.server.level.ServerLevel) $1.level(), $2)
+\.connection\.teleport\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => .connection.teleport(new net.minecraft.world.entity.PositionMoveRotation(new net.minecraft.world.phys.Vec3($1, $2, $3), net.minecraft.world.phys.Vec3.ZERO, $4, $5), $6)
+\.sendParticles\((\w+), (\w+), (false|true), => .sendParticles($1, $2, $3, false,
+\bExplosion\.getSeenPercent\( => net.minecraft.world.level.ServerExplosion.getSeenPercent(
+\.teleportTo\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*(Set\.of\(\)|java\.util\.Set\.of\(\)|EnumSet\.noneOf\([\w.]+\)),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => .teleportTo($1, $2, $3, $4, $5, $6, $7, true)
+, GenerationStep\.Carving \w+\) \{ => ) {
+\b(\w+)\.level\(\)\.getGameRules\(\) => ((net.minecraft.server.level.ServerLevel) $1.level()).getGameRules()
+\bBuiltInRegistries\.(\w+)\.asLookup\(\) => BuiltInRegistries.$1
+\bBuiltInRegistries\.(\w+)\.get\( => BuiltInRegistries.$1.getValue(
+\bBuiltInRegistries\.(\w+)\.getTag\( => BuiltInRegistries.$1.get(
+\bspawn\.pos\(\) => spawn.position()
+\bitem\.getDescription\(\) => item.getName(item.getDefaultInstance())
+\bBlockTags\.TALL_FLOWERS\b => net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK, com.kolodkingal.enhanced.Enhanced.id("tall_flowers"))
+\.removeCooldown\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => .removeCooldown(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey($1))
+\bwalkAnimation\.update\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => walkAnimation.update($1, $2, 1.0F)
+\bgetSituationalMusic\(\) => getSituationalMusic().music()
+new ServerboundMovePlayerPacket\.Pos\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => new ServerboundMovePlayerPacket.Pos($1, $2, $3, $4, false)
+\bMissingTextureAtlasSprite\.getTexture\(\) => MissingTextureAtlasSprite.getLocation()
+\.blitSprite\( => .blitSprite(net.minecraft.client.renderer.RenderType::guiTextured, 
+Mth\.lerp\(t, a\.(\w+), b\.\1\) => Mth.lerp(t, a.$1(), b.$1())
+\ba\.(xRot|yRot|zRot) \* Mth\.RAD_TO_DEG, b\.\1 \* => a.$1() * Mth.RAD_TO_DEG, b.$1() *
+# rendering: core shaders, buffers and fog
+\bimport net\.minecraft\.client\.renderer\.ShaderInstance; => import net.minecraft.client.renderer.CompiledShaderProgram;
+\bShaderInstance\b => CompiledShaderProgram
+GameRenderer::getPositionShader\b => net.minecraft.client.renderer.CoreShaders.POSITION
+GameRenderer::getPositionTexShader\b => net.minecraft.client.renderer.CoreShaders.POSITION_TEX
+GameRenderer::getPositionTexColorShader\b => net.minecraft.client.renderer.CoreShaders.POSITION_TEX_COLOR
+GameRenderer::getPositionColorShader\b => net.minecraft.client.renderer.CoreShaders.POSITION_COLOR
+\bGameRenderer\.getPositionShader\(\) => com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION)
+\bGameRenderer\.getPositionTexShader\(\) => com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX)
+\bGameRenderer\.getPositionTexColorShader\(\) => com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX_COLOR)
+\bGameRenderer\.getPositionColorShader\(\) => com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_COLOR)
+\bVertexBuffer\.Usage\.STATIC\b => com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE
+\bFogRenderer\.setupNoFog\(\) => com.mojang.blaze3d.systems.RenderSystem.setShaderFog(net.minecraft.client.renderer.FogParameters.NO_FOG)
+\bcart\.getMinecartType\(\) == AbstractMinecart\.Type\.COMMAND_BLOCK\b => cart instanceof net.minecraft.world.entity.vehicle.MinecartCommandBlock
+\bcontainer\.getLootTable\(\) => container.getContainerLootTable()
+# blocks
+protected boolean propagatesSkylightDown\(BlockState (\w+), BlockGetter \w+, BlockPos \w+\) => protected boolean propagatesSkylightDown(BlockState $1)
+protected void neighborChanged\(BlockState (\w+), Level (\w+), BlockPos (\w+), Block (\w+), BlockPos (\w+),\s*boolean (\w+)\) => protected void neighborChanged(BlockState $1, Level $2, BlockPos $3, Block $4, @org.jetbrains.annotations.Nullable net.minecraft.world.level.redstone.Orientation $5, boolean $6)
+protected BlockState updateShape\(BlockState (\w+), Direction (\w+), BlockState (\w+), LevelAccessor (\w+),\s*BlockPos (\w+), BlockPos (\w+)\) => protected BlockState updateShape(BlockState $1, net.minecraft.world.level.LevelReader $4, net.minecraft.world.level.ScheduledTickAccess shapeTicks, BlockPos $5, Direction $2, BlockPos $6, BlockState $3, net.minecraft.util.RandomSource shapeRandom)
+\bsuper\.updateShape\((\w+), (\w+), (\w+), (\w+), (\w+), (\w+)\) => super.updateShape($1, $4, shapeTicks, $5, $2, $6, $3, shapeRandom)
+\b(\w+)\.updateShape\(([\w.()]+), (\w+), (\w+), (\w+), (\w+)\) => $1.updateShape($4, $4, $5, $2, $6, $3, $4.getRandom())
+# mobs
+protected void pickUpItem\(ItemEntity (\w+)\) => protected void pickUpItem(net.minecraft.server.level.ServerLevel pickLevel, ItemEntity $1)
+# NeoForge 21.4's events
+net\.neoforged\.neoforge\.event\.entity\.EntityTeleportEvent\.ChorusFruit\b => net.neoforged.neoforge.event.entity.EntityTeleportEvent.ItemConsumption
+\bn\.getItem\(\), n\.getHand\(\) => n.getItem(), n.getEntity().getUsedItemHand()
+super\(n\.getEntity\(\), n\.getEffectInstance\(\), n\.getEffectSource\(\)\); => super(n.getEntity(), n.getEffectInstance(), null);
+\(n\.getEntity\(\), n\.getRenderer\(\), => ((net.minecraft.world.entity.player.Player) com.kolodkingal.enhanced.compat.RenderBridge.entity(n.getRenderState()), n.getRenderer(),
+net\.neoforged\.neoforge\.client\.event\.RenderNameTagEvent\b(?!\.(?:CanRender|DoRender)\b) => net.neoforged.neoforge.client.event.RenderNameTagEvent.CanRender
+n\.getEntityRenderer\(\), n\.getPoseStack\(\),\s*n\.getMultiBufferSource\(\), n\.getPackedLight\(\) => n.getEntityRenderer(), new com.mojang.blaze3d.vertex.PoseStack(), null, 0
+\bsuper\(n\.getOriginalMusic\(\), => super(n.getOriginalMusic().music(),
+return n\.getMusic\(\); => return n.getMusic() == null ? null : n.getMusic().music();
+\bn\.setMusic\(music\); => n.setMusic(music == null ? null : new net.minecraft.client.sounds.MusicInfo(music));
+\bEntityRenderer<\? extends (\w+)> => EntityRenderer<? extends $1, ?>
+\bEntityRenderer<\?> => EntityRenderer<?, ?>
+\blevel\.getGameRules\(\) => ((net.minecraft.server.level.ServerLevel) level).getGameRules()
+# client item hooks behind 1.21.4's item models (compat.LegacyItems; the item models by tools/overlays.py)
+\bimport net\.minecraft\.client\.color\.item\.ItemColor; => import com.kolodkingal.enhanced.compat.ItemColor;
+\bimport net\.minecraft\.client\.renderer\.BlockEntityWithoutLevelRenderer; => import com.kolodkingal.enhanced.compat.BlockEntityWithoutLevelRenderer;
+\bimport net\.minecraft\.client\.renderer\.item\.CompassItemPropertyFunction; => import com.kolodkingal.enhanced.compat.CompassItemPropertyFunction;
+\bimport net\.minecraft\.client\.renderer\.item\.ItemProperties; => // (ItemProperties: compat.LegacyItems on 1.21.4)
+(?:net\.minecraft\.client\.renderer\.item\.)?\bItemProperties\.register\( => com.kolodkingal.enhanced.compat.LegacyItems.register(
+\bEntityRenderer<T>> R renderer => EntityRenderer<T, ?>> R renderer
+# tools: tiers are tool materials; the attributes the mod gives stay (mixin.ItemPropertiesMixin)
+\bimport net\.minecraft\.world\.item\.Tiers; => // (Tiers: ToolMaterial on 1.21.4)
+\bsuper\(Tiers\.NETHERITE, properties\) => super(net.minecraft.world.item.ToolMaterial.NETHERITE, 0.0F, 0.0F, properties)
+\b(?:SwordItem|AxeItem)\.createAttributes\(Tiers\.NETHERITE,\s* => com.kolodkingal.enhanced.compat.Tools.attributes(
+\bimport net\.minecraft\.world\.item\.EnchantedBookItem; => import net.minecraft.world.item.enchantment.EnchantmentHelper;
+\bEnchantedBookItem\.createForEnchantment\( => EnchantmentHelper.createBook(
+\(Input input\) => (ClientInput input)
+# more models and renderers
+\bHumanoidModel<(?:[\w.]*AbstractClientPlayer|LivingEntity)> => HumanoidModel<net.minecraft.client.renderer.entity.state.PlayerRenderState>
+\bextends HumanoidModel<(\w+)> => extends com.kolodkingal.enhanced.compat.LegacyHumanoidModel<$1>
+\bEntityRenderer<\? super ([\w.]+)> => EntityRenderer<? super $1, ?>
+@Override\s+public ModelPart root\(\) \{\s*return (\w+);\s*\} => // (root(): Model\'s own from 1.21.2, given to the constructor)
+\bTextureStateShard\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*false,\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => TextureStateShard($1, net.minecraft.util.TriState.FALSE, $2)
+\bTextureStateShard\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*true,\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => TextureStateShard($1, net.minecraft.util.TriState.TRUE, $2)
+\bRenderSystem\.runAsFancy\(\(\) -> ((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+)\); => $1;
+\bdispatcher\.render\(((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\))+)\) => dispatcher.render($1, $2, $3, $4, $6, $7, $8, $9)
+public ResourceLocation getTextureLocation\(AbstractClientPlayer (\w+)\) \{ => public ResourceLocation getTextureLocation(net.minecraft.client.renderer.entity.state.PlayerRenderState legacyState) {\n        return getTextureLocation((AbstractClientPlayer) com.kolodkingal.enhanced.compat.RenderBridge.entity(legacyState));\n    }\n\n    public ResourceLocation getTextureLocation(AbstractClientPlayer $1) {
+\b(hulk|renderer)\.render\(player, yaw, pt, poseStack, ((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => $1.render($1.createRenderState(player, pt), poseStack, $2, $3)
+\bevent\.getRenderer\(\)\.getTextureLocation\((\w+)\) => $1.getSkin().texture()
+\bnet\.minecraft\.client\.ParticleStatus\b => net.minecraft.server.level.ParticleStatus
+\bbuiltIn\.getLocation\(\) => builtIn.location()
+\.CHUNK_OFFSET\b => .MODEL_OFFSET
+\bItemRenderer\.getFoilBufferDirect\( => ItemRenderer.getFoilBuffer(
+\bPlayerFaceRenderer\.draw\(g, face, ((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => PlayerFaceRenderer.draw(g, face, $1, $2, $3, true, false, -1)
+\bLevelRenderer\.renderLineBox\( => net.minecraft.client.renderer.ShapeRenderer.renderLineBox(
+\bInventoryMenu\.BLOCK_ATLAS\b => net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS
+# more entities and game
+public boolean isAlliedTo\(Entity (\w+)\) => protected boolean considersEntityAsAlly(Entity $1)
+\bsuper\.isAlliedTo\( => super.considersEntityAsAlly(
+\bsuper\.canChangeDimensions\( => super.canTeleport(
+\.dropLeash\(true, true\) => .dropLeash()
+\bserver\.getServer\(\)\.isSpawningAnimals\(\) => true
+(home\.newLevel\(\)\.dimensionType\(\), )home\.pos\(\) => $1home.position()
+Vec3 at = home\.pos\(\); => Vec3 at = home.position();
+\.getHolder\((?=BOOKS\b) => .get(
+\)\s*\.getTag\((\w+)\) => ).get($1)
+\.getParamOrNull\( => .getOptionalParameter(
+super\(ModEntities\.(IRON_SHRAPNEL|LOKI_DAGGER)\.get\(\), (\w+), level\); => super(ModEntities.$1.get(), $2, level, new net.minecraft.world.item.ItemStack(com.kolodkingal.enhanced.registry.ModItems.$1.get()));
+# more
+public ResourceLocation getTextureLocation\(Wolf (\w+)\) => public ResourceLocation getTextureLocation(net.minecraft.client.renderer.entity.state.WolfRenderState $1)
+protected RenderType getRenderType\(AbstractClientPlayer (\w+), => protected RenderType getRenderType(net.minecraft.client.renderer.entity.state.PlayerRenderState $1,
+(?:@Override\s+)?public ModelPart root\(\) \{\s*return (?:this\.)?root;\s*\} => // (root(): Model\'s own from 1.21.2)
+protected ResourceKey<LootTable> getDefaultLootTable\(\) \{\s*return ([^;]+);\s*\} => protected void dropFromLootTable(net.minecraft.server.level.ServerLevel lootLevel, net.minecraft.world.damagesource.DamageSource lootSource, boolean lootByPlayer) {\n        // (1.21.4: Mob.getLootTable is final; the mob's own table is rolled here as LivingEntity rolls its own)\n        ResourceKey<LootTable> key = $1;\n        net.minecraft.world.level.storage.loot.LootParams.Builder b = new net.minecraft.world.level.storage.loot.LootParams.Builder(lootLevel)\n                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.THIS_ENTITY, this)\n                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, position())\n                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.DAMAGE_SOURCE, lootSource)\n                .withOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ATTACKING_ENTITY, lootSource.getEntity())\n                .withOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.DIRECT_ATTACKING_ENTITY, lootSource.getDirectEntity());\n        if (lootByPlayer && lastHurtByPlayer != null) {\n            b = b.withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.LAST_DAMAGE_PLAYER, lastHurtByPlayer).withLuck(lastHurtByPlayer.getLuck());\n        }\n        lootLevel.getServer().reloadableRegistries().getLootTable(key).getRandomItems(b.create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.ENTITY), getLootTableSeed(), stack -> spawnAtLocation(lootLevel, stack));\n    }
+@Override(\s+public SoundEvent getEatingSound\b) => $1
+\btexture == MissingTextureAtlasSprite\.getLocation\(\) => texture == mc.getTextureManager().getTexture(MissingTextureAtlasSprite.getLocation())
+\bplayer\.getFoodData\(\)\.getExhaustionLevel\(\) => ((com.kolodkingal.enhanced.mixin.FoodDataAccessor) player.getFoodData()).enhanced\$getExhaustionLevel()
+\.isSolidRender\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => .isSolidRender()
+\b(\w+)\.spawnAtLocation\( => $1.spawnAtLocation((net.minecraft.server.level.ServerLevel) $1.level(), 
+(?<![.\w])setCanPassDoors\( => getNodeEvaluator().setCanPassDoors(
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.(?:pass)\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => net.minecraft.world.InteractionResult.PASS
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.(?:fail)\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => net.minecraft.world.InteractionResult.FAIL
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.(?:success|consume)\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => net.minecraft.world.InteractionResult.SUCCESS.heldItemTransformedTo($1)
+(?:net\.minecraft\.world\.)?InteractionResultHolder\.sidedSuccess\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => net.minecraft.world.InteractionResult.SUCCESS.heldItemTransformedTo($1)
+\bEntityType\.BOAT\.create\( => EntityType.DARK_OAK_BOAT.create(
+\b\w+\.setVariant\(Boat\.Type\.DARK_OAK\); => // (one boat type per wood from 1.21.2)
+protected AABB makeBoundingBox\(\) \{ => protected AABB makeBoundingBox(net.minecraft.world.phys.Vec3 boxPos) {
+(?<![.\w])getTextureLocation\((\w+)\)(?!\s*\{) => com.kolodkingal.enhanced.compat.RenderBridge.texture($1)
+\brenderer\.render\(body, ((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+), partialTick, ((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+),\s*((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)\) => com.kolodkingal.enhanced.compat.RenderBridge.render(renderer, body, partialTick, $2, $3, $4)
+# shaped recipe subclasses
+\bshaped\.getGroup\(\) => shaped.group()
+\bshaped\.getResultItem\(null\) => shaped.assemble(net.minecraft.world.item.crafting.CraftingInput.EMPTY, null)
+(?s)(extends ShapedRecipe \{.*?)public RecipeSerializer<\?> getSerializer\(\) => $1public RecipeSerializer<? extends ShapedRecipe> getSerializer()
+\breturn kind\.serializer\.get\(\); => return (RecipeSerializer<? extends ShapedRecipe>) (RecipeSerializer<?>) kind.serializer.get();
+\bsentry\.kill\(\) => sentry.kill((net.minecraft.server.level.ServerLevel) sentry.level())
+\.isAngryAt\((\w+)\) => .isAngryAt($1, (net.minecraft.server.level.ServerLevel) $1.level())
+\bEntitySpawnReason\.SPAWN_EGG\b => EntitySpawnReason.SPAWN_ITEM_USE
+\bnew ((?:net\.minecraft\.client\.model\.)?(?:PlayerModel|HumanoidModel<\w*>))\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)(?=[,)]) => new $1(com.kolodkingal.enhanced.compat.Meshes.humanoid($2)

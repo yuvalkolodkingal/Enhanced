@@ -1,0 +1,25 @@
+{
+  "type": "enhanced:gauntlet_shaped",
+  "category": "equipment",
+  "pattern": [
+    "GNG",
+    "GCG",
+    "GGG"
+  ],
+  "key": {
+    "G": "minecraft:gold_block",
+    "N": "minecraft:netherite_ingot",
+    "C": "minecraft:nether_star"
+  },
+  "result": {
+    "id": "enhanced:infinity_gauntlet",
+    "count": 1,
+    "components": {
+      "enhanced:gauntlet": {
+        "stones": 0,
+        "titan": false,
+        "selected": 0
+      }
+    }
+  }
+}

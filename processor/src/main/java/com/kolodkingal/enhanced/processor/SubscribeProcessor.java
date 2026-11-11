@@ -5,8 +5,6 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -53,14 +51,17 @@ import java.util.TreeMap;
  * common event ({@code platform.event} or {@code platform.event.client}); its class is a public {@code @Subscriber}
  * (nested classes public and static); a client event only in a {@code Side.CLIENT} subscriber.
  */
-@SupportedAnnotationTypes({SubscribeProcessor.SUBSCRIBE, SubscribeProcessor.SUBSCRIBER})
-@SupportedOptions(SubscribeProcessor.ORDER_OPTION)
 public final class SubscribeProcessor extends AbstractProcessor {
-    static final String EVENT_PACKAGE = "com.kolodkingal.enhanced.platform.event";
-    static final String SUBSCRIBE = EVENT_PACKAGE + ".Subscribe";
-    static final String SUBSCRIBER = EVENT_PACKAGE + ".Subscriber";
+    /** The mod's base package; a version copy of the mod (moved to {@code <base>.v1_21_4}) passes its own. */
+    static final String DEFAULT_BASE = "com.kolodkingal.enhanced";
     static final String ORDER_OPTION = "enhanced.listenerOrder";
-    static final String OUT_PACKAGE = EVENT_PACKAGE + ".generated";
+    static final String BASE_OPTION = "enhanced.basePackage";
+
+    private String base = DEFAULT_BASE;
+    private String EVENT_PACKAGE = DEFAULT_BASE + ".platform.event";
+    private String SUBSCRIBE = EVENT_PACKAGE + ".Subscribe";
+    private String SUBSCRIBER = EVENT_PACKAGE + ".Subscriber";
+    private String OUT_PACKAGE = EVENT_PACKAGE + ".generated";
     static final String[] PRIORITIES = {"HIGHEST", "HIGH", "NORMAL", "LOW", "LOWEST"};
 
     private Elements elements;
@@ -83,6 +84,25 @@ public final class SubscribeProcessor extends AbstractProcessor {
         elements = env.getElementUtils();
         messager = env.getMessager();
         filer = env.getFiler();
+        String option = env.getOptions().get(BASE_OPTION);
+        if (option != null && !option.isBlank()) {
+            base = option.trim();
+            EVENT_PACKAGE = base + ".platform.event";
+            SUBSCRIBE = EVENT_PACKAGE + ".Subscribe";
+            SUBSCRIBER = EVENT_PACKAGE + ".Subscriber";
+            OUT_PACKAGE = EVENT_PACKAGE + ".generated";
+        }
+    }
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        // every base package: the option is only known after init
+        return Set.of("*");
+    }
+
+    @Override
+    public Set<String> getSupportedOptions() {
+        return Set.of(ORDER_OPTION, BASE_OPTION);
     }
 
     @Override
@@ -212,7 +232,12 @@ public final class SubscribeProcessor extends AbstractProcessor {
             return ranks;
         }
         try {
-            ListenerOrder order = ListenerOrder.parse(Files.readAllLines(file, StandardCharsets.UTF_8));
+            List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+            if (!base.equals(DEFAULT_BASE)) {
+                // the recording names the 1.21.1 classes; a moved copy has the same listeners in its own package
+                lines = lines.stream().map(l -> l.replace(DEFAULT_BASE + ".", base + ".")).toList();
+            }
+            ListenerOrder order = ListenerOrder.parse(lines);
             order.merged().forEach((group, keys) -> {
                 Map<String, Integer> rank = new HashMap<>();
                 for (int i = 0; i < keys.size(); i++) {

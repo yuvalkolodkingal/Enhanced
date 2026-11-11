@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bread",
+    "#enhanced:chimichanga_fillings",
+    "minecraft:carrot"
+  ],
+  "result": {
+    "id": "enhanced:chimichanga",
+    "count": 2
+  }
+}

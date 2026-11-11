@@ -127,4 +127,11 @@ public class SeatEntity extends Entity {
     public boolean isPickable() {
         return false;
     }
+
+    //#if >=1.21.4
+    //$$ @Override
+    //$$ public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+    //$$     return false;
+    //$$ }
+    //#endif
 }

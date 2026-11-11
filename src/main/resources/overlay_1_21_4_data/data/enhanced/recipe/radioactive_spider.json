@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FGF",
+    "GBG",
+    "FGF"
+  ],
+  "key": {
+    "F": "minecraft:fermented_spider_eye",
+    "G": "minecraft:glow_ink_sac",
+    "B": "minecraft:slime_block"
+  },
+  "result": {
+    "id": "enhanced:radioactive_spider",
+    "count": 1
+  }
+}

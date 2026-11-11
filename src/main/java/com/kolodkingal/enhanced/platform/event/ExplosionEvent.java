@@ -28,10 +28,13 @@ public abstract class ExplosionEvent {
     /** An explosion goes off: what it breaks and whom it hits (live lists). */
     public static class Detonate extends ExplosionEvent {
         private final List<Entity> affectedEntities;
+        private final List<BlockPos> affectedBlocks;
 
-        public Detonate(Level level, Explosion explosion, List<Entity> affectedEntities) {
+        public Detonate(Level level, Explosion explosion, List<Entity> affectedEntities,
+                        List<BlockPos> affectedBlocks) {
             super(level, explosion);
             this.affectedEntities = affectedEntities;
+            this.affectedBlocks = affectedBlocks;
         }
 
         public List<Entity> getAffectedEntities() {
@@ -40,7 +43,7 @@ public abstract class ExplosionEvent {
 
         /** The blocks the explosion breaks (a live list: remove a position to spare it). */
         public List<BlockPos> getAffectedBlocks() {
-            return getExplosion().getToBlow();
+            return affectedBlocks;
         }
     }
 }

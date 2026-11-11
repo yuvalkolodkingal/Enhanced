@@ -36,7 +36,6 @@ import java.util.function.Function;
  * listeners, a cancellation made by anyone is seen by everyone, and every change a listener makes is made on the
  * NeoForge event itself.
  */
-@EventBusSubscriber(modid = Enhanced.MODID)
 public final class NeoForgeBridge {
     private static final Map<Class<?>, Binding<?, ?>> BINDINGS = new HashMap<>();
     private static IEventBus modBus;

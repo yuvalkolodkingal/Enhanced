@@ -283,7 +283,8 @@ public final class GameBindings {
                 NeoPistonEventPre::new);
         Binding.put(table, ExplosionEvent.Detonate.class,
                 net.neoforged.neoforge.event.level.ExplosionEvent.Detonate.class,
-                n -> new ExplosionEvent.Detonate(n.getLevel(), n.getExplosion(), n.getAffectedEntities()));
+                n -> new ExplosionEvent.Detonate(n.getLevel(), n.getExplosion(), n.getAffectedEntities(),
+                        n.getAffectedBlocks()));
         Binding.put(table, ExplosionKnockbackEvent.class,
                 net.neoforged.neoforge.event.level.ExplosionKnockbackEvent.class,
                 NeoExplosionKnockbackEvent::new);

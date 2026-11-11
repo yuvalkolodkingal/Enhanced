@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "GRG",
+    "G G"
+  ],
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "enhanced:wanda_crown",
+    "count": 1
+  }
+}

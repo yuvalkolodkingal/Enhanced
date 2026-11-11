@@ -1,0 +1,19 @@
+{
+  "type": "enhanced:stone_locator",
+  "category": "equipment",
+  "pattern": [
+    "NKN",
+    "DSD",
+    "NDN"
+  ],
+  "key": {
+    "N": "minecraft:netherite_block",
+    "K": "minecraft:wither_skeleton_skull",
+    "D": "minecraft:diamond_block",
+    "S": "#enhanced:locator_cores"
+  },
+  "result": {
+    "id": "enhanced:stone_locator",
+    "count": 1
+  }
+}

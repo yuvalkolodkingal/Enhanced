@@ -1,0 +1,20 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "enhanced:legacy",
+    "name": "enhanced:folded",
+    "entries": [
+      {
+        "threshold": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/iron_man_mark_5_suitcase"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "enhanced:item/iron_man_mark_5"
+    }
+  }
+}

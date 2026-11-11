@@ -195,7 +195,11 @@ public class NanoDroneEntity extends Entity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        //#if >=1.21.4
+        //$$ if (!level().isClientSide() && !isInvulnerableToBase(source)) {
+        //#else
         if (!level().isClientSide() && !isInvulnerableTo(source)) {
+        //#endif
             entityData.set(FLICKER, tickCount);
         }
         return false;

@@ -92,7 +92,9 @@ public class VibraniumKeyEntity extends Entity {
         return false;
     }
 
+    //#if <1.21.4
     @Override
+    //#endif
     public boolean isInvulnerableTo(DamageSource source) {
         return true;
     }

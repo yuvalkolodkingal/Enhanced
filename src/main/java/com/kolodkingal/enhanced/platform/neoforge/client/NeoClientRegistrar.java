@@ -32,7 +32,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+//#if <1.21.4
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+//#endif
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -64,7 +66,9 @@ public final class NeoClientRegistrar implements ClientRegistrar {
     private final List<Consumer<RegisterParticleProvidersEvent>> particles = new ArrayList<>();
     private final List<KeyMapping> keys = new ArrayList<>();
     private final List<Consumer<RegisterGuiLayersEvent>> guiLayers = new ArrayList<>();
+    //#if <1.21.4
     private final List<Consumer<RegisterColorHandlersEvent.Item>> itemColors = new ArrayList<>();
+    //#endif
     private final List<Consumer<RegisterClientExtensionsEvent>> itemExtensions = new ArrayList<>();
     private final List<Consumer<RegisterDimensionSpecialEffectsEvent>> dimensionEffects = new ArrayList<>();
     private final List<PreparableReloadListener> reloadListeners = new ArrayList<>();
@@ -85,12 +89,24 @@ public final class NeoClientRegistrar implements ClientRegistrar {
         modBus.addListener(RegisterParticleProvidersEvent.class, e -> registrar.particles.forEach(r -> r.accept(e)));
         modBus.addListener(RegisterKeyMappingsEvent.class, e -> registrar.keys.forEach(e::register));
         modBus.addListener(RegisterGuiLayersEvent.class, e -> registrar.guiLayers.forEach(r -> r.accept(e)));
+        //#if >=1.21.4
+        //$$ com.kolodkingal.enhanced.compat.LegacyItems.install(modBus);
+        //#else
         modBus.addListener(RegisterColorHandlersEvent.Item.class, e -> registrar.itemColors.forEach(r -> r.accept(e)));
+        //#endif
         modBus.addListener(RegisterClientExtensionsEvent.class, e -> registrar.itemExtensions.forEach(r -> r.accept(e)));
         modBus.addListener(RegisterDimensionSpecialEffectsEvent.class,
                 e -> registrar.dimensionEffects.forEach(r -> r.accept(e)));
+        //#if >=1.21.4
+        //$$ modBus.addListener(net.neoforged.neoforge.client.event.AddClientReloadListenersEvent.class, e -> {
+        //$$     for (int i = 0; i < registrar.reloadListeners.size(); i++) {
+        //$$         e.addListener(com.kolodkingal.enhanced.Enhanced.id("reload_" + i), registrar.reloadListeners.get(i));
+        //$$     }
+        //$$ });
+        //#else
         modBus.addListener(RegisterClientReloadListenersEvent.class,
                 e -> registrar.reloadListeners.forEach(e::registerReloadListener));
+        //#endif
         NeoForge.EVENT_BUS.addListener(RegisterClientCommandsEvent.class,
                 e -> registrar.commands.forEach(c -> c.accept(e.getDispatcher(), e.getBuildContext())));
         return registrar;
@@ -168,12 +184,21 @@ public final class NeoClientRegistrar implements ClientRegistrar {
 
     @Override
     public void itemColor(ItemColor color, List<? extends Supplier<? extends ItemLike>> items) {
+        //#if >=1.21.4
+        //$$ com.kolodkingal.enhanced.compat.LegacyItems.colour(color, items);
+        //#else
         itemColors.add(e -> e.register(color, items.stream().map(Supplier::get).toArray(ItemLike[]::new)));
+        //#endif
     }
 
     @Override
     public void specialItemRenderer(Supplier<BlockEntityWithoutLevelRenderer> renderer,
                                     List<? extends Supplier<? extends ItemLike>> items) {
+        //#if >=1.21.4
+        //$$ if (renderer != null) {
+        //$$     com.kolodkingal.enhanced.compat.LegacyItems.renderer(renderer, items);
+        //$$ }
+        //#else
         IClientItemExtensions extensions = renderer == null ? new IClientItemExtensions() {
         } : new IClientItemExtensions() {
             @Override
@@ -183,6 +208,7 @@ public final class NeoClientRegistrar implements ClientRegistrar {
         };
         itemExtensions.add(e -> e.registerItem(extensions,
                 items.stream().map(item -> item.get().asItem()).toArray(Item[]::new)));
+        //#endif
     }
 
     @Override

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "enhanced:empty_tesseract",
+    "enhanced:space_stone"
+  ],
+  "result": {
+    "id": "enhanced:tesseract",
+    "count": 1
+  }
+}

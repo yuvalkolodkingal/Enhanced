@@ -169,3 +169,33 @@ out what phases 0 to 3 really cost before Enhanced commits to them.
 What is uncertain: the per-version notes in section 4 for 1.21.5 and later are from NeoForge's release notes and from
 memory, not from doing the work, and 26.2 and 26.3 have not been audited at all. Phase 0 and the audit numbers are
 the facts; the rest should be re-measured at the start of each phase.
+
+## Progress (3.11.0): 1.21.1 and 1.21.4 in one jar
+
+Phases 0 to 3 are done for 1.21.4 (1.21.3 is left out: nobody plays it, and 1.21.4 has the same changes), in the
+same way as Enlightened 1.0.29.
+
+* **The jar**: `boot.EnhancedBoot` is the only `@Mod`; `boot.Versions` lists the copies; `boot.MixinGate` lets a copy's
+  mixins apply only on its version. `NeoForgeBridge` is installed by the entry instead of being found by scanning.
+  The build makes each copy's mixin config from `enhanced.mixins.json` plus the version's own mixins
+  (`versions/1.21.4/mixins.json`).
+* **The sources**: one tree. `versions/1.21.4` makes the 1.21.4 copy with the `Preprocess` task (buildSrc): version
+  blocks (`//#if >=1.21.4` ... `//#else` ... `//#endif`), whole-file replacements in `versions/1.21.4/src/main/java`
+  and about 300 renames in `versions/1.21.4/renames.txt` (most of the differences are mechanical: new parameters, a
+  render state instead of the entity, the teleport and item-result types). The `@Subscribe` index is generated for the
+  copy too (the processor takes the copy's package, `-Aenhanced.basePackage`).
+* **1.21.4's own code** (`versions/1.21.4/src/main/java`): the render-state bridge and the `Legacy*` model and renderer
+  bases, so the heroes' renderers, models and layers draw unchanged from a render state; `compat.Ids` (an item's and a
+  block's id is given to its properties while it is registered, and the mod's own durability and attributes stay);
+  the armour materials as 1.21.4 values with equipment assets; `compat.AttachSync` (NeoForge 21.4 has no attachment
+  sync); `compat.LegacyItems` (item properties, item colours and the items drawn by code, behind 1.21.4's item
+  models); the stone extraction recipe; the client mixins whose targets changed.
+* **Resources**: pack overlays made by `tools/overlays.py`: recipes, biomes and NeoForge's load conditions in 1.21.4's
+  format; an item model definition for every item (the overrides as range dispatches, the separate GUI models as a
+  display-context select, the spawn eggs' and the Stone Locator's tints, the Vibranium Shield as a special model); the
+  models that used NeoForge 21.1's `item_layers` and `separate_transforms` loaders; the slow-motion post effects.
+* **Checked**: both copies compile; the jar starts a dedicated server on 1.21.1 and on 1.21.4 (with Enlightened beside
+  it); the GameTests pass on 1.21.1. The GameTests are not built for 1.21.4 yet.
+* **Known differences on 1.21.4**: items' emissive layers (the Infinity Stones' glow in the inventory) are drawn
+  plainly (21.4 has no per-layer light for generated items); Hela's fading uses the model's full alpha; Wanda's crown is
+  drawn on the Scarlet Witch's suit too.

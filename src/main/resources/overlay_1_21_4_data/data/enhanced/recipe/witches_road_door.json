@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ALA",
+    "TET",
+    "ALA"
+  ],
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "L": "minecraft:soul_lantern",
+    "T": "minecraft:dark_oak_trapdoor",
+    "E": "minecraft:ender_eye"
+  },
+  "result": {
+    "id": "enhanced:witches_road_door",
+    "count": 1
+  }
+}

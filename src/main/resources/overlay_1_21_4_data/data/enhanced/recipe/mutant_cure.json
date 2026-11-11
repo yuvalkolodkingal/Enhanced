@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "minecraft:milk_bucket",
+    "minecraft:echo_shard",
+    "minecraft:iron_nugget"
+  ],
+  "result": {
+    "id": "enhanced:mutant_cure",
+    "count": 1
+  }
+}

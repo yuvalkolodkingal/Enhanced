@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "enhanced:empty_scepter",
+    "enhanced:mind_stone"
+  ],
+  "result": {
+    "id": "enhanced:lokis_scepter",
+    "count": 1
+  }
+}

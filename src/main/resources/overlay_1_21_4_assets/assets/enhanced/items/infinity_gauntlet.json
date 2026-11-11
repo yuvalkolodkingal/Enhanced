@@ -1,0 +1,454 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "enhanced:legacy",
+    "name": "enhanced:stones",
+    "entries": [
+      {
+        "threshold": 0.015625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_01"
+        }
+      },
+      {
+        "threshold": 0.03125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_02"
+        }
+      },
+      {
+        "threshold": 0.046875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_03"
+        }
+      },
+      {
+        "threshold": 0.0625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_04"
+        }
+      },
+      {
+        "threshold": 0.078125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_05"
+        }
+      },
+      {
+        "threshold": 0.09375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_06"
+        }
+      },
+      {
+        "threshold": 0.109375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_07"
+        }
+      },
+      {
+        "threshold": 0.125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_08"
+        }
+      },
+      {
+        "threshold": 0.140625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_09"
+        }
+      },
+      {
+        "threshold": 0.15625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_10"
+        }
+      },
+      {
+        "threshold": 0.171875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_11"
+        }
+      },
+      {
+        "threshold": 0.1875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_12"
+        }
+      },
+      {
+        "threshold": 0.203125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_13"
+        }
+      },
+      {
+        "threshold": 0.21875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_14"
+        }
+      },
+      {
+        "threshold": 0.234375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_15"
+        }
+      },
+      {
+        "threshold": 0.25,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_16"
+        }
+      },
+      {
+        "threshold": 0.265625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_17"
+        }
+      },
+      {
+        "threshold": 0.28125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_18"
+        }
+      },
+      {
+        "threshold": 0.296875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_19"
+        }
+      },
+      {
+        "threshold": 0.3125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_20"
+        }
+      },
+      {
+        "threshold": 0.328125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_21"
+        }
+      },
+      {
+        "threshold": 0.34375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_22"
+        }
+      },
+      {
+        "threshold": 0.359375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_23"
+        }
+      },
+      {
+        "threshold": 0.375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_24"
+        }
+      },
+      {
+        "threshold": 0.390625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_25"
+        }
+      },
+      {
+        "threshold": 0.40625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_26"
+        }
+      },
+      {
+        "threshold": 0.421875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_27"
+        }
+      },
+      {
+        "threshold": 0.4375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_28"
+        }
+      },
+      {
+        "threshold": 0.453125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_29"
+        }
+      },
+      {
+        "threshold": 0.46875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_30"
+        }
+      },
+      {
+        "threshold": 0.484375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_31"
+        }
+      },
+      {
+        "threshold": 0.5,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_32"
+        }
+      },
+      {
+        "threshold": 0.515625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_33"
+        }
+      },
+      {
+        "threshold": 0.53125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_34"
+        }
+      },
+      {
+        "threshold": 0.546875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_35"
+        }
+      },
+      {
+        "threshold": 0.5625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_36"
+        }
+      },
+      {
+        "threshold": 0.578125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_37"
+        }
+      },
+      {
+        "threshold": 0.59375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_38"
+        }
+      },
+      {
+        "threshold": 0.609375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_39"
+        }
+      },
+      {
+        "threshold": 0.625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_40"
+        }
+      },
+      {
+        "threshold": 0.640625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_41"
+        }
+      },
+      {
+        "threshold": 0.65625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_42"
+        }
+      },
+      {
+        "threshold": 0.671875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_43"
+        }
+      },
+      {
+        "threshold": 0.6875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_44"
+        }
+      },
+      {
+        "threshold": 0.703125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_45"
+        }
+      },
+      {
+        "threshold": 0.71875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_46"
+        }
+      },
+      {
+        "threshold": 0.734375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_47"
+        }
+      },
+      {
+        "threshold": 0.75,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_48"
+        }
+      },
+      {
+        "threshold": 0.765625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_49"
+        }
+      },
+      {
+        "threshold": 0.78125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_50"
+        }
+      },
+      {
+        "threshold": 0.796875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_51"
+        }
+      },
+      {
+        "threshold": 0.8125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_52"
+        }
+      },
+      {
+        "threshold": 0.828125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_53"
+        }
+      },
+      {
+        "threshold": 0.84375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_54"
+        }
+      },
+      {
+        "threshold": 0.859375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_55"
+        }
+      },
+      {
+        "threshold": 0.875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_56"
+        }
+      },
+      {
+        "threshold": 0.890625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_57"
+        }
+      },
+      {
+        "threshold": 0.90625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_58"
+        }
+      },
+      {
+        "threshold": 0.921875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_59"
+        }
+      },
+      {
+        "threshold": 0.9375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_60"
+        }
+      },
+      {
+        "threshold": 0.953125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_61"
+        }
+      },
+      {
+        "threshold": 0.96875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_62"
+        }
+      },
+      {
+        "threshold": 0.984375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/gauntlet/infinity_gauntlet_63"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "enhanced:item/infinity_gauntlet"
+    }
+  }
+}

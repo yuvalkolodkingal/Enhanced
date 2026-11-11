@@ -189,4 +189,11 @@ public class MjolnirPinEntity extends Entity {
     public long endsAt() {
         return endsAt;
     }
+
+    //#if >=1.21.4
+    //$$ @Override
+    //$$ public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+    //$$     return false;
+    //$$ }
+    //#endif
 }

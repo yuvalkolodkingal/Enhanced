@@ -23,22 +23,26 @@ import com.kolodkingal.enhanced.registry.ModStructures;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 /**
  * Enhanced: become an MCU hero.
  */
-@Mod(Enhanced.MODID)
+/* Started by boot.EnhancedBoot (the jar's only @Mod), which picks the copy of the running Minecraft version. */
 public class Enhanced {
     public static final String MODID = "enhanced";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public Enhanced(IEventBus modBus, ModContainer container) {
+        // (the bridge used to start on FMLConstructModEvent, found by scanning; a copy for another version must never be
+        // found, so it is started here, before anything registers a listener)
+        com.kolodkingal.enhanced.platform.neoforge.bridge.NeoForgeBridge.install();
         // Port P0: the platform layer's NeoForge glue (attachments, messages, entity attributes) comes first.
         NeoSetup.init(modBus);
+        //#if <1.21.4
         NeoRegistrars.register(ModArmorMaterials.ARMOR_MATERIALS, modBus);
+        //#endif
         NeoRegistrars.register(ModDataComponents.DATA_COMPONENTS, modBus);
         NeoRegistrars.register(ModBlocks.BLOCKS, modBus);
         NeoRegistrars.register(ModBlockEntities.BLOCK_ENTITIES, modBus);

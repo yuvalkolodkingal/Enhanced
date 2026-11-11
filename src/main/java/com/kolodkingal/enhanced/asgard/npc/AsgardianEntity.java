@@ -726,6 +726,13 @@ public class AsgardianEntity extends PathfinderMob implements Merchant {
     protected void pickUpItem(ItemEntity item) {
     }
 
+    //#if >=1.21.4
+    //$$ @Override
+    //$$ public boolean stillValid(Player player) {
+    //$$     return getTradingPlayer() == player && isAlive() && player.distanceToSqr(this) <= 64.0;
+    //$$ }
+    //$$
+    //#endif
     // ---- talking ----
 
     @Override

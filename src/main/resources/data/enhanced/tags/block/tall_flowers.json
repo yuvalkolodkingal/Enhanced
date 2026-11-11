@@ -1,0 +1,12 @@
+{
+  "values": [
+    "minecraft:sunflower",
+    "minecraft:lilac",
+    "minecraft:rose_bush",
+    "minecraft:peony",
+    {
+      "id": "minecraft:pitcher_plant",
+      "required": false
+    }
+  ]
+}

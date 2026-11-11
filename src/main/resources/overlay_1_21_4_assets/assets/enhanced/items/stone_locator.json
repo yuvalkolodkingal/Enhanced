@@ -1,0 +1,618 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "enhanced:legacy",
+    "name": "enhanced:angle",
+    "entries": [
+      {
+        "threshold": 0.0,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_00",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.015625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_01",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.046875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_02",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.078125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_03",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.109375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_04",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.140625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_05",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.171875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_06",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.203125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_07",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.234375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_08",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.265625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_09",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.296875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_10",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.328125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_11",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.359375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_12",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.390625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_13",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.421875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_14",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.453125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_15",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.484375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_16",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.515625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_17",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.546875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_18",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.578125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_19",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.609375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_20",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.640625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_21",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.671875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_22",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.703125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_23",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.734375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_24",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.765625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_25",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.796875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_26",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.828125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_27",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.859375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_28",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.890625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_29",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.921875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_30",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.953125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_31",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 0.984375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "enhanced:item/stone_locator_00",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "enhanced:legacy",
+              "item": "enhanced:stone_locator",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "enhanced:item/stone_locator",
+      "tints": [
+        {
+          "type": "minecraft:constant",
+          "value": -1
+        },
+        {
+          "type": "enhanced:legacy",
+          "item": "enhanced:stone_locator",
+          "index": 1
+        }
+      ]
+    }
+  }
+}

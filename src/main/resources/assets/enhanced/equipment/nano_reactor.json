@@ -1,0 +1,9 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "enhanced:nano_reactor"
+      }
+    ]
+  }
+}

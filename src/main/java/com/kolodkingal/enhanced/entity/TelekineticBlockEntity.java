@@ -361,11 +361,13 @@ public class TelekineticBlockEntity extends Entity {
     }
 
     /** A held door is drawn two blocks tall: its upper half is seen even when only the top is in view. */
+    //#if <1.21.4
     @Override
     public AABB getBoundingBoxForCulling() {
         AABB box = super.getBoundingBoxForCulling();
         return BlockLifting.isDoor(getBlockState()) ? box.expandTowards(0.0, 1.0, 0.0) : box;
     }
+    //#endif
 
     /** A borrowed block never leaves the dimension of its arena (D-T 7). */
     @Override
@@ -429,4 +431,11 @@ public class TelekineticBlockEntity extends Entity {
             tag.putUUID("Thrower", thrower);
         }
     }
+
+    //#if >=1.21.4
+    //$$ @Override
+    //$$ public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+    //$$     return false;
+    //$$ }
+    //#endif
 }
