@@ -84,7 +84,7 @@ public class HortonManorPiece extends StructurePiece {
         BlockState air = Blocks.AIR.defaultBlockState();
         BlockState brick = Blocks.BRICKS.defaultBlockState();
         BlockState stone = Blocks.SMOOTH_STONE.defaultBlockState();
-        BlockState quoin = Blocks.STONE_BRICKS.defaultBlockState();
+        BlockState quoin = Blocks.CALCITE.defaultBlockState();
         BlockState trim = Blocks.IRON_BLOCK.defaultBlockState();
         BlockState floor = Blocks.POLISHED_ANDESITE.defaultBlockState();
         // the ground under it made level: a lawn before it, and the house's own footing
@@ -95,8 +95,9 @@ public class HortonManorPiece extends StructurePiece {
         // the shell, as the Horton estate in the series: red brick, stone quoins and bands, two floors
         fill(-HALF_X, 0, -HALF_Z, HALF_X, 11, HALF_Z, brick);
         // the wings at both ends, a little forward, and the entrance bay in the middle
+        // (the wings stand a floor higher than the middle, as at the estate in the series)
         for (int sx : new int[] {-1, 1}) {
-            fill(sx * 9, 0, -HALF_Z - 3, sx * HALF_X, 13, -HALF_Z - 1, brick);
+            fill(sx * 9, 0, -HALF_Z - 3, sx * HALF_X, 17, HALF_Z, brick);
         }
         fill(-3, 0, -HALF_Z - 2, 3, 11, -HALF_Z - 1, brick);
         for (int f : new int[] {0, 6}) {
@@ -129,30 +130,55 @@ public class HortonManorPiece extends StructurePiece {
             band(y, stone);
         }
         for (int[] c : new int[][] {{-HALF_X, HALF_Z}, {HALF_X, HALF_Z}, {-HALF_X, -HALF_Z - 3}, {HALF_X, -HALF_Z - 3},
-                {-9, -HALF_Z - 3}, {9, -HALF_Z - 3}, {-3, -HALF_Z - 2}, {3, -HALF_Z - 2}}) {
-            for (int y = 0; y <= 11; y += 2) {
-                set(c[0], y, c[1], quoin);
+                {-9, -HALF_Z - 3}, {9, -HALF_Z - 3}, {-9, HALF_Z}, {9, HALF_Z}, {-3, -HALF_Z - 2}, {3, -HALF_Z - 2}}) {
+            int top = Math.abs(c[0]) >= 9 ? 17 : 11;
+            for (int y = 0; y <= top; y++) {
+                set(c[0], y, c[1], (y & 1) == 0 ? quoin : Blocks.SMOOTH_QUARTZ.defaultBlockState());
             }
         }
         // the roof: flat behind a stone parapet, chimneys, little turrets on the corners of the wings
         fill(-HALF_X + 1, 12, -HALF_Z + 1, HALF_X - 1, 12, HALF_Z - 1, Blocks.STONE_BRICK_SLAB.defaultBlockState());
-        parapet(-HALF_X, -HALF_Z, HALF_X, HALF_Z, 12);
+        // (the middle's balustrade, front and back, between the wings)
+        fill(-8, 12, -HALF_Z, 8, 12, -HALF_Z, Blocks.STONE_BRICK_WALL.defaultBlockState());
+        fill(-8, 12, HALF_Z, 8, 12, HALF_Z, Blocks.STONE_BRICK_WALL.defaultBlockState());
         for (int sx : new int[] {-1, 1}) {
-            parapet(Math.min(sx * 9, sx * HALF_X), -HALF_Z - 3, Math.max(sx * 9, sx * HALF_X), -HALF_Z - 1, 14);
-            for (int x : new int[] {sx * 9, sx * HALF_X}) {
-                fill(x, 12, -HALF_Z - 3, x, 16, -HALF_Z - 3, quoin);
-                set(x, 17, -HALF_Z - 3, Blocks.POLISHED_DEEPSLATE.defaultBlockState());
-                set(x, 18, -HALF_Z - 3, Blocks.LIGHTNING_ROD.defaultBlockState());
+            int x1 = Math.min(sx * 9, sx * HALF_X);
+            int x2 = Math.max(sx * 9, sx * HALF_X);
+            // the wing's third row of windows, its roof and balustrade
+            for (int z = -HALF_Z + 1; z <= HALF_Z - 2; z += 4) {
+                mullion(sx * HALF_X, 12, z, false);
+            }
+            mullion(sx > 0 ? 10 : -11, 12, -HALF_Z - 3, true);
+            mullion(sx > 0 ? 10 : -11, 12, HALF_Z, true);
+            band(x1, -HALF_Z - 3, x2, HALF_Z, 11, Blocks.SMOOTH_STONE.defaultBlockState());
+            fill(x1 + 1, 18, -HALF_Z - 2, x2 - 1, 18, HALF_Z - 1, Blocks.STONE_BRICK_SLAB.defaultBlockState());
+            parapet(x1, -HALF_Z - 3, x2, HALF_Z, 18);
+            // turrets on its four corners: white and brick, a grey lead dome, a gilt finial
+            for (int x : new int[] {x1, x2}) {
+                for (int z : new int[] {-HALF_Z - 3, HALF_Z}) {
+                    fill(x, 18, z, x, 20, z, quoin);
+                    set(x, 21, z, Blocks.POLISHED_ANDESITE.defaultBlockState());
+                    set(x, 22, z, Blocks.ANDESITE_WALL.defaultBlockState());
+                    set(x, 23, z, Blocks.LIGHTNING_ROD.defaultBlockState());
+                }
             }
             fill(sx * 6, 12, 5, sx * 6, 17, 5, brick);
             fill(sx * 6, 12, -5, sx * 6, 17, -5, brick);
+            // ivy on the front, between the windows
+            RandomSource ivy = RandomSource.create(o.asLong() + sx);
+            for (int x : sx > 0 ? new int[] {4, 7, 8} : new int[] {-4, -5, -8}) {
+                int top = 2 + ivy.nextInt(8);
+                for (int y = 0; y <= top; y++) {
+                    set(x, y, -HALF_Z - 1, Blocks.VINE.defaultBlockState().setValue(net.minecraft.world.level.block.VineBlock.SOUTH, true));
+                }
+            }
         }
         // the clock tower over the entrance, and its white cupola
-        fill(-2, 12, -HALF_Z - 2, 2, 21, -HALF_Z + 2, brick);
+        fill(-2, 12, -HALF_Z - 2, 2, 21, -HALF_Z + 2, Blocks.CALCITE.defaultBlockState());
         for (int[] c : new int[][] {{-2, -HALF_Z - 2}, {2, -HALF_Z - 2}, {-2, -HALF_Z + 2}, {2, -HALF_Z + 2}}) {
-            fill(c[0], 12, c[1], c[0], 21, c[1], quoin);
+            fill(c[0], 12, c[1], c[0], 21, c[1], Blocks.SMOOTH_QUARTZ.defaultBlockState());
         }
-        fill(-1, 15, -HALF_Z - 2, 1, 17, -HALF_Z - 2, Blocks.CALCITE.defaultBlockState());
+        fill(-1, 15, -HALF_Z - 2, 1, 17, -HALF_Z - 2, Blocks.SMOOTH_QUARTZ.defaultBlockState());
         set(0, 16, -HALF_Z - 2, Blocks.BLACK_CONCRETE.defaultBlockState());
         band(-2, -HALF_Z - 2, 2, -HALF_Z + 2, 18, stone);
         for (int y = 19; y <= 20; y++) {
@@ -189,7 +215,7 @@ public class HortonManorPiece extends StructurePiece {
             for (int z = -7; z <= 7; z++) {
                 double d = Math.sqrt(x * x + z * z);
                 if (d <= 6.5) {
-                    set(x, -1, fz + z, Blocks.GRAVEL.defaultBlockState());
+                    set(x, -1, fz + z, d <= 4.5 ? Blocks.GRASS_BLOCK.defaultBlockState() : Blocks.GRAVEL.defaultBlockState());
                 }
                 if (d <= 3.5 && d > 2.5) {
                     set(x, 0, fz + z, quoin);
