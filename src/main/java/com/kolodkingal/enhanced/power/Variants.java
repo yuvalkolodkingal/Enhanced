@@ -17,7 +17,9 @@ public final class Variants {
                 new Variant("vision", Power.VISION, Variant.suit("vision"), Variant.suit("vision_cape"), false, Power.VISION.color, Power.VISION.glow),
                 new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), Variant.suit("white_vision_cape"), false, 0xA6E2F0, 0xE8FBFF),
                 // 3.12: earned from the Human Torch in Vision's mind (EarnedLooks)
-                new Variant("source_code", Power.VISION, Variant.suit("vision_source_code"), Variant.suit("vision_source_code_cape"), false, 0xFFC93A, 0xFFF3C2));
+                new Variant("source_code", Power.VISION, Variant.suit("vision_source_code"), Variant.suit("vision_source_code_cape"), false, 0xFFC93A, 0xFFF3C2),
+                // 3.12.1: the VisionQuest look, its eyes glowing while a power is in use (VisionQuestEyesLayer)
+                new Variant("vision_visionquest", Power.VISION, Variant.suit("vision_visionquest"), Variant.suit("vision_cape"), false, 0xFFC93A, 0xFFF3C2));
 
         add(Power.BILLY,
                 new Variant("wiccan", Power.BILLY, Variant.suit("billy_wiccan"), Variant.suit("billy_wiccan_cape"), false, Power.BILLY.color, Power.BILLY.glow),

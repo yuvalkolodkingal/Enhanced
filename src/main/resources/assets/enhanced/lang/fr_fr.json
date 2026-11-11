@@ -5126,5 +5126,6 @@
   "sign.enhanced.horton.nano.3": "Ne pas toucher.",
   "mind.enhanced.nano_question.start": "Que suis-je pour toi ?",
   "mind.enhanced.nano_question.start.0": "Tu n'es rien pour moi.",
-  "mind.enhanced.nano_question.start.1": "Tu n'es pas mon père. Tu es mon quelque chose."
+  "mind.enhanced.nano_question.start.1": "Tu n'es pas mon père. Tu es mon quelque chose.",
+  "variant.enhanced.vision.vision_visionquest": "VisionQuest"
 }

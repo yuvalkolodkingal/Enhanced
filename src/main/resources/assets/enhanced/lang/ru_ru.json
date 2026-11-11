@@ -5126,5 +5126,6 @@
   "sign.enhanced.horton.nano.3": "Не трогать.",
   "mind.enhanced.nano_question.start": "Кто я для тебя?",
   "mind.enhanced.nano_question.start.0": "Ты для меня никто.",
-  "mind.enhanced.nano_question.start.1": "Ты не мой отец. Ты моё что-то."
+  "mind.enhanced.nano_question.start.1": "Ты не мой отец. Ты моё что-то.",
+  "variant.enhanced.vision.vision_visionquest": "VisionQuest"
 }

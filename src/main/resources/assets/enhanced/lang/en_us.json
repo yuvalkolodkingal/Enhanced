@@ -5126,5 +5126,6 @@
   "sign.enhanced.horton.nano.3": "Do not touch.",
   "mind.enhanced.nano_question.start": "What am I to you?",
   "mind.enhanced.nano_question.start.0": "You are nothing to me.",
-  "mind.enhanced.nano_question.start.1": "You are not my father. You are my something."
+  "mind.enhanced.nano_question.start.1": "You are not my father. You are my something.",
+  "variant.enhanced.vision.vision_visionquest": "VisionQuest"
 }

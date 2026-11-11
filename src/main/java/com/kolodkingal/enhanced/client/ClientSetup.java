@@ -22,6 +22,7 @@ import com.kolodkingal.enhanced.client.render.HexVisionRenderer;
 import com.kolodkingal.enhanced.client.render.LokiDaggerRenderer;
 import com.kolodkingal.enhanced.client.render.LokiIllusionRenderer;
 import com.kolodkingal.enhanced.client.render.MindStoneLayer;
+import com.kolodkingal.enhanced.client.render.VisionQuestEyesLayer;
 import com.kolodkingal.enhanced.client.render.MjolnirFragmentRenderer;
 import com.kolodkingal.enhanced.client.render.MjolnirPinRenderer;
 import com.kolodkingal.enhanced.client.render.PhoenixFlameLayer;
@@ -461,6 +462,7 @@ public final class ClientSetup {
                 renderer.addLayer(new PowerAuraLayer(renderer, energy));
                 renderer.addLayer(new GlowingEyesLayer(renderer));
                 renderer.addLayer(new MindStoneLayer(renderer));
+                renderer.addLayer(new VisionQuestEyesLayer(renderer));
                 renderer.addLayer(new BillyCrownLayer(renderer));
                 // The layers of 3.0, one region per hero (the // ===== lines), before the last one.
                 // ===== phoenix =====
