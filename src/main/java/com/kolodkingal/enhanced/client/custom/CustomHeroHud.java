@@ -5,8 +5,11 @@ import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.client.BossBarOverride;
+import com.kolodkingal.enhanced.client.Coexist;
+import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.KeyBindings;
 import com.kolodkingal.enhanced.client.PowerHud;
+import com.kolodkingal.enhanced.client.hud.PowerPanels;
 import com.kolodkingal.enhanced.custom.CatalogEntry;
 import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.CustomHeroes;
@@ -58,6 +61,31 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         HeroKit kit = data.kit();
         Font font = mc.font;
         long now = mc.level.getGameTime();
+        if (!Coexist.active()) {
+            // A bender of Enlightened too, and switched to the bending: one line under its panel says how to come back.
+            int[] other = Coexist.otherHudBottom();
+            Component stub = Component.literal("[").append(KeyBindings.SWITCH_POWERS.getTranslatedKeyMessage()).append("] ")
+                    .withStyle(ChatFormatting.YELLOW)
+                    .append(CustomHeroes.name(player).copy().withStyle(s -> s.withColor(hero.color())));
+            int w = font.width(stub) + 6;
+            int ly = other == null ? 4 : other[0] + 2;
+            int lx = other != null && other[1] == 1 ? graphics.guiWidth() - 4 - w : 4;
+            graphics.fill(lx, ly, lx + w, ly + 11, 0x70000000);
+            graphics.drawString(font, stub, lx + 3, ly + 2, 0xFFFFFFFF, true);
+            return;
+        }
+        PowerPanels.Style style = EnhancedClientConfig.hudStyle();
+        if (style != PowerPanels.Style.CLASSIC) {
+            PowerPanels.Model model = model(mc);
+            if (model != null) {
+                boolean right = EnhancedClientConfig.hudRight();
+                int top = 4 + Math.max(BossBarOverride.clearance(4 + 150), right ? PowerHud.effectsClearance(player) : 0);
+                int height = PowerPanels.draw(style, graphics, font, model, graphics.guiWidth(), top, right,
+                        EnhancedClientConfig.reducedMotion());
+                Coexist.hudBottom(top + height, right);
+            }
+            return;
+        }
 
         Component title = CustomHeroes.name(player).copy().withStyle(s -> s.withColor(hero.color()).withBold(true));
         List<Component> lines = new ArrayList<>();
@@ -125,6 +153,64 @@ public class CustomHeroHud implements LayeredDraw.Layer {
             graphics.drawString(font, line, x, y, 0xFFFFFFFF, true);
             y += 10;
         }
+    }
+
+    /** What the new panel styles and the wheel draw: the classic panel's content, as data (null: not a custom hero). */
+    @Nullable
+    public static PowerPanels.Model model(Minecraft mc) {
+        LocalPlayer player = mc.player;
+        if (player == null || mc.level == null) {
+            return null;
+        }
+        PowerData data = Powers.get(player);
+        if (data.power() != Power.CUSTOM || data.kit() == null) {
+            return null;
+        }
+        CustomHero hero = CustomHeroes.hero(player);
+        CustomState state = CustomHeroes.state(player);
+        HeroKit kit = data.kit();
+        long now = mc.level.getGameTime();
+        PowerPanels.Model model = new PowerPanels.Model();
+        model.color = hero.color();
+        model.title = CustomHeroes.name(player);
+        model.identity = "custom/" + model.title.getString();
+        model.sneaking = player.isShiftKeyDown();
+        for (int column = 1; column <= CustomHero.KEYS; column++) {
+            Component key = KeyBindings.ability(column).getTranslatedKeyMessage();
+            HeroKit.Binding plain = kit.plain(column);
+            HeroKit.Binding sneak = kit.sneak(column);
+            model.rows.add(new PowerPanels.Row(key,
+                    plain == null ? null : panelSlot(player, data, state, hero, plain, column, now, true),
+                    sneak == null ? null : panelSlot(player, data, state, hero, sneak, column, now, false)));
+        }
+        MutableComponent always = null;
+        for (CustomHero.Pick pick : hero.powers()) {
+            CatalogEntry entry = pick.entry();
+            if (entry != null && onNoKey(kit, entry)) {
+                if (always == null) {
+                    always = Component.translatable("hud.enhanced.custom.always").withStyle(ChatFormatting.GRAY).append(" ");
+                } else {
+                    always.append(Component.literal(", ").withStyle(ChatFormatting.GRAY));
+                }
+                always.append(CreatorUi.name(entry).withStyle(s -> s.withColor(pick.color() < 0 ? hero.glow() : pick.color())));
+            }
+        }
+        if (always != null) {
+            model.notes.add(always);
+        }
+        return model;
+    }
+
+    /** A binding for the new styles: on when the classic panel writes its state in green or aqua (ON, active, holding). */
+    private static PowerPanels.Slot panelSlot(LocalPlayer player, PowerData data, CustomState state, CustomHero hero,
+                                              HeroKit.Binding b, int column, long now, boolean keyLine) {
+        Component status = status(player, data, state, hero, b, column, now, keyLine);
+        long left = keyLine ? data.cooldownUntil(column) - now : 0L;
+        net.minecraft.network.chat.TextColor color = status == null ? null : status.getStyle().getColor();
+        boolean on = color != null && (color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.GREEN))
+                || color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.AQUA)));
+        return new PowerPanels.Slot(name(b).withStyle(s -> s.withColor(colorOf(hero, b.picked()))), status,
+                left > 0 ? left / 20.0F : 0.0F, on, -1, 0, null);
     }
 
     private static MutableComponent label(MutableComponent text, CustomHero hero) {

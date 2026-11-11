@@ -48,6 +48,10 @@ public final class PowerPanels {
      */
     public record Slot(Component name, @Nullable Component status, float cooldownLeft, boolean on, int level,
                        int maxLevel, @Nullable Icon icon) {
+        /** This ability with an icon. */
+        public Slot withIcon(@Nullable Icon icon) {
+            return new Slot(name, status, cooldownLeft, on, level, maxLevel, icon);
+        }
     }
 
     /** A key: the ability on it, and the one on it with Sneak (null: none). */

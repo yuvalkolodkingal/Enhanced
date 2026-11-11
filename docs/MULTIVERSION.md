@@ -143,6 +143,17 @@ phase 1: it is the only practical way to check 30 heroes on 10 versions.)
 
 Each of phases 3 to 7 can be released when it is done: the jar simply gains a version.
 
+### Phase 0, first result (2026-11-11)
+
+A toy mod built the way section 2 describes was tried: one jar holding a `boot` entry class and one `Entry` class per
+version (`spike.v1_21_1.Entry` using `ResourceLocation`, `spike.v1_21_11.Entry` using its 1.21.11 name `Identifier`),
+each compiled against its own NeoForge. **The same jar loaded on a dedicated server of NeoForge 21.1.265 (1.21.1) and
+of 21.11.48 (1.21.11)**, and on each the entry of that version ran. So the core of the approach holds across the whole
+1.21 range.
+
+Still to prove before phase 1: a mixin config per version switched by a plugin, a pack overlay, a client (only
+servers were started), and 26.x with its Java 25 classes. The two small projects are in `tools/multiversion-spike/`.
+
 **Start with Enlightened.** It is a seventh of the size (234 files against 1,575), so it is the cheap place to find
 out what phases 0 to 3 really cost before Enhanced commits to them.
 

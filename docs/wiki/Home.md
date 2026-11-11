@@ -53,11 +53,11 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 
 ## What's new in 3.10.0
 
-* **The powers panel has styles.** Besides the classic text panel (still the default) there are five drawn ones: **Key stack**, **Dial**, **Comic panels**, **Scroll** and **Cluster**, in the top-right corner, with cooldowns that drain, a glint when a power is ready again and a glow on what is switched on. Choose one in the settings (Mods, Enhanced, Config, Powers panel) or with a key you bind. See [Controls](Controls#the-powers-panels-style).
+* **The powers panel has styles.** Besides the classic text panel (still the default) there are five drawn ones: **Key stack**, **Dial**, **Comic panels**, **Scroll** and **Cluster**, in the top-right corner, with a symbol for every power, cooldowns that drain, a glint when a power is ready again and a glow on what is switched on. A hero you made with The One Above All has them too. Choose one in the settings (Mods, Enhanced, Config, Powers panel) or with a key you bind. See [Controls](Controls#the-powers-panels-style).
 * **The ability wheel** (hold **U**): your powers around your face, with the name, key and state of the one you point at.
-* **Plays together with Enlightened.** A hero who is also a bender no longer fires both mods' abilities at once: **`** switches the ability keys between your hero and your bending.
+* **Plays together with Enlightened.** A hero who is also a bender no longer fires both mods' abilities at once: **`** switches the ability keys between your hero and your bending. A hero's suit, when it is on, is what everyone sees; the bending poses the body only while a bending move plays.
 * **The Hero Creator item is now called The One Above All.** The screen it opens is still the Hero Creator.
-* **Five more languages**: Spanish, French, German, Russian and Brazilian Portuguese (machine translated; corrections are welcome; about a quarter of the Portuguese is still in English). In Hebrew the new panel styles are laid out right to left.
+* **Five more languages**: Spanish, French, German, Russian and Brazilian Portuguese (machine translated; corrections are welcome). In Hebrew the new panel styles are laid out right to left.
 * 3.10 plays with 3.9 servers and clients (the network protocol is still **14**).
 
 ## What's new in 3.9.0

@@ -192,7 +192,8 @@ public class PowerHud implements LayeredDraw.Layer {
         model.sneaking = false;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             model.rows.add(new PowerPanels.Row(KeyBindings.ability(i).getTranslatedKeyMessage(),
-                    panelSlot(Component.translatable(power.abilityKey(i)), status(player, data, i, now), data, i, now), null));
+                    panelSlot(Component.translatable(power.abilityKey(i)), status(player, data, i, now), data, i, now)
+                            .withIcon(symbol(power.abilityKey(i))), null));
         }
         Power builder = BuildClient.hero(player);
         if (extraLines(builder) > 0) {
@@ -208,6 +209,20 @@ public class PowerHud implements LayeredDraw.Layer {
                     .append(look.displayName().copy().withStyle(ChatFormatting.GRAY)));
         }
         return model;
+    }
+
+    /**
+     * The symbol of an ability (3.10): textures/gui/ability/&lt;hero&gt;_&lt;n&gt;.png, drawn by tools/symbols.py from the motif
+     * tools/symbols.json gives its translation key ("ability.enhanced.thor.3" is thor_3).
+     */
+    private static PowerPanels.Icon symbol(String abilityKey) {
+        net.minecraft.resources.ResourceLocation texture = com.kolodkingal.enhanced.Enhanced.id(
+                "textures/gui/ability/" + abilityKey.substring("ability.enhanced.".length()).replace('.', '_') + ".png");
+        return (g, x, y, size) -> {
+            com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+            g.blit(texture, x, y, size, size, 0, 0, 32, 32, 32, 32);
+            com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+        };
     }
 
     /** An ability for the new styles: on when the classic panel writes its state in green or aqua (ON, active, holding). */

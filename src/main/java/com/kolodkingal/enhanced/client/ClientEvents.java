@@ -310,8 +310,9 @@ public final class ClientEvents {
         while (KeyBindings.WHEEL.consumeClick()) {
             wheelClicked = true;
         }
-        if (wheelClicked && mine && power.hasPowers() && power != Power.CUSTOM && mc.screen == null) {
-            mc.setScreen(new com.kolodkingal.enhanced.client.hud.PowerWheelScreen(() -> PowerHud.model(mc),
+        if (wheelClicked && mine && power.hasPowers() && mc.screen == null) {
+            mc.setScreen(new com.kolodkingal.enhanced.client.hud.PowerWheelScreen(
+                    power == Power.CUSTOM ? () -> com.kolodkingal.enhanced.client.custom.CustomHeroHud.model(mc) : () -> PowerHud.model(mc),
                     Keys.boundKey(KeyBindings.WHEEL), Component.translatable("hud.enhanced.sneak"),
                     Component.translatable("hud.enhanced.ready")));
         }

@@ -365,7 +365,7 @@ The panel of your powers can be drawn in six styles. Choose one in the settings 
 | **Scroll** | A scroll pinned to the corner. |
 | **Cluster** | A small cluster of tiles and nothing else. |
 
-The new styles sit in the top-right corner (*Panel on the right* off: top-left), under the status effect icons, and follow the *Reduced motion* setting. A custom hero's panel is always the classic one.
+The new styles sit in the top-right corner (*Panel on the right* off: top-left), under the status effect icons, and follow the *Reduced motion* setting. Each power has its own symbol; a custom hero's powers show their initials.
 
 **The ability wheel: U (hold).** Shows your powers as a wheel around your face; point at one to read its name, key and state. Let go to close it. It only shows: nothing is cast from it.
 
