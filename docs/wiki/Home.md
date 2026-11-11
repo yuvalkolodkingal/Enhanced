@@ -57,7 +57,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 * **The ability wheel** (hold **U**): your powers around your face, with the name, key and state of the one you point at.
 * **Plays together with Enlightened.** A hero who is also a bender no longer fires both mods' abilities at once: **`** switches the ability keys between your hero and your bending.
 * **The Hero Creator item is now called The One Above All.** The screen it opens is still the Hero Creator.
-* **Five more languages**: Spanish, French, German, Russian and Brazilian Portuguese (machine translated; corrections are welcome). In Hebrew the new panel styles are laid out right to left.
+* **Five more languages**: Spanish, French, German, Russian and Brazilian Portuguese (machine translated; corrections are welcome; about a quarter of the Portuguese is still in English). In Hebrew the new panel styles are laid out right to left.
 * 3.10 plays with 3.9 servers and clients (the network protocol is still **14**).
 
 ## What's new in 3.9.0
