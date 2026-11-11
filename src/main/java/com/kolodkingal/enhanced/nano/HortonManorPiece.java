@@ -226,8 +226,11 @@ public class HortonManorPiece extends StructurePiece {
                 }
             }
         }
-        fill(0, 0, fz, 0, 2, fz, Blocks.STONE_BRICK_WALL.defaultBlockState());
-        set(0, 3, fz, Blocks.WATER.defaultBlockState());
+        // (in its middle a metal sculpture on a stone plinth, as at the estate; still water round it)
+        set(0, 0, fz, Blocks.CHISELED_STONE_BRICKS.defaultBlockState());
+        set(0, 1, fz, Blocks.STONE_BRICK_WALL.defaultBlockState());
+        set(0, 2, fz, Blocks.IRON_BARS.defaultBlockState());
+        set(0, 3, fz, Blocks.LIGHTNING_ROD.defaultBlockState());
         fill(-1, -1, fz + 7, 1, -1, -HALF_Z - 3, stone);
         fill(-1, -1, -FRONT, 1, -1, fz - 7, stone);
         for (int z = -FRONT + 1; z <= -HALF_Z - 4; z += 2) {
