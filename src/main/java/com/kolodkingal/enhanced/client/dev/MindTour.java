@@ -222,26 +222,34 @@ public final class MindTour {
         shot("m25_source_code", 20);
         camera(CameraType.FIRST_PERSON);
         server(MindRealm::leave, 80);
-        // the Horton manor, built here by its own piece
+        if ("manor".equals(System.getProperty("enhanced.mindtour.from"))) {
+            // (-Denhanced.mindtour.from=manor: only the manor and Nano Ultron)
+            STEPS.subList(2, STEPS.size()).clear();
+        }
+        // the Horton manor, built here by its own piece (its spot kept, so every view is placed from it)
         server(p -> {
             ServerLevel level = p.serverLevel();
             BlockPos base = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                     p.blockPosition().offset(30, 0, 0));
+            manor = base;
+            for (int cx = (base.getX() - 20) >> 4; cx <= (base.getX() + 20) >> 4; cx++) {
+                for (int cz = (base.getZ() - 20) >> 4; cz <= (base.getZ() + 20) >> 4; cz++) {
+                    level.getChunk(cx, cz);
+                }
+            }
             com.kolodkingal.enhanced.nano.HortonManorPiece piece = new com.kolodkingal.enhanced.nano.HortonManorPiece(base);
             piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random,
                     piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(base), base);
-            p.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() - 16.5, 0.0F, -5.0F);
+            level.setDayTime(6000);
+            p.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() - 12.5, 0.0F, -10.0F);
         }, 80);
-        shot("m26_manor", 10);
-        server(p -> {
-            BlockPos base = p.blockPosition().offset(0, 0, 16);
-            p.teleportTo(p.serverLevel(), base.getX() + 6.5, base.getY(), base.getZ() + 0.5, 270.0F, 20.0F);
-        }, 40);
-        shot("m27_storage", 10);
+        shot("m26_manor", 40);
+        server(p -> p.teleportTo(p.serverLevel(), manor.getX() + 5.5, manor.getY(), manor.getZ() + 0.5, 270.0F, 25.0F), 40);
+        shot("m27_storage", 40);
         server(p -> {
             p.setGameMode(GameType.SURVIVAL);
             p.setInvulnerable(true);
-            BlockPos storage = p.blockPosition().offset(2, 0, 0);
+            BlockPos storage = manor.offset(8, 0, 0);
             var state = p.serverLevel().getBlockState(storage);
             state.useWithoutItem(p.serverLevel(), p, new net.minecraft.world.phys.BlockHitResult(storage.getCenter(),
                     Direction.UP, storage, false));
@@ -258,7 +266,7 @@ public final class MindTour {
         shot("m30_peace", 10);
         server(p -> {
             Powers.awaken(p, Power.ULTRON, "", false);
-            BlockPos storage = p.blockPosition().offset(2, 0, 0);
+            BlockPos storage = manor.offset(8, 0, 0);
             p.serverLevel().getBlockState(storage).useWithoutItem(p.serverLevel(), p,
                     new net.minecraft.world.phys.BlockHitResult(storage.getCenter(), Direction.UP, storage, false));
         }, 60);
@@ -268,6 +276,9 @@ public final class MindTour {
         camera(CameraType.THIRD_PERSON_BACK);
         shot("m32_nano_army", 20);
     }
+
+    /** Where the tour built the Horton manor. */
+    private static BlockPos manor = BlockPos.ZERO;
 
     private static net.minecraft.world.entity.Entity MindQuest_find(ServerPlayer p, String role) {
         for (var npc : p.serverLevel().getEntitiesOfClass(com.kolodkingal.enhanced.mind.MindNpcEntity.class,
