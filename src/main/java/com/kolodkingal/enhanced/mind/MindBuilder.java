@@ -134,7 +134,14 @@ public final class MindBuilder {
     static void ensure(ServerLevel level, BlockPos origin, MindProgress progress) {
         MindBuilder b = new MindBuilder(level, origin);
         level.getChunk(origin);
-        if (!level.getBlockState(origin.offset(0, -40, 0)).is(Blocks.BEDROCK)) {
+        if (!level.getBlockState(origin.offset(0, -40, 0)).is(Blocks.BEDROCK)
+                || !level.getBlockState(origin.offset(1, -40, 0)).is(Blocks.REINFORCED_DEEPSLATE)) {
+            // (3.12.1: a house of 3.12, built before the house took its look from the series, is built again)
+            for (net.minecraft.world.entity.Entity e : level.getEntities((net.minecraft.world.entity.Entity) null,
+                    new net.minecraft.world.phys.AABB(origin).inflate(20, 40, 16),
+                    e -> e instanceof ArmorStand || e instanceof ItemFrame)) {
+                e.discard();
+            }
             b.build();
         }
         if (progress.gateOpen()) {
@@ -242,6 +249,7 @@ public final class MindBuilder {
         bottom();
         mausoleum();
         set(0, -40, 0, Blocks.BEDROCK.defaultBlockState()); // (built)
+        set(1, -40, 0, Blocks.REINFORCED_DEEPSLATE.defaultBlockState()); // (in the look of 3.12.1)
     }
 
     private void island() {
@@ -265,46 +273,94 @@ public final class MindBuilder {
         }
         // the rock under the house deep enough for the floors below
         fill(-24, -24, -13, 17, -5, 14, stone);
-        // the path to the door, and a few trees
-        fill(-1, -1, -26, 1, -1, -12, Blocks.DIRT_PATH.defaultBlockState());
+        // the front garden: a white path to the door between hedges and lamps, a balustrade with a gate, a few trees
+        fill(-1, -1, -34, 1, -1, -16, Blocks.POLISHED_DIORITE.defaultBlockState());
+        fill(-2, -1, -34, -2, -1, -16, Blocks.SMOOTH_STONE.defaultBlockState());
+        fill(2, -1, -34, 2, -1, -16, Blocks.SMOOTH_STONE.defaultBlockState());
+        BlockState hedge = Blocks.OAK_LEAVES.defaultBlockState().setValue(BlockStateProperties.PERSISTENT, true);
+        for (int z = -32; z <= -18; z += 2) {
+            set(-3, 0, z, hedge);
+            set(3, 0, z, hedge);
+        }
+        for (int z : new int[] {-30, -22}) {
+            for (int x : new int[] {-4, 4}) {
+                fill(x, 0, z, x, 2, z, Blocks.DARK_OAK_FENCE.defaultBlockState());
+                set(x, 3, z, Blocks.LANTERN.defaultBlockState());
+            }
+        }
+        for (int x = -24; x <= 24; x++) {
+            if (Math.abs(x) > 2) {
+                set(x, 0, -36, Blocks.DIORITE_WALL.defaultBlockState());
+            }
+        }
+        for (int x : new int[] {-3, 3}) {
+            fill(x, 0, -36, x, 1, -36, Blocks.QUARTZ_PILLAR.defaultBlockState());
+            set(x, 2, -36, Blocks.LANTERN.defaultBlockState());
+        }
         RandomSource random = RandomSource.create(o.asLong());
-        int[][] trees = {{-30, -25}, {28, -30}, {-38, 8}, {36, 14}, {-20, 34}, {20, 36}, {42, -8}, {-44, -14}};
+        int[][] trees = {{-14, -26}, {14, -27}, {-38, 8}, {36, 14}, {-20, 34}, {20, 36}, {40, -12}, {-42, -14}, {-28, -26}, {28, -24}};
         for (int[] t : trees) {
             tree(t[0], t[1], 4 + random.nextInt(3));
         }
     }
 
+    /** A round, full oak, as the trees on the lawn round the house in the series. */
     private void tree(int x, int z, int height) {
-        fill(x, 0, z, x, height - 1, z, Blocks.DARK_OAK_LOG.defaultBlockState());
-        BlockState leaves = Blocks.DARK_OAK_LEAVES.defaultBlockState().setValue(BlockStateProperties.PERSISTENT, true);
-        for (int dx = -2; dx <= 2; dx++) {
-            for (int dz = -2; dz <= 2; dz++) {
-                for (int dy = height - 2; dy <= height + 1; dy++) {
-                    if (Math.abs(dx) + Math.abs(dz) + Math.max(0, dy - height) <= 3 && (dx != 0 || dz != 0 || dy >= height)) {
+        BlockState leaves = Blocks.OAK_LEAVES.defaultBlockState().setValue(BlockStateProperties.PERSISTENT, true);
+        int top = height + 2;
+        for (int dx = -3; dx <= 3; dx++) {
+            for (int dz = -3; dz <= 3; dz++) {
+                for (int dy = height - 2; dy <= top + 1; dy++) {
+                    double ry = (dy - (height + 0.5)) / 2.6;
+                    if (dx * dx / 9.0 + dz * dz / 9.0 + ry * ry <= 1.0) {
                         set(x + dx, dy, z + dz, leaves);
                     }
                 }
             }
         }
+        fill(x, 0, z, x, height, z, Blocks.OAK_LOG.defaultBlockState());
     }
 
-    /** The house's shell: three floors of dark stone and wood, windows, a steep roof. */
+    /**
+     * The house's shell, as in the series: a tall white Victorian house (calcite, quartz trim and cornices) of three
+     * floors, two eight-sided bay towers at its front corners, a portico of pillars at the door carrying Ultron's
+     * balcony, a red mansard roof with lit dormers and an iron railing round its top, and a turret with a red cone and
+     * a weathervane over the hall.
+     */
     private void house() {
-        BlockState wall = Blocks.DEEPSLATE_BRICKS.defaultBlockState();
-        BlockState beam = Blocks.DARK_OAK_LOG.defaultBlockState();
+        BlockState air = Blocks.AIR.defaultBlockState();
+        BlockState wall = Blocks.CALCITE.defaultBlockState();
+        BlockState trim = Blocks.SMOOTH_QUARTZ.defaultBlockState();
+        BlockState pillar = Blocks.QUARTZ_PILLAR.defaultBlockState();
         BlockState floor = Blocks.DARK_OAK_PLANKS.defaultBlockState();
+        // (an older house's roof and whatever stood round it)
+        fill(-HALF_X - 4, 18, -HALF_Z - 5, HALF_X + 4, 40, HALF_Z + 4, air);
+        fill(-HALF_X - 4, 0, -HALF_Z - 5, HALF_X + 4, 17, -HALF_Z - 1, air);
         fill(-HALF_X, -1, -HALF_Z, HALF_X, 17, HALF_Z, wall);
+        // the plinth, the corners, the bands between the floors and the cornice
+        ring(-1, Blocks.POLISHED_ANDESITE.defaultBlockState());
+        ring(5, trim);
+        ring(11, trim);
+        ring(17, trim);
+        for (int sx : new int[] {-HALF_X, HALF_X}) {
+            for (int sz : new int[] {-HALF_Z, HALF_Z}) {
+                fill(sx, 0, sz, sx, 16, sz, pillar);
+            }
+        }
+        cornice(18, -HALF_X - 1, -HALF_Z - 1, HALF_X + 1, HALF_Z + 1);
         for (int f : new int[] {GROUND, UPPER, TOP}) {
-            fill(-HALF_X + 1, f, -HALF_Z + 1, HALF_X - 1, f + 4, HALF_Z - 1, Blocks.AIR.defaultBlockState());
+            fill(-HALF_X + 1, f, -HALF_Z + 1, HALF_X - 1, f + 4, HALF_Z - 1, air);
             fill(-HALF_X + 1, f - 1, -HALF_Z + 1, HALF_X - 1, f - 1, HALF_Z - 1, floor);
-            // windows on every side
-            for (int x = -HALF_X + 3; x <= HALF_X - 3; x += 4) {
-                fill(x, f + 1, -HALF_Z, x, f + 2, -HALF_Z, Blocks.GLASS_PANE.defaultBlockState());
-                fill(x, f + 1, HALF_Z, x, f + 2, HALF_Z, Blocks.GLASS_PANE.defaultBlockState());
+            // tall windows in white frames on every side
+            for (int x = -HALF_X + 2; x <= HALF_X - 2; x += 3) {
+                if (f != GROUND || Math.abs(x) > 2) {
+                    window(x, f, -HALF_Z, true);
+                }
+                window(x, f, HALF_Z, true);
             }
             for (int z = -HALF_Z + 3; z <= HALF_Z - 3; z += 4) {
-                fill(-HALF_X, f + 1, z, -HALF_X, f + 2, z, Blocks.GLASS_PANE.defaultBlockState());
-                fill(HALF_X, f + 1, z, HALF_X, f + 2, z, Blocks.GLASS_PANE.defaultBlockState());
+                window(-HALF_X, f, z, false);
+                window(HALF_X, f, z, false);
             }
             // a lantern in every room's middle
             for (int x = -10; x <= 10; x += 10) {
@@ -312,27 +368,189 @@ public final class MindBuilder {
                 lantern(x, f + 4, 5);
             }
         }
-        // the corner beams
-        for (int sx : new int[] {-HALF_X, HALF_X}) {
-            for (int sz : new int[] {-HALF_Z, HALF_Z}) {
-                fill(sx, -1, sz, sx, 17, sz, beam);
-            }
+        for (int sx : new int[] {-10, 10}) {
+            bay(sx);
         }
-        // the roof: a steep pyramid of dark shingles
-        BlockState roof = Blocks.DEEPSLATE_TILES.defaultBlockState();
-        for (int i = 0; i <= 11; i++) {
-            fill(-HALF_X - 1 + i, 18 + i, -HALF_Z - 1 + i, HALF_X + 1 - i, 18 + i, HALF_Z + 1 - i, roof);
+        // the portico: pillars before the door, carrying the balcony of Ultron's room
+        for (int x : new int[] {-3, 3}) {
+            fill(x, 0, -HALF_Z - 3, x, 4, -HALF_Z - 3, pillar);
+            set(x, -1, -HALF_Z - 3, Blocks.CHISELED_QUARTZ_BLOCK.defaultBlockState());
         }
-        // the front door (two wide) and its porch
+        fill(-3, 5, -HALF_Z - 3, 3, 5, -HALF_Z - 1, trim);
+        fill(-3, GROUND - 1, -HALF_Z - 3, 3, GROUND - 1, -HALF_Z - 1, Blocks.POLISHED_DIORITE.defaultBlockState());
+        for (int x = -2; x <= 2; x++) {
+            set(x, GROUND - 1, -HALF_Z - 4, stairs(Blocks.QUARTZ_STAIRS.defaultBlockState(), Direction.SOUTH));
+        }
         door(0, GROUND, -HALF_Z, Direction.SOUTH);
         door(-1, GROUND, -HALF_Z, Direction.SOUTH);
-        fill(-3, GROUND - 1, -HALF_Z - 3, 2, GROUND - 1, -HALF_Z - 1, Blocks.POLISHED_DEEPSLATE.defaultBlockState());
-        lantern(-3, GROUND + 3, -HALF_Z - 1);
-        lantern(2, GROUND + 3, -HALF_Z - 1);
+        fill(-2, GROUND, -HALF_Z, -2, GROUND + 2, -HALF_Z, trim);
+        fill(1, GROUND, -HALF_Z, 1, GROUND + 2, -HALF_Z, trim);
+        fill(-2, GROUND + 3, -HALF_Z, 1, GROUND + 3, -HALF_Z, trim);
+        lantern(-2, GROUND + 4, -HALF_Z - 2);
+        lantern(2, GROUND + 4, -HALF_Z - 2);
+        roof();
+        turret(0, -6);
         // the elevator's shaft: a column of dark glass in the south-east corner, a panel on every floor
         for (int f : new int[] {GROUND, UPPER, TOP}) {
             liftNook(f);
         }
+    }
+
+    /** A band of {@code state} round the house's outside at height {@code y}. */
+    private void ring(int y, BlockState state) {
+        fill(-HALF_X, y, -HALF_Z, HALF_X, y, -HALF_Z, state);
+        fill(-HALF_X, y, HALF_Z, HALF_X, y, HALF_Z, state);
+        fill(-HALF_X, y, -HALF_Z, -HALF_X, y, HALF_Z, state);
+        fill(HALF_X, y, -HALF_Z, HALF_X, y, HALF_Z, state);
+    }
+
+    /** An overhanging cornice of upside-down quartz stairs round a rectangle, at height {@code y}. */
+    private void cornice(int y, int x1, int z1, int x2, int z2) {
+        BlockState st = Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairBlock.HALF, net.minecraft.world.level.block.state.properties.Half.TOP);
+        for (int x = x1; x <= x2; x++) {
+            set(x, y, z1, st.setValue(StairBlock.FACING, Direction.SOUTH));
+            set(x, y, z2, st.setValue(StairBlock.FACING, Direction.NORTH));
+        }
+        for (int z = z1 + 1; z < z2; z++) {
+            set(x1, y, z, st.setValue(StairBlock.FACING, Direction.EAST));
+            set(x2, y, z, st.setValue(StairBlock.FACING, Direction.WEST));
+        }
+    }
+
+    /** A window two high in a white frame (sill and lintel) in the wall at {@code (x, z)}. */
+    private void window(int x, int f, int z, boolean alongX) {
+        BlockState trim = Blocks.SMOOTH_QUARTZ.defaultBlockState();
+        fill(x, f + 1, z, x, f + 2, z, Blocks.GLASS_PANE.defaultBlockState());
+        set(x, f, z, trim);
+        set(x, f + 3, z, trim);
+    }
+
+    /** An eight-sided bay tower before the front wall, centred on {@code sx}, open to the rooms behind it. */
+    private void bay(int sx) {
+        BlockState air = Blocks.AIR.defaultBlockState();
+        BlockState wall = Blocks.CALCITE.defaultBlockState();
+        BlockState trim = Blocks.SMOOTH_QUARTZ.defaultBlockState();
+        BlockState pane = Blocks.GLASS_PANE.defaultBlockState();
+        int front = -HALF_Z - 3;
+        fill(sx - 2, -1, front, sx + 2, 18, -HALF_Z - 1, wall);
+        fill(sx - 2, -1, front, sx - 2, 18, front, air);
+        fill(sx + 2, -1, front, sx + 2, 18, front, air);
+        for (int y : new int[] {-1, 5, 11, 17}) {
+            fill(sx - 1, y, front, sx + 1, y, front, y == -1 ? Blocks.POLISHED_ANDESITE.defaultBlockState() : trim);
+            fill(sx - 2, y, front + 1, sx - 2, y, -HALF_Z - 1, y == -1 ? Blocks.POLISHED_ANDESITE.defaultBlockState() : trim);
+            fill(sx + 2, y, front + 1, sx + 2, y, -HALF_Z - 1, y == -1 ? Blocks.POLISHED_ANDESITE.defaultBlockState() : trim);
+        }
+        for (int f : new int[] {GROUND, UPPER, TOP}) {
+            fill(sx - 1, f, front + 1, sx + 1, f + 4, -HALF_Z, air);
+            fill(sx - 1, f - 1, front + 1, sx + 1, f - 1, -HALF_Z, Blocks.DARK_OAK_PLANKS.defaultBlockState());
+            fill(sx - 1, f + 1, front, sx + 1, f + 3, front, pane);
+            fill(sx - 2, f + 1, front + 1, sx - 2, f + 3, front + 1, pane);
+            fill(sx + 2, f + 1, front + 1, sx + 2, f + 3, front + 1, pane);
+        }
+        // its cap: a red pyramid with a finial
+        fill(sx - 1, 18, front, sx + 1, 18, front, trim);
+        fill(sx - 2, 19, front + 1, sx + 2, 19, -HALF_Z - 1, Blocks.BRICKS.defaultBlockState());
+        fill(sx - 1, 19, front, sx + 1, 19, front, Blocks.BRICKS.defaultBlockState());
+        fill(sx - 1, 20, front + 1, sx + 1, 20, -HALF_Z - 1, Blocks.BRICKS.defaultBlockState());
+        set(sx, 21, front + 1, Blocks.BRICKS.defaultBlockState());
+        set(sx, 22, front + 1, Blocks.LIGHTNING_ROD.defaultBlockState());
+    }
+
+    /** The mansard roof: steep red sides with lit dormers, a flat top with an iron railing round it. */
+    private void roof() {
+        BlockState brick = Blocks.BRICKS.defaultBlockState();
+        BlockState st = Blocks.BRICK_STAIRS.defaultBlockState();
+        int[] inset = {0, 0, 1, 2, 3};
+        for (int i = 0; i < inset.length; i++) {
+            int y = 18 + i;
+            int x1 = -HALF_X + inset[i];
+            int x2 = HALF_X - inset[i];
+            int z1 = -HALF_Z + inset[i];
+            int z2 = HALF_Z - inset[i];
+            fill(x1, y, z1, x2, y, z2, brick);
+            if (i == 1 || i == inset.length - 1) {
+                continue;
+            }
+            for (int x = x1; x <= x2; x++) {
+                set(x, y, z1, stairs(st, Direction.SOUTH));
+                set(x, y, z2, stairs(st, Direction.NORTH));
+            }
+            for (int z = z1 + 1; z < z2; z++) {
+                set(x1, y, z, stairs(st, Direction.EAST));
+                set(x2, y, z, stairs(st, Direction.WEST));
+            }
+        }
+        int top = 18 + inset.length - 1;
+        int t = inset[inset.length - 1];
+        for (int x = -HALF_X + t; x <= HALF_X - t; x++) {
+            set(x, top + 1, -HALF_Z + t, Blocks.IRON_BARS.defaultBlockState());
+            set(x, top + 1, HALF_Z - t, Blocks.IRON_BARS.defaultBlockState());
+        }
+        for (int z = -HALF_Z + t; z <= HALF_Z - t; z++) {
+            set(-HALF_X + t, top + 1, z, Blocks.IRON_BARS.defaultBlockState());
+            set(HALF_X - t, top + 1, z, Blocks.IRON_BARS.defaultBlockState());
+        }
+        // dormers on the front and the back, lit from within
+        for (int x : new int[] {-6, -3, 3, 6}) {
+            for (int z : new int[] {-HALF_Z, HALF_Z}) {
+                int in = z < 0 ? 1 : -1;
+                set(x - 1, 19, z, Blocks.SMOOTH_QUARTZ.defaultBlockState());
+                set(x, 19, z, Blocks.GLASS_PANE.defaultBlockState());
+                set(x + 1, 19, z, Blocks.SMOOTH_QUARTZ.defaultBlockState());
+                set(x, 19, z + in, Blocks.GLOWSTONE.defaultBlockState());
+                fill(x - 1, 20, z, x + 1, 20, z, Blocks.SMOOTH_QUARTZ_SLAB.defaultBlockState());
+            }
+        }
+        // chimneys
+        for (int[] c : new int[][] {{-11, 6}, {11, 6}}) {
+            fill(c[0], 18, c[1], c[0] + 1, 25, c[1], brick);
+            set(c[0], 26, c[1], Blocks.CAMPFIRE.defaultBlockState().setValue(BlockStateProperties.LIT, false));
+        }
+    }
+
+    /** The turret over the hall: round-cornered and white, windows lit, a red cone and a weathervane. */
+    private void turret(int cx, int cz) {
+        BlockState wall = Blocks.CALCITE.defaultBlockState();
+        BlockState trim = Blocks.SMOOTH_QUARTZ.defaultBlockState();
+        BlockState air = Blocks.AIR.defaultBlockState();
+        int base = 22;
+        fill(cx - 2, base, cz - 2, cx + 2, base + 8, cz + 2, wall);
+        for (int dx : new int[] {-2, 2}) {
+            for (int dz : new int[] {-2, 2}) {
+                fill(cx + dx, base, cz + dz, cx + dx, base + 8, cz + dz, air);
+            }
+        }
+        fill(cx - 1, base + 1, cz - 1, cx + 1, base + 7, cz + 1, air);
+        set(cx, base + 1, cz, Blocks.GLOWSTONE.defaultBlockState());
+        for (int y : new int[] {base + 2, base + 5}) {
+            fill(cx, y, cz - 2, cx, y + 1, cz - 2, Blocks.GLASS_PANE.defaultBlockState());
+            fill(cx, y, cz + 2, cx, y + 1, cz + 2, Blocks.GLASS_PANE.defaultBlockState());
+            fill(cx - 2, y, cz, cx - 2, y + 1, cz, Blocks.GLASS_PANE.defaultBlockState());
+            fill(cx + 2, y, cz, cx + 2, y + 1, cz, Blocks.GLASS_PANE.defaultBlockState());
+        }
+        fill(cx - 1, base + 4, cz - 2, cx + 1, base + 4, cz - 2, trim);
+        fill(cx - 1, base + 4, cz + 2, cx + 1, base + 4, cz + 2, trim);
+        fill(cx - 2, base + 4, cz - 1, cx - 2, base + 4, cz + 1, trim);
+        fill(cx + 2, base + 4, cz - 1, cx + 2, base + 4, cz + 1, trim);
+        cornice(base + 8, cx - 2, cz - 2, cx + 2, cz + 2);
+        // the cone
+        BlockState st = Blocks.BRICK_STAIRS.defaultBlockState();
+        int y = base + 9;
+        fill(cx - 2, y, cz - 2, cx + 2, y, cz + 2, Blocks.BRICKS.defaultBlockState());
+        for (int d = -2; d <= 2; d++) {
+            set(cx + d, y, cz - 2, stairs(st, Direction.SOUTH));
+            set(cx + d, y, cz + 2, stairs(st, Direction.NORTH));
+            set(cx - 2, y, cz + d, stairs(st, Direction.EAST));
+            set(cx + 2, y, cz + d, stairs(st, Direction.WEST));
+        }
+        fill(cx - 1, y + 1, cz - 1, cx + 1, y + 1, cz + 1, Blocks.BRICKS.defaultBlockState());
+        for (int d = -1; d <= 1; d++) {
+            set(cx + d, y + 1, cz - 1, stairs(st, Direction.SOUTH));
+            set(cx + d, y + 1, cz + 1, stairs(st, Direction.NORTH));
+        }
+        set(cx, y + 2, cz, Blocks.BRICKS.defaultBlockState());
+        set(cx, y + 3, cz, Blocks.BRICK_WALL.defaultBlockState());
+        set(cx, y + 4, cz, Blocks.LIGHTNING_ROD.defaultBlockState());
     }
 
     /** The elevator on a floor: the stop, its panel on the east wall, a sign. */
@@ -388,13 +606,21 @@ public final class MindBuilder {
         set(9, f, -5, stairs(Blocks.DARK_OAK_STAIRS.defaultBlockState(), Direction.EAST));
         set(11, f, -5, stairs(Blocks.DARK_OAK_STAIRS.defaultBlockState(), Direction.WEST));
         // the cinema (south-west): dark walls, a white screen on the west, rows of seats, the projector at the back
-        room(-14, f - 1, 0, -2, f + 5, 10, Blocks.BLACK_WOOL.defaultBlockState(), Blocks.DARK_OAK_PLANKS.defaultBlockState(),
-                Blocks.BLACK_CONCRETE.defaultBlockState());
+        // (as in the series: red walls, red seats, a little amber lamp at the end of every row)
+        room(-14, f - 1, 0, -2, f + 5, 10, Blocks.RED_WOOL.defaultBlockState(), Blocks.DARK_OAK_PLANKS.defaultBlockState(),
+                Blocks.RED_TERRACOTTA.defaultBlockState());
         fill(-13, f, 1, -3, f, 9, Blocks.RED_CARPET.defaultBlockState());
         fill(-14, f, 2, -14, f + 3, 8, Blocks.WHITE_CONCRETE.defaultBlockState());
         for (int x : new int[] {-10, -8, -6}) {
             for (int z = 3; z <= 8; z++) {
                 set(x, f, z, stairs(Blocks.RED_NETHER_BRICK_STAIRS.defaultBlockState(), Direction.EAST));
+            }
+        }
+        for (int x : new int[] {-10, -8, -6}) {
+            for (int z : new int[] {2, 9}) {
+                set(x, f, z, Blocks.DARK_OAK_FENCE.defaultBlockState());
+                set(x, f + 1, z, Blocks.ORANGE_CANDLE.defaultBlockState().setValue(CandleBlock.CANDLES, 1)
+                        .setValue(CandleBlock.LIT, true));
             }
         }
         set(-4, f, 6, Blocks.DARK_OAK_FENCE.defaultBlockState());
@@ -418,19 +644,47 @@ public final class MindBuilder {
         // Ultron's room: grey and red, a long rug
         fill(-14, f, -10, 4, f, 10, Blocks.GRAY_CARPET.defaultBlockState());
         fill(-6, f, -4, 0, f, 4, Blocks.RED_CARPET.defaultBlockState());
-        // the balcony: a doorway in the north wall to a terrace with a railing
-        opening(-5, f, -HALF_Z, 2, 0, 3);
-        fill(-7, f - 1, -HALF_Z - 3, -1, f - 1, -HALF_Z - 1, Blocks.POLISHED_DEEPSLATE.defaultBlockState());
-        fill(-7, f, -HALF_Z - 3, -1, f, -HALF_Z - 3, Blocks.DARK_OAK_FENCE.defaultBlockState());
-        fill(-7, f, -HALF_Z - 3, -7, f, -HALF_Z - 1, Blocks.DARK_OAK_FENCE.defaultBlockState());
-        fill(-1, f, -HALF_Z - 3, -1, f, -HALF_Z - 1, Blocks.DARK_OAK_FENCE.defaultBlockState());
-        // the televisions on the west wall
-        for (int z : new int[] {-7, -2, 3}) {
-            fill(-14, f + 1, z, -14, f + 2, z + 2, Blocks.BLACK_CONCRETE.defaultBlockState());
-            fill(-14, f + 3, z, -14, f + 3, z + 2, Blocks.GRAY_CONCRETE.defaultBlockState());
+        // brick walls, as Ultron's attic in the series (the windows left as they are)
+        for (int x = -14; x <= 4; x++) {
+            for (int y = f; y <= f + 4; y++) {
+                for (int z : new int[] {-HALF_Z + 1, HALF_Z - 1}) {
+                    boolean window = level.getBlockState(at(x, y, z < 0 ? -HALF_Z : HALF_Z)).is(Blocks.GLASS_PANE)
+                            || level.getBlockState(at(x, y, z < 0 ? -HALF_Z : HALF_Z)).isAir();
+                    if (!window && !(z < 0 && Math.abs(x) <= 2) && level.getBlockState(at(x, y, z)).isAir()) {
+                        set(x, y, z, Blocks.BRICKS.defaultBlockState());
+                    }
+                }
+            }
         }
-        set(-10, f, -2, stairs(Blocks.DARK_OAK_STAIRS.defaultBlockState(), Direction.EAST));
-        set(-10, f, -1, stairs(Blocks.DARK_OAK_STAIRS.defaultBlockState(), Direction.EAST));
+        // the balcony: a door shaped like the Mind Stone, its glass blue, to the terrace over the portico
+        BlockState rim = Blocks.POLISHED_BLACKSTONE.defaultBlockState();
+        BlockState gem = Blocks.LIGHT_BLUE_STAINED_GLASS_PANE.defaultBlockState();
+        // (rows from the floor up: how far the stone reaches to each side; the doorway is the two lowest rows' middle)
+        int[] half = {1, 2, 2, 1, 0};
+        for (int r = 0; r < half.length; r++) {
+            int y = f + r;
+            fill(-half[r] - 1, y, -HALF_Z, half[r] + 1, y, -HALF_Z, rim);
+            fill(-half[r], y, -HALF_Z, half[r], y, -HALF_Z, gem);
+            if (r < 2) {
+                fill(-1, y, -HALF_Z, 1, y, -HALF_Z, Blocks.AIR.defaultBlockState());
+            }
+        }
+        set(0, f + half.length, -HALF_Z, rim);
+        fill(-3, f - 1, -HALF_Z - 3, 3, f - 1, -HALF_Z - 1, Blocks.SMOOTH_QUARTZ.defaultBlockState());
+        fill(-3, f, -HALF_Z - 3, 3, f, -HALF_Z - 3, Blocks.DIORITE_WALL.defaultBlockState());
+        fill(-3, f, -HALF_Z - 3, -3, f, -HALF_Z - 1, Blocks.DIORITE_WALL.defaultBlockState());
+        fill(3, f, -HALF_Z - 3, 3, f, -HALF_Z - 1, Blocks.DIORITE_WALL.defaultBlockState());
+        // the televisions: a wall of old screens glowing cyan, stacked on the west wall
+        for (int z = -9; z <= 5; z++) {
+            for (int y = f; y <= f + 3; y++) {
+                boolean screen = (z & 1) == 0 && y <= f + 2;
+                set(-14, y, z, screen ? Blocks.SEA_LANTERN.defaultBlockState() : Blocks.BLACK_CONCRETE.defaultBlockState());
+                set(-13, y, z, screen ? Blocks.CYAN_STAINED_GLASS.defaultBlockState()
+                        : y == f + 3 ? Blocks.AIR.defaultBlockState() : Blocks.GRAY_CONCRETE.defaultBlockState());
+            }
+        }
+        set(-9, f, -2, stairs(Blocks.DARK_OAK_STAIRS.defaultBlockState(), Direction.EAST));
+        set(-9, f, -1, stairs(Blocks.DARK_OAK_STAIRS.defaultBlockState(), Direction.EAST));
         // the hats: three stands to try them on, a mirror
         fill(-14, f + 1, 8, -14, f + 3, 10, Blocks.GLASS.defaultBlockState());
         int i = 0;

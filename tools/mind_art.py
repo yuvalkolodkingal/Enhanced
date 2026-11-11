@@ -342,23 +342,87 @@ def painting_logo():
 
 
 def painting_torch():
-    """The workshop's painting of the first android (32x48: a 2x3 painting): a red figure in flames."""
-    im = Image.new("RGBA", (32, 48), (40, 30, 24, 255))
+    """The workshop's painting of the first android (64x96: a 2x3 painting at twice the pixels), after the one in
+    VisionQuest: a dark figure standing in a column of fire that bursts out round his feet, red, pink and gold on a
+    dark violet ground with glints of neon, in a gilt frame."""
+    import math
+    W, H = 64, 96
+    rnd = random.Random(1939)
+    px = [[(0, 0, 0)] * W for _ in range(H)]
+    # the ground: dark violet, darker at the top, a little teal neon at the sides
+    for y in range(H):
+        for x in range(W):
+            t = y / H
+            base = (int(28 + 20 * t), int(16 + 8 * t), int(44 + 16 * t))
+            px[y][x] = base
+    for (x0, y0, x1, y1) in [(8, 30, 15, 31), (8, 30, 8, 40), (50, 58, 57, 59), (57, 50, 57, 59), (46, 22, 54, 23)]:
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                px[y][x] = (40, 190, 210)
+
+    def add(x, y, c, a):
+        if 0 <= x < W and 0 <= y < H:
+            r, g, b = px[y][x]
+            px[y][x] = (min(255, int(r + c[0] * a)), min(255, int(g + c[1] * a)), min(255, int(b + c[2] * a)))
+
+    fire = [(235, 25, 35), (250, 45, 80), (255, 95, 30), (245, 170, 60), (200, 20, 45)]
+    cx = 32
+    # the column of fire round the figure, rising to a point above his head
+    for _ in range(3400):
+        y = rnd.uniform(4, 88)
+        u = (y - 4) / 84.0
+        spread = 4 + 14 * u ** 1.6 + 3 * math.sin(y * 0.35)
+        x = cx + rnd.gauss(0, spread / 2.2)
+        c = rnd.choice(fire)
+        add(int(x), int(y), c, rnd.uniform(0.1, 0.32))
+    # the burst at his feet, spreading out to both sides
+    for _ in range(2600):
+        ang = rnd.uniform(math.pi * 0.05, math.pi * 0.95)
+        r = abs(rnd.gauss(0, 18))
+        x = cx + math.cos(ang) * r * 1.6 * rnd.choice([-1, 1])
+        y = 84 - math.sin(ang) * r * 0.55 + rnd.gauss(0, 2)
+        add(int(x), int(y), rnd.choice(fire), rnd.uniform(0.12, 0.38))
+    # embers
+    for _ in range(90):
+        x = int(rnd.uniform(4, 60))
+        y = int(rnd.uniform(4, 90))
+        add(x, y, rnd.choice([(255, 210, 120), (255, 120, 140)]), 0.9)
+    # the figure: a dark silhouette, his outline lit by the fire
+    fig = set()
+    for y in range(26, 33):
+        for x in range(cx - 3, cx + 3):
+            if (x - cx + 0.5) ** 2 / 9 + (y - 29.5) ** 2 / 12 <= 1:
+                fig.add((x, y))
+    for y in range(33, 35):
+        for x in range(cx - 1, cx + 1):
+            fig.add((x, y))
+    for y in range(35, 58):
+        w = 6 if y < 40 else 5 if y < 52 else 4
+        for x in range(cx - w, cx + w):
+            fig.add((x, y))
+    for y in range(36, 56):  # arms, a little out from the body
+        for x in (cx - 8 + (y - 36) // 10, cx - 7 + (y - 36) // 10, cx + 6 - (y - 36) // 10, cx + 7 - (y - 36) // 10):
+            fig.add((x, y))
+    for y in range(58, 84):  # legs
+        for x in range(cx - 4, cx - 1):
+            fig.add((x, y))
+        for x in range(cx + 1, cx + 4):
+            fig.add((x, y))
+    for (x, y) in fig:
+        px[y][x] = (18, 10, 16)
+    for (x, y) in fig:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if (x + dx, y + dy) not in fig and 0 <= x + dx < W and 0 <= y + dy < H:
+                add(x + dx, y + dy, (255, 150, 70), 0.55)
+    im = Image.new("RGBA", (W, H))
+    for y in range(H):
+        for x in range(W):
+            im.putpixel((x, y), px[y][x] + (255,))
+    # the gilt frame
     d = ImageDraw.Draw(im)
-    d.rectangle([0, 0, 31, 47], outline=(150, 110, 50, 255))
-    d.rectangle([2, 2, 29, 45], fill=(26, 22, 30, 255))
-    rnd = random.Random(9)
-    for _ in range(220):
-        x = 16 + rnd.gauss(0, 6)
-        y = 24 + rnd.gauss(0, 10)
-        c = rnd.choice([(255, 120, 30), (255, 190, 60), (230, 60, 30), (255, 230, 120)])
-        d.point((x, y), fill=c + (255,))
-    d.ellipse([13, 8, 19, 14], fill=(200, 60, 40, 255))  # the head
-    d.rectangle([12, 15, 20, 30], fill=(190, 50, 36, 255))  # the body
-    d.line([(12, 16), (6, 9)], fill=(190, 50, 36, 255), width=2)  # an arm raised
-    d.line([(20, 16), (24, 24)], fill=(190, 50, 36, 255), width=2)
-    d.line([(14, 30), (12, 40)], fill=(190, 50, 36, 255), width=2)
-    d.line([(18, 30), (20, 40)], fill=(190, 50, 36, 255), width=2)
+    d.rectangle([0, 0, W - 1, H - 1], outline=(120, 86, 30, 255))
+    d.rectangle([1, 1, W - 2, H - 2], outline=(214, 172, 74, 255))
+    d.rectangle([2, 2, W - 3, H - 3], outline=(160, 120, 44, 255))
     save(im, "painting/human_torch.png")
 
 

@@ -1,13 +1,13 @@
 package com.kolodkingal.enhanced.gametest;
 
 import com.kolodkingal.enhanced.Enhanced;
-import com.kolodkingal.enhanced.client.render.VisionQuestEyesLayer;
 import com.kolodkingal.enhanced.platform.test.EnhancedTest;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
+import com.kolodkingal.enhanced.power.VisionQuest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -48,18 +48,18 @@ public final class VisionQuestLookTests {
         ServerPlayer vision = f.player(10.5, FLOOR, 10.5);
         Powers.awaken(vision, Power.VISION, "vision_visionquest");
         PowerData data = Powers.get(vision);
-        check(!VisionQuestEyesLayer.lit(data), "at rest: plain yellow eyes");
+        check(!VisionQuest.eyesLit(data), "at rest: plain yellow eyes");
         data.setVisionPhased(true);
-        check(VisionQuestEyesLayer.lit(data), "phasing: they glow");
+        check(VisionQuest.eyesLit(data), "phasing: they glow");
         data.setVisionPhased(false);
         data.setDense(true);
-        check(VisionQuestEyesLayer.lit(data), "dense: they glow");
+        check(VisionQuest.eyesLit(data), "dense: they glow");
         data.setDense(false);
-        check(!VisionQuestEyesLayer.lit(data), "and stop");
+        check(!VisionQuest.eyesLit(data), "and stop");
         Powers.setVariant(vision, Variants.get(Power.VISION, "vision"));
         data = Powers.get(vision);
         data.setVisionPhased(true);
-        check(!VisionQuestEyesLayer.lit(data), "only in the VisionQuest look");
+        check(!VisionQuest.eyesLit(data), "only in the VisionQuest look");
         helper.succeed();
     }
 }

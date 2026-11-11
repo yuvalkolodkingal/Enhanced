@@ -23,19 +23,13 @@ import java.util.Map;
  * fifth row.
  */
 public class VisionQuestEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
-    public static final String LOOK = "vision_visionquest";
+    private static final String LOOK = com.kolodkingal.enhanced.power.VisionQuest.LOOK;
     private static final RenderType EYES = RenderType.eyes(Enhanced.id("textures/entity/suit/vision_visionquest_eyes.png"));
     /** Per player: how strong the glow is (0 to 1) and when it was last drawn. */
     private static final Map<Integer, float[]> SHOWN = new HashMap<>();
 
     public VisionQuestEyesLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
         super(parent);
-    }
-
-    /** Whether this player's VisionQuest eyes glow now: the look, and a power of his in use. */
-    public static boolean lit(PowerData data) {
-        return data.power() == Power.VISION && LOOK.equals(data.variant()) && !data.disguise()
-                && (data.beamActive() || data.visionPhased() || data.dense());
     }
 
     @Override
@@ -46,7 +40,7 @@ public class VisionQuestEyesLayer extends RenderLayer<AbstractClientPlayer, Play
             SHOWN.remove(player.getId());
             return;
         }
-        boolean on = lit(data);
+        boolean on = com.kolodkingal.enhanced.power.VisionQuest.eyesLit(data);
         float t = player.tickCount + partialTicks;
         float[] shown = SHOWN.computeIfAbsent(player.getId(), id -> new float[]{0.0F, t});
         float dt = Mth.clamp(t - shown[1], 0.0F, 4.0F);

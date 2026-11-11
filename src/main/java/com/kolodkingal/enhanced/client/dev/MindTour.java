@@ -243,7 +243,7 @@ public final class MindTour {
             piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random,
                     piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(base), base);
             level.setDayTime(6000);
-            p.teleportTo(level, base.getX() + 0.5, base.getY(), base.getZ() - 12.5, 0.0F, -10.0F);
+            p.teleportTo(level, base.getX() + 0.5, base.getY() + 1, base.getZ() - 34.5, 0.0F, -12.0F);
         }, 80);
         shot("m26_manor", 40);
         server(p -> p.teleportTo(p.serverLevel(), manor.getX() + 5.5, manor.getY(), manor.getZ() + 0.5, 270.0F, 25.0F), 40);

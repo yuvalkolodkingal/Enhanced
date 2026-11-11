@@ -209,7 +209,7 @@ public final class MindTests {
         check("source_code".equals(Powers.get(vision).variant()), "White Vision becomes Source Code");
         check(EarnedLooks.has(vision, Variants.get(Power.VISION, "source_code")), "earned");
         boolean seen = false;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < Variants.of(Power.VISION).size(); i++) {
             Powers.cycleVariant(vision, 1);
             seen |= "source_code".equals(Powers.get(vision).variant());
         }

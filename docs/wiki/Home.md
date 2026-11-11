@@ -51,6 +51,18 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.12.1
+
+* **Vision's VisionQuest look.** A new look for Vision (Change Look, **H**): the green, gold and maroon suit from *VisionQuest*. While one of his powers is in use (the Mind Stone beam, Phase or Density) his yellow eyes **glow**, fading in and out and bright even in the dark. See [Vision](Vision).
+* **Vision's mind, as in the series.** His mansion is now the tall white Victorian house from *VisionQuest*:
+  * Outside: bay towers, a pillared portico, a red mansard roof with lit dormers, and a turret with a red cone and a weathervane.
+  * The grounds: a white path between hedges and lamp posts, a balustrade, and round oaks.
+  * The cinema has red walls with amber lamps at the seats.
+  * Ultron's attic has brick walls, a wall of glowing old screens, and a door shaped like the Mind Stone onto a balcony over the portico.
+  * The Human Torch's painting is the one from the series: a dark figure in a column of fire.
+  * A mansion built in 3.12.0 is rebuilt in the new look the next time you go in, and your progress is kept.
+* **The Horton manor, as in the series.** A red-brick house with stone bands and mullioned windows, wings with little turrets, a clock tower with a white cupola, and a forecourt with a fountain. Manors already in your world keep their old look; new ones are built this way.
+
 ## What's new in 3.12.0
 
 * **Vision: Source Code.** A new item, the Source Code, shaped like the gem on Vision's forehead. Use it as White Vision and you become **Vision: Source Code**, a new look with more strength, more armour and health, faster flight and no fire damage. Change Look skips it until you have earned it.
