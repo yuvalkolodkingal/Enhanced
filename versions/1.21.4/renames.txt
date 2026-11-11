@@ -17,7 +17,7 @@ public boolean isInvulnerableTo\(DamageSource source\) => public boolean isInvul
 public boolean hurt\((?:net\.minecraft\.world\.damagesource\.)?DamageSource (\w+), float (\w+)\) => public boolean hurtServer(net.minecraft.server.level.ServerLevel hurtLevel, net.minecraft.world.damagesource.DamageSource $1, float $2)
 \bsuper\.hurt\( => super.hurtServer(hurtLevel, 
 (?<!super|\b[A-Z]\w{0,60})\.hurt\((?!\)) => .hurtOrSimulate(
-\.create\(((?:\w+\.)?(?:level|serverLevel)(?:\(\))?(?:\.getLevel\(\))?)\) => .create($1, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED)
+\.create\(((?:\w+\.)?(?:level|serverLevel|mind|server)(?:\(\))?(?:\.getLevel\(\))?)\) => .create($1, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED)
 # registries
 \bgetHolderOrThrow\( => getOrThrow(
 \bstructures\.get\( => structures.getValue(
@@ -295,3 +295,5 @@ protected AABB makeBoundingBox\(\) \{ => protected AABB makeBoundingBox(net.mine
 \.isAngryAt\((\w+)\) => .isAngryAt($1, (net.minecraft.server.level.ServerLevel) $1.level())
 \bEntitySpawnReason\.SPAWN_EGG\b => EntitySpawnReason.SPAWN_ITEM_USE
 \bnew ((?:net\.minecraft\.client\.model\.)?(?:PlayerModel|HumanoidModel<\w*>))\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)(?=[,)]) => new $1(com.kolodkingal.enhanced.compat.Meshes.humanoid($2)
+# 3.12: food eaten quickly is a consumable component in 1.21.4 (popcorn is eaten at the plain speed there)
+\.fast\(\)\.build\(\) => .build()

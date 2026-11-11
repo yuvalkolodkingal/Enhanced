@@ -152,7 +152,12 @@ public final class UltronAbilities {
                     press(player, data);
                 }
             }
-            case 2 -> PowerTicker.toggleFlight(player);
+            case 2 -> {
+                // (3.12: Sneak + flight, in nanotech: pure nanotech on or off)
+                if (!(sneak && com.kolodkingal.enhanced.nano.NanoUltron.toggleForm(player))) {
+                    PowerTicker.toggleFlight(player);
+                }
+            }
             case 3 -> {
                 if (sneak) {
                     slam(player, data);
@@ -170,6 +175,13 @@ public final class UltronAbilities {
             case 5 -> {
                 if (sneak) {
                     UltronDrones.command(player);
+                } else if (com.kolodkingal.enhanced.nano.NanoUltron.is(player)) {
+                    // (3.12: in nanotech, the army is people the nanotech has taken)
+                    long now = player.serverLevel().getGameTime();
+                    if (data.isReady(HeroAbility.ULTRON_ARMY, now)) {
+                        com.kolodkingal.enhanced.nano.NanoUltron.army(player, data);
+                        data.startCooldown(HeroAbility.ULTRON_ARMY, now, UltronConfig.DRONE_COOLDOWN.get());
+                    }
                 } else {
                     UltronDrones.army(player, data);
                 }
@@ -234,6 +246,7 @@ public final class UltronAbilities {
      * builds.
      */
     static void applyBody(ServerPlayer player, PowerData data) {
+        com.kolodkingal.enhanced.nano.NanoUltron.applyBody(player);
         // (3.4: and a custom hero with his body, its amounts times the strength's factor; the Overcharge's slowness with it.)
         boolean ultron = data.has(HeroAbility.ULTRON_BODY);
         double scale = data.bodyScale(HeroAbility.ULTRON_BODY);
@@ -384,7 +397,8 @@ public final class UltronAbilities {
         Vec3 direction = Vec3.directionFromRotation(player.getXRot() + spread(player), player.getYRot() + spread(player));
         Vec3 from = fingertip(player, plasma.hand++ % 2 == 0 ? 1.0 : -1.0);
         UltronBoltEntity bolt = UltronBoltEntity.create(level, player, from, direction.scale(BOLT_SPEED),
-                UltronConfig.BOLT_DAMAGE.get().floatValue(), palette(player)).tint(AbilityColors.chosen(player,
+                UltronConfig.BOLT_DAMAGE.get().floatValue() * (com.kolodkingal.enhanced.nano.NanoUltron.is(player) ? 1.5F : 1.0F),
+                palette(player)).tint(AbilityColors.chosen(player,
                         HeroAbility.ULTRON_REPULSOR));
         float splash = UltronConfig.BOLT_SPLASH.get().floatValue();
         if (splash > 0.0F) {
@@ -416,7 +430,7 @@ public final class UltronAbilities {
     public static UltronBoltEntity.Palette palette(Player player) {
         return switch (Powers.variant(player).id()) {
             case "sentry" -> UltronBoltEntity.Palette.SENTRY;
-            case "human" -> UltronBoltEntity.Palette.HUMAN;
+            case "human", "nano" -> UltronBoltEntity.Palette.HUMAN;
             default -> UltronBoltEntity.Palette.PRIME;
         };
     }

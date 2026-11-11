@@ -65,7 +65,7 @@ public enum HeroAbility implements CatalogEntry {
             .fixed().res(Resource.PHASE).family(Family.PHASE).on(PowerData::visionPhased)),
     VISION_DENSITY(Power.VISION, 4, "density", toggle().cost(1).group(Group.BODY).icon("minecraft:iron_block")
             .fixed().traits(Trait.METAL_BODY).on(PowerData::dense)),
-    VISION_DISGUISE(Power.VISION, 5, "disguise", toggle().cost(1).group(Group.BODY).icon("minecraft:leather_chestplate")
+    VISION_DISGUISE(Power.VISION, 5, "disguise", toggle().alt(Act.PRESS).cost(1).group(Group.BODY).icon("minecraft:leather_chestplate")
             .fixed().on(PowerData::disguise)),
     /** Vision's synthetic body (L2): more health and armour, never hungry nor out of breath, metal (Magneto may lift it). */
     VISION_BODY(Power.VISION, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:copper_ingot")
@@ -531,7 +531,10 @@ public enum HeroAbility implements CatalogEntry {
     FALCON_WING_SLASH(FALCON_WING_SHIELD, "wing_slash", variant(FALCON_WING_SHIELD).icon("minecraft:iron_sword")),
     FALCON_REDWING_STRIKE(FALCON_REDWING, "redwing_strike", variant(FALCON_REDWING).icon("minecraft:arrow")),
     LOVE_THUNDER_STRIKE(LOVE_AXE, "thunder_strike", variant(LOVE_AXE).icon("minecraft:trident")),
-    LOVE_BIFROST_LOOK(LOVE_BIFROST, "bifrost_look", variant(LOVE_BIFROST).icon("minecraft:spyglass"));
+    LOVE_BIFROST_LOOK(LOVE_BIFROST, "bifrost_look", variant(LOVE_BIFROST).icon("minecraft:spyglass")),
+    // ===== vision's mind (3.12): appended =====
+    /** Sneak + Disguise: five seconds still, and Vision is in his own mind (MindPalace). */
+    VISION_MIND_PALACE(VISION_DISGUISE, "mind_palace", variant(VISION_DISGUISE).icon("minecraft:ender_eye"));
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {

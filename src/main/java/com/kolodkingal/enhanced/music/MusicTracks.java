@@ -28,6 +28,8 @@ public final class MusicTracks {
     public static final String ROAD = "witches_road";
     /** The file that stands in for every track that has none of its own. */
     public static final String FALLBACK = "music";
+    /** 3.12: the fight with Nano Ultron. */
+    public static final String NANO_ULTRON = "nano_ultron";
     /** The Road's version for the end of the Road (its stage is {@link EndingHall#ID}, "road_end"). */
     public static final String ROAD_ENDING = "ending";
 
@@ -54,7 +56,7 @@ public final class MusicTracks {
 
     /** Whether a name is one this mod plays: one of the tracks, a version of the Road, or the fallback. */
     public static boolean isTrackName(String name) {
-        return name.equals(QUICKSILVER) || name.equals(SPEED) || name.equals(ROAD) || name.equals(FALLBACK)
+        return name.equals(QUICKSILVER) || name.equals(SPEED) || name.equals(ROAD) || name.equals(FALLBACK) || name.equals(NANO_ULTRON)
                 || name.startsWith(ROAD + "_") && name.length() > ROAD.length() + 1 && NAME.matcher(name).matches();
     }
 

@@ -23,6 +23,12 @@ public final class ModCreativeTab {
                         output.accept(ModItems.WANDA_CROWN.get());
                         output.accept(ModItems.QUICKSILVER_GOGGLES.get());
                         output.accept(ModItems.SYNTHEZOID_CORE.get());
+                        output.accept(ModItems.SOURCE_CODE.get());
+                        output.accept(ModItems.ULTRON_HAT.get());
+                        output.accept(ModItems.POPCORN.get());
+                        output.accept(ModItems.MIND_ELEVATOR.get());
+                        output.accept(ModItems.CINEMA_PROJECTOR.get());
+                        output.accept(ModItems.NANO_STORAGE.get());
                         output.accept(ModItems.MJOLNIR.get());
                         output.accept(ModItems.STORMBREAKER.get());
                         output.accept(ModItems.BOOK_OF_THE_VISHANTI.get());

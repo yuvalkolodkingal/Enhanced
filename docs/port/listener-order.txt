@@ -3,12 +3,23 @@
 # read by the @Subscribe processor (the generated order) and ListenerOrderTests. Do not edit.
 
 [server]
+event net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent -> com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent
+    NORMAL - com.kolodkingal.enhanced.cottage.CottageDialogue#onCommonSetup
+    NORMAL - com.kolodkingal.enhanced.ironman.nano.NanoEvents$Setup#onSetup
+    NORMAL - com.kolodkingal.enhanced.hydra.HydraEvents$Setup#onCommonSetup
+    NORMAL - com.kolodkingal.enhanced.apocalypse.ApocalypseSetup#onCommonSetup
+    NORMAL - com.kolodkingal.enhanced.thanos.ThanosEvents#onCommonSetup
+    NORMAL - com.kolodkingal.enhanced.heimdall.HeimdallTalk#onCommonSetup
+    NORMAL - com.kolodkingal.enhanced.hela.HelaSetup#onCommonSetup
+    NORMAL - com.kolodkingal.enhanced.ultron.UltronSetup#onCommonSetup
 event net.neoforged.neoforge.event.ItemAttributeModifierEvent -> com.kolodkingal.enhanced.platform.event.ItemAttributeModifierEvent
     NORMAL - com.kolodkingal.enhanced.ironman.IronEvents#onAttributes
 event net.neoforged.neoforge.event.OnDatapackSyncEvent -> com.kolodkingal.enhanced.platform.event.OnDatapackSyncEvent
     NORMAL - com.kolodkingal.enhanced.music.MusicEvents#onDatapackSync
 event net.neoforged.neoforge.event.RegisterCommandsEvent -> com.kolodkingal.enhanced.platform.event.RegisterCommandsEvent
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onRegisterCommands
+event net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent -> -
+    NORMAL - com.kolodkingal.enhanced.Enhanced#lambda
 event net.neoforged.neoforge.event.entity.EntityJoinLevelEvent -> com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent
     HIGHEST - com.kolodkingal.enhanced.apocalypse.ApocalypseEvents#onEntityJoin
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onEntityJoin
@@ -185,6 +196,7 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     NORMAL - com.kolodkingal.enhanced.redhulk.RedHulkEvents#onFire
     NORMAL - com.kolodkingal.enhanced.hela.HelaEvents#onIncomingDamage
     NORMAL - com.kolodkingal.enhanced.falcon.FalconEvents#onShieldedBlow
+    NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onIncomingDamage
     LOW - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onBladeBlow
     LOW - com.kolodkingal.enhanced.event.CommonEvents#onThorMelee
     LOW - com.kolodkingal.enhanced.event.PhoenixEvents#onSlam
@@ -277,6 +289,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedInEvent
     NORMAL - com.kolodkingal.enhanced.death.DeathMeeting#onLogin
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onLogin
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onLogin
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogin
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerLoggedOutEvent
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.school.LabEvents#onLogout
@@ -302,6 +315,8 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEven
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onLogout
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogout
+    NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onLogout
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerRespawnEvent
     HIGH - com.kolodkingal.enhanced.death.DeathMeeting#onRespawn
     NORMAL - com.kolodkingal.enhanced.vormir.VormirEvents#onRespawn
@@ -406,6 +421,8 @@ event net.neoforged.neoforge.event.level.LevelEvent$Save -> com.kolodkingal.enha
 event net.neoforged.neoforge.event.level.PistonEvent$Pre -> com.kolodkingal.enhanced.platform.event.PistonEvent$Pre
     HIGH - com.kolodkingal.enhanced.boss.BossArenaEvents#onPiston
     NORMAL - com.kolodkingal.enhanced.asgard.AsgardRules#onPiston
+event net.neoforged.neoforge.event.server.ServerAboutToStartEvent -> -
+    HIGHEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStartedEvent -> com.kolodkingal.enhanced.platform.event.ServerStartedEvent
     NORMAL - com.kolodkingal.enhanced.asgard.AsgardRules#onServerStarted
     NORMAL - com.kolodkingal.enhanced.stones.StoneSites#onServerStarted
@@ -444,6 +461,8 @@ event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onServerStopped
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onStopped
+    LOWEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStoppingEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppingEvent
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onServerStopping
     NORMAL - com.kolodkingal.enhanced.event.XavierEvents#onServerStopping
@@ -487,6 +506,7 @@ event net.neoforged.neoforge.event.tick.PlayerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.hydra.HydraEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.tower.TowerEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onPlayerTick
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onPlayerTick
 event net.neoforged.neoforge.event.tick.PlayerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.PlayerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.wolverine.WolverineEvents#onPlayerTick
@@ -501,6 +521,20 @@ event net.neoforged.neoforge.event.tick.ServerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onServerTick
 event net.neoforged.neoforge.event.tick.ServerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.ServerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onServerTick
+event net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent -> -
+    NORMAL - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
+event net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent -> -
+    NORMAL - com.kolodkingal.enhanced.Enhanced#lambda
+    NORMAL - com.kolodkingal.enhanced.network.SpeedNetwork#register
+    NORMAL - com.kolodkingal.enhanced.network.SpiderNetwork#register
+    NORMAL - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
+
+[client]
+event net.neoforged.fml.event.lifecycle.FMLClientSetupEvent -> com.kolodkingal.enhanced.platform.event.client.FMLClientSetupEvent
+    NORMAL - com.kolodkingal.enhanced.client.stones.StoneClient$Setup#onClientSetup
+    NORMAL - com.kolodkingal.enhanced.client.render.HelaEffects$Setup#onClientSetup
+    NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView$Setup#onClientSetup
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onClientSetup
 event net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent -> com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent
     NORMAL - com.kolodkingal.enhanced.cottage.CottageDialogue#onCommonSetup
     NORMAL - com.kolodkingal.enhanced.ironman.nano.NanoEvents$Setup#onSetup
@@ -510,13 +544,6 @@ event net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent -> com.kolodkingal.e
     NORMAL - com.kolodkingal.enhanced.heimdall.HeimdallTalk#onCommonSetup
     NORMAL - com.kolodkingal.enhanced.hela.HelaSetup#onCommonSetup
     NORMAL - com.kolodkingal.enhanced.ultron.UltronSetup#onCommonSetup
-event net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent -> -
-    NORMAL - com.kolodkingal.enhanced.Enhanced#lambda
-event net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent -> -
-    NORMAL - com.kolodkingal.enhanced.Enhanced#lambda
-    NORMAL - com.kolodkingal.enhanced.network.SpeedNetwork#register
-    NORMAL - com.kolodkingal.enhanced.network.SpiderNetwork#register
-[client]
 event net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent -> com.kolodkingal.enhanced.platform.event.client.CalculateDetachedCameraDistanceEvent
     NORMAL - com.kolodkingal.enhanced.client.hulk.HulkRenderEvents#onCameraDistance
 event net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent$Clone -> com.kolodkingal.enhanced.platform.event.client.ClientPlayerNetworkEvent$Clone
@@ -567,12 +594,21 @@ event net.neoforged.neoforge.client.event.ClientTickEvent$Post -> com.kolodkinga
     NORMAL - com.kolodkingal.enhanced.client.ClientEvents#onClientTick
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onClientTick
     NORMAL - com.kolodkingal.enhanced.client.RoadMusicPlayer#onClientTick
+    NORMAL - com.kolodkingal.enhanced.client.dev.MindTour#onTick
+    NORMAL - com.kolodkingal.enhanced.client.nano.NanoMusic#onClientTick
 event net.neoforged.neoforge.client.event.ComputeFovModifierEvent -> com.kolodkingal.enhanced.platform.event.client.ComputeFovModifierEvent
     NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView#onComputeFov
     NORMAL - com.kolodkingal.enhanced.client.render.SpiderEffects#onComputeFov
     NORMAL - com.kolodkingal.enhanced.client.ClientEvents#onComputeFov
 event net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent$BossEventProgress -> com.kolodkingal.enhanced.platform.event.client.CustomizeGuiOverlayEvent$BossEventProgress
     NORMAL - com.kolodkingal.enhanced.client.BossBarOverride#onBossBar
+event net.neoforged.neoforge.client.event.EntityRenderersEvent$AddLayers -> -
+    NORMAL - com.kolodkingal.enhanced.client.stones.StoneClient$Setup#onAddLayers
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onAddLayers
+event net.neoforged.neoforge.client.event.EntityRenderersEvent$RegisterLayerDefinitions -> -
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterLayers
+event net.neoforged.neoforge.client.event.EntityRenderersEvent$RegisterRenderers -> -
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterRenderers
 event net.neoforged.neoforge.client.event.InputEvent$InteractionKeyMappingTriggered -> com.kolodkingal.enhanced.platform.event.client.InputEvent$InteractionKeyMappingTriggered
     NORMAL - com.kolodkingal.enhanced.client.XavierControl#onClick
     NORMAL - com.kolodkingal.enhanced.client.build.BuildInput#onInteraction
@@ -598,6 +634,22 @@ event net.neoforged.neoforge.client.event.RegisterClientCommandsEvent -> com.kol
     NORMAL - com.kolodkingal.enhanced.client.ModelViewer#onRegister
     NORMAL - com.kolodkingal.enhanced.client.AnimDebugCommands#onRegister
     NORMAL - com.kolodkingal.enhanced.client.render.UltronFxCommand#onRegister
+event net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent -> -
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterReloadListeners
+event net.neoforged.neoforge.client.event.RegisterColorHandlersEvent$Item -> -
+    NORMAL - com.kolodkingal.enhanced.client.finders.LocatorClient#onItemColors
+event net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent -> -
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterDimensionEffects
+event net.neoforged.neoforge.client.event.RegisterGuiLayersEvent -> -
+    NORMAL - com.kolodkingal.enhanced.client.vormir.VormirClient$Setup#onRegisterGui
+    NORMAL - com.kolodkingal.enhanced.client.stones.StoneClient$Setup#onRegisterGui
+    NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView$Setup#onRegisterGui
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterGui
+event net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent -> -
+    NORMAL - com.kolodkingal.enhanced.client.SpiderAssistKey$Registration#onRegisterKeys
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterKeys
+event net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent -> -
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterParticles
 event net.neoforged.neoforge.client.event.RenderArmEvent -> com.kolodkingal.enhanced.platform.event.client.RenderArmEvent
     HIGHEST - com.kolodkingal.enhanced.client.ironman.suits.SuitRenderContext#onArm
     HIGH - com.kolodkingal.enhanced.client.ironman.HulkbusterRenderEvents#onRenderArm
@@ -673,6 +725,7 @@ event net.neoforged.neoforge.client.event.SelectMusicEvent -> com.kolodkingal.en
     NORMAL - com.kolodkingal.enhanced.client.ApocalypseMusic#onSelectMusic
     NORMAL - com.kolodkingal.enhanced.client.ClientEvents#onSelectMusic
     NORMAL - com.kolodkingal.enhanced.client.RoadMusicPlayer#onSelectMusic
+    NORMAL - com.kolodkingal.enhanced.client.nano.NanoMusic#onSelectMusic
 event net.neoforged.neoforge.client.event.ViewportEvent$ComputeCameraAngles -> com.kolodkingal.enhanced.platform.event.client.ViewportEvent$ComputeCameraAngles
     NORMAL - com.kolodkingal.enhanced.client.sokovia.SokoviaCamera#onCameraAngles
     NORMAL - com.kolodkingal.enhanced.client.strange.MirrorView#onCameraAngles
@@ -693,12 +746,16 @@ event net.neoforged.neoforge.client.event.ViewportEvent$ComputeFogColor -> com.k
 event net.neoforged.neoforge.client.event.ViewportEvent$RenderFog -> com.kolodkingal.enhanced.platform.event.client.ViewportEvent$RenderFog
     NORMAL - com.kolodkingal.enhanced.client.render.ArenaFx#onFog
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFog
+event net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent -> -
+    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterClientExtensions
 event net.neoforged.neoforge.event.ItemAttributeModifierEvent -> com.kolodkingal.enhanced.platform.event.ItemAttributeModifierEvent
     NORMAL - com.kolodkingal.enhanced.ironman.IronEvents#onAttributes
 event net.neoforged.neoforge.event.OnDatapackSyncEvent -> com.kolodkingal.enhanced.platform.event.OnDatapackSyncEvent
     NORMAL - com.kolodkingal.enhanced.music.MusicEvents#onDatapackSync
 event net.neoforged.neoforge.event.RegisterCommandsEvent -> com.kolodkingal.enhanced.platform.event.RegisterCommandsEvent
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onRegisterCommands
+event net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent -> -
+    NORMAL - com.kolodkingal.enhanced.Enhanced#lambda
 event net.neoforged.neoforge.event.entity.EntityJoinLevelEvent -> com.kolodkingal.enhanced.platform.event.EntityJoinLevelEvent
     HIGHEST - com.kolodkingal.enhanced.apocalypse.ApocalypseEvents#onEntityJoin
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onEntityJoin
@@ -844,8 +901,8 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     HIGHEST - com.kolodkingal.enhanced.event.AgathaEvents#onShieldDamage
     HIGHEST - com.kolodkingal.enhanced.healing.HealingEvents#onIncomingDamage
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onIncomingDamage
-    HIGHEST - com.kolodkingal.enhanced.apocalypse.ApocalypseEvents#onFriendlyFire
     HIGHEST - com.kolodkingal.enhanced.apocalypse.ApocalypseEvents#onIncomingDamage
+    HIGHEST - com.kolodkingal.enhanced.apocalypse.ApocalypseEvents#onFriendlyFire
     HIGHEST - com.kolodkingal.enhanced.heimdall.HeimdallEvents#onShadowHurt
     HIGHEST - com.kolodkingal.enhanced.ultron.SokoviaEvents#onIncomingDamage
     HIGHEST - com.kolodkingal.enhanced.eternity.EternityEvents#onDamage
@@ -875,6 +932,7 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     NORMAL - com.kolodkingal.enhanced.redhulk.RedHulkEvents#onFire
     NORMAL - com.kolodkingal.enhanced.hela.HelaEvents#onIncomingDamage
     NORMAL - com.kolodkingal.enhanced.falcon.FalconEvents#onShieldedBlow
+    NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onIncomingDamage
     LOW - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onBladeBlow
     LOW - com.kolodkingal.enhanced.event.CommonEvents#onThorMelee
     LOW - com.kolodkingal.enhanced.event.PhoenixEvents#onSlam
@@ -969,6 +1027,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedInEvent
     NORMAL - com.kolodkingal.enhanced.death.DeathMeeting#onLogin
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onLogin
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onLogin
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogin
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerLoggedOutEvent
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.school.LabEvents#onLogout
@@ -994,6 +1053,8 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEven
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onLogout
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogout
+    NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onLogout
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerRespawnEvent
     HIGH - com.kolodkingal.enhanced.death.DeathMeeting#onRespawn
     NORMAL - com.kolodkingal.enhanced.vormir.VormirEvents#onRespawn
@@ -1101,6 +1162,8 @@ event net.neoforged.neoforge.event.level.LevelEvent$Unload -> com.kolodkingal.en
 event net.neoforged.neoforge.event.level.PistonEvent$Pre -> com.kolodkingal.enhanced.platform.event.PistonEvent$Pre
     HIGH - com.kolodkingal.enhanced.boss.BossArenaEvents#onPiston
     NORMAL - com.kolodkingal.enhanced.asgard.AsgardRules#onPiston
+event net.neoforged.neoforge.event.server.ServerAboutToStartEvent -> -
+    HIGHEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStartedEvent -> com.kolodkingal.enhanced.platform.event.ServerStartedEvent
     NORMAL - com.kolodkingal.enhanced.asgard.AsgardRules#onServerStarted
     NORMAL - com.kolodkingal.enhanced.stones.StoneSites#onServerStarted
@@ -1139,6 +1202,8 @@ event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onServerStopped
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onStopped
+    LOWEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStoppingEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppingEvent
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onServerStopping
     NORMAL - com.kolodkingal.enhanced.event.XavierEvents#onServerStopping
@@ -1181,8 +1246,9 @@ event net.neoforged.neoforge.event.tick.PlayerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.captain.CaptainEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.hydra.HydraEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.tower.TowerEvents#onPlayerTick
-    NORMAL - com.kolodkingal.enhanced.client.SpeedsterMotion#onPlayerTickPost
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onPlayerTick
+    NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onPlayerTick
+    NORMAL - com.kolodkingal.enhanced.client.SpeedsterMotion#onPlayerTickPost
 event net.neoforged.neoforge.event.tick.PlayerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.PlayerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.wolverine.WolverineEvents#onPlayerTick
@@ -1201,48 +1267,10 @@ event net.neoforged.neoforge.event.tick.ServerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onServerTick
 event net.neoforged.neoforge.event.tick.ServerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.ServerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onServerTick
-event net.neoforged.fml.event.lifecycle.FMLClientSetupEvent -> com.kolodkingal.enhanced.platform.event.client.FMLClientSetupEvent
-    NORMAL - com.kolodkingal.enhanced.client.stones.StoneClient$Setup#onClientSetup
-    NORMAL - com.kolodkingal.enhanced.client.render.HelaEffects$Setup#onClientSetup
-    NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView$Setup#onClientSetup
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onClientSetup
-event net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent -> com.kolodkingal.enhanced.platform.event.FMLCommonSetupEvent
-    NORMAL - com.kolodkingal.enhanced.cottage.CottageDialogue#onCommonSetup
-    NORMAL - com.kolodkingal.enhanced.ironman.nano.NanoEvents$Setup#onSetup
-    NORMAL - com.kolodkingal.enhanced.hydra.HydraEvents$Setup#onCommonSetup
-    NORMAL - com.kolodkingal.enhanced.apocalypse.ApocalypseSetup#onCommonSetup
-    NORMAL - com.kolodkingal.enhanced.thanos.ThanosEvents#onCommonSetup
-    NORMAL - com.kolodkingal.enhanced.heimdall.HeimdallTalk#onCommonSetup
-    NORMAL - com.kolodkingal.enhanced.hela.HelaSetup#onCommonSetup
-    NORMAL - com.kolodkingal.enhanced.ultron.UltronSetup#onCommonSetup
-event net.neoforged.neoforge.client.event.EntityRenderersEvent$AddLayers -> -
-    NORMAL - com.kolodkingal.enhanced.client.stones.StoneClient$Setup#onAddLayers
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onAddLayers
-event net.neoforged.neoforge.client.event.EntityRenderersEvent$RegisterLayerDefinitions -> -
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterLayers
-event net.neoforged.neoforge.client.event.EntityRenderersEvent$RegisterRenderers -> -
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterRenderers
-event net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent -> -
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterReloadListeners
-event net.neoforged.neoforge.client.event.RegisterColorHandlersEvent$Item -> -
-    NORMAL - com.kolodkingal.enhanced.client.finders.LocatorClient#onItemColors
-event net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent -> -
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterDimensionEffects
-event net.neoforged.neoforge.client.event.RegisterGuiLayersEvent -> -
-    NORMAL - com.kolodkingal.enhanced.client.vormir.VormirClient$Setup#onRegisterGui
-    NORMAL - com.kolodkingal.enhanced.client.stones.StoneClient$Setup#onRegisterGui
-    NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView$Setup#onRegisterGui
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterGui
-event net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent -> -
-    NORMAL - com.kolodkingal.enhanced.client.SpiderAssistKey$Registration#onRegisterKeys
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterKeys
-event net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent -> -
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterParticles
-event net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent -> -
-    NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterClientExtensions
-event net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent -> -
-    NORMAL - com.kolodkingal.enhanced.Enhanced#lambda
+event net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent -> -
+    NORMAL - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent -> -
     NORMAL - com.kolodkingal.enhanced.Enhanced#lambda
     NORMAL - com.kolodkingal.enhanced.network.SpeedNetwork#register
     NORMAL - com.kolodkingal.enhanced.network.SpiderNetwork#register
+    NORMAL - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda

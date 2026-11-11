@@ -97,7 +97,8 @@ public final class Powers {
      */
     public static void awaken(ServerPlayer player, Power power, String variant, boolean ownWay) {
         setPower(player, power);
-        setVariant(player, Variants.get(power, variant));
+        Variant chosen = Variants.get(power, variant);
+        setVariant(player, EarnedLooks.has(player, chosen) ? chosen : Variants.get(power, ""));
         ServerLevel level = player.serverLevel();
 
         Component title = power.awakeningTitle().copy().withStyle(s -> s.withColor(power.titleColor()).withBold(true));
@@ -170,7 +171,12 @@ public final class Powers {
         if (!Variants.hasChoice(data.power())) {
             return false;
         }
-        Variant next = Variants.step(data.power(), data.variant(), step);
+        Variant step1 = Variants.step(data.power(), data.variant(), step);
+        // (3.12: a look that is earned is skipped until it is)
+        for (int i = 0; i < Variants.of(data.power()).size() && !EarnedLooks.has(player, step1); i++) {
+            step1 = Variants.step(data.power(), step1.id(), step);
+        }
+        Variant next = step1;
         setVariant(player, next);
         ServerLevel level = player.serverLevel();
         burst(level, player.getX(), player.getY() + 1.0, player.getZ(), next.color(), 40, 0.5);

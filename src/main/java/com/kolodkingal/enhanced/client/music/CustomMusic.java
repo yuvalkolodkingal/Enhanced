@@ -37,6 +37,7 @@ public final class CustomMusic {
               witches_road.mp3         the Witches' Road, all of it
               witches_road_<part>.mp3  one part of the Road only: entrance, parkour,
                                        structure_copy, ice_boat, choice or ending
+              nano_ultron.mp3          the fight with Nano Ultron
 
             Any other song file here (say "my song.mp3") is Quicksilver's, as before 3.5;
             if there is more than one, the first in alphabetical order is used.

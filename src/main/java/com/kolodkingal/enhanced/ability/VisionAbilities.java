@@ -80,7 +80,9 @@ public final class VisionAbilities {
                 }
             }
             case 5 -> {
-                if (down) {
+                if (down && alt) {
+                    com.kolodkingal.enhanced.mind.MindPalace.press(player);
+                } else if (down) {
                     data.setDisguise(!data.disguise());
                     player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 0.8F, 1.2F);
                     player.serverLevel().sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_DISGUISE, Powers.glow(player)), 1.4F),
@@ -139,10 +141,29 @@ public final class VisionAbilities {
         PowerTicker.setModifier(player, Attributes.ATTACK_KNOCKBACK, DENSE_PUNCH, 1.5, dense);
         PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, DENSE_SPEED, -0.3, dense, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         PowerTicker.setModifier(player, Attributes.GRAVITY, DENSE_GRAVITY, 0.04, dense);
+        // 3.12: Vision as his Source Code: stronger, harder to hurt, and fire does not touch him
+        boolean source = vision && "source_code".equals(data.variant());
+        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, SOURCE_DAMAGE, 5.0, source);
+        PowerTicker.setModifier(player, Attributes.ARMOR, SOURCE_ARMOR, 6.0, source);
+        PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, SOURCE_TOUGHNESS, 6.0, source);
+        PowerTicker.setModifier(player, Attributes.MAX_HEALTH, SOURCE_HEALTH, 10.0, source);
+        if (source) {
+            player.clearFire();
+            if (!player.hasEffect(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE)
+                    || player.getEffect(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE).getDuration() < 40) {
+                player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE,
+                        100, 0, true, false, true));
+            }
+        }
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
     }
+
+    private static final ResourceLocation SOURCE_DAMAGE = Enhanced.id("vision_source_code_damage");
+    private static final ResourceLocation SOURCE_ARMOR = Enhanced.id("vision_source_code_armor");
+    private static final ResourceLocation SOURCE_TOUGHNESS = Enhanced.id("vision_source_code_toughness");
+    private static final ResourceLocation SOURCE_HEALTH = Enhanced.id("vision_source_code_health");
 
     /** Vision phasing, or (3.3) a custom hero whose Phasing passes through walls: the same rules for both. */
     public static boolean isPhased(Player player) {

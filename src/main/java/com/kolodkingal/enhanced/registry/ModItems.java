@@ -355,6 +355,28 @@ public final class ModItems {
     public static final ItemEntry<BlockItem> ETERNITY_MIRROR =
             ITEMS.registerSimpleBlockItem(ModBlocks.ETERNITY_MIRROR, new Item.Properties().rarity(Rarity.EPIC));
     // ===== love (3.8) =====
+    // ===== vision's mind (3.12) =====
+    /** The Source Code: White Vision becomes Vision as his Source Code. */
+    public static final ItemEntry<com.kolodkingal.enhanced.mind.SourceCodeItem> SOURCE_CODE = ITEMS.register("source_code",
+            () -> new com.kolodkingal.enhanced.mind.SourceCodeItem(new Item.Properties().stacksTo(1).fireResistant()
+                    .rarity(Rarity.EPIC)));
+    /** The cinema's popcorn. */
+    public static final ItemEntry<Item> POPCORN = ITEMS.register("popcorn", () -> new Item(new Item.Properties()
+            .food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(3).saturationModifier(0.3F).fast().build())));
+    /** Ultron's gift to Vision: a hat. */
+    public static final ItemEntry<com.kolodkingal.enhanced.mind.UltronHatItem> ULTRON_HAT = ITEMS.register("ultron_hat",
+            () -> new com.kolodkingal.enhanced.mind.UltronHatItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)
+                    //#if >=1.21.4
+                    //$$ .component(net.minecraft.core.component.DataComponents.EQUIPPABLE,
+                    //$$         net.minecraft.world.item.equipment.Equippable.builder(net.minecraft.world.entity.EquipmentSlot.HEAD).build())
+                    //#endif
+                    ));
+    public static final ItemEntry<BlockItem> MIND_ELEVATOR = ITEMS.registerSimpleBlockItem(ModBlocks.MIND_ELEVATOR,
+            new Item.Properties().rarity(Rarity.RARE));
+    public static final ItemEntry<BlockItem> NANO_STORAGE = ITEMS.registerSimpleBlockItem(ModBlocks.NANO_STORAGE,
+            new Item.Properties().rarity(Rarity.EPIC));
+    public static final ItemEntry<BlockItem> CINEMA_PROJECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CINEMA_PROJECTOR,
+            new Item.Properties());
 
     /** 3.8: a suit of Iron Man's as a chest item, with its durability (the plan's numbers). */
     private static ItemEntry<com.kolodkingal.enhanced.item.IronSuitItem> suit(String name,

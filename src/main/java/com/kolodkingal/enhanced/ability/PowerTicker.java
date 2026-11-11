@@ -70,7 +70,7 @@ public final class PowerTicker {
         float speed = !survivalLike || !canFly ? 0.05F : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
-                : power.flightSpeed();
+                : power.flightSpeed() * lookFlight(data);
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);
@@ -178,6 +178,13 @@ public final class PowerTicker {
      * Adds or removes a permanent attribute modifier. Permanent (saved) modifiers are used so that max health and
      * flight are already correct when the player's health and abilities are loaded on login.
      */
+    /** 3.12: the earned looks fly faster: Vision's Source Code by half again, the nanotech Ultron by two fifths. */
+    static float lookFlight(PowerData data) {
+        String look = data.variant();
+        return data.power() == Power.VISION && "source_code".equals(look) ? 1.5F
+                : data.power() == Power.ULTRON && "nano".equals(look) ? 1.4F : 1.0F;
+    }
+
     static void setModifier(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id, double amount, boolean present) {
         setModifier(player, attribute, id, amount, present, AttributeModifier.Operation.ADD_VALUE);
     }

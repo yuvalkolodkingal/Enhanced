@@ -77,7 +77,7 @@ public final class CreatorCatalogTests {
                 "Speed Blitz", "quicksilver.blitz", "Pickpocket", "quicksilver.pickpocket",
                 "wall and water running", "quicksilver.wall_run", "Pebble Barrage", "quicksilver.barrage");
         hero(Power.VISION, "Mind Stone beam", "vision.mind_beam", "Phase", "vision.phase", "Density", "vision.density",
-                "Disguise", "vision.disguise", "synthetic body", "vision.body", "flight", "flight");
+                "Disguise", "vision.disguise", "Mind Palace", "vision.mind_palace", "synthetic body", "vision.body", "flight", "flight");
         hero(Power.BILLY, "Hex Beam (or Hex Bolt)", "billy.hex_beam", "telekinesis", "billy.telekinesis",
                 "Freeze", "billy.freeze", "Hex Barrier", "billy.hex_barrier", "The Noise", "billy.noise",
                 "Build Magic (Y)", "billy.build_magic", "flight", "flight");

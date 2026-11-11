@@ -338,13 +338,14 @@ public final class AvengersSkeletonTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsAre221(GameTestHelper helper) throws IOException {
-        check(HeroAbility.values().length == 221, "176 + 27 + 18 rows: " + HeroAbility.values().length);
+        check(HeroAbility.values().length == 222, "176 + 27 + 18 rows, and 3.12's Mind Palace: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.CAPTAIN_SHIELD_THROW.ordinal() - 1] == HeroAbility.DEADPOOL_BODY,
                 "Captain America after Deadpool");
         check(HeroAbility.values()[HeroAbility.CAPTAIN_RICOCHET.ordinal() - 1] == HeroAbility.DEADPOOL_SMOKE,
                 "3.8's variants after 3.7's");
-        check(HeroAbility.values()[HeroAbility.values().length - 1] == HeroAbility.LOVE_BIFROST_LOOK,
-                "and they come last");
+        check(HeroAbility.values()[HeroAbility.values().length - 2] == HeroAbility.LOVE_BIFROST_LOOK,
+                "and they come last (but for 3.12's row)");
+        check(HeroAbility.values()[HeroAbility.values().length - 1] == HeroAbility.VISION_MIND_PALACE, "3.12 appends");
         Map<Power, int[]> counts = Map.of(Power.CAPTAIN_AMERICA, new int[]{6, 5}, Power.RED_HULK, new int[]{6, 4},
                 Power.IRON_MAN, new int[]{5, 3}, Power.FALCON, new int[]{5, 4}, Power.LOVE, new int[]{5, 2});
         for (Power hero : HEROES) {

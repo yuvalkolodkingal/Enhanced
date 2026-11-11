@@ -329,6 +329,10 @@ public final class ClientSetup {
         registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.TECH_CASE,
                 com.kolodkingal.enhanced.client.tower.TechCaseRenderer::new);
         // ===== eternity (3.8) =====
+        // ===== vision's mind (3.12) =====
+        registrar.entityRenderer(ModEntities.NANO_ULTRON, com.kolodkingal.enhanced.client.nano.NanoUltronRenderer::new);
+        registrar.entityRenderer(ModEntities.NANO_INFECTED, com.kolodkingal.enhanced.client.nano.NanoInfectedRenderer::new);
+        registrar.entityRenderer(ModEntities.MIND_NPC, com.kolodkingal.enhanced.client.mind.MindNpcRenderer::new);
         registrar.entityRenderer(ModEntities.ETERNITY,
                 com.kolodkingal.enhanced.client.eternity.EternityRenderer::new);
         registrar.blockEntityRenderer(com.kolodkingal.enhanced.registry.ModBlockEntities.ETERNITY_ALTAR,
@@ -360,6 +364,10 @@ public final class ClientSetup {
         // ===== spider =====
         // ===== thanos =====
         registrar.layerDefinition(ThanosModel.LAYER, ThanosModel::createBodyLayer);
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.mind.MindNpcRenderer.DUM_E,
+                com.kolodkingal.enhanced.client.mind.MindNpcRenderer::createDumE);
+        registrar.layerDefinition(com.kolodkingal.enhanced.client.mind.MindNpcRenderer.ORB,
+                com.kolodkingal.enhanced.client.mind.MindNpcRenderer::createOrb);
         registrar.layerDefinition(ThanosSwordModel.LAYER, ThanosSwordModel::createBodyLayer);
         registrar.layerDefinition(GauntletLayer.LAYER, GauntletLayer::createLayer);
         // ===== ultron =====

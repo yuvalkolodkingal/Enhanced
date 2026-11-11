@@ -21,7 +21,7 @@ public final class ModNetwork {
      * states in two words), and once for 3.9 (the mod's own config files: the server's settings travel to a player
      * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once).
      */
-    public static final String PROTOCOL_VERSION = "14";
+    public static final String PROTOCOL_VERSION = "15";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -83,6 +83,9 @@ public final class ModNetwork {
         // BIFROST_DEPART travel in the payloads above.
         registrar.clientbound(AsgardTalkPayload.Open.TYPE, AsgardTalkPayload.Open.STREAM_CODEC, AsgardTalkPayload.Open::handle);
         registrar.serverbound(AsgardTalkPayload.Choose.TYPE, AsgardTalkPayload.Choose.STREAM_CODEC, AsgardTalkPayload.Choose::handle);
+        // 3.12: the talks of Vision's mind
+        registrar.clientbound(MindTalkPayload.Open.TYPE, MindTalkPayload.Open.STREAM_CODEC, MindTalkPayload.Open::handle);
+        registrar.serverbound(MindTalkPayload.Choose.TYPE, MindTalkPayload.Choose.STREAM_CODEC, MindTalkPayload.Choose::handle);
         registrar.clientbound(HeimdallSightPayload.TYPE, HeimdallSightPayload.STREAM_CODEC, HeimdallSightPayload::handle);
         registrar.clientbound(AsgardFxPayload.TYPE, AsgardFxPayload.STREAM_CODEC, AsgardFxPayload::handle);
         // 3.6 (the Infinity Stones, Doctor Strange, the Hulk and Hydra): protocol 10. The handlers call the lanes'

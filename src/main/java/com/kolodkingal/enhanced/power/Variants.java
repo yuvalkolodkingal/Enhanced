@@ -15,7 +15,9 @@ public final class Variants {
     static {
         add(Power.VISION,
                 new Variant("vision", Power.VISION, Variant.suit("vision"), Variant.suit("vision_cape"), false, Power.VISION.color, Power.VISION.glow),
-                new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), Variant.suit("white_vision_cape"), false, 0xA6E2F0, 0xE8FBFF));
+                new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), Variant.suit("white_vision_cape"), false, 0xA6E2F0, 0xE8FBFF),
+                // 3.12: earned from the Human Torch in Vision's mind (EarnedLooks)
+                new Variant("source_code", Power.VISION, Variant.suit("vision_source_code"), Variant.suit("vision_source_code_cape"), false, 0xFFC93A, 0xFFF3C2));
 
         add(Power.BILLY,
                 new Variant("wiccan", Power.BILLY, Variant.suit("billy_wiccan"), Variant.suit("billy_wiccan_cape"), false, Power.BILLY.color, Power.BILLY.glow),
@@ -66,6 +68,8 @@ public final class Variants {
                 new Variant("prime", Power.ULTRON, Variant.suit("ultron_prime"), null, false, 0xFFA23A, 0xFFE9B8),
                 new Variant("sentry", Power.ULTRON, Variant.suit("ultron_sentry"), null, false, 0x45B4F5, 0xD8F0FF),
                 new Variant("human", Power.ULTRON, Variant.suit("ultron_human"), null, false, 0xE23B2E, 0xFFD6CF),
+                // 3.12: earned at the Horton manor's nanotech storage (EarnedLooks)
+                new Variant("nano", Power.ULTRON, Variant.suit("ultron_nano"), null, false, 0xFF7A1A, 0xFFD2A0),
                 own(Power.ULTRON));
 
         add(Power.APOCALYPSE,

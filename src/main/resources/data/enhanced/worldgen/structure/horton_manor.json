@@ -1,0 +1,7 @@
+{
+  "type": "enhanced:horton_manor",
+  "biomes": "#enhanced:has_structure/horton_manor",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {}
+}

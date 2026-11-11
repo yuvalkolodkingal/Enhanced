@@ -52,6 +52,11 @@ public final class ModStructures {
 
     public static final RegEntry<StructurePieceType, StructurePieceType> TEMPLATE_SITE_PIECE =
             STRUCTURE_PIECES.register("template_site", () -> TemplateSitePiece::new);
+    // ===== nanotech (3.12): the Horton manor =====
+    public static final RegEntry<StructureType<?>, StructureType<com.kolodkingal.enhanced.nano.HortonManorStructure>> HORTON_MANOR =
+            STRUCTURE_TYPES.register("horton_manor", () -> () -> com.kolodkingal.enhanced.nano.HortonManorStructure.CODEC);
+    public static final RegEntry<StructurePieceType, StructurePieceType> HORTON_MANOR_PIECE =
+            STRUCTURE_PIECES.register("horton_manor", () -> (StructurePieceType.ContextlessType) com.kolodkingal.enhanced.nano.HortonManorPiece::new);
     public static final RegEntry<StructurePieceType, StructurePieceType> CRATER_PIECE =
             STRUCTURE_PIECES.register("crater", () -> (StructurePieceType.ContextlessType) CraterPiece::new);
 

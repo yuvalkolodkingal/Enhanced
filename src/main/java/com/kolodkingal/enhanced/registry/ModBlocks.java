@@ -383,6 +383,34 @@ public final class ModBlocks {
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
 
+    // ===== nanotech (3.12) =====
+    /** The Horton manor's nanotech storage. */
+    public static final BlockEntry<com.kolodkingal.enhanced.nano.NanoStorageBlock> NANO_STORAGE =
+            BLOCKS.registerBlock("nano_storage", com.kolodkingal.enhanced.nano.NanoStorageBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.NETHERITE_BLOCK)
+                    .noOcclusion()
+                    .lightLevel(state -> 7));
+    // ===== vision's mind (3.12) =====
+    /** The elevator's panel in Vision's house. */
+    public static final BlockEntry<com.kolodkingal.enhanced.mind.MindElevatorBlock> MIND_ELEVATOR =
+            BLOCKS.registerBlock("mind_elevator", com.kolodkingal.enhanced.mind.MindElevatorBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(-1.0F, 3600000.0F)
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> 6));
+    /** The cinema's projector in Vision's house. */
+    public static final BlockEntry<com.kolodkingal.enhanced.mind.CinemaProjectorBlock> CINEMA_PROJECTOR =
+            BLOCKS.registerBlock("cinema_projector", com.kolodkingal.enhanced.mind.CinemaProjectorBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(2.0F, 6.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion());
+
     private ModBlocks() {
     }
 }

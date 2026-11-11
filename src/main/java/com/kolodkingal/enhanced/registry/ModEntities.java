@@ -543,6 +543,35 @@ public final class ModEntities {
                     .noSummon()
                     .build("eternity"));
     // ===== love (3.8) =====
+    // ===== nanotech (3.12) =====
+    /** Ultron in nanotech: the boss of the Horton manor's storage. */
+    public static final RegEntry<EntityType<?>, EntityType<com.kolodkingal.enhanced.nano.NanoUltronEntity>>
+            NANO_ULTRON = ENTITIES.register("nano_ultron",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.nano.NanoUltronEntity>of(
+                            com.kolodkingal.enhanced.nano.NanoUltronEntity::new, MobCategory.MONSTER)
+                    .sized(0.7F, 2.2F)
+                    .clientTrackingRange(12)
+                    .fireImmune()
+                    .build("nano_ultron"));
+    /** A person the nanotech has taken. */
+    public static final RegEntry<EntityType<?>, EntityType<com.kolodkingal.enhanced.nano.NanoInfectedEntity>>
+            NANO_INFECTED = ENTITIES.register("nano_infected",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.nano.NanoInfectedEntity>of(
+                            com.kolodkingal.enhanced.nano.NanoInfectedEntity::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(8)
+                    .build("nano_infected"));
+    // ===== vision's mind (3.12) =====
+    /** The people of Vision's mind: Dum-E, the AIs, the robots, Ultron, the Human Torch and Dr. Horton. */
+    public static final RegEntry<EntityType<?>, EntityType<com.kolodkingal.enhanced.mind.MindNpcEntity>>
+            MIND_NPC = ENTITIES.register("mind_npc",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.mind.MindNpcEntity>of(
+                            com.kolodkingal.enhanced.mind.MindNpcEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(10)
+                    .fireImmune()
+                    .noSummon()
+                    .build("mind_npc"));
 
     /**
      * The attributes of the mod's living entities, given to the loader through {@link Registrars#entityAttributes} (it
@@ -557,6 +586,9 @@ public final class ModEntities {
         attributes(ULTRON, () -> UltronEntity.createAttributes().build());
         attributes(ULTRON_SENTRY, () -> UltronSentryEntity.createAttributes().build());
         attributes(APOCALYPSE, () -> ApocalypseEntity.createAttributes().build());
+        attributes(NANO_ULTRON, () -> com.kolodkingal.enhanced.nano.NanoUltronEntity.createAttributes().build());
+        attributes(NANO_INFECTED, () -> com.kolodkingal.enhanced.nano.NanoInfectedEntity.createAttributes().build());
+        attributes(MIND_NPC, () -> com.kolodkingal.enhanced.mind.MindNpcEntity.createAttributes().build());
         // 3.5
         attributes(HELA_SHADOW, () -> HelaShadowEntity.createAttributes().build());
         // ===== odin (3.5) =====

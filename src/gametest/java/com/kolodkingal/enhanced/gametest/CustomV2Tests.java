@@ -207,8 +207,9 @@ public final class CustomV2Tests {
         for (HeroAbility a : HeroAbility.values()) {
             check(ids.add(a.id()), "ids are unique: " + a.id());
             check(HeroAbility.byId(a.id()) == a && Catalog.byId(a.id().toUpperCase()) == a, a + " is found by its id");
-            if (a == HeroAbility.MAGNETO_MAGNETIC_PULL) {
-                // (3.5: the creator lane's region of variant rows, appended after the rest, has its own order)
+            if (a == HeroAbility.MAGNETO_MAGNETIC_PULL || a == HeroAbility.VISION_MIND_PALACE) {
+                // (3.5: the creator lane's region of variant rows, appended after the rest, has its own order;
+                // 3.12: so does each region appended after it)
                 lastHero = -1;
             }
             check(a.hero.ordinal() >= lastHero, a + " sits in its hero's region, in the order of the heroes");
@@ -231,11 +232,11 @@ public final class CustomV2Tests {
                 check((row != null) != (key == p.flightAbility()), p + " key " + key + " is a row or the flight key, never both");
             }
         }
-        check(HeroAbility.values().length == 221,
+        check(HeroAbility.values().length == 222,
                 "71 keys + 9 bodies (L2: Vision's) + Build Magic, 3.5's 15 keys + 3 bodies, the creator lane's 33 "
                 + "variant rows + the Scarlet Witch's Build Magic, 3.6's 10 keys + 2 bodies + 9 variant rows, and "
                 + "3.7's 10 keys + 2 bodies + 10 variant rows (Wolverine, Deadpool), and 3.8's 22 keys + 5 bodies + 18"
-                + " variant rows (Captain America, Red Hulk, Iron Man, Falcon, Love): " + HeroAbility.values().length);
+                + " variant rows (Captain America, Red Hulk, Iron Man, Falcon, Love), and 3.12's Mind Palace: " + HeroAbility.values().length);
         check(Catalog.all().size()
                 == PowerModule.values().length + HeroAbility.values().length + StoneRow.values().length,
                 "the catalogue is the three lists (3.6: the stone rows)");

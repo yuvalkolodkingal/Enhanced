@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "enhanced:block/mind_elevator"
+    },
+    "facing=east": {
+      "model": "enhanced:block/mind_elevator",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "enhanced:block/mind_elevator",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "enhanced:block/mind_elevator",
+      "y": 270
+    }
+  }
+}

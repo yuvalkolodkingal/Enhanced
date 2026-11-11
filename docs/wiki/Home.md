@@ -51,6 +51,24 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.12.0
+
+* **Vision: Source Code.** A new item, the Source Code, shaped like the gem on Vision's forehead. Use it as White Vision and you become **Vision: Source Code**, a new look with more strength, more armour and health, faster flight and no fire damage. Change Look skips it until you have earned it.
+* **Vision's mind.** Every Vision can go into his own mind: **Sneak + Disguise** (key 5), then stand still for five seconds (moving or being hit breaks it off, so a wrong press never throws you out of a fight). The same key takes you back where you were. In there is an island with his mansion in the middle:
+  * **The ground floor:** the hall with Dum-E at the door (talk to him: he answers questions), the kitchen with E.D.I.T.H. and milk in the fridge, the cinema with seats, popcorn and a projector showing the WandaVision logo, F.R.I.D.A.Y. across from it, and the elevator (on every floor).
+  * **Upstairs:** Ultron's room, with a balcony, televisions, a hat stand and a table with a hat and a note: *a gift from Ultron to Vision, don't forget to take it*. The hat can be worn, and it stays on over a hero's suit.
+  * **The top floor:** three robots ask *are you a robot?*. Answer as a person and the gate opens to chests of books of codes and knowledge.
+  * **Down:** a small room where Ultron, in Vision's human face, sits on a sofa before a television. The talk cannot be skipped: *"How are you here?" / "You can't exorcise me." / "Why can't I?" / "Because family is forever."* Then the elevator goes all the way down.
+  * **The lowest floor:** a corridor of candles to a 1930s workshop with the Human Torch's painting, and the Human Torch himself, in flames. Their long talk, with Dr. Phineas Horton, ends with the Torch giving Vision the Source Code. The elevator takes you back up, and the floors below are gone for good.
+  * **Outside:** a small mausoleum with two graves, *Jocasta*.
+* **The Horton manor and Nano Ultron.** The Horton family's house now stands in plains, meadows, forests and savannas, with rooms of redstone and machines and a **Nanotech Storage** console.
+  * **Use the console as anyone but Ultron** and **Nano Ultron** rises: a flying boss, strong and fast, with red lasers and a faint orange glow. He turns into nanotech that blows pass through, and calls people the nanotech has taken.
+  * If you are **Vision**, at half health he stops and asks *"What am I to you?"*. Answer *"You are nothing to me."* and the fight goes on. Answer *"You are not my father. You are my something."* and he flies away, and the people he took are villagers again.
+  * **Use the console as Ultron** and you become **Nano Ultron**: a new look (Nanotech), more armour, damage and flying speed, and stronger lasers. **Sneak + flight key** (key 2) turns you into pure nanotech that blows pass through. The Sentry Army (key 5) calls up to 12 nanotech-taken people instead of Sentries.
+  * **The fight's music:** put your own `nano_ultron.mp3` (or .ogg/.wav) in `config/enhanced/music` and it plays during the fight with Nano Ultron (for example the *Ultra Vision* theme). Without it, Hela's fight music plays.
+* All of it is in English and Hebrew, on Minecraft 1.21.1 and 1.21.4.
+* The network protocol is now **15**: a 3.12 server needs 3.12 clients.
+
 ## What's new in 3.11.1
 
 * **Flight no longer flickers.** After an hour or two in a world, a flying hero seen in third person (F5) could drop to the standing pose for single frames, so the flight flashed between standing and flying. The poses now use the exact moment of each frame, and it no longer happens. The same fix is in Enlightened 1.0.30.

@@ -330,7 +330,7 @@ public final class EternityRealm {
      * safe spot within {@link #SAFE_SEARCH} (rings nearest first, each column from the same height outward), else null.
      */
     @Nullable
-    static Vec3 safeSpot(ServerLevel level, ServerPlayer player, Vec3 at) {
+    public static Vec3 safeSpot(ServerLevel level, ServerPlayer player, Vec3 at) {
         level.getChunk(BlockPos.containing(at));
         if (standable(level, player, at)) {
             return at;
