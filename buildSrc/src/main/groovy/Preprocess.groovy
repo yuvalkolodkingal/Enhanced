@@ -26,16 +26,21 @@ abstract class Preprocess extends DefaultTask {
     @OutputDirectory
     abstract DirectoryProperty getTarget()
 
-    /** Files of this version that replace the shared file of the same path whole (written as for 1.21.1's package). */
-    @InputDirectory @PathSensitive(PathSensitivity.RELATIVE) @org.gradle.api.tasks.Optional
-    abstract DirectoryProperty getOverlay()
+    /**
+     * Folders of files that replace the shared file of the same path whole (written as for 1.21.1's package), in
+     * order: a later folder wins. A version's copy lists the folders of the versions before it, then its own
+     * (1.21.5: 1.21.4's, then 1.21.5's), so that each version only holds what changed since the one before.
+     */
+    @org.gradle.api.tasks.InputFiles @PathSensitive(PathSensitivity.RELATIVE)
+    abstract org.gradle.api.file.ConfigurableFileCollection getOverlays()
 
     /**
-     * Pure renames of this version, applied to every file after the version blocks: one {@code regex => replacement}
-     * per line ({@code #} comments). For names that only moved or changed (MobSpawnType => EntitySpawnReason).
+     * Pure renames, applied to every file after the version blocks, file by file in order (the versions before this
+     * one first): one {@code regex => replacement} per line ({@code #} comments). For names that only moved or
+     * changed (MobSpawnType => EntitySpawnReason).
      */
-    @org.gradle.api.tasks.InputFile @PathSensitive(PathSensitivity.RELATIVE) @org.gradle.api.tasks.Optional
-    abstract org.gradle.api.file.RegularFileProperty getRenames()
+    @org.gradle.api.tasks.InputFiles @PathSensitive(PathSensitivity.RELATIVE)
+    abstract org.gradle.api.file.ConfigurableFileCollection getRenames()
 
     @Input
     abstract Property<String> getMinecraft()
@@ -132,18 +137,28 @@ abstract class Preprocess extends DefaultTask {
     List<List<String>> renameRules() {
         if (cachedRules == null) {
             List<List<String>> rules = []
-            if (renames.isPresent()) {
-                renames.get().asFile.readLines('UTF-8').each { String line ->
+            renames.files.each { File file ->
+                file.readLines('UTF-8').each { String line ->
                     String l = line.trim()
                     if (l.isEmpty() || l.startsWith('#')) return
                     int at = l.indexOf(' => ')
-                    if (at < 0) throw new IllegalArgumentException('bad rename line: ' + line)
+                    if (at < 0) throw new IllegalArgumentException(file.name + ': bad rename line: ' + line)
                     rules << [l.substring(0, at), l.substring(at + 4).replace('\\n', '\n')]  // (\\n in a replacement is a new line)
                 }
             }
             cachedRules = rules
         }
         return cachedRules
+    }
+
+    /** The overlay file for {@code path}: the last folder that has it, or null. */
+    File overlayFor(String path) {
+        File found = null
+        overlays.files.each { File dir ->
+            File f = new File(dir, path)
+            if (f.isFile()) found = f
+        }
+        return found
     }
 
     @TaskAction
@@ -158,20 +173,20 @@ abstract class Preprocess extends DefaultTask {
             if (!path.startsWith(rel) || path.startsWith(rel + 'boot/')) return
             File out = new File(dst, rel + suffix.get() + '/' + path.substring(rel.length()))
             out.parentFile.mkdirs()
-            File replacement = overlay.isPresent() ? new File(overlay.get().asFile, path) : null
-            File from = replacement != null && replacement.isFile() ? replacement : f
+            File replacement = overlayFor(path)
+            File from = replacement != null ? replacement : f
             out.setText(process(from.getText('UTF-8'), path), 'UTF-8')
         }
-        if (overlay.isPresent()) {
-            // files only this version has
-            File ov = overlay.get().asFile
+        // files only the versions' folders have (the last folder that has one wins)
+        overlays.files.each { File ov ->
+            if (!ov.isDirectory()) return
             ov.eachFileRecurse { File f ->
                 if (!f.isFile() || !f.name.endsWith('.java')) return
                 String path = ov.toPath().relativize(f.toPath()).toString().replace('\\', '/')
                 File out = new File(dst, rel + suffix.get() + '/' + path.substring(rel.length()))
                 if (!out.exists()) {
                     out.parentFile.mkdirs()
-                    out.setText(process(f.getText('UTF-8'), path), 'UTF-8')
+                    out.setText(process(overlayFor(path).getText('UTF-8'), path), 'UTF-8')
                 }
             }
         }

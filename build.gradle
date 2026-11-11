@@ -415,22 +415,28 @@ tasks.named('check') { dependsOn portLint }
 // com.kolodkingal.enhanced.v<mc>); boot.EnhancedBoot starts the copy of the running version. Each copy has its own
 // mixin config, made from enhanced.mixins.json plus the version's own mixins (versions/<mc>/mixins.json), which
 // boot.MixinGate applies only on its version.
-def copies = [[project: ':v1_21_4', suffix: 'v1_21_4', dir: 'versions/1.21.4']]
+// (each copy's own mixins are those of the versions it is built from, then its own: chain)
+def copies = [[project: ':v1_21_4', suffix: 'v1_21_4', chain: ['versions/1.21.4']],
+              [project: ':v1_21_5', suffix: 'v1_21_5', chain: ['versions/1.21.4', 'versions/1.21.5']]]
+        .findAll { c -> findProject(c.project) != null }
 def copyMixins = tasks.register('copyMixinConfigs') {
     def source = file('src/main/resources/enhanced.mixins.json')
     def out = layout.buildDirectory.dir('generated/copyMixins')
-    def extras = copies.collectEntries { c -> [(c.suffix): file("${c.dir}/mixins.json")] }
+    def extras = copies.collectEntries { c -> [(c.suffix): c.chain.collect { d -> file("${d}/mixins.json") }] }
     inputs.file(source)
-    extras.values().each { f -> if (f.exists()) inputs.file(f) }
+    extras.values().flatten().each { f -> if (f.exists()) inputs.file(f) }
     outputs.dir(out)
     doLast {
         copies.each { c ->
             def config = new groovy.json.JsonSlurper().parse(source)
             config.package = "com.kolodkingal.enhanced.${c.suffix}.mixin".toString()
-            def extra = extras[c.suffix]
-            if (extra.exists()) {
-                def more = new groovy.json.JsonSlurper().parse(extra)
-                ['mixins', 'client', 'server'].each { k -> if (more[k]) config[k] = (config[k] ?: []) + more[k] }
+            extras[c.suffix].each { extra ->
+                if (extra.exists()) {
+                    def more = new groovy.json.JsonSlurper().parse(extra)
+                    ['mixins', 'client', 'server'].each { k -> if (more[k]) config[k] = ((config[k] ?: []) + more[k]).unique() }
+                    // (a later version can drop a mixin of an earlier one: "remove": ["client.Foo", ...])
+                    (more.remove ?: []).each { String gone -> ['mixins', 'client', 'server'].each { k -> config[k]?.remove(gone) } }
+                }
             }
             def f = out.get().file("enhanced.${c.suffix}.mixins.json").asFile
             f.parentFile.mkdirs()

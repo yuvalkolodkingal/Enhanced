@@ -12,8 +12,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 def preprocess = tasks.register('preprocess', Preprocess) {
     source = rootProject.file('src/main/java')
     target = layout.buildDirectory.dir('preprocessed/java')
-    overlay = file('src/main/java')
-    renames = file('renames.txt')
+    overlays.from(file('src/main/java'))
+    renames.from(file('renames.txt'))
     minecraft = mc
     suffix = copySuffix
     basePackage = 'com.kolodkingal.enhanced'

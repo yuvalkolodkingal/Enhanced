@@ -44,6 +44,15 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 public final class ModEntities {
     public static final Registrar<EntityType<?>> ENTITIES = Registrars.create(Registries.ENTITY_TYPE, Enhanced.MODID);
+    //#if >=1.21.5
+    //$$ // (1.21.5 has no Optional<UUID> entity data of its own: the owners of the mod's entities sync with this one)
+    //$$ public static final com.kolodkingal.enhanced.platform.reg.Registrar<net.minecraft.network.syncher.EntityDataSerializer<?>> SERIALIZERS =
+    //$$         Registrars.create(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, Enhanced.MODID);
+    //$$ public static final com.kolodkingal.enhanced.platform.reg.RegEntry<net.minecraft.network.syncher.EntityDataSerializer<?>,
+    //$$         net.minecraft.network.syncher.EntityDataSerializer<java.util.Optional<java.util.UUID>>> OPTIONAL_UUID = SERIALIZERS.register("optional_uuid",
+    //$$         () -> net.minecraft.network.syncher.EntityDataSerializer.forValueType(
+    //$$                 net.minecraft.core.UUIDUtil.STREAM_CODEC.apply(net.minecraft.network.codec.ByteBufCodecs::optional)));
+    //#endif
 
     public static final RegEntry<EntityType<?>, EntityType<IronShrapnelEntity>> IRON_SHRAPNEL = ENTITIES.register("iron_shrapnel",
             () -> EntityType.Builder.<IronShrapnelEntity>of(IronShrapnelEntity::new, MobCategory.MISC)

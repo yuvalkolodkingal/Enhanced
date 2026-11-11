@@ -1,0 +1,129 @@
+# Renames for 1.21.5, applied after 1.21.4's (docs/MULTIVERSION.md)
+
+# ---- saved data: a SavedDataType with a codec (compat.SavedBridge makes it from the tag-based load and save) ----
+SavedData\.Factory<(\w+)> factory\(\) => net.minecraft.world.level.saveddata.SavedDataType<$1> factory()
+new (?:SavedData\.)?Factory<>\((\w+)::new, (\w+)::load, null\) => com.kolodkingal.enhanced.compat.SavedBridge.type(NAME, $1::new, $2::load, $1::save)
+\.computeIfAbsent\((\w+(?:\.\w+)?\(\)), NAME\) => .computeIfAbsent($1)
+\.getDataStorage\(\)\.get\((\w+\(\)), NAME\) => .getDataStorage().get($1)
+@Override(\s+)public CompoundTag save\(CompoundTag tag, (net\.minecraft\.core\.)?HolderLookup\.Provider registries\) => $1public CompoundTag save(CompoundTag tag, $2HolderLookup.Provider registries)
+
+# ---- NBT: the getters give Optionals; the ...Or forms keep 1.21.1's defaults (CompoundTag and ListTag alike) ----
+\.getInt\(("[^"]*"|[A-Z][A-Z0-9_]*|\d+|key|name|k)\) => .getIntOr($1, 0)
+\.getLong\(("[^"]*"|[A-Z][A-Z0-9_]*|key|name|k)\) => .getLongOr($1, 0L)
+\.getFloat\(([^(),]+)\) => .getFloatOr($1, 0.0F)
+\.getDouble\(([^(),]+)\) => .getDoubleOr($1, 0.0D)
+(?<!getGameRules\(\))(?<!Boolean)\.getBoolean\(([^(),]+)\) => .getBooleanOr($1, false)
+\.getString\(([^(),]+)\) => .getStringOr($1, "")
+\.getShort\(([^(),]+)\) => .getShortOr($1, (short) 0)
+\.getCompound\(([^(),]+)\) => .getCompoundOrEmpty($1)
+\.getList\(([^(),]+), (?:Tag\.TAG_\w+|\d+)\) => .getListOrEmpty($1)
+\.getIntArray\(([^(),]+)\) => .getIntArray($1).orElse(new int[0])
+\.getLongArray\(([^(),]+)\) => .getLongArray($1).orElse(new long[0])
+\.getByteArray\(([^(),]+)\) => .getByteArray($1).orElse(new byte[0])
+\.contains\(([^(),]+), (?:Tag\.TAG_\w+|\d+)\) => .contains($1)
+\.getAllKeys\(\) => .keySet()
+\b(\w+)\.putUUID\( => com.kolodkingal.enhanced.compat.Tags.putUUID($1, 
+\b(\w+)\.getUUID\((?=[^)]) => com.kolodkingal.enhanced.compat.Tags.getUUID($1, 
+\b(\w+)\.hasUUID\( => com.kolodkingal.enhanced.compat.Tags.hasUUID($1, 
+
+# ---- entities ----
+(?<!getNavigation\(\))(?<!navigation)\.moveTo\( => .snapTo(
+
+# ---- effects were renamed ----
+\bMobEffects\.MOVEMENT_SPEED\b => MobEffects.SPEED
+\bMobEffects\.MOVEMENT_SLOWDOWN\b => MobEffects.SLOWNESS
+\bMobEffects\.DIG_SPEED\b => MobEffects.HASTE
+\bMobEffects\.DIG_SLOWDOWN\b => MobEffects.MINING_FATIGUE
+\bMobEffects\.DAMAGE_BOOST\b => MobEffects.STRENGTH
+\bMobEffects\.HEAL\b => MobEffects.INSTANT_HEALTH
+\bMobEffects\.HARM\b => MobEffects.INSTANT_DAMAGE
+\bMobEffects\.JUMP\b => MobEffects.JUMP_BOOST
+\bMobEffects\.CONFUSION\b => MobEffects.NAUSEA
+\bMobEffects\.DAMAGE_RESISTANCE\b => MobEffects.RESISTANCE
+
+# ---- inventory ----
+\b(\w+\.getInventory\(\)|inventory|inv)\.items\b => $1.getNonEquipmentItems()
+\b(\w+\.getInventory\(\)|inventory|inv)\.selected\s*=\s*([^;]+); => $1.setSelectedSlot($2);
+\b(\w+\.getInventory\(\)|inventory|inv)\.selected\b => $1.getSelectedSlot()
+\.getInventory\(\)\.getSelected\(\) => .getInventory().getSelectedItem()
+
+# ---- armour and swords: plain items with armour or sword properties (compat.ArmorItem, compat.SwordItem) ----
+\bimport net\.minecraft\.world\.item\.ArmorItem; => import com.kolodkingal.enhanced.compat.ArmorItem;
+\bimport net\.minecraft\.world\.item\.SwordItem; => import com.kolodkingal.enhanced.compat.SwordItem;
+\bnet\.minecraft\.world\.item\.(ArmorItem|SwordItem)\b => com.kolodkingal.enhanced.compat.$1
+
+# ---- tooltips: the lines go to a consumer (compat.TipList is a list that hands each line on) ----
+public void appendHoverText\(ItemStack (\w+), (?:Item\.)?TooltipContext (\w+), List<Component> (\w+),\s*TooltipFlag (\w+)\) \{ => public void appendHoverText(ItemStack $1, net.minecraft.world.item.Item.TooltipContext $2, net.minecraft.world.item.component.TooltipDisplay tooltipDisplay, java.util.function.Consumer<Component> tooltipAdder, TooltipFlag $4) {\n        java.util.List<Component> $3 = com.kolodkingal.enhanced.compat.TipList.of(tooltipAdder);
+super\.appendHoverText\((\w+), (\w+), \w+, (\w+)\) => super.appendHoverText($1, $2, tooltipDisplay, tooltipAdder, $3)
+
+# ---- chunk tickets: no key, a radius (registry/ModTicketTypes is 1.21.5's own) ----
+\.(add|remove)RegionTicket\((ModTicketTypes\.\w+),\s*((?:new ChunkPos\(\w+\))|[\w.()]+?),\s*(\w+),[^;]*?\); => .$1TicketWithRadius($2, $3, $4);
+
+# ---- owners: an entity reference instead of a UUID ----
+\b(pet|owned)\.getOwnerUUID\(\) => com.kolodkingal.enhanced.compat.Owners.uuid($1)
+(\s+)public UUID getOwnerUUID\(\) \{ => $1public net.minecraft.world.entity.EntityReference<net.minecraft.world.entity.LivingEntity> getOwnerReference() {$1    UUID id = getOwnerUUID();$1    return id == null ? null : new net.minecraft.world.entity.EntityReference<>(id);$1}\n$1public UUID getOwnerUUID() {
+
+# ---- immediate drawing: GL state is a render pipeline (compat.Gl keeps the old calls' state and draws in a type made for it) ----
+\bimport com\.mojang\.blaze3d\.vertex\.VertexBuffer; => import com.kolodkingal.enhanced.compat.VertexBuffer;
+\bimport com\.mojang\.blaze3d\.shaders\.Uniform; => import com.kolodkingal.enhanced.compat.Uniform;
+\bimport com\.mojang\.blaze3d\.vertex\.BufferUploader; => // (1.21.5: gone)
+\bimport com\.mojang\.blaze3d\.platform\.GlStateManager; => // (1.21.5: gone)
+\bimport net\.minecraft\.client\.renderer\.CompiledShaderProgram; => // (1.21.5: gone)
+\bCompiledShaderProgram\b => Object
+\b(?:com\.mojang\.blaze3d\.systems\.)?RenderSystem\.(setShader|getShader|enableBlend|disableBlend|defaultBlendFunc|blendFunc|depthMask|enableDepthTest|disableDepthTest|enableCull|disableCull)\( => com.kolodkingal.enhanced.compat.Gl.$1(
+\bRenderSystem\.setShaderTexture\((\d+), ((?!.*getTexture\(\))[^;]*)\); => com.kolodkingal.enhanced.compat.Gl.setShaderTexture($1, $2);
+\b(?:net\.minecraft\.client\.renderer\.)?CoreShaders\.(\w+) => com.kolodkingal.enhanced.compat.Gl.Shader.$1
+\b(?:com\.mojang\.blaze3d\.platform\.)?GlStateManager\.(SourceFactor|DestFactor|_getTexLevelParameter)\b => com.kolodkingal.enhanced.compat.Gl.$1
+\bBufferUploader\.drawWithShader\( => com.kolodkingal.enhanced.compat.Gl.draw(
+\b(\w+(?:\.\w+)?)\.setupRenderState\(\); => com.kolodkingal.enhanced.compat.Gl.use($1);
+\b\w+(?:\.\w+)?\.clearRenderState\(\); => com.kolodkingal.enhanced.compat.Gl.use(null);
+\bshader\.MODEL_OFFSET\b => com.kolodkingal.enhanced.compat.Gl.MODEL_OFFSET
+\b\w+\.setDefaultUniforms\([^;]*\); => // (1.21.5: the pipeline sets its own uniforms)
+
+# ---- one-offs of 1.21.5 ----
+\b(\w+)\.getBaseDamage\(\) => ((com.kolodkingal.enhanced.mixin.AbstractArrowAccessor) $1).enhanced\$baseDamage()
+causeFallDamage\(float (\w+), float (\w+), DamageSource (\w+)\) => causeFallDamage(double $1, float $2, DamageSource $3)
+\bNbtUtils\.writeBlockPos\(([^()]+)\) => net.minecraft.nbt.NbtUtils.writeBlockPos($1)
+\b(\w+)\.put\(("\w+"), (?:net\.minecraft\.nbt\.)?NbtUtils\.writeBlockPos\(([^()]+)\)\) => $1.store($2, net.minecraft.core.BlockPos.CODEC, $3)
+\b(?:net\.minecraft\.nbt\.)?NbtUtils\.readBlockPos\((\w+), ("\w+")\) => $1.read($2, net.minecraft.core.BlockPos.CODEC)
+\b(?:net\.minecraft\.nbt\.)?NbtUtils\.createUUID\(([^()]+)\) => new net.minecraft.nbt.IntArrayTag(net.minecraft.core.UUIDUtil.uuidToIntArray($1))
+\b(?:net\.minecraft\.nbt\.)?NbtUtils\.loadUUID\(([^()]+(?:\([^()]*\))?)\) => net.minecraft.core.UUIDUtil.uuidFromIntArray(((net.minecraft.nbt.IntArrayTag) $1).getAsIntArray())
+(\w+)::putUUID => (k, v) -> com.kolodkingal.enhanced.compat.Tags.putUUID($1, k, v)
+(ModAttachments\.PERSISTENT_DATA\.get\(\w+\))\.(put|get|has)UUID\( => com.kolodkingal.enhanced.compat.Tags.$2UUID($1, 
+\bTicketType<\w+> => TicketType
+\b(\w+)\.equipSaddle\(([^,;]+), null\) => $1.setItemSlot(net.minecraft.world.entity.EquipmentSlot.SADDLE, $2)
+\b(\w+)\.setVariant\(Rabbit\.Variant\.(\w+)\) => $1.setComponent(net.minecraft.core.component.DataComponents.RABBIT_VARIANT, Rabbit.Variant.$2)
+\bItemStack\.parseOptional\(([^,]+), ([^;]+?)\)\); => ItemStack.parse($1, $2).orElse(ItemStack.EMPTY));
+\b(\w+)\.getInventory\(\)\.offhand\b => java.util.List.of($1.getOffhandItem())
+\b(?:net\.minecraft\.network\.syncher\.)?EntityDataSerializers\.OPTIONAL_UUID\b => com.kolodkingal.enhanced.registry.ModEntities.OPTIONAL_UUID.get()
+(n\.setBlocked\(blocked\);\s+\}\s+@Override\s+public boolean isCanceled\(\) \{\s+)return n\.isCanceled\(\);(\s+\}\s+@Override\s+public void setCanceled\(boolean canceled\) \{\s+)n\.setCanceled\(canceled\); => $1return !n.getBlocked();$2n.setBlocked(!canceled);
+\bnet\.neoforged\.neoforge\.common\.util\.TriState\b => net.minecraft.util.TriState
+\bimport net\.neoforged\.neoforge\.common\.util\.TriState; => import net.minecraft.util.TriState;
+, defaultModifiers\.showInTooltip\(\)\) => )
+\bnew (?:net\.minecraft\.world\.item\.component\.)?Unbreakable\((?:true|false)\) => net.minecraft.util.Unit.INSTANCE
+\bimport net\.minecraft\.world\.item\.component\.Unbreakable; => // (1.21.5: unbreakable is a plain unit)
+\bstack\.canPerformAction\(ItemAbilities\.SHIELD_BLOCK\) => stack.has(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS)
+\.getListOrEmpty\(("\w+")\)\.getList\((\d+)\) => .getListOrEmpty($1).getListOrEmpty($2)
+\.getList\(([^(),]+), (?:net\.minecraft\.nbt\.)?Tag\.TAG_\w+\) => .getListOrEmpty($1)
+\.getByte\(("[^"]+"|[A-Z_]+)\) => .getByteOr($1, (byte) 0)
+(?<![\w.])moveTo\((?=[^;]*,[^;]*,[^;]*,[^;]*,) => snapTo(
+\bimport net\.minecraft\.world\.entity\.animal\.Wolf; => import net.minecraft.world.entity.animal.wolf.Wolf;
+\bnet\.minecraft\.world\.entity\.animal\.Wolf\b => net.minecraft.world.entity.animal.wolf.Wolf
+\.setBlockState\((\w+), (\w+), false\) => .setBlockState($1, $2, 0)
+\b(\w+)\.fallDistance\b(?!\s*[-+*/]?=) => ((float) $1.fallDistance)
+\bn\.(getFallDistance|getDistance)\(\) => ((float) n.$1())
+# a block drawn into the mod's buffers: its model is parts (NeoForge collects them with the level's model data)
+BakedModel model = dispatcher\.getBlockModel\(state\);\s+ModelData data = [^;]+;\s+for \(RenderType type : model\.getRenderTypes\(state, random, data\)\) \{\s+dispatcher\.renderBatched\([^;]+;\s+\} => dispatcher.renderBatched(state, pos, view, pose, bufferFor, checkSides, dispatcher.getBlockModel(state).collectParts(view, pos, state, random));
+\bimport net\.minecraft\.client\.resources\.model\.BakedModel; => // (1.21.5: block models are BlockStateModels)
+\bimport net\.neoforged\.neoforge\.client\.model\.data\.ModelData; => // (1.21.5: model data is NeoForge's own business)
+
+# ---- block entity renderers are given the camera's position ----
+public void render\((\w+) (\w+),\s*float (\w+),\s*PoseStack (\w+),\s*MultiBufferSource (\w+),\s*int (\w+),\s*int (\w+)\) => public void render($1 $2, float $3, PoseStack $4, MultiBufferSource $5, int $6, int $7, net.minecraft.world.phys.Vec3 cameraPos)
+
+# ---- 1.21.5 renames of the world and the player ----
+\.isInWaterOrBubble\(\) => .isInWater()
+\.isDay\(\) => .isBrightOutside()
+\.isNight\(\) => .isDarkOutside()
+(\w+)\.forwardImpulse = 0\.0F;(\s+)\1\.leftImpulse = 0\.0F; => ((com.kolodkingal.enhanced.mixin.client.ClientInputAccessor) $1).enhanced\$setMoveVector(net.minecraft.world.phys.Vec2.ZERO);$2// (and no sideways step)
+\b(\w+)\.forwardImpulse\b => $1.getMoveVector().y
+\b(\w+)\.leftImpulse\b => $1.getMoveVector().x

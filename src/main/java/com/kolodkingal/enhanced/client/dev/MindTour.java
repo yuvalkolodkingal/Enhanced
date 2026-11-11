@@ -232,10 +232,10 @@ public final class MindTour {
         server(p -> {
             ServerLevel level = p.serverLevel();
             BlockPos base = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                    p.blockPosition().offset(30, 0, 0));
+                    p.blockPosition().offset(60, 0, 0));
             manor = base;
-            for (int cx = (base.getX() - 20) >> 4; cx <= (base.getX() + 20) >> 4; cx++) {
-                for (int cz = (base.getZ() - 20) >> 4; cz <= (base.getZ() + 20) >> 4; cz++) {
+            for (int cx = (base.getX() - 40) >> 4; cx <= (base.getX() + 40) >> 4; cx++) {
+                for (int cz = (base.getZ() - 50) >> 4; cz <= (base.getZ() + 20) >> 4; cz++) {
                     level.getChunk(cx, cz);
                 }
             }
@@ -243,7 +243,9 @@ public final class MindTour {
             piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random,
                     piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(base), base);
             level.setDayTime(6000);
-            p.teleportTo(level, base.getX() + 0.5, base.getY() + 3, base.getZ() - 23.5, 0.0F, -18.0F);
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+            p.teleportTo(level, base.getX() + 0.5, base.getY() + 20, base.getZ() - 66.5, 0.0F, 9.0F);
         }, 80);
         shot("m26_manor", 40);
         server(p -> p.teleportTo(p.serverLevel(), manor.getX() + 5.5, manor.getY(), manor.getZ() + 0.5, 270.0F, 25.0F), 40);
