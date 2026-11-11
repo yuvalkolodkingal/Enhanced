@@ -68,6 +68,11 @@ public final class HeroPoses {
             st.posed = false;
         }
         float pt = ageInTicks - player.tickCount;
+        if (st != null && st.preview == null && ageInTicks == st.frameAge) {
+            // (the frame the body was just animated for: its exact partial tick; the float sum rounds to a whole tick
+            // after an hour or two in the world, which drew the vanilla pose for that frame: the flight's flicker)
+            pt = st.framePt;
+        }
         if (st != null && st.preview != null) {
             // 3.4: the editor's puppet runs on its own clock (it may be drawn with the inventory's partial tick of 1):
             // its walk is put on that clock too.

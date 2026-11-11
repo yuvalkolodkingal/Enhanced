@@ -173,7 +173,7 @@ public class ThanosModel<T extends Monster> extends EntityModel<T> {
 
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        float partial = ageInTicks - entity.tickCount;
+        float partial = Math.min(ageInTicks - entity.tickCount, 0.999F); // (the float sum can round to a whole tick)
         target.stand();
         float walk = 1.0F;
         Vec3 aim = null;

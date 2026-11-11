@@ -51,6 +51,10 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.11.1
+
+* **Flight no longer flickers.** After an hour or two in a world, a flying hero seen in third person (F5) could drop to the standing pose for single frames, so the flight flashed between standing and flying. The poses now use the exact moment of each frame, and it no longer happens. The same fix is in Enlightened 1.0.30.
+
 ## What's new in 3.11.0
 
 * **One jar for Minecraft 1.21.1 and 1.21.4.** The same `enhanced-3.11.0.jar` runs on NeoForge 21.1 (Minecraft 1.21.1) and on NeoForge 21.4 (Minecraft 1.21.4): the game picks the right copy of the mod by itself. Worlds, heroes and settings are the same on both.

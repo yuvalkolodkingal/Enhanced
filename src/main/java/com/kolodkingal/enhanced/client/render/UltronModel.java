@@ -86,7 +86,7 @@ public class UltronModel<T extends LivingEntity> extends EntityModel<T> {
 
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        float partial = ageInTicks - entity.tickCount;
+        float partial = Math.min(ageInTicks - entity.tickCount, 0.999F); // (the float sum can round to a whole tick)
         UltronPose pose = UltronAnimation.pose(entity, partial);
         int form = UltronAnimation.form(entity);
         for (UltronCubes.Cube cube : UltronCubes.CUBES) {

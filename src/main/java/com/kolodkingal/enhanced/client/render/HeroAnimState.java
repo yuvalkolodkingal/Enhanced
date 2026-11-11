@@ -49,6 +49,13 @@ public final class HeroAnimState {
     public boolean fresh = true;
     /** The age (ticks plus partial tick) of the last frame update; -1 before the first. */
     public double time = -1.0;
+    /**
+     * The model's ageInTicks of the frame last animated ({@code (float) tickCount + partialTick}, as the renderer sums it)
+     * and that frame's exact partial tick: the float sum rounds (to a whole tick, after an hour or two in the world), so
+     * the poses take the partial tick from here instead of taking it back out of the sum.
+     */
+    public float frameAge = Float.NaN;
+    public float framePt;
     /** Whether the tick has looked at this hero yet (the first tick only remembers). */
     public boolean seeded;
     /**

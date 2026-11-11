@@ -444,6 +444,10 @@ public final class HeroAnimator {
         if (s == null || pt >= 1.0F || !EnhancedClientConfig.animations()) {
             return null;
         }
+        if (s.preview == null) {
+            s.frameAge = (float) player.tickCount + pt;
+            s.framePt = pt;
+        }
         double time = s.preview != null ? s.previewClock : player.tickCount + pt;
         if (debugFrozen && isDebugTarget(player) && !s.fresh) {
             // A frozen frame: keep every weight and spring, but stay current.
