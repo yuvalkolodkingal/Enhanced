@@ -79,6 +79,8 @@ public final class MindTour {
         }
         if (!scripted) {
             scripted = true;
+            // (-Denhanced.mindtour.clean=true: no HUD, for pictures to share)
+            mc.options.hideGui = Boolean.getBoolean("enhanced.mindtour.clean");
             script();
         }
         if (wait > 0) {
