@@ -31,6 +31,8 @@ public final class EnhancedClientConfig {
     public static final ConfigSpec.BooleanValue IRON_HELMET_HUD;
     public static final ConfigSpec.BooleanValue ETERNITY_REFLECTIONS;
     public static final ConfigSpec.BooleanValue ETERNITY_FOG;
+    public static final ConfigSpec.EnumValue<com.kolodkingal.enhanced.client.hud.PowerPanels.Style> HUD_STYLE;
+    public static final ConfigSpec.BooleanValue HUD_RIGHT;
 
     static {
         BUILDER.push("animation");
@@ -141,6 +143,18 @@ public final class EnhancedClientConfig {
         ETERNITY_FOG = BUILDER.comment("Whether the white mist lies on the horizon of Eternity's realm.")
                 .define("eternityFog", true);
         BUILDER.pop();
+        // The powers panel's style (the classic text panel, or one of the five drawn ones).
+        BUILDER.push("hud");
+        HUD_STYLE = BUILDER.comment("How the powers panel is drawn. CLASSIC: the text panel of every version until now.",
+                        "STACK: one bar per key. DIAL: tiles around an emblem. COMIC: comic panels.",
+                        "SCROLL: a scroll pinned to the corner. CLUSTER: a small cluster of tiles.")
+                .translation("config.enhanced.hud_style")
+                .defineEnum("hudStyle", com.kolodkingal.enhanced.client.hud.PowerPanels.Style.CLASSIC);
+        HUD_RIGHT = BUILDER.comment("Draw the new panel styles in the top-right corner (off: top-left).",
+                        "The classic panel is always top-left.")
+                .translation("config.enhanced.hud_right")
+                .define("hudOnTheRight", true);
+        BUILDER.pop();
     }
 
     public static final ConfigSpec SPEC = BUILDER.build();
@@ -148,6 +162,14 @@ public final class EnhancedClientConfig {
     /** Whether the hero animation runs at all (true until the config has loaded). */
     public static boolean animations() {
         return !SPEC.isLoaded() || ANIMATIONS.get();
+    }
+
+    public static com.kolodkingal.enhanced.client.hud.PowerPanels.Style hudStyle() {
+        return SPEC.isLoaded() ? HUD_STYLE.get() : com.kolodkingal.enhanced.client.hud.PowerPanels.Style.CLASSIC;
+    }
+
+    public static boolean hudRight() {
+        return !SPEC.isLoaded() || HUD_RIGHT.get();
     }
 
     public static boolean reducedMotion() {

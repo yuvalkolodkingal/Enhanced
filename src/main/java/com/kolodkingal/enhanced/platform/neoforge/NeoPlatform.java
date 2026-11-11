@@ -80,6 +80,11 @@ public final class NeoPlatform implements Platform {
     }
 
     @Override
+    public boolean isModLoaded(String modId) {
+        return ModList.get().isLoaded(modId);
+    }
+
+    @Override
     public Path configDir() {
         return FMLPaths.CONFIGDIR.get();
     }

@@ -351,3 +351,24 @@ All twenty keys are in the game's key settings: **Options, Controls, Key Binds, 
 Quicksilver and Tommy each have two separate powers in 3.3. **G** turns **Super Speed** on or off: with it on, **sprinting** is super speed (Tommy's is on from the start). **R** turns the slowing of time on or off (**Quicksilver Time**, **Tommy's Slow Time**): the world slows down around him whether he sprints or not. Use one, or both. While either is on, Quicksilver also mines, attacks, swims and uses items faster without sprinting; only the running speed and the step-up need a sprint.
 
 **Running up walls:** with super speed on, sprint into a wall (holding **W**) and he runs up it, along a ceiling, round an overhang and down the far wall; keep **W** held and keep sprinting, or he slows and drops off; **Space** leaps off. Quicksilver needs **Wall & Water Run** on (**B**); Tommy's **Wall & Water Run** is on unless **Sneak + R** turns it off (both run across water too while they keep running). See [Quicksilver](Quicksilver#running-up-walls-and-across-ceilings).
+
+## The powers panel's style
+
+The panel of your powers can be drawn in six styles. Choose one in the settings (Mods, Enhanced, Config, **Powers panel**, *Panel style*), or bind the key **Change the Powers Panel's Style** in the controls and press it to go through them.
+
+| Style | What it is |
+|---|---|
+| **Classic** (the default) | The text panel in the top-left corner, as always. |
+| **Key stack** | One bar per key. A cooldown drains across the bar, a bar glints when its power is ready again, and the stack folds to the keys alone after five quiet seconds. |
+| **Dial** | A tile per power, fanned around your hero's emblem. |
+| **Comic panels** | A slanted name banner and one comic cell per power that fills with ink as it recharges. |
+| **Scroll** | A scroll pinned to the corner. |
+| **Cluster** | A small cluster of tiles and nothing else. |
+
+The new styles sit in the top-right corner (*Panel on the right* off: top-left), under the status effect icons, and follow the *Reduced motion* setting. A custom hero's panel is always the classic one.
+
+**The ability wheel: U (hold).** Shows your powers as a wheel around your face; point at one to read its name, key and state. Let go to close it. It only shows: nothing is cast from it.
+
+## Playing with Enlightened
+
+Enhanced and Enlightened can be installed together. A player who is a hero **and** a bender has both mods' abilities on the same keys, so the keys go to one of the two at a time: **` (the key left of 1)** switches between your hero and your bending. The panel of the one you are using is shown, with a one-line reminder of the other under it.

@@ -51,6 +51,15 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.10.0
+
+* **The powers panel has styles.** Besides the classic text panel (still the default) there are five drawn ones: **Key stack**, **Dial**, **Comic panels**, **Scroll** and **Cluster**, in the top-right corner, with cooldowns that drain, a glint when a power is ready again and a glow on what is switched on. Choose one in the settings (Mods, Enhanced, Config, Powers panel) or with a key you bind. See [Controls](Controls#the-powers-panels-style).
+* **The ability wheel** (hold **U**): your powers around your face, with the name, key and state of the one you point at.
+* **Plays together with Enlightened.** A hero who is also a bender no longer fires both mods' abilities at once: **`** switches the ability keys between your hero and your bending.
+* **The Hero Creator item is now called The One Above All.** The screen it opens is still the Hero Creator.
+* **Five more languages**: Spanish, French, German, Russian and Brazilian Portuguese (machine translated; corrections are welcome). In Hebrew the new panel styles are laid out right to left.
+* 3.10 plays with 3.9 servers and clients (the network protocol is still **14**).
+
 ## What's new in 3.9.0
 
 * **Under the hood, the mod now runs on its own platform layer.** It is the first step towards a Fabric version of Enhanced. Nothing changes in play: every hero, power, boss and place works exactly as in 3.8.4, and your worlds, heroes and settings carry over.

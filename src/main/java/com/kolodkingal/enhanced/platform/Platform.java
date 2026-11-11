@@ -36,6 +36,9 @@ public interface Platform {
     /** The game's {@code config} folder. */
     Path configDir();
 
+    /** Whether a mod with this id is installed. */
+    boolean isModLoaded(String modId);
+
     /**
      * A file of the mod's own jar (or of its resource folders in development), by its path inside the jar, such as
      * {@code assets/enhanced/lang/en_us.json}; empty if there is none.

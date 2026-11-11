@@ -181,6 +181,11 @@ public final class ClientSetup {
         }
         registrar.keyMapping(KeyBindings.CHANGE_LOOK);
         registrar.keyMapping(KeyBindings.VISION_COMMAND);
+        registrar.keyMapping(KeyBindings.HUD_STYLE);
+        registrar.keyMapping(KeyBindings.WHEEL);
+        if (Coexist.otherLoaded()) {
+            registrar.keyMapping(KeyBindings.SWITCH_POWERS);
+        }
         // 3.6: the Stone Wheel (J).
         registrar.keyMapping(KeyBindings.STONE_WHEEL);
         // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).

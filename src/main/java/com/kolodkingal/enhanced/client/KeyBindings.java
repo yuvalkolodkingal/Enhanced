@@ -25,6 +25,18 @@ public final class KeyBindings {
     public static final KeyMapping CHANGE_LOOK = Keys.newKey("key.enhanced.change_look", KeyContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
 
+    /** Changes the powers panel's style (the client option hudStyle) to the next one. Not bound by default. */
+    public static final KeyMapping HUD_STYLE = Keys.newKey("key.enhanced.hud_style", KeyContext.IN_GAME,
+            InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), CATEGORY);
+
+    /** Held: the abilities as a wheel around the hero's face, with the details of the one pointed at. */
+    public static final KeyMapping WHEEL = Keys.newKey("key.enhanced.wheel", KeyContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, CATEGORY);
+
+    /** With Enlightened installed, for a hero who also bends: gives the ability keys to the bending, and back. */
+    public static final KeyMapping SWITCH_POWERS = Keys.newKey("key.enhanced.switch_powers", KeyContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_GRAVE_ACCENT, CATEGORY);
+
     public static final KeyMapping VISION_COMMAND = Keys.newKey("key.enhanced.vision_command", KeyContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY);
 

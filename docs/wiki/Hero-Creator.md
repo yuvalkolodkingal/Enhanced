@@ -1,6 +1,6 @@
 # Hero Creator
 
-The **Hero Creator** is a Creative-mode item that opens a screen where you can **become any hero of the mod** at once, in any look, or **make a hero of your own**: a name, up to ten powers, each with its own **strength**, on the keys you choose (plain or with **Sneak**), with your own moves, colours, **skin** and extras like a cape or glowing eyes. Since 3.4 the powers are not only **the thirty most common superpowers** of comics and films: **every ability of every hero of the mod** is there too, from Thor's Lightning Beam to Agatha's Rune Trap. A hero you make can be saved to a file and loaded again, on any server.
+**The One Above All** (called the Hero Creator until 3.9) is a Creative-mode item that opens the Hero Creator, a screen where you can **become any hero of the mod** at once, in any look, or **make a hero of your own**: a name, up to ten powers, each with its own **strength**, on the keys you choose (plain or with **Sneak**), with your own moves, colours, **skin** and extras like a cape or glowing eyes. Since 3.4 the powers are not only **the thirty most common superpowers** of comics and films: **every ability of every hero of the mod** is there too, from Thor's Lightning Beam to Agatha's Rune Trap. A hero you make can be saved to a file and loaded again, on any server.
 
 Hebrew: [עברית](Hero-Creator-HE)
 

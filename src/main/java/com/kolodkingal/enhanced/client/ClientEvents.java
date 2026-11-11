@@ -49,6 +49,7 @@ import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.protect.HexRunes;
 import com.kolodkingal.enhanced.registry.ModAttachments;
+import net.minecraft.network.chat.Component;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -284,11 +285,41 @@ public final class ClientEvents {
 
     private static void handleKeys(Minecraft mc, LocalPlayer player) {
         Power power = Powers.power(player);
+        Coexist.publish(power.hasPowers(), KeyBindings.SWITCH_POWERS.getTranslatedKeyMessage().getString());
+        boolean switchClicked = false;
+        while (KeyBindings.SWITCH_POWERS.consumeClick()) {
+            switchClicked = true;
+        }
+        if (switchClicked && mc.screen == null && power.hasPowers() && Coexist.otherHasPowers()) {
+            player.displayClientMessage(Component.translatable(Coexist.toggle() ? "hud.enhanced.switch.hero" : "hud.enhanced.switch.other"), true);
+        }
+        // (with Enlightened installed and the hero a bender too, the keys go to whichever of the two is switched to)
+        boolean mine = Coexist.active();
+        boolean styleClicked = false;
+        while (KeyBindings.HUD_STYLE.consumeClick()) {
+            styleClicked = true;
+        }
+        if (styleClicked && mc.screen == null && EnhancedClientConfig.SPEC.isLoaded()) {
+            var next = EnhancedClientConfig.HUD_STYLE.get().next();
+            EnhancedClientConfig.HUD_STYLE.set(next);
+            EnhancedClientConfig.SPEC.save();
+            player.displayClientMessage(Component.translatable("hud.enhanced.style",
+                    Component.translatable("hud.enhanced.style." + next.name().toLowerCase(java.util.Locale.ROOT))), true);
+        }
+        boolean wheelClicked = false;
+        while (KeyBindings.WHEEL.consumeClick()) {
+            wheelClicked = true;
+        }
+        if (wheelClicked && mine && power.hasPowers() && power != Power.CUSTOM && mc.screen == null) {
+            mc.setScreen(new com.kolodkingal.enhanced.client.hud.PowerWheelScreen(() -> PowerHud.model(mc),
+                    Keys.boundKey(KeyBindings.WHEEL), Component.translatable("hud.enhanced.sneak"),
+                    Component.translatable("hud.enhanced.ready")));
+        }
         boolean lookClicked = false;
         while (KeyBindings.CHANGE_LOOK.consumeClick()) {
             lookClicked = true;
         }
-        if (lookClicked && power.hasPowers() && mc.screen == null && !player.isSpectator()) {
+        if (lookClicked && mine && power.hasPowers() && mc.screen == null && !player.isSpectator()) {
             Net.sendToServer(new ChangeLookPayload(player.isShiftKeyDown() ? -1 : 1));
         }
         boolean visionClicked = false;
@@ -305,7 +336,7 @@ public final class ClientEvents {
                 clicked = true;
             }
             // (3.3: the Hex Runes hold a sorcerer's powers: no gesture is predicted for a press the server refuses)
-            boolean usable = power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
+            boolean usable = mine && power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
             boolean down = usable && key.isDown();
             // (3.5: the Sneak the key was pressed with, not the one the tick read; see PRESS_SNEAK)
             boolean sneak = PRESS_SNEAK[i] != 0 ? PRESS_SNEAK[i] == 2 : mc.options.keyShift.isDown();

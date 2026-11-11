@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client;
 
+import com.kolodkingal.enhanced.client.hud.PowerPanels;
 import com.kolodkingal.enhanced.ability.BillyAbilities;
 import com.kolodkingal.enhanced.ability.BillyBarrier;
 import com.kolodkingal.enhanced.ability.MagnetoAbilities;
@@ -63,6 +64,31 @@ public class PowerHud implements LayeredDraw.Layer {
         }
         Font font = mc.font;
         long now = mc.level.getGameTime();
+        if (!Coexist.active()) {
+            // A bender of Enlightened too, and switched to the bending: one line under its panel says how to come back.
+            int[] other = Coexist.otherHudBottom();
+            Component line = Component.literal("[").append(KeyBindings.SWITCH_POWERS.getTranslatedKeyMessage()).append("] ")
+                    .withStyle(ChatFormatting.YELLOW)
+                    .append(power.displayName().copy().withStyle(s -> s.withColor(power.titleColor())));
+            int w = font.width(line) + 6;
+            int ly = other == null ? 4 : other[0] + 2;
+            int lx = other != null && other[1] == 1 ? graphics.guiWidth() - 4 - w : 4;
+            graphics.fill(lx, ly, lx + w, ly + 11, 0x70000000);
+            graphics.drawString(font, line, lx + 3, ly + 2, 0xFFFFFFFF, true);
+            return;
+        }
+        PowerPanels.Style style = EnhancedClientConfig.hudStyle();
+        if (style != PowerPanels.Style.CLASSIC) {
+            PowerPanels.Model model = model(mc);
+            if (model != null) {
+                boolean right = EnhancedClientConfig.hudRight();
+                int top = 4 + Math.max(BossBarOverride.clearance(4 + 150), right ? effectsClearance(player) : 0);
+                int height = PowerPanels.draw(style, graphics, font, model, graphics.guiWidth(), top, right,
+                        EnhancedClientConfig.reducedMotion());
+                Coexist.hudBottom(top + height, right);
+            }
+            return;
+        }
         Variant look = Variants.current(data);
         // Heroes with several looks show the current one, and the key that changes it, after their name.
         int titleColor = Variants.hasChoice(power) ? look.color() : power.titleColor();
@@ -119,6 +145,7 @@ public class PowerHud implements LayeredDraw.Layer {
         // Under the boss bars, when a fight's bars and their names would run into the panel.
         int y = 4 + BossBarOverride.clearance(x + width + 4);
         int height = 12 + lines.length * 10;
+        Coexist.hudBottom(y + height, false);
         graphics.fill(x - 2, y - 2, x + width + 4, y + height, 0x70000000);
         graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);
         y += 12;
@@ -126,6 +153,71 @@ public class PowerHud implements LayeredDraw.Layer {
             graphics.drawString(font, line, x, y, 0xFFFFFFFF, true);
             y += 10;
         }
+    }
+
+    /** How far down a panel in the top-right corner starts so as not to cover the status effect icons there. */
+    public static int effectsClearance(LocalPlayer player) {
+        boolean good = false;
+        boolean bad = false;
+        for (net.minecraft.world.effect.MobEffectInstance effect : player.getActiveEffects()) {
+            if (effect.showIcon()) {
+                if (effect.getEffect().value().isBeneficial()) {
+                    good = true;
+                } else {
+                    bad = true;
+                }
+            }
+        }
+        return bad ? 52 : good ? 26 : 0;
+    }
+
+    /** What the new panel styles and the wheel draw: the classic panel's content, as data (null: no hero to show). */
+    @org.jetbrains.annotations.Nullable
+    public static PowerPanels.Model model(Minecraft mc) {
+        LocalPlayer player = mc.player;
+        if (player == null || mc.level == null) {
+            return null;
+        }
+        PowerData data = Powers.get(player);
+        Power power = data.power();
+        if (!power.hasPowers() || power == Power.CUSTOM) {
+            return null;
+        }
+        long now = mc.level.getGameTime();
+        Variant look = Variants.current(data);
+        PowerPanels.Model model = new PowerPanels.Model();
+        model.color = Variants.hasChoice(power) ? look.color() : power.titleColor();
+        model.title = power.displayName();
+        model.identity = power.getSerializedName() + "/" + look.displayName().getString();
+        model.sneaking = false;
+        for (int i = 1; i <= PowerData.ABILITIES; i++) {
+            model.rows.add(new PowerPanels.Row(KeyBindings.ability(i).getTranslatedKeyMessage(),
+                    panelSlot(Component.translatable(power.abilityKey(i)), status(player, data, i, now), data, i, now), null));
+        }
+        Power builder = BuildClient.hero(player);
+        if (extraLines(builder) > 0) {
+            model.notes.add(buildLine(player, builder, now));
+        } else if (com.kolodkingal.enhanced.custom.HeroKeys.yRow(data) != null) {
+            int y = com.kolodkingal.enhanced.custom.HeroKeys.Y;
+            model.rows.add(new PowerPanels.Row(BuildKeys.MAGIC.getTranslatedKeyMessage(),
+                    panelSlot(Component.translatable(power.abilityKey(y)), status(player, data, y, now), data, y, now), null));
+        }
+        if (Variants.hasChoice(power)) {
+            model.notes.add(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
+                    .withStyle(ChatFormatting.YELLOW)
+                    .append(look.displayName().copy().withStyle(ChatFormatting.GRAY)));
+        }
+        return model;
+    }
+
+    /** An ability for the new styles: on when the classic panel writes its state in green or aqua (ON, active, holding). */
+    private static PowerPanels.Slot panelSlot(Component name, @org.jetbrains.annotations.Nullable Component status, PowerData data,
+                                               int ability, long now) {
+        long left = data.cooldownUntil(ability) - now;
+        net.minecraft.network.chat.TextColor color = status == null ? null : status.getStyle().getColor();
+        boolean on = color != null && (color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.GREEN))
+                || color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.AQUA)));
+        return new PowerPanels.Slot(name, status, left > 0 ? left / 20.0F : 0.0F, on, -1, 0, null);
     }
 
     private static Component status(LocalPlayer player, PowerData data, int ability, long now) {
