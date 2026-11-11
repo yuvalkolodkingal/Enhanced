@@ -60,8 +60,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
   * The cinema has red walls with amber lamps at the seats.
   * Ultron's attic has brick walls, a wall of glowing old screens, and a door shaped like the Mind Stone onto a balcony over the portico.
   * The Human Torch's painting is the one from the series: a dark figure in a column of fire.
-  * A mansion built in 3.12.0 is rebuilt in the new look the next time you go in, and your progress is kept.
-* **The Horton manor, as in the series.** A red-brick house with stone bands and mullioned windows, wings with little turrets, a clock tower with a white cupola, and a forecourt with a fountain. Manors already in your world keep their old look; new ones are built this way.
+* **The Horton manor, as in the series.** A red-brick house with white stone corners and mullioned windows, tall wings with grey domed turrets, ivy on the front, a white clock tower with a cupola, and a forecourt with a fountain on a round of grass.
 
 ## What's new in 3.12.0
 

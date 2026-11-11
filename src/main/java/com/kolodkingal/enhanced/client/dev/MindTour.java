@@ -154,7 +154,7 @@ public final class MindTour {
         }, 40);
         server(MindRealm::enter, 120);
         shot("m01_arrival", 10);
-        at(0, 0, -30, 0.0F, -10.0F, 60);
+        at(0, 8, -46, 0.0F, -4.0F, 60);
         shot("m02_house", 10);
         at(0, 0, -6, 180.0F, 10.0F, 40);
         shot("m03_hall_dume", 10);
@@ -243,7 +243,7 @@ public final class MindTour {
             piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.random,
                     piece.getBoundingBox(), new net.minecraft.world.level.ChunkPos(base), base);
             level.setDayTime(6000);
-            p.teleportTo(level, base.getX() + 0.5, base.getY() + 1, base.getZ() - 34.5, 0.0F, -12.0F);
+            p.teleportTo(level, base.getX() + 0.5, base.getY() + 3, base.getZ() - 23.5, 0.0F, -18.0F);
         }, 80);
         shot("m26_manor", 40);
         server(p -> p.teleportTo(p.serverLevel(), manor.getX() + 5.5, manor.getY(), manor.getZ() + 0.5, 270.0F, 25.0F), 40);

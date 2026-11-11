@@ -124,7 +124,7 @@ public final class ConfigFileTests {
     }
 
     /** A file changed on disk is read again (half a second after the change), its values with it. */
-    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 600)
     public static void aFileChangedOnDiskIsReadAgain(GameTestHelper helper) {
         TestSpec t = TestSpec.make();
         Path dir = tempDir();
@@ -137,6 +137,14 @@ public final class ConfigFileTests {
             writeValue(path, "on", "false");
         });
         helper.succeedWhen(() -> {
+            if (t.range().get() != 3) {
+                // (the file watcher waits in real time; the test server's ticks may run far faster than that)
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
             check(t.range().get() == 3 && !t.on().get(), "the new values are read: " + t.range().get() + ", "
                     + t.on().get());
             check(read(path).contains("\trange = 3"), "the file is left as written");

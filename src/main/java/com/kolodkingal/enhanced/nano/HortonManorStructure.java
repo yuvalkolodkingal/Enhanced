@@ -30,8 +30,9 @@ public class HortonManorStructure extends Structure {
         int z = chunk.getMiddleBlockZ();
         int low = Integer.MAX_VALUE;
         int high = Integer.MIN_VALUE;
+        // (the house's corners and middle, and the far corners of its forecourt)
         for (int dx = -HortonManorPiece.HALF_X; dx <= HortonManorPiece.HALF_X; dx += HortonManorPiece.HALF_X) {
-            for (int dz = -HortonManorPiece.HALF_Z; dz <= HortonManorPiece.HALF_Z; dz += HortonManorPiece.HALF_Z) {
+            for (int dz : new int[] {-HortonManorPiece.FRONT, -HortonManorPiece.HALF_Z, 0, HortonManorPiece.HALF_Z}) {
                 int h = context.chunkGenerator().getFirstOccupiedHeight(x + dx, z + dz, Heightmap.Types.WORLD_SURFACE_WG,
                         context.heightAccessor(), context.randomState());
                 low = Math.min(low, h);
