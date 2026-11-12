@@ -1,0 +1,13 @@
+{
+  "processors": [
+    {
+      "processor_type": "enhanced:seal",
+      "block": "minecraft:stone"
+    },
+    {
+      "processor_type": "enhanced:foundation",
+      "block": "minecraft:stone",
+      "max_depth": 16
+    }
+  ]
+}

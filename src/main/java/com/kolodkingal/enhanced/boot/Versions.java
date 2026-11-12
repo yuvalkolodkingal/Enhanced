@@ -24,7 +24,8 @@ public final class Versions {
     static final List<Copy> COPIES = List.of(
             new Copy(List.of("1.21.1"), "com.kolodkingal.enhanced"),
             new Copy(List.of("1.21.4"), "com.kolodkingal.enhanced.v1_21_4"),
-            new Copy(List.of("1.21.11"), "com.kolodkingal.enhanced.v1_21_11"));
+            new Copy(List.of("1.21.11"), "com.kolodkingal.enhanced.v1_21_11"),
+            new Copy(List.of("26.3"), "com.kolodkingal.enhanced.v26_3"));
 
     private static String running;
 

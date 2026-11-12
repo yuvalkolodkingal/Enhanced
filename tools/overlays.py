@@ -37,6 +37,11 @@ DATA_4 = "overlay_1_21_4_data"
 ASSETS_4 = "overlay_1_21_4_assets"
 DATA_11 = "overlay_1_21_11_data"
 ASSETS_11 = "overlay_1_21_11_assets"
+DATA_26 = "overlay_26_3_data"
+ASSETS_26 = "overlay_26_3_assets"
+# 26.3's pack formats (version.json of the 26.3 game jar: pack_version data_major 121, resource_major 97.1)
+DATA_FORMAT_26 = 121
+ASSETS_FORMAT_26 = 97
 # 1.21.11's pack formats (version.json of the 1.21.11 client jar: pack_version data_major 94.1, resource_major 75)
 DATA_FORMAT_11 = 94
 ASSETS_FORMAT_11 = 75
@@ -497,6 +502,72 @@ def main_11():
         f.write(SLOW_MOTION_FSH)
 
 
+def block_states_26(obj):
+    """1.21.1's block states ({"Name": id, "Properties": {...}}) as 26.3's ({"id": id, "properties": {...}}, or
+    the id alone when it has no properties)."""
+    if isinstance(obj, list):
+        return [block_states_26(v) for v in obj]
+    if not isinstance(obj, dict):
+        return obj
+    if isinstance(obj.get("Name"), str) and set(obj) <= {"Name", "Properties"}:
+        if obj.get("Properties"):
+            return {"id": obj["Name"], "properties": obj["Properties"]}
+        return obj["Name"]
+    return {k: block_states_26(v) for k, v in obj.items()}
+
+
+def data_26(obj, rel):
+    """A data file as 26.3 reads it, from what 1.21.11 reads: block states by "id"; recipe advancements name "recipes"; dimension types say whether
+    they have the dragon fight, and the ones with the overworld's day its clock; timelines name their clock."""
+    rel = rel.replace(os.sep, "/")
+    obj = block_states_26(obj)
+    if "/dimension_type/" in rel and isinstance(obj, dict):
+        obj.setdefault("has_ender_dragon_fight", False)
+        if obj.get("timelines") == "#minecraft:in_overworld":
+            obj.setdefault("default_clock", "minecraft:overworld")
+    if "/advancement/" in rel and isinstance(obj, dict):
+        for c in obj.get("criteria", {}).values():
+            if c.get("trigger") == "minecraft:recipe_unlocked" and "recipe" in c.get("conditions", {}):
+                c["conditions"]["recipes"] = c["conditions"].pop("recipe")
+    if "/timeline/" in rel and isinstance(obj, dict):
+        obj.setdefault("clock", "minecraft:overworld")
+    if "/tags/block_entity_type/" in rel and isinstance(obj, dict):
+        # (26.3's bed has no block entity)
+        obj["values"] = [v for v in obj.get("values", []) if v != "minecraft:bed"]
+    if rel.endswith("neoforge/loot_modifiers/global_loot_modifiers.json"):
+        # (NeoForge 26.3 loads every file of loot_modifiers/ and has no list: the list is read as a modifier, so it is
+        # one that never applies)
+        obj = {"type": "neoforge:add_table", "conditions": [{"condition": "neoforge:loot_table_id",
+               "loot_table_id": "enhanced:never"}], "table": "minecraft:empty"}
+    return obj
+
+
+def main_26():
+    for d in (DATA_26, ASSETS_26):
+        shutil.rmtree(os.path.join(RES, d), ignore_errors=True)
+    # every data file as 1.21.11 sees it (its overlays over 1.21.4's over the 1.21.1 file) that changed again
+    for base, _, files in os.walk(os.path.join(RES, "data")):
+        for name in files:
+            if not name.endswith(".json"):
+                continue
+            rel = os.path.relpath(os.path.join(base, name), RES)
+            path = next(p for p in (os.path.join(RES, DATA_11, rel), os.path.join(RES, DATA_4, rel),
+                                    os.path.join(RES, rel)) if os.path.exists(p))
+            obj = json.load(open(path, encoding="utf-8"))
+            new = data_26(json.loads(json.dumps(obj)), rel)
+            if new != obj:
+                write(os.path.join(RES, DATA_26, rel), new)
+    for base, _, files in os.walk(os.path.join(RES, DATA_11, "data")):
+        for name in files:
+            rel = os.path.relpath(os.path.join(base, name), os.path.join(RES, DATA_11))
+            if os.path.exists(os.path.join(RES, rel)) or not name.endswith(".json"):
+                continue
+            obj = json.load(open(os.path.join(base, name), encoding="utf-8"))
+            new = data_26(json.loads(json.dumps(obj)), rel)
+            if new != obj:
+                write(os.path.join(RES, DATA_26, rel), new)
+
+
 def entries_11(directories, fmt):
     return [{"formats": {"min_inclusive": fmt, "max_inclusive": fmt}, "min_format": fmt, "max_format": fmt,
              "directory": d} for d in directories]
@@ -561,13 +632,16 @@ def main():
         write(os.path.join(assets, "post_effect", name), post_effect(obj))
 
     main_11()
+    main_26()
 
     # (a later entry wins over an earlier one: 1.21.11's overlays are on top of 1.21.4's)
     write(os.path.join(RES, "pack.mcmeta"), {
         "overlays": {"entries": [
             {"formats": {"min_inclusive": 57, "max_inclusive": 61}, "directory": DATA_4},
             {"formats": {"min_inclusive": 42, "max_inclusive": 46}, "directory": ASSETS_4},
-        ] + entries_11([DATA_4, DATA_11], DATA_FORMAT_11) + entries_11([ASSETS_4, ASSETS_11], ASSETS_FORMAT_11)}
+        ] + entries_11([DATA_4, DATA_11], DATA_FORMAT_11) + entries_11([ASSETS_4, ASSETS_11], ASSETS_FORMAT_11)
+            + entries_11([DATA_4, DATA_11, DATA_26], DATA_FORMAT_26)
+            + entries_11([ASSETS_4, ASSETS_11, ASSETS_26], ASSETS_FORMAT_26)}
     })
     print("overlays written; spawn eggs:", sorted(colours))
 

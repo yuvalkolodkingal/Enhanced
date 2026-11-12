@@ -26,10 +26,12 @@ import net.minecraft.world.level.Level;
 public class StoneExtractionRecipe implements CraftingRecipe {
     private final String group;
     private final Ingredient ingredient;
-    private final ItemStack result;
-    private final ItemStack remainder;
+    // (26.3: a recipe holds item templates; an item's components are not known while recipes are read)
+    private final net.minecraft.world.item.ItemStackTemplate result;
+    private final net.minecraft.world.item.ItemStackTemplate remainder;
 
-    public StoneExtractionRecipe(String group, Ingredient ingredient, ItemStack result, ItemStack remainder) {
+    public StoneExtractionRecipe(String group, Ingredient ingredient, net.minecraft.world.item.ItemStackTemplate result,
+                                 net.minecraft.world.item.ItemStackTemplate remainder) {
         this.group = group;
         this.ingredient = ingredient;
         this.result = result;
@@ -41,12 +43,12 @@ public class StoneExtractionRecipe implements CraftingRecipe {
     }
 
     public ItemStack result() {
-        return result;
+        return result.create();
     }
 
     /** The empty vessel left in the ingredient's slot. */
     public ItemStack remainder() {
-        return remainder;
+        return remainder.create();
     }
 
     @Override
@@ -64,12 +66,12 @@ public class StoneExtractionRecipe implements CraftingRecipe {
 
     @Override
     public ItemStack assemble(CraftingInput input) {
-        return result.copy();
+        return result.create();
     }
 
     /** 1.21.1's result getter (no longer the recipe API's). */
     public ItemStack getResultItem(HolderLookup.Provider registries) {
-        return result;
+        return result.create();
     }
 
     @Override
@@ -77,7 +79,7 @@ public class StoneExtractionRecipe implements CraftingRecipe {
         NonNullList<ItemStack> left = CraftingRecipe.super.getRemainingItems(input);
         for (int i = 0; i < input.size(); i++) {
             if (ingredient.test(input.getItem(i))) {
-                left.set(i, remainder.copy());
+                left.set(i, remainder.create());
             }
         }
         return left;
@@ -112,15 +114,15 @@ public class StoneExtractionRecipe implements CraftingRecipe {
     private static final MapCodec<StoneExtractionRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Codec.STRING.optionalFieldOf("group", "").forGetter(r -> r.group),
             Ingredient.CODEC.fieldOf("ingredient").forGetter(r -> r.ingredient),
-            ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
-            ItemStack.CODEC.fieldOf("remainder").forGetter(r -> r.remainder)
+            net.minecraft.world.item.ItemStackTemplate.CODEC.fieldOf("result").forGetter(r -> r.result),
+            net.minecraft.world.item.ItemStackTemplate.CODEC.fieldOf("remainder").forGetter(r -> r.remainder)
     ).apply(i, StoneExtractionRecipe::new));
     private static final StreamCodec<RegistryFriendlyByteBuf, StoneExtractionRecipe> STREAM_CODEC =
             StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, r -> r.group,
             Ingredient.CONTENTS_STREAM_CODEC, r -> r.ingredient,
-            ItemStack.STREAM_CODEC, r -> r.result,
-            ItemStack.STREAM_CODEC, r -> r.remainder,
+            net.minecraft.world.item.ItemStackTemplate.STREAM_CODEC, r -> r.result,
+            net.minecraft.world.item.ItemStackTemplate.STREAM_CODEC, r -> r.remainder,
             StoneExtractionRecipe::new);
 
     public static final RecipeSerializer<StoneExtractionRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);

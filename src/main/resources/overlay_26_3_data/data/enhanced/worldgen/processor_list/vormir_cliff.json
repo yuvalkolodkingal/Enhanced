@@ -1,0 +1,18 @@
+{
+  "processors": [
+    {
+      "processor_type": "enhanced:seal",
+      "block": "minecraft:blackstone"
+    },
+    {
+      "processor_type": "enhanced:foundation",
+      "block": {
+        "id": "minecraft:basalt",
+        "properties": {
+          "axis": "y"
+        }
+      },
+      "max_depth": 24
+    }
+  ]
+}
