@@ -6,7 +6,7 @@ The mod's source is at [github.com/yuvalkolodkingal/enhanced](https://github.com
 
 ## What you need
 
-* **Java 21** (a JDK).
+* **Java 21** (a JDK). The copy of the mod for Minecraft 26.3 is compiled with Java 25; Gradle downloads one by itself if it is not installed.
 * **Git**, to clone the repository.
 * Nothing else: the Gradle wrapper (`./gradlew`) downloads Gradle, NeoForge and the Minecraft mappings the first time.
 

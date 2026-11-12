@@ -66,10 +66,21 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 |---|---|---|
 | ![Quicksilver](docs/screenshots/014-quicksilver-mutant-school.png) | ![Vision](docs/screenshots/008-vision.png) | ![Wolverine](docs/screenshots/051-wolverine-adamantium-claws.png) |
 
-* **Minecraft** 1.21.1, 1.21.4 or 1.21.11 (the same jar)
-* **Mod loader** NeoForge 21.1.x, 21.4.x or 21.11.x
+* **Minecraft** 1.21.1, 1.21.4, 1.21.11 or 26.3 (the same jar)
+* **Mod loader** NeoForge 21.1.x, 21.4.x, 21.11.x or 26.3.x
 * **Install it on** the client, plus the server for multiplayer
 * **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
+
+## What's new in 3.14.0
+
+* **Minecraft 26.3 in the same jar**, beside 1.21.1, 1.21.4 and 1.21.11 (NeoForge 26.3.0.102 or newer; Minecraft 26.3
+  runs on Java 25, which its launcher includes). Every hero, creature, block, screen and realm is there, and a world
+  played on an earlier version keeps the mod's saved world data.
+* On 26.3 a few things are a little different: the Hero Creator has no "choose a file" window for a skin (drop the PNG
+  on the game window or put it in the skins folder); the powers' effects in the world are drawn together with the
+  creatures, so where they cross water, glass or rain they can look a little different; the slow-motion tint shares its
+  place with the spectator's creeper or spider view; the Hydra spawn eggs have a picture of their own; the Asgardian
+  braziers' flames are a little shorter. See [What's new](docs/wiki/Home.md) for the whole list.
 
 ## Becoming a hero
 
@@ -287,7 +298,8 @@ your Minecraft folder) and put an `.mp3`, `.ogg` or `.wav` file there (`quicksil
 
 ## Building
 
-You need Java 21.
+You need Java 21. The copy of the mod for Minecraft 26.3 is compiled with Java 25 (into Java 21 class files);
+Gradle downloads a Java 25 by itself if none is installed.
 
 GitHub Actions (`.github/workflows/build.yml`) runs the same build and the GameTests on every
 push and pull request, and publishes a release for every push to `main` (or a `v*` tag).
@@ -299,7 +311,7 @@ push and pull request, and publishes a release for every push to `main` (or a `v
 ```
 
 To install, copy `build/libs/enhanced-<version>.jar` into the `mods` folder of a NeoForge
-1.21.1, 1.21.4 or 1.21.11 instance (the jar holds a copy of the mod for each; see [docs/MULTIVERSION.md](docs/MULTIVERSION.md)).
+1.21.1, 1.21.4, 1.21.11 or 26.3 instance (the jar holds a copy of the mod for each; see [docs/MULTIVERSION.md](docs/MULTIVERSION.md)).
 
 How the heroes and bosses of 3.0 hang on the shared code (the plug-ins, the event priorities, the
 boss framework and its rules) is in [docs/HEROES-AND-BOSSES.md](docs/HEROES-AND-BOSSES.md).

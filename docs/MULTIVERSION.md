@@ -21,7 +21,7 @@ them, and each has a stable neighbour.
 | 1.21.11 | 21.11.48 | 21 | 2,130 (cut short) | 968 |
 | 26.1.2 | 26.1.2.126 | 25 | not audited | |
 | 26.2 | 26.2.0.93 | 25 | not audited | |
-| 26.3 | 26.3.0.102 | 25 | not audited | |
+| 26.3 | 26.3.0.102 | 25 | 3,431 (from the 1.21.11 copy, see 3.14.0) | |
 
 **The audit.** The mod's main sources (1,575 Java files) were compiled, unchanged, against each NeoForge version,
 and javac's errors counted. "Files" is how many source files have at least one error. The numbers are a lower bound:
@@ -250,3 +250,54 @@ needs them next to 1.21.11). The jar now holds three copies: 1.21.1 (as written)
     (1.21.11 decides it by the entity type, which the mod's types do not set).
   * The mod's geometry of one render type is merged per entity (drawn in one go, not in the order it was written).
   * The glowing outline of the mod's effects uses the outline render types.
+
+## Progress (3.14.0): 26.3 in the same jar
+
+Phase 7 is done for 26.3, the newest version (26.1.2 and 26.2 are not shipped). The jar now holds four copies: 1.21.1,
+1.21.4, 1.21.11 and 26.3.
+
+* **One jar, Java 21 class files.** `versions/26.3` is compiled by a Java 25 toolchain (26.3's classes are Java 25's)
+  with `options.release = 21`, so its classes are Java 21 class files and FML 4 still scans the whole jar on 1.21.1;
+  `java.disableAutoTargetJvm()` lets NeoForge 26.3's Java 25 libraries resolve for a Java 21 target. The root project,
+  `boot` and the other copies stay on Java 21. CI installs Java 25 beside 21 (21 stays the default). `boot.Versions`
+  picks the 26.3 copy only on 26.3 (the version is read through `FMLLoader.getCurrent().getVersionInfo()` on FML 12).
+* **How the copy is made.** From 1.21.4's, 1.21.5's and 1.21.11's rules and files, then its own: about 510 rules in
+  `versions/26.3/renames.txt` (270 of them the coloured blocks and items) and 35 files in `versions/26.3/src/main/java`. `Preprocess` gained two things for it: a
+  version's own files (`//#norenames`) get the renames of the versions after theirs (the 1.21.11 copy's files get 26.3's
+  renames), `//#norenames 1.21.11` marks a 26.3 file written as a changed copy of a 1.21.11 file, and a rule can be
+  limited to some files (`@in(<regex>) regex => replacement`). The javac errors went from 3,431 (the copy as 1.21.11 left
+  it; javac stopped early at first) to 0: 3,431, 1,433, 855, 606, 536, 331, 185, 97, 66, 26, 7, 0.
+* **Drawing.** 26.3 extracts a frame's state and then draws what was submitted; nothing draws at once and there is no
+  `MultiBufferSource`. `compat.MultiBufferSource` is the mod's own interface, `compat.SubmitBuffers` records what the
+  renderers write as before; the level stages of 1.21.1 are all posted while NeoForge's `SubmitCustomGeometryEvent` is
+  fired, into the stage's buffers (`renderBuffers().bufferSource()` is `MultiBufferSource.immediate()`). Blocks are drawn
+  through `compat.BlockRenderDispatcher` (vanilla's block model render state, or the block's quads into the mod's
+  meshes), text in the level through `compat.TextDraw`. Render pipelines are built with `compat.Pipe` (26.3's depth is
+  reversed and its states are whole objects); `compat.Gl` draws the skies at once in NeoForge's custom sky renderer and
+  everything else into the stage's buffers (`compat.MeshReader` reads a built mesh back).
+* **Other changes:** the GUI extracts (`GuiGraphicsExtractor`, `extractRenderState`), the HUD is `Gui.hud`, keys are SDL
+  scancodes, recipes and loot functions and structure processors are codec registries (`compat.ShapedBase`), `Holder` is
+  sealed (`RegEntry.holder()`), coloured blocks and entity types are collections (`Blocks.WOOL.red()`,
+  `EntityTypes.X`), item slots are NeoForge's transfer API, the first-person hands renderer, swings, knockback with a
+  damage source (`compat.Knock`), chunk positions as a record, bonemeal sources, signs by slot, boss bars with ids,
+  ids only for entities in a level (`compat.ClientIds`), saved data by identifier (`compat.SavedBridge` also reads the
+  file an earlier version saved).
+* **Resources:** `tools/overlays.py` makes the 26.3 overlays (data format 121, assets 97, on top of 1.21.4's and
+  1.21.11's): block states by `id`, dimension types with the dragon fight and the overworld's clock, timelines with a
+  clock, recipe advancements by `recipes`, no bed block entity, the global loot modifier list as a modifier that never
+  applies (NeoForge 26.3 loads every file), model faces kept inside their texture, and the Hydra spawn eggs drawn.
+* **Checked:** `./gradlew build` builds the jar with the four copies; the jar starts a 26.3 dedicated server (NeoForge
+  26.3.0.102) on a fresh world, which starts again on the same world, and opens a 1.21.11 world (the mod's saved data
+  read from 1.21.11's files); it still starts 1.21.11 and 1.21.4 servers; a production 26.3 client (Xvfb, EGL) walks the
+  port tour without an error, and its pictures match 1.21.11's; the GameTests pass on 1.21.1 (2,755).
+* **Known differences on 26.3** (besides 1.21.11's):
+  * No system "open file" dialog in the Hero Creator (26.3 ships no TinyFileDialogs): `compat.Dialogs` answers
+    "cancelled".
+  * The mod's effects of the level stages are all drawn with the submitted geometry, sorted by render type: how they
+    layer with water, translucent blocks and weather can differ.
+  * The clouds and weather renderers of the mod's realms only hide vanilla's (as on 1.21.11; the mod draws none).
+  * The slow-motion post effect uses the spectated entity's effect slot.
+  * The Hydra spawn eggs are pictures made by `tools/overlays.py` (no template egg to tint).
+  * Model faces that reach out of their block (the brazier's flames) are cut at the texture's edge.
+  * A special item model is not told its display context (the Vibranium Shield does not use it).
+  * A shapeshifted body starts its own swing when the player swings.
