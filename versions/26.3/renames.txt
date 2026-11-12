@@ -556,3 +556,11 @@ protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float
 @in(/Legacy\w*Renderer\.java) \bthis\.submitNameTag\( => this.submitNameDisplay(
 @in(/ItemExt\.java) \bConsumer<Item> onBroken\b => Consumer<ItemStack> onBroken
 @in(/SpeedSurfaceFx\.java) \bpose\.rotate\(Axis\. => pose.mulPose(Axis.
+@in(/NeoClientServices\.java) dispatcher\.renderBatched\(state, pos, view, pose, layer -> bufferFor\.apply\(switch \(layer\) \{[^}]*\}\), checkSides, dispatcher\.getBlockModel\(state\)\.collectParts\(view, pos, state, random\)\); => dispatcher.renderBatched(state, pos, view, pose, checkSides, net.minecraft.util.Mth.getSeed(pos), bufferFor);
+
+# ---- the development tours ----
+\bnew LevelSettings\("(\w+)", GameType\.(\w+), false, Difficulty\.(\w+), true,\s*new GameRules\((?:[^()]|\([^()]*\))*\),\s*WorldDataConfiguration\.DEFAULT\) => new LevelSettings("$1", GameType.$2, new net.minecraft.world.level.LevelSettings.DifficultySettings(Difficulty.$3, false, false), true, WorldDataConfiguration.DEFAULT)
+\b(mc|minecraft)\.getMainRenderTarget\(\) => $1.gameRenderer.mainRenderTarget()
+\b(mc|minecraft)\.options\.hideGui = ([^;]+); => if (($2) != $1.gui.hud.isHidden()) { $1.gui.hud.toggle(); }
+\bnew net\.minecraft\.world\.level\.ChunkPos\((\w+)\) => net.minecraft.world.level.ChunkPos.containing($1)
+\blevel\.setDayTime\((\w+)\); => level.clockManager().setTotalTicks(level.registryAccess().getOrThrow(net.minecraft.world.clock.WorldClocks.OVERWORLD), $1);
