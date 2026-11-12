@@ -16,7 +16,9 @@ import org.gradle.api.tasks.TaskAction
  *   {@code //$$ } when it does not; the lines after {@code //#else} the other way round. In the shared sources the
  *   lines of the versions that are not 1.21.1 are written commented, as {@code //$$ code};</li>
  *   <li>renames (below), except in a file that has the line {@code //#norenames} (an overlay written in the
- *   version's own names);</li>
+ *   version's own names): such a file still gets the renames of the versions after the one whose folder it is in
+ *   (a 1.21.11 file in a 26.3 copy gets 26.3's renames), when the overlay folders and the rename files are listed
+ *   in the same order, one per version;</li>
  *   <li>relocation: {@code <basePackage>} becomes {@code <basePackage>.<suffix>} (all
  *   but the {@code boot} package, which is not copied), so that every copy has classes of its own in the one jar.</li>
  * </ul>
@@ -39,7 +41,8 @@ abstract class Preprocess extends DefaultTask {
     /**
      * Pure renames, applied to every file after the version blocks, file by file in order (the versions before this
      * one first): one {@code regex => replacement} per line ({@code #} comments). For names that only moved or
-     * changed (MobSpawnType => EntitySpawnReason).
+     * changed (MobSpawnType => EntitySpawnReason). A line {@code @in(<regex>) regex => replacement} applies only to
+     * the files whose path (relative to the sources, as for 1.21.1's package) the first regex finds.
      */
     @org.gradle.api.tasks.InputFiles @PathSensitive(PathSensitivity.RELATIVE)
     abstract org.gradle.api.file.ConfigurableFileCollection getRenames()
@@ -94,6 +97,11 @@ abstract class Preprocess extends DefaultTask {
     }
 
     String process(String text, String file) {
+        return process(text, file, -1)
+    }
+
+    /** {@code folder}: the index of the overlay folder the file comes from, -1 for a shared file. */
+    String process(String text, String file, int folder) {
         String mc = minecraft.get()
         List<String> out = []
         // a stack of [active?, inIf?, condition]
@@ -125,10 +133,14 @@ abstract class Preprocess extends DefaultTask {
         if (!stack.isEmpty()) throw new IllegalStateException(file + ': //#if without //#endif')
         String s = out.join('\n')
         // (a file written for this version already, with the line //#norenames, is only relocated)
-        if (!(s =~ /(?m)^\s*\/\/#norenames\s*$/).find()) {
-            for (List<String> rule : renameRules()) {
-                s = s.replaceAll(rule[0], rule[1])
-            }
+        int from = 0
+        if ((s =~ /(?m)^\s*\/\/#norenames\s*$/).find()) {
+            from = folder >= 0 && overlays.files.size() == renames.files.size() ? folder + 1 : Integer.MAX_VALUE
+        }
+        for (List rule : renameRules()) {
+            if ((rule[2] as int) < from) continue
+            if (rule[3] != null && !(file =~ (rule[3] as String)).find()) continue
+            s = s.replaceAll(rule[0] as String, rule[1] as String)
         }
         String pkg = basePackage.get()
         String to = pkg + '.' + suffix.get()
@@ -137,18 +149,28 @@ abstract class Preprocess extends DefaultTask {
     }
 
     @org.gradle.api.tasks.Internal
-    List<List<String>> cachedRules
+    List<List> cachedRules
 
-    List<List<String>> renameRules() {
+    /** [regex, replacement, index of the rename file, file regex or null] */
+    List<List> renameRules() {
         if (cachedRules == null) {
-            List<List<String>> rules = []
+            List<List> rules = []
+            int index = 0
             renames.files.each { File file ->
+                int k = index++
                 file.readLines('UTF-8').each { String line ->
                     String l = line.trim()
                     if (l.isEmpty() || l.startsWith('#')) return
+                    String scope = null
+                    if (l.startsWith('@in(')) {
+                        int close = l.indexOf(') ')
+                        if (close < 0) throw new IllegalArgumentException(file.name + ': bad @in line: ' + line)
+                        scope = l.substring(4, close)
+                        l = l.substring(close + 2).trim()
+                    }
                     int at = l.indexOf(' => ')
                     if (at < 0) throw new IllegalArgumentException(file.name + ': bad rename line: ' + line)
-                    rules << [l.substring(0, at), l.substring(at + 4).replace('\\n', '\n')]  // (\\n in a replacement is a new line)
+                    rules << [l.substring(0, at), l.substring(at + 4).replace('\\n', '\n'), k, scope]  // (\\n in a replacement is a new line)
                 }
             }
             cachedRules = rules
@@ -158,10 +180,18 @@ abstract class Preprocess extends DefaultTask {
 
     /** The overlay file for {@code path}: the last folder that has it, or null. */
     File overlayFor(String path) {
-        File found = null
+        int i = overlayIndex(path)
+        return i < 0 ? null : new File(overlays.files.toList()[i], path)
+    }
+
+    /** The index of the last overlay folder that has {@code path}, or -1. */
+    int overlayIndex(String path) {
+        int found = -1
+        int i = 0
         overlays.files.each { File dir ->
             File f = new File(dir, path)
-            if (f.isFile()) found = f
+            if (f.isFile()) found = i
+            i++
         }
         return found
     }
@@ -178,9 +208,9 @@ abstract class Preprocess extends DefaultTask {
             if (!path.startsWith(rel) || path.startsWith(rel + 'boot/')) return
             File out = new File(dst, rel + suffix.get() + '/' + path.substring(rel.length()))
             out.parentFile.mkdirs()
-            File replacement = overlayFor(path)
-            File from = replacement != null ? replacement : f
-            out.setText(process(from.getText('UTF-8'), path), 'UTF-8')
+            int folder = overlayIndex(path)
+            File from = folder >= 0 ? overlayFor(path) : f
+            out.setText(process(from.getText('UTF-8'), path, folder), 'UTF-8')
         }
         // files only the versions' folders have (the last folder that has one wins)
         overlays.files.each { File ov ->
@@ -191,7 +221,7 @@ abstract class Preprocess extends DefaultTask {
                 File out = new File(dst, rel + suffix.get() + '/' + path.substring(rel.length()))
                 if (!out.exists()) {
                     out.parentFile.mkdirs()
-                    out.setText(process(overlayFor(path).getText('UTF-8'), path), 'UTF-8')
+                    out.setText(process(overlayFor(path).getText('UTF-8'), path, overlayIndex(path)), 'UTF-8')
                 }
             }
         }

@@ -1,1 +1,418 @@
-# Renames for 26.3, after 1.21.4's, 1.21.5's and 1.21.11's (Preprocess: regex => replacement)
+# Renames for 26.3, applied after 1.21.4's, 1.21.5's and 1.21.11's (docs/MULTIVERSION.md). The 1.21.11 copy's own
+# files (//#norenames) get these too: they are written in 1.21.11's names.
+
+# ---- classes that moved (from 26.3's own sources: the same name in exactly one new place) ----
+\bcom\.mojang\.blaze3d\.buffers\.(GpuBuffer|GpuBufferSlice)\b => com.mojang.renderpearl.api.buffers.$1
+\bcom\.mojang\.blaze3d\.pipeline\.(BlendFunction|RenderPipeline)\b => com.mojang.renderpearl.api.pipeline.$1
+\bcom\.mojang\.blaze3d\.systems\.RenderPass\b => com.mojang.renderpearl.api.commands.RenderPass
+\bcom\.mojang\.blaze3d\.textures\.(AddressMode|FilterMode|GpuSampler|GpuTextureView|GpuTexture|TextureFormat)\b => com.mojang.renderpearl.api.textures.$1
+\bcom\.mojang\.blaze3d\.vertex\.(VertexFormat|VertexFormatElement)\b => com.mojang.renderpearl.api.vertex.$1
+\bnet\.minecraft\.client\.gui\.render\.state\.(GuiElementRenderState|GuiItemRenderState|GuiTextRenderState|BlitRenderState|ColoredRectangleRenderState|GuiRenderState)\b => net.minecraft.client.renderer.state.gui.$1
+\bnet\.minecraft\.client\.renderer\.state\.(CameraRenderState|LevelRenderState|SkyRenderState|WeatherRenderState)\b => net.minecraft.client.renderer.state.level.$1
+\bnet\.minecraft\.world\.level\.BlockAndTintGetter\b => net.minecraft.client.renderer.block.BlockAndTintGetter
+\bnet\.minecraft\.world\.entity\.monster\.EnderMan\b => net.minecraft.world.entity.monster.Enderman
+\bEnderMan\b => Enderman
+
+# ---- classes renamed ----
+\bnet\.minecraft\.client\.renderer\.LightTexture\b => net.minecraft.util.LightCoordsUtil
+\bLightTexture\b => LightCoordsUtil
+\bnet\.minecraft\.client\.gui\.GuiGraphics\b => net.minecraft.client.gui.GuiGraphicsExtractor
+\bGuiGraphics\b => GuiGraphicsExtractor
+# (26.3 has no MultiBufferSource: the mod's renderers write into compat.MultiBufferSource, compat.SubmitBuffers)
+\bnet\.minecraft\.client\.renderer\.MultiBufferSource\b => com.kolodkingal.enhanced.compat.MultiBufferSource
+
+# ---- the GUI: GuiGraphicsExtractor's names ----
+(?<!GuiText)\.drawCenteredString\( => .centeredText(
+(?<!GuiText)\.drawStringWithBackdrop\( => .textWithBackdrop(
+(?<!GuiText)\.drawWordWrap\( => .textWithWordWrap(
+(?<!GuiText)\.drawString\( => .text(
+\.hLine\( => .horizontalLine(
+\.vLine\( => .verticalLine(
+\.renderItemDecorations\( => .itemDecorations(
+\.renderFakeItem\( => .fakeItem(
+\.renderOutline\( => .outline(
+\.renderTooltip\( => .tooltip(
+\.renderComponentHoverEffect\( => .componentHoverEffect(
+
+# ---- keys: SDL scancodes in InputConstants instead of GLFW's ----
+(?:\borg\.lwjgl\.glfw\.)?\bGLFW\.GLFW_KEY_ENTER\b => com.mojang.blaze3d.platform.InputConstants.KEY_RETURN
+(?:\borg\.lwjgl\.glfw\.)?\bGLFW\.GLFW_KEY_KP_ENTER\b => com.mojang.blaze3d.platform.InputConstants.KEY_NUMPADENTER
+(?:\borg\.lwjgl\.glfw\.)?\bGLFW\.GLFW_KEY_KP_(\d)\b => com.mojang.blaze3d.platform.InputConstants.KEY_NUMPAD$1
+(?:\borg\.lwjgl\.glfw\.)?\bGLFW\.GLFW_KEY_GRAVE_ACCENT\b => com.mojang.blaze3d.platform.InputConstants.KEY_GRAVE
+(?:\borg\.lwjgl\.glfw\.)?\bGLFW\.GLFW_KEY_LEFT_ALT\b => com.mojang.blaze3d.platform.InputConstants.KEY_LALT
+(?:\borg\.lwjgl\.glfw\.)?\bGLFW\.GLFW_KEY_(\w+) => com.mojang.blaze3d.platform.InputConstants.KEY_$1
+(?:\borg\.lwjgl\.glfw\.)?\bGLFW\.GLFW_PRESS\b => com.mojang.blaze3d.platform.InputConstants.PRESS
+(?m)^import org\.lwjgl\.glfw\.GLFW; => // (26.3 has no GLFW)
+
+# ---- entities ----
+\.hurtMarked\b => .needsSync
+\b(level|level\(\)|server|mc\.level|serverLevel|world)\.random\b(?!\s*=[^=]) => $1.getRandom()
+\.getType\(\)\.is\( => .getType().builtInRegistryHolder().is(
+# (a player's message: the overlay or the chat, compat.Msg)
+\b([A-Za-z_][\w]*(?:\.[A-Za-z_]\w*)*)\.displayClientMessage\( => com.kolodkingal.enhanced.compat.Msg.display($1, 
+
+# ---- poses: rotate for a quaternion ----
+\.mulPose\(Axis\. => .rotate(Axis.
+\.mulPose\(com\.mojang\.math\.Axis\. => .rotate(com.mojang.math.Axis.
+
+# ---- drawing at once in a level stage: the stage's buffers (compat.MultiBufferSource) ----
+\b(mc|minecraft|Minecraft\.getInstance\(\))\.renderBuffers\(\)\.bufferSource\(\) => com.kolodkingal.enhanced.compat.MultiBufferSource.immediate()
+\b(g|gg|graphics|guiGraphics|gui)\.renderItem\( => $1.item(
+
+# ---- render types: the cut-out ones cull by name now (26.3's entityCutout is 1.21.1's entityCutoutNoCull) ----
+(\.|::)entityCutout\b(?!\w) => $1entityCutoutCull
+(\.|::)entityCutoutNoCullZOffset\b => $1entityCutoutZOffset
+(\.|::)entityCutoutNoCull\b => $1entityCutout
+(\.|::)itemEntityTranslucentCull\b => $1entityTranslucentCull
+
+# ---- the client: the HUD (Gui is the screens, Gui.hud the HUD) ----
+\b(mc|minecraft|Minecraft\.getInstance\(\)|this\.minecraft|minecraft\(\))\.options\.hideGui\b(?!\s*=[^=]) => $1.gui.hud.isHidden()
+\b(mc|minecraft|Minecraft\.getInstance\(\)|this\.minecraft|minecraft\(\))\.screen\b(?!\s*=[^=]) => $1.gui.screen()
+\b(mc|minecraft|Minecraft\.getInstance\(\)|this\.minecraft|minecraft\(\))\.setScreen\( => $1.gui.setScreen(
+\b(mc|minecraft|Minecraft\.getInstance\(\)|this\.minecraft|minecraft\(\))\.gameRenderer\.getMainCamera\(\) => $1.gameRenderer.mainCamera()
+\.getMainCamera\(\) => .mainCamera()
+
+# ---- blocks and the world ----
+\bPushReaction\.NORMAL\b => PushReaction.PUSH_PULL
+\bPushReaction\.DESTROY\b => PushReaction.POPPED
+\bPushReaction\.BLOCK\b => PushReaction.IMMOVEABLE
+\bPushReaction\.PUSH_ONLY\b => PushReaction.PUSH
+\bPushReaction\.IGNORE\b => PushReaction.IGNORE_ENTITY
+\bChunkPos\.asLong\( => ChunkPos.pack(
+\bnew ChunkPos\((chunkKey|key|\w+Key|packed)\) => ChunkPos.unpack($1)
+\bnew ChunkPos\(((?:[^(),]|\((?:[^()]|\([^()]*\))*\))+)\) => ChunkPos.containing($1)
+\b(chunk|best|chunkPos|ChunkPos\.containing\((?:[^()]|\([^()]*\))*\))\.toLong\(\) => $1.pack()
+@in(/(AsgardPopulation|BuildJob|CottageKeeper|EternityRealm|SiteSearch|HydraGarrison|RoadSweeper|LabBuilder|TowerRefit|SokoviaRecovery)\.java) \b(chunk|at|center|chunkPos|origin)\.(x|z)\b(?![\w(]) => $1.$2()
+\b(pos|nearestBlock|storage|be\.getBlockPos\(\)|s\.plotCorner\(\)|box\.getCenter\(\))\.getCenter\(\) => net.minecraft.world.phys.Vec3.atCenterOf($1)
+\bBlocks\.(COPPER_BLOCK|COPPER_BULB|LIGHTNING_ROD|CUT_COPPER|COPPER_GRATE|COPPER_DOOR|COPPER_TRAPDOOR|CHISELED_COPPER|COPPER_CHEST)\b => Blocks.$1.weathering().unaffected()
+\bsetInvulnerable\( => setPermanentlyInvulnerable(
+\b(server|level|level\(\)|getServer\(\)|\w+\.getServer\(\))\.getStructureManager\(\) => $1.getStructureTemplateManager()
+\bI18n\.exists\( => net.minecraft.locale.Language.getInstance().has(
+\b(NOISE|UNDER|noise|\w+_NOISE)\.getValue\( => $1.get(
+\.getDayTime\(\) => .getOverworldClockTime()
+
+# ---- entities: swinging (an animation of its own now) ----
+\.swing\(([^,()]+)\) => .swing($1, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false)
+\.swing\(([^,()]+), (true|false)\) => .swing($1, net.minecraft.world.item.component.SwingAnimation.DEFAULT, $2)
+\b(state|pose|s|renderState)\.attackTime\b => $1.swingAnimation
+
+# ---- screens and widgets: they extract a render state (render -> extractRenderState, ...) ----
+@Override(\s+)public void render\(GuiGraphicsExtractor => @Override$1public void extractRenderState(GuiGraphicsExtractor
+\bsuper\.render\((g|graphics|gg|guiGraphics|graphic), => super.extractRenderState($1,
+\bvoid renderBackground\(GuiGraphicsExtractor => void extractBackground(GuiGraphicsExtractor
+\b(super\.|this\.|(?<![.\w]))renderBackground\((g|graphics|gg|guiGraphics|graphic), => $1extractBackground($2,
+\b(super\.|this\.|(?<![.\w]))renderTransparentBackground\( => $1extractTransparentBackground(
+\bprotected void renderContents\(GuiGraphicsExtractor => protected void extractContents(GuiGraphicsExtractor
+\bvoid renderWidget\(GuiGraphicsExtractor => void extractWidgetRenderState(GuiGraphicsExtractor
+\bsuper\.renderWidget\( => super.extractWidgetRenderState(
+
+# ---- entity renderers: shouldRender has the partial tick ----
+public boolean shouldRender\(([^)]*?double \w+)\) => public boolean shouldRender($1, float partialTicks)
+\bsuper\.shouldRender\(((?:\w+, ){4}\w+)\) => super.shouldRender($1, partialTicks)
+
+# ---- block views: the face shading is the level's cardinal lighting ----
+@Override(\s+)public float getShade\(Direction (\w+), boolean (\w+)\) \{ => @Override$1public net.minecraft.world.level.CardinalLighting cardinalLighting() {$1    return net.minecraft.world.level.CardinalLighting.DEFAULT;$1}$1public float getShade(Direction $2, boolean $3) {
+\bInputConstants\.Type\.KEYSYM\b => InputConstants.Type.KEYBOARD
+\b(legacyKey|event|key)\.scancode\(\) => $1.keycode()
+\bInputConstants\.isKeyDown\((?:window|mc\.getWindow\(\)|minecraft\.getWindow\(\)|Minecraft\.getInstance\(\)\.getWindow\(\)),\s* => InputConstants.isKeyDown(
+\borg\.lwjgl\.glfw\.GLFW\.glfwGetMouseButton\(window\.handle\(\), (\w+(?:\.\w+\(\))?)\) == (?:com\.mojang\.blaze3d\.platform\.InputConstants|InputConstants)\.PRESS => com.kolodkingal.enhanced.compat.Input.mouseDown($1)
+\bVertexFormat\.Mode\. => com.mojang.renderpearl.api.pipeline.PrimitiveTopology.
+
+# ---- the coloured blocks and items: one collection per kind (Blocks.WOOL.red()) ----
+\b(Blocks|Items)\.WHITE_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.white()
+\b(Blocks|Items)\.ORANGE_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.orange()
+\b(Blocks|Items)\.MAGENTA_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.lightBlue()
+\b(Blocks|Items)\.YELLOW_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.yellow()
+\b(Blocks|Items)\.LIME_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.lime()
+\b(Blocks|Items)\.PINK_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.pink()
+\b(Blocks|Items)\.GRAY_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.lightGray()
+\b(Blocks|Items)\.CYAN_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.cyan()
+\b(Blocks|Items)\.PURPLE_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.purple()
+\b(Blocks|Items)\.BLUE_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.blue()
+\b(Blocks|Items)\.BROWN_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.brown()
+\b(Blocks|Items)\.GREEN_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.green()
+\b(Blocks|Items)\.RED_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.red()
+\b(Blocks|Items)\.BLACK_STAINED_GLASS_PANE\b => $1.STAINED_GLASS_PANE.black()
+\b(Blocks|Items)\.WHITE_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.white()
+\b(Blocks|Items)\.ORANGE_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.orange()
+\b(Blocks|Items)\.MAGENTA_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.lightBlue()
+\b(Blocks|Items)\.YELLOW_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.yellow()
+\b(Blocks|Items)\.LIME_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.lime()
+\b(Blocks|Items)\.PINK_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.pink()
+\b(Blocks|Items)\.GRAY_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.lightGray()
+\b(Blocks|Items)\.CYAN_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.cyan()
+\b(Blocks|Items)\.PURPLE_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.purple()
+\b(Blocks|Items)\.BLUE_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.blue()
+\b(Blocks|Items)\.BROWN_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.brown()
+\b(Blocks|Items)\.GREEN_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.green()
+\b(Blocks|Items)\.RED_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.red()
+\b(Blocks|Items)\.BLACK_GLAZED_TERRACOTTA\b => $1.GLAZED_TERRACOTTA.black()
+\b(Blocks|Items)\.WHITE_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.white()
+\b(Blocks|Items)\.ORANGE_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.orange()
+\b(Blocks|Items)\.MAGENTA_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.lightBlue()
+\b(Blocks|Items)\.YELLOW_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.yellow()
+\b(Blocks|Items)\.LIME_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.lime()
+\b(Blocks|Items)\.PINK_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.pink()
+\b(Blocks|Items)\.GRAY_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.lightGray()
+\b(Blocks|Items)\.CYAN_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.cyan()
+\b(Blocks|Items)\.PURPLE_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.purple()
+\b(Blocks|Items)\.BLUE_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.blue()
+\b(Blocks|Items)\.BROWN_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.brown()
+\b(Blocks|Items)\.GREEN_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.green()
+\b(Blocks|Items)\.RED_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.red()
+\b(Blocks|Items)\.BLACK_CONCRETE_POWDER\b => $1.CONCRETE_POWDER.black()
+\b(Blocks|Items)\.WHITE_STAINED_GLASS\b => $1.STAINED_GLASS.white()
+\b(Blocks|Items)\.ORANGE_STAINED_GLASS\b => $1.STAINED_GLASS.orange()
+\b(Blocks|Items)\.MAGENTA_STAINED_GLASS\b => $1.STAINED_GLASS.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_STAINED_GLASS\b => $1.STAINED_GLASS.lightBlue()
+\b(Blocks|Items)\.YELLOW_STAINED_GLASS\b => $1.STAINED_GLASS.yellow()
+\b(Blocks|Items)\.LIME_STAINED_GLASS\b => $1.STAINED_GLASS.lime()
+\b(Blocks|Items)\.PINK_STAINED_GLASS\b => $1.STAINED_GLASS.pink()
+\b(Blocks|Items)\.GRAY_STAINED_GLASS\b => $1.STAINED_GLASS.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_STAINED_GLASS\b => $1.STAINED_GLASS.lightGray()
+\b(Blocks|Items)\.CYAN_STAINED_GLASS\b => $1.STAINED_GLASS.cyan()
+\b(Blocks|Items)\.PURPLE_STAINED_GLASS\b => $1.STAINED_GLASS.purple()
+\b(Blocks|Items)\.BLUE_STAINED_GLASS\b => $1.STAINED_GLASS.blue()
+\b(Blocks|Items)\.BROWN_STAINED_GLASS\b => $1.STAINED_GLASS.brown()
+\b(Blocks|Items)\.GREEN_STAINED_GLASS\b => $1.STAINED_GLASS.green()
+\b(Blocks|Items)\.RED_STAINED_GLASS\b => $1.STAINED_GLASS.red()
+\b(Blocks|Items)\.BLACK_STAINED_GLASS\b => $1.STAINED_GLASS.black()
+\b(Blocks|Items)\.WHITE_WALL_BANNER\b => $1.WALL_BANNER.white()
+\b(Blocks|Items)\.ORANGE_WALL_BANNER\b => $1.WALL_BANNER.orange()
+\b(Blocks|Items)\.MAGENTA_WALL_BANNER\b => $1.WALL_BANNER.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_WALL_BANNER\b => $1.WALL_BANNER.lightBlue()
+\b(Blocks|Items)\.YELLOW_WALL_BANNER\b => $1.WALL_BANNER.yellow()
+\b(Blocks|Items)\.LIME_WALL_BANNER\b => $1.WALL_BANNER.lime()
+\b(Blocks|Items)\.PINK_WALL_BANNER\b => $1.WALL_BANNER.pink()
+\b(Blocks|Items)\.GRAY_WALL_BANNER\b => $1.WALL_BANNER.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_WALL_BANNER\b => $1.WALL_BANNER.lightGray()
+\b(Blocks|Items)\.CYAN_WALL_BANNER\b => $1.WALL_BANNER.cyan()
+\b(Blocks|Items)\.PURPLE_WALL_BANNER\b => $1.WALL_BANNER.purple()
+\b(Blocks|Items)\.BLUE_WALL_BANNER\b => $1.WALL_BANNER.blue()
+\b(Blocks|Items)\.BROWN_WALL_BANNER\b => $1.WALL_BANNER.brown()
+\b(Blocks|Items)\.GREEN_WALL_BANNER\b => $1.WALL_BANNER.green()
+\b(Blocks|Items)\.RED_WALL_BANNER\b => $1.WALL_BANNER.red()
+\b(Blocks|Items)\.BLACK_WALL_BANNER\b => $1.WALL_BANNER.black()
+\b(Blocks|Items)\.WHITE_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.white()
+\b(Blocks|Items)\.ORANGE_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.orange()
+\b(Blocks|Items)\.MAGENTA_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.lightBlue()
+\b(Blocks|Items)\.YELLOW_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.yellow()
+\b(Blocks|Items)\.LIME_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.lime()
+\b(Blocks|Items)\.PINK_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.pink()
+\b(Blocks|Items)\.GRAY_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.lightGray()
+\b(Blocks|Items)\.CYAN_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.cyan()
+\b(Blocks|Items)\.PURPLE_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.purple()
+\b(Blocks|Items)\.BLUE_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.blue()
+\b(Blocks|Items)\.BROWN_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.brown()
+\b(Blocks|Items)\.GREEN_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.green()
+\b(Blocks|Items)\.RED_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.red()
+\b(Blocks|Items)\.BLACK_CANDLE_CAKE\b => $1.DYED_CANDLE_CAKE.black()
+\b(Blocks|Items)\.WHITE_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.white()
+\b(Blocks|Items)\.ORANGE_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.orange()
+\b(Blocks|Items)\.MAGENTA_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.lightBlue()
+\b(Blocks|Items)\.YELLOW_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.yellow()
+\b(Blocks|Items)\.LIME_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.lime()
+\b(Blocks|Items)\.PINK_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.pink()
+\b(Blocks|Items)\.GRAY_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.lightGray()
+\b(Blocks|Items)\.CYAN_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.cyan()
+\b(Blocks|Items)\.PURPLE_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.purple()
+\b(Blocks|Items)\.BLUE_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.blue()
+\b(Blocks|Items)\.BROWN_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.brown()
+\b(Blocks|Items)\.GREEN_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.green()
+\b(Blocks|Items)\.RED_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.red()
+\b(Blocks|Items)\.BLACK_SHULKER_BOX\b => $1.DYED_SHULKER_BOX.black()
+\b(Blocks|Items)\.WHITE_TERRACOTTA\b => $1.DYED_TERRACOTTA.white()
+\b(Blocks|Items)\.ORANGE_TERRACOTTA\b => $1.DYED_TERRACOTTA.orange()
+\b(Blocks|Items)\.MAGENTA_TERRACOTTA\b => $1.DYED_TERRACOTTA.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_TERRACOTTA\b => $1.DYED_TERRACOTTA.lightBlue()
+\b(Blocks|Items)\.YELLOW_TERRACOTTA\b => $1.DYED_TERRACOTTA.yellow()
+\b(Blocks|Items)\.LIME_TERRACOTTA\b => $1.DYED_TERRACOTTA.lime()
+\b(Blocks|Items)\.PINK_TERRACOTTA\b => $1.DYED_TERRACOTTA.pink()
+\b(Blocks|Items)\.GRAY_TERRACOTTA\b => $1.DYED_TERRACOTTA.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_TERRACOTTA\b => $1.DYED_TERRACOTTA.lightGray()
+\b(Blocks|Items)\.CYAN_TERRACOTTA\b => $1.DYED_TERRACOTTA.cyan()
+\b(Blocks|Items)\.PURPLE_TERRACOTTA\b => $1.DYED_TERRACOTTA.purple()
+\b(Blocks|Items)\.BLUE_TERRACOTTA\b => $1.DYED_TERRACOTTA.blue()
+\b(Blocks|Items)\.BROWN_TERRACOTTA\b => $1.DYED_TERRACOTTA.brown()
+\b(Blocks|Items)\.GREEN_TERRACOTTA\b => $1.DYED_TERRACOTTA.green()
+\b(Blocks|Items)\.RED_TERRACOTTA\b => $1.DYED_TERRACOTTA.red()
+\b(Blocks|Items)\.BLACK_TERRACOTTA\b => $1.DYED_TERRACOTTA.black()
+\b(Blocks|Items)\.WHITE_CONCRETE\b => $1.CONCRETE.white()
+\b(Blocks|Items)\.ORANGE_CONCRETE\b => $1.CONCRETE.orange()
+\b(Blocks|Items)\.MAGENTA_CONCRETE\b => $1.CONCRETE.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_CONCRETE\b => $1.CONCRETE.lightBlue()
+\b(Blocks|Items)\.YELLOW_CONCRETE\b => $1.CONCRETE.yellow()
+\b(Blocks|Items)\.LIME_CONCRETE\b => $1.CONCRETE.lime()
+\b(Blocks|Items)\.PINK_CONCRETE\b => $1.CONCRETE.pink()
+\b(Blocks|Items)\.GRAY_CONCRETE\b => $1.CONCRETE.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_CONCRETE\b => $1.CONCRETE.lightGray()
+\b(Blocks|Items)\.CYAN_CONCRETE\b => $1.CONCRETE.cyan()
+\b(Blocks|Items)\.PURPLE_CONCRETE\b => $1.CONCRETE.purple()
+\b(Blocks|Items)\.BLUE_CONCRETE\b => $1.CONCRETE.blue()
+\b(Blocks|Items)\.BROWN_CONCRETE\b => $1.CONCRETE.brown()
+\b(Blocks|Items)\.GREEN_CONCRETE\b => $1.CONCRETE.green()
+\b(Blocks|Items)\.RED_CONCRETE\b => $1.CONCRETE.red()
+\b(Blocks|Items)\.BLACK_CONCRETE\b => $1.CONCRETE.black()
+\b(Blocks|Items)\.WHITE_HARNESS\b => $1.HARNESS.white()
+\b(Blocks|Items)\.ORANGE_HARNESS\b => $1.HARNESS.orange()
+\b(Blocks|Items)\.MAGENTA_HARNESS\b => $1.HARNESS.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_HARNESS\b => $1.HARNESS.lightBlue()
+\b(Blocks|Items)\.YELLOW_HARNESS\b => $1.HARNESS.yellow()
+\b(Blocks|Items)\.LIME_HARNESS\b => $1.HARNESS.lime()
+\b(Blocks|Items)\.PINK_HARNESS\b => $1.HARNESS.pink()
+\b(Blocks|Items)\.GRAY_HARNESS\b => $1.HARNESS.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_HARNESS\b => $1.HARNESS.lightGray()
+\b(Blocks|Items)\.CYAN_HARNESS\b => $1.HARNESS.cyan()
+\b(Blocks|Items)\.PURPLE_HARNESS\b => $1.HARNESS.purple()
+\b(Blocks|Items)\.BLUE_HARNESS\b => $1.HARNESS.blue()
+\b(Blocks|Items)\.BROWN_HARNESS\b => $1.HARNESS.brown()
+\b(Blocks|Items)\.GREEN_HARNESS\b => $1.HARNESS.green()
+\b(Blocks|Items)\.RED_HARNESS\b => $1.HARNESS.red()
+\b(Blocks|Items)\.BLACK_HARNESS\b => $1.HARNESS.black()
+\b(Blocks|Items)\.WHITE_CARPET\b => $1.CARPET.white()
+\b(Blocks|Items)\.ORANGE_CARPET\b => $1.CARPET.orange()
+\b(Blocks|Items)\.MAGENTA_CARPET\b => $1.CARPET.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_CARPET\b => $1.CARPET.lightBlue()
+\b(Blocks|Items)\.YELLOW_CARPET\b => $1.CARPET.yellow()
+\b(Blocks|Items)\.LIME_CARPET\b => $1.CARPET.lime()
+\b(Blocks|Items)\.PINK_CARPET\b => $1.CARPET.pink()
+\b(Blocks|Items)\.GRAY_CARPET\b => $1.CARPET.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_CARPET\b => $1.CARPET.lightGray()
+\b(Blocks|Items)\.CYAN_CARPET\b => $1.CARPET.cyan()
+\b(Blocks|Items)\.PURPLE_CARPET\b => $1.CARPET.purple()
+\b(Blocks|Items)\.BLUE_CARPET\b => $1.CARPET.blue()
+\b(Blocks|Items)\.BROWN_CARPET\b => $1.CARPET.brown()
+\b(Blocks|Items)\.GREEN_CARPET\b => $1.CARPET.green()
+\b(Blocks|Items)\.RED_CARPET\b => $1.CARPET.red()
+\b(Blocks|Items)\.BLACK_CARPET\b => $1.CARPET.black()
+\b(Blocks|Items)\.WHITE_BANNER\b => $1.BANNER.white()
+\b(Blocks|Items)\.ORANGE_BANNER\b => $1.BANNER.orange()
+\b(Blocks|Items)\.MAGENTA_BANNER\b => $1.BANNER.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_BANNER\b => $1.BANNER.lightBlue()
+\b(Blocks|Items)\.YELLOW_BANNER\b => $1.BANNER.yellow()
+\b(Blocks|Items)\.LIME_BANNER\b => $1.BANNER.lime()
+\b(Blocks|Items)\.PINK_BANNER\b => $1.BANNER.pink()
+\b(Blocks|Items)\.GRAY_BANNER\b => $1.BANNER.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_BANNER\b => $1.BANNER.lightGray()
+\b(Blocks|Items)\.CYAN_BANNER\b => $1.BANNER.cyan()
+\b(Blocks|Items)\.PURPLE_BANNER\b => $1.BANNER.purple()
+\b(Blocks|Items)\.BLUE_BANNER\b => $1.BANNER.blue()
+\b(Blocks|Items)\.BROWN_BANNER\b => $1.BANNER.brown()
+\b(Blocks|Items)\.GREEN_BANNER\b => $1.BANNER.green()
+\b(Blocks|Items)\.RED_BANNER\b => $1.BANNER.red()
+\b(Blocks|Items)\.BLACK_BANNER\b => $1.BANNER.black()
+\b(Blocks|Items)\.WHITE_CANDLE\b => $1.DYED_CANDLE.white()
+\b(Blocks|Items)\.ORANGE_CANDLE\b => $1.DYED_CANDLE.orange()
+\b(Blocks|Items)\.MAGENTA_CANDLE\b => $1.DYED_CANDLE.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_CANDLE\b => $1.DYED_CANDLE.lightBlue()
+\b(Blocks|Items)\.YELLOW_CANDLE\b => $1.DYED_CANDLE.yellow()
+\b(Blocks|Items)\.LIME_CANDLE\b => $1.DYED_CANDLE.lime()
+\b(Blocks|Items)\.PINK_CANDLE\b => $1.DYED_CANDLE.pink()
+\b(Blocks|Items)\.GRAY_CANDLE\b => $1.DYED_CANDLE.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_CANDLE\b => $1.DYED_CANDLE.lightGray()
+\b(Blocks|Items)\.CYAN_CANDLE\b => $1.DYED_CANDLE.cyan()
+\b(Blocks|Items)\.PURPLE_CANDLE\b => $1.DYED_CANDLE.purple()
+\b(Blocks|Items)\.BLUE_CANDLE\b => $1.DYED_CANDLE.blue()
+\b(Blocks|Items)\.BROWN_CANDLE\b => $1.DYED_CANDLE.brown()
+\b(Blocks|Items)\.GREEN_CANDLE\b => $1.DYED_CANDLE.green()
+\b(Blocks|Items)\.RED_CANDLE\b => $1.DYED_CANDLE.red()
+\b(Blocks|Items)\.BLACK_CANDLE\b => $1.DYED_CANDLE.black()
+\b(Blocks|Items)\.WHITE_BUNDLE\b => $1.DYED_BUNDLE.white()
+\b(Blocks|Items)\.ORANGE_BUNDLE\b => $1.DYED_BUNDLE.orange()
+\b(Blocks|Items)\.MAGENTA_BUNDLE\b => $1.DYED_BUNDLE.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_BUNDLE\b => $1.DYED_BUNDLE.lightBlue()
+\b(Blocks|Items)\.YELLOW_BUNDLE\b => $1.DYED_BUNDLE.yellow()
+\b(Blocks|Items)\.LIME_BUNDLE\b => $1.DYED_BUNDLE.lime()
+\b(Blocks|Items)\.PINK_BUNDLE\b => $1.DYED_BUNDLE.pink()
+\b(Blocks|Items)\.GRAY_BUNDLE\b => $1.DYED_BUNDLE.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_BUNDLE\b => $1.DYED_BUNDLE.lightGray()
+\b(Blocks|Items)\.CYAN_BUNDLE\b => $1.DYED_BUNDLE.cyan()
+\b(Blocks|Items)\.PURPLE_BUNDLE\b => $1.DYED_BUNDLE.purple()
+\b(Blocks|Items)\.BLUE_BUNDLE\b => $1.DYED_BUNDLE.blue()
+\b(Blocks|Items)\.BROWN_BUNDLE\b => $1.DYED_BUNDLE.brown()
+\b(Blocks|Items)\.GREEN_BUNDLE\b => $1.DYED_BUNDLE.green()
+\b(Blocks|Items)\.RED_BUNDLE\b => $1.DYED_BUNDLE.red()
+\b(Blocks|Items)\.BLACK_BUNDLE\b => $1.DYED_BUNDLE.black()
+\b(Blocks|Items)\.WHITE_WOOL\b => $1.WOOL.white()
+\b(Blocks|Items)\.ORANGE_WOOL\b => $1.WOOL.orange()
+\b(Blocks|Items)\.MAGENTA_WOOL\b => $1.WOOL.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_WOOL\b => $1.WOOL.lightBlue()
+\b(Blocks|Items)\.YELLOW_WOOL\b => $1.WOOL.yellow()
+\b(Blocks|Items)\.LIME_WOOL\b => $1.WOOL.lime()
+\b(Blocks|Items)\.PINK_WOOL\b => $1.WOOL.pink()
+\b(Blocks|Items)\.GRAY_WOOL\b => $1.WOOL.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_WOOL\b => $1.WOOL.lightGray()
+\b(Blocks|Items)\.CYAN_WOOL\b => $1.WOOL.cyan()
+\b(Blocks|Items)\.PURPLE_WOOL\b => $1.WOOL.purple()
+\b(Blocks|Items)\.BLUE_WOOL\b => $1.WOOL.blue()
+\b(Blocks|Items)\.BROWN_WOOL\b => $1.WOOL.brown()
+\b(Blocks|Items)\.GREEN_WOOL\b => $1.WOOL.green()
+\b(Blocks|Items)\.RED_WOOL\b => $1.WOOL.red()
+\b(Blocks|Items)\.BLACK_WOOL\b => $1.WOOL.black()
+\b(Blocks|Items)\.WHITE_BED\b => $1.BED.white()
+\b(Blocks|Items)\.ORANGE_BED\b => $1.BED.orange()
+\b(Blocks|Items)\.MAGENTA_BED\b => $1.BED.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_BED\b => $1.BED.lightBlue()
+\b(Blocks|Items)\.YELLOW_BED\b => $1.BED.yellow()
+\b(Blocks|Items)\.LIME_BED\b => $1.BED.lime()
+\b(Blocks|Items)\.PINK_BED\b => $1.BED.pink()
+\b(Blocks|Items)\.GRAY_BED\b => $1.BED.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_BED\b => $1.BED.lightGray()
+\b(Blocks|Items)\.CYAN_BED\b => $1.BED.cyan()
+\b(Blocks|Items)\.PURPLE_BED\b => $1.BED.purple()
+\b(Blocks|Items)\.BLUE_BED\b => $1.BED.blue()
+\b(Blocks|Items)\.BROWN_BED\b => $1.BED.brown()
+\b(Blocks|Items)\.GREEN_BED\b => $1.BED.green()
+\b(Blocks|Items)\.RED_BED\b => $1.BED.red()
+\b(Blocks|Items)\.BLACK_BED\b => $1.BED.black()
+\b(Blocks|Items)\.WHITE_DYE\b => $1.DYE.white()
+\b(Blocks|Items)\.ORANGE_DYE\b => $1.DYE.orange()
+\b(Blocks|Items)\.MAGENTA_DYE\b => $1.DYE.magenta()
+\b(Blocks|Items)\.LIGHT_BLUE_DYE\b => $1.DYE.lightBlue()
+\b(Blocks|Items)\.YELLOW_DYE\b => $1.DYE.yellow()
+\b(Blocks|Items)\.LIME_DYE\b => $1.DYE.lime()
+\b(Blocks|Items)\.PINK_DYE\b => $1.DYE.pink()
+\b(Blocks|Items)\.GRAY_DYE\b => $1.DYE.gray()
+\b(Blocks|Items)\.LIGHT_GRAY_DYE\b => $1.DYE.lightGray()
+\b(Blocks|Items)\.CYAN_DYE\b => $1.DYE.cyan()
+\b(Blocks|Items)\.PURPLE_DYE\b => $1.DYE.purple()
+\b(Blocks|Items)\.BLUE_DYE\b => $1.DYE.blue()
+\b(Blocks|Items)\.BROWN_DYE\b => $1.DYE.brown()
+\b(Blocks|Items)\.GREEN_DYE\b => $1.DYE.green()
+\b(Blocks|Items)\.RED_DYE\b => $1.DYE.red()
+\b(Blocks|Items)\.BLACK_DYE\b => $1.DYE.black()
+
+# ---- entity types: the constants are EntityTypes' ----
+(?:\bnet\.minecraft\.world\.entity\.)?\bEntityType\.(?!CODEC\b|STREAM_CODEC\b|NO_UPDATE_INTERVAL\b)([A-Z][A-Z0-9_]*)\b => net.minecraft.world.entity.EntityTypes.$1
+
+# ---- entities ----
+\b(?!super\b|this\b)(\w+)\.knockback\( => com.kolodkingal.enhanced.compat.Knock.back($1, 
+\.drop\(([^,()]+(?:\([^()]*\))?), (true|false)\) => .drop($1, $2, net.minecraft.util.Prediction.SERVER_ONLY)
+\.drop\(([^,()]+(?:\([^()]*\))?), (true|false), (?:true|false)\) => .drop($1, $2, net.minecraft.util.Prediction.SERVER_ONLY)
+\b(\w+)\.invulnerableTime = ([^;]+); => $1.setInvulnerableTime($2);
+\b(\w+)\.invulnerableTime\b => $1.getInvulnerableTime()
+\.mulPose\((new Quaternionf|view\.rotation\(\)|facing\.getRotation\(\)|p\.rotation\)|[\w.()]*\.orientation\)) => .rotate($1
+
+# ---- registries of codecs: structure processors and loot functions have no type objects (the codec is the type) ----
+\bextends StructureProcessor\b => implements net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor
+protected StructureProcessorType<\?> getType\(\) \{(\s*)return [^;]+; => public com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor> codec() {$1return CODEC;
+\bStructureProcessorType<\?> => com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor>
+\bStructureProcessorType<([\w.]+)> => com.mojang.serialization.MapCodec<$1>
+(PROCESSORS\.register\("\w+",\s*)\(\) -> \(\) -> => $1() ->
+(?m)^import net\.minecraft\.world\.level\.storage\.loot\.functions\.LootItemFunctionType; => // (26.3: no LootItemFunctionType)
+public LootItemFunctionType<(\w+)> getType\(\) \{(\s*)return [^;]+; => public com.mojang.serialization.MapCodec<$1> codec() {$2return CODEC;
+\bLootItemFunctionType<\?> => com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.storage.loot.functions.LootItemFunction>
+\bLootItemFunctionType<([\w.]+)> => com.mojang.serialization.MapCodec<$1>
+\bnew LootItemFunctionType<>\(([\w.]+)\) => $1
+@in(/(SiteStoneLootFunction|MarkSpentFunction)\.java) \bList<LootItemCondition> conditions => java.util.Optional<net.minecraft.core.Holder<LootItemCondition>> conditions
+\b(context|ctx|lootContext)\.getOptionalParameter\( => $1.getOptional(
