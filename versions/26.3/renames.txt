@@ -49,7 +49,7 @@
 \b(level|level\(\)|server|mc\.level|serverLevel|world)\.random\b(?!\s*=[^=]) => $1.getRandom()
 \.getType\(\)\.is\( => .getType().builtInRegistryHolder().is(
 # (a player's message: the overlay or the chat, compat.Msg)
-\b([A-Za-z_][\w]*(?:\.[A-Za-z_]\w*)*)\.displayClientMessage\( => com.kolodkingal.enhanced.compat.Msg.display($1, 
+\b([A-Za-z_][\w]*(?:\.[A-Za-z_]\w*(?:\(\))?)*|\(\(\w+\) \w+\))\.displayClientMessage\( => com.kolodkingal.enhanced.compat.Msg.display($1, 
 
 # ---- poses: rotate for a quaternion ----
 \.mulPose\(Axis\. => .rotate(Axis.
@@ -97,7 +97,7 @@
 \b(state|pose|s|renderState)\.attackTime\b => $1.swingAnimation
 
 # ---- screens and widgets: they extract a render state (render -> extractRenderState, ...) ----
-@Override(\s+)public void render\(GuiGraphicsExtractor => @Override$1public void extractRenderState(GuiGraphicsExtractor
+@Override(\s+)public void render\(GuiGraphicsExtractor (\w+), int => @Override$1public void extractRenderState(GuiGraphicsExtractor $2, int
 \bsuper\.render\((g|graphics|gg|guiGraphics|graphic), => super.extractRenderState($1,
 \bvoid renderBackground\(GuiGraphicsExtractor => void extractBackground(GuiGraphicsExtractor
 \b(super\.|this\.|(?<![.\w]))renderBackground\((g|graphics|gg|guiGraphics|graphic), => $1extractBackground($2,
@@ -397,7 +397,7 @@ public boolean shouldRender\(([^)]*?double \w+)\) => public boolean shouldRender
 
 # ---- entities ----
 \b(?!super\b|this\b)(\w+)\.knockback\( => com.kolodkingal.enhanced.compat.Knock.back($1, 
-\.drop\(([^,()]+(?:\([^()]*\))?), (true|false)\) => .drop($1, $2, net.minecraft.util.Prediction.SERVER_ONLY)
+(?<!Field)\.drop\(([^,()]+(?:\([^()]*\))?), (true|false)\) => .drop($1, $2, net.minecraft.util.Prediction.SERVER_ONLY)
 \.drop\(([^,()]+(?:\([^()]*\))?), (true|false), (?:true|false)\) => .drop($1, $2, net.minecraft.util.Prediction.SERVER_ONLY)
 \b(\w+)\.invulnerableTime = ([^;]+); => $1.setInvulnerableTime($2);
 \b(\w+)\.invulnerableTime\b => $1.getInvulnerableTime()
@@ -432,7 +432,7 @@ public LootItemFunctionType<(\w+)> getType\(\) \{(\s*)return [^;]+; => public co
 \b(\w+) instanceof FlyingAnimal\b => com.kolodkingal.enhanced.compat.Fliers.is($1)
 (?m)^import net\.minecraft\.world\.item\.AxeItem; => // (26.3: an axe is an item with the axe's properties)
 \bextends AxeItem\b => extends net.minecraft.world.item.Item
-\bsuper\((net\.minecraft\.world\.item\.ToolMaterial\.\w+|ToolMaterial\.\w+), ([\d.F-]+), ([\d.F-]+), (\w+)\); => super($4.axe($1, $2, $3));
+@in(/StormbreakerItem\.java) \bsuper\((net\.minecraft\.world\.item\.ToolMaterial\.\w+|ToolMaterial\.\w+), ([\d.F-]+), ([\d.F-]+), (\w+)\); => super($4.axe($1, $2, $3));
 \bnet\.minecraft\.client\.gui\.components\.PlayerFaceRenderer\b => net.minecraft.client.gui.components.PlayerFaceExtractor
 \bPlayerFaceRenderer\.draw\( => PlayerFaceExtractor.extractRenderState(
 (?m)^import org\.lwjgl\.util\.tinyfd\.TinyFileDialogs; => // (26.3: no TinyFileDialogs, compat.Dialogs)
@@ -455,3 +455,64 @@ public LootItemFunctionType<(\w+)> getType\(\) \{(\s*)return [^;]+; => public co
 @in(/ThorGrip\.java) \bItemInHandRenderer renderer\b => Object renderer
 @in(/ThorGrip\.java) \brenderer\.renderItem\(entity, stack, ItemDisplayContext\.NONE, ps, com\.kolodkingal\.enhanced\.compat\.ItemDraw\.collector\(buffer\), light\); => com.kolodkingal.enhanced.compat.ItemDraw.renderStatic(entity, stack, ItemDisplayContext.NONE, ps, buffer, entity.level(), light, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
 @in(/ItemInHandLayerMixin\.java) Minecraft\.getInstance\(\)\.getEntityRenderDispatcher\(\)\.getItemInHandRenderer\(\) => null
+
+# ---- blocks have no codec in 26.3 ----
+\bMapCodec<(\w+)> CODEC = simpleCodec\(\w+::new\); => MapCodec<$1> CODEC = null; // (26.3: blocks have no codec)
+@Override(\s+)protected MapCodec<\? extends \w+> codec\(\) \{\s*return CODEC;\s*\} => // (26.3: blocks have no codec)
+
+# ---- more entities and models ----
+\bhurtMarked\b => needsSync
+(getPos\(\)|getChunkPos\(\)|\))\.toLong\(\) => $1.pack()
+\b(\w+)\.swingingArm\b => ($1.getCurrentSwing() == null ? null : $1.getCurrentSwing().hand())
+\b(p|player|other|living|entity|e)\.swinging\b(?!\s*=[^=]) => $1.isSwinging()
+\b(\w+)\.setAllVisible\( => com.kolodkingal.enhanced.compat.Visible.all($1, 
+\b(font|mc\.font|minecraft\.font|this\.font|f)\.drawInBatch\( => com.kolodkingal.enhanced.compat.TextDraw.drawInBatch($1, 
+@in(/Shapeshifts\.java) \bbody\.attackAnim = player\.attackAnim; => if (player.isSwinging() && !body.isSwinging() && player.getCurrentSwing() != null) { body.swing(player.getCurrentSwing().hand(), player.getCurrentSwing().animation(), false); }
+@in(/Shapeshifts\.java) \bbody\.oAttackAnim = player\.oAttackAnim; => // (26.3: the body's swing is its own, started above)
+
+# ---- registered objects are not holders themselves (Holder is sealed in 26.3): RegEntry.holder() ----
+\bModEffects\.(?!EFFECTS\b)([A-Z][A-Z0-9_]*)\b(?!\s*\.\s*(?:get|value|holder|getId|getKey|is|unwrapKey)\b) => ModEffects.$1.holder()
+@in(/ModItems\.java) \bregisterSimpleBlockItem\((ModBlocks\.\w+)([,)]) => registerSimpleBlockItem($1.holder()$2
+@in(/NeoRegistrars\.java) (static final class Entry<R, T extends R> extends DeferredHolder<R, T> implements RegEntry<R, T> \{) => $1\n        @Override\n        public net.minecraft.resources.ResourceKey<R> getKey() {\n            return unwrapKey().orElseThrow();\n        }\n
+@in(/NeoRegistrars\.java) (static final class ItemHolder<I extends Item> extends DeferredItem<I> implements ItemEntry<I> \{) => $1\n        @Override\n        public net.minecraft.resources.ResourceKey<Item> getKey() {\n            return unwrapKey().orElseThrow();\n        }\n
+@in(/NeoRegistrars\.java) (static final class BlockHolder<B extends Block> extends DeferredBlock<B> implements BlockEntry<B> \{) => $1\n        @Override\n        public net.minecraft.resources.ResourceKey<Block> getKey() {\n            return unwrapKey().orElseThrow();\n        }\n
+@in(/NeoRegistrars\.java) (deferred\.register(?:SimpleBlockItem|Item|SimpleItem|Block|SimpleBlock)\([^;]*?), properties\) => $1, () -> properties)
+
+# ---- assorted 26.3 changes ----
+@in(/(LabBuilder|CottageKeeper|HydraGarrison|RoadSweeper|TowerRefit|BuildJob)\.java) \bChunkPos\.containing\((start|chunk|oldest)\) => ChunkPos.unpack($1)
+(?<![.\w])swing\((?:net\.minecraft\.world\.)?InteractionHand\.(\w+)\) => swing(net.minecraft.world.InteractionHand.$1, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false)
+@in(/ShieldCharge\.java) : net\.minecraft\.world\.InteractionHand\.MAIN_HAND, true\); => : net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
+\.markPosForPostprocessing\( => .markPosForPostProcessing(
+\bnew ItemParticleOption\(ParticleTypes\.ITEM, => com.kolodkingal.enhanced.compat.Particles.item(
+\b(minecraft|mc|Minecraft\.getInstance\(\))\.isSingleplayer\(\) => $1.isLocalServer()
+\bnew BlockEvent\.BreakEvent\( => new net.neoforged.neoforge.event.level.block.BreakBlockEvent(
+\b(\w+)\.getEyeInFluidType\(\) => $1.getFirstEyeInFluidType()
+\bMinecraft\.getInstance\(\)\.gui\.(leftHeight|rightHeight)\b => Minecraft.getInstance().gui.hud.$1
+\b(mc|minecraft|Minecraft\.getInstance\(\))\.gui\.(getChat|setOverlayMessage|getBossOverlay|getTabList|getSpectatorGui|setTitle|setSubtitle|setTimes|clearTitles|getGuiTicks|getFont)\( => $1.gui.hud.$2(
+@in(/GameBindings\.java) \bn\.getNewDamage\(\), n\.getBlockedDamage\(\), n\.getShieldDamage\(\)\) => n.getInflictedDamage(), n.getBlockedDamage(), n.getShieldDamage())
+@in(/ClientBindings\.java) Binding\.put\(table, RenderLevelStageEvent\.class, net\.neoforged\.neoforge\.client\.event\.SubmitCustomGeometryEvent\.class, ClientConvert::stageEvents\); => Binding.putAll(table, RenderLevelStageEvent.class, net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent.class, java.util.List.of(net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent.class), ClientConvert::stageEvents);
+@in(/ClientBindings\.java) \bn\.getScanCode\(\) => n.getKeycode()
+@in(/ClientBindings\.java) super\(n\.getPoseStack\(\), buffers\(n\.getSubmitNodeCollector\(\)\), n\.getPackedLight\(\), n\.getPlayer\(\), n\.getArm\(\)\); => super(n.getPoseStack(), buffers(n.getSubmitNodeCollector()), n.getLightCoords(), net.minecraft.client.Minecraft.getInstance().player, n.getArm());
+@in(/ClientBindings\.java) super\(n\.getLevelRenderer\(\), => super(net.minecraft.client.Minecraft.getInstance().levelRenderer,
+\bBlocks\.WAXED_OXIDIZED_(\w+)\b => Blocks.$1.waxed().oxidized()
+\bsign\.setText\(new SignText\((\w+), \1, (DyeColor\.\w+), (false|true)\), true\) => sign.setText(new SignText(java.util.List.of($1), java.util.List.of($1), $2, $3), net.minecraft.world.level.block.entity.SignTextSlot.FRONT)
+\.getFrontText\(\) => .getText(net.minecraft.world.level.block.entity.SignTextSlot.FRONT)
+\.getBackText\(\) => .getText(net.minecraft.world.level.block.entity.SignTextSlot.BACK)
+\b(text|signText)\.getMessage\((\w+), (false|true)\) => $1.getMessages($3).get($2)
+@in(/TowerRefit\.java) SignText text = new SignText\(\)\.setColor\(sign\.colour\(\)\)\.setHasGlowingText\(true\); => java.util.List<Component> lines = new java.util.ArrayList<>();
+@in(/TowerRefit\.java) text = text\.setMessage\(i, (key\.isEmpty\(\) \? Component\.empty\(\) : Component\.translatable\(key\))\); => lines.add($1);
+@in(/TowerRefit\.java) entity\.setText\(text, true\); => entity.setText(new SignText(lines, lines, sign.colour(), true), net.minecraft.world.level.block.entity.SignTextSlot.FRONT);
+\bnew ServerBossEvent\( => new ServerBossEvent(java.util.UUID.randomUUID(), 
+\bIntProvider\.codec\( => net.minecraft.util.valueproviders.IntProviders.codec(
+\.isValidBonemealTarget\(([^()]*)\) => .isValidBonemealTarget($1, net.minecraft.world.level.block.BonemealSource.INTERACTION)
+\.performBonemeal\(((?:[^()]|\([^()]*\))*)\) => .performBonemeal($1, net.minecraft.world.level.block.BonemealSource.INTERACTION)
+\.placeItemBackInInventory\(((?:[^()]|\((?:[^()]|\([^()]*\))*\))*)\) => .placeItemBackInInventory($1, net.minecraft.util.Prediction.SERVER_ONLY)
+\bfor \(ItemStack (\w+) : (bundle)\.items\(\)\) => for (ItemStack $1 : $2.itemCopies().toList())
+\bfor \(ItemStack (\w+) : (container)\.nonEmptyItems\(\)\) => for (ItemStack $1 : $2.nonEmptyItemCopyStream().toList())
+\bnew BundleContents\((\w+)\) => new BundleContents($1.stream().map(net.minecraft.world.item.ItemStackTemplate::fromNonEmptyStack).toList())
+@in(/BuildRules\.java) \bShulkerBoxBlock\.getBlockByColor\(shulker\.getColor\(\)\) => shulker.getBlockState().getBlock()
+\bDyeItem\.byColor\((\w+)\) => (net.minecraft.world.item.DyeItem) net.minecraft.world.item.Items.DYE.pick($1)
+(WOLF_SOUNDS\.get\([^;]*?SoundSet\.\w+\))\.(\w+Sound)\(\) => $1.adultSounds().$2()
+\bEntityType\.byString\( => com.kolodkingal.enhanced.compat.Particles.entityType(
+\b(level|serverLevel|overworld\(\))\.setWeatherParameters\( => $1.getServer().setWeatherParameters(
+\b(level|ArenaLoans\.this\.level|this\.level)\.getShade\((\w+), (\w+)\) => ($3 ? $1.cardinalLighting().byFace($2) : 1.0F)
