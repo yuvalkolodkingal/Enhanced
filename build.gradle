@@ -417,7 +417,8 @@ tasks.named('check') { dependsOn portLint }
 // boot.MixinGate applies only on its version.
 // (each copy's own mixins are those of the versions it is built from, then its own: chain)
 def copies = [[project: ':v1_21_4', suffix: 'v1_21_4', chain: ['versions/1.21.4']],
-              [project: ':v1_21_5', suffix: 'v1_21_5', chain: ['versions/1.21.4', 'versions/1.21.5']]]
+              [project: ':v1_21_5', suffix: 'v1_21_5', chain: ['versions/1.21.4', 'versions/1.21.5']],
+              [project: ':v1_21_11', suffix: 'v1_21_11', chain: ['versions/1.21.4', 'versions/1.21.5', 'versions/1.21.11']]]
         .findAll { c -> findProject(c.project) != null }
 def copyMixins = tasks.register('copyMixinConfigs') {
     def source = file('src/main/resources/enhanced.mixins.json')

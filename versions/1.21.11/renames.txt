@@ -1,0 +1,62 @@
+# Renames for 1.21.11, applied after 1.21.4's and 1.21.5's (docs/MULTIVERSION.md)
+
+# ---- classes that moved (made from 1.21.11's own sources: the same name in exactly one new place) ----
+\bnet\.minecraft\.resources\.ResourceLocation\b => net.minecraft.resources.Identifier
+\bnet\.minecraft\.client\.renderer\.entity\.state\.PlayerRenderState\b => net.minecraft.client.renderer.entity.state.AvatarRenderState
+\bnet\.minecraft\.client\.renderer\.RenderType\b => net.minecraft.client.renderer.rendertype.RenderType
+\bnet\.minecraft\.client\.model\.PlayerModel\b => net.minecraft.client.model.player.PlayerModel
+\bnet\.minecraft\.client\.resources\.PlayerSkin\b => net.minecraft.world.entity.player.PlayerSkin
+\bnet\.minecraft\.world\.level\.GameRules\b => net.minecraft.world.level.gamerules.GameRules
+\bnet\.minecraft\.world\.entity\.projectile\.AbstractArrow\b => net.minecraft.world.entity.projectile.arrow.AbstractArrow
+\bnet\.minecraft\.client\.renderer\.entity\.player\.PlayerRenderer\b => net.minecraft.client.renderer.entity.player.AvatarRenderer
+\bnet\.minecraft\.world\.entity\.animal\.IronGolem\b => net.minecraft.world.entity.animal.golem.IronGolem
+\bnet\.minecraft\.client\.renderer\.FogRenderer\b => net.minecraft.client.renderer.fog.FogRenderer
+\bnet\.minecraft\.world\.entity\.npc\.AbstractVillager\b => net.minecraft.world.entity.npc.villager.AbstractVillager
+\bnet\.minecraft\.world\.entity\.projectile\.ThrownTrident\b => net.minecraft.world.entity.projectile.arrow.ThrownTrident
+\bnet\.minecraft\.world\.entity\.animal\.horse\.Horse\b => net.minecraft.world.entity.animal.equine.Horse
+\bnet\.minecraft\.world\.entity\.animal\.Rabbit\b => net.minecraft.world.entity.animal.rabbit.Rabbit
+\bnet\.minecraft\.world\.entity\.projectile\.ThrownEnderpearl\b => net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl
+\bnet\.minecraft\.world\.entity\.projectile\.AbstractHurtingProjectile\b => net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile
+\bnet\.minecraft\.world\.entity\.decoration\.Painting\b => net.minecraft.world.entity.decoration.painting.Painting
+\bnet\.minecraft\.world\.entity\.monster\.Husk\b => net.minecraft.world.entity.monster.zombie.Husk
+\bnet\.minecraft\.world\.entity\.animal\.AbstractGolem\b => net.minecraft.world.entity.animal.golem.AbstractGolem
+\bnet\.minecraft\.world\.entity\.animal\.WaterAnimal\b => net.minecraft.world.entity.animal.fish.WaterAnimal
+\bnet\.minecraft\.world\.entity\.vehicle\.AbstractMinecart\b => net.minecraft.world.entity.vehicle.minecart.AbstractMinecart
+\bnet\.minecraft\.world\.entity\.projectile\.ThrowableItemProjectile\b => net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile
+\bnet\.minecraft\.client\.model\.PlayerCapeModel\b => net.minecraft.client.model.player.PlayerCapeModel
+\bnet\.minecraft\.world\.entity\.npc\.Villager\b => net.minecraft.world.entity.npc.villager.Villager
+\bnet\.minecraft\.world\.entity\.animal\.horse\.AbstractHorse\b => net.minecraft.world.entity.animal.equine.AbstractHorse
+\bnet\.minecraft\.world\.entity\.monster\.Pillager\b => net.minecraft.world.entity.monster.illager.Pillager
+\bnet\.minecraft\.world\.entity\.vehicle\.Boat\b => net.minecraft.world.entity.vehicle.boat.Boat
+\bnet\.minecraft\.world\.entity\.decoration\.PaintingVariant\b => net.minecraft.world.entity.decoration.painting.PaintingVariant
+\bnet\.minecraft\.world\.entity\.boss\.EnderDragonPart\b => net.minecraft.world.entity.boss.enderdragon.EnderDragonPart
+\bnet\.minecraft\.world\.entity\.vehicle\.MinecartCommandBlock\b => net.minecraft.world.entity.vehicle.minecart.MinecartCommandBlock
+\bnet\.minecraft\.world\.entity\.monster\.ZombieVillager\b => net.minecraft.world.entity.monster.zombie.ZombieVillager
+
+# ---- classes renamed ----
+\bResourceLocation\b => Identifier
+\bPlayerRenderState\b => AvatarRenderState
+\bPlayerRenderer\b => AvatarRenderer
+
+# ---- the server player: its level is a ServerLevel, its server through the level ----
+\.serverLevel\(\) => .level()
+\b(player|p|sp|serverPlayer|target|caster|hero|owner|viewer|other|holder|who|user|attacker|victim|online|host|self|thrower|wanda|spider|thanos|xavier|vision)\.server\b(?!\s*=) => $1.level().getServer()
+\b(player|p|sp|serverPlayer|host|entity|e|mob|owner|caster|hero|target|holder|viewer|living|attacker|victim|self|wanda|spider|thanos)\.getServer\(\) => $1.level().getServer()
+\bnet\.minecraft\.Util\b => net.minecraft.util.Util
+
+# ---- render types: the factories are RenderTypes' ----
+\bnet\.minecraft\.client\.renderer\.rendertype\.RenderType\.([a-z]\w*)\( => net.minecraft.client.renderer.rendertype.RenderTypes.$1(
+(?<![\w.])RenderType\.([a-z]\w*)\( => net.minecraft.client.renderer.rendertype.RenderTypes.$1(
+
+# ---- small renames ----
+\b(camera|cam|getCamera\(\)|getMainCamera\(\))\.getPosition\(\) => $1.position()
+\b(dimension|dim|key|\w+Key|\w+\.dimension\(\)|dimension\(\))\.location\(\) => $1.identifier()
+\b(profile|gp|getGameProfile\(\)|\w+Profile|\w+\.profile\(\))\.getName\(\) => $1.name()
+\b(profile|gp|getGameProfile\(\)|\w+Profile|\w+\.profile\(\))\.getId\(\) => $1.id()
+\.getSkin\(\)\.texture\(\) => .getSkin().body().texturePath()
+\bskinOf\((\w+)\)\.texture\(\) => skinOf($1).body().texturePath()
+\bPlayerSkin\.Model\.(SLIM|WIDE)\b => net.minecraft.world.entity.player.PlayerModelType.$1
+\.getSkin\(\)\.model\(\) => .getSkin().model()
+([\w.]+)\.copyFrom\(([\w.]+)\); => $1.loadPose($2.storePose());
+\b(graphics|g|gui|guiGraphics)\.flush\(\); => // (1.21.6: the GUI draws in one pass at the end of the frame)
+\bhasImpulse\b => needsSync
