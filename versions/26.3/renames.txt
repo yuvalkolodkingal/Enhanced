@@ -564,3 +564,16 @@ protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float
 \b(mc|minecraft)\.options\.hideGui = ([^;]+); => if (($2) != $1.gui.hud.isHidden()) { $1.gui.hud.toggle(); }
 \bnew net\.minecraft\.world\.level\.ChunkPos\((\w+)\) => net.minecraft.world.level.ChunkPos.containing($1)
 \blevel\.setDayTime\((\w+)\); => level.clockManager().setTotalTicks(level.registryAccess().getOrThrow(net.minecraft.world.clock.WorldClocks.OVERWORLD), $1);
+
+# ---- the mixins' descriptors and targets ----
+\bLnet/minecraft/client/renderer/state/(CameraRenderState|QuadParticleRenderState|LevelRenderState|SkyRenderState|WeatherRenderState); => Lnet/minecraft/client/renderer/state/level/$1;
+@in(/LivingEntityRendererMixin\.java) Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer\$CrumblingOverlay;\)V => Lnet/minecraft/client/renderer/texture/UvMapping;I)V
+@in(/GuiAccessor\.java) \bimport net\.minecraft\.client\.gui\.Gui; => import net.minecraft.client.gui.Hud;
+@in(/GuiAccessor\.java) @Mixin\(Gui\.class\) => @Mixin(Hud.class)
+\(GuiAccessor\) (\w+)\.gui\) => (GuiAccessor) $1.gui.hud)
+# (26.3 makes the block entity renderers before the items have their components: the rack's stack is made when drawn)
+@in(/LabRenderers\.java) private final ItemStack injection = new ItemStack\(ModItems\.ADAMANTIUM_INJECTION\.get\(\)\); => private ItemStack injection = ItemStack.EMPTY;
+@in(/LabRenderers\.java) ItemDraw\.renderStatic\(injection, => ItemDraw.renderStatic(injection.isEmpty() ? (injection = new ItemStack(ModItems.ADAMANTIUM_INJECTION.get())) : injection,
+# (26.3: an entity has an id only once it is in a level: compat.ClientIds for the ones made for drawing)
+@in(/PreviewPuppet\.java) (super\(level, profile\);) => $1\n        setId(com.kolodkingal.enhanced.compat.ClientIds.next());
+@in(/Shapeshifts\.java) (Entity created = form\.type\(\)\.create\([^;]*\);) => $1\n        if (created != null) {\n            created.setId(com.kolodkingal.enhanced.compat.ClientIds.next());\n        }

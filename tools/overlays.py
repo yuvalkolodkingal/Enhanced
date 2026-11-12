@@ -542,9 +542,70 @@ def data_26(obj, rel):
     return obj
 
 
+def face_uv_26(face, lo, hi):
+    """Vanilla's default uv of a face of an element from lo to hi (FaceBakery), kept inside the texture."""
+    x0, y0, z0 = lo
+    x1, y1, z1 = hi
+    uv = {"north": [16 - x1, 16 - y1, 16 - x0, 16 - y0], "south": [x0, 16 - y1, x1, 16 - y0],
+          "east": [16 - z1, 16 - y1, 16 - z0, 16 - y0], "west": [z0, 16 - y1, z1, 16 - y0],
+          "up": [x0, z0, x1, z1], "down": [x0, 16 - z1, x1, 16 - z0]}[face]
+    return [min(16, max(0, v)) for v in uv]
+
+
+def model_26(obj):
+    """A model as 26.3 bakes it: 26.3 refuses a face whose (default) uv leaves its texture, which an element that
+    reaches out of its block gives (the brazier's flames): such faces get their uv, kept inside."""
+    changed = False
+    for e in obj.get("elements", []) if isinstance(obj, dict) else []:
+        lo, hi = e.get("from"), e.get("to")
+        if not lo or not hi or all(0 <= v <= 16 for v in lo + hi):
+            continue
+        for name, face in e.get("faces", {}).items():
+            if "uv" not in face:
+                face["uv"] = face_uv_26(name, lo, hi)
+                changed = True
+    return changed
+
+
+def egg_26(path, base, spots):
+    """A spawn egg's picture (26.3 has no template egg to tint): the egg in its two colours."""
+    from PIL import Image
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    b = ((base >> 16) & 255, (base >> 8) & 255, base & 255, 255)
+    s = ((spots >> 16) & 255, (spots >> 8) & 255, spots & 255, 255)
+    dark = tuple(int(c * 0.6) for c in b[:3]) + (255,)
+    for y in range(2, 15):
+        for x in range(3, 13):
+            dx, dy = (x - 7.5) / 4.6, (y - 8.7 + (0.6 if y < 8 else 0)) / 6.2
+            if dx * dx + dy * dy <= 1.0:
+                edge = dx * dx + dy * dy > 0.72
+                img.putpixel((x, y), dark if edge else b)
+    for x, y in ((6, 5), (9, 7), (5, 9), (8, 10), (10, 11), (7, 12)):
+        img.putpixel((x, y), s)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    img.save(path)
+
+
 def main_26():
     for d in (DATA_26, ASSETS_26):
         shutil.rmtree(os.path.join(RES, d), ignore_errors=True)
+    assets = os.path.join(RES, ASSETS_26, "assets", NS)
+    for base, _, files in os.walk(os.path.join(RES, "assets", NS, "models")):
+        for name in files:
+            if not name.endswith(".json"):
+                continue
+            rel = os.path.relpath(os.path.join(base, name), RES)
+            path = next(p for p in (os.path.join(RES, ASSETS_11, rel), os.path.join(RES, ASSETS_4, rel),
+                                    os.path.join(RES, rel)) if os.path.exists(p))
+            obj = json.load(open(path, encoding="utf-8"))
+            if model_26(obj):
+                write(os.path.join(RES, ASSETS_26, rel), obj)
+    for item, colours in sorted(eggs().items()):
+        egg_26(os.path.join(assets, "textures", "item", item + ".png"), colours[0], colours[1])
+        write(os.path.join(assets, "models", "item", item + ".json"),
+              {"parent": "minecraft:item/generated", "textures": {"layer0": NS + ":item/" + item}})
+        write(os.path.join(assets, "items", item + ".json"),
+              {"model": {"type": "minecraft:model", "model": NS + ":item/" + item}})
     # every data file as 1.21.11 sees it (its overlays over 1.21.4's over the 1.21.1 file) that changed again
     for base, _, files in os.walk(os.path.join(RES, "data")):
         for name in files:
