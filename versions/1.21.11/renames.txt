@@ -269,3 +269,6 @@ Stacks\.parse\(player\.registryAccess\(\), entry\.getCompoundOrEmpty\("Item"\)\.
 GameProfileArgument\.getGameProfiles\(ctx, "player"\)\.stream\(\) => GameProfileArgument.getGameProfiles(ctx, "player").stream().map(n -> new GameProfile(n.id(), n.name()))
 GameProfileArgument\.getGameProfiles\(ctx, "player"\)\) => GameProfileArgument.getGameProfiles(ctx, "player").stream().map(n -> new GameProfile(n.id(), n.name())).toList())
 \bcase MAINHAND, OFFHAND -> => case MAINHAND, OFFHAND, SADDLE ->
+\.enhanced\$getChunks\(\) => .enhanced\$chunkMap().values()
+\.enhanced\$getEquipmentDropChance\((\w+)\) => .enhanced\$dropChances().byEquipment($1)
+(enhanced\$renderPlayerArm\(ps, |enhanced\$renderArmWithItem\([^;]*?ps,\s*)event\.getMultiBufferSource\(\) => $1com.kolodkingal.enhanced.compat.ItemDraw.collector(event.getMultiBufferSource())

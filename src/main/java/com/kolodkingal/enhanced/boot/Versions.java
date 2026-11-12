@@ -23,7 +23,8 @@ public final class Versions {
      */
     static final List<Copy> COPIES = List.of(
             new Copy(List.of("1.21.1"), "com.kolodkingal.enhanced"),
-            new Copy(List.of("1.21.4"), "com.kolodkingal.enhanced.v1_21_4"));
+            new Copy(List.of("1.21.4"), "com.kolodkingal.enhanced.v1_21_4"),
+            new Copy(List.of("1.21.11"), "com.kolodkingal.enhanced.v1_21_11"));
 
     private static String running;
 
@@ -39,10 +40,17 @@ public final class Versions {
     }
 
     private static String read() {
-        // FML knows it first: FMLLoader.versionInfo().mcVersion() (reflection: not every FML has it)
+        // FML knows it first: FMLLoader.versionInfo().mcVersion() (FML 4), FMLLoader.getCurrent().getVersionInfo()
+        // .mcVersion() (FML 10); reflection: not every FML has either
         try {
             Class<?> loader = Class.forName("net.neoforged.fml.loading.FMLLoader");
-            Object info = loader.getMethod("versionInfo").invoke(null);
+            Object info;
+            try {
+                info = loader.getMethod("versionInfo").invoke(null);
+            } catch (NoSuchMethodException e) {
+                Object current = loader.getMethod("getCurrent").invoke(null);
+                info = current.getClass().getMethod("getVersionInfo").invoke(current);
+            }
             Object mc = info.getClass().getMethod("mcVersion").invoke(info);
             if (mc instanceof String s && !s.isEmpty()) {
                 return s;
@@ -68,17 +76,25 @@ public final class Versions {
     public static String packageForRunning() {
         String mc = minecraft();
         for (Copy copy : COPIES) {
-            if (copy.minecraft().contains(mc)) {
+            if (copy.minecraft().contains(mc) && present(copy)) {
                 return copy.pkg();
             }
         }
         return null;
     }
 
+    /** Whether the jar holds this copy (a build may leave out a copy that is still being ported). */
+    private static boolean present(Copy copy) {
+        return Versions.class.getClassLoader().getResource(copy.pkg().replace('.', '/') + "/Enhanced.class") != null;
+    }
+
     /** The versions this jar supports, for the message when the running one is not among them. */
     public static String supported() {
         StringBuilder out = new StringBuilder();
         for (Copy copy : COPIES) {
+            if (!present(copy)) {
+                continue;
+            }
             for (String mc : copy.minecraft()) {
                 out.append(out.isEmpty() ? "" : ", ").append(mc);
             }

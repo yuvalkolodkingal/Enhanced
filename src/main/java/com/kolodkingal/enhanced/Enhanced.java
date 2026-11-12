@@ -49,6 +49,9 @@ public class Enhanced {
         NeoRegistrars.register(ModItems.ITEMS, modBus);
         NeoRegistrars.register(ModEffects.EFFECTS, modBus);
         NeoRegistrars.register(ModEntities.ENTITIES, modBus);
+        //#if >=1.21.5
+        //$$ NeoRegistrars.register(ModEntities.SERIALIZERS, modBus);
+        //#endif
         ModAttachments.init();
         NeoRegistrars.register(ModParticles.PARTICLES, modBus);
         NeoRegistrars.register(ModSounds.SOUNDS, modBus);

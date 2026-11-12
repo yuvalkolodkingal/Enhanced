@@ -1,0 +1,34 @@
+{
+  "has_precipitation": false,
+  "temperature": 0.8,
+  "downfall": 0.0,
+  "effects": {
+    "water_color": "#3f76e4",
+    "grass_color": "#7fbf4f",
+    "foliage_color": "#9bcb3c"
+  },
+  "spawners": {},
+  "spawn_costs": {},
+  "carvers": [],
+  "features": [],
+  "attributes": {
+    "minecraft:visual/fog_color": "#d8c9a0",
+    "minecraft:visual/sky_color": "#9ec4f0",
+    "minecraft:visual/water_fog_color": "#1e3a6e",
+    "minecraft:audio/background_music": {
+      "default": {
+        "sound": "enhanced:music.asgard",
+        "min_delay": 1200,
+        "max_delay": 3600,
+        "replace_current_music": false
+      }
+    },
+    "minecraft:audio/ambient_sounds": {
+      "loop": "enhanced:ambient.asgard.loop",
+      "additions": {
+        "sound": "enhanced:ambient.asgard.additions",
+        "tick_chance": 0.008
+      }
+    }
+  }
+}

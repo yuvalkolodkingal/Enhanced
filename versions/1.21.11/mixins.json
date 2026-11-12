@@ -1,5 +1,8 @@
 {
   "mixins": [],
-  "client": ["client.ClientAvatarStateAccessor"],
+  "client": [
+    "client.ClientAvatarStateAccessor",
+    "client.QuadParticleGroupMixin"
+  ],
   "remove": []
 }

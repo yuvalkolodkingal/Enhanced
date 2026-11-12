@@ -1,0 +1,61 @@
+{
+  "targets": {
+    "swap": {}
+  },
+  "passes": [
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "minecraft:main"
+        }
+      ],
+      "output": "swap",
+      "fragment_shader": "enhanced:post/slow_motion",
+      "uniforms": {
+        "SlowMotionConfig": [
+          {
+            "name": "Saturation",
+            "type": "float",
+            "value": 0.35
+          },
+          {
+            "name": "ColorScale",
+            "type": "vec3",
+            "value": [
+              0.9,
+              0.98,
+              1.15
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "swap"
+        }
+      ],
+      "output": "minecraft:main",
+      "fragment_shader": "minecraft:post/blit",
+      "uniforms": {
+        "BlitConfig": [
+          {
+            "name": "ColorModulate",
+            "type": "vec4",
+            "value": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

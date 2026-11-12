@@ -14,6 +14,42 @@
           "max_inclusive": 46
         },
         "directory": "overlay_1_21_4_assets"
+      },
+      {
+        "formats": {
+          "min_inclusive": 94,
+          "max_inclusive": 94
+        },
+        "min_format": 94,
+        "max_format": 94,
+        "directory": "overlay_1_21_4_data"
+      },
+      {
+        "formats": {
+          "min_inclusive": 94,
+          "max_inclusive": 94
+        },
+        "min_format": 94,
+        "max_format": 94,
+        "directory": "overlay_1_21_11_data"
+      },
+      {
+        "formats": {
+          "min_inclusive": 75,
+          "max_inclusive": 75
+        },
+        "min_format": 75,
+        "max_format": 75,
+        "directory": "overlay_1_21_4_assets"
+      },
+      {
+        "formats": {
+          "min_inclusive": 75,
+          "max_inclusive": 75
+        },
+        "min_format": 75,
+        "max_format": 75,
+        "directory": "overlay_1_21_11_assets"
       }
     ]
   }
