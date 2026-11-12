@@ -1,0 +1,54 @@
+// Enhanced's copy for Minecraft 26.3: the shared sources (../../src/main/java) through Preprocess, compiled
+// against NeoForge 26.3. The root project puts its classes into the one jar (docs/MULTIVERSION.md).
+// 26.x runs on Java 25, so this copy is compiled by a Java 25 toolchain; its classes are written as Java 21 classes
+// (the release option below) so that the one jar still loads on 1.21.x, where FML scans every class of the jar.
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+def mc = '26.3'
+def copySuffix = 'v26_3'
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+// (the release option would make Gradle look for Java 21 libraries; Minecraft 26.3's are Java 25)
+java.disableAutoTargetJvm()
+
+def preprocess = tasks.register('preprocess', Preprocess) {
+    source = rootProject.file('src/main/java')
+    target = layout.buildDirectory.dir('preprocessed/java')
+    overlays.from(file('../1.21.4/src/main/java'), file('../1.21.5/src/main/java'), file('../1.21.11/src/main/java'),
+            file('src/main/java'))
+    renames.from(file('../1.21.4/renames.txt'), file('../1.21.5/renames.txt'), file('../1.21.11/renames.txt'),
+            file('renames.txt'))
+    minecraft = mc
+    suffix = copySuffix
+    basePackage = 'com.kolodkingal.enhanced'
+}
+sourceSets.main.java.srcDirs = [preprocess.map { it.target }]
+
+neoForge {
+    version = '26.3.0.102'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // the @Subscribe registration index, as for 1.21.1 (the root's processor; listener order from docs/port)
+    annotationProcessor files(rootProject.layout.buildDirectory.dir('classes/java/processor'),
+            rootProject.layout.buildDirectory.dir('resources/processor'))
+    implementation 'javazoom:jlayer:1.0.1'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+    // (javac in its own process: thousands of errors while porting do not fit in the daemon's heap)
+    options.fork = true
+    options.forkOptions.memoryMaximumSize = '4g'
+    options.compilerArgs.addAll(['-Xmaxerrs', '100000',
+            "-Aenhanced.listenerOrder=${rootProject.file('docs/port/listener-order.txt').absolutePath}".toString(),
+            '-Aenhanced.basePackage=com.kolodkingal.enhanced.v26_3'])
+    dependsOn(':processorClasses')
+}
