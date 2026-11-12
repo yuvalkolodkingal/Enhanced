@@ -539,7 +539,6 @@ protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float
 \.getChat\(\)\.addMessage\( => .getChat().addClientSystemMessage(
 \bstack\.getRarity\(\)\.color\(\)\.getColor\(\) => net.minecraft.network.chat.TextColor.fromLegacyFormat(stack.getRarity().color()).getValue()
 (class \w+ implements VertexConsumer(?:, [\w.]+)? \{|record \w+\([^)]*\) implements VertexConsumer \{) => $1\n    @Override\n    public VertexConsumer setUv3(float u, float v) {\n        return this;\n    }\n
-@in(/SavedBridge\.java) new SavedDataType<>\(id, => new SavedDataType<>(net.minecraft.resources.Identifier.fromNamespaceAndPath("enhanced", id),
 @in(/GuiEntity\.java) \bg\.submitEntityRenderState\( => g.entity(
 @in(/ItemDraw\.java) Minecraft\.getInstance\(\)\.gameRenderer\.getSubmitNodeStorage\(\) => null
 @in(/RenderBridge\.java) Minecraft\.getInstance\(\)\.gameRenderer\.getLevelRenderState\(\) => Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState
