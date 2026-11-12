@@ -595,6 +595,7 @@ event net.neoforged.neoforge.client.event.ClientTickEvent$Post -> com.kolodkinga
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onClientTick
     NORMAL - com.kolodkingal.enhanced.client.RoadMusicPlayer#onClientTick
     NORMAL - com.kolodkingal.enhanced.client.dev.MindTour#onTick
+    NORMAL - com.kolodkingal.enhanced.client.dev.FlickerProbe#onTick
     NORMAL - com.kolodkingal.enhanced.client.nano.NanoMusic#onClientTick
 event net.neoforged.neoforge.client.event.ComputeFovModifierEvent -> com.kolodkingal.enhanced.platform.event.client.ComputeFovModifierEvent
     NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView#onComputeFov

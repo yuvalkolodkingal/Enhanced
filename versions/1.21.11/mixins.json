@@ -5,7 +5,8 @@
   "client": [
     "client.ClientAvatarStateAccessor",
     "client.EntityRenderDispatcherMixin",
-    "client.QuadParticleGroupMixin"
+    "client.QuadParticleGroupMixin",
+    "client.HumanoidModelMixin"
   ],
   "remove": []
 }

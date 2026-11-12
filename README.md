@@ -71,6 +71,14 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Install it on** the client, plus the server for multiplayer
 * **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
 
+## What's new in 3.14.1
+
+* **Flight no longer drops to the standing pose.** A flying hero seen in third person (F5) who came out of water or out
+  of a gap too low to stand in was drawn upright for a moment, then eased back into the flight. The flight's pose now
+  takes over at once.
+* On Minecraft 1.21.11 and 26.3, armour and hero gear (Magneto's helmet, Wanda's crown) follow the hero's pose again
+  instead of standing upright on a flying body.
+
 ## What's new in 3.14.0
 
 * **Minecraft 26.3 in the same jar**, beside 1.21.1, 1.21.4 and 1.21.11 (NeoForge 26.3.0.102 or newer; Minecraft 26.3

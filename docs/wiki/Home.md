@@ -51,6 +51,12 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.14.1
+
+* **Flight no longer drops to the standing pose.** A flying hero seen in third person (F5) who flew out of water, or out of a gap too low to stand in, was drawn upright for a moment and then eased back into the flight, so the flight flashed between standing and flying. The flight's pose now takes over at once.
+* On Minecraft 1.21.11 and 26.3, the armour a hero wears and the hero gear drawn as armour (Magneto's helmet, Wanda's crown) follow the hero's pose again, as on 1.21.1 and 1.21.4: they no longer stand upright on a flying body. (1.21.9 changed how armour is posed.)
+* For testing: `-Denhanced.flickerprobe=true` measures the flight in F5 and writes to the log every frame the hero's pose was not drawn and why (off unless asked for).
+
 ## What's new in 3.14.0
 
 * **Minecraft 26.3 in the same jar.** The same `enhanced-3.14.0.jar` now also runs on NeoForge 26.3 (Minecraft 26.3), beside 1.21.1, 1.21.4 and 1.21.11: the game picks the right copy of the mod by itself. Every hero, creature, block, screen and realm is there.

@@ -217,6 +217,9 @@ needs them next to 1.21.11). The jar now holds three copies: 1.21.1 (as written)
   on top of it; `compat.ItemDraw` draws items, `compat.RenderBridge` entities. Render types are made with
   `RenderSetup` (`EnhancedRenderTypes`, `SandRenderTypes`). The few places that drew with GL state (the skies, Build
   Magic's ghost, Sokovia) go through `compat.Gl`, which makes a render pipeline per state.
+  (3.14.1) A submitted model is posed when it is drawn, from the render state: the armour layer no longer copies the
+  player model's pose (`copyPropertiesTo`), so `compat.ArmourPose` and `HumanoidModelMixin` put the hero's pose of the
+  frame (kept by `HeroPoses`) on the armour models.
 * **The GUI (1.21.6).** Screens and HUD layers draw in 2D (`compat.GuiPose`, `GuiStack`, `GuiTint`, `GuiQuads` for
   the mod's own geometry, `GuiEntity` for the models in screens), HUD layers are NeoForge `GuiLayer`s
   (`compat.LayeredDraw`), key input comes as events, and text colours without alpha are drawn opaque as on 1.21.1

@@ -29,6 +29,9 @@ public final class BodyLean {
      */
     public static void apply(AbstractClientPlayer player, PoseStack poseStack, float yBodyRot, float partialTick) {
         HeroAnimState state = HeroAnimator.frame(player, yBodyRot, partialTick);
+        if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+            com.kolodkingal.enhanced.client.dev.FlickerProbe.lean(player, partialTick, state);
+        }
         if (state != null && state.wVanilla <= 0.0F) {
             HeroAnimator.applyBody(poseStack, state, player);
         }

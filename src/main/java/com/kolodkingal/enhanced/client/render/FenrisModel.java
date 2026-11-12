@@ -82,7 +82,7 @@ public class FenrisModel extends HierarchicalModel<FenrisEntity> {
     @Override
     public void setupAnim(FenrisEntity wolf, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         root().getAllParts().forEach(ModelPart::resetPose);
-        float partial = ageInTicks - wolf.tickCount;
+        float partial = Math.min(ageInTicks - wolf.tickCount, 0.999F); // (the float sum can round to a whole tick)
         float swing = Math.min(1.0F, limbSwingAmount * 1.2F);
         float lope = limbSwing * 0.55F;
         // The lope: the legs in pairs, the shins following, the body rocking a little.

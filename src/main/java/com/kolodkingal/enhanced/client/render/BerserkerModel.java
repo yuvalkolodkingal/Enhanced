@@ -45,7 +45,7 @@ public class BerserkerModel extends PlayerModel<BerserkerEntity> {
     @Override
     public void setupAnim(BerserkerEntity berserker, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         super.setupAnim(berserker, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        float partial = ageInTicks - berserker.tickCount;
+        float partial = Math.min(ageInTicks - berserker.tickCount, 0.999F); // (the float sum can round to a whole tick)
         float risen = berserker.risen(berserker.level().getGameTime() + partial);
         boolean striking = attackTime > 0.0F;
         if (!striking) {

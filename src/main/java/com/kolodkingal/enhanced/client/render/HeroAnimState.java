@@ -63,6 +63,13 @@ public final class HeroAnimState {
      * false for the inventory's preview of the player, which the layers must draw as vanilla does: no whirl, no tracked points.
      */
     public boolean posed;
+    /**
+     * The pose last drawn (3.14.1): head, hat, body, arms and legs (pivot and rotations of each), and the model age it was
+     * made for (NaN: the body was left to vanilla). From 1.21.9 the armour layer's models are posed when they are drawn,
+     * from the render state, not copied from the player's model; {@link HeroPoses#dress} puts this pose on them.
+     */
+    public final float[] drawnPose = new float[42];
+    public float drawnAge = Float.NaN;
 
     // ---- the custom hero's animation identity (3.4; L5 fills and reads these) ----
     /** The custom hero's definition last seen (identity), to reseed when it changes; null for a built-in hero. */

@@ -199,7 +199,7 @@ public class ApocalypseModel extends EntityModel<ApocalypseEntity> {
 
     @Override
     public void setupAnim(ApocalypseEntity boss, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        float partial = ageInTicks - boss.tickCount;
+        float partial = Math.min(ageInTicks - boss.tickCount, 0.999F); // (the float sum can round to a whole tick)
         ApocalypseState state = boss.state();
         float time = boss.stateTime(partial);
         Pose pose = ApocalypseBossPoses.poseFor(state);

@@ -55,7 +55,7 @@ public class HelaModel extends PlayerModel<HelaEntity> {
     @Override
     public void setupAnim(HelaEntity hela, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         super.setupAnim(hela, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        float partial = ageInTicks - hela.tickCount;
+        float partial = Math.min(ageInTicks - hela.tickCount, 0.999F); // (the float sum can round to a whole tick)
         HelaState state = hela.state();
         float time = hela.stateTime(partial);
         float[] p = HelaBossPoses.at(state, time);

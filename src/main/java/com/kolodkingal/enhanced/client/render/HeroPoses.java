@@ -66,6 +66,7 @@ public final class HeroPoses {
         HeroAnimState st = HeroAnimator.peek(player);
         if (st != null) {
             st.posed = false;
+            st.drawnAge = Float.NaN;
         }
         float pt = ageInTicks - player.tickCount;
         if (st != null && st.preview == null && ageInTicks == st.frameAge) {
@@ -81,6 +82,11 @@ public final class HeroPoses {
             previewWalk(model, player, limbSwing, limbSwingAmount, pt);
         }
         if (st == null || pt >= 1.0F || st.wVanilla > 0.0F || Math.abs(st.time - ageInTicks) > 1.5 || !EnhancedClientConfig.animations()) {
+            if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+                com.kolodkingal.enhanced.client.dev.FlickerProbe.pose(player, ageInTicks, st == null ? "no state" : pt >= 1.0F ? "pt>=1 (" + pt + ", frameAge " + st.frameAge + ")"
+                        : st.wVanilla > 0.0F ? "wVanilla" : Math.abs(st.time - ageInTicks) > 1.5 ? "time gap " + (st.time - ageInTicks)
+                        : "animations off", model.body.xRot, model.rightArm.xRot, model.leftArm.xRot, model.rightLeg.xRot, model.leftLeg.xRot);
+            }
             return;
         }
         st.posed = true;
@@ -112,6 +118,85 @@ public final class HeroPoses {
         // ---- 6. the swing, the shoulders, the overlay parts ----
         putBackSwing(c, vanillaTwist);
         RunPoses.sync(model);
+        remember(st, model, ageInTicks);
+        if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+            com.kolodkingal.enhanced.client.dev.FlickerProbe.pose(player, ageInTicks, "posed", model.body.xRot, model.rightArm.xRot, model.leftArm.xRot, model.rightLeg.xRot,
+                    model.leftLeg.xRot);
+        }
+    }
+
+    /** Keeps the pose just made, for the models that wear it (see {@link #dress}). */
+    private static void remember(HeroAnimState st, PlayerModel<?> model, float ageInTicks) {
+        float[] p = st.drawnPose;
+        put(p, 0, model.head);
+        put(p, 6, model.hat);
+        put(p, 12, model.body);
+        put(p, 18, model.rightArm);
+        put(p, 24, model.leftArm);
+        put(p, 30, model.rightLeg);
+        put(p, 36, model.leftLeg);
+        st.drawnAge = ageInTicks;
+    }
+
+    private static void put(float[] p, int i, ModelPart part) {
+        p[i] = part.x;
+        p[i + 1] = part.y;
+        p[i + 2] = part.z;
+        p[i + 3] = part.xRot;
+        p[i + 4] = part.yRot;
+        p[i + 5] = part.zRot;
+    }
+
+    private static void take(float[] p, int i, ModelPart part) {
+        part.x = p[i];
+        part.y = p[i + 1];
+        part.z = p[i + 2];
+        part.xRot = p[i + 3];
+        part.yRot = p[i + 4];
+        part.zRot = p[i + 5];
+    }
+
+    /**
+     * Puts this player's hero pose of the frame (the model age {@code ageInTicks}) on a model he wears, as vanilla's
+     * {@code copyPropertiesTo} did for the armour up to 1.21.8: from 1.21.9 the armour is posed by vanilla when it is drawn,
+     * so a flying hero's armour stood upright on his flying body. Returns whether it did (false: no pose of this frame).
+     */
+    public static boolean dress(net.minecraft.client.model.HumanoidModel<?> model, Player player, float ageInTicks) {
+        HeroAnimState st = HeroAnimator.peek(player);
+        if (st == null || st.drawnAge != ageInTicks) {
+            return false;
+        }
+        float[] p = st.drawnPose;
+        take(p, 0, model.head);
+        take(p, 6, model.hat);
+        take(p, 12, model.body);
+        take(p, 18, model.rightArm);
+        take(p, 24, model.leftArm);
+        take(p, 30, model.rightLeg);
+        take(p, 36, model.leftLeg);
+        return true;
+    }
+
+    /** Whether a model already wears this player's hero pose of the frame (for the flicker probe). */
+    public static boolean wears(net.minecraft.client.model.HumanoidModel<?> model, Player player, float ageInTicks) {
+        HeroAnimState st = HeroAnimator.peek(player);
+        if (st == null || st.drawnAge != ageInTicks) {
+            return true;
+        }
+        float[] now = new float[42];
+        put(now, 0, model.head);
+        put(now, 6, model.hat);
+        put(now, 12, model.body);
+        put(now, 18, model.rightArm);
+        put(now, 24, model.leftArm);
+        put(now, 30, model.rightLeg);
+        put(now, 36, model.leftLeg);
+        for (int i = 0; i < now.length; i++) {
+            if (Math.abs(now[i] - st.drawnPose[i]) > 1.0E-3F) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // ---------------------------------------------------------------------------------------------------------------

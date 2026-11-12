@@ -11,16 +11,25 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** 1.21.11: a hero's suit hides the armour he wears (the layer submits from 1.21.9; the same two hooks). */
+/**
+ * 1.21.11: a hero's suit hides the armour he wears (the layer submits from 1.21.9; the same two hooks). 3.14.1: the
+ * armour's models are marked, so that they wear the hero's pose when they are drawn (HumanoidModelMixin).
+ */
 @Mixin(HumanoidArmorLayer.class)
 public abstract class HumanoidArmorLayerMixin {
     @Unique
     private LivingEntity enhanced$wearer;
+
+    @Shadow
+    private net.minecraft.client.model.HumanoidModel<?> getArmorModel(HumanoidRenderState state, EquipmentSlot slot) {
+        throw new AssertionError();
+    }
 
     @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;FF)V",
             at = @At("HEAD"))
@@ -34,6 +43,8 @@ public abstract class HumanoidArmorLayerMixin {
                                          EquipmentSlot slot, int light, HumanoidRenderState state, CallbackInfo ci) {
         if (enhanced$wearer != null && HeroArmour.hidden(enhanced$wearer, slot)) {
             ci.cancel();
+            return;
         }
+        com.kolodkingal.enhanced.compat.ArmourPose.mark(getArmorModel(state, slot));
     }
 }

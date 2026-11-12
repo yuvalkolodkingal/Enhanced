@@ -442,6 +442,9 @@ public final class HeroAnimator {
         }
         // The inventory preview draws the player with a partial tick of 1 and its own made-up turn.
         if (s == null || pt >= 1.0F || !EnhancedClientConfig.animations()) {
+            if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+                com.kolodkingal.enhanced.client.dev.FlickerProbe.anim(player, s == null ? "no state" : pt >= 1.0F ? "pt>=1 (" + pt + ")" : "animations off");
+            }
             return null;
         }
         if (s.preview == null) {
@@ -453,11 +456,17 @@ public final class HeroAnimator {
             // A frozen frame: keep every weight and spring, but stay current.
             s.time = time;
             s.bodyYaw = yBodyRot;
+            if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+                com.kolodkingal.enhanced.client.dev.FlickerProbe.anim(player, "frozen");
+            }
             return s;
         }
         boolean first = s.fresh || time < s.time - 1.5;
         float dt = first ? 0.0F : (float) Mth.clamp(time - s.time, 0.0, 4.0);
         if (!first && dt <= 0.0F) {
+            if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+                com.kolodkingal.enhanced.client.dev.FlickerProbe.anim(player, "dt<=0 (time " + time + ", last " + s.time + ", wVanilla " + s.wVanilla + ")");
+            }
             return s;
         }
         s.time = time;
@@ -467,7 +476,12 @@ public final class HeroAnimator {
         PowerData data = Powers.get(player);
         FlightProfile profile = FlightProfile.of(s);
 
-        if (vanillaOwnsBody(player, pt)) {
+        // (3.14.1: whether vanilla had the body until now: the hero's pose then starts where it is, see below)
+        boolean fromVanilla = s.wVanilla > 0.0F;
+        if (vanillaOwnsBody(player, pt, s)) {
+            if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+                com.kolodkingal.enhanced.client.dev.FlickerProbe.anim(player, "vanilla owns the body: " + vanillaClause(player, pt));
+            }
             s.wVanilla = 1.0F;
             s.wAir = 0.0F;
             s.wRun = 0.0F;
@@ -492,7 +506,10 @@ public final class HeroAnimator {
             return s;
         }
         s.wVanilla = 0.0F;
-        boolean snap = first;
+        // 3.14.1: when vanilla hands the body back (a swim, a glide or a ride ended), the weights were all at rest: easing
+        // them in from there drew a hero who rises out of the water in flight standing upright for a moment, then flying.
+        // The hero's pose starts at its targets instead, as on a first frame.
+        boolean snap = first || fromVanilla;
 
         measure(s, player, yBodyRot, dt, profile);
 
@@ -559,6 +576,9 @@ public final class HeroAnimator {
         }
         advanceWhirl(s, dt);
         compose(s);
+        if (com.kolodkingal.enhanced.client.dev.FlickerProbe.ENABLED) {
+            com.kolodkingal.enhanced.client.dev.FlickerProbe.anim(player, first ? "animated (first)" : "animated");
+        }
         return s;
     }
 
@@ -593,10 +613,28 @@ public final class HeroAnimator {
         }
     }
 
-    /** Vanilla already turns the body of a dying, sleeping, gliding, swimming or riding player (and a spectator floats). */
-    private static boolean vanillaOwnsBody(AbstractClientPlayer player, float pt) {
+    /**
+     * Vanilla already turns the body of a dying, sleeping, gliding, swimming or riding player (and a spectator floats). A
+     * hero who flies on out of the water is the hero's again at once (3.14.1): vanilla's swim pose fading out over the
+     * next ticks drew him half-upright, then upright and standing, in the air.
+     */
+    private static boolean vanillaOwnsBody(AbstractClientPlayer player, float pt, HeroAnimState s) {
         return player.deathTime > 0 || player.isSleeping() || player.isFallFlying() || player.isAutoSpinAttack()
-                || player.isPassenger() || player.getSwimAmount(pt) > 0.0F || player.isSpectator();
+                || player.isPassenger() || swimming(player, pt, s) || player.isSpectator();
+    }
+
+    /** Swimming, or (not in flight) vanilla's swim pose still fading out. */
+    private static boolean swimming(AbstractClientPlayer player, float pt, HeroAnimState s) {
+        return player.isVisuallySwimming() || player.getSwimAmount(pt) > 0.0F && !s.flyingEff;
+    }
+
+    /** Which clause of {@link #vanillaOwnsBody} holds (for the flicker probe). */
+    private static String vanillaClause(AbstractClientPlayer player, float pt) {
+        return player.deathTime > 0 ? "dying" : player.isSleeping() ? "sleeping" : player.isFallFlying() ? "gliding"
+                : player.isAutoSpinAttack() ? "spin attack" : player.isPassenger() ? "riding"
+                : player.isVisuallySwimming() ? "swimming (" + player.getSwimAmount(pt) + ", in the swim pose)"
+                : player.getSwimAmount(pt) > 0.0F ? "swimming (" + player.getSwimAmount(pt) + ", fading)"
+                : player.isSpectator() ? "spectator" : "?";
     }
 
     /** Takes the motion of the player from their position and body yaw into the smoothed motion and the normalised speeds. */
