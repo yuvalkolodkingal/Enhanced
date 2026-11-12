@@ -154,7 +154,7 @@ public final class MindTour {
         }, 40);
         server(MindRealm::enter, 120);
         shot("m01_arrival", 10);
-        at(4, 14, -54, 0.0F, -2.0F, 60);
+        at(4, 16, -47, 0.0F, 4.0F, 60);
         shot("m02_house", 10);
         at(0, 0, -6, 180.0F, 10.0F, 40);
         shot("m03_hall_dume", 10);
