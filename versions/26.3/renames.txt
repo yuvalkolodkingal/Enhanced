@@ -416,3 +416,42 @@ public LootItemFunctionType<(\w+)> getType\(\) \{(\s*)return [^;]+; => public co
 \bnew LootItemFunctionType<>\(([\w.]+)\) => $1
 @in(/(SiteStoneLootFunction|MarkSpentFunction)\.java) \bList<LootItemCondition> conditions => java.util.Optional<net.minecraft.core.Holder<LootItemCondition>> conditions
 \b(context|ctx|lootContext)\.getOptionalParameter\( => $1.getOptional(
+
+# ---- blocks drawn by the mod: compat.BlockRenderDispatcher (26.3 has none) ----
+\bnet\.minecraft\.client\.renderer\.block\.BlockRenderDispatcher\b => com.kolodkingal.enhanced.compat.BlockRenderDispatcher
+\b(?:Minecraft\.getInstance\(\)|mc|minecraft|this\.minecraft)\.getBlockRenderer\(\) => com.kolodkingal.enhanced.compat.BlockRenderDispatcher.get()
+\b(context|ctx|c)\.getBlockRenderDispatcher\(\) => com.kolodkingal.enhanced.compat.BlockRenderDispatcher.get()
+# (items are submitted: compat.ItemDraw; the mod's renderers kept an item renderer they no longer use)
+(?m)^import net\.minecraft\.client\.renderer\.entity\.ItemRenderer; => // (26.3: no ItemRenderer)
+\bprivate final ItemRenderer itemRenderer; => // (26.3: no item renderer)
+\bthis\.itemRenderer = [^;]*getItemRenderer\(\); => // (26.3: items are submitted, compat.ItemDraw)
+
+# ---- small replacements ----
+(?m)^import net\.minecraft\.world\.entity\.animal\.FlyingAnimal; => // (26.3: no FlyingAnimal, compat.Fliers)
+\b(\w+) instanceof FlyingAnimal (\w+) && \2\.isFlying\(\) => com.kolodkingal.enhanced.compat.Fliers.flying($1)
+\b(\w+) instanceof FlyingAnimal\b => com.kolodkingal.enhanced.compat.Fliers.is($1)
+(?m)^import net\.minecraft\.world\.item\.AxeItem; => // (26.3: an axe is an item with the axe's properties)
+\bextends AxeItem\b => extends net.minecraft.world.item.Item
+\bsuper\((net\.minecraft\.world\.item\.ToolMaterial\.\w+|ToolMaterial\.\w+), ([\d.F-]+), ([\d.F-]+), (\w+)\); => super($4.axe($1, $2, $3));
+\bnet\.minecraft\.client\.gui\.components\.PlayerFaceRenderer\b => net.minecraft.client.gui.components.PlayerFaceExtractor
+\bPlayerFaceRenderer\.draw\( => PlayerFaceExtractor.extractRenderState(
+(?m)^import org\.lwjgl\.util\.tinyfd\.TinyFileDialogs; => // (26.3: no TinyFileDialogs, compat.Dialogs)
+\bTinyFileDialogs\.tinyfd_openFileDialog\( => com.kolodkingal.enhanced.compat.Dialogs.openFile(
+
+# ---- the bridge: 26.3's events ----
+@in(/ClientBindings\.java) Binding\.putAll\(table, RenderLevelStageEvent\.class, net\.neoforged\.neoforge\.client\.event\.RenderLevelStageEvent\.class,\s*ClientConvert\.STAGE_EVENTS, ClientConvert::stageEvents\); => Binding.put(table, RenderLevelStageEvent.class, net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent.class, ClientConvert::stageEvents);
+@in(/GameBindings\.java) \bnet\.neoforged\.neoforge\.event\.entity\.player\.PlayerInteractEvent\.EntityInteractSpecific\b => net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract
+@in(/GameBindings\.java) \bn\.getLocalPos\(\) => n.getLocation()
+\bnet\.neoforged\.neoforge\.event\.level\.BlockEvent\.BreakEvent\b => net.neoforged.neoforge.event.level.block.BreakBlockEvent
+
+# ---- immediate drawing: compat.Tesselator, compat.Gl (26.3 draws the level from what was submitted) ----
+\bcom\.mojang\.blaze3d\.vertex\.Tesselator\b => com.kolodkingal.enhanced.compat.Tesselator
+
+# ---- the first-person arm and the item in hand (26.3's first-person hands renderer) ----
+@in(/FirstPersonArms\.java) \(ItemInHandRendererAccessor\) mc\.gameRenderer\.itemInHandRenderer; => (ItemInHandRendererAccessor) mc.gameRenderer.firstPersonHandsAndItemsRenderer;\n        net.minecraft.client.renderer.state.level.PlayerRenderState playerState = mc.gameRenderer.gameRenderState().levelRenderState.playerRenderState;
+@in(/FirstPersonArms\.java) renderer\.enhanced\$renderPlayerArm\(ps, ([^;]*?), (event\.getPackedLight\(\)), (1\.0F - Math\.min\(1\.0F, o\.used\)), (0\.0F), arm\); => renderer.enhanced\$renderPlayerArm(ps, $1, $2, $3, $4, arm, playerState);
+@in(/FirstPersonArms\.java) renderer\.enhanced\$renderArmWithItem\(player, pt, (event\.getInterpolatedPitch\(\)), hand, swing, stack, (event\.getEquipProgress\(\)), ps, => renderer.enhanced\$submitArmWithItem(playerState, playerState.firstPersonHandsAndItems, pt, $1, hand, swing, stack, $2, ps,
+@in(/ThorGrip\.java) (?m)^import net\.minecraft\.client\.renderer\.ItemInHandRenderer; => // (26.3: no ItemInHandRenderer; items are submitted, compat.ItemDraw)
+@in(/ThorGrip\.java) \bItemInHandRenderer renderer\b => Object renderer
+@in(/ThorGrip\.java) \brenderer\.renderItem\(entity, stack, ItemDisplayContext\.NONE, ps, com\.kolodkingal\.enhanced\.compat\.ItemDraw\.collector\(buffer\), light\); => com.kolodkingal.enhanced.compat.ItemDraw.renderStatic(entity, stack, ItemDisplayContext.NONE, ps, buffer, entity.level(), light, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
+@in(/ItemInHandLayerMixin\.java) Minecraft\.getInstance\(\)\.getEntityRenderDispatcher\(\)\.getItemInHandRenderer\(\) => null
