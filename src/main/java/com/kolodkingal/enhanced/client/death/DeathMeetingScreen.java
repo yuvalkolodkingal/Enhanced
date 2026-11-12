@@ -441,12 +441,16 @@ public class DeathMeetingScreen extends DeathScreen {
         npc.setXRot(-turnY * 18.0F);
         npc.xRotO = npc.getXRot();
 
-        graphics.pose().pushPose();
-        graphics.pose().translate(rioX, rioFeet, 50.0F);
-        graphics.pose().scale(rioScale, rioScale, -rioScale);
         Quaternionf pose = new Quaternionf().rotateZ((float) Math.PI);
         Quaternionf tilt = new Quaternionf().rotateX(-4.0F * Mth.DEG_TO_RAD);
         pose.mul(tilt);
+        //#if >=1.21.11
+        //$$ // (1.21.6: an entity in a screen is a picture in the picture, compat.GuiEntity)
+        //$$ com.kolodkingal.enhanced.compat.GuiEntity.draw(graphics, npc, rioX, rioFeet, rioScale, pose, tilt, partialTick);
+        //#else
+        graphics.pose().pushPose();
+        graphics.pose().translate(rioX, rioFeet, 50.0F);
+        graphics.pose().scale(rioScale, rioScale, -rioScale);
         graphics.pose().mulPose(pose);
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
@@ -458,6 +462,7 @@ public class DeathMeetingScreen extends DeathScreen {
         dispatcher.setRenderShadow(true);
         graphics.pose().popPose();
         Lighting.setupFor3DItems();
+        //#endif
     }
 
     /** Rio, made once (client side only, never added to the level). */

@@ -15,6 +15,8 @@ import org.gradle.api.tasks.TaskAction
  *   {@code //#else} / {@code //#endif} are kept when the condition holds for this version and commented out with
  *   {@code //$$ } when it does not; the lines after {@code //#else} the other way round. In the shared sources the
  *   lines of the versions that are not 1.21.1 are written commented, as {@code //$$ code};</li>
+ *   <li>renames (below), except in a file that has the line {@code //#norenames} (an overlay written in the
+ *   version's own names);</li>
  *   <li>relocation: {@code <basePackage>} becomes {@code <basePackage>.<suffix>} (all
  *   but the {@code boot} package, which is not copied), so that every copy has classes of its own in the one jar.</li>
  * </ul>
@@ -122,8 +124,11 @@ abstract class Preprocess extends DefaultTask {
         }
         if (!stack.isEmpty()) throw new IllegalStateException(file + ': //#if without //#endif')
         String s = out.join('\n')
-        for (List<String> rule : renameRules()) {
-            s = s.replaceAll(rule[0], rule[1])
+        // (a file written for this version already, with the line //#norenames, is only relocated)
+        if (!(s =~ /(?m)^\s*\/\/#norenames\s*$/).find()) {
+            for (List<String> rule : renameRules()) {
+                s = s.replaceAll(rule[0], rule[1])
+            }
         }
         String pkg = basePackage.get()
         String to = pkg + '.' + suffix.get()

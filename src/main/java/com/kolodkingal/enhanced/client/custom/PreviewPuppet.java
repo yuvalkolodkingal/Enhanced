@@ -162,9 +162,20 @@ public final class PreviewPuppet extends RemotePlayer {
         xo = xOld = x;
         yo = yOld = y;
         zo = zOld = z;
+        //#if >=1.21.11
+        //$$ // (1.21.9: the cloak's place is the avatar state's)
+        //$$ com.kolodkingal.enhanced.mixin.client.ClientAvatarStateAccessor cloak = (com.kolodkingal.enhanced.mixin.client.ClientAvatarStateAccessor) avatarState();
+        //$$ cloak.enhanced$setXCloak(x);
+        //$$ cloak.enhanced$setXCloakO(x);
+        //$$ cloak.enhanced$setYCloak(y);
+        //$$ cloak.enhanced$setYCloakO(y);
+        //$$ cloak.enhanced$setZCloak(z);
+        //$$ cloak.enhanced$setZCloakO(z);
+        //#else
         xCloak = xCloakO = x;
         yCloak = yCloakO = y;
         zCloak = zCloakO = z;
+        //#endif
     }
 
     /** One tick of the editor: its clock, its walk, the swing of its cape. */
@@ -186,6 +197,17 @@ public final class PreviewPuppet extends RemotePlayer {
             default -> 0.0F;
         };
         float yaw = yBodyRot * Mth.DEG_TO_RAD;
+        //#if >=1.21.11
+        //$$ com.kolodkingal.enhanced.mixin.client.ClientAvatarStateAccessor cloak = (com.kolodkingal.enhanced.mixin.client.ClientAvatarStateAccessor) avatarState();
+        //$$ cloak.enhanced$setXCloakO(cloak.enhanced$xCloak());
+        //$$ cloak.enhanced$setZCloakO(cloak.enhanced$zCloak());
+        //$$ cloak.enhanced$setXCloak(getX() + Mth.sin(yaw) * lag);
+        //$$ cloak.enhanced$setZCloak(getZ() - Mth.cos(yaw) * lag);
+        //$$ cloak.enhanced$setBobO(cloak.enhanced$bob());
+        //$$ cloak.enhanced$setBob(speed * 0.1F);
+        //$$ cloak.enhanced$setWalkDistO(cloak.enhanced$walkDist());
+        //$$ cloak.enhanced$setWalkDist(cloak.enhanced$walkDist() + speed * 0.6F);
+        //#else
         xCloakO = xCloak;
         zCloakO = zCloak;
         xCloak = getX() + Mth.sin(yaw) * lag;
@@ -194,6 +216,7 @@ public final class PreviewPuppet extends RemotePlayer {
         bob = speed * 0.1F;
         walkDistO = walkDist;
         walkDist += speed * 0.6F;
+        //#endif
     }
 
     /**
@@ -216,6 +239,10 @@ public final class PreviewPuppet extends RemotePlayer {
             // The animator's clock for the puppet (its own: the editor's frames are not the world's).
             float own = HeroAnimator.previewPartialTick(this);
             float pt = own >= 0.0F ? own : partialTick;
+            //#if >=1.21.11
+            //$$ // (1.21.6: an entity in a screen is a picture in the picture, compat.GuiEntity)
+            //$$ com.kolodkingal.enhanced.compat.GuiEntity.draw(g, this, x, y, size, Axis.ZP.rotationDegrees(180.0F), null, pt);
+            //#else
             g.pose().pushPose();
             pushed = true;
             g.pose().translate(x, y, 150.0F);
@@ -230,13 +257,16 @@ public final class PreviewPuppet extends RemotePlayer {
             g.pose().popPose();
             pushed = false;
             Lighting.setupFor3DItems();
+            //#endif
             return true;
         } catch (RuntimeException e) {
             fail(e);
+            //#if <1.21.11
             if (pushed) {
                 g.pose().popPose();
             }
             Lighting.setupFor3DItems();
+            //#endif
             return false;
         }
     }

@@ -1,4 +1,5 @@
 {
   "mixins": [],
-  "client": []
+  "client": ["client.ClientAvatarStateAccessor"],
+  "remove": []
 }

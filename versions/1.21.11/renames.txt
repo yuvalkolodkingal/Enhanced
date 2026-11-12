@@ -40,8 +40,8 @@
 
 # ---- the server player: its level is a ServerLevel, its server through the level ----
 \.serverLevel\(\) => .level()
-\b(player|p|sp|serverPlayer|target|caster|hero|owner|viewer|other|holder|who|user|attacker|victim|online|host|self|thrower|wanda|spider|thanos|xavier|vision)\.server\b(?!\s*=) => $1.level().getServer()
-\b(player|p|sp|serverPlayer|host|entity|e|mob|owner|caster|hero|target|holder|viewer|living|attacker|victim|self|wanda|spider|thanos)\.getServer\(\) => $1.level().getServer()
+\b(player|p|sp|serverPlayer|target|caster|hero|owner|viewer|other|holder|who|user|attacker|victim|online|host|self|thrower|wanda|spider|thanos|xavier|vision|thor|phoenix|billy|heimdall|seer|starter|master|seeker|(?:ctx|c)\.player\(\))\.server\b(?!\s*=[^=]) => $1.level().getServer()
+\b(player|p|sp|serverPlayer|host|entity|e|mob|owner|caster|hero|target|holder|viewer|living|attacker|victim|self|wanda|spider|thanos|vision|body|patient)\.getServer\(\) => $1.level().getServer()
 \bnet\.minecraft\.Util\b => net.minecraft.util.Util
 
 # ---- render types: the factories are RenderTypes' ----
@@ -57,6 +57,215 @@
 \bskinOf\((\w+)\)\.texture\(\) => skinOf($1).body().texturePath()
 \bPlayerSkin\.Model\.(SLIM|WIDE)\b => net.minecraft.world.entity.player.PlayerModelType.$1
 \.getSkin\(\)\.model\(\) => .getSkin().model()
-([\w.]+)\.copyFrom\(([\w.]+)\); => $1.loadPose($2.storePose());
+\b(?!frozen\b)([\w.]+)\.copyFrom\(([\w.]+)\); => $1.loadPose($2.storePose());
 \b(graphics|g|gui|guiGraphics)\.flush\(\); => // (1.21.6: the GUI draws in one pass at the end of the frame)
 \bhasImpulse\b => needsSync
+
+# ---- rendering (1.21.9: renderers submit): the mod's layers, block entity renderers and items draw into compat.SubmitBuffers ----
+\bextends (?:net\.minecraft\.client\.renderer\.entity\.layers\.)?RenderLayer< => extends com.kolodkingal.enhanced.compat.LegacyRenderLayer<
+\bimplements BlockEntityRenderer<(\w+)> => implements com.kolodkingal.enhanced.compat.LegacyBlockEntityRenderer<$1>
+<B extends BlockEntity> void blockEntityRenderer\( => <B extends BlockEntity, BS extends net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState> void blockEntityRenderer(
+\bBlockEntityRendererProvider<B> provider => BlockEntityRendererProvider<B, BS> provider
+\b(?:[\w.]+(?:\(\))?\.)*getItemRenderer\(\)\.renderStatic\( => com.kolodkingal.enhanced.compat.ItemDraw.renderStatic(
+\bitemRenderer\.renderStatic\( => com.kolodkingal.enhanced.compat.ItemDraw.renderStatic(
+
+# ---- saving (1.21.6: through ValueOutput/ValueInput): the mod's CompoundTag code reads and writes their compound (compat.ValueBridge) ----
+(public|protected) void addAdditionalSaveData\(CompoundTag tag\) \{ => $1 void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput legacyOutput) { CompoundTag tag = com.kolodkingal.enhanced.compat.ValueBridge.tag(legacyOutput);
+(public|protected) void readAdditionalSaveData\(CompoundTag tag\) \{ => $1 void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput legacyInput) { CompoundTag tag = com.kolodkingal.enhanced.compat.ValueBridge.tag(legacyInput);
+protected void saveAdditional\(CompoundTag tag, HolderLookup\.Provider registries\) \{ => protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput legacyOutput) { CompoundTag tag = com.kolodkingal.enhanced.compat.ValueBridge.tag(legacyOutput); HolderLookup.Provider registries = com.kolodkingal.enhanced.compat.ValueBridge.registries(this);
+protected void loadAdditional\(CompoundTag tag, HolderLookup\.Provider registries\) \{ => protected void loadAdditional(net.minecraft.world.level.storage.ValueInput legacyInput) { CompoundTag tag = com.kolodkingal.enhanced.compat.ValueBridge.tag(legacyInput); HolderLookup.Provider registries = legacyInput.lookup();
+\bsuper\.addAdditionalSaveData\(tag\) => super.addAdditionalSaveData(legacyOutput)
+\bsuper\.readAdditionalSaveData\(tag\) => super.readAdditionalSaveData(legacyInput)
+\bsuper\.saveAdditional\(tag, registries\) => super.saveAdditional(legacyOutput)
+\bsuper\.loadAdditional\(tag, registries\) => super.loadAdditional(legacyInput)
+
+# ---- permissions, profiles, sounds, rules (1.21.6 - 1.21.11) ----
+\b(\w+)\.hasPermissions?\((\d)\) => com.kolodkingal.enhanced.compat.Perms.has($1, $2)
+\b(\w+)\.getProfileCache\(\) => com.kolodkingal.enhanced.compat.Profiles.cache($1)
+\bGameProfile::getName\b => GameProfile::name
+\bGameProfile::getId\b => GameProfile::id
+\b(\w+)\.playNotifySound\( => com.kolodkingal.enhanced.compat.Sounds.notify($1, 
+\.isPvpAllowed\(\) => .overworld().isPvpAllowed()
+\.getBoolean\(GameRules\.RULE_MOBGRIEFING\) => .get(GameRules.MOB_GRIEFING)
+\.getBoolean\(GameRules\.RULE_KEEPINVENTORY\) => .get(GameRules.KEEP_INVENTORY)
+\.getBoolean\(GameRules\.RULE_DOBLOCKDROPS\) => .get(GameRules.BLOCK_DROPS)
+\.getBoolean\(GameRules\.RULE_DO_IMMEDIATE_RESPAWN\) => .get(GameRules.IMMEDIATE_RESPAWN)
+
+# ---- GUI (1.21.6: drawn in 2D, a colour per blit, no LayeredDraw) ----
+\bnet\.minecraft\.client\.gui\.LayeredDraw\b => com.kolodkingal.enhanced.compat.LayeredDraw
+\b(g|graphics|guiGraphics|gui)\.pose\(\)\.pushPose\(\) => $1.pose().pushMatrix()
+\b(g|graphics|guiGraphics|gui)\.pose\(\)\.popPose\(\) => $1.pose().popMatrix()
+\b(g|graphics|guiGraphics|gui)\.pose\(\)\.(translate|scale|mulPose)\( => com.kolodkingal.enhanced.compat.GuiPose.$2($1.pose(), 
+\b(\w+)\.blit\((?:net\.minecraft\.client\.renderer\.rendertype\.)?RenderType::guiTextured,\s* => com.kolodkingal.enhanced.compat.GuiTint.blit($1, 
+\b(?:com\.mojang\.blaze3d\.systems\.)?RenderSystem\.setShaderColor\( => com.kolodkingal.enhanced.compat.GuiTint.set(
+protected void renderWidget\(GuiGraphics => protected void renderContents(GuiGraphics
+public void onPress\(\) \{ => public void onPress(net.minecraft.client.input.InputWithModifiers legacyInput) {
+
+# ---- screen input (1.21.9: events) ----
+public boolean keyPressed\(int (\w+), int (\w+), int (\w+)\) \{ => public boolean keyPressed(net.minecraft.client.input.KeyEvent legacyKey) { int $1 = legacyKey.key(), $2 = legacyKey.scancode(), $3 = legacyKey.modifiers();
+public boolean keyReleased\(int (\w+), int (\w+), int (\w+)\) \{ => public boolean keyReleased(net.minecraft.client.input.KeyEvent legacyKey) { int $1 = legacyKey.key(), $2 = legacyKey.scancode(), $3 = legacyKey.modifiers();
+public boolean mouseClicked\(double (\w+), double (\w+), int (\w+)\) \{ => public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent legacyEvent, boolean legacyDouble) { double $1 = legacyEvent.x(), $2 = legacyEvent.y(); int $3 = legacyEvent.button();
+public boolean mouseReleased\(double (\w+), double (\w+), int (\w+)\) \{ => public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent legacyEvent) { double $1 = legacyEvent.x(), $2 = legacyEvent.y(); int $3 = legacyEvent.button();
+public boolean mouseDragged\(double (\w+), double (\w+), int (\w+), double (\w+), double (\w+)\) \{ => public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent legacyEvent, double $4, double $5) { double $1 = legacyEvent.x(), $2 = legacyEvent.y(); int $3 = legacyEvent.button();
+public boolean charTyped\(char (\w+), int (\w+)\) \{ => public boolean charTyped(net.minecraft.client.input.CharacterEvent legacyChar) { char $1 = (char) legacyChar.codepoint(); int $2 = legacyChar.modifiers();
+\.(keyPressed|keyReleased)\((\w+), (\w+), (\w+)\) => .$1(new net.minecraft.client.input.KeyEvent($2, $3, $4))
+\.mouseClicked\(([^,()]+), ([^,()]+), ([^,()]+)\) => .mouseClicked(new net.minecraft.client.input.MouseButtonEvent($1, $2, new net.minecraft.client.input.MouseButtonInfo($3, 0)), false)
+\.mouseReleased\(([^,()]+), ([^,()]+), ([^,()]+)\) => .mouseReleased(new net.minecraft.client.input.MouseButtonEvent($1, $2, new net.minecraft.client.input.MouseButtonInfo($3, 0)))
+\.mouseDragged\(([^,()]+), ([^,()]+), ([^,()]+), ([^,()]+), ([^,()]+)\) => .mouseDragged(new net.minecraft.client.input.MouseButtonEvent($1, $2, new net.minecraft.client.input.MouseButtonInfo($3, 0)), $4, $5)
+\.charTyped\(([^,()]+), ([^,()]+)\) => .charTyped(new net.minecraft.client.input.CharacterEvent($1, $2))
+\bInputConstants\.getKey\((\w+), (\w+)\) => InputConstants.getKey(new net.minecraft.client.input.KeyEvent($1, $2, 0))
+
+# ---- fog, skies and particles (1.21.6 - 1.21.11) ----
+\bcom\.mojang\.blaze3d\.shaders\.FogShape\b => com.kolodkingal.enhanced.compat.FogShape
+\bFogRenderer\.FogMode\b => com.kolodkingal.enhanced.compat.FogMode
+\bnet\.minecraft\.client\.renderer\.DimensionSpecialEffects\b => com.kolodkingal.enhanced.compat.DimensionSpecialEffects
+\bPlayerSkin\.Model\b => net.minecraft.world.entity.player.PlayerModelType
+\bimport net\.minecraft\.world\.entity\.FlyingMob; => // (1.21.6: no FlyingMob; the ghast and the phantom fly)
+\bmob instanceof FlyingMob\b => (mob instanceof net.minecraft.world.entity.monster.Ghast || mob instanceof net.minecraft.world.entity.monster.Phantom)
+\bimport net\.minecraft\.client\.model\.HumanoidArmorModel; => // (1.21.9: armour models are humanoid models in an ArmorModelSet)
+new HumanoidArmorModel<>\(context\.bakeLayer\(ModelLayers\.PLAYER_INNER_ARMOR\)\),\s*new HumanoidArmorModel<>\(context\.bakeLayer\(ModelLayers\.PLAYER_OUTER_ARMOR\)\) => net.minecraft.client.renderer.entity.ArmorModelSet.bake(ModelLayers.PLAYER_ARMOR, context.getModelSet(), net.minecraft.client.model.HumanoidModel::new)
+\bModelLayers\.PLAYER_OUTER_ARMOR\b => ModelLayers.PLAYER_ARMOR.chest()
+\bModelLayers\.PLAYER_INNER_ARMOR\b => ModelLayers.PLAYER_ARMOR.legs()
+
+# ---- skins (1.21.9: client assets) ----
+\bnew PlayerSkin\( => com.kolodkingal.enhanced.compat.Skins.of(
+\.getInsecureSkin\(([^()]*\(\))\)\.texture\(\) => .createLookup($1, false).get().body().texturePath()
+\.getInsecureSkin\(([^()]*\(\))\) => .createLookup($1, false).get()
+\b(skin|own|skinOf\(entity\)|skin\(body\))\.texture\(\) => $1.body().texturePath()
+\b((?:\w+\.)?(?:getSkin\(\)|skin))\.capeTexture\(\) => com.kolodkingal.enhanced.compat.Skins.cape($1)
+\b((?:\w+\.)?(?:getSkin\(\)|skin))\.elytraTexture\(\) => com.kolodkingal.enhanced.compat.Skins.elytra($1)
+\b((?:\w+\.)?(?:getSkin\(\)|skin))\.textureUrl\(\) => com.kolodkingal.enhanced.compat.Skins.url($1)
+
+# ---- items, blocks and entities (1.21.6 - 1.21.11) ----
+\b(\w+(?:\(\))?)\.save\((registries|registryAccess\(\)|player\.registryAccess\(\)|level\.registryAccess\(\))\) => com.kolodkingal.enhanced.compat.Stacks.save($1, $2)
+\bItemStack\.parseOptional\( => com.kolodkingal.enhanced.compat.Stacks.parseOptional(
+\bItemStack\.parse\((registries|registryAccess\(\)|player\.registryAccess\(\)|level\.registryAccess\(\)), => com.kolodkingal.enhanced.compat.Stacks.parse($1,
+\bParticleTypes\.FLASH\b => net.minecraft.core.particles.ColorParticleOption.create(net.minecraft.core.particles.ParticleTypes.FLASH, -1)
+\binventory\.offhand\.get\(0\) => inventory.getItem(net.minecraft.world.entity.player.Inventory.SLOT_OFFHAND)
+pois\.getFreeTickets\(pos\) < type\.get\(\)\.value\(\)\.maxTickets\(\) => pois.getInRange(t -> true, pos, 0, net.minecraft.world.entity.ai.village.poi.PoiManager.Occupancy.IS_OCCUPIED).anyMatch(r -> r.getPos().equals(pos))
+\b(\w+)\.getChunkSource\(\)\.broadcast\( => $1.getChunkSource().sendToTrackingPlayers(
+\.startRiding\(([^,()]+), (true|false)\) => .startRiding($1, $2, true)
+\b(\w+)\.restrictTo\( => $1.setHomeTo(
+(?<![\w.])restrictTo\( => setHomeTo(
+(?<![\w.])clearRestriction\(\) => clearHome()
+\b(?:net\.minecraft\.nbt\.)?NbtUtils\.createUUID\(([^()]*\([^()]*\))\) => new net.minecraft.nbt.IntArrayTag(net.minecraft.core.UUIDUtil.uuidToIntArray($1))
+\bClearable\.tryClear\( => com.kolodkingal.enhanced.compat.Tags.tryClear(
+\bnet\.minecraft\.ResourceLocationException\b => net.minecraft.IdentifierException
+\b(\w+)\.loadWithComponents\(([^;]*?), (level\.registryAccess\(\))\); => $1.loadWithComponents(com.kolodkingal.enhanced.compat.ValueBridge.input($3, $2));
+\b(info\.getProfile\(\))\.getName\(\) => $1.name()
+\b(info\.getProfile\(\))\.getId\(\) => $1.id()
+(sendSuccess\(\(\) -> Component\.translatable\("commands\.enhanced\.build\.[^;]*?)target\.getName\(\)\), (true|false)\); => $1target.name()), $2);
+\b(sync\(server, |getPlayer\(|loaded\()target\.getId\(\) => $1target.id()
+\binfo -> info\.getProfile\(\)\.getName\(\) => info -> info.getProfile().name()
+\.getSituationalMusic\(\)\.music\(\) => .getSituationalMusic()
+\.getMinDelay\(\) => .minDelay()
+\.getMaxDelay\(\) => .maxDelay()
+\bScreen\.hasControlDown\(\) => net.minecraft.client.Minecraft.getInstance().hasControlDown()
+\bInputConstants\.isKeyDown\(([\w.]+(?:\(\))?)\.getWindow\(\)\.getWindow\(\), => InputConstants.isKeyDown($1.getWindow(),
+\blong window = mc\.getWindow\(\)\.getWindow\(\); => com.mojang.blaze3d.platform.Window window = mc.getWindow();
+\)\s*\.alignLeft\(\) => )
+\bCycleButton\.<Enum<\?>>builder\(e -> Component\.literal\(e\.name\(\)\)\)\.withValues\(choices\)\s*\.withInitialValue\(current\) => CycleButton.<Enum<?>>builder(e -> Component.literal(e.name()), current).withValues(choices)
+\b(\w+)\.matches\((keyCode|key), (scanCode|scan)\) => $1.matches(new net.minecraft.client.input.KeyEvent($2, $3, 0))
+\bInputConstants\.getKey\(event\.getKey\(\), event\.getScanCode\(\)\) => InputConstants.getKey(new net.minecraft.client.input.KeyEvent(event.getKey(), event.getScanCode(), 0))
+\b(g|graphics)\.renderTooltip\(font, => $1.setTooltipForNextFrame(font, 
+\b(g|graphics)\.renderComponentTooltip\(font, => $1.setComponentTooltipForNextFrame(font, 
+\bARGB\.lerp\( => ARGB.srgbLerp(
+\b(Items|Blocks)\.CHAIN\b => $1.IRON_CHAIN
+\bSoundEvents\.WOLF_HOWL\b => net.minecraft.sounds.SoundEvents.WOLF_SOUNDS.get(net.minecraft.world.entity.animal.wolf.WolfSoundVariants.SoundSet.CLASSIC).growlSound().value()
+\b(\w+)\.isLevelEnabled\(\w+\) => $1.overworld().getGameRules().get(net.minecraft.world.level.gamerules.GameRules.ALLOW_ENTERING_NETHER_USING_PORTALS)
+\.getForcedChunks\(\) => .getForceLoadedChunks()
+\bnew DyedItemColor\(([^,()]+), (?:true|false)\) => new DyedItemColor($1)
+\.noCollission\(\) => .noCollision()
+\b(\w+)\.getSharedSpawnPos\(\) => $1.getRespawnData().pos()
+\bComponent\.Serializer\.toJson\(([^,()]+), ([^()]+\(\))\) => net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart($2.createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE), $1).getOrThrow().toString()
+\bTagParser\.parseTag\( => TagParser.parseCompoundFully(
+\.withParameter\(([\w.]*LootContextParams\.LAST_DAMAGE_PLAYER), lastHurtByPlayer\)\.withLuck\(lastHurtByPlayer\.getLuck\(\)\) => .withParameter($1, getLastHurtByPlayer()).withLuck(getLastHurtByPlayer().getLuck())
+\bif \(lootByPlayer && lastHurtByPlayer != null\) => if (lootByPlayer && getLastHurtByPlayer() != null)
+(?<![\w.])setOwnerUUID\((\w+)\.getUUID\(\)\) => setOwner($1)
+\b(dog|pet|owned)\.getOwnerUUID\(\) => com.kolodkingal.enhanced.compat.Owners.uuid($1)
+(?<![\w.])moveTo\(([^;,]+), ([^;,]+), ([^;,]+)\); => snapTo($1, $2, $3);
+\b(\w+)\.copyTag\(\)\.getUUID\( => com.kolodkingal.enhanced.compat.Tags.getUUID($1.copyTag(), 
+new net\.minecraft\.world\.entity\.EntityReference<>\((\w+)\) => net.minecraft.world.entity.EntityReference.of($1)
+\.unwrapKey\(\)\.map\(k -> k\.location\(\) => .unwrapKey().map(k -> k.identifier()
+\bid\.location\(\) => id.identifier()
+\bBuiltInRegistries\.BLOCK\.containsKey\(id\.identifier\(\)\) => BuiltInRegistries.BLOCK.containsKey(id.identifier())
+public void inventoryTick\(ItemStack (\w+), Level (\w+), Entity (\w+), int (\w+), boolean (\w+)\) \{ => public void inventoryTick(ItemStack $1, net.minecraft.server.level.ServerLevel $2, Entity $3, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.EquipmentSlot legacySlot) { int $4 = -1; boolean $5 = legacySlot == net.minecraft.world.entity.EquipmentSlot.MAINHAND;
+public void onCraftedBy\(ItemStack (\w+), Level (\w+), Player (\w+)\) \{ => public void onCraftedBy(ItemStack $1, Player $3) { Level $2 = $3.level();
+\bsuper\.onCraftedBy\((\w+), \w+, (\w+)\) => super.onCraftedBy($1, $2)
+@Override(\s+)public boolean hurtEnemy\(ItemStack (\w+), LivingEntity (\w+), LivingEntity (\w+)\) \{ => @Override$1public void hurtEnemy(ItemStack $2, LivingEntity $3, LivingEntity $4) {$1    legacyHurtEnemy($2, $3, $4);$1}$1$1public boolean legacyHurtEnemy(ItemStack $2, LivingEntity $3, LivingEntity $4) {
+public boolean canBeCollidedWith\(\) \{ => public boolean canBeCollidedWith(@org.jetbrains.annotations.Nullable net.minecraft.world.entity.Entity legacyOther) {
+protected void entityInside\(BlockState (\w+), Level (\w+), BlockPos (\w+), Entity (\w+)\) \{ => protected void entityInside(BlockState $1, Level $2, BlockPos $3, Entity $4, net.minecraft.world.entity.InsideBlockEffectApplier legacyEffects, boolean legacyPast) {
+\bsuper\.entityInside\((\w+), (\w+), (\w+), (\w+)\) => super.entityInside($1, $2, $3, $4, legacyEffects, legacyPast)
+protected void onRemove\(BlockState (\w+), Level (\w+), BlockPos (\w+), BlockState (\w+), boolean (\w+)\) \{ => protected void affectNeighborsAfterRemoval(BlockState $1, net.minecraft.server.level.ServerLevel $2, BlockPos $3, boolean $5) { BlockState $4 = $2.getBlockState($3);
+\bsuper\.onRemove\((\w+), (\w+), (\w+), \w+, (\w+)\) => super.affectNeighborsAfterRemoval($1, $2, $3, $4)
+EntityDataAccessor<Vector3f> DATA_AIM => EntityDataAccessor<org.joml.Vector3fc> DATA_AIM
+\bVector3f aim = entityData\.get\(DATA_AIM\); => Vector3f aim = new Vector3f(entityData.get(DATA_AIM));
+
+# ---- the camera (1.21.11: records) ----
+\b(camera|cam|view|getCamera\(\)|getMainCamera\(\)|dispatcher\.camera|entityRenderDispatcher\.camera)\.getPosition\(\) => $1.position()
+\b(camera|cam|view|getCamera\(\)|getMainCamera\(\)|dispatcher\.camera|entityRenderDispatcher\.camera)\.getEntity\(\) => $1.entity()
+\b(camera|cam|view|getCamera\(\)|getMainCamera\(\)|dispatcher\.camera|entityRenderDispatcher\.camera)\.getYRot\(\) => $1.yRot()
+\b(camera|cam|view|getCamera\(\)|getMainCamera\(\)|dispatcher\.camera|entityRenderDispatcher\.camera)\.getXRot\(\) => $1.xRot()
+\b(camera|cam|view|getCamera\(\)|getMainCamera\(\)|dispatcher\.camera|entityRenderDispatcher\.camera)\.getLeftVector\(\) => $1.leftVector()
+\b(camera|cam|view|getCamera\(\)|getMainCamera\(\)|dispatcher\.camera|entityRenderDispatcher\.camera)\.getUpVector\(\) => $1.upVector()
+\b(camera|cam|view|getCamera\(\)|getMainCamera\(\)|dispatcher\.camera|entityRenderDispatcher\.camera)\.getLookVector\(\) => $1.forwardVector()
+\bentityRenderDispatcher\.cameraOrientation\(\) => com.kolodkingal.enhanced.compat.RenderBridge.camera().orientation
+\bMth\.lerp\((\w+), (\w+)\.xCloakO, \2\.xCloak\) => $2.avatarState().getInterpolatedCloakX($1)
+\bMth\.lerp\((\w+), (\w+)\.yCloakO, \2\.yCloak\) => $2.avatarState().getInterpolatedCloakY($1)
+\bMth\.lerp\((\w+), (\w+)\.zCloakO, \2\.zCloak\) => $2.avatarState().getInterpolatedCloakZ($1)
+\bMth\.lerp\((\w+), (\w+)\.oBob, \2\.bob\) => $2.avatarState().getInterpolatedBob($1)
+\bMth\.lerp\((\w+), (\w+)\.walkDistO, \2\.walkDist\) => $2.avatarState().getInterpolatedWalkDistance($1)
+
+# ---- second pass (1.21.11) ----
+\bnew CustomHeadLayer<>\(this, context\.getModelSet\(\)\) => new CustomHeadLayer<>(this, context.getModelSet(), context.getPlayerSkinRenderCache())
+\b(?:net\.minecraft\.client\.renderer\.(?:rendertype\.)?)?RenderType::(?!guiTextured)(\w+) => net.minecraft.client.renderer.rendertype.RenderTypes::$1
+\b(\w+)\.blitSprite\((?:net\.minecraft\.client\.renderer\.(?:rendertype\.)?)?RenderType::guiTextured,\s* => $1.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, 
+\bevent\.getGuiGraphics\(\)\.pose\(\)\.pushPose\(\) => event.getGuiGraphics().pose().pushMatrix()
+\bevent\.getGuiGraphics\(\)\.pose\(\)\.popPose\(\) => event.getGuiGraphics().pose().popMatrix()
+\bevent\.getGuiGraphics\(\)\.pose\(\)\.(translate|scale|mulPose)\( => com.kolodkingal.enhanced.compat.GuiPose.$1(event.getGuiGraphics().pose(), 
+\bnew VertexBuffer\(com\.mojang\.blaze3d\.buffers\.BufferUsage\.STATIC_WRITE\) => new VertexBuffer(null)
+\b(?:com\.mojang\.blaze3d\.systems\.)?RenderSystem\.setShaderFog\([^;]*\); => // (1.21.6: the sky is drawn with the fog the level gives it)
+\bnew DynamicTexture\((\w+)\) => new DynamicTexture(() -> "enhanced", $1)
+\b(\w+(?:\(\))?)\.copyPropertiesTo\((\w+)\) => com.kolodkingal.enhanced.compat.Models.copyPose($1, $2)
+\bScreenshot\.grab\(([^,]+), ([^,]+), ([^,]+), => Screenshot.grab($1, $2, $3, 1,
+\bglfwGetMouseButton\(window, => glfwGetMouseButton(window.handle(), 
+\b(hulk|renderer)\.render\(((?:hulk|renderer)\.createRenderState\(player, pt\)), poseStack, event\.getMultiBufferSource\(\), event\.getPackedLight\(\)\) => $1.submit($2, poseStack, com.kolodkingal.enhanced.compat.ItemDraw.collector(event.getMultiBufferSource()), com.kolodkingal.enhanced.compat.RenderBridge.camera())
+\bextends AvatarRenderer \{ => extends AvatarRenderer<net.minecraft.client.player.AbstractClientPlayer> {
+\bAvatarRenderer\b(?!\s*[<(.;{]) => AvatarRenderer<?>
+\bdispatcher\.render\((\w+), ([^,]+), ([^,]+), ([^,]+), (\w+), (\w+), (\w+), (\w+)\); => com.kolodkingal.enhanced.compat.RenderBridge.render($1, $2, $3, $4, $5, $6, $7, $8);
+protected boolean shouldDropLoot\(\) \{ => protected boolean shouldDropLoot(net.minecraft.server.level.ServerLevel legacyLevel) {
+\bsuper\.shouldDropLoot\(\) => super.shouldDropLoot(legacyLevel)
+@Override(\s+)(?:protected|public) boolean shouldDespawnInPeaceful\(\) => $1public boolean shouldDespawnInPeaceful()
+public boolean shouldRenderOffScreen\(\w+ \w+\) \{ => public boolean shouldRenderOffScreen() {
+(class WitchesRoadDoorBlock[\s\S]*?)@Override(\s+public void appendHoverText) => $1// (1.21.5: a block has no tooltip of its own: see docs/MULTIVERSION.md)$2
+(private record Shifted\(VertexConsumer to, float dx, float dy, float dz\) implements VertexConsumer \{) => $1\n        @Override\n        public VertexConsumer setLineWidth(float width) {\n            to.setLineWidth(width);\n            return this;\n        }\n\n        @Override\n        public VertexConsumer setColor(int argb) {\n            to.setColor(argb);\n            return this;\n        }\n
+(static final class NebulaUv implements VertexConsumer \{) => $1\n        @Override\n        public VertexConsumer setLineWidth(float width) {\n            inner.setLineWidth(width);\n            return this;\n        }\n\n        @Override\n        public VertexConsumer setColor(int argb) {\n            inner.setColor(argb);\n            return this;\n        }\n
+\bBeaconRenderer\.renderBeaconBeam\((\w+), (\w+), ([\w.]+), (\w+), ([^,]+), (\w+), => com.kolodkingal.enhanced.compat.ItemDraw.beaconBeam($1, $2, $3, $4, $5, $6,
+\bPacket<\?> packet = possessed => Packet<? super net.minecraft.network.protocol.game.ClientGamePacketListener> packet = possessed
+\brenderer\.renderItem\(entity, stack, ItemDisplayContext\.NONE, left, ps, buffer, light\) => renderer.renderItem(entity, stack, ItemDisplayContext.NONE, ps, com.kolodkingal.enhanced.compat.ItemDraw.collector(buffer), light)
+\b(\w+)\.getTimeOfDay\((\w+)\) => com.kolodkingal.enhanced.compat.DimensionSpecialEffects.timeOfDay($1)
+new ProtoChunk\(([^;]+), height, biomes, null\) => new ProtoChunk($1, height, net.minecraft.world.level.chunk.PalettedContainerFactory.create(server.registryAccess()), null)
+\bplayer\.getInventory\(\)\.save\(new ListTag\(\)\) => com.kolodkingal.enhanced.compat.Stacks.saveInventory(player.getInventory(), player.registryAccess())
+\bplayer\.getInventory\(\)\.load\(kept\.inventory\(\)\) => com.kolodkingal.enhanced.compat.Stacks.loadInventory(player.getInventory(), kept.inventory(), player.registryAccess())
+(private record Without\(ServerLevel level, Map<BlockPos, BlockState> gone\) implements LevelReader \{) => $1\n        @Override\n        public net.minecraft.world.attribute.EnvironmentAttributeReader environmentAttributes() {\n            return level.environmentAttributes();\n        }\n
+\.(add|remove)RegionTicket\(([^,;]+\(\)), (\w+), ([^,;]+), \w+, (?:true|false)\) => .$1TicketWithRadius($2, $3, $4)
+\bPoseStack (\w+) = (g|graphics|guiGraphics|gui)\.pose\(\); => com.kolodkingal.enhanced.compat.GuiStack $1 = com.kolodkingal.enhanced.compat.GuiStack.of($2.pose());
+VertexConsumer vc = net\.minecraft\.client\.Minecraft\.getInstance\(\)\.renderBuffers\(\)\.bufferSource\(\)\.getBuffer\(net\.minecraft\.client\.renderer\.rendertype\.RenderTypes\.gui\(\)\); => VertexConsumer vc = com.kolodkingal.enhanced.compat.GuiQuads.of(g);
+\bg\.pose\(\)\.last\(\)\.pose\(\) => com.kolodkingal.enhanced.compat.GuiQuads.IDENTITY
+\binput\.getMoveVector\(\)\.x = 0\.0F;\s*input\.getMoveVector\(\)\.y = ([^;]+); => ((com.kolodkingal.enhanced.mixin.client.ClientInputAccessor) input).enhanced\$setMoveVector(new net.minecraft.world.phys.Vec2(0.0F, $1));
+texture\.bind\(\);[\s\S]*?image\.downloadTexture\(0, false\);\s*return image; => return null; // (1.21.11: a downloaded skin can't be read back from the GPU at once: it keeps its colours, docs/MULTIVERSION.md)
+net\.minecraft\.client\.renderer\.rendertype\.RenderTypes\.create\("enhanced_thanos_through_walls",[\s\S]*?\.createCompositeState\(false\)\); => com.kolodkingal.enhanced.client.render.EnhancedRenderTypes.ENERGY_BEAM_OVER; // (the same: lightning, no depth test, no culling)
+(type = net\.minecraft\.client\.renderer\.rendertype\.RenderTypes\.)solid\(\); => $1solidMovingBlock(); // (1.21.11: the island's geometry is in the moving-block types, NeoClientServices)
+(type = net\.minecraft\.client\.renderer\.rendertype\.RenderTypes\.)cutoutMipped\(\); => $1cutoutMovingBlock();
+(type = net\.minecraft\.client\.renderer\.rendertype\.RenderTypes\.)cutout\(\); => $1translucentMovingBlock();
+Object shader = com\.kolodkingal\.enhanced\.compat\.Gl\.getShader\(\);[\s\S]*?shader\.clear\(\);\s*VertexBuffer\.unbind\(\); => if (buffer == null) {\n            return;\n        }\n        // (1.21.11: drawn in its render type, moved by the model-view instead of the shader's chunk offset)\n        buffer.drawAs(type, (float) (ground.getX() - camera.x), (float) (ground.getY() + offset - camera.y), (float) (ground.getZ() - camera.z));
+super\(null, false\); => super(null, false, net.minecraft.client.Minecraft.getInstance().player);
+if \(minecraft\.level != null\) \{\s*minecraft\.level\.disconnect\(\);\s*\}\s*minecraft\.disconnect\(new GenericMessageScreen\(Component\.translatable\("menu\.savingLevel"\)\)\);\s*minecraft\.setScreen\(new TitleScreen\(\)\); => minecraft.disconnectFromWorld(net.minecraft.client.multiplayer.ClientLevel.DEFAULT_QUIT_MESSAGE); // (1.21.11: the level is left as the game's own title button leaves it)
+\b(?:net\.minecraft\.client\.renderer\.)?(?:LevelRenderer|ShapeRenderer)\.renderLineBox\( => com.kolodkingal.enhanced.compat.Lines.box(
+SavedBridge\.type\(NAME, Plots::new, Plots::load, Plots::save\),\s*"enhanced_vision_mind"\) => SavedBridge.type("enhanced_vision_mind", Plots::new, Plots::load, Plots::save))
+\bLeavesBlock::new, BlockBehaviour\.Properties\.of\(\) => p -> new net.minecraft.world.level.block.TintedParticleLeavesBlock(0.01F, p), BlockBehaviour.Properties.of()
+\bdisplay\.load\( => com.kolodkingal.enhanced.compat.ValueBridge.load(display, 
+Stacks\.parse\(player\.registryAccess\(\), entry\.getCompoundOrEmpty\("Item"\)\.orElse\(ItemStack\.EMPTY\)\); => Stacks.parseOptional(player.registryAccess(), entry.getCompoundOrEmpty("Item"));
+GameProfileArgument\.getGameProfiles\(ctx, "player"\)\.stream\(\) => GameProfileArgument.getGameProfiles(ctx, "player").stream().map(n -> new GameProfile(n.id(), n.name()))
+GameProfileArgument\.getGameProfiles\(ctx, "player"\)\) => GameProfileArgument.getGameProfiles(ctx, "player").stream().map(n -> new GameProfile(n.id(), n.name())).toList())
+\bcase MAINHAND, OFFHAND -> => case MAINHAND, OFFHAND, SADDLE ->
