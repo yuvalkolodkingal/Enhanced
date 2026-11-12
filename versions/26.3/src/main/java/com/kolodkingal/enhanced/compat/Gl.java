@@ -212,7 +212,7 @@ public final class Gl {
     private static RenderType typeFor() {
         Identifier tex = shader.textured && texture != null ? texture : null;
         return TYPES.computeIfAbsent(key() + "/" + tex, k -> {
-            RenderSetup.RenderSetupBuilder b = RenderSetup.builder(pipeline()).bufferSize(4096);
+            RenderSetup.RenderSetupBuilder b = RenderSetup.builder(pipeline());
             if (tex != null) {
                 b.withTexture("Sampler0", tex);
             }
@@ -253,7 +253,7 @@ public final class Gl {
                 int indexCount = copy.drawState().indexCount();
                 RenderSystem.AutoStorageIndexBuffer sequential = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
                 GpuBuffer indices = sequential.getBuffer(indexCount);
-                try (GpuBuffer vertices = RenderSystem.getDevice().createBuffer(() -> "Enhanced immediate vertices",
+                try (GpuBuffer upload = RenderSystem.getDevice().createBuffer(() -> "Enhanced immediate vertices",
                         GpuBuffer.USAGE_VERTEX, copy.vertexBuffer())) {
                     var target = Minecraft.getInstance().gameRenderer.mainRenderTarget();
                     GpuTextureView colour = target.getColorTextureView();
@@ -266,7 +266,7 @@ public final class Gl {
                         if (bound != null) {
                             pass.setUniform("Sampler0", bound.getTextureView(), bound.getSampler());
                         }
-                        pass.setVertexBuffer(0, vertices.slice());
+                        pass.setVertexBuffer(0, upload.slice());
                         pass.setIndexBuffer(indices, sequential.type());
                         pass.drawIndexed(indexCount, 1, 0, 0, 0);
                     }

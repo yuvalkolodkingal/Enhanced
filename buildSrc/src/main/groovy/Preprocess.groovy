@@ -18,7 +18,8 @@ import org.gradle.api.tasks.TaskAction
  *   <li>renames (below), except in a file that has the line {@code //#norenames} (an overlay written in the
  *   version's own names): such a file still gets the renames of the versions after the one whose folder it is in
  *   (a 1.21.11 file in a 26.3 copy gets 26.3's renames), when the overlay folders and the rename files are listed
- *   in the same order, one per version;</li>
+ *   in the same order, one per version; {@code //#norenames 1.21.11} in a later version's folder says the file is
+ *   written in 1.21.11's names (a copy of a 1.21.11 file, changed for the later version);</li>
  *   <li>relocation: {@code <basePackage>} becomes {@code <basePackage>.<suffix>} (all
  *   but the {@code boot} package, which is not copied), so that every copy has classes of its own in the one jar.</li>
  * </ul>
@@ -134,8 +135,16 @@ abstract class Preprocess extends DefaultTask {
         String s = out.join('\n')
         // (a file written for this version already, with the line //#norenames, is only relocated)
         int from = 0
-        if ((s =~ /(?m)^\s*\/\/#norenames\s*$/).find()) {
-            from = folder >= 0 && overlays.files.size() == renames.files.size() ? folder + 1 : Integer.MAX_VALUE
+        def marker = s =~ /(?m)^\s*\/\/#norenames(?:[ \t]+([0-9.]+))?[ \t]*$/
+        if (marker.find()) {
+            String written = marker.group(1)
+            int index = folder
+            if (written != null) {
+                // (a file written in an earlier version's names: the renames after that version's)
+                index = overlays.files.toList().findIndexOf { File d -> d.path.replace('\\', '/').contains('/versions/' + written + '/') }
+                if (index < 0) throw new IllegalArgumentException(file + ': //#norenames ' + written + ': no such version in the chain')
+            }
+            from = index >= 0 && overlays.files.size() == renames.files.size() ? index + 1 : Integer.MAX_VALUE
         }
         for (List rule : renameRules()) {
             if ((rule[2] as int) < from) continue

@@ -42,7 +42,7 @@ public final class EnhancedRenderTypes {
     }
 
     private static RenderType type(String name, RenderPipeline pipeline, int size) {
-        return RenderType.create(name, RenderSetup.builder(pipeline).sortOnUpload().bufferSize(size).createRenderSetup());
+        return RenderType.create(name, RenderSetup.builder(pipeline).sortOnUpload().createRenderSetup());
     }
 
     public static final RenderType ENERGY_BEAM = type("enhanced_energy_beam", lightning("energy_beam").build(), 4096);
@@ -76,7 +76,7 @@ public final class EnhancedRenderTypes {
 
     private static RenderType ghost(String name, RenderPipeline pipeline, Identifier texture, boolean sort) {
         RenderSetup.RenderSetupBuilder b = RenderSetup.builder(pipeline).useLightmap().withTexture("Sampler0", texture)
-                .bufferSize(4096);
+                ;
         if (sort) {
             b.sortOnUpload();
         }
@@ -126,7 +126,7 @@ public final class EnhancedRenderTypes {
         return RenderType.create(name, RenderSetup.builder(pipeline)
                 .withTexture("Sampler0", texture, blur ? BLUR : null)
                 .sortOnUpload()
-                .bufferSize(size)
+                
                 .createRenderSetup());
     }
 

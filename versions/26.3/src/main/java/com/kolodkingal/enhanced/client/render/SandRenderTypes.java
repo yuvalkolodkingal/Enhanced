@@ -26,7 +26,7 @@ public final class SandRenderTypes {
                     .withDepthWrite(false)
                     .withCull(false)
                     .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, PrimitiveTopology.QUADS)
-                    .build()).sortOnUpload().bufferSize(8192).createRenderSetup());
+                    .build()).sortOnUpload().createRenderSetup());
 
     private static final RenderPipeline TEXTURED_PIPELINE = Pipe.builder(Pipe.MATRICES_PROJECTION)
             .withLocation(Enhanced.id("pipeline/sand_textured"))
@@ -41,7 +41,7 @@ public final class SandRenderTypes {
 
     private static final Function<Identifier, RenderType> TEXTURED = Util.memoize(texture ->
             RenderType.create("enhanced_sand_textured", RenderSetup.builder(TEXTURED_PIPELINE)
-                    .withTexture("Sampler0", texture).sortOnUpload().bufferSize(16384).createRenderSetup()));
+                    .withTexture("Sampler0", texture).sortOnUpload().createRenderSetup()));
 
     public static RenderType textured(Identifier texture) {
         return TEXTURED.apply(texture);

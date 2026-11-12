@@ -29,7 +29,10 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
+          # (25 for the 26.3 copy's toolchain; the last one listed, 21, is the default)
+          java-version: |
+            25
+            21
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5

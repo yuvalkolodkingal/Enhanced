@@ -97,7 +97,7 @@
 \b(state|pose|s|renderState)\.attackTime\b => $1.swingAnimation
 
 # ---- screens and widgets: they extract a render state (render -> extractRenderState, ...) ----
-@Override(\s+)public void render\(GuiGraphicsExtractor (\w+), int => @Override$1public void extractRenderState(GuiGraphicsExtractor $2, int
+@Override(\s+)public void render\(GuiGraphicsExtractor (\w+), int (\w+), int (\w+), float (\w+)\) => @Override$1public void extractRenderState(GuiGraphicsExtractor $2, int $3, int $4, float $5)
 \bsuper\.render\((g|graphics|gg|guiGraphics|graphic), => super.extractRenderState($1,
 \bvoid renderBackground\(GuiGraphicsExtractor => void extractBackground(GuiGraphicsExtractor
 \b(super\.|this\.|(?<![.\w]))renderBackground\((g|graphics|gg|guiGraphics|graphic), => $1extractBackground($2,
@@ -111,7 +111,7 @@ public boolean shouldRender\(([^)]*?double \w+)\) => public boolean shouldRender
 \bsuper\.shouldRender\(((?:\w+, ){4}\w+)\) => super.shouldRender($1, partialTicks)
 
 # ---- block views: the face shading is the level's cardinal lighting ----
-@Override(\s+)public float getShade\(Direction (\w+), boolean (\w+)\) \{ => @Override$1public net.minecraft.world.level.CardinalLighting cardinalLighting() {$1    return net.minecraft.world.level.CardinalLighting.DEFAULT;$1}$1public float getShade(Direction $2, boolean $3) {
+@Override(\s+)public float getShade\(Direction (\w+), boolean (\w+)\) \{ => public net.minecraft.world.level.CardinalLighting cardinalLighting() {$1    return net.minecraft.world.level.CardinalLighting.DEFAULT;$1}$1public float getShade(Direction $2, boolean $3) {
 \bInputConstants\.Type\.KEYSYM\b => InputConstants.Type.KEYBOARD
 \b(legacyKey|event|key)\.scancode\(\) => $1.keycode()
 \bInputConstants\.isKeyDown\((?:window|mc\.getWindow\(\)|minecraft\.getWindow\(\)|Minecraft\.getInstance\(\)\.getWindow\(\)),\s* => InputConstants.isKeyDown(
@@ -458,7 +458,7 @@ public LootItemFunctionType<(\w+)> getType\(\) \{(\s*)return [^;]+; => public co
 
 # ---- blocks have no codec in 26.3 ----
 \bMapCodec<(\w+)> CODEC = simpleCodec\(\w+::new\); => MapCodec<$1> CODEC = null; // (26.3: blocks have no codec)
-@Override(\s+)protected MapCodec<\? extends \w+> codec\(\) \{\s*return CODEC;\s*\} => // (26.3: blocks have no codec)
+@Override(\s+)protected MapCodec<\? extends \w*Block> codec\(\) \{\s*return CODEC;\s*\} => // (26.3: blocks have no codec)
 
 # ---- more entities and models ----
 \bhurtMarked\b => needsSync
@@ -515,4 +515,44 @@ public LootItemFunctionType<(\w+)> getType\(\) \{(\s*)return [^;]+; => public co
 (WOLF_SOUNDS\.get\([^;]*?SoundSet\.\w+\))\.(\w+Sound)\(\) => $1.adultSounds().$2()
 \bEntityType\.byString\( => com.kolodkingal.enhanced.compat.Particles.entityType(
 \b(level|serverLevel|overworld\(\))\.setWeatherParameters\( => $1.getServer().setWeatherParameters(
-\b(level|ArenaLoans\.this\.level|this\.level)\.getShade\((\w+), (\w+)\) => ($3 ? $1.cardinalLighting().byFace($2) : 1.0F)
+\b(level|ArenaLoans\.this\.level|this\.level)\.getShade\((\w+), (\w+)\) => ($3 ? net.minecraft.world.level.CardinalLighting.DEFAULT.byFace($2) : 1.0F)
+\b(renderable|b|button|widget|w|child)\.render\((\w+), (mouseX|mx), (mouseY|my), (\w+)\) => $1.extractRenderState($2, $3, $4, $5)
+public void knockback\(double (\w+), double (\w+), double (\w+)\) \{ => public void knockback(double $1, double $2, double $3, net.minecraft.world.damagesource.DamageSource knockbackSource, float knockbackDamage) {
+\bsuper\.knockback\((\w+), (\w+), (\w+)\); => super.knockback($1, $2, $3, knockbackSource, knockbackDamage);
+\b(?:net\.minecraft\.client\.renderer\.)?LevelRenderer\.getLightColor\( => net.minecraft.util.LightCoordsUtil.getLightCoords(
+protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float $1)
+@in(/AsgardChunkGenerator\.java) public CompletableFuture<ChunkAccess> fillFromNoise\(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunk\) => public CompletableFuture<ChunkAccess> buildTerrain(ChunkAccess chunk, Blender blender, RandomState randomState, StructureManager structureManager, net.minecraft.world.level.biome.BiomeManager biomeManager, net.minecraft.server.level.WorldGenRegion carverBiomeRegion, java.util.Set<net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>> possibleBiomes)
+@in(/AsgardChunkGenerator\.java) @Override\s+public void (buildSurface|applyCarvers)\([^)]*\) \{\s*\} => // (26.3: the surface and the carvers are part of buildTerrain)
+@in(/AsgardChunkGenerator\.java) public void addDebugScreenInfo\(List<String> info, RandomState random, BlockPos pos\) => public void addDebugScreenInfo(List<String> info, RandomState random, BlockPos pos, net.minecraft.world.level.levelgen.densityfunction.SamplerContext samplerContext)
+@in(/SiteAmbience\.java) \bModSounds\.(\w+); => ModSounds.$1.holder();
+@in(/SiteAmbience\.java) getStructureWithPieceAt\(player\.blockPosition\(\), structure\) => getStructureWithPieceAt(player.blockPosition().getX(), player.blockPosition().getY(), player.blockPosition().getZ(), structure)
+\bgetStartForStructure\(SectionPos\.bottomOf\((\w+)\),\s* => getStartForStructure(
+\bstate\.getTags\(\) => state.typeHolder().tags()
+@in(/CompassItemPropertyFunction\.java) \bstack\.getEntityRepresentation\(\) => null
+\btype\.is\(((?:ModTags|EntityTypeTags|net\.minecraft\.tags\.EntityTypeTags)\.\w+)\) => type.builtInRegistryHolder().is($1)
+
+# ---- assorted client changes ----
+\(\(ServerPlayer\) (\w+)\)\.displayClientMessage\( => com.kolodkingal.enhanced.compat.Msg.display((ServerPlayer) $1, 
+@in(/StructureCopyChallenge\.java) corner\.offset\(c\.x\(\), c\.y\(\), c\.z\(\)\)\.getCenter\(\) => net.minecraft.world.phys.Vec3.atCenterOf(corner.offset(c.x(), c.y(), c.z()))
+\bliving\.getAttackAnim\( => living.getSwingAnimation(
+@in(/Legacy\w*Renderer\.java) \b(void |super\.)submitNameTag\( => $1submitNameDisplay(
+\.getChat\(\)\.addMessage\( => .getChat().addClientSystemMessage(
+\bstack\.getRarity\(\)\.color\(\)\.getColor\(\) => net.minecraft.network.chat.TextColor.fromLegacyFormat(stack.getRarity().color()).getValue()
+(class \w+ implements VertexConsumer(?:, [\w.]+)? \{|record \w+\([^)]*\) implements VertexConsumer \{) => $1\n    @Override\n    public VertexConsumer setUv3(float u, float v) {\n        return this;\n    }\n
+@in(/SavedBridge\.java) new SavedDataType<>\(id, => new SavedDataType<>(net.minecraft.resources.Identifier.fromNamespaceAndPath("enhanced", id),
+@in(/GuiEntity\.java) \bg\.submitEntityRenderState\( => g.entity(
+@in(/ItemDraw\.java) Minecraft\.getInstance\(\)\.gameRenderer\.getSubmitNodeStorage\(\) => null
+@in(/RenderBridge\.java) Minecraft\.getInstance\(\)\.gameRenderer\.getLevelRenderState\(\) => Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState
+@in(/IronSuitItem\.java) \bConsumer<Item> onBroken\b => Consumer<ItemStack> onBroken
+\.isViewBlocking\(\((\w+), (\w+), (\w+)\) -> => .isViewBlocking(($1, $2, $3, viewBox) ->
+\b(mc|minecraft)\.gameRenderer\.currentPostEffect\(\) => $1.gameRenderer.spectatedEntityPostEffect()
+\b(mc|minecraft)\.gameRenderer\.setPostEffect\( => $1.gameRenderer.setSpectatedEntityPostEffect(
+\b(mc|minecraft)\.gameRenderer\.clearPostEffect\(\) => $1.gameRenderer.clearSpectatedEntityPostEffect()
+(\.renderToBuffer\([^;]*?\bOverlayTexture\.NO_OVERLAY)\); => $1, -1);
+\bnet\.minecraft\.util\.Util\.getPlatform\(\)\.openFile\((\w+)\.toFile\(\)\) => com.mojang.blaze3d.Blaze3D.openPath($1)
+\bModelBlockRenderer\.(enableCaching|clearCache)\(\); => // (26.3: no block renderer cache to switch)
+@in(/ShieldItemRenderer\.java) \bItemRenderer\.getFoilBuffer\(buffer, ShieldModel\.renderType\(\), true,\s*stack\.hasFoil\(\)\) => buffer.getBuffer(ShieldModel.renderType())
+@in(/(SokoviaMesh|GhostMesh)\.java) \bnew ByteBufferBuilder\(type\.bufferSize\(\)\) => new ByteBufferBuilder(786432)
+@in(/Legacy\w*Renderer\.java) \bthis\.submitNameTag\( => this.submitNameDisplay(
+@in(/ItemExt\.java) \bConsumer<Item> onBroken\b => Consumer<ItemStack> onBroken
+@in(/SpeedSurfaceFx\.java) \bpose\.rotate\(Axis\. => pose.mulPose(Axis.
