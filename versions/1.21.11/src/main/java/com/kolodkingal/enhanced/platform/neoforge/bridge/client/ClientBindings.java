@@ -79,11 +79,14 @@ public final class ClientBindings {
         Binding.put(table, ViewportEvent.RenderFog.class,
                 net.neoforged.neoforge.client.event.ViewportEvent.RenderFog.class,
                 NeoViewportEventRenderFog::new);
+        // (1.21.9: an avatar renderer draws mannequins and the mod's player-like mobs too: their events are not players')
         Binding.put(table, RenderPlayerEvent.Pre.class, net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre.class,
-                NeoRenderPlayerEventPre::new);
+                n -> com.kolodkingal.enhanced.compat.RenderBridge.entity(n.getRenderState()) instanceof net.minecraft.world.entity.player.Player
+                        ? new NeoRenderPlayerEventPre(n) : null);
         Binding.put(table, RenderPlayerEvent.Post.class,
                 net.neoforged.neoforge.client.event.RenderPlayerEvent.Post.class,
-                n -> new RenderPlayerEvent.Post((net.minecraft.world.entity.player.Player) com.kolodkingal.enhanced.compat.RenderBridge.entity(n.getRenderState()), n.getRenderer(), n.getPartialTick(),
+                n -> !(com.kolodkingal.enhanced.compat.RenderBridge.entity(n.getRenderState()) instanceof net.minecraft.world.entity.player.Player) ? null
+                        : new RenderPlayerEvent.Post((net.minecraft.world.entity.player.Player) com.kolodkingal.enhanced.compat.RenderBridge.entity(n.getRenderState()), n.getRenderer(), n.getPartialTick(),
                         n.getPoseStack(), buffers(n.getSubmitNodeCollector()), n.getRenderState().lightCoords));
         Binding.put(table, RenderArmEvent.class, net.neoforged.neoforge.client.event.RenderArmEvent.class,
                 NeoRenderArmEvent::new);

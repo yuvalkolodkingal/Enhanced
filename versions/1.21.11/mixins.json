@@ -2,6 +2,7 @@
   "mixins": [],
   "client": [
     "client.ClientAvatarStateAccessor",
+    "client.EntityRenderDispatcherMixin",
     "client.QuadParticleGroupMixin"
   ],
   "remove": []
