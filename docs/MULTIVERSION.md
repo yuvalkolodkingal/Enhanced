@@ -199,3 +199,54 @@ same way as Enlightened 1.0.29.
 * **Known differences on 1.21.4**: items' emissive layers (the Infinity Stones' glow in the inventory) are drawn
   plainly (21.4 has no per-layer light for generated items); Hela's fading uses the model's full alpha; Wanda's crown is
   drawn on the Scarlet Witch's suit too.
+
+## Progress (3.13.0): 1.21.11 in the same jar
+
+Phases 4 to 6 are done for 1.21.11, the newest 1.21 version (1.21.5, 1.21.8 and 1.21.10 are not shipped: nobody
+needs them next to 1.21.11). The jar now holds three copies: 1.21.1 (as written), 1.21.4 and 1.21.11.
+
+* **How the copy is made.** `versions/1.21.11` is built from 1.21.4's rules and files, then 1.21.5's (a step that is
+  not shipped on its own: `-Pwip=1.21.5`), then its own: 244 renames in `versions/1.21.11/renames.txt` and 67 whole
+  files in `versions/1.21.11/src/main/java`. A file that starts with `//#norenames` is only relocated (the renames
+  are for the shared sources, not for the copy's own code). The javac errors went from about 1,240 (the copy as 1.21.4
+  and 1.21.5 left it) to 0.
+* **Drawing (1.21.9's submit renderer).** Entity, layer and block entity renderers no longer draw: they hand
+  geometry to a `SubmitNodeCollector`. `compat.SubmitBuffers` is a `MultiBufferSource` that records the vertices the
+  mod's renderers write, per render type, and hands them over with `submitCustomGeometry`; so the heroes' models,
+  layers, beams and effects still draw with 1.21.1's code. The `Legacy*` renderer, layer and model bases are rewritten
+  on top of it; `compat.ItemDraw` draws items, `compat.RenderBridge` entities. Render types are made with
+  `RenderSetup` (`EnhancedRenderTypes`, `SandRenderTypes`). The few places that drew with GL state (the skies, Build
+  Magic's ghost, Sokovia) go through `compat.Gl`, which makes a render pipeline per state.
+* **The GUI (1.21.6).** Screens and HUD layers draw in 2D (`compat.GuiPose`, `GuiStack`, `GuiTint`, `GuiQuads` for
+  the mod's own geometry, `GuiEntity` for the models in screens), HUD layers are NeoForge `GuiLayer`s
+  (`compat.LayeredDraw`), key input comes as events, and text colours without alpha are drawn opaque as on 1.21.1
+  (`compat.GuiText`).
+* **Saving (1.21.6).** Entities and block entities save through `ValueInput`/`ValueOutput`; `compat.ValueBridge`
+  hands the mod's code the compound tag it used before, so saved worlds keep their shape. Attachments keep their
+  compound shape too (`NeoAttach`), and saved data uses `compat.SavedBridge`.
+* **Other changes:** permissions (`compat.Perms`), game profiles (`compat.Profiles`), game rules, the time of day,
+  fog (`ViewportEvent` and NeoForge's fog events), the dimension effects (the dimension type's attributes and
+  NeoForge's custom sky, cloud and weather renderers: `compat.DimensionSpecialEffects`), particles (single-quad
+  particles), key categories, item capabilities (`Capabilities.Item`), FML 10, the abstract `RenderLevelStageEvent`
+  (the bridge listens to its sub-events), the entity packages that moved.
+* **Resources:** `tools/overlays.py` makes the 1.21.11 overlays (data format 94, assets 75, with `min_format` and
+  `max_format`): dimension types with environment attributes, skyboxes and timelines (a fixed-time timeline for the
+  mind realm), biomes with attributes, the post effects, `minecraft:chain` as `minecraft:iron_chain`, dyed colours as
+  plain numbers, and loot conditions that 1.21.11 checks differently.
+* **Checked:** the three copies compile; `./gradlew build` builds the jar; the jar starts a 1.21.11 dedicated server
+  (NeoForge 21.11.48), which stops and starts again on the same world; a 1.21.11 client joins a world, walks the mind
+  tour and the port tour (`-Denhanced.porttour=true`, a development tool in the 1.21.11 copy: every hero, creature,
+  block entity, screen and realm, with a screenshot each) without an error; the GameTests pass on 1.21.1.
+* **Known differences on 1.21.11** (each is a small, commented fallback in the 1.21.11 code):
+  * A downloaded skin keeps its own colours in the Frost Giant form (1.21.11 gives no way to read a skin back from the
+    graphics card; the default skins are recoloured as before).
+  * The Witches' Road door block has no tooltip line (1.21.11 dropped the block's tooltip method).
+  * Thor's grip on Mjolnir ignores the left-hand flag; the same hand is drawn for both.
+  * The Eternity realm's fog is always the terrain fog (1.21.11 has no separate sky fog to skip).
+  * The custom skies ignore the projection matrix they were given (1.21.11 uses the frame's).
+  * Sokovia's lifted ground draws its translucent blocks with the cutout ones.
+  * The wolf's howl is the wolf's growl (1.21.11 has wolf sound variants, not one howl).
+  * Whether a mob of the mod goes away in peaceful is decided by a mixin calling the mob's own 1.21.1 answer
+    (1.21.11 decides it by the entity type, which the mod's types do not set).
+  * The mod's geometry of one render type is merged per entity (drawn in one go, not in the order it was written).
+  * The glowing outline of the mod's effects uses the outline render types.

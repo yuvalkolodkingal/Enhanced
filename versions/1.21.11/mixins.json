@@ -1,5 +1,7 @@
 {
-  "mixins": [],
+  "mixins": [
+    "MobPeacefulMixin"
+  ],
   "client": [
     "client.ClientAvatarStateAccessor",
     "client.EntityRenderDispatcherMixin",

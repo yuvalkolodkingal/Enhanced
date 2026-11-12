@@ -6,8 +6,8 @@
 
 | | |
 |---|---|
-| **Minecraft** | Java Edition 1.21.1 or 1.21.4 (the same jar runs on both) |
-| **Mod loader** | NeoForge 21.1.256 or newer for Minecraft 1.21.1, or NeoForge 21.4.x for Minecraft 1.21.4 |
+| **Minecraft** | Java Edition 1.21.1, 1.21.4 or 1.21.11 (the same jar runs on all three) |
+| **Mod loader** | NeoForge 21.1.256 or newer for Minecraft 1.21.1, NeoForge 21.4.x for Minecraft 1.21.4, or NeoForge 21.11.48 or newer for Minecraft 1.21.11 |
 | **Java** | 21 (the Minecraft launcher already includes it) |
 | **Install it on** | The client, and the server too for multiplayer |
 
@@ -15,7 +15,7 @@ In multiplayer, the mod adds items, a block, entities and key bindings, so the s
 
 ## Install the mod
 
-1. Install **NeoForge** for Minecraft 1.21.1 or 1.21.4 (the installer is on [neoforged.net](https://neoforged.net/)) and start the game once with the NeoForge profile, so it creates the `mods` folder.
+1. Install **NeoForge** for Minecraft 1.21.1, 1.21.4 or 1.21.11 (the installer is on [neoforged.net](https://neoforged.net/)) and start the game once with the NeoForge profile, so it creates the `mods` folder.
 2. Download the newest jar from the [Releases](https://github.com/yuvalkolodkingal/enhanced/releases) page. It is the build marked *Latest*, named like `enhanced-1.0.0-build.12.jar`. (To build the jar yourself, see [Building from Source](Building-from-Source).)
 3. Put the jar in the `mods` folder of your Minecraft folder:
    * Windows: `%appdata%\.minecraft\mods`
@@ -25,7 +25,7 @@ In multiplayer, the mod adds items, a block, entities and key bindings, so the s
 
 ## Install it on a server
 
-Put the same jar in the `mods` folder of a NeoForge 21.1 (1.21.1) or 21.4 (1.21.4) server and start it. Players need the mod on their own client to join. A single-player world works like a server of its own.
+Put the same jar in the `mods` folder of a NeoForge 21.1 (1.21.1), 21.4 (1.21.4) or 21.11 (1.21.11) server and start it. Players need the mod on their own client to join. A single-player world works like a server of its own.
 
 ## What the mod creates on first start
 
@@ -51,7 +51,7 @@ Quicksilver's Walkman plays his own theme, *Silver Hours*. Since 3.8.4 *Sweet Dr
 | Problem | Try this |
 |---|---|
 | "Missing mod" or you cannot join a server | Install the same jar on the client and on the server. |
-| The game says NeoForge is too old | Update NeoForge to 21.1.256 or newer (on 1.21.1), or to a 21.4.x build (on 1.21.4). |
+| The game says NeoForge is too old | Update NeoForge to 21.1.256 or newer (on 1.21.1), to a 21.4.x build (on 1.21.4), or to 21.11.48 or newer (on 1.21.11). |
 | The keys do nothing | Keys work only for a hero, with no screen open. See [Becoming a Hero](Becoming-a-Hero), and check the bindings under *Options, Controls, Enhanced Powers*. |
 | I cannot lift Mjolnir | See the [FAQ](FAQ) and [Thor](Thor). |
 | Quicksilver's song does not play | The song plays for as long as Quicksilver Time is on (press R), whether Quicksilver runs or not, and **Sneak + R** turns the Walkman on and off. Super Speed (G) alone plays no song. A song of your own must be an `.mp3`, `.ogg` or `.wav` file in `config/enhanced/music/`. See [Music](Music). |

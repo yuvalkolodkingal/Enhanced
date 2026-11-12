@@ -14,8 +14,8 @@ import org.joml.Matrix4f;
  * methods they override, and {@link #skybox()}, {@link #clouds()} and {@link #weather()} are NeoForge's custom renderers
  * that call them (registered under the dimension type's id, which the dimension type names as its
  * {@code neoforge:custom_skybox}, {@code neoforge:custom_clouds} and {@code neoforge:custom_weather_effects}).
- * The fog's colour is the dimension type's {@code minecraft:visual/fog_color} (1.21.11 has no hook for
- * {@link #getBrightnessDependentFogColor}).
+ * The fog's colour is the dimension type's, then {@link #getBrightnessDependentFogColor} (from NeoForge's fog colour
+ * event, {@link #install}).
  */
 public abstract class DimensionSpecialEffects {
     public enum SkyType { NONE, NORMAL, END }
@@ -54,6 +54,36 @@ public abstract class DimensionSpecialEffects {
         return (float) (d0 * 2.0 + d1) / 3.0F;
     }
 
+    private static final java.util.Map<net.minecraft.resources.Identifier, DimensionSpecialEffects> BY_TYPE = new java.util.HashMap<>();
+    private static boolean listening;
+
+    /** Gives {@code effects} the fog colour of the levels of this dimension type (1.21.1's brightness-dependent fog). */
+    public static synchronized void install(net.minecraft.resources.Identifier dimensionType, DimensionSpecialEffects effects) {
+        BY_TYPE.put(dimensionType, effects);
+        if (!listening) {
+            listening = true;
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                    net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor.class, DimensionSpecialEffects::fog);
+        }
+    }
+
+    private static void fog(net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor event) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level == null) {
+            return;
+        }
+        DimensionSpecialEffects effects = level.dimensionTypeRegistration().unwrapKey()
+                .map(k -> BY_TYPE.get(k.identifier())).orElse(null);
+        if (effects == null) {
+            return;
+        }
+        float brightness = net.minecraft.util.Mth.clamp(net.minecraft.util.Mth.cos(timeOfDay(level) * ((float) Math.PI * 2.0F)) * 2.0F + 0.5F, 0.0F, 1.0F);
+        Vec3 out = effects.getBrightnessDependentFogColor(new Vec3(event.getRed(), event.getGreen(), event.getBlue()), brightness);
+        event.setRed((float) out.x);
+        event.setGreen((float) out.y);
+        event.setBlue((float) out.z);
+    }
+
     private static float partialTick() {
         return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
@@ -68,8 +98,18 @@ public abstract class DimensionSpecialEffects {
                 if (level == null) {
                     return false;
                 }
-                return DimensionSpecialEffects.this.renderSky(level, (int) level.getGameTime(), partialTick(), modelView,
-                        mc.gameRenderer.getMainCamera(), new Matrix4f(), false, setupFog);
+                // (the sky draws with modelView as 1.21.1's did, onto a model-view stack that is 1.21.11's and already
+                // holds the camera's turn: the stack is set aside while it draws)
+                Matrix4f turn = new Matrix4f(modelView); // (modelView may be the stack itself)
+                org.joml.Matrix4fStack stack = com.mojang.blaze3d.systems.RenderSystem.getModelViewStack();
+                stack.pushMatrix();
+                stack.identity();
+                try {
+                    return DimensionSpecialEffects.this.renderSky(level, (int) level.getGameTime(), partialTick(), turn,
+                            mc.gameRenderer.getMainCamera(), new Matrix4f(), false, setupFog);
+                } finally {
+                    stack.popMatrix();
+                }
             }
         };
     }

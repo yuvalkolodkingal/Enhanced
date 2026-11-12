@@ -224,6 +224,7 @@ public final class NeoClientRegistrar implements ClientRegistrar {
     @Override
     public void dimensionEffects(Identifier dimensionType, DimensionSpecialEffects effects) {
         // (1.21.11: the dimension type names these renderers in its environment attributes, by its own id)
+        DimensionSpecialEffects.install(dimensionType, effects);
         dimensionEffects.add(e -> {
             e.registerSkyboxRenderer(dimensionType, effects.skybox());
             e.registerCloudRenderer(dimensionType, effects.clouds());

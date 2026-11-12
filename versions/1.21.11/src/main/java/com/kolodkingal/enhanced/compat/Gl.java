@@ -175,15 +175,16 @@ public final class Gl {
         GpuTextureView depthView = target.useDepth
                 ? (RenderSystem.outputDepthTextureOverride != null ? RenderSystem.outputDepthTextureOverride : target.getDepthTextureView())
                 : null;
+        // (a texture loads itself the first time it is asked for, which is not allowed while a render pass is open)
+        AbstractTexture bound = shader.textured && texture != null ? Minecraft.getInstance().getTextureManager().getTexture(texture) : null;
         try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder()
                 .createRenderPass(() -> "Enhanced immediate draw", colourView, OptionalInt.empty(), depthView, OptionalDouble.empty())) {
             pass.setPipeline(pipeline);
             RenderSystem.bindDefaultUniforms(pass);
             pass.setUniform("DynamicTransforms", transforms);
             pass.setVertexBuffer(0, vertices);
-            if (shader.textured && texture != null) {
-                AbstractTexture t = Minecraft.getInstance().getTextureManager().getTexture(texture);
-                pass.bindTexture("Sampler0", t.getTextureView(), t.getSampler());
+            if (bound != null) {
+                pass.bindTexture("Sampler0", bound.getTextureView(), bound.getSampler());
             }
             pass.setIndexBuffer(indices, indexType);
             pass.drawIndexed(0, 0, mesh.drawState().indexCount(), 1);

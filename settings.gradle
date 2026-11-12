@@ -11,10 +11,12 @@ plugins {
 // The copies of the mod for the Minecraft versions after 1.21.1 (docs/MULTIVERSION.md).
 include ':v1_21_4'
 project(':v1_21_4').projectDir = file('versions/1.21.4')
-// (copies still being ported are built only when asked: ./gradlew -Pwip=1.21.11 :v1_21_11:compileJava; 1.21.5 is not
-// shipped: its rules are a step on the way to 1.21.11)
+include ':v1_21_11'
+project(':v1_21_11').projectDir = file('versions/1.21.11')
+// (copies still being ported are built only when asked: ./gradlew -Pwip=1.21.5 :v1_21_5:compileJava; 1.21.5 is not
+// shipped: its rules are a step on the way to 1.21.11, whose copy is built from 1.21.4's, 1.21.5's and its own)
 def wip = (startParameter.projectProperties.get('wip') ?: '').split(',') as List
-['1.21.5', '1.21.11'].each { v ->
+['1.21.5'].each { v ->
     if (wip.contains(v)) {
         def name = ':v' + v.replace('.', '_')
         include name

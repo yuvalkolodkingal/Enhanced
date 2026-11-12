@@ -92,6 +92,7 @@ protected void loadAdditional\(CompoundTag tag, HolderLookup\.Provider registrie
 \.getBoolean\(GameRules\.RULE_DO_IMMEDIATE_RESPAWN\) => .get(GameRules.IMMEDIATE_RESPAWN)
 
 # ---- GUI (1.21.6: drawn in 2D, a colour per blit, no LayeredDraw) ----
+\b(g|graphics|guiGraphics)\.(drawString|drawCenteredString|drawWordWrap)\( => com.kolodkingal.enhanced.compat.GuiText.$2($1,
 \bnet\.minecraft\.client\.gui\.LayeredDraw\b => com.kolodkingal.enhanced.compat.LayeredDraw
 \b(g|graphics|guiGraphics|gui)\.pose\(\)\.pushPose\(\) => $1.pose().pushMatrix()
 \b(g|graphics|guiGraphics|gui)\.pose\(\)\.popPose\(\) => $1.pose().popMatrix()

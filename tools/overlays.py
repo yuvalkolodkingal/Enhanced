@@ -335,8 +335,9 @@ def dimension_type_11(obj, timelines):
     elif effects == "minecraft:the_end":
         out["skybox"] = "end"
     elif effects != "minecraft:overworld":
-        # the mod's own sky: NeoForge's custom renderers, registered under this id (ClientSetup, compat.DimensionSpecialEffects)
-        out["skybox"] = "none"
+        # the mod's own sky: NeoForge's custom renderers, registered under this id (ClientSetup, compat.DimensionSpecialEffects);
+        # the skybox is not "none", for 1.21.11 adds the sky pass (where NeoForge calls the custom renderer) only for a skybox
+        out["skybox"] = "overworld"
         for kind in ("custom_skybox", "custom_clouds", "custom_weather_effects"):
             attributes["neoforge:" + kind] = effects
     if obj.get("bed_works", True):
