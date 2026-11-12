@@ -136,6 +136,9 @@ public final class MindTour {
     private static void at(int x, int y, int z, float yaw, float pitch, int delay) {
         server(p -> {
             BlockPos at = o(p).offset(x, y, z);
+            // (flying, so a view from the air stays where it is put)
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
             p.teleportTo(p.serverLevel(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yaw, pitch);
         }, delay);
     }
@@ -154,7 +157,7 @@ public final class MindTour {
         }, 40);
         server(MindRealm::enter, 120);
         shot("m01_arrival", 10);
-        at(4, 16, -47, 0.0F, 4.0F, 60);
+        at(4, 20, -48, 0.0F, 8.0F, 60);
         shot("m02_house", 10);
         at(0, 0, -6, 180.0F, 10.0F, 40);
         shot("m03_hall_dume", 10);

@@ -338,10 +338,10 @@ public final class MindBuilder {
         BlockState pillar = Blocks.QUARTZ_PILLAR.defaultBlockState();
         BlockState floor = Blocks.DARK_OAK_PLANKS.defaultBlockState();
         // (an older house's roof and whatever stood round it)
-        fill(-HALF_X - 6, EAVES + 1, -HALF_Z - 6, HALF_X + 12, 44, HALF_Z + 6, air);
-        fill(-HALF_X - 6, 0, -HALF_Z - 6, HALF_X + 12, EAVES, -HALF_Z - 1, air);
+        fill(-HALF_X - 12, EAVES + 1, -HALF_Z - 6, HALF_X + 12, 44, HALF_Z + 6, air);
+        fill(-HALF_X - 12, 0, -HALF_Z - 6, HALF_X + 12, EAVES, -HALF_Z - 1, air);
         fill(HALF_X + 1, 0, -HALF_Z, HALF_X + 12, EAVES, HALF_Z + 4, air);
-        fill(-HALF_X - 6, 0, -HALF_Z, -HALF_X - 1, EAVES, HALF_Z + 4, air);
+        fill(-HALF_X - 12, 0, -HALF_Z, -HALF_X - 1, EAVES, HALF_Z + 4, air);
         fill(-HALF_X, -1, -HALF_Z, HALF_X, EAVES, HALF_Z, wall);
         // the plinth, the corners, the bands between the floors and the cornice
         ring(-1, Blocks.POLISHED_ANDESITE.defaultBlockState());
@@ -376,8 +376,9 @@ public final class MindBuilder {
             }
         }
         // the bays: left from the ground, right (wider) from the first floor on brackets
-        bay(-10, 2, -1);
-        bay(9, 3, UPPER);
+        // (seen from the path: the narrow one on the left, the wide one on brackets on the right, as in the series)
+        bay(10, 2, -1);
+        bay(-9, 3, UPPER);
         // the porch: pillars before the door carrying the balcony of Ultron's room
         for (int x : new int[] {-3, 3}) {
             fill(x, 0, -HALF_Z - 3, x, 4, -HALF_Z - 3, pillar);
@@ -409,9 +410,9 @@ public final class MindBuilder {
         fill(-2, EAVES + 2, -HALF_Z - 1, 2, EAVES + 2, -HALF_Z - 1, trim);
         set(0, EAVES + 3, -HALF_Z - 1, Blocks.CHISELED_QUARTZ_BLOCK.defaultBlockState());
         wing();
-        roundTower(-HALF_X - 2, -2);
+        roundTower(HALF_X + 2, -2);
         roof();
-        turret(8, 4);
+        turret(-8, 4);
         // the elevator's shaft: a column of dark glass in the south-east corner, a panel on every floor
         for (int f : new int[] {GROUND, UPPER, TOP}) {
             liftNook(f);
@@ -495,16 +496,16 @@ public final class MindBuilder {
         fill(sx - half + 1, EAVES + 1, front + 1, sx + half - 1, EAVES + 1, -HALF_Z - 1, trim);
     }
 
-    /** The low wing to the right: one floor, a great arched window, a flat roof with a balustrade. */
+    /** The low wing to the right (seen from the path: the west): one floor, a great arched window, a flat roof with a balustrade. */
     private void wing() {
         BlockState wall = Blocks.CALCITE.defaultBlockState();
         BlockState trim = Blocks.SMOOTH_QUARTZ.defaultBlockState();
-        int x1 = HALF_X + 1;
-        int x2 = HALF_X + 10;
+        int x1 = -HALF_X - 1;
+        int x2 = -HALF_X - 10;
         int z1 = -HALF_Z + 2;
         int z2 = HALF_Z - 4;
         fill(x1, -1, z1, x2, 6, z2, wall);
-        fill(x1, 0, z1 + 1, x2 - 1, 4, z2 - 1, Blocks.AIR.defaultBlockState());
+        fill(x1, 0, z1 + 1, x2 + 1, 4, z2 - 1, Blocks.AIR.defaultBlockState());
         fill(x1, -1, z1, x2, -1, z2, Blocks.POLISHED_ANDESITE.defaultBlockState());
         fill(x1, 5, z1, x2, 5, z1, trim);
         fill(x2, 5, z1, x2, 5, z2, trim);
@@ -513,13 +514,13 @@ public final class MindBuilder {
         fill(cx - 2, 1, z1, cx + 2, 3, z1, Blocks.GLASS_PANE.defaultBlockState());
         fill(cx - 1, 4, z1, cx + 1, 4, z1, Blocks.GLASS_PANE.defaultBlockState());
         set(cx - 2, 4, z1, stairs(Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairBlock.HALF,
-                net.minecraft.world.level.block.state.properties.Half.TOP), Direction.WEST));
-        set(cx + 2, 4, z1, stairs(Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairBlock.HALF,
                 net.minecraft.world.level.block.state.properties.Half.TOP), Direction.EAST));
+        set(cx + 2, 4, z1, stairs(Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairBlock.HALF,
+                net.minecraft.world.level.block.state.properties.Half.TOP), Direction.WEST));
         set(cx, 5, z1, Blocks.CHISELED_QUARTZ_BLOCK.defaultBlockState());
         fill(x2, 1, z1 + 2, x2, 3, z2 - 2, Blocks.GLASS_PANE.defaultBlockState());
         // the balustrade on its roof
-        for (int x = x1; x <= x2; x++) {
+        for (int x = x2; x <= x1; x++) {
             set(x, 7, z1, Blocks.DIORITE_WALL.defaultBlockState());
             set(x, 7, z2, Blocks.DIORITE_WALL.defaultBlockState());
         }
@@ -528,14 +529,14 @@ public final class MindBuilder {
         }
     }
 
-    /** A round tower against the west wall, with windows all the way up and a cornice under the eaves. */
+    /** A round tower against a side wall, with windows all the way up and a cornice under the eaves. */
     private void roundTower(int cx, int cz) {
         BlockState wall = Blocks.CALCITE.defaultBlockState();
         BlockState trim = Blocks.SMOOTH_QUARTZ.defaultBlockState();
         for (int dx = -3; dx <= 3; dx++) {
             for (int dz = -3; dz <= 3; dz++) {
                 double d = Math.sqrt(dx * dx + dz * dz);
-                if (d > 3.2 || cx + dx >= -HALF_X) {
+                if (d > 3.2 || Math.abs(cx + dx) <= HALF_X) {
                     continue;
                 }
                 boolean rim = d > 2.2;
