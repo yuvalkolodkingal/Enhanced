@@ -147,6 +147,7 @@ public final class VisionAbilities {
         PowerTicker.setModifier(player, Attributes.ARMOR, SOURCE_ARMOR, 6.0, source);
         PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, SOURCE_TOUGHNESS, 6.0, source);
         PowerTicker.setModifier(player, Attributes.MAX_HEALTH, SOURCE_HEALTH, 10.0, source);
+        PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, SOURCE_SPEED, 0.025, source);
         if (source) {
             player.clearFire();
             if (!player.hasEffect(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE)
@@ -164,6 +165,7 @@ public final class VisionAbilities {
     private static final ResourceLocation SOURCE_ARMOR = Enhanced.id("vision_source_code_armor");
     private static final ResourceLocation SOURCE_TOUGHNESS = Enhanced.id("vision_source_code_toughness");
     private static final ResourceLocation SOURCE_HEALTH = Enhanced.id("vision_source_code_health");
+    private static final ResourceLocation SOURCE_SPEED = Enhanced.id("vision_source_code_speed");
 
     /** Vision phasing, or (3.3) a custom hero whose Phasing passes through walls: the same rules for both. */
     public static boolean isPhased(Player player) {

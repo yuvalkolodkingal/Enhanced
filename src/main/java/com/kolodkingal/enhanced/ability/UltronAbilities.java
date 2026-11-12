@@ -430,7 +430,7 @@ public final class UltronAbilities {
     public static UltronBoltEntity.Palette palette(Player player) {
         return switch (Powers.variant(player).id()) {
             case "sentry" -> UltronBoltEntity.Palette.SENTRY;
-            case "human", "nano" -> UltronBoltEntity.Palette.HUMAN;
+            case "human", "nano", "nano_human" -> UltronBoltEntity.Palette.HUMAN; // (Nano Ultron's lasers: red)
             default -> UltronBoltEntity.Palette.PRIME;
         };
     }

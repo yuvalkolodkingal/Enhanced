@@ -182,7 +182,7 @@ public final class PowerTicker {
     static float lookFlight(PowerData data) {
         String look = data.variant();
         return data.power() == Power.VISION && "source_code".equals(look) ? 1.5F
-                : data.power() == Power.ULTRON && "nano".equals(look) ? 1.4F : 1.0F;
+                : com.kolodkingal.enhanced.power.Characters.is(data, com.kolodkingal.enhanced.power.Characters.NANO_ULTRON) ? 1.4F : 1.0F;
     }
 
     static void setModifier(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id, double amount, boolean present) {

@@ -152,6 +152,115 @@ def horton():
     save(im, "entity/mind/horton.png")
 
 
+def ai_human(name, hair, suit, trousers, shirt=None, glasses=False, long_hair=False, stripe=None):
+    """An AI of the mind in her (or his) human form, as the AIs are played in the series: a person drawn here on the
+    human body of the mod's own skins, hair, clothes and touches of their own."""
+    im = load("ultron_human")
+    px = im.load()
+
+    def shade(c, v):
+        return tuple(max(0, min(255, int(k * (0.7 + 0.5 * v)))) for k in c[:3]) + (255,)
+
+    for y in range(64):
+        for x in range(64):
+            c = px[x, y]
+            if c[3] == 0:
+                continue
+            second = (y >= 32 and y < 48) or (y >= 48 and (x < 16 or x >= 48))
+            if second:
+                px[x, y] = (0, 0, 0, 0)
+                continue
+            h, s, v = hsv(c)
+            if y < 16:
+                if is_skin(c) and not (y < 10 and 8 <= x < 16) and not (x < 8 or x >= 16):
+                    continue
+                if 8 <= x < 16 and 8 <= y < 16 and is_skin(c):
+                    continue
+                px[x, y] = shade(hair, v)
+                continue
+            if is_skin(c):
+                continue
+            legs = (y >= 16 and y < 32 and x < 16) or (y >= 48 and 16 <= x < 32)
+            px[x, y] = shade(trousers if legs else suit, v)
+            if legs and (y % 16) >= 13:
+                px[x, y] = shade((34, 30, 28), v)  # shoes
+    # the face, painted whole: skin, brows, eyes, a mouth
+    skin = (226, 184, 152, 255)
+    for x in range(8, 16):
+        for y in range(10, 16):
+            px[x, y] = skin
+    for x in (8, 15):
+        px[x, 10] = shade(hair, 0.7)
+        px[x, 11] = shade(hair, 0.7) if long_hair else skin
+    for x in (9, 10, 13, 14):
+        px[x, 11] = shade(hair, 0.5)
+    px[11, 14] = (170, 104, 96, 255)
+    px[12, 14] = (170, 104, 96, 255)
+    px[11, 13] = (206, 164, 134, 255)
+    px[12, 13] = (206, 164, 134, 255)
+    # the eyes plain, no red light
+    for x in (9, 10, 13, 14):
+        px[x, 12] = (250, 250, 250, 255)
+    px[10, 12] = (60, 70, 90, 255)
+    px[13, 12] = (60, 70, 90, 255)
+    # the top of the head and its sides, all hair
+    for x in range(8, 16):
+        for y in range(0, 8):
+            px[x, y] = shade(hair, 0.6 + 0.2 * ((x + y) % 2))
+        px[x, 8] = shade(hair, 0.7)
+    for x in list(range(0, 8)) + list(range(16, 32)):
+        for y in range(8, 12 if not long_hair else 16):
+            px[x, y] = shade(hair, 0.6 + 0.2 * ((x * y) % 2))
+    if long_hair:
+        # hair down the back, over the shoulders (the hat layer of the head's back and sides)
+        for x in range(32, 64):
+            for y in range(8, 16):
+                if x >= 56 or x < 40 or y >= 14:
+                    px[x, y] = shade(hair, 0.65 + 0.2 * ((x + y) % 2))
+        for x in range(24, 32):
+            for y in range(20, 24):
+                px[x + 8, y] = shade(hair, 0.7)
+    if shirt:
+        for x in range(23, 25):
+            for y in range(20, 26):
+                px[x, y] = shirt + (255,)
+    if stripe:
+        for x in range(44, 48):
+            px[x, 20] = stripe + (255,)
+            px[x, 21] = stripe + (255,)
+        for x in range(36, 40):
+            px[x, 52] = stripe + (255,)
+            px[x, 53] = stripe + (255,)
+        for x in range(20, 28):
+            px[x, 27] = stripe + (255,)
+    if glasses:
+        for x in (8, 11, 12, 15):
+            px[x, 12] = (30, 30, 34, 255)
+        for x in range(8, 16):
+            px[x, 11] = (30, 30, 34, 255)
+    save(im, "entity/mind/" + name + ".png")
+
+
+def nano_overlay(w, h, name, seed):
+    """The nanotech's threads over what it took (3.12.2): thin lines of orange and pale blue light, laid over a
+    villager's, a golem's or a zombie's own look (drawn full-bright over their texture)."""
+    rnd = random.Random(seed)
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    px = im.load()
+    colours = [(255, 138, 31), (255, 170, 60), (95, 227, 255), (150, 240, 255)]
+    for _ in range(w * h // 40):
+        x, y = rnd.randrange(w), rnd.randrange(h)
+        c = rnd.choice(colours)
+        horizontal = rnd.random() < 0.5
+        for i in range(rnd.randint(2, 6)):
+            xx, yy = (x + i, y) if horizontal else (x, y + i)
+            if 0 <= xx < w and 0 <= yy < h:
+                px[xx, yy] = c + (rnd.randint(170, 230),)
+        if rnd.random() < 0.3:
+            px[x, y] = (255, 255, 255, 240)
+    save(im, "entity/mind/" + name + ".png")
+
+
 def sentry_bot():
     """The riddle robots: a Sentry's frame in workshop grey."""
     im = load("ultron_sentry")
@@ -433,8 +542,13 @@ def main():
     horton()
     sentry_bot()
     ai_orb("edith", 0.55)
+    ai_human("friday_human", (176, 64, 36), (28, 28, 34), (24, 24, 30), shirt=(236, 236, 240), long_hair=True)
+    ai_human("edith_human", (64, 44, 34), (112, 114, 122), (60, 62, 70), shirt=(220, 228, 236), glasses=True)
+    ai_human("dum_e_human", (172, 140, 92), (78, 82, 88), (64, 66, 72), stripe=(236, 184, 40))
     ai_orb("friday", 0.93)
     dum_e()
+    nano_overlay(64, 64, "nano_overlay", 12)
+    nano_overlay(128, 128, "nano_overlay_golem", 13)
     nano_infected_skin()
     source_code_item()
     popcorn_item()

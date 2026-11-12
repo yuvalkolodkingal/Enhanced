@@ -32,7 +32,7 @@ public class MindNpcEntity extends PathfinderMob {
 
         /** The AIs float, as holograms. */
         public boolean floats() {
-            return this == EDITH || this == FRIDAY;
+            return false; // (3.12.2: E.D.I.T.H. and F.R.I.D.A.Y. stand as women now, not orbs in the air)
         }
 
         static Role of(int i) {

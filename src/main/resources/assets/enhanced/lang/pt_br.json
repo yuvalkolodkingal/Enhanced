@@ -5127,5 +5127,8 @@
   "mind.enhanced.nano_question.start": "O que eu sou para você?",
   "mind.enhanced.nano_question.start.0": "Você não é nada para mim.",
   "mind.enhanced.nano_question.start.1": "Você não é meu pai. Você é o meu algo.",
-  "variant.enhanced.vision.vision_visionquest": "VisionQuest"
+  "variant.enhanced.vision.vision_visionquest": "VisionQuest",
+  "character.enhanced.source_code_vision": "Visão Código-Fonte",
+  "character.enhanced.nano_ultron": "Nano Ultron",
+  "variant.enhanced.ultron.nano_human": "Forma humana (Nano Ultron)"
 }

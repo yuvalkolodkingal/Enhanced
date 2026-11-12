@@ -92,7 +92,7 @@ public class PowerHud implements LayeredDraw.Layer {
         Variant look = Variants.current(data);
         // Heroes with several looks show the current one, and the key that changes it, after their name.
         int titleColor = Variants.hasChoice(power) ? look.color() : power.titleColor();
-        MutableComponent title = power.displayName().copy().withStyle(s -> s.withColor(titleColor).withBold(true));
+        MutableComponent title = com.kolodkingal.enhanced.power.Characters.name(data).copy().withStyle(s -> s.withColor(titleColor).withBold(true));
         if (Variants.hasChoice(power)) {
             title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
                     .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
@@ -187,7 +187,7 @@ public class PowerHud implements LayeredDraw.Layer {
         Variant look = Variants.current(data);
         PowerPanels.Model model = new PowerPanels.Model();
         model.color = Variants.hasChoice(power) ? look.color() : power.titleColor();
-        model.title = power.displayName();
+        model.title = com.kolodkingal.enhanced.power.Characters.name(data);
         model.identity = power.getSerializedName() + "/" + look.displayName().getString();
         model.sneaking = false;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {

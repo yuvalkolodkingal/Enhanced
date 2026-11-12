@@ -168,13 +168,22 @@ public final class Powers {
      */
     public static boolean cycleVariant(ServerPlayer player, int step) {
         PowerData data = get(player);
-        if (!Variants.hasChoice(data.power())) {
+        // (3.12.2: within the character the hero is: Source Code Vision and Nano Ultron have looks of their own only)
+        java.util.List<Variant> looks = Characters.looks(data);
+        if (looks.size() < 2) {
             return false;
         }
-        Variant step1 = Variants.step(data.power(), data.variant(), step);
+        int at = 0;
+        for (int i = 0; i < looks.size(); i++) {
+            if (looks.get(i).id().equals(data.variant())) {
+                at = i;
+            }
+        }
+        Variant step1 = looks.get(Math.floorMod(at + step, looks.size()));
         // (3.12: a look that is earned is skipped until it is)
-        for (int i = 0; i < Variants.of(data.power()).size() && !EarnedLooks.has(player, step1); i++) {
-            step1 = Variants.step(data.power(), step1.id(), step);
+        for (int i = 0; i < looks.size() && !EarnedLooks.has(player, step1); i++) {
+            at = Math.floorMod(at + step, looks.size());
+            step1 = looks.get(Math.floorMod(at + step, looks.size()));
         }
         Variant next = step1;
         setVariant(player, next);

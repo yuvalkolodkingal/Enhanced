@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.nano;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.power.Characters;
 import com.kolodkingal.enhanced.power.EarnedLooks;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -43,6 +44,8 @@ public final class NanoUltron {
     private static final ResourceLocation ARMOR = Enhanced.id("ultron_nano_armor");
     private static final ResourceLocation TOUGHNESS = Enhanced.id("ultron_nano_toughness");
     private static final ResourceLocation DAMAGE = Enhanced.id("ultron_nano_damage");
+    private static final ResourceLocation HEALTH = Enhanced.id("ultron_nano_health");
+    private static final ResourceLocation SPEED = Enhanced.id("ultron_nano_speed");
     private static final Set<UUID> NANO_FORM = new HashSet<>();
 
     private NanoUltron() {
@@ -50,13 +53,14 @@ public final class NanoUltron {
 
     /** Whether the player is Ultron in nanotech now. */
     public static boolean is(Player player) {
-        return Powers.is(player, Power.ULTRON) && "nano".equals(Powers.get(player).variant());
+        return Powers.is(player, Power.ULTRON) && Characters.is(Powers.get(player), Characters.NANO_ULTRON);
     }
 
     /** The storage touched by a player who is Ultron: he earns (and puts on) the nanotech body. */
     static void upgrade(ServerPlayer player) {
         Variant nano = Variants.get(Power.ULTRON, "nano");
         boolean first = EarnedLooks.earn(player, nano);
+        EarnedLooks.earn(player, Variants.get(Power.ULTRON, "nano_human"));
         Powers.setVariant(player, nano);
         ServerLevel level = player.serverLevel();
         Powers.burst(level, player.getX(), player.getY() + 1.0, player.getZ(), nano.color(), 90, 0.7);
@@ -71,11 +75,19 @@ public final class NanoUltron {
         set(player, Attributes.ARMOR, ARMOR, 8.0, nano);
         set(player, Attributes.ARMOR_TOUGHNESS, TOUGHNESS, 6.0, nano);
         set(player, Attributes.ATTACK_DAMAGE, DAMAGE, 6.0, nano);
-        if (!nano) {
-            NANO_FORM.remove(player.getUUID());
-        } else if (NANO_FORM.contains(player.getUUID()) && player.tickCount % 2 == 0) {
-            player.serverLevel().sendParticles(new DustParticleOptions(new Vector3f(1.0F, 0.45F, 0.1F), 1.1F),
-                    player.getX(), player.getY() + 1.0, player.getZ(), 4, 0.35, 0.7, 0.35, 0.02);
+        // (3.12.2: a hero of his own: more life and quicker on his feet too)
+        set(player, Attributes.MAX_HEALTH, HEALTH, 12.0, nano);
+        set(player, Attributes.MOVEMENT_SPEED, SPEED, 0.025, nano);
+        if (!nano && NANO_FORM.remove(player.getUUID())) {
+            player.setInvisible(player.hasEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY));
+        } else if (nano && NANO_FORM.contains(player.getUUID())) {
+            // (3.12.2: in pure nanotech his body is not seen: only a cloud of orange and pale blue particles where he is)
+            player.setInvisible(true);
+            ServerLevel level = player.serverLevel();
+            level.sendParticles(new DustParticleOptions(new Vector3f(1.0F, 0.54F, 0.12F), 0.9F),
+                    player.getX(), player.getY() + 0.95, player.getZ(), 7, 0.28, 0.55, 0.28, 0.01);
+            level.sendParticles(new DustParticleOptions(new Vector3f(0.37F, 0.89F, 1.0F), 0.8F),
+                    player.getX(), player.getY() + 0.95, player.getZ(), 5, 0.3, 0.6, 0.3, 0.01);
         }
     }
 
@@ -100,6 +112,7 @@ public final class NanoUltron {
         boolean on = NANO_FORM.add(player.getUUID());
         if (!on) {
             NANO_FORM.remove(player.getUUID());
+            player.setInvisible(player.hasEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY));
         }
         player.serverLevel().playSound(null, player.getX(), player.getY(), player.getZ(),
                 on ? SoundEvents.SCULK_CLICKING : SoundEvents.IRON_GOLEM_REPAIR, SoundSource.PLAYERS, 1.0F, 0.8F);
@@ -135,6 +148,7 @@ public final class NanoUltron {
             if (infected == null) {
                 continue;
             }
+            infected.setKind(NanoInfectedEntity.randomKind(level.random));
             double a = player.getRandom().nextDouble() * Math.PI * 2;
             Vec3 at = player.position().add(Math.cos(a) * 2.5, 0.0, Math.sin(a) * 2.5);
             infected.moveTo(at.x, at.y, at.z, player.getYRot(), 0.0F);
@@ -147,6 +161,8 @@ public final class NanoUltron {
     }
 
     public static void forget(Player player) {
-        NANO_FORM.remove(player.getUUID());
+        if (NANO_FORM.remove(player.getUUID())) {
+            player.setInvisible(false);
+        }
     }
 }

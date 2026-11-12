@@ -51,6 +51,20 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.12.2
+
+* **Source Code Vision is a hero of his own.** Taking in the Source Code as White Vision makes you **Source Code Vision**: he goes by his own name, and Change Look no longer takes him back to Vision's looks. He keeps all of Vision's powers (the Mind Stone beam, Phase, Density, flight, his human disguise) and is stronger, tougher, faster, flies faster and is not hurt by fire.
+* **Nano Ultron is a hero of his own.** Using the Horton nanotech storage as Ultron makes you **Nano Ultron**:
+  * His looks are the nanotech body and a **human form**, and only those two.
+  * Red lasers, more health, more strength and armour, faster on foot and in the air.
+  * In pure nanotech (Sneak + flight key) **his body disappears**: only a cloud of orange and light-blue nanotech particles is seen where he is, and blows pass through him.
+  * His army (up to 12) and the boss's are **villagers, iron golems and zombies** the nanotech has taken, glowing with orange and blue threads. Freed, they are villagers again (a golem is a golem).
+* **Vision's mind:**
+  * The mansion now looks much more like the house of the series: four floors under a red mansard roof, a big bay on the front left and a wider one on brackets on the right, a bay over the porch, a low wing with an arched window, a round tower on the side and a turret with a red cone and a weathervane on the roof.
+  * Dum-E, E.D.I.T.H. and F.R.I.D.A.Y. appear in their **human form**.
+  * The elevator now lets you out facing the room, so on the floor below you face Ultron on his sofa.
+* **The Horton manor** follows Eilon's design: a long red-brick house with stepped gables, a clock tower with a green copper dome, and a formal garden of hedge mazes, lamps, benches, fountains and topiary.
+
 ## What's new in 3.12.1
 
 * **Vision's VisionQuest look.** A new look for Vision (Change Look, **H**): the green, gold and maroon suit from *VisionQuest*. While one of his powers is in use (the Mind Stone beam, Phase or Density) his yellow eyes **glow**, fading in and out and bright even in the dark. See [Vision](Vision).

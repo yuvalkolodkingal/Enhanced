@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.nano;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -27,9 +28,20 @@ import java.util.UUID;
 /**
  * A person the nanotech has taken (3.12): fights for Nano Ultron (the boss's, against everyone) or for a player who is
  * Ultron in nanotech (his, against whatever he fights and whatever fights him; never against him). Freed
- * ({@link #free}), he is himself again: a villager.
+ * ({@link #free}), he is himself again: a villager (or a golem).
+ *
+ * <p>3.12.2: what the nanotech took ({@link Kind}): a villager, an iron golem or a zombie, drawn as one with the
+ * nanotech's orange and blue threads over it.
  */
 public class NanoInfectedEntity extends Monster {
+    /** What the nanotech took. (PERSON: 3.12's grey people, still in old worlds.) */
+    public enum Kind { PERSON, VILLAGER, GOLEM, ZOMBIE }
+
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Byte> DATA_KIND =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(NanoInfectedEntity.class,
+                    net.minecraft.network.syncher.EntityDataSerializers.BYTE);
+    private static final ResourceLocation GOLEM_HEALTH = com.kolodkingal.enhanced.Enhanced.id("nano_infected_golem_health");
+
     @Nullable
     private UUID owner;
     private int life = -1;
@@ -45,6 +57,51 @@ public class NanoInfectedEntity extends Monster {
                 .add(Attributes.ATTACK_DAMAGE, 5.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.FOLLOW_RANGE, 32.0);
+    }
+
+    @Override
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_KIND, (byte) Kind.PERSON.ordinal());
+    }
+
+    public Kind kind() {
+        int k = entityData.get(DATA_KIND);
+        return k >= 0 && k < Kind.values().length ? Kind.values()[k] : Kind.PERSON;
+    }
+
+    /** What the nanotech took; a golem is bigger and stronger. */
+    public void setKind(Kind kind) {
+        entityData.set(DATA_KIND, (byte) kind.ordinal());
+        var health = getAttribute(Attributes.MAX_HEALTH);
+        if (health != null) {
+            health.removeModifier(GOLEM_HEALTH);
+            if (kind == Kind.GOLEM) {
+                health.addPermanentModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(GOLEM_HEALTH, 36.0,
+                        net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE));
+                setHealth(getMaxHealth());
+            }
+        }
+        refreshDimensions();
+    }
+
+    /** One of the three, as chance will have it: villagers and zombies more often than golems. */
+    public static Kind randomKind(net.minecraft.util.RandomSource random) {
+        int r = random.nextInt(5);
+        return r < 2 ? Kind.VILLAGER : r < 4 ? Kind.ZOMBIE : Kind.GOLEM;
+    }
+
+    @Override
+    public void onSyncedDataUpdated(net.minecraft.network.syncher.EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (DATA_KIND.equals(key)) {
+            refreshDimensions();
+        }
+    }
+
+    @Override
+    public net.minecraft.world.entity.EntityDimensions getDefaultDimensions(net.minecraft.world.entity.Pose pose) {
+        return kind() == Kind.GOLEM ? net.minecraft.world.entity.EntityDimensions.scalable(1.4F, 2.7F) : super.getDefaultDimensions(pose);
     }
 
     @Override
@@ -93,10 +150,11 @@ public class NanoInfectedEntity extends Monster {
         if (!(level() instanceof ServerLevel level) || isRemoved()) {
             return;
         }
-        Villager villager = net.minecraft.world.entity.EntityType.VILLAGER.create(level);
-        if (villager != null) {
-            villager.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
-            level.addFreshEntity(villager);
+        Entity freed = kind() == Kind.GOLEM ? net.minecraft.world.entity.EntityType.IRON_GOLEM.create(level)
+                : net.minecraft.world.entity.EntityType.VILLAGER.create(level);
+        if (freed != null) {
+            freed.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
+            level.addFreshEntity(freed);
         }
         level.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, getX(), getY() + 1.0, getZ(), 10, 0.3, 0.5, 0.3, 0.0);
         discard();
@@ -159,6 +217,7 @@ public class NanoInfectedEntity extends Monster {
             tag.putUUID("Owner", owner);
         }
         tag.putInt("Life", life);
+        tag.putString("Kind", kind().name());
     }
 
     @Override
@@ -166,5 +225,10 @@ public class NanoInfectedEntity extends Monster {
         super.readAdditionalSaveData(tag);
         owner = tag.hasUUID("Owner") ? tag.getUUID("Owner") : null;
         life = tag.contains("Life") ? tag.getInt("Life") : -1;
+        try {
+            setKind(Kind.valueOf(tag.getString("Kind")));
+        } catch (IllegalArgumentException e) {
+            setKind(Kind.PERSON);
+        }
     }
 }

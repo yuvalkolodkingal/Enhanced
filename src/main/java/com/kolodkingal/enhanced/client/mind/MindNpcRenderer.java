@@ -40,6 +40,9 @@ public class MindNpcRenderer extends LivingEntityRenderer<MindNpcEntity, PlayerM
     private static final ResourceLocation DUM_E_TEXTURE = Enhanced.id("textures/entity/mind/dum_e.png");
     private static final ResourceLocation EDITH = Enhanced.id("textures/entity/mind/edith.png");
     private static final ResourceLocation FRIDAY = Enhanced.id("textures/entity/mind/friday.png");
+    private static final ResourceLocation DUM_E_HUMAN = Enhanced.id("textures/entity/mind/dum_e_human.png");
+    private static final ResourceLocation EDITH_HUMAN = Enhanced.id("textures/entity/mind/edith_human.png");
+    private static final ResourceLocation FRIDAY_HUMAN = Enhanced.id("textures/entity/mind/friday_human.png");
 
     private final ModelPart dumE;
     private final ModelPart orb;
@@ -76,7 +79,8 @@ public class MindNpcRenderer extends LivingEntityRenderer<MindNpcEntity, PlayerM
     @Override
     public void render(MindNpcEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         MindNpcEntity.Role role = entity.role();
-        if (role == MindNpcEntity.Role.DUM_E || role.floats()) {
+        // (3.12.2: the AIs are people, as the series plays them; the robot arm and the orbs are kept for a later use)
+        if (false && (role == MindNpcEntity.Role.DUM_E || role.floats())) {
             float time = entity.tickCount + partialTicks;
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot)));
@@ -111,9 +115,9 @@ public class MindNpcRenderer extends LivingEntityRenderer<MindNpcEntity, PlayerM
             case ULTRON -> ULTRON;
             case TORCH -> entity.ablaze() ? TORCH_ABLAZE : TORCH;
             case HORTON -> HORTON;
-            case EDITH -> EDITH;
-            case FRIDAY -> FRIDAY;
-            case DUM_E -> DUM_E_TEXTURE;
+            case EDITH -> EDITH_HUMAN;
+            case FRIDAY -> FRIDAY_HUMAN;
+            case DUM_E -> DUM_E_HUMAN;
         };
     }
 

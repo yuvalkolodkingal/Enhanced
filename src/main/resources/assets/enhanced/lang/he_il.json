@@ -5127,5 +5127,8 @@
   "mind.enhanced.nano_question.start": "מה אני עבורך?",
   "mind.enhanced.nano_question.start.0": "אתה כלום עבורי.",
   "mind.enhanced.nano_question.start.1": "אתה לא אבא שלי. אתה המשהו שלי.",
-  "variant.enhanced.vision.vision_visionquest": "ויז'ן קווסט (VisionQuest)"
+  "variant.enhanced.vision.vision_visionquest": "ויז'ן קווסט (VisionQuest)",
+  "character.enhanced.source_code_vision": "ויז'ן קוד המקור",
+  "character.enhanced.nano_ultron": "נאנו אולטרון",
+  "variant.enhanced.ultron.nano_human": "צורה אנושית (נאנו אולטרון)"
 }

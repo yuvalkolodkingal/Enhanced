@@ -72,6 +72,8 @@ public final class Variants {
                 new Variant("human", Power.ULTRON, Variant.suit("ultron_human"), null, false, 0xE23B2E, 0xFFD6CF),
                 // 3.12: earned at the Horton manor's nanotech storage (EarnedLooks)
                 new Variant("nano", Power.ULTRON, Variant.suit("ultron_nano"), null, false, 0xFF7A1A, 0xFFD2A0),
+                // 3.12.2: Nano Ultron's human form (Characters: his looks are the nanotech body and this one)
+                new Variant("nano_human", Power.ULTRON, Variant.suit("ultron_human"), null, false, 0xFF5A2A, 0xFFD2A0),
                 own(Power.ULTRON));
 
         add(Power.APOCALYPSE,

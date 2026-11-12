@@ -59,7 +59,8 @@ public final class MindQuest {
         if (level == Integer.MIN_VALUE || floor.equals("down") && MindProgress.of(player).torchDone()) {
             return;
         }
-        move(player, MindBuilder.liftStop(o, level), 270.0F);
+        // (out of the elevator, facing the room: on the floor below, Ultron on his sofa)
+        move(player, MindBuilder.liftStop(o, level), 90.0F);
         if (floor.equals("down")) {
             // Ultron waits on the sofa: the talk starts at once and cannot be left
             Entity ultron = find(player, MindNpcEntity.Role.ULTRON);
@@ -148,7 +149,7 @@ public final class MindQuest {
         }
         progress.setTorchDone(true);
         player.displayClientMessage(Component.translatable("message.enhanced.mind.source_code"), false);
-        move(player, MindBuilder.liftStop(o, MindBuilder.GROUND), 270.0F);
+        move(player, MindBuilder.liftStop(o, MindBuilder.GROUND), 90.0F);
         ServerLevel level = player.serverLevel();
         MindBuilder.removeBelow(level, o);
         MindRealm.keepPeople(level, MindRealm.plotOf(player), progress);

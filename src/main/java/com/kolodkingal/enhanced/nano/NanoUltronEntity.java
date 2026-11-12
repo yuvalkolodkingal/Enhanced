@@ -187,6 +187,7 @@ public class NanoUltronEntity extends Monster {
             if (infected == null) {
                 continue;
             }
+            infected.setKind(NanoInfectedEntity.randomKind(level.random));
             Vec3 at = target.position().add((random.nextDouble() - 0.5) * 8.0, 0.0, (random.nextDouble() - 0.5) * 8.0);
             BlockPos ground = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, BlockPos.containing(at));
             infected.moveTo(ground.getX() + 0.5, ground.getY(), ground.getZ() + 0.5, random.nextFloat() * 360.0F, 0.0F);

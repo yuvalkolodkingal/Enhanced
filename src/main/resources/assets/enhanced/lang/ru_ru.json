@@ -5127,5 +5127,8 @@
   "mind.enhanced.nano_question.start": "Кто я для тебя?",
   "mind.enhanced.nano_question.start.0": "Ты для меня никто.",
   "mind.enhanced.nano_question.start.1": "Ты не мой отец. Ты моё что-то.",
-  "variant.enhanced.vision.vision_visionquest": "VisionQuest"
+  "variant.enhanced.vision.vision_visionquest": "VisionQuest",
+  "character.enhanced.source_code_vision": "Вижн Исходный код",
+  "character.enhanced.nano_ultron": "Нано-Альтрон",
+  "variant.enhanced.ultron.nano_human": "Человеческий облик (Нано-Альтрон)"
 }

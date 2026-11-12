@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public final class EarnedLooks {
     private static final String TAG = "enhanced_earned_looks";
-    private static final Set<String> EARNED = Set.of("vision:source_code", "ultron:nano");
+    private static final Set<String> EARNED = Set.of("vision:source_code", "ultron:nano", "ultron:nano_human");
 
     private EarnedLooks() {
     }

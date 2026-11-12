@@ -208,12 +208,12 @@ public final class MindTests {
         ModItems.SOURCE_CODE.get().use(vision.level(), vision, InteractionHand.MAIN_HAND);
         check("source_code".equals(Powers.get(vision).variant()), "White Vision becomes Source Code");
         check(EarnedLooks.has(vision, Variants.get(Power.VISION, "source_code")), "earned");
-        boolean seen = false;
-        for (int i = 0; i < Variants.of(Power.VISION).size(); i++) {
-            Powers.cycleVariant(vision, 1);
-            seen |= "source_code".equals(Powers.get(vision).variant());
-        }
-        check(seen, "Change Look reaches it now");
+        // (3.12.2: Source Code Vision is a hero of his own: Change Look stays on him, and he goes by his own name)
+        check(com.kolodkingal.enhanced.power.Characters.is(Powers.get(vision), com.kolodkingal.enhanced.power.Characters.SOURCE_CODE_VISION),
+                "Source Code Vision");
+        Powers.cycleVariant(vision, 1);
+        check("source_code".equals(Powers.get(vision).variant()), "Change Look does not take him back to Vision's looks");
+        check(com.kolodkingal.enhanced.power.Characters.name(Powers.get(vision)).getString().contains("Source Code"), "his own name");
         helper.succeed();
     }
 
@@ -267,10 +267,31 @@ public final class MindTests {
         ServerPlayer ultron = f.player(12.5, FLOOR, 12.5, Power.ULTRON);
         level.getBlockState(storage).useWithoutItem(level, ultron, hit);
         check(NanoUltron.is(ultron) && EarnedLooks.has(ultron, Variants.get(Power.ULTRON, "nano")), "Ultron takes the nanotech");
+        // (3.12.2: Nano Ultron is a hero of his own: his looks are the nanotech body and the human form, nothing else)
+        Powers.cycleVariant(ultron, 1);
+        check("nano_human".equals(Powers.get(ultron).variant()) && NanoUltron.is(ultron), "Change Look: his human form, still Nano Ultron");
+        Powers.cycleVariant(ultron, 1);
+        check("nano".equals(Powers.get(ultron).variant()), "and back to the nanotech");
         check(NanoUltron.toggleForm(ultron) && NanoUltron.inForm(ultron), "his nano form");
+        NanoUltron.applyBody(ultron);
+        check(ultron.isInvisible(), "in pure nanotech his body is not seen");
         check(NanoUltron.shrugsOff(ultron, level.damageSources().playerAttack(plain)), "a blow passes through");
         check(!NanoUltron.shrugsOff(ultron, level.damageSources().magic()), "magic does not");
+        NanoUltron.toggleForm(ultron);
+        check(!ultron.isInvisible(), "seen again out of it");
+        check(NanoUltron.army(ultron, Powers.get(ultron)), "he calls his army");
+        var army = level.getEntitiesOfClass(com.kolodkingal.enhanced.nano.NanoInfectedEntity.class, new AABB(storage).inflate(12),
+                e -> ultron.getUUID().equals(e.owner()));
+        check(!army.isEmpty() && army.stream().allMatch(e -> e.kind() != com.kolodkingal.enhanced.nano.NanoInfectedEntity.Kind.PERSON),
+                "villagers, golems and zombies the nanotech has taken");
+        army.forEach(net.minecraft.world.entity.Entity::discard);
         bosses.forEach(net.minecraft.world.entity.Entity::discard);
+        // a plain Ultron never steps into Nano Ultron's looks
+        ServerPlayer plainUltron = f.player(14.5, FLOOR, 12.5, Power.ULTRON);
+        for (int i = 0; i < 8; i++) {
+            Powers.cycleVariant(plainUltron, 1);
+            check(!NanoUltron.is(plainUltron), "Ultron's Change Look stays Ultron's");
+        }
         helper.succeed();
     }
 }
