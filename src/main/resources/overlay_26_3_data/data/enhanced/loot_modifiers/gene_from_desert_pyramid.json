@@ -2,15 +2,15 @@
   "type": "neoforge:add_table",
   "table": "enhanced:inject/scarlet_witch_gene",
   "condition": {
-    "condition": "minecraft:all_of",
+    "type": "minecraft:all_of",
     "terms": [
       {
-        "condition": "neoforge:loot_table_id",
-        "loot_table_id": "minecraft:chests/desert_pyramid"
+        "loot_table_id": "minecraft:chests/desert_pyramid",
+        "type": "neoforge:loot_table_id"
       },
       {
-        "condition": "minecraft:random_chance",
-        "chance": 0.02
+        "chance": 0.02,
+        "type": "minecraft:random_chance"
       }
     ]
   }

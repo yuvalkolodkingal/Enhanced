@@ -576,3 +576,6 @@ protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float
 # (26.3: an entity has an id only once it is in a level: compat.ClientIds for the ones made for drawing)
 @in(/PreviewPuppet\.java) (super\(level, profile\);) => $1\n        setId(com.kolodkingal.enhanced.compat.ClientIds.next());
 @in(/Shapeshifts\.java) (Entity created = form\.type\(\)\.create\([^;]*\);) => $1\n        if (created != null) {\n            created.setId(com.kolodkingal.enhanced.compat.ClientIds.next());\n        }
+
+# ---- 26.3's dirt tag is dirt alone: grass, podzol, mycelium, moss and mud are in substrate_overworld with it ----
+\bBlockTags\.DIRT\b => BlockTags.SUBSTRATE_OVERWORLD

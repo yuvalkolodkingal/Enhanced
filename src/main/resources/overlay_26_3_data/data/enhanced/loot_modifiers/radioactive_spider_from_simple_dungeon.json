@@ -2,15 +2,15 @@
   "type": "neoforge:add_table",
   "table": "enhanced:inject/radioactive_spider",
   "condition": {
-    "condition": "minecraft:all_of",
+    "type": "minecraft:all_of",
     "terms": [
       {
-        "condition": "neoforge:loot_table_id",
-        "loot_table_id": "minecraft:chests/simple_dungeon"
+        "loot_table_id": "minecraft:chests/simple_dungeon",
+        "type": "neoforge:loot_table_id"
       },
       {
-        "condition": "minecraft:random_chance",
-        "chance": 0.05
+        "chance": 0.05,
+        "type": "minecraft:random_chance"
       }
     ]
   }

@@ -2,15 +2,15 @@
   "type": "neoforge:add_table",
   "table": "enhanced:inject/radioactive_spider",
   "condition": {
-    "condition": "minecraft:all_of",
+    "type": "minecraft:all_of",
     "terms": [
       {
-        "condition": "neoforge:loot_table_id",
-        "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+        "loot_table_id": "minecraft:chests/abandoned_mineshaft",
+        "type": "neoforge:loot_table_id"
       },
       {
-        "condition": "minecraft:random_chance",
-        "chance": 0.04
+        "chance": 0.04,
+        "type": "minecraft:random_chance"
       }
     ]
   }

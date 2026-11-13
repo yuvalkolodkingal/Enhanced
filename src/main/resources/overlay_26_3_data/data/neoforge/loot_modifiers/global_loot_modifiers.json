@@ -2,7 +2,7 @@
   "type": "neoforge:add_table",
   "table": "minecraft:empty",
   "condition": {
-    "condition": "neoforge:loot_table_id",
-    "loot_table_id": "enhanced:never"
+    "loot_table_id": "enhanced:never",
+    "type": "neoforge:loot_table_id"
   }
 }

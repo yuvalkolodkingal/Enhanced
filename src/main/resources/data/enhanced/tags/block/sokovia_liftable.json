@@ -37,6 +37,11 @@
     "minecraft:vine",
     "minecraft:red_mushroom",
     "minecraft:brown_mushroom",
-    "minecraft:sweet_berry_bush"
+    "minecraft:sweet_berry_bush",
+    "minecraft:muddy_mangrove_roots",
+    {
+      "id": "minecraft:pale_moss_block",
+      "required": false
+    }
   ]
 }

@@ -541,10 +541,25 @@ def data_26(obj, rel):
                "loot_table_id": "enhanced:never"}], "table": "minecraft:empty"}
     if "/loot_modifiers/" in rel and isinstance(obj, dict) and isinstance(obj.get("conditions"), list):
         # (NeoForge 26.3's loot modifiers have one "condition" and ignore "conditions": with the list left as it
-        # was, every modifier applied to every loot drawn, a block's or a mob's too)
-        terms = obj.pop("conditions")
-        obj["condition"] = terms[0] if len(terms) == 1 else {"condition": "minecraft:all_of", "terms": terms}
+        # was, every modifier applied to every loot drawn, a block's or a mob's too; and 26.3 names a condition's
+        # kind "type")
+        terms = [condition_26(t) for t in obj.pop("conditions")]
+        obj["condition"] = terms[0] if len(terms) == 1 else {"type": "minecraft:all_of", "terms": terms}
     return obj
+
+
+def condition_26(c):
+    """A loot condition as 26.3 writes it: its kind under "type", and so the conditions inside it."""
+    if not isinstance(c, dict):
+        return c
+    c = dict(c)
+    if "condition" in c and "type" not in c:
+        c["type"] = c.pop("condition")
+    if isinstance(c.get("terms"), list):
+        c["terms"] = [condition_26(t) for t in c["terms"]]
+    if isinstance(c.get("term"), dict):
+        c["term"] = condition_26(c["term"])
+    return c
 
 
 def face_uv_26(face, lo, hi):

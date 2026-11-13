@@ -51,6 +51,12 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.14.2
+
+* **No more Enhanced items out of nowhere on Minecraft 26.3.** NeoForge 26.3 reads the conditions of loot additions differently, so every addition of the mod's (a gene in a witch's drops, an ember in an End city chest...) was added to every loot drawn: breaking a block, lifting one with telekinesis, killing a mob, the chests of a new world. They now come only where they should, as on the other versions.
+* **Sleeves and trousers stay on.** On Minecraft 1.21.4, 1.21.11 and 26.3 a hero's outer skin layer (the sleeves, the jacket, the trousers, the hat: Jean Grey's gauntlets, for one) floated off the arms and legs, in third person and in first. They are drawn on the body again.
+* **Building, smashing and lifting the ground on 26.3**: 26.3's dirt is dirt alone, so grass, podzol, mycelium, moss and mud are named again where the mod's ground is (Build Magic's ground, what the Hulk smashes, what can be lifted).
+
 ## What's new in 3.14.1
 
 * **Flight no longer drops to the standing pose.** A flying hero seen in third person (F5) who flew out of water, or out of a gap too low to stand in, was drawn upright for a moment and then eased back into the flight, so the flight flashed between standing and flying. The flight's pose now takes over at once.
