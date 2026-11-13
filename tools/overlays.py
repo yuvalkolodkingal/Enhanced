@@ -539,6 +539,11 @@ def data_26(obj, rel):
         # one that never applies)
         obj = {"type": "neoforge:add_table", "conditions": [{"condition": "neoforge:loot_table_id",
                "loot_table_id": "enhanced:never"}], "table": "minecraft:empty"}
+    if "/loot_modifiers/" in rel and isinstance(obj, dict) and isinstance(obj.get("conditions"), list):
+        # (NeoForge 26.3's loot modifiers have one "condition" and ignore "conditions": with the list left as it
+        # was, every modifier applied to every loot drawn, a block's or a mob's too)
+        terms = obj.pop("conditions")
+        obj["condition"] = terms[0] if len(terms) == 1 else {"condition": "minecraft:all_of", "terms": terms}
     return obj
 
 

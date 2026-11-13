@@ -1,0 +1,17 @@
+{
+  "type": "neoforge:add_table",
+  "table": "enhanced:inject/scarlet_witch_gene",
+  "condition": {
+    "condition": "minecraft:all_of",
+    "terms": [
+      {
+        "condition": "neoforge:loot_table_id",
+        "loot_table_id": "minecraft:chests/stronghold_corridor"
+      },
+      {
+        "condition": "minecraft:random_chance",
+        "chance": 0.02
+      }
+    ]
+  }
+}

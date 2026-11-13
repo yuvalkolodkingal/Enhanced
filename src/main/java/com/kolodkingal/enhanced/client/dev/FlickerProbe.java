@@ -407,6 +407,10 @@ public final class FlickerProbe {
 
     private static void script() {
         String rounds = System.getProperty("enhanced.flickerprobe.rounds", "1,2,3");
+        if (rounds.equals("duo")) {
+            duo();
+            return;
+        }
         for (int round = 0; round < 3; round++) {
             boolean aged = round == 1;
             boolean survival = round == 2;
@@ -527,6 +531,133 @@ public final class FlickerProbe {
                 });
             }
         }
+    }
+
+    // ---- the "duo" round (-Denhanced.flickerprobe.rounds=duo): with Enlightened beside it, what players reported ----
+
+    /**
+     * The items lying about once the world is made, Jean Grey (X-Men: Apocalypse) flying behind, in front and in first
+     * person, her telekinesis and the items after it, a witch, and Enlightened's Rock Lift on its own key. Screenshots
+     * ({@code duo_*.png}) and {@code Duo probe:} lines.
+     */
+    private static void duo() {
+        server("items at the start", p -> logItems(p, "after the world was made"), 5);
+        server("phoenix", p -> {
+            Powers.awaken(p, Power.PHOENIX, "apocalypse", false);
+            p.getAbilities().invulnerable = true;
+            p.onUpdateAbilities();
+        }, 40);
+        server("items after phoenix", p -> logItems(p, "after Jean Grey"), 5);
+        server("up", p -> {
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+            p.teleportTo(p.getX(), p.getY() + 12.0, p.getZ());
+        }, 30);
+        once("fly", FlickerProbe::fly);
+        camera(CameraType.THIRD_PERSON_BACK, 20);
+        shot("duo_01_flying_back");
+        camera(CameraType.THIRD_PERSON_FRONT, 20);
+        shot("duo_02_flying_front");
+        camera(CameraType.FIRST_PERSON, 20);
+        shot("duo_03_first_person");
+        server("down", p -> {
+            p.getAbilities().flying = false;
+            p.onUpdateAbilities();
+            ServerLevel level = (ServerLevel) p.level();
+            BlockPos top = level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, p.blockPosition());
+            p.teleportTo(p.getX(), top.getY(), p.getZ());
+        }, 30);
+        once("look down", p -> p.setXRot(45.0F));
+        camera(CameraType.THIRD_PERSON_BACK, 10);
+        shot("duo_04_standing");
+        press("key.enhanced.ability_3", 30);
+        shot("duo_05_telekinesis");
+        press("key.enhanced.ability_3", 30);
+        server("items after telekinesis", p -> logItems(p, "after telekinesis"), 5);
+        shot("duo_06_after_telekinesis");
+        // Enlightened on grass: the keys to the bending, an earthbender, Rock Throw on R and Rock Lift on G
+        server("earth", p -> {
+            command(p, "fill ~-8 ~-1 ~-8 ~8 ~-1 ~8 minecraft:grass_block");
+            command(p, "fill ~-8 ~ ~-8 ~8 ~6 ~8 minecraft:air");
+            command(p, "kill @e[type=item]");
+            p.setYRot(0.0F);
+            command(p, "enlightened element set @s earth");
+            command(p, "enlightened learn @s rock_throw 3");
+            command(p, "enlightened learn @s rock_lift 3");
+            command(p, "enlightened loadout @s 1 rock_throw");
+            command(p, "enlightened loadout @s 3 rock_lift");
+        }, 30);
+        press("key.enhanced.switch_powers", 20);
+        once("look ahead", p -> p.setXRot(-5.0F));
+        camera(CameraType.THIRD_PERSON_FRONT, 10);
+        press("key.enlightened.ability_1", 0);
+        server("thrown", p -> Enhanced.LOGGER.info("Duo probe: rocks thrown: {}", p.level().getEntities((net.minecraft.world.entity.Entity) null,
+                p.getBoundingBox().inflate(32), e -> String.valueOf(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(e.getType())).equals("enlightened:shot")).size()), 0);
+        shot("duo_07_rock_throw");
+        camera(CameraType.THIRD_PERSON_BACK, 30);
+        once("look at the ground", p -> p.setXRot(40.0F));
+        press("key.enlightened.ability_2", 30);
+        once("look ahead again", p -> p.setXRot(0.0F));
+        server("shots", p -> Enhanced.LOGGER.info("Duo probe: Enlightened shots around: {}", p.level().getEntities((net.minecraft.world.entity.Entity) null,
+                p.getBoundingBox().inflate(16), e -> String.valueOf(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(e.getType())).equals("enlightened:shot")).size()), 10);
+        shot("duo_08_rock_lift");
+        camera(CameraType.THIRD_PERSON_FRONT, 10);
+        shot("duo_09_rock_lift_front");
+        server("items at the end", p -> logItems(p, "at the end"), 5);
+    }
+
+    private static void logItems(ServerPlayer p, String when) {
+        var items = p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, p.getBoundingBox().inflate(64));
+        StringBuilder names = new StringBuilder();
+        for (var item : items) {
+            names.append(' ').append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item.getItem().getItem()))
+                    .append(" x").append(item.getItem().getCount()).append(" @").append(item.blockPosition().toShortString());
+        }
+        Enhanced.LOGGER.info("Duo probe: {} items on the ground {}:{}", items.size(), when, names);
+    }
+
+    private static void command(ServerPlayer p, String command) {
+        var server = p.level().getServer();
+        server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), command);
+    }
+
+    private static void camera(CameraType type, int wait) {
+        once("camera " + type, p -> Minecraft.getInstance().options.setCameraType(type));
+        step(wait, "camera wait", p -> {
+        });
+    }
+
+    private static void shot(String name) {
+        once(name, p -> {
+            Minecraft mc = Minecraft.getInstance();
+            net.minecraft.client.Screenshot.grab(mc.gameDirectory, name + ".png", mc.getMainRenderTarget(), msg -> {
+            });
+        });
+        step(10, name + " (wait)", p -> {
+        });
+    }
+
+    /** Presses the key mapping of that name (another mod's too), as the keyboard would, then waits. */
+    private static void press(String name, int wait) {
+        once("press " + name, p -> {
+            for (net.minecraft.client.KeyMapping k : Minecraft.getInstance().options.keyMappings) {
+                if (k.getName().equals(name)) {
+                    k.setDown(true);
+                    net.minecraft.client.KeyMapping.click(k.getKey());
+                }
+            }
+        });
+        step(3, "hold " + name, p -> {
+        });
+        once("release " + name, p -> {
+            for (net.minecraft.client.KeyMapping k : Minecraft.getInstance().options.keyMappings) {
+                if (k.getName().equals(name)) {
+                    k.setDown(false);
+                }
+            }
+        });
+        step(wait, "after " + name, p -> {
+        });
     }
 
     private static int round(boolean aged, boolean survival) {

@@ -297,3 +297,9 @@ protected AABB makeBoundingBox\(\) \{ => protected AABB makeBoundingBox(net.mine
 \bnew ((?:net\.minecraft\.client\.model\.)?(?:PlayerModel|HumanoidModel<\w*>))\(((?:[^,;()]|\((?:[^()]|\([^()]*\))*\))+)(?=[,)]) => new $1(com.kolodkingal.enhanced.compat.Meshes.humanoid($2)
 # 3.12: food eaten quickly is a consumable component in 1.21.4 (popcorn is eaten at the plain speed there)
 \.fast\(\)\.build\(\) => .build()
+
+# ---- the overlay parts (hat, jacket, sleeves, trousers) are children of what they cover from 1.21.2 ----
+# 1.21.1 copied the covered part's pose onto them; a child copying its parent's pose has it twice (a sleeve floating
+# off the arm), so it is put back on its parent instead
+\b((?:\w+\.)*)(hat|jacket|rightSleeve|leftSleeve|rightPants|leftPants)\.copyFrom\(\1(?:head|body|rightArm|leftArm|rightLeg|leftLeg)\); => $1$2.resetPose();
+@in(client/hulk/HulkPlayerRenderer) \bsleeve\.copyFrom\(arm\); => sleeve.resetPose();

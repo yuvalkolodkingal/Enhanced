@@ -1,10 +1,8 @@
 {
   "type": "neoforge:add_table",
-  "conditions": [
-    {
-      "condition": "neoforge:loot_table_id",
-      "loot_table_id": "enhanced:never"
-    }
-  ],
-  "table": "minecraft:empty"
+  "table": "minecraft:empty",
+  "condition": {
+    "condition": "neoforge:loot_table_id",
+    "loot_table_id": "enhanced:never"
+  }
 }
