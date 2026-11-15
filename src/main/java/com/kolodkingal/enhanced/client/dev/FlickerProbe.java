@@ -426,6 +426,10 @@ public final class FlickerProbe {
             world();
             return;
         }
+        if (rounds.equals("reports")) {
+            reports();
+            return;
+        }
         for (int round = 0; round < 3; round++) {
             boolean aged = round == 1;
             boolean survival = round == 2;
@@ -732,6 +736,81 @@ public final class FlickerProbe {
     }
 
     private static final List<String> REALMS = new ArrayList<>();
+
+    // ---- the "reports" round (-Denhanced.flickerprobe.rounds=reports): what players reported ----
+
+    /**
+     * Every hero chosen as a player chooses him (the Hero Creator's Choose a hero screen opened and the hero picked in it,
+     * then the Become message sent as its button does), each of his looks chosen so, then the player killed (in survival,
+     * with whatever the hero carries) and respawned. {@code Reports probe:} lines; screenshots {@code rep_*.png}.
+     */
+    private static void reports() {
+        server("setup", p -> {
+            command(p, "gamerule doMobSpawning false");
+            command(p, "time set 6000");
+            command(p, "execute in minecraft:overworld run fill -14 99 -14 14 99 14 minecraft:grass_block");
+            command(p, "execute in minecraft:overworld run fill -14 100 -14 14 112 14 minecraft:air");
+        }, 20);
+        for (Power hero : com.kolodkingal.enhanced.custom.HeroLooks.heroes()) {
+            String h = hero.name().toLowerCase(java.util.Locale.ROOT);
+            server(h + " place", p -> {
+                Enhanced.LOGGER.info("Reports probe: === {} ===", h);
+                command(p, "execute in minecraft:overworld run tp @s 0 100 0 0 10");
+                p.setGameMode(GameType.SURVIVAL);
+                p.getAbilities().invulnerable = false;
+                p.onUpdateAbilities();
+                p.setHealth(p.getMaxHealth());
+            }, 10);
+            once(h + " the screen", p -> {
+                Enhanced.LOGGER.info("Reports probe: {} picked in the Choose a hero screen", h);
+                Minecraft mc = Minecraft.getInstance();
+                var screen = new com.kolodkingal.enhanced.client.screen.ChooseHeroScreen(null);
+                mc.setScreen(screen);
+                try {
+                    var pick = com.kolodkingal.enhanced.client.screen.ChooseHeroScreen.class.getDeclaredMethod("pick", Power.class);
+                    pick.setAccessible(true);
+                    pick.invoke(screen, hero);
+                } catch (ReflectiveOperationException e) {
+                    Enhanced.LOGGER.error("Reports probe: could not pick {}", h, e);
+                }
+            });
+            step(20, h + " (screen)", p -> {
+            });
+            shot("rep_" + h + "_screen");
+            once(h + " become", p -> {
+                Enhanced.LOGGER.info("Reports probe: {} become", h);
+                com.kolodkingal.enhanced.platform.net.Net.sendToServer(com.kolodkingal.enhanced.network.HeroCreatorPayload.choose(hero, ""));
+                Minecraft.getInstance().setScreen(null);
+            });
+            step(40, h + " (become)", p -> {
+            });
+            for (com.kolodkingal.enhanced.power.Variant look : com.kolodkingal.enhanced.power.Variants.of(hero)) {
+                once(h + " look " + look.id(), p -> {
+                    Enhanced.LOGGER.info("Reports probe: {} become in look {}", h, look.id());
+                    com.kolodkingal.enhanced.platform.net.Net.sendToServer(com.kolodkingal.enhanced.network.HeroCreatorPayload.choose(hero, look.id()));
+                });
+                step(15, h + " (look)", p -> {
+                });
+            }
+            shot("rep_" + h + "_hero");
+            server(h + " die", p -> {
+                Enhanced.LOGGER.info("Reports probe: {} dies", h);
+                command(p, "kill @s");
+            }, 30);
+            shot("rep_" + h + "_dead");
+            once(h + " respawn", p -> {
+                Enhanced.LOGGER.info("Reports probe: {} respawns", h);
+                if (p.isDeadOrDying()) {
+                    p.respawn();
+                }
+                Minecraft.getInstance().setScreen(null);
+            });
+            step(50, h + " (respawned)", p -> {
+            });
+            shot("rep_" + h + "_respawned");
+        }
+        server("end", p -> Enhanced.LOGGER.info("Reports probe: the end"), 5);
+    }
 
     /** What each hero carries in the "all" round: his own weapon or gear (slot, item id). */
     private static final Map<Power, String[][]> KIT = Map.ofEntries(
