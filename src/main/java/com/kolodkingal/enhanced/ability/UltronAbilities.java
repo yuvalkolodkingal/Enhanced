@@ -144,6 +144,13 @@ public final class UltronAbilities {
             return;
         }
         boolean sneak = alt;
+        // (3.15) In pure nanotech he has no body, and nothing is struck by him: his powers wait until he takes form again
+        // (only the flight key works, which also ends the form)
+        if (ability != 2 && com.kolodkingal.enhanced.nano.NanoUltron.inForm(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.nano_ultron.form.no_powers")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY), true);
+            return;
+        }
         switch (ability) {
             case 1 -> {
                 if (sneak) {

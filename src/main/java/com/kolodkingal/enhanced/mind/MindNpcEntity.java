@@ -18,13 +18,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.PushReaction;
 
 /**
- * Someone who lives in Vision's mind (3.12): Dum-E, E.D.I.T.H., F.R.I.D.A.Y., the riddle robots, Ultron in a human face,
+ * Someone who lives in Vision's mind (3.12): Dum-E and U, E.D.I.T.H., F.R.I.D.A.Y., J.A.R.V.I.S. (3.15), the riddle robots, Ultron in a human face,
  * the Human Torch and Dr. Phineas Horton ({@link Role}). They do not move, cannot be hurt, and talk when used
  * ({@link MindTalk}). They are never saved: {@link MindRealm} puts them in their places when their mind is visited.
  */
 public class MindNpcEntity extends PathfinderMob {
     public enum Role {
-        DUM_E, EDITH, FRIDAY, ROBOT, ULTRON, TORCH, HORTON;
+        DUM_E, EDITH, FRIDAY, ROBOT, ULTRON, TORCH, HORTON,
+        /** (3.15) J.A.R.V.I.S. and U, as VisionQuest plays them. */
+        JARVIS, U;
 
         public String id() {
             return name().toLowerCase(java.util.Locale.ROOT);

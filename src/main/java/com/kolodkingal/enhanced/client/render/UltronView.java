@@ -103,6 +103,11 @@ final class UltronView {
     @Nullable
     static RenderType eyes(AbstractClientPlayer player, PowerData data) {
         String look = Powers.variant(player).id();
+        if ("nano_human".equals(look)) {
+            // (3.15) Nano Ultron in a human face has a man's eyes, not a light in them (no other look of his is known
+            // here, so it burned with Prime's)
+            return null;
+        }
         int index = 0;
         for (int i = 0; i < LOOKS.length; i++) {
             if (LOOKS[i].equals(look)) {

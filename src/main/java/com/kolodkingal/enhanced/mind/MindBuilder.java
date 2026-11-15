@@ -94,9 +94,51 @@ public final class MindBuilder {
         return origin.offset(LIFT_X, BOTTOM, LIFT_Z);
     }
 
-    /** The cinema's screen: the bottom-left block of the painting the projector shows (on the west wall, facing east). */
+    /**
+     * The cinema's screen: where the painting the projector shows hangs (on the west wall, facing east). 3.15: the
+     * picture fills the whole screen (7x4, z 2..8 and the floor's level to three above it), so it hangs from the
+     * screen's middle: a painting is centred on its block, and one of an even height reaches a block lower than up.
+     */
     public static BlockPos screen(BlockPos origin) {
-        return origin.offset(-13, GROUND + 1, 6);
+        return origin.offset(-13, GROUND + 1, 5);
+    }
+
+    /** The projector's picture on the screen (3.15): the whole screen covered, lit. */
+    public static net.minecraft.world.entity.decoration.Painting showPicture(net.minecraft.server.level.ServerLevel level, BlockPos origin) {
+        clearScreen(level, origin);
+        net.minecraft.world.entity.decoration.Painting picture = MindPaintings.placeCovering(level, origin.offset(-13, GROUND, 2),
+                origin.offset(-13, GROUND + 3, 8), Direction.EAST, MindPaintings.CINEMA);
+        screenLight(level, origin, true);
+        return picture;
+    }
+
+    /**
+     * The projector's light on the screen (3.15): invisible light blocks just before it while the picture shows, so the
+     * picture is seen in the dark cinema; put out with it.
+     */
+    public static void screenLight(net.minecraft.server.level.ServerLevel level, BlockPos origin, boolean on) {
+        for (int z = 3; z <= 7; z += 2) {
+            for (int y = GROUND + 1; y <= GROUND + 2; y++) {
+                BlockPos at = origin.offset(-12, y, z);
+                BlockState now = level.getBlockState(at);
+                if (on && now.isAir()) {
+                    level.setBlock(at, Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 13), 3);
+                } else if (!on && now.is(Blocks.LIGHT)) {
+                    level.setBlock(at, Blocks.AIR.defaultBlockState(), 3);
+                }
+            }
+        }
+    }
+
+    /** Clears what stands before the screen at the floor (the carpet of a mind built before 3.15), so the picture fits. */
+    public static void clearScreen(net.minecraft.server.level.ServerLevel level, BlockPos origin) {
+        for (int z = 2; z <= 8; z++) {
+            BlockPos at = origin.offset(-13, GROUND, z);
+            BlockState there = level.getBlockState(at);
+            if (there.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || there.is(net.minecraft.tags.BlockTags.WOOL_CARPETS)) {
+                level.setBlock(at, Blocks.AIR.defaultBlockState(), 3);
+            }
+        }
     }
 
     /** The Human Torch's armchair, where he sits once his flames are out. */
@@ -118,6 +160,8 @@ public final class MindBuilder {
     static List<Spot> people(BlockPos o, MindProgress progress) {
         List<Spot> out = new ArrayList<>();
         out.add(new Spot(MindNpcEntity.Role.DUM_E, Vec3.atBottomCenterOf(o.offset(2, GROUND, -8)), 180.0F));
+        out.add(new Spot(MindNpcEntity.Role.U, Vec3.atBottomCenterOf(o.offset(3, GROUND, -9)), 180.0F));
+        out.add(new Spot(MindNpcEntity.Role.JARVIS, Vec3.atBottomCenterOf(o.offset(-3, GROUND, -4)), -90.0F));
         out.add(new Spot(MindNpcEntity.Role.EDITH, Vec3.atBottomCenterOf(o.offset(8, GROUND, -7)), 0.0F));
         out.add(new Spot(MindNpcEntity.Role.FRIDAY, Vec3.atBottomCenterOf(o.offset(3, GROUND, 5)), 90.0F));
         out.add(new Spot(MindNpcEntity.Role.ROBOT, Vec3.atBottomCenterOf(o.offset(-11, TOP, 4)), 0.0F));
@@ -712,7 +756,7 @@ public final class MindBuilder {
         // (as in the series: red walls, red seats, a little amber lamp at the end of every row)
         room(-14, f - 1, 0, -2, f + 5, 10, Blocks.RED_WOOL.defaultBlockState(), Blocks.DARK_OAK_PLANKS.defaultBlockState(),
                 Blocks.RED_TERRACOTTA.defaultBlockState());
-        fill(-13, f, 1, -3, f, 9, Blocks.RED_CARPET.defaultBlockState());
+        fill(-12, f, 1, -3, f, 9, Blocks.RED_CARPET.defaultBlockState()); // (3.15: the screen's picture comes down to the floor)
         fill(-14, f, 2, -14, f + 3, 8, Blocks.WHITE_CONCRETE.defaultBlockState());
         for (int x : new int[] {-10, -8, -6}) {
             for (int z = 3; z <= 8; z++) {

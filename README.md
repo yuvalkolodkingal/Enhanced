@@ -71,6 +71,17 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Install it on** the client, plus the server for multiplayer
 * **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
 
+## What's new in 3.15.0
+
+Changes from playtesting in Vision's mind:
+
+* **The AIs look like themselves.** FRIDAY, EDITH and Dum-E have new skins, and **JARVIS** (in the hall) and **U** (by Dum-E at the door) now live in the mind too, each with their own talk.
+* **The cinema picture fills the whole screen:** a black-and-white WandaVision picture with Wanda and Vision in it, lit while the projector runs.
+* **Source Code Vision wears the VisionQuest suit**, with its lit eyes.
+* **Nano Ultron in his pure nanotech form** (no body, no harm can touch him) can no longer use abilities or hurt anyone. Take form again (Sneak + flight) to fight.
+* **Ultron's gift hat is bigger** and covers the whole head.
+* **Ultron's human looks:** the Nano Ultron human form has normal eyes (no red glow), and the red glitch in the hair is gone.
+
 ## What's new in 3.14.4
 
 * **The Hex works again on Minecraft 1.21.4, 1.21.11 and 26.3.** Wanda's Hex rose on the server, but the players were never told of it: only its Vision came, with no walls, no red sky and no runes. The game no longer sends what is kept on a whole dimension by itself (as it did on 1.21.1), and the mod now does.

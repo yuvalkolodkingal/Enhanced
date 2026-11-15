@@ -825,7 +825,8 @@ public final class FlickerProbe {
             Map.entry(Power.MAGNETO, new String[][]{{"armor.head", "magneto_helmet"}}),
             Map.entry(Power.SCARLET_WITCH, new String[][]{{"armor.head", "wanda_crown"}}),
             Map.entry(Power.QUICKSILVER, new String[][]{{"armor.head", "quicksilver_goggles"}}),
-            Map.entry(Power.CYCLOPS, new String[][]{{"armor.head", "ruby_quartz_glasses"}}));
+            Map.entry(Power.CYCLOPS, new String[][]{{"armor.head", "ruby_quartz_glasses"}}),
+            Map.entry(Power.VISION, new String[][]{{"armor.head", "ultron_hat"}}));
 
     private static void all() {
         String from = System.getProperty("enhanced.flickerprobe.from", "");
@@ -847,7 +848,7 @@ public final class FlickerProbe {
                 continue;
             }
             String only = System.getProperty("enhanced.flickerprobe.only", "");
-            if (!only.isEmpty() && !hero.name().equalsIgnoreCase(only)) {
+            if (!only.isEmpty() && !java.util.Arrays.asList(only.toLowerCase(java.util.Locale.ROOT).split(",")).contains(hero.name().toLowerCase(java.util.Locale.ROOT))) {
                 continue;
             }
             started = true;

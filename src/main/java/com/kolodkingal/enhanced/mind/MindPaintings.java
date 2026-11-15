@@ -38,6 +38,48 @@ public final class MindPaintings {
         return null;
     }
 
+    /**
+     * Hangs the painting so that it covers the blocks from {@code low} to {@code high} (both corners of the wall's face it
+     * hangs on): of the places around their middle where it fits, the one that covers them best (3.15: the cinema's
+     * picture, the whole screen). Falls back to {@link #place} if none covers them.
+     */
+    public static Painting placeCovering(ServerLevel level, BlockPos low, BlockPos high, Direction facing, ResourceKey<PaintingVariant> key) {
+        Holder<PaintingVariant> variant = level.registryAccess().registryOrThrow(Registries.PAINTING_VARIANT).getHolderOrThrow(key);
+        AABB want = new AABB(low.getX(), low.getY(), low.getZ(), high.getX() + 1, high.getY() + 1, high.getZ() + 1);
+        BlockPos middle = new BlockPos((low.getX() + high.getX()) / 2, (low.getY() + high.getY()) / 2, (low.getZ() + high.getZ()) / 2);
+        Painting best = null;
+        double bestScore = -1.0;
+        for (int dy = -1; dy <= 2; dy++) {
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    Painting painting = new Painting(level, middle.offset(dx, dy, dz), facing, variant);
+                    if (!painting.survives()) {
+                        continue;
+                    }
+                    AABB box = painting.getBoundingBox();
+                    double score = overlap(box, want);
+                    if (score > bestScore) {
+                        best = painting;
+                        bestScore = score;
+                    }
+                }
+            }
+        }
+        if (best == null) {
+            return place(level, middle, facing, key);
+        }
+        level.addFreshEntity(best);
+        return best;
+    }
+
+    /** How much of {@code want} (in the wall's plane) a box covers. */
+    private static double overlap(AABB box, AABB want) {
+        double y = Math.max(0.0, Math.min(box.maxY, want.maxY) - Math.max(box.minY, want.minY));
+        double x = Math.max(0.0, Math.min(box.maxX, want.maxX) - Math.max(box.minX, want.minX));
+        double z = Math.max(0.0, Math.min(box.maxZ, want.maxZ) - Math.max(box.minZ, want.minZ));
+        return y * (want.getXsize() > want.getZsize() ? x : z);
+    }
+
     /** The painting of {@code key} near {@code pos}, if one hangs there. */
     public static Painting find(ServerLevel level, BlockPos pos, ResourceKey<PaintingVariant> key) {
         for (Painting p : level.getEntitiesOfClass(Painting.class, new AABB(pos).inflate(3))) {

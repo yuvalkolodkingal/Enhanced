@@ -66,6 +66,15 @@ public final class MindTalk {
                 .line("start", "edith", "who", "what", "")
                 .line("who", "edith", "what", "")
                 .line("what", "edith", "who", ""));
+        // J.A.R.V.I.S., in the hall (3.15)
+        scene("jarvis", new Script()
+                .line("start", "jarvis", "who", "house", "")
+                .line("who", "jarvis", "house", "")
+                .line("house", "jarvis", "who", ""));
+        // U, at the door with Dum-E (3.15)
+        scene("u", new Script()
+                .line("start", "u", "dum_e", "")
+                .line("dum_e", "u", ""));
         // F.R.I.D.A.Y., across from the cinema
         scene("friday", new Script()
                 .line("start", "friday", "cinema", "gift", "")
@@ -139,6 +148,8 @@ public final class MindTalk {
             case ULTRON -> "ultron";
             case TORCH -> progress.torchDone() ? "torch_after" : "torch";
             case HORTON -> "horton_after";
+            case JARVIS -> "jarvis";
+            case U -> "u";
         };
         start(player, scene, npc, scene.equals("ultron") || scene.equals("torch"));
     }

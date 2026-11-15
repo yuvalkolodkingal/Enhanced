@@ -43,6 +43,8 @@ public class MindNpcRenderer extends LivingEntityRenderer<MindNpcEntity, PlayerM
     private static final ResourceLocation DUM_E_HUMAN = Enhanced.id("textures/entity/mind/dum_e_human.png");
     private static final ResourceLocation EDITH_HUMAN = Enhanced.id("textures/entity/mind/edith_human.png");
     private static final ResourceLocation FRIDAY_HUMAN = Enhanced.id("textures/entity/mind/friday_human.png");
+    private static final ResourceLocation JARVIS_HUMAN = Enhanced.id("textures/entity/mind/jarvis_human.png");
+    private static final ResourceLocation U_HUMAN = Enhanced.id("textures/entity/mind/u_human.png");
 
     private final ModelPart dumE;
     private final ModelPart orb;
@@ -118,6 +120,8 @@ public class MindNpcRenderer extends LivingEntityRenderer<MindNpcEntity, PlayerM
             case EDITH -> EDITH_HUMAN;
             case FRIDAY -> FRIDAY_HUMAN;
             case DUM_E -> DUM_E_HUMAN;
+            case JARVIS -> JARVIS_HUMAN;
+            case U -> U_HUMAN;
         };
     }
 

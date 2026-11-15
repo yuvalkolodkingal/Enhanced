@@ -37,8 +37,9 @@ public final class VisionQuestLookTests {
                 "the skin and its eyes are in the jar");
         check(Variants.get(Power.VISION, "vision").skin().equals(Enhanced.id("textures/entity/suit/vision.png"))
                 && Variants.get(Power.VISION, "white_vision").skin().equals(Enhanced.id("textures/entity/suit/white_vision.png"))
-                && Variants.get(Power.VISION, "source_code").skin().equals(Enhanced.id("textures/entity/suit/vision_source_code.png")),
-                "the other looks are as they were");
+                // (3.15: the Source Code wears the VisionQuest suit, which was meant for it)
+                && Variants.get(Power.VISION, "source_code").skin().equals(Enhanced.id("textures/entity/suit/vision_visionquest.png")),
+                "the other looks are as they were (the Source Code in the VisionQuest suit)");
         helper.succeed();
     }
 

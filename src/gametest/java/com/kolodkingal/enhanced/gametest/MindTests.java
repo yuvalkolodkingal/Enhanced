@@ -124,13 +124,22 @@ public final class MindTests {
         }
         check(people.getOrDefault(MindNpcEntity.Role.DUM_E, 0) == 1 && people.getOrDefault(MindNpcEntity.Role.EDITH, 0) == 1
                 && people.getOrDefault(MindNpcEntity.Role.FRIDAY, 0) == 1 && people.getOrDefault(MindNpcEntity.Role.ROBOT, 0) == 3
-                && people.getOrDefault(MindNpcEntity.Role.ULTRON, 0) == 1 && people.getOrDefault(MindNpcEntity.Role.TORCH, 0) == 1,
+                && people.getOrDefault(MindNpcEntity.Role.ULTRON, 0) == 1 && people.getOrDefault(MindNpcEntity.Role.TORCH, 0) == 1
+                && people.getOrDefault(MindNpcEntity.Role.JARVIS, 0) == 1 && people.getOrDefault(MindNpcEntity.Role.U, 0) == 1,
                 "everyone in his place: " + people);
+        // (3.15) the projector's picture fills the screen: a 7x4 painting hangs on it
+        net.minecraft.world.entity.decoration.Painting picture = com.kolodkingal.enhanced.mind.MindBuilder.showPicture(mind, o);
+        check(picture != null && picture.getVariant().value().width() == 7 && picture.getVariant().value().height() == 4
+                        && Math.abs(picture.getBoundingBox().minY - (o.getY() + MindBuilder.GROUND)) < 0.01
+                        && Math.abs(picture.getBoundingBox().minZ - (o.getZ() + 2)) < 0.01,
+                "the cinema's picture fills the screen: " + (picture == null ? null : picture.getBoundingBox()));
+        com.kolodkingal.enhanced.mind.MindBuilder.screenLight(mind, o, false);
+        picture.discard();
         // a second visit makes no one twice
         MindRealm.leave(vision);
         check(MindRealm.enter(vision), "in again");
         int count = mind.getEntitiesOfClass(MindNpcEntity.class, new AABB(o).inflate(70, 80, 70)).size();
-        check(count == 8, "still eight: " + count);
+        check(count == 10, "still ten: " + count);
         MindRealm.leave(vision);
         helper.succeed();
     }

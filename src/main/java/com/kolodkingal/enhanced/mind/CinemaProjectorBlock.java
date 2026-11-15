@@ -51,9 +51,10 @@ public class CinemaProjectorBlock extends HorizontalDirectionalBlock {
             Painting shown = MindPaintings.find(server, screen, MindPaintings.CINEMA);
             if (shown != null) {
                 shown.discard();
+                MindBuilder.screenLight(server, MindRealm.origin(MindRealm.plotAt(pos)), false);
                 server.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.8F, 0.7F);
             } else {
-                MindPaintings.place(server, screen, Direction.EAST, MindPaintings.CINEMA);
+                MindBuilder.showPicture(server, MindRealm.origin(MindRealm.plotAt(pos)));
                 server.playSound(null, pos, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.8F, 1.8F);
             }
         }

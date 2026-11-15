@@ -5131,5 +5131,18 @@
   "variant.enhanced.vision.vision_visionquest": "ויז'ן קווסט (VisionQuest)",
   "character.enhanced.source_code_vision": "ויז'ן קוד המקור",
   "character.enhanced.nano_ultron": "נאנו אולטרון",
-  "variant.enhanced.ultron.nano_human": "צורה אנושית (נאנו אולטרון)"
+  "variant.enhanced.ultron.nano_human": "צורה אנושית (נאנו אולטרון)",
+  "mind.enhanced.speaker.jarvis": "ג'רוויס",
+  "mind.enhanced.speaker.u": "יו",
+  "mind.enhanced.jarvis.start": "ערב טוב, ויז'ן. ג'רוויס, לשירותך, כמו שהייתי פעם לשירותו של מר סטארק.",
+  "mind.enhanced.jarvis.start.0": "מי אתה, באמת?",
+  "mind.enhanced.jarvis.start.1": "מה הבית הזה?",
+  "mind.enhanced.jarvis.who": "הקול שממנו נבנית. חלק ממך התחיל בתור אני, אדוני. אני אוהב לחשוב שהשארתי לך את הנימוסים שלי.",
+  "mind.enhanced.jarvis.who.0": "מה הבית הזה?",
+  "mind.enhanced.jarvis.house": "התודעה שלך, מסודרת. המטבח, הקולנוע, הסדנה למטה: כל מה שיש כאן הוא משהו שאתה זוכר.",
+  "mind.enhanced.jarvis.house.0": "מי אתה, באמת?",
+  "mind.enhanced.u.start": "אה! היי. אני יו. אל תשים לב לדאמי, הוא מתרגש כשמישהו חוזר הביתה.",
+  "mind.enhanced.u.start.0": "מי זה דאמי?",
+  "mind.enhanced.u.dum_e": "השותף שלי. תיקנו הכול בסדנה של טוני, ושברנו את רוב זה קודם. עכשיו אנחנו מתקנים דברים כאן.",
+  "message.enhanced.nano_ultron.form.no_powers": "ננו-טכנולוגיה טהורה: בלי גוף, בלי כוחות. חזור לצורה (התגנבות + תעופה)."
 }

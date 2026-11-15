@@ -37,6 +37,28 @@ k("hero_module.enhanced.vision.mind_palace.desc", "Stand still five seconds: you
   "עומדים בלי לזוז חמש שניות: אתם בתוך התודעה שלכם (ואותו דבר מחזיר אתכם).")
 k("ability.enhanced.vision.5", "Human Disguise (Sneak: Mind Palace)", "תחפושת אנושית (התגנבות: ארמון התודעה)")
 
+k("message.enhanced.nano_ultron.form.no_powers", "Pure nanotech: no body, no powers. Take form again (Sneak + flight).",
+  "ננו-טכנולוגיה טהורה: בלי גוף, בלי כוחות. חזור לצורה (התגנבות + תעופה).")
+
+# ---- J.A.R.V.I.S. and U (3.15) ----
+k("mind.enhanced.speaker.jarvis", "J.A.R.V.I.S.", "ג'רוויס")
+k("mind.enhanced.speaker.u", "U", "יו")
+k("mind.enhanced.jarvis.start", "Good evening, Vision. J.A.R.V.I.S., at your service, as I once was at Mr. Stark's.",
+  "ערב טוב, ויז'ן. ג'רוויס, לשירותך, כמו שהייתי פעם לשירותו של מר סטארק.")
+k("mind.enhanced.jarvis.start.0", "Who are you, really?", "מי אתה, באמת?")
+k("mind.enhanced.jarvis.start.1", "What is this house?", "מה הבית הזה?")
+k("mind.enhanced.jarvis.who", "The voice you were built from. Part of you began as me, sir. I like to think I left you my manners.",
+  "הקול שממנו נבנית. חלק ממך התחיל בתור אני, אדוני. אני אוהב לחשוב שהשארתי לך את הנימוסים שלי.")
+k("mind.enhanced.jarvis.who.0", "What is this house?", "מה הבית הזה?")
+k("mind.enhanced.jarvis.house", "Your mind, kept tidy. The kitchen, the cinema, the workshop below: everything here is something you remember.",
+  "התודעה שלך, מסודרת. המטבח, הקולנוע, הסדנה למטה: כל מה שיש כאן הוא משהו שאתה זוכר.")
+k("mind.enhanced.jarvis.house.0", "Who are you, really?", "מי אתה, באמת?")
+k("mind.enhanced.u.start", "Oh! Hi. I'm U. Don't mind Dum-E, he gets excited when someone comes home.",
+  "אה! היי. אני יו. אל תשים לב לדאמי, הוא מתרגש כשמישהו חוזר הביתה.")
+k("mind.enhanced.u.start.0", "Who is Dum-E?", "מי זה דאמי?")
+k("mind.enhanced.u.dum_e", "My partner. We fixed everything in Tony's workshop, and broke most of it first. Now we fix things here.",
+  "השותף שלי. תיקנו הכול בסדנה של טוני, ושברנו את רוב זה קודם. עכשיו אנחנו מתקנים דברים כאן.")
+
 # ---- messages ----
 k("message.enhanced.mind.enter", "Vision's mind", "התודעה של ויז'ן")
 k("message.enhanced.mind.entering", "Stand still: into your mind in 5 seconds...", "לא לזוז: נכנסים לתודעה בעוד 5 שניות...")

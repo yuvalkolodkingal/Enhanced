@@ -5131,5 +5131,18 @@
   "variant.enhanced.vision.vision_visionquest": "VisionQuest",
   "character.enhanced.source_code_vision": "Source Code Vision",
   "character.enhanced.nano_ultron": "Nano Ultron",
-  "variant.enhanced.ultron.nano_human": "Human form (Nano Ultron)"
+  "variant.enhanced.ultron.nano_human": "Human form (Nano Ultron)",
+  "mind.enhanced.speaker.jarvis": "J.A.R.V.I.S.",
+  "mind.enhanced.speaker.u": "U",
+  "mind.enhanced.jarvis.start": "Good evening, Vision. J.A.R.V.I.S., at your service, as I once was at Mr. Stark's.",
+  "mind.enhanced.jarvis.start.0": "Who are you, really?",
+  "mind.enhanced.jarvis.start.1": "What is this house?",
+  "mind.enhanced.jarvis.who": "The voice you were built from. Part of you began as me, sir. I like to think I left you my manners.",
+  "mind.enhanced.jarvis.who.0": "What is this house?",
+  "mind.enhanced.jarvis.house": "Your mind, kept tidy. The kitchen, the cinema, the workshop below: everything here is something you remember.",
+  "mind.enhanced.jarvis.house.0": "Who are you, really?",
+  "mind.enhanced.u.start": "Oh! Hi. I'm U. Don't mind Dum-E, he gets excited when someone comes home.",
+  "mind.enhanced.u.start.0": "Who is Dum-E?",
+  "mind.enhanced.u.dum_e": "My partner. We fixed everything in Tony's workshop, and broke most of it first. Now we fix things here.",
+  "message.enhanced.nano_ultron.form.no_powers": "Pure nanotech: no body, no powers. Take form again (Sneak + flight)."
 }

@@ -12,7 +12,7 @@ public final class VisionQuest {
 
     /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, Phase, Density). */
     public static boolean eyesLit(PowerData data) {
-        return data.power() == Power.VISION && LOOK.equals(data.variant()) && !data.disguise()
+        return data.power() == Power.VISION && (LOOK.equals(data.variant()) || "source_code".equals(data.variant())) && !data.disguise()
                 && (data.beamActive() || data.visionPhased() || data.dense());
     }
 }

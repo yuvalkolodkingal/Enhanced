@@ -40,34 +40,6 @@ def is_skin(c):
 
 # ---- skins ----
 
-def source_code_vision():
-    """White Vision, his seams turned to gold circuitry and the stone gold: Vision as his source code."""
-    im = load("white_vision")
-    px = im.load()
-    for y in range(64):
-        for x in range(64):
-            c = px[x, y]
-            if c[3] == 0:
-                continue
-            h, s, v = hsv(c)
-            if s < 0.25 and v < 0.78:
-                px[x, y] = rgb(0.12, 0.70, min(1.0, v + 0.35), c[3])  # the seams: gold
-            elif s < 0.25:
-                px[x, y] = rgb(0.13, 0.08, min(1.0, v + 0.04), c[3])  # the shell: warm pearl
-            else:
-                px[x, y] = rgb(0.14, 0.85, 1.0, c[3])  # the stone and the eyes: bright gold
-    save(im, "entity/suit/vision_source_code.png")
-    cape = load("white_vision_cape")
-    cp = cape.load()
-    for y in range(cape.height):
-        for x in range(cape.width):
-            c = cp[x, y]
-            if c[3]:
-                h, s, v = hsv(c)
-                cp[x, y] = rgb(0.12, 0.35, v, c[3])
-    save(cape, "entity/suit/vision_source_code_cape.png")
-
-
 def nano_ultron():
     """Ultron Prime in the colours of the nanotech: copper plates, orange light."""
     im = load("ultron_prime")
@@ -435,21 +407,103 @@ def nano_storage_side(im, d):
 
 
 def painting_logo():
-    """The cinema's title card (64x32: a 4x2 painting): a TV's screen, two letters and a heart, drawn here."""
-    im = Image.new("RGBA", (64, 32), (24, 18, 30, 255))
+    """The cinema's picture (3.15: 112x64, a 7x4 painting filling the screen): WandaVision as its first episodes were,
+    in black and white: the title, a heart, and Wanda and Vision side by side in their 1950s living room, on an old
+    television's rounded screen with its scanlines and grain. Drawn here."""
+    W, H = 112, 64
+    im = Image.new("RGBA", (W, H), (0, 0, 0, 255))
     d = ImageDraw.Draw(im)
-    d.rectangle([2, 2, 61, 29], outline=(230, 200, 120, 255))
-    d.rectangle([4, 4, 59, 27], fill=(52, 40, 70, 255))
-    # a W of two Vs, a V, in gold and red
-    w = [(10, 9), (14, 22), (18, 13), (22, 22), (26, 9)]
-    d.line(w, fill=(232, 52, 64, 255), width=2)
-    d.line([(36, 9), (42, 22), (48, 9)], fill=(240, 210, 90, 255), width=2)
-    d.polygon([(52, 17), (54, 15), (56, 17), (54, 20)], fill=(232, 52, 64, 255))
-    for x in range(6, 58, 3):
-        d.point((x, 25), fill=(120, 100, 150, 255))
+
+    def g(v):
+        v = max(0, min(255, int(v)))
+        return (v, v, v, 255)
+
+    # the room: a wall in soft light, a skirting board, a floor; a window with curtains, a lamp
+    for y in range(H):
+        for x in range(W):
+            light = 150 - abs(x - W / 2) * 0.9 - abs(y - 26) * 0.6
+            im.putpixel((x, y), g(light if y < 46 else light * 0.55))
+    d.rectangle([0, 45, W, 46], fill=g(70))
+    d.rectangle([12, 10, 30, 32], fill=g(190))
+    d.line([(21, 10), (21, 32)], fill=g(120))
+    d.line([(12, 21), (30, 21)], fill=g(120))
+    d.rectangle([9, 8, 13, 36], fill=g(95))
+    d.rectangle([29, 8, 33, 36], fill=g(95))
+    d.polygon([(88, 22), (98, 22), (95, 14), (91, 14)], fill=g(200))
+    d.line([(93, 22), (93, 44)], fill=g(60))
+    d.rectangle([90, 44, 96, 45], fill=g(60))
+    # the title, and a heart
+    title = "WandaVision"
+    font = None
+    try:
+        from PIL import ImageFont
+        font = ImageFont.load_default()
+    except Exception:
+        pass
+    tw = d.textlength(title, font=font) if font else 6 * len(title)
+    d.text(((W - tw) / 2 + 1, 4), title, fill=g(30), font=font)
+    d.text(((W - tw) / 2, 3), title, fill=g(240), font=font)
+    hx, hy = 56, 24
+    d.polygon([(hx - 3, hy - 1), (hx - 2, hy - 3), (hx, hy - 2), (hx + 2, hy - 3), (hx + 3, hy - 1), (hx, hy + 3)], fill=g(225))
+
+    # Wanda (left of the heart): long dark hair, a pale face, a dress with a wide skirt
+    wx, top = 44, 18
+    d.ellipse([wx - 4, top, wx + 4, top + 9], fill=g(35))  # hair
+    d.rectangle([wx - 5, top + 4, wx + 5, top + 15], fill=g(35))
+    d.ellipse([wx - 3, top + 2, wx + 3, top + 9], fill=g(205))  # face
+    d.point((wx - 1, top + 5), fill=g(40))
+    d.point((wx + 1, top + 5), fill=g(40))
+    d.line([(wx - 1, top + 7), (wx + 1, top + 7)], fill=g(90))
+    d.rectangle([wx - 1, top + 10, wx + 1, top + 11], fill=g(200))  # neck
+    d.polygon([(wx - 4, top + 12), (wx + 4, top + 12), (wx + 3, top + 19), (wx - 3, top + 19)], fill=g(125))  # bodice
+    d.polygon([(wx - 3, top + 19), (wx + 3, top + 19), (wx + 8, top + 30), (wx - 8, top + 30)], fill=g(145))  # skirt
+    d.line([(wx - 3, top + 19), (wx + 3, top + 19)], fill=g(60))  # her belt
+    d.line([(wx - 4, top + 13), (wx - 6, top + 22)], fill=g(200), width=2)  # arm
+    d.line([(wx + 4, top + 13), (wx + 7, top + 19)], fill=g(200), width=2)  # the arm in his
+    d.rectangle([wx - 3, top + 30, wx - 2, top + 33], fill=g(195))  # legs
+    d.rectangle([wx + 2, top + 30, wx + 3, top + 33], fill=g(195))
+    d.rectangle([wx - 4, top + 33, wx - 1, top + 34], fill=g(25))
+    d.rectangle([wx + 1, top + 33, wx + 4, top + 34], fill=g(25))
+
+    # Vision (right of the heart): tall, his bald head (mid grey: red in colour), the Mind Stone pale on his brow,
+    # a dark suit, a white shirt and a tie
+    vx, top = 68, 15
+    d.ellipse([vx - 4, top, vx + 4, top + 10], fill=g(120))  # head
+    d.polygon([(vx, top + 2), (vx + 1, top + 3), (vx, top + 4), (vx - 1, top + 3)], fill=g(245))  # the stone
+    d.point((vx - 2, top + 5), fill=g(250))
+    d.point((vx + 2, top + 5), fill=g(250))
+    d.line([(vx - 1, top + 8), (vx + 1, top + 8)], fill=g(70))
+    d.line([(vx - 4, top + 3), (vx - 4, top + 8)], fill=g(95))  # the lines of his head
+    d.line([(vx + 4, top + 3), (vx + 4, top + 8)], fill=g(95))
+    d.rectangle([vx - 1, top + 11, vx + 1, top + 12], fill=g(115))  # neck
+    d.polygon([(vx - 6, top + 13), (vx + 6, top + 13), (vx + 5, top + 28), (vx - 5, top + 28)], fill=g(45))  # jacket
+    d.polygon([(vx - 2, top + 13), (vx + 2, top + 13), (vx, top + 19)], fill=g(235))  # shirt
+    d.line([(vx, top + 14), (vx, top + 20)], fill=g(20))  # tie
+    d.line([(vx - 6, top + 14), (vx - 8, top + 23)], fill=g(45), width=2)  # the arm to her
+    d.line([(vx + 6, top + 14), (vx + 7, top + 27)], fill=g(45), width=2)
+    d.rectangle([vx - 4, top + 28, vx - 1, top + 36], fill=g(40))  # trousers
+    d.rectangle([vx + 1, top + 28, vx + 4, top + 36], fill=g(40))
+    d.rectangle([vx - 5, top + 36, vx - 1, top + 37], fill=g(15))
+    d.rectangle([vx + 1, top + 36, vx + 5, top + 37], fill=g(15))
+
+    # the old television: scanlines, grain, a vignette and the screen's rounded black edge
+    rnd = random.Random(1950)
+    px = im.load()
+    for y in range(H):
+        for x in range(W):
+            v = px[x, y][0]
+            if y % 2:
+                v *= 0.86
+            v += rnd.randint(-10, 10)
+            dx, dy = (x - W / 2) / (W / 2), (y - H / 2) / (H / 2)
+            v *= max(0.0, 1.0 - 0.45 * (dx * dx + dy * dy))
+            r = 7
+            cx = r if x < r else (W - 1 - r if x > W - 1 - r else x)
+            cy = r if y < r else (H - 1 - r if y > H - 1 - r else y)
+            if (x - cx) ** 2 + (y - cy) ** 2 > r * r or x < 1 or y < 1 or x > W - 2 or y > H - 2:
+                v = 8
+            px[x, y] = g(v)
     save(im, "painting/mind_cinema.png")
-
-
 def painting_torch():
     """The workshop's painting of the first android (64x96: a 2x3 painting at twice the pixels), after the one in
     VisionQuest: a dark figure standing in a column of fire that bursts out round his feet, red, pink and gold on a
@@ -535,16 +589,276 @@ def painting_torch():
     save(im, "painting/human_torch.png")
 
 
+
+# ---- the AIs as the series plays them (3.15): people painted whole, from their pictures ----
+
+# (u, v, w, h, d) of each box of a 64x64 skin, and of its second layer
+BOXES = {"head": (0, 0, 8, 8, 8), "body": (16, 16, 8, 12, 4), "rarm": (40, 16, 4, 12, 4), "larm": (32, 48, 4, 12, 4),
+         "rleg": (0, 16, 4, 12, 4), "lleg": (16, 48, 4, 12, 4)}
+LAYER2 = {"head": (32, 0), "body": (16, 32), "rarm": (40, 32), "larm": (48, 48), "rleg": (0, 32), "lleg": (0, 48)}
+
+
+def faces(box, second=False):
+    """The faces of a box: name -> (x0, y0, width, height) in the skin."""
+    u, v, w, h, d = BOXES[box]
+    if second:
+        u, v = LAYER2[box]
+    return {"top": (u + d, v, w, d), "bottom": (u + d + w, v, w, d), "right": (u, v + d, d, h),
+            "front": (u + d, v + d, w, h), "left": (u + d + w, v + d, d, h), "back": (u + d + w + d, v + d, w, h)}
+
+
+def cloth(c, x, y, grain=0.06, seed=0):
+    """A colour with the weave of cloth in it (a little light and shade, the same every run)."""
+    r = random.Random(x * 131 + y * 71 + seed * 7)
+    f = 1.0 + (r.random() - 0.5) * 2 * grain
+    return tuple(max(0, min(255, int(k * f))) for k in c[:3]) + (255,)
+
+
+def paint(px, box, fn, second=False, which=None):
+    """Paints a box: fn(face, x, y, w, h) -> a colour or None, for each pixel of each face (x, y from its top left)."""
+    for name, (x0, y0, w, h) in faces(box, second).items():
+        if which and name not in which:
+            continue
+        for y in range(h):
+            for x in range(w):
+                c = fn(name, x, y, w, h)
+                if c is not None:
+                    px[x0 + x, y0 + y] = c
+
+
+def face_of(px, skin, hair, eyes, lips, brows=None, female=False, beard=None, fringe=1):
+    """The face (head front 8x8): hair over the forehead (fringe rows), brows, eyes, nose, mouth, a beard."""
+    x0, y0 = 8, 8
+    brows = brows or tuple(int(k * 0.7) for k in hair[:3])
+    for y in range(8):
+        for x in range(8):
+            px[x0 + x, y0 + y] = cloth(skin, x, y, 0.03, 3)
+    for y in range(fringe):
+        for x in range(8):
+            px[x0 + x, y0 + y] = cloth(hair, x, y, 0.1, 5)
+    for x in (0, 7):
+        for y in range(fringe, 3 if female else 2):
+            px[x0 + x, y0 + y] = cloth(hair, x, y, 0.1, 5)
+    for x in (1, 2, 5, 6):
+        px[x0 + x, y0 + 3] = brows + (255,)
+    for x, iris in ((1, False), (2, True), (5, True), (6, False)):
+        px[x0 + x, y0 + 4] = (eyes + (255,)) if iris else (245, 243, 238, 255)
+    if female:
+        px[x0 + 1, y0 + 4] = (60, 40, 36, 255)
+        px[x0 + 6, y0 + 4] = (60, 40, 36, 255)
+    shade = tuple(int(k * 0.88) for k in skin[:3]) + (255,)
+    px[x0 + 3, y0 + 5] = shade
+    px[x0 + 4, y0 + 5] = shade
+    px[x0 + 3, y0 + 6] = lips + (255,)
+    px[x0 + 4, y0 + 6] = lips + (255,)
+    if beard:
+        for y in range(5, 8):
+            for x in range(8):
+                if y == 5 and 2 <= x <= 5:
+                    continue
+                if y == 6 and 3 <= x <= 4:
+                    continue
+                px[x0 + x, y0 + y] = cloth(beard, x, y, 0.12, 9)
+        for x in range(2, 6):
+            px[x0 + x, y0 + 5] = cloth(beard, x, 5, 0.12, 9)
+        px[x0 + 3, y0 + 6] = lips + (255,)
+        px[x0 + 4, y0 + 6] = lips + (255,)
+
+
+def hair_of(px, hair, style, skin):
+    """The rest of the head: its top, sides and back, by style (short, slick, curly, long, pulled)."""
+    def fn(face, x, y, w, h):
+        if face in ("top",):
+            return cloth(hair, x, y, 0.12 if style == "curly" else 0.08, 11)
+        if face == "bottom":
+            return cloth(skin, x, y, 0.03, 3)
+        if face == "front":
+            return None
+        low = {"short": 3, "slick": 3, "curly": 4, "long": 8, "pulled": 3}[style]
+        if face == "back":
+            low = {"short": 6, "slick": 6, "curly": 6, "long": 8, "pulled": 8}[style]
+        if y < low:
+            g = 0.18 if style == "curly" else 0.09
+            c = cloth(hair, x, y, g, 13)
+            if style == "curly" and (x + y) % 3 == 0:
+                c = tuple(min(255, int(k * 1.25)) for k in c[:3]) + (255,)
+            return c
+        return cloth(skin, x, y, 0.03, 3)
+    paint(px, "head", fn)
+    # the second layer: volume for curls and long hair, and a knot of pulled-back hair at the back
+    def layer(face, x, y, w, h):
+        if style == "curly" and face in ("top", "left", "right", "back") and (face == "top" or y < 4):
+            return cloth(hair, x, y, 0.2, 17) if (x * 3 + y) % 4 else None
+        if style == "curly" and face == "front" and y < 1:
+            return cloth(hair, x, y, 0.2, 17) if x % 2 else None
+        if style == "long" and face in ("back", "left", "right") and y >= 2:
+            return cloth(hair, x, y, 0.1, 19)
+        if style == "pulled" and face == "back" and 2 <= x <= 5 and 3 <= y <= 6:
+            return cloth(tuple(int(k * 0.85) for k in hair[:3]), x, y, 0.1, 19)
+        return None
+    paint(px, "head", layer, second=True)
+
+
+def person(name, skin, hair, style, eyes, lips, body, arms, legs, female=False, beard=None, fringe=1, extra=None):
+    """A person of Vision's mind: body(face, x, y, w, h), arms(...), legs(...) give the clothes' colours; extra(px) adds touches."""
+    im = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    px = im.load()
+    hair_of(px, hair, style, skin)
+    face_of(px, skin, hair, eyes, lips, female=female, beard=beard, fringe=fringe)
+    paint(px, "body", body)
+    paint(px, "rarm", arms)
+    paint(px, "larm", lambda f, x, y, w, h: arms(f, w - 1 - x if f in ("front", "back") else x, y, w, h))
+    paint(px, "rleg", legs)
+    paint(px, "lleg", legs)
+    if extra:
+        extra(px)
+    save(im, "entity/mind/" + name + ".png")
+
+
+def friday_person():
+    """F.R.I.D.A.Y. (VisionQuest): auburn hair loose to the shoulders, a long brown work dress with its sleeves rolled
+    to the elbow, a belt with a pouch, boots."""
+    skin, hair = (232, 192, 166), (146, 62, 36)
+    dress, dark, belt, shirt, boots = (112, 80, 54), (86, 60, 40), (58, 38, 24), (196, 176, 146), (52, 36, 26)
+
+    def body(f, x, y, w, h):
+        if f == "front" and y < 3 and 2 <= x <= 5:
+            return cloth(shirt if abs(x - 3.5) < 3 - y else dress, x, y, 0.05, 1)
+        if y in (7, 8):
+            return cloth(belt, x, y, 0.05, 2) if not (f == "front" and x == 5 and y == 7) else (196, 160, 72, 255)
+        if f == "front" and x in (1, 6) and y < 7:
+            return cloth(dark, x, y, 0.06, 1)
+        return cloth(dress, x, y, 0.06, 1)
+
+    def arms(f, x, y, w, h):
+        if y < 5:
+            return cloth(dress, x, y, 0.06, 4)
+        if y == 5:
+            return cloth(shirt, x, y, 0.05, 4)  # the rolled sleeve
+        return cloth(skin, x, y, 0.03, 3)
+
+    def legs(f, x, y, w, h):
+        if y >= 10:
+            return cloth(boots, x, y, 0.05, 6)
+        return cloth(dress if y < 9 else dark, x, y, 0.06, 5)
+
+    def extra(px):
+        # the pouch on her right hip
+        for x in range(4, 8):
+            for y in range(20, 23):
+                px[x, y] = cloth((70, 46, 30), x, y, 0.06, 7)
+    person("friday_human", skin, hair, "long", (70, 96, 80), (176, 102, 92), body, arms, legs, female=True, extra=extra)
+
+
+def jarvis_person():
+    """J.A.R.V.I.S. (VisionQuest): dark hair combed back, a grey-brown tweed suit, a white shirt and a gold tie."""
+    skin, hair = (226, 190, 160), (40, 32, 28)
+    tweed, lapel, shirt, tie, shoes = (126, 116, 98), (102, 94, 80), (236, 236, 230), (204, 162, 52), (44, 32, 26)
+
+    def body(f, x, y, w, h):
+        if f == "front":
+            if y < 7 and 3 <= x <= 4:
+                return cloth(tie, x, y, 0.08, 1) if y > 0 else cloth(shirt, x, y, 0.02, 1)
+            if y < 5 and x in (2, 5):
+                return cloth(shirt, x, y, 0.02, 1)
+            if y < 7 and x in (1, 6):
+                return cloth(lapel, x, y, 0.1, 1)
+            if y >= 7 and x in (3, 4):
+                return cloth(lapel, x, y, 0.1, 1)  # the jacket's front closed, its edge
+        return cloth(tweed, x, y, 0.14, 1)
+
+    def arms(f, x, y, w, h):
+        if y == 11:
+            return cloth(skin, x, y, 0.03, 3)
+        if y == 10:
+            return cloth(shirt, x, y, 0.02, 4)  # the cuff
+        return cloth(tweed, x, y, 0.14, 4)
+
+    def legs(f, x, y, w, h):
+        if y >= 11:
+            return cloth(shoes, x, y, 0.05, 6)
+        return cloth(tweed, x, y, 0.14, 5)
+    person("jarvis_human", skin, hair, "slick", (70, 60, 50), (170, 112, 100), body, arms, legs)
+
+
+def jumpsuit(teal, patch, boots):
+    """A mechanic's jumpsuit (Dum-E's and U's): a collar, a zip, a name patch on the chest, boots."""
+    collar = tuple(int(k * 0.8) for k in teal)
+
+    def body(f, x, y, w, h):
+        if f == "front":
+            if y == 0 and x in (2, 5):
+                return cloth(collar, x, y, 0.05, 1)
+            if x in (3, 4) and y < 8 and (x == 4):
+                return cloth(collar, x, y, 0.05, 1)  # the zip
+            if 5 <= x <= 6 and 2 <= y <= 3:
+                return cloth(patch, x, y, 0.03, 1)
+        if y == 8:
+            return cloth(collar, x, y, 0.05, 1)  # the waist seam
+        return cloth(teal, x, y, 0.07, 1)
+
+    def arms(f, x, y, w, h):
+        return cloth(teal, x, y, 0.07, 4) if y < 11 else cloth((224, 182, 152), x, y, 0.03, 3)
+
+    def legs(f, x, y, w, h):
+        return cloth(boots, x, y, 0.05, 6) if y >= 10 else cloth(teal, x, y, 0.07, 5)
+    return body, arms, legs
+
+
+def dum_e_person():
+    """Dum-E (VisionQuest): broad, brown hair and a full beard, a dark teal jumpsuit with his name on it."""
+    body, arms, legs = jumpsuit((50, 76, 82), (214, 216, 210), (30, 28, 26))
+    person("dum_e_human", (222, 178, 148), (96, 70, 50), "short", (70, 60, 50), (166, 104, 92), body, arms, legs,
+           beard=(92, 66, 46))
+
+
+def u_person():
+    """U (VisionQuest): young, dark curly hair, clean-shaven, the same jumpsuit as Dum-E."""
+    body, arms, legs = jumpsuit((58, 86, 92), (214, 216, 210), (30, 28, 26))
+    person("u_human", (230, 190, 160), (44, 34, 30), "curly", (70, 56, 46), (178, 108, 96), body, arms, legs, fringe=2)
+
+
+def edith_person():
+    """E.D.I.T.H. (VisionQuest): dark hair pulled back, a navy sweater with a red neckerchief and red at the cuffs, a
+    grey skirt and dark tights."""
+    skin, hair = (232, 196, 172), (58, 40, 32)
+    navy, red, skirt, tights, shoes = (34, 44, 80), (186, 40, 40), (112, 112, 118), (42, 40, 50), (24, 22, 24)
+
+    def body(f, x, y, w, h):
+        if f == "front" and y < 3 and abs(x - 3.5) < 3.5 - y:
+            return cloth(red, x, y, 0.06, 1)  # the neckerchief's knot and points
+        if f == "back" and y < 2 and 2 <= x <= 5:
+            return cloth(red, x, y, 0.06, 1)
+        if y >= 10:
+            return cloth(skirt, x, y, 0.06, 1)
+        return cloth(navy, x, y, 0.08, 1)
+
+    def arms(f, x, y, w, h):
+        if y in (9, 10):
+            return cloth(red if y == 9 else navy, x, y, 0.06, 4)
+        if y == 11:
+            return cloth(skin, x, y, 0.03, 3)
+        return cloth(navy, x, y, 0.08, 4)
+
+    def legs(f, x, y, w, h):
+        if y < 4:
+            return cloth(skirt, x, y, 0.06, 5)  # the pleated skirt to the knee
+        if y >= 11:
+            return cloth(shoes, x, y, 0.04, 6)
+        return cloth(tights, x, y, 0.05, 5)
+    person("edith_human", skin, hair, "pulled", (60, 48, 40), (170, 96, 92), body, arms, legs, female=True)
+
 def main():
-    source_code_vision()
     nano_ultron()
     human_torch()
     horton()
     sentry_bot()
     ai_orb("edith", 0.55)
-    ai_human("friday_human", (176, 64, 36), (28, 28, 34), (24, 24, 30), shirt=(236, 236, 240), long_hair=True)
-    ai_human("edith_human", (64, 44, 34), (112, 114, 122), (60, 62, 70), shirt=(220, 228, 236), glasses=True)
-    ai_human("dum_e_human", (172, 140, 92), (78, 82, 88), (64, 66, 72), stripe=(236, 184, 40))
+    friday_person()
+    edith_person()
+    dum_e_person()
+    jarvis_person()
+    u_person()
     ai_orb("friday", 0.93)
     dum_e()
     nano_overlay(64, 64, "nano_overlay", 12)
