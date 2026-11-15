@@ -72,22 +72,59 @@ public final class AttachSync {
         return -1;
     }
 
+    /** The id a payload carries for the level itself (no entity has it). */
+    private static final int LEVEL = Integer.MIN_VALUE;
+
     @SuppressWarnings("unchecked")
-    private static <T> Payload payload(Entity holder, int index) {
+    private static <T> Payload payload(net.neoforged.neoforge.attachment.IAttachmentHolder holder, net.minecraft.core.RegistryAccess registries,
+                                       int id, int index) {
         Synced<T> synced = (Synced<T>) SYNCED.get(index);
-        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), holder.registryAccess());
+        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), registries);
         try {
             synced.codec().encode(buf, holder.getData(synced.type()));
             byte[] bytes = new byte[buf.readableBytes()];
             buf.readBytes(bytes);
-            return new Payload(holder.getId(), index, bytes);
+            return new Payload(id, index, bytes);
         } finally {
             buf.release();
         }
     }
 
+    private static Payload payload(Entity holder, int index) {
+        return payload(holder, holder.registryAccess(), holder.getId(), index);
+    }
+
+    private static Payload payload(net.minecraft.server.level.ServerLevel level, int index) {
+        return payload(level, level.registryAccess(), LEVEL, index);
+    }
+
+    /** Whether {@code type} is a synced attachment (setting it sends it, as NeoForge 21.1 did). */
+    public static boolean synced(AttachmentType<?> type) {
+        return indexOf(type) >= 0;
+    }
+
+    /**
+     * Sends a level's synced attachments (a dimension's Hexes) to a player in it: NeoForge 21.1 synced a level's as
+     * it did an entity's, and the mod's own sync knew only entities, so from 1.21.4 a Hex never reached the players
+     * (no walls, no red sky, no runes: only its Vision).
+     */
+    private static void sendLevel(net.minecraft.server.level.ServerLevel level, ServerPlayer to) {
+        for (int i = 0; i < SYNCED.size(); i++) {
+            if (level.hasData(SYNCED.get(i).type().get())) {
+                PacketDistributor.sendToPlayer(to, payload(level, i));
+            }
+        }
+    }
+
     /** Sends {@code type}'s value of {@code holder}, if it is a synced attachment of an entity on the server. */
     public static void send(Object holder, AttachmentType<?> type) {
+        if (holder instanceof net.minecraft.server.level.ServerLevel level) {
+            int index = indexOf(type);
+            if (index >= 0) {
+                PacketDistributor.sendToPlayersInDimension(level, payload(level, index));
+            }
+            return;
+        }
         if (!(holder instanceof Entity entity) || entity.level().isClientSide()) {
             return;
         }
@@ -124,6 +161,7 @@ public final class AttachSync {
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer p) {
             sendAll(p, p);
+            sendLevel(p.serverLevel(), p);
         }
     }
 
@@ -131,6 +169,7 @@ public final class AttachSync {
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer p) {
             sendAll(p, p);
+            sendLevel(p.serverLevel(), p);
         }
     }
 
@@ -138,6 +177,7 @@ public final class AttachSync {
     public static void onDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer p) {
             sendAll(p, p);
+            sendLevel(p.serverLevel(), p);
         }
     }
 
@@ -153,13 +193,17 @@ public final class AttachSync {
             if (mc.level == null || payload.index() < 0 || payload.index() >= SYNCED.size()) {
                 return;
             }
+            Synced<T> synced = (Synced<T>) SYNCED.get(payload.index());
+            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(payload.bytes()),
+                    mc.level.registryAccess());
+            if (payload.entityId() == LEVEL) {
+                mc.level.setData(synced.type(), synced.codec().decode(buf));
+                return;
+            }
             Entity entity = mc.level.getEntity(payload.entityId());
             if (entity == null) {
                 return;
             }
-            Synced<T> synced = (Synced<T>) SYNCED.get(payload.index());
-            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(payload.bytes()),
-                    mc.level.registryAccess());
             entity.setData(synced.type(), synced.codec().decode(buf));
         }
     }

@@ -51,6 +51,11 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.14.4
+
+* **The Hex works again on Minecraft 1.21.4, 1.21.11 and 26.3.** Wanda's Hex rose on the server, but the players were never told of it: only its Vision came, with no walls, no red sky and no runes. The game no longer sends what is kept on a whole dimension by itself (as it did on 1.21.1), and the mod now does.
+* For testing: the flight probe's `rounds=reports` chooses every hero in the Hero Creator, puts on each look, then dies and respawns; `-Denhanced.flickerprobe.only=<hero>` runs one hero.
+
 ## What's new in 3.14.3
 
 Every hero was put through every ability key (alone and with Sneak) and every look, and every creature, boss fight and realm of the mod was visited, on Minecraft 1.21.1, 1.21.4, 1.21.11 and 26.3, and on 1.21.4, 1.21.11 and 26.3 dedicated servers. What went wrong is fixed:

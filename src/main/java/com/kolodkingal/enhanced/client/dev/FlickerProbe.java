@@ -846,6 +846,10 @@ public final class FlickerProbe {
             if (!started && !hero.name().equalsIgnoreCase(from)) {
                 continue;
             }
+            String only = System.getProperty("enhanced.flickerprobe.only", "");
+            if (!only.isEmpty() && !hero.name().equalsIgnoreCase(only)) {
+                continue;
+            }
             started = true;
             String h = hero.name().toLowerCase(java.util.Locale.ROOT);
             once(h + " start", p -> {
@@ -903,6 +907,12 @@ public final class FlickerProbe {
                     step(25, what + " (after)", p -> {
                     });
                     shot("all_" + h + "_k" + k + (sneak ? "s" : ""));
+                    if (hero == Power.SCARLET_WITCH && k == 5 && !sneak) {
+                        // the Hex from outside: its walls
+                        server(h + " hex outside", p -> command(p, "execute in minecraft:overworld run tp @s 0 108 -55 0 8"), 40);
+                        shot("all_" + h + "_hex_outside");
+                        server(h + " hex back", p -> command(p, "execute in minecraft:overworld run tp @s 0 100 0 0 15"), 10);
+                    }
                 }
             }
             // the looks, from the front

@@ -93,7 +93,14 @@ public final class NeoAttach implements AttachService {
 
         @Override
         public @Nullable T set(Object holder, T value) {
-            return holder(holder).setData(type.get(), value);
+            T before = holder(holder).setData(type.get(), value);
+            //#if >=1.21.4
+            //$$ // (NeoForge 21.1 sent a synced attachment when it was set; from 21.4 the mod sends it itself)
+            //$$ if (com.kolodkingal.enhanced.compat.AttachSync.synced(type.get())) {
+            //$$     com.kolodkingal.enhanced.compat.AttachSync.send(holder, type.get());
+            //$$ }
+            //#endif
+            return before;
         }
 
         @Override
