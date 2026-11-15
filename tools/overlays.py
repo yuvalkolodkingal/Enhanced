@@ -562,6 +562,25 @@ def condition_26(c):
     return c
 
 
+def shader_26(text):
+    """A GLSL stage as 26.3 compiles it: separate shader objects, and each top-level "in" and "out" at its location."""
+    lines = text.split("\n")
+    out, ins, outs = [], 0, 0
+    for line in lines:
+        m = re.match(r"^(in|out)\s+(\w+\s+\w+\s*;.*)$", line)
+        if m:
+            n = ins if m.group(1) == "in" else outs
+            line = "layout(location = %d) %s %s" % (n, m.group(1), m.group(2))
+            if m.group(1) == "in":
+                ins += 1
+            else:
+                outs += 1
+        out.append(line)
+        if line.startswith("#version"):
+            out.append("#extension GL_ARB_separate_shader_objects : require")
+    return "\n".join(out)
+
+
 def face_uv_26(face, lo, hi):
     """Vanilla's default uv of a face of an element from lo to hi (FaceBakery), kept inside the texture."""
     x0, y0, z0 = lo
@@ -609,7 +628,8 @@ def egg_26(path, base, spots):
 def main_26():
     for d in (DATA_26, ASSETS_26):
         shutil.rmtree(os.path.join(RES, d), ignore_errors=True)
-    assets = os.path.join(RES, ASSETS_26, "assets", NS)
+    # (the spawn eggs go to 1.21.11's overlay, which 26.3 reads too: 1.21.11 has no template egg either)
+    assets = os.path.join(RES, ASSETS_11, "assets", NS)
     for base, _, files in os.walk(os.path.join(RES, "assets", NS, "models")):
         for name in files:
             if not name.endswith(".json"):
@@ -620,6 +640,16 @@ def main_26():
             obj = json.load(open(path, encoding="utf-8"))
             if model_26(obj):
                 write(os.path.join(RES, ASSETS_26, rel), obj)
+    # the mod's own shaders as 26.3 compiles them (to SPIR-V): every stage input and output at a location
+    for base, _, files in os.walk(os.path.join(RES, ASSETS_11, "assets", NS, "shaders")):
+        for name in files:
+            if name.endswith((".fsh", ".vsh")):
+                src = os.path.join(base, name)
+                rel = os.path.relpath(src, os.path.join(RES, ASSETS_11))
+                out = os.path.join(RES, ASSETS_26, rel)
+                os.makedirs(os.path.dirname(out), exist_ok=True)
+                with open(out, "w", encoding="utf-8") as f:
+                    f.write(shader_26(open(src, encoding="utf-8").read()))
     for item, colours in sorted(eggs().items()):
         egg_26(os.path.join(assets, "textures", "item", item + ".png"), colours[0], colours[1])
         write(os.path.join(assets, "models", "item", item + ".json"),

@@ -51,6 +51,15 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.14.3
+
+Every hero was put through every ability key (alone and with Sneak) and every look, and every creature, boss fight and realm of the mod was visited, on Minecraft 1.21.1, 1.21.4, 1.21.11 and 26.3, and on 1.21.4, 1.21.11 and 26.3 dedicated servers. What went wrong is fixed:
+
+* **Minecraft 26.3: Quicksilver's slow motion threw you out of the world.** Its screen effect did not compile on 26.3, and the game left the world. It now works as on the other versions (for Tommy too).
+* **Minecraft 26.3: meeting Death on the Witches' Road crashed the game.** Drawing Rio in that screen asked her for something 26.3 no longer gives a figure that is only drawn. Fixed, and so for the Hero Creator's preview.
+* **Minecraft 1.21.11 and 26.3: the Hydra spawn eggs had no picture.** They are drawn again.
+* For testing: `-Denhanced.flickerprobe=true -Denhanced.flickerprobe.rounds=all` (every hero, key and look) and `rounds=world` (every creature, boss fight and realm) run the game through it all and write each problem to the log.
+
 ## What's new in 3.14.2
 
 * **No more Enhanced items out of nowhere on Minecraft 26.3.** NeoForge 26.3 reads the conditions of loot additions differently, so every addition of the mod's (a gene in a witch's drops, an ember in an End city chest...) was added to every loot drawn: breaking a block, lifting one with telekinesis, killing a mob, the chests of a new world. They now come only where they should, as on the other versions.

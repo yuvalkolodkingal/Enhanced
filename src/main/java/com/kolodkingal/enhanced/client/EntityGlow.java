@@ -35,10 +35,15 @@ public final class EntityGlow {
 
     /** Whether any source makes the entity glow. */
     public static boolean reveals(Entity entity) {
-        for (Source source : SOURCES) {
-            if (source.reveals().test(entity)) {
-                return true;
+        try {
+            for (Source source : SOURCES) {
+                if (source.reveals().test(entity)) {
+                    return true;
+                }
             }
+        } catch (IllegalStateException e) {
+            // (26.1: an entity made only to be drawn, in no level, has no id to ask for; nothing reveals it)
+            return false;
         }
         return false;
     }
@@ -48,10 +53,14 @@ public final class EntityGlow {
      * does.
      */
     public static int color(Entity entity, IntSupplier fallback) {
-        for (Source source : SOURCES) {
-            if (source.reveals().test(entity)) {
-                return source.color().applyAsInt(entity);
+        try {
+            for (Source source : SOURCES) {
+                if (source.reveals().test(entity)) {
+                    return source.color().applyAsInt(entity);
+                }
             }
+        } catch (IllegalStateException e) {
+            // (as in reveals: no id)
         }
         return fallback.getAsInt();
     }

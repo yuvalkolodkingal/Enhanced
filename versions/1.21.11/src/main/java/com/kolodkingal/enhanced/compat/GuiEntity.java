@@ -21,6 +21,22 @@ public final class GuiEntity {
     private GuiEntity() {
     }
 
+    /** The ids given to entities made only to be drawn in a screen (none of them is in a level). */
+    private static final java.util.concurrent.atomic.AtomicInteger SCREEN_IDS = new java.util.concurrent.atomic.AtomicInteger(-1_000_000);
+
+    /**
+     * Gives an entity made only to be drawn in a screen an id of its own: from 26.1 an entity has none until a level
+     * adds it, and asking for it throws (whatever reads the entities being drawn asks: the glow of Odin's ravens did,
+     * and the Witches' Road's meeting with Death crashed the game).
+     */
+    public static void identify(Entity entity) {
+        try {
+            entity.getId();
+        } catch (IllegalStateException e) {
+            entity.setId(SCREEN_IDS.decrementAndGet());
+        }
+    }
+
     /**
      * Draws {@code entity} with its feet at ({@code x}, {@code y}), {@code scale} pixels a block, turned {@code rotation}
      * (with 1.21.1's flip about the screen's normal), the camera turned {@code cameraAngle} for its lighting (or not).
@@ -28,6 +44,7 @@ public final class GuiEntity {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void draw(GuiGraphics g, Entity entity, float x, float y, float scale, Quaternionf rotation,
                             @Nullable Quaternionf cameraAngle, float partialTick) {
+        identify(entity);
         EntityRenderer renderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
         EntityRenderState state = renderer.createRenderState(entity, partialTick);
         state.lightCoords = 0xF000F0;

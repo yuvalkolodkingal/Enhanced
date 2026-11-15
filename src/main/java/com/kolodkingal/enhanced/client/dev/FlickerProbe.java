@@ -297,6 +297,13 @@ public final class FlickerProbe {
         }
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
+            if (scripted) {
+                // (thrown out of the world: a disconnect is as bad as a crash to a player)
+                Enhanced.LOGGER.error("Flicker probe: thrown out of the world at step {} ({})", index,
+                        index >= 0 && index < STEPS.size() ? STEPS.get(index).name() : "-");
+                mc.stop();
+                return;
+            }
             if (!asked && mc.screen instanceof TitleScreen) {
                 asked = true;
                 mc.options.chatOpacity().set(0.0);
@@ -409,6 +416,14 @@ public final class FlickerProbe {
         String rounds = System.getProperty("enhanced.flickerprobe.rounds", "1,2,3");
         if (rounds.equals("duo")) {
             duo();
+            return;
+        }
+        if (rounds.equals("all")) {
+            all();
+            return;
+        }
+        if (rounds.equals("world")) {
+            world();
             return;
         }
         for (int round = 0; round < 3; round++) {
@@ -604,6 +619,235 @@ public final class FlickerProbe {
         camera(CameraType.THIRD_PERSON_FRONT, 10);
         shot("duo_09_rock_lift_front");
         server("items at the end", p -> logItems(p, "at the end"), 5);
+    }
+
+    // ---- the "all" round (-Denhanced.flickerprobe.rounds=all): every hero, every key, every look ----
+
+    /**
+     * Every hero (from {@code -Denhanced.flickerprobe.from}, a hero's name, if given): made the hero at the same place,
+     * with a zombie and a pig before him; each of the five ability keys pressed and held a moment, then with Sneak;
+     * then each of his looks put on and pictured from the front. {@code All probe:} lines say where it is, so that an
+     * error in the log can be put to a hero and a key; screenshots {@code all_<hero>_...png}.
+     */
+    // ---- the "world" round (-Denhanced.flickerprobe.rounds=world): the mod's creatures, bosses, realms, screens ----
+
+    /**
+     * Every creature of the mod summoned before the camera and pictured; each boss fight started and stopped; each of
+     * the mod's dimensions visited; the ability wheel and the look key; then a long flight out, so that new chunks (and
+     * the mod's structures in them) are made. {@code World probe:} lines.
+     */
+    private static void world() {
+        server("setup", p -> {
+            command(p, "gamerule doMobSpawning false");
+            command(p, "time set 6000");
+            command(p, "execute in minecraft:overworld run fill -14 99 -14 14 99 14 minecraft:grass_block");
+            command(p, "execute in minecraft:overworld run fill -14 100 -14 14 112 14 minecraft:air");
+            command(p, "execute in minecraft:overworld run tp @s 0 100 0 0 10");
+            p.getAbilities().invulnerable = true;
+            p.onUpdateAbilities();
+        }, 20);
+        camera(CameraType.FIRST_PERSON, 5);
+        List<String> types = new ArrayList<>();
+        for (var key : net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.keySet()) {
+            if (key.getNamespace().equals("enhanced")) {
+                types.add(key.toString());
+            }
+        }
+        java.util.Collections.sort(types);
+        for (String type : types) {
+            server("summon " + type, p -> {
+                Enhanced.LOGGER.info("World probe: summon {}", type);
+                command(p, "execute in minecraft:overworld run kill @e[type=!minecraft:player,distance=..60]");
+                command(p, "execute in minecraft:overworld run tp @s 0 100 0 0 10");
+                command(p, "execute in minecraft:overworld run summon " + type + " 0 100 4");
+            }, 30);
+            shot("world_" + type.replace(':', '_'));
+        }
+        once("dimensions", p -> {
+        });
+        server("realms", p -> {
+            List<String> levels = new ArrayList<>();
+            for (var key : p.level().getServer().levelKeys()) {
+                if (key.location().getNamespace().equals("enhanced")) {
+                    levels.add(key.location().toString());
+                }
+            }
+            Enhanced.LOGGER.info("World probe: realms {}", levels);
+            REALMS.addAll(levels);
+        }, 5);
+        for (int i = 0; i < 12; i++) {
+            int n = i;
+            server("realm " + i, p -> {
+                if (n < REALMS.size()) {
+                    Enhanced.LOGGER.info("World probe: realm {}", REALMS.get(n));
+                    command(p, "execute in " + REALMS.get(n) + " run tp @s 0 120 0");
+                }
+            }, 200);
+            once("realm shot " + i, p -> {
+                if (n < REALMS.size()) {
+                    Minecraft mc = Minecraft.getInstance();
+                    net.minecraft.client.Screenshot.grab(mc.gameDirectory, "world_realm_" + n + ".png", mc.getMainRenderTarget(), msg -> {
+                    });
+                }
+            });
+            step(10, "realm wait", p -> {
+            });
+        }
+        server("clear", p -> command(p, "execute in minecraft:overworld run kill @e[type=!minecraft:player,distance=..80]"), 10);
+        for (com.kolodkingal.enhanced.boss.BossKind boss : com.kolodkingal.enhanced.boss.BossKind.values()) {
+            server("boss " + boss.id(), p -> {
+                Enhanced.LOGGER.info("World probe: boss {}", boss.id());
+                command(p, "execute in minecraft:overworld run spreadplayers 300 300 0 8 false @s");
+                command(p, "enhanced boss start " + boss.id() + " force");
+            }, 200);
+            camera(CameraType.THIRD_PERSON_BACK, 5);
+            shot("world_boss_" + boss.id());
+            server("boss stop " + boss.id(), p -> command(p, "enhanced boss stop"), 40);
+        }
+        server("home", p -> {
+            Enhanced.LOGGER.info("World probe: home");
+            command(p, "execute in minecraft:overworld run tp @s 0 100 0 0 10");
+            Powers.awaken(p, Power.SCARLET_WITCH, "", false);
+        }, 40);
+        press("key.enhanced.wheel", 20);
+        shot("world_wheel");
+        once("close", p -> Minecraft.getInstance().setScreen(null));
+        press("key.enhanced.change_look", 30);
+        shot("world_change_look");
+        server("flight", p -> {
+            Enhanced.LOGGER.info("World probe: the long flight");
+            p.getAbilities().mayfly = true;
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+        }, 5);
+        for (int i = 1; i <= 8; i++) {
+            int n = i;
+            server("far " + i, p -> {
+                Enhanced.LOGGER.info("World probe: far {}", n);
+                command(p, "execute in minecraft:overworld run tp @s " + (n * 600) + " 160 " + (n * 450));
+            }, 300);
+            shot("world_far_" + i);
+        }
+        server("end", p -> Enhanced.LOGGER.info("World probe: the end"), 5);
+    }
+
+    private static final List<String> REALMS = new ArrayList<>();
+
+    /** What each hero carries in the "all" round: his own weapon or gear (slot, item id). */
+    private static final Map<Power, String[][]> KIT = Map.ofEntries(
+            Map.entry(Power.THOR, new String[][]{{"weapon.mainhand", "mjolnir"}, {"hotbar.1", "stormbreaker"}}),
+            Map.entry(Power.LOKI, new String[][]{{"weapon.mainhand", "lokis_scepter"}, {"hotbar.1", "loki_dagger"}}),
+            Map.entry(Power.HEIMDALL, new String[][]{{"weapon.mainhand", "hofund"}}),
+            Map.entry(Power.ODIN, new String[][]{{"weapon.mainhand", "gungnir"}}),
+            Map.entry(Power.HELA, new String[][]{{"armor.head", "hela_headdress"}}),
+            Map.entry(Power.THANOS, new String[][]{{"weapon.mainhand", "infinity_gauntlet"}}),
+            Map.entry(Power.DOCTOR_STRANGE, new String[][]{{"hotbar.1", "sling_ring"}, {"hotbar.2", "eye_of_agamotto"}}),
+            Map.entry(Power.CAPTAIN_AMERICA, new String[][]{{"weapon.offhand", "vibranium_shield"}}),
+            Map.entry(Power.MAGNETO, new String[][]{{"armor.head", "magneto_helmet"}}),
+            Map.entry(Power.SCARLET_WITCH, new String[][]{{"armor.head", "wanda_crown"}}),
+            Map.entry(Power.QUICKSILVER, new String[][]{{"armor.head", "quicksilver_goggles"}}),
+            Map.entry(Power.CYCLOPS, new String[][]{{"armor.head", "ruby_quartz_glasses"}}));
+
+    private static void all() {
+        String from = System.getProperty("enhanced.flickerprobe.from", "");
+        server("setup", p -> {
+            command(p, "gamerule doMobSpawning false");
+            command(p, "gamerule doDaylightCycle false");
+            command(p, "gamerule doWeatherCycle false");
+            command(p, "time set 6000");
+            command(p, "weather clear");
+            command(p, "execute in minecraft:overworld run fill -14 99 -14 14 99 14 minecraft:grass_block");
+            command(p, "execute in minecraft:overworld run fill -14 100 -14 14 112 14 minecraft:air");
+        }, 20);
+        boolean started = from.isEmpty();
+        for (Power hero : Power.values()) {
+            if (hero == Power.NONE) {
+                continue;
+            }
+            if (!started && !hero.name().equalsIgnoreCase(from)) {
+                continue;
+            }
+            started = true;
+            String h = hero.name().toLowerCase(java.util.Locale.ROOT);
+            once(h + " start", p -> {
+                Minecraft.getInstance().setScreen(null);
+                Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            });
+            server(h + " awaken", p -> {
+                Enhanced.LOGGER.info("All probe: === {} ===", h);
+                command(p, "execute in minecraft:overworld run tp @s 0 100 0 0 0");
+                command(p, "execute in minecraft:overworld run kill @e[type=!minecraft:player,distance=..40]");
+                command(p, "effect clear @s");
+                p.setHealth(p.getMaxHealth());
+                p.getFoodData().setFoodLevel(20);
+                p.getInventory().clearContent();
+                p.setGameMode(GameType.SURVIVAL);
+                Powers.awaken(p, hero, "", false);
+                p.getAbilities().invulnerable = true;
+                p.onUpdateAbilities();
+                for (String[] item : KIT.getOrDefault(hero, new String[0][])) {
+                    command(p, "item replace entity @s " + item[0] + " with enhanced:" + item[1]);
+                }
+                command(p, "execute in minecraft:overworld run summon minecraft:zombie 0 100 5 {NoAI:1b,PersistenceRequired:1b,Silent:1b}");
+                command(p, "execute in minecraft:overworld run summon minecraft:pig 3 100 5 {NoAI:1b,PersistenceRequired:1b}");
+            }, 50);
+            for (int k = 1; k <= 5; k++) {
+                for (boolean sneak : new boolean[]{false, true}) {
+                    int key = k;
+                    String what = h + " key " + k + (sneak ? " sneak" : "");
+                    once(what, p -> {
+                        Enhanced.LOGGER.info("All probe: {}", what);
+                        Minecraft mc = Minecraft.getInstance();
+                        if (mc.screen != null) {
+                            mc.setScreen(null);
+                        }
+                        p.setYRot(0.0F);
+                        p.setXRot(15.0F);
+                        mc.options.keyShift.setDown(sneak);
+                        for (net.minecraft.client.KeyMapping m : mc.options.keyMappings) {
+                            if (m.getName().equals("key.enhanced.ability_" + key)) {
+                                m.setDown(true);
+                                net.minecraft.client.KeyMapping.click(m.getKey());
+                            }
+                        }
+                    });
+                    step(15, what + " (held)", p -> Minecraft.getInstance().options.keyShift.setDown(sneak));
+                    once(what + " (let go)", p -> {
+                        Minecraft mc = Minecraft.getInstance();
+                        for (net.minecraft.client.KeyMapping m : mc.options.keyMappings) {
+                            if (m.getName().equals("key.enhanced.ability_" + key)) {
+                                m.setDown(false);
+                            }
+                        }
+                        mc.options.keyShift.setDown(false);
+                    });
+                    step(25, what + " (after)", p -> {
+                    });
+                    shot("all_" + h + "_k" + k + (sneak ? "s" : ""));
+                }
+            }
+            // the looks, from the front
+            once(h + " looks", p -> {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.screen != null) {
+                    mc.setScreen(null);
+                }
+                mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            });
+            server(h + " to the ground", p -> {
+                command(p, "execute in minecraft:overworld run tp @s 0 100 0 0 0");
+                command(p, "effect clear @s");
+            }, 10);
+            for (com.kolodkingal.enhanced.power.Variant look : com.kolodkingal.enhanced.power.Variants.of(hero)) {
+                server(h + " look " + look.id(), p -> {
+                    Enhanced.LOGGER.info("All probe: {} look {}", h, look.id());
+                    Powers.setVariant(p, look);
+                }, 15);
+                shot("all_" + h + "_look_" + look.id());
+            }
+            server(h + " done", p -> Enhanced.LOGGER.info("All probe: {} done", h), 2);
+        }
+        server("end", p -> Enhanced.LOGGER.info("All probe: the end"), 5);
     }
 
     private static void logItems(ServerPlayer p, String when) {
