@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.config.UltronConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.UltronFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -204,10 +206,14 @@ final class UltronActing {
         switch (id) {
             case ULTRON_FIRE_START -> flash(player, true, 3, 0xFFA23A);
             case ULTRON_CHARGE_START -> flash(player, true, 5, 0xFFD27A);
-            case ULTRON_PULL, ULTRON_HACK -> flash(player, true, 4, 0x9FD8FF);
+            // (3.16) a custom hero's colour: the glints of each ability in the colour chosen for it
+            case ULTRON_PULL -> flash(player, true, 4, AbilityColors.shade(player, HeroAbility.ULTRON_GRAVITY, 0x9FD8FF));
+            case ULTRON_HACK -> flash(player, true, 4, AbilityColors.shade(player, HeroAbility.ULTRON_HACK, 0x9FD8FF));
             case ULTRON_SLAM, ULTRON_ARMY, ULTRON_UPLOAD -> {
-                flash(player, true, 4, 0x9FD8FF);
-                flash(player, false, 4, 0x9FD8FF);
+                int c = AbilityColors.shade(player, id == GestureId.ULTRON_SLAM ? HeroAbility.ULTRON_SLAM
+                        : id == GestureId.ULTRON_ARMY ? HeroAbility.ULTRON_ARMY : HeroAbility.ULTRON_UPLOAD, 0x9FD8FF);
+                flash(player, true, 4, c);
+                flash(player, false, 4, c);
             }
             default -> {
             }

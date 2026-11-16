@@ -1,76 +1,76 @@
-case default SERVER input=d3f900d632f5ea55 output=d3f900d632f5ea55 backup=false recreated=false values=1181c6619b1d6f84
-case missing SERVER input=none output=d3f900d632f5ea55 backup=false recreated=false values=1181c6619b1d6f84
-case values_in_range SERVER input=2d7bf53deed4cfe6 output=2d7bf53deed4cfe6 backup=false recreated=false values=cd73c2e805fb1e7b
-  apocalypse_boss.ritualDimensions=List[String:minecraft:the_nether, String:minecraft:overworld]
-  build_magic.deniedDimensions=List[String:minecraft:the_end]
-  build_magic.fullContainers=Enum:SPILL
-  darkhold.poisonTarget=Enum:HOLDER
+case default SERVER input=db40692d404c38dc output=db40692d404c38dc backup=false recreated=false values=f16b638d0ed97422
+case missing SERVER input=none output=db40692d404c38dc backup=false recreated=false values=f16b638d0ed97422
+case values_in_range SERVER input=f785c5f24e699554 output=f785c5f24e699554 backup=false recreated=false values=3ada670313114f76
   magneto.flightSpeed=Double:0.2
-  magneto.pullTakesBuiltMetal=Boolean:false
   magneto.telekinesisRange=Integer:64
+  magneto.pullTakesBuiltMetal=Boolean:false
   spider_man.webAssistOpenLand=String:zip
-case out_of_range SERVER input=8904385285767810 output=5ac807496c06562f backup=true recreated=false values=95756eea5a9a90e6
+  apocalypse_boss.ritualDimensions=List[String:minecraft:the_nether, String:minecraft:overworld]
+  build_magic.fullContainers=Enum:SPILL
+  build_magic.deniedDimensions=List[String:minecraft:the_end]
+  darkhold.poisonTarget=Enum:HOLDER
+case out_of_range SERVER input=e70e3d5d7ab8c600 output=692b713c9ea96623 backup=true recreated=false values=f60003c61e7fd46a
   magneto.flightSpeed=Double:0.5
-  magneto.shrapnelPierce=Integer:1
   magneto.telekinesisRange=Integer:128
   magneto.throwSpeed=Double:0.5
-case wrong_types SERVER input=e47b0c26f6a52371 output=23d5e48ffa021f7e backup=true recreated=false values=11738e81f6c69fbb
+  magneto.shrapnelPierce=Integer:1
+case wrong_types SERVER input=4e701a3fe2c1244b output=7c5c28c89442b51e backup=true recreated=false values=768ba498a0dc0f63
   build_magic.deniedDimensions=List[String:minecraft:the_end]
-case loose_types SERVER input=a8b26c403c5506b7 output=a8b26c403c5506b7 backup=false recreated=false values=4a42cc5e2c5eeda2
+case loose_types SERVER input=2ca1fbce8182be46 output=2ca1fbce8182be46 backup=false recreated=false values=616a9ce1361f0f71
   build_magic.fullContainers=Enum:SPILL
   darkhold.poisonTarget=Enum:HOLDER
-case string_boolean SERVER input=34bf0f7c47b200c0 output=34bf0f7c47b200c0 backup=false recreated=false values=f91ede4a09490500
+case string_boolean SERVER input=a22f50bf46b0f413 output=a22f50bf46b0f413 backup=false recreated=false values=f8db1f20b0e339c0
   magneto.pullTakesBuiltMetal=String:false
-case number_syntax SERVER input=b4d8f3063b32658d output=b4d8f3063b32658d backup=false recreated=false values=2e5177ac4252c18a
-  magneto.disarmCooldown=Integer:15
-  magneto.disarmRange=Integer:48
-  magneto.shrapnelDamage=Double:10.0
-  magneto.shrapnelFireInterval=Integer:3
-  magneto.shrapnelPierce=Integer:10
+case number_syntax SERVER input=ea31146546eaaf46 output=ea31146546eaaf46 backup=false recreated=false values=44088cda261252c1
   magneto.telekinesisRange=Integer:64
-case inf_nan SERVER input=bf593cf478c16e13 output=6d9287a327e46afd backup=true recreated=false values=cfb30c7321ecbb01
-  magneto.shieldReflectChance=Double:0.0
-  magneto.shrapnelDamage=Double:100.0
+  magneto.shrapnelDamage=Double:10.0
+  magneto.shrapnelPierce=Integer:10
+  magneto.shrapnelFireInterval=Integer:3
+  magneto.disarmRange=Integer:48
+  magneto.disarmCooldown=Integer:15
+case inf_nan SERVER input=587e2b1bb6350749 output=16743bfb9a5eab45 backup=true recreated=false values=80d8062998388295
   magneto.throwSpeed=Double:NaN
-case unknown_keys SERVER input=48860ad43911f9f1 output=d3f900d632f5ea55 backup=true recreated=false values=1181c6619b1d6f84
-case missing_keys SERVER input=d4e85aac4c4aa773 output=43a12724f9766713 backup=true recreated=false values=1181c6619b1d6f84
-case comments_edited SERVER input=37ec182d2be1f48a output=d3f900d632f5ea55 backup=true recreated=false values=1181c6619b1d6f84
-case trailing_comment SERVER input=313e29e45136a77c output=c8094ab0e1dad359 backup=true recreated=false values=996c2dc3836fa0ed
+  magneto.shrapnelDamage=Double:100.0
+  magneto.shieldReflectChance=Double:0.0
+case unknown_keys SERVER input=1370229ad1189781 output=db40692d404c38dc backup=true recreated=false values=f16b638d0ed97422
+case missing_keys SERVER input=7ac09a4a63e87a81 output=52534b2790be45fd backup=true recreated=false values=f16b638d0ed97422
+case comments_edited SERVER input=21ca626ce5bb0d73 output=db40692d404c38dc backup=true recreated=false values=f16b638d0ed97422
+case trailing_comment SERVER input=ac0237244b086273 output=da553f0f3a728742 backup=true recreated=false values=3f087ea94bb5a8a4
   magneto.flightSpeed=Double:0.2
-case crlf SERVER input=7cff01a5bbd88006 output=7cff01a5bbd88006 backup=false recreated=false values=1181c6619b1d6f84
-case spaces SERVER input=f06550a4bfcff436 output=d3f900d632f5ea55 backup=true recreated=false values=1181c6619b1d6f84
-case quoted_keys SERVER input=17de4083be017370 output=17de4083be017370 backup=false recreated=false values=89510478e8452235
+case crlf SERVER input=3c0080c9899a41b3 output=3c0080c9899a41b3 backup=false recreated=false values=f16b638d0ed97422
+case spaces SERVER input=1f5fe65c17bf96f6 output=db40692d404c38dc backup=true recreated=false values=f16b638d0ed97422
+case quoted_keys SERVER input=818a8c0b124d6f02 output=818a8c0b124d6f02 backup=false recreated=false values=d900625cb5d3760c
   magneto.flightSpeed=Double:0.2
   magneto.telekinesisRange=Integer:40
-case reordered SERVER input=ef314587078ffd40 output=ef314587078ffd40 backup=false recreated=false values=1181c6619b1d6f84
-case strings SERVER input=0601eb64b6c1a37f output=0601eb64b6c1a37f backup=false recreated=false values=33dbe40c7c642494
+case reordered SERVER input=ddc35141b8862d48 output=ddc35141b8862d48 backup=false recreated=false values=f16b638d0ed97422
+case strings SERVER input=30ae6c66e81d81cc output=30ae6c66e81d81cc backup=false recreated=false values=803ac5e1b5eeb2fd
+  spider_man.webAssistOpenLand=String:zip
   apocalypse_boss.ritualDimensions=List[String:minecraft:overworld, String:minecraft:the_end, String:a	b"c\d]
   build_magic.fullContainers=Enum:SPILL
-  spider_man.webAssistOpenLand=String:zip
-case multiline_array SERVER input=6b91495a53c5a9c8 output=6b91495a53c5a9c8 backup=false recreated=false values=88850ac42d71b8a7
+case multiline_array SERVER input=ec5a6f964b0789be output=ec5a6f964b0789be backup=false recreated=false values=013dfa07fba8a6bf
   apocalypse_boss.ritualDimensions=List[String:minecraft:overworld, String:minecraft:the_nether]
-case tables_inside SERVER input=c97e6fa53937766c output=d3f900d632f5ea55 backup=true recreated=false values=1181c6619b1d6f84
-case empty_file SERVER input=e3b0c44298fc1c14 output=d3f900d632f5ea55 backup=true recreated=false values=1181c6619b1d6f84
-case syntax_error SERVER input=1f9bbce3e40c0f52 output=d3f900d632f5ea55 backup=true recreated=true values=1181c6619b1d6f84
-case duplicate_key SERVER input=12bdcd9a71341a70 output=d3f900d632f5ea55 backup=true recreated=true values=1181c6619b1d6f84
-case old_a SERVER input=659f61a61d19797d output=cfd561f0f9dc9c2b backup=true recreated=false values=68fbadc16c17efc7
-  apocalypse_boss.backhandDamage=Double:16.0
-  apocalypse_boss.boulderDamage=Double:11.0
-  apocalypse_boss.entombTicks=Integer:100
-  apocalypse_boss.horsemanDamageBonus=Double:4.0
-  apocalypse_boss.horsemanHealthFactor=Double:2.0
-  apocalypse_boss.mindCrushNauseaTicks=Integer:120
-  apocalypse_boss.regenPerSecond=Double:4.0
-  apocalypse_boss.ringDamage=Double:12.0
-  apocalypse_boss.shieldGrowth=Double:1.25
-  apocalypse_boss.shieldPerExtraPlayer=Double:0.35
-  apocalypse_boss.shieldStrength=Double:150.0
-  apocalypse_boss.staggerTicks=Integer:60
-  apocalypse_boss.trueFormRegenPerSecond=Double:3.0
-  apocalypse_boss.windowTicks=Integer:200
+case tables_inside SERVER input=87dc0941848a9af9 output=db40692d404c38dc backup=true recreated=false values=f16b638d0ed97422
+case empty_file SERVER input=e3b0c44298fc1c14 output=db40692d404c38dc backup=true recreated=false values=f16b638d0ed97422
+case syntax_error SERVER input=4decb2da7e8c56fb output=db40692d404c38dc backup=true recreated=true values=f16b638d0ed97422
+case duplicate_key SERVER input=f57ceae3433112e4 output=db40692d404c38dc backup=true recreated=true values=f16b638d0ed97422
+case old_a SERVER input=659f61a61d19797d output=9ce838387793c3ba backup=true recreated=false values=0d836cccd5b5ddbf
   apocalypse_shield.shieldRegenDelayTicks=Integer:160
   apocalypse_shield.shieldRegenFraction=Double:0.03
-case old_b SERVER input=9e8a6667e1b0ae2a output=1fe220317c64d5ad backup=true recreated=false values=1181c6619b1d6f84
+  apocalypse_boss.shieldStrength=Double:150.0
+  apocalypse_boss.shieldGrowth=Double:1.25
+  apocalypse_boss.shieldPerExtraPlayer=Double:0.35
+  apocalypse_boss.windowTicks=Integer:200
+  apocalypse_boss.staggerTicks=Integer:60
+  apocalypse_boss.regenPerSecond=Double:4.0
+  apocalypse_boss.trueFormRegenPerSecond=Double:3.0
+  apocalypse_boss.boulderDamage=Double:11.0
+  apocalypse_boss.backhandDamage=Double:16.0
+  apocalypse_boss.ringDamage=Double:12.0
+  apocalypse_boss.entombTicks=Integer:100
+  apocalypse_boss.mindCrushNauseaTicks=Integer:120
+  apocalypse_boss.horsemanHealthFactor=Double:2.0
+  apocalypse_boss.horsemanDamageBonus=Double:4.0
+case old_b SERVER input=9e8a6667e1b0ae2a output=a6e1e21fa1dc1bec backup=true recreated=false values=f16b638d0ed97422
 case client_default CLIENT input=eced480f94e220dd output=eced480f94e220dd backup=false recreated=false values=7e6175fcce61a32a
 case client_missing CLIENT input=none output=eced480f94e220dd backup=false recreated=false values=7e6175fcce61a32a
 case client_values CLIENT input=2147fe613e9d75f2 output=2147fe613e9d75f2 backup=false recreated=false values=867094e7be874585

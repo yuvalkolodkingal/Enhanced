@@ -522,7 +522,9 @@ public final class UltronAbilities {
         Vec3 at = target.position().add(0.0, target.getBbHeight() * 0.5, 0.0);
         UltronFx.from(level, UltronFxPayload.GRAVITY_PULL, player, palm, at, 0.0F, 8);
         UltronSounds.GRAVITY.play(level, player.position(), SoundSource.PLAYERS, 0.8F, 1.0F);
-        level.sendParticles(new EnergyParticleOptions(0x9FD8FF, 1.0F), at.x, at.y, at.z, 10, 0.2, 0.3, 0.2, 0.05);
+        // (3.16) a custom hero's colour
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.ULTRON_GRAVITY, 0x9FD8FF),
+                1.0F), at.x, at.y, at.z, 10, 0.2, 0.3, 0.2, 0.05);
     }
 
     /**
@@ -652,9 +654,11 @@ public final class UltronAbilities {
         }
         UltronFx.from(level, UltronFxPayload.GRAVITY_SLAM, player, centre, Vec3.ZERO, (float) radius, 10);
         UltronSounds.GRAVITY.play(level, centre, SoundSource.PLAYERS, 1.0F, 0.8F);
+        // (3.16) a custom hero's colour
+        int slamColor = AbilityColors.shade(player, HeroAbility.ULTRON_SLAM, 0x9FD8FF);
         for (int i = 0; i < 24; i++) {
             double angle = Mth.TWO_PI * i / 24.0;
-            level.sendParticles(new EnergyParticleOptions(0x9FD8FF, 1.2F), centre.x + Math.cos(angle) * 1.5, centre.y + 0.2, centre.z + Math.sin(angle) * 1.5,
+            level.sendParticles(new EnergyParticleOptions(slamColor, 1.2F), centre.x + Math.cos(angle) * 1.5, centre.y + 0.2, centre.z + Math.sin(angle) * 1.5,
                     0, Math.cos(angle), 0.02, Math.sin(angle), 0.5);
         }
     }

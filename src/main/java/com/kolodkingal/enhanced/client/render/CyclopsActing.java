@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.ability.CyclopsAbilities;
 import com.kolodkingal.enhanced.ability.CyclopsGlasses;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -136,8 +138,13 @@ final class CyclopsActing {
         Vec3 eyes = CyclopsBeamFx.eyes(player, 1.0F);
         switch (id) {
             case CYCLOPS_GLASSES_OFF, CYCLOPS_RICOCHET, CYCLOPS_CONCUSSION -> {
+                // (3.16) a custom hero's colour: the Concussion's (and the Ricochet's) sparks in the colour chosen for it
+                HeroAbility row = id == GestureId.CYCLOPS_CONCUSSION ? HeroAbility.CYCLOPS_CONCUSSION
+                        : id == GestureId.CYCLOPS_RICOCHET ? HeroAbility.CYCLOPS_RICOCHET : null;
+                int red = row == null ? CyclopsAbilities.RED : AbilityColors.shade(player, row, CyclopsAbilities.RED);
+                int core = row == null ? CyclopsAbilities.CORE : AbilityColors.shade(player, row, CyclopsAbilities.CORE);
                 for (int i = 0; i < 6; i++) {
-                    level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? CyclopsAbilities.RED : CyclopsAbilities.CORE, 0.6F),
+                    level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? red : core, 0.6F),
                             eyes.x + (r.nextDouble() - 0.5) * 0.3, eyes.y + (r.nextDouble() - 0.5) * 0.12, eyes.z + (r.nextDouble() - 0.5) * 0.3,
                             (r.nextDouble() - 0.5) * 0.04, 0.01, (r.nextDouble() - 0.5) * 0.04);
                 }

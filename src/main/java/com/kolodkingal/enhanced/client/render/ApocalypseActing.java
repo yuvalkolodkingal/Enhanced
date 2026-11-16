@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.ability.ApocalypseAim;
 import com.kolodkingal.enhanced.ability.ApocalypseGuard;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
@@ -316,7 +318,9 @@ final class ApocalypseActing {
                         look.z * 0.28 + (r.nextDouble() - 0.5) * 0.14);
             }
         }
-        FlightEffects.ring(level, p.getId(), p.position().add(look.scale(1.3)).add(0, 0.06, 0), UP, 7, 0.3F, 2.2F, 0.14F, SandPalette.MAIN, 0.7F);
+        // (3.16) a custom hero's colour
+        FlightEffects.ring(level, p.getId(), p.position().add(look.scale(1.3)).add(0, 0.06, 0), UP, 7, 0.3F, 2.2F, 0.14F,
+                AbilityColors.shade(p, HeroAbility.APOCALYPSE_SAND, SandPalette.MAIN), 0.7F);
     }
 
     private static void entombClench(ClientLevel level, AbstractClientPlayer p) {
@@ -334,7 +338,9 @@ final class ApocalypseActing {
         for (HumanoidArm arm : HumanoidArm.values()) {
             Vec3 h = hand(p, arm);
             for (int i = 0; i < 2; i++) {
-                level.addParticle(new EnergyParticleOptions(i == 0 ? SandPalette.VIOLET : SandPalette.VIOLET_CORE, 0.8F * size(p)),
+                // (3.16) a custom hero's colour
+                level.addParticle(new EnergyParticleOptions(AbilityColors.shade(p, HeroAbility.APOCALYPSE_PORTAL,
+                        i == 0 ? SandPalette.VIOLET : SandPalette.VIOLET_CORE), 0.8F * size(p)),
                         h.x + (r.nextDouble() - 0.5) * 0.2, h.y + (r.nextDouble() - 0.5) * 0.2, h.z + (r.nextDouble() - 0.5) * 0.2,
                         (r.nextDouble() - 0.5) * 0.05, 0.02 + r.nextDouble() * 0.03, (r.nextDouble() - 0.5) * 0.05);
             }

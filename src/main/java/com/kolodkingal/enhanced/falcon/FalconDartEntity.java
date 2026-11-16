@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.falcon;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -70,7 +72,7 @@ public class FalconDartEntity extends ThrowableProjectile {
         super.tick();
         if (level().isClientSide()) {
             Vec3 at = position();
-            level().addParticle(new EnergyParticleOptions(FalconAbilities.RED, 0.45F), at.x, at.y, at.z, 0, 0, 0);
+            level().addParticle(new EnergyParticleOptions(red(), 0.45F), at.x, at.y, at.z, 0, 0, 0);
             return;
         }
         if (isRemoved()) {
@@ -135,9 +137,14 @@ public class FalconDartEntity extends ThrowableProjectile {
         discard();
     }
 
+    /** (3.16) a custom hero's colour: its red, or the colour its shooter chose for the blasters. */
+    private int red() {
+        return AbilityColors.color(getOwner(), HeroAbility.FALCON_BLASTERS, FalconAbilities.RED);
+    }
+
     /** A red spark where it ends (brighter when it hit something). */
     private void spark(ServerLevel server, Vec3 at, boolean hit) {
-        server.sendParticles(new EnergyParticleOptions(FalconAbilities.RED, hit ? 1.0F : 0.6F), at.x, at.y, at.z,
+        server.sendParticles(new EnergyParticleOptions(red(), hit ? 1.0F : 0.6F), at.x, at.y, at.z,
                 hit ? 6 : 2, 0.1, 0.1, 0.1, 0.12);
     }
 

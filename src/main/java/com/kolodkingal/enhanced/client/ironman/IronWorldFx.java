@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.ironman;
 
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.platform.event.Side;
 import com.kolodkingal.enhanced.platform.event.Subscribe;
 import com.kolodkingal.enhanced.platform.event.Subscriber;
@@ -31,19 +32,25 @@ public final class IronWorldFx {
     static final int RAY_TICKS = 5;
     static final int BURST_TICKS = 10;
 
-    private record Flash(boolean ring, Vec3 a, Vec3 b, float size, long start) {
+    /** (3.16) a custom hero's colour: {@code tint} the colour his pick of the ability chose, or -1 (Iron Man's own). */
+    private record Flash(boolean ring, Vec3 a, Vec3 b, float size, long start, int tint) {
     }
 
     private static final List<Flash> FLASHES = new ArrayList<>();
 
     /** A repulsor's ray from {@code from} to {@code to} ({@code size} 1: one palm; 1.6: both). */
     public static void ray(ClientLevel level, Vec3 from, Vec3 to, float size) {
-        add(new Flash(false, from, to, size, level.getGameTime()));
+        ray(level, from, to, size, -1);
+    }
+
+    /** (3.16) a custom hero's colour: {@link #ray} in the colour {@code tint} (-1: Iron Man's own). */
+    public static void ray(ClientLevel level, Vec3 from, Vec3 to, float size, int tint) {
+        add(new Flash(false, from, to, size, level.getGameTime(), tint));
     }
 
     /** The Laser Burst's ring round {@code centre}, of {@code radius}. */
     public static void burst(ClientLevel level, Vec3 centre, float radius) {
-        add(new Flash(true, centre, centre, radius, level.getGameTime()));
+        add(new Flash(true, centre, centre, radius, level.getGameTime(), -1));
     }
 
     private static void add(Flash flash) {
@@ -91,18 +98,19 @@ public final class IronWorldFx {
 
     /** The ray: three layers that thin and fade as it ages; a flare where it lands. */
     private static void ray(Matrix4f pose, VertexConsumer vc, Flash f, Vec3 camera, float age) {
+        // (3.16) a custom hero's colour: the blues of the ray moved to the one he chose
         float k = 1.0F - Mth.clamp(age / RAY_TICKS, 0.0F, 1.0F);
         Vec3 a = f.a().subtract(camera);
         Vec3 b = f.b().subtract(camera);
         float s = f.size();
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.32F * s * k, 0.22F * s * k, EnergyGeometry.argb(0x3FA8E8, 0.35F * k),
-                EnergyGeometry.argb(0x3FA8E8, 0.25F * k));
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.16F * s * k, 0.12F * s * k, EnergyGeometry.argb(0x9FE8FF, 0.7F * k),
-                EnergyGeometry.argb(0x9FE8FF, 0.6F * k));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.32F * s * k, 0.22F * s * k, EnergyGeometry.argb(c(f, 0x3FA8E8), 0.35F * k),
+                EnergyGeometry.argb(c(f, 0x3FA8E8), 0.25F * k));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.16F * s * k, 0.12F * s * k, EnergyGeometry.argb(c(f, 0x9FE8FF), 0.7F * k),
+                EnergyGeometry.argb(c(f, 0x9FE8FF), 0.6F * k));
         EnergyGeometry.ribbon(pose, vc, a, b, 0.06F * s * k, 0.05F * s * k, EnergyGeometry.argb(0xFFFFFF, 0.95F * k),
                 EnergyGeometry.argb(0xFFFFFF, 0.9F * k));
         float flare = (0.35F + 0.4F * (1.0F - k)) * s;
-        EnergyGeometry.ring(pose, vc, b, b.scale(-1), flare, 0.18F * s, 14, EnergyGeometry.argb(0x9FE8FF, 0.6F * k));
+        EnergyGeometry.ring(pose, vc, b, b.scale(-1), flare, 0.18F * s, 14, EnergyGeometry.argb(c(f, 0x9FE8FF), 0.6F * k));
         EnergyGeometry.ring(pose, vc, a, a.scale(-1), 0.12F * s, 0.1F * s, 10, EnergyGeometry.argb(0xFFFFFF, 0.8F * k));
     }
 
@@ -127,6 +135,11 @@ public final class IronWorldFx {
             EnergyGeometry.ribbon(pose, vc, p, q, 0.12F, 0.12F, EnergyGeometry.argb(0xFF6A50, 0.8F * fade),
                     EnergyGeometry.argb(0xFFFFFF, 0.9F * fade));
         }
+    }
+
+    /** (3.16) a custom hero's colour: {@code rgb}, or it moved to the flash's chosen colour. */
+    private static int c(Flash f, int rgb) {
+        return f.tint() < 0 ? rgb : AbilityColors.recolor(rgb, f.tint());
     }
 
     private IronWorldFx() {

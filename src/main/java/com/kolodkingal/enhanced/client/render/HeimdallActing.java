@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.config.HeimdallConfig;
 import com.kolodkingal.enhanced.heimdall.HofundBond;
 import com.kolodkingal.enhanced.item.HofundItem;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.heimdall.HeimdallAbilities;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -265,16 +266,25 @@ final class HeimdallActing {
     /** A gesture of his just began: the golden motes that go with it. */
     static void started(AbstractClientPlayer player, GestureId id) {
         switch (id) {
-            case HEIMDALL_SIGHT_ON -> motes(player, HumanoidArm.LEFT, 6, 0.5F, 0.02, HeimdallAbilities.LIGHT);
-            case HEIMDALL_CALL, HEIMDALL_RETURN -> motes(player, HumanoidArm.RIGHT, 10, 0.7F, 0.05, HeimdallAbilities.LIGHT);
-            case HEIMDALL_STRIKE, HEIMDALL_BIFROST -> motes(player, HumanoidArm.RIGHT, 8, 0.6F, 0.03, HeimdallEffects.rainbow(player.getRandom().nextInt(7)));
-            case HEIMDALL_SEND -> motes(player, HumanoidArm.LEFT, 8, 0.6F, 0.04, HeimdallAbilities.LIGHT);
+            // (3.16) a custom hero's colour: the motes of each ability in the colour chosen for it
+            case HEIMDALL_SIGHT_ON -> motes(player, HumanoidArm.LEFT, 6, 0.5F, 0.02, HeimdallAbilities.LIGHT,
+                    HeroAbility.HEIMDALL_SIGHT);
+            case HEIMDALL_CALL, HEIMDALL_RETURN -> motes(player, HumanoidArm.RIGHT, 10, 0.7F, 0.05, HeimdallAbilities.LIGHT,
+                    id == GestureId.HEIMDALL_RETURN ? HeroAbility.HEIMDALL_HOFUND : null);
+            case HEIMDALL_STRIKE, HEIMDALL_BIFROST -> motes(player, HumanoidArm.RIGHT, 8, 0.6F, 0.03,
+                    HeimdallEffects.rainbow(player.getRandom().nextInt(7)),
+                    id == GestureId.HEIMDALL_STRIKE ? HeroAbility.HEIMDALL_STRIKE : HeroAbility.HEIMDALL_BIFROST);
+            case HEIMDALL_SEND -> motes(player, HumanoidArm.LEFT, 8, 0.6F, 0.04, HeimdallAbilities.LIGHT, null);
             default -> {
             }
         }
     }
 
-    private static void motes(AbstractClientPlayer player, HumanoidArm side, int count, float size, double speed, int colour) {
+    private static void motes(AbstractClientPlayer player, HumanoidArm side, int count, float size, double speed, int colour,
+                              @org.jetbrains.annotations.Nullable HeroAbility row) {
+        // (3.16) a custom hero's colour
+        int light = row == null ? HeimdallAbilities.LIGHT : AbilityColors.shade(player, row, HeimdallAbilities.LIGHT);
+        colour = row == null ? colour : AbilityColors.shade(player, row, colour);
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         if (level == null) {
@@ -289,7 +299,7 @@ final class HeimdallActing {
         float scale = firstPerson ? size * 0.45F : size;
         RandomSource random = level.random;
         for (int i = 0; i < count; i++) {
-            int c = i % 3 == 0 ? HeimdallAbilities.LIGHT : colour;
+            int c = i % 3 == 0 ? light : colour;
             level.addParticle(new EnergyParticleOptions(c, scale), hand.x + (random.nextDouble() - 0.5) * 0.2, hand.y + (random.nextDouble() - 0.5) * 0.2,
                     hand.z + (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * speed, 0.01 + random.nextDouble() * speed,
                     (random.nextDouble() - 0.5) * speed);

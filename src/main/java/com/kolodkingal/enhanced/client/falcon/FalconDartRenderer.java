@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.falcon;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.falcon.FalconDartEntity;
@@ -50,13 +52,16 @@ public class FalconDartRenderer extends EntityRenderer<FalconDartEntity> {
         Matrix4f pose = new Matrix4f();
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         float flicker = 0.9F + 0.1F * Mth.sin((dart.tickCount + partialTick) * 2.7F + dart.getId());
-        EnergyGeometry.ribbon(pose, vc, tail, centre, 0.0F, 0.16F, EnergyGeometry.argb(HALO, 0.0F),
-                EnergyGeometry.argb(HALO, 0.5F * flicker));
-        EnergyGeometry.ribbon(pose, vc, tail, centre, 0.0F, 0.09F, EnergyGeometry.argb(MAIN, 0.0F),
-                EnergyGeometry.argb(MAIN, 0.95F * flicker));
+        // (3.16) a custom hero's colour: the dart's reds moved to the colour its shooter chose for the blasters
+        int halo = AbilityColors.shade(dart.getOwner(), HeroAbility.FALCON_BLASTERS, HALO);
+        int main = AbilityColors.shade(dart.getOwner(), HeroAbility.FALCON_BLASTERS, MAIN);
+        EnergyGeometry.ribbon(pose, vc, tail, centre, 0.0F, 0.16F, EnergyGeometry.argb(halo, 0.0F),
+                EnergyGeometry.argb(halo, 0.5F * flicker));
+        EnergyGeometry.ribbon(pose, vc, tail, centre, 0.0F, 0.09F, EnergyGeometry.argb(main, 0.0F),
+                EnergyGeometry.argb(main, 0.95F * flicker));
         EnergyGeometry.ribbon(pose, vc, tail, centre, 0.0F, 0.04F, EnergyGeometry.argb(CORE, 0.0F),
                 EnergyGeometry.argb(CORE, 1.0F));
         Vec3 toCamera = centre.scale(-1.0);
-        EnergyGeometry.ring(pose, vc, centre, toCamera, 0.08F, 0.07F, 10, EnergyGeometry.argb(MAIN, 0.9F));
+        EnergyGeometry.ring(pose, vc, centre, toCamera, 0.08F, 0.07F, 10, EnergyGeometry.argb(main, 0.9F));
     }
 }

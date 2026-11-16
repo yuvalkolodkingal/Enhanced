@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.asgard.AsgardFx;
 import com.kolodkingal.enhanced.client.screen.BifrostScreen;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.heimdall.HeimdallAbilities;
 import com.kolodkingal.enhanced.heimdall.HeimdallFx;
@@ -49,13 +50,26 @@ public final class HeimdallEffects {
     private static final int DOME_SEGMENTS = 28;
     private static final int DOME_RINGS = 8;
 
-    private record Arc(Vec3 center, Vec3 look, int step, long start) {
+    // (3.16) a custom hero's colour: each keeps its caster, for the colour he chose
+    private record Arc(Vec3 center, Vec3 look, int step, long start, int caster) {
     }
 
-    private record Streak(Vec3 from, Vec3 to, long start) {
+    private record Streak(Vec3 from, Vec3 to, long start, int caster) {
     }
 
-    private record Column(Vec3 at, float radius, long start) {
+    private record Column(Vec3 at, float radius, long start, int caster) {
+    }
+
+    /** (3.16) a custom hero's colour: the one chosen for the ability being drawn, or -1 (Heimdall's gold and rainbow). */
+    private static int tint = -1;
+
+    /** One of Heimdall's colours, or it moved to the colour chosen for what is being drawn. */
+    private static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
+    private static int tintOf(ClientLevel level, int caster, HeroAbility row) {
+        return caster < 0 ? -1 : AbilityColors.chosen(level.getEntity(caster), row);
     }
 
     private record Pillar(Vec3 at, long start) {
@@ -90,18 +104,20 @@ public final class HeimdallEffects {
         switch (p.kind()) {
             case HeimdallFx.SLASH -> {
                 if (pts.size() >= 2) {
-                    ARCS.add(new Arc(pts.get(0), pts.get(1), p.arg(), now));
+                    ARCS.add(new Arc(pts.get(0), pts.get(1), p.arg(), now, p.entityId()));
                 }
             }
             case HeimdallFx.LUNGE -> {
                 if (pts.size() >= 2) {
-                    STREAKS.add(new Streak(pts.get(0), pts.get(1), now));
+                    STREAKS.add(new Streak(pts.get(0), pts.get(1), now, p.entityId()));
                 }
             }
             case HeimdallFx.STRIKE -> {
                 if (!pts.isEmpty()) {
-                    COLUMNS.add(new Column(pts.get(0), p.arg() / 10.0F, now));
+                    COLUMNS.add(new Column(pts.get(0), p.arg() / 10.0F, now, p.entityId()));
+                    tint = AbilityColors.chosen(who, HeroAbility.HEIMDALL_STRIKE); // (3.16) a custom hero's colour
                     burst(level, pts.get(0), 40, 0.35);
+                    tint = -1;
                 }
                 play(who, GestureId.HEIMDALL_STRIKE);
             }
@@ -115,7 +131,9 @@ public final class HeimdallEffects {
             }
             case HeimdallFx.RETURN -> {
                 if (who != null) {
+                    tint = AbilityColors.chosen(who, HeroAbility.HEIMDALL_HOFUND); // (3.16) a custom hero's colour
                     burst(level, who.position().add(0, 1.2, 0), 18, 0.2);
+                    tint = -1;
                 }
                 play(who, GestureId.HEIMDALL_RETURN);
             }
@@ -147,7 +165,7 @@ public final class HeimdallEffects {
     private static void burst(ClientLevel level, Vec3 at, int count, double speed) {
         RandomSource r = level.random;
         for (int i = 0; i < count; i++) {
-            int c = i % 3 == 0 ? HeimdallAbilities.LIGHT : i % 3 == 1 ? HeimdallAbilities.GOLD : rainbow(i);
+            int c = c(i % 3 == 0 ? HeimdallAbilities.LIGHT : i % 3 == 1 ? HeimdallAbilities.GOLD : rainbow(i));
             level.addParticle(new EnergyParticleOptions(c, 0.7F), at.x, at.y, at.z,
                     r.nextGaussian() * speed, r.nextDouble() * speed, r.nextGaussian() * speed);
         }
@@ -169,8 +187,10 @@ public final class HeimdallEffects {
                 RandomSource r = level.random;
                 double a = r.nextDouble() * Math.PI * 2;
                 double d = r.nextDouble() * c.radius();
-                level.addParticle(new EnergyParticleOptions(rainbow(r.nextInt(7)), 0.6F), c.at().x + Math.cos(a) * d, c.at().y + 0.1,
+                tint = tintOf(level, c.caster(), HeroAbility.HEIMDALL_STRIKE); // (3.16) a custom hero's colour
+                level.addParticle(new EnergyParticleOptions(c(rainbow(r.nextInt(7))), 0.6F), c.at().x + Math.cos(a) * d, c.at().y + 0.1,
                         c.at().z + Math.sin(a) * d, 0, 0.12 + r.nextDouble() * 0.1, 0);
+                tint = -1;
             }
         }
         for (AbstractClientPlayer p : level.players()) {
@@ -179,7 +199,9 @@ public final class HeimdallEffects {
                 double a = r.nextDouble() * Math.PI * 2;
                 double up = r.nextDouble() * Math.PI * 0.5;
                 double rad = HeimdallAbilities.WARD_RADIUS;
-                level.addParticle(new EnergyParticleOptions(HeimdallAbilities.LIGHT, 0.4F), p.getX() + Math.cos(a) * Math.cos(up) * rad,
+                // (3.16) a custom hero's colour
+                level.addParticle(new EnergyParticleOptions(AbilityColors.shade(p, HeroAbility.HEIMDALL_WARD,
+                        HeimdallAbilities.LIGHT), 0.4F), p.getX() + Math.cos(a) * Math.cos(up) * rad,
                         p.getY() + Math.sin(up) * rad, p.getZ() + Math.sin(a) * Math.cos(up) * rad, 0, 0.01, 0);
             }
         }
@@ -225,15 +247,20 @@ public final class HeimdallEffects {
         Matrix4f pose = new Matrix4f();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         VertexConsumer vc = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
+        // (3.16) a custom hero's colour: each in the colour its caster chose for it
         for (Arc a : ARCS) {
+            tint = tintOf(level, a.caster(), HeroAbility.HEIMDALL_HOFUND);
             arc(pose, vc, a, camera, time);
         }
         for (Streak s : STREAKS) {
+            tint = tintOf(level, s.caster(), HeroAbility.HEIMDALL_HOFUND);
             streak(pose, vc, s, camera, time);
         }
         for (Column c : COLUMNS) {
+            tint = tintOf(level, c.caster(), HeroAbility.HEIMDALL_STRIKE);
             column(pose, vc, c, camera, time);
         }
+        tint = -1;
         for (Pillar p : PILLARS) {
             pillar(pose, vc, p, camera, time);
         }
@@ -241,8 +268,10 @@ public final class HeimdallEffects {
         if (!warded.isEmpty()) {
             VertexConsumer veil = buffers.getBuffer(EnhancedRenderTypes.ENERGY_VEIL);
             for (AbstractClientPlayer p : warded) {
+                tint = AbilityColors.chosen(p, HeroAbility.HEIMDALL_WARD); // (3.16) a custom hero's colour
                 dome(pose, veil, p.getPosition(partial).subtract(camera), time);
             }
+            tint = -1;
             buffers.endBatch(EnhancedRenderTypes.ENERGY_VEIL);
         }
     }
@@ -287,7 +316,7 @@ public final class HeimdallEffects {
             if (prevIn != null) {
                 float lead = 1.0F - (float) Math.abs(u - f) * 2.0F;
                 int edge = EnergyGeometry.argb(0xFFFFFF, 0.55F * fade * Math.max(0.2F, lead));
-                int body = EnergyGeometry.argb(HeimdallAbilities.GOLD, 0.0F);
+                int body = EnergyGeometry.argb(c(HeimdallAbilities.GOLD), 0.0F);
                 quad(pose, vc, prevOut, out, in, prevIn, edge, edge, body, body);
             }
             prevIn = in;
@@ -301,8 +330,8 @@ public final class HeimdallEffects {
         float fade = 1.0F - Mth.clamp(age / LUNGE_TICKS, 0.0F, 1.0F);
         Vec3 a = s.from().add(0, 1.0, 0).subtract(camera);
         Vec3 b = s.to().add(0, 1.0, 0).subtract(camera);
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.05F, 0.35F, EnergyGeometry.argb(HeimdallAbilities.GOLD, 0.0F),
-                EnergyGeometry.argb(HeimdallAbilities.LIGHT, 0.8F * fade));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.05F, 0.35F, EnergyGeometry.argb(c(HeimdallAbilities.GOLD), 0.0F),
+                EnergyGeometry.argb(c(HeimdallAbilities.LIGHT), 0.8F * fade));
     }
 
     /** The Bifrost Strike: seven bands of colour falling from the sky into a ring on the ground. */
@@ -320,8 +349,8 @@ public final class HeimdallEffects {
         for (int i = 0; i < RAINBOW.length; i++) {
             double a = time * 0.25 + i * Math.PI * 2 / RAINBOW.length;
             Vec3 off = new Vec3(Math.cos(a) * 0.35, 0, Math.sin(a) * 0.35);
-            EnergyGeometry.ribbon(pose, vc, top.add(off), ground.add(off), width * 0.5F, width, EnergyGeometry.argb(RAINBOW[i], 0.0F),
-                    EnergyGeometry.argb(RAINBOW[i], 0.55F * fade));
+            EnergyGeometry.ribbon(pose, vc, top.add(off), ground.add(off), width * 0.5F, width, EnergyGeometry.argb(c(RAINBOW[i]), 0.0F),
+                    EnergyGeometry.argb(c(RAINBOW[i]), 0.55F * fade));
         }
         EnergyGeometry.ribbon(pose, vc, top, ground, 0.3F, 0.7F, EnergyGeometry.argb(0xFFFFFF, 0.2F * fade),
                 EnergyGeometry.argb(0xFFFFFF, 0.9F * fade));
@@ -331,7 +360,7 @@ public final class HeimdallEffects {
         for (int k = 0; k < segs; k++) {
             double t0 = k * Math.PI * 2 / segs;
             double t1 = (k + 1) * Math.PI * 2 / segs;
-            int col = EnergyGeometry.argb(RAINBOW[k % RAINBOW.length], 0.7F * fade);
+            int col = EnergyGeometry.argb(c(RAINBOW[k % RAINBOW.length]), 0.7F * fade);
             Vec3 a0 = ground.add(Math.cos(t0) * r, 0.05, Math.sin(t0) * r);
             Vec3 a1 = ground.add(Math.cos(t1) * r, 0.05, Math.sin(t1) * r);
             Vec3 b0 = ground.add(Math.cos(t0) * (r - 0.35), 0.05, Math.sin(t0) * (r - 0.35));
@@ -361,7 +390,7 @@ public final class HeimdallEffects {
                 double t1 = Math.PI * 2 * (s + 1) / DOME_SEGMENTS;
                 float shimmer = 0.5F + 0.5F * Mth.sin(time * 0.15F + s * 0.9F + ring * 1.3F);
                 boolean rib = s % 4 == 0;
-                int c = EnergyGeometry.argb(rib ? HeimdallAbilities.LIGHT : HeimdallAbilities.GOLD, (rib ? 0.22F : 0.08F) + 0.06F * shimmer);
+                int c = EnergyGeometry.argb(rib ? c(HeimdallAbilities.LIGHT) : c(HeimdallAbilities.GOLD), (rib ? 0.22F : 0.08F) + 0.06F * shimmer);
                 Vec3 a = base.add(Math.cos(t0) * Math.cos(p0) * r, Math.sin(p0) * r, Math.sin(t0) * Math.cos(p0) * r);
                 Vec3 b = base.add(Math.cos(t1) * Math.cos(p0) * r, Math.sin(p0) * r, Math.sin(t1) * Math.cos(p0) * r);
                 Vec3 cc = base.add(Math.cos(t1) * Math.cos(p1) * r, Math.sin(p1) * r, Math.sin(t1) * Math.cos(p1) * r);

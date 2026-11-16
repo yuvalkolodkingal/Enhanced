@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.falcon;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -127,7 +129,11 @@ public class RedwingEntity extends PathfinderMob {
         if (level().isClientSide()) {
             if (tickCount % 3 == 0) {
                 Vec3 back = Vec3.directionFromRotation(0.0F, getYRot()).scale(-0.3);
-                level().addParticle(new EnergyParticleOptions(FalconAbilities.RED, 0.35F), getX() + back.x,
+                // (3.16) a custom hero's colour
+                UUID id = ownerId();
+                level().addParticle(new EnergyParticleOptions(AbilityColors.color(id == null ? null
+                        : level().getPlayerByUUID(id), HeroAbility.FALCON_REDWING, FalconAbilities.RED), 0.35F),
+                        getX() + back.x,
                         getY() + 0.12, getZ() + back.z, 0, -0.02, 0);
             }
             return;

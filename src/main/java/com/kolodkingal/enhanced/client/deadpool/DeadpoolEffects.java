@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.deadpool;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.DeadpoolActing;
 import com.kolodkingal.enhanced.deadpool.DeadpoolLines;
@@ -16,6 +18,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -88,12 +91,12 @@ public final class DeadpoolEffects {
             }
             case DeadpoolFxPayload.BLINK_OUT, DeadpoolFxPayload.BLINK_IN, DeadpoolFxPayload.GLITCH -> {
                 if (!points.isEmpty()) {
-                    flicker(level, r, points.get(0), payload.kind() == DeadpoolFxPayload.GLITCH);
+                    flicker(level, r, points.get(0), payload.kind() == DeadpoolFxPayload.GLITCH, who);
                 }
             }
             case DeadpoolFxPayload.DROP_IN -> {
                 if (!points.isEmpty()) {
-                    flicker(level, r, points.get(0), false);
+                    flicker(level, r, points.get(0), false, who);
                 }
             }
             case DeadpoolFxPayload.TAUNT -> {
@@ -127,14 +130,17 @@ public final class DeadpoolEffects {
     }
 
     /** The Teleport Belt's flicker: a column of red and black motes (a glitch scatters them and adds a cyan blink). */
-    static void flicker(ClientLevel level, RandomSource r, Vec3 at, boolean glitch) {
+    static void flicker(ClientLevel level, RandomSource r, Vec3 at, boolean glitch, @Nullable Entity who) {
         if (!EnhancedClientConfig.flightEffects()) {
             return;
         }
+        // (3.16) a custom hero's colour: the belt's red and black moved to the colour he chose for it
+        int red = AbilityColors.shade(who, HeroAbility.DEADPOOL_BELT, RED);
+        int dark = AbilityColors.shade(who, HeroAbility.DEADPOOL_BELT, DARK);
         for (int i = 0; i < 24; i++) {
             double y = r.nextDouble() * 1.9;
             double spread = glitch ? 0.9 : 0.4;
-            int color = i % 2 == 0 ? RED : DARK;
+            int color = i % 2 == 0 ? red : dark;
             level.addParticle(new EnergyParticleOptions(color, 1.2F), at.x + (r.nextDouble() - 0.5) * spread,
                     at.y + y, at.z + (r.nextDouble() - 0.5) * spread, 0.0, 0.02, 0.0);
         }

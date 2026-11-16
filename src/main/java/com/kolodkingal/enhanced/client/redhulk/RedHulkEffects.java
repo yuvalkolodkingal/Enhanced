@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.redhulk;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.RedHulkActing;
 import com.kolodkingal.enhanced.network.RedHulkFxPayload;
@@ -51,11 +53,19 @@ import java.util.Map;
 @Subscriber(side = Side.CLIENT)
 public final class RedHulkEffects {
     /** A ring running out over the ground: the smash's crumbs ({@code fire} false) or the burst's flames. */
-    private record Ring(Vec3 center, float radius, long start, float speed, boolean fire) {
+    private record Ring(Vec3 center, float radius, long start, float speed, boolean fire, int caster) {
+        Ring(Vec3 center, float radius, long start, float speed, boolean fire) {
+            this(center, radius, start, speed, fire, -1);
+        }
     }
 
     /** The heat wave rolling out in a cone. */
-    private record Wave(Vec3 origin, Vec3 dir, float length, long start) {
+    private record Wave(Vec3 origin, Vec3 dir, float length, long start, int caster) {
+    }
+
+    /** (3.16) a custom hero's colour: {@code rgb}, or it moved to the colour the caster chose for {@code row}. */
+    private static int shade(ClientLevel level, int caster, HeroAbility row, int rgb) {
+        return caster < 0 ? rgb : AbilityColors.shade(level.getEntity(caster), row, rgb);
     }
 
     /** Steam round a changing Red Hulk. */
@@ -109,7 +119,7 @@ public final class RedHulkEffects {
                 if (p.points().size() >= 2) {
                     Vec3 dir = p.points().get(1).subtract(at);
                     WAVES.add(new Wave(at, dir.lengthSqr() < 1.0E-6 ? new Vec3(0, 0, 1) : dir.normalize(),
-                            Math.max(2, p.arg()), now));
+                            Math.max(2, p.arg()), now, p.entityId())); // (3.16) its caster, for his colour
                     shake(at, 0.8F);
                 }
             }
@@ -132,7 +142,8 @@ public final class RedHulkEffects {
                 shake(at, 3.0F);
             }
             case RedHulkFxPayload.BURST -> {
-                RINGS.add(new Ring(at, Math.max(2, p.arg()), now, Math.max(2, p.arg()) / 10.0F, true));
+                // (3.16) its caster, for his colour
+                RINGS.add(new Ring(at, Math.max(2, p.arg()), now, Math.max(2, p.arg()) / 10.0F, true, p.entityId()));
                 level.addParticle(ParticleTypes.FLASH, at.x, at.y + 1.0, at.z, 0, 0, 0);
                 level.addParticle(ParticleTypes.EXPLOSION_EMITTER, at.x, at.y + 0.5, at.z, 0, 0, 0);
                 if (who == mc.player || mc.player != null && mc.player.position().distanceTo(at) < 8.0) {
@@ -141,11 +152,14 @@ public final class RedHulkEffects {
                 shake(at, 4.0F);
             }
             case RedHulkFxPayload.ABSORB_HIT -> {
+                // (3.16) a custom hero's colour
+                int absorb = AbilityColors.shade(who, HeroAbility.RED_HULK_ABSORB, ABSORB);
+                int ember = AbilityColors.shade(who, HeroAbility.RED_HULK_ABSORB, EMBER);
                 for (int i = 0; i < 16; i++) {
                     Vec3 from = at.add((level.random.nextDouble() - 0.5) * 3.0, (level.random.nextDouble() - 0.5)
                             * 3.0, (level.random.nextDouble() - 0.5) * 3.0);
                     Vec3 v = at.subtract(from).scale(0.18);
-                    level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? ABSORB : EMBER, 0.8F), from.x, from.y,
+                    level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? absorb : ember, 0.8F), from.x, from.y,
                             from.z, v.x, v.y, v.z);
                 }
             }
@@ -219,8 +233,11 @@ public final class RedHulkEffects {
             level.addParticle(ParticleTypes.CLOUD, head.x + d.x, head.y + d.y * 0.5, head.z + d.z, d.x * 0.5,
                     d.y * 0.2, d.z * 0.5);
         }
+        // (3.16) a custom hero's colour: the Roar is the Heat Wave's other half (its pick, else the Heat Wave's)
+        int ember = AbilityColors.shade(who, HeroAbility.RED_HULK_ROAR, EMBER);
+        int red = AbilityColors.shade(who, HeroAbility.RED_HULK_ROAR, RedHulkAbilities.RED);
         for (int i = 0; i < 14; i++) {
-            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? EMBER : RedHulkAbilities.RED, 0.6F), head.x,
+            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? ember : red, 0.6F), head.x,
                     head.y, head.z, (r.nextDouble() - 0.5) * 0.4, (r.nextDouble() - 0.5) * 0.2,
                     (r.nextDouble() - 0.5) * 0.4);
         }
@@ -266,7 +283,9 @@ public final class RedHulkEffects {
                     level.addParticle(ParticleTypes.FLAME, x, y + r.nextDouble() * 0.6, z, Math.cos(a) * 0.12,
                             0.05 + r.nextDouble() * 0.08, Math.sin(a) * 0.12);
                     if (i % 2 == 0) {
-                        level.addParticle(new EnergyParticleOptions(i % 4 == 0 ? EMBER : FLAME, 0.9F), x, y + 0.4,
+                        // (3.16) a custom hero's colour
+                        level.addParticle(new EnergyParticleOptions(shade(level, ring.caster(), HeroAbility.RED_HULK_BURST,
+                                i % 4 == 0 ? EMBER : FLAME), 0.9F), x, y + 0.4,
                                 z, Math.cos(a) * 0.05, 0.08, Math.sin(a) * 0.05);
                     }
                     if (i % 12 == 0) {
@@ -300,7 +319,9 @@ public final class RedHulkEffects {
                 double y = p.y + (r.nextDouble() - 0.5) * 1.4;
                 level.addParticle(ParticleTypes.FLAME, p.x, y, p.z, wave.dir().x * 0.25, 0.02, wave.dir().z * 0.25);
                 if (i % 2 == 0) {
-                    level.addParticle(new EnergyParticleOptions(i % 4 == 0 ? EMBER : FLAME, 0.8F), p.x, y, p.z,
+                    // (3.16) a custom hero's colour
+                    level.addParticle(new EnergyParticleOptions(shade(level, wave.caster(), HeroAbility.RED_HULK_HEAT_WAVE,
+                            i % 4 == 0 ? EMBER : FLAME), 0.8F), p.x, y, p.z,
                             wave.dir().x * 0.2, 0.03, wave.dir().z * 0.2);
                 }
                 if (i % 3 == 0) {
@@ -377,7 +398,9 @@ public final class RedHulkEffects {
                 Vec3 from = c.add((r.nextDouble() - 0.5) * 4.0, (r.nextDouble() - 0.5) * 3.0,
                         (r.nextDouble() - 0.5) * 4.0);
                 Vec3 v = c.subtract(from).scale(0.15);
-                level.addParticle(new EnergyParticleOptions(ABSORB, 0.7F), from.x, from.y, from.z, v.x, v.y, v.z);
+                // (3.16) a custom hero's colour
+                level.addParticle(new EnergyParticleOptions(AbilityColors.shade(player, HeroAbility.RED_HULK_ABSORB,
+                        ABSORB), 0.7F), from.x, from.y, from.z, v.x, v.y, v.z);
             }
         }
         loop(STEAM_LOOPS, player, data.is(Live.RED_HULK_HEATED), ModSounds.RED_HULK_STEAM.get(), 0.6F);

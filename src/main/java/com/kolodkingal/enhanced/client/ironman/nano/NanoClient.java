@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.ironman.nano;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.beam.AvengersBeams;
 import com.kolodkingal.enhanced.client.ironman.IronFx;
 import com.kolodkingal.enhanced.client.ironman.IronHud;
@@ -54,9 +56,18 @@ public final class NanoClient {
      * A flash in the world: what it is, its points, its argument, when it began (client game time) and how long, and
      * the entity it came from (a drone's laser follows its blade).
      */
-    private record Flash(int kind, List<Vec3> points, int arg, long start, int ticks, int who) {
+    private record Flash(int kind, List<Vec3> points, int arg, long start, int ticks, int who, int tint) {
+        Flash(int kind, List<Vec3> points, int arg, long start, int ticks, int who) {
+            this(kind, points, arg, start, ticks, who, -1);
+        }
+
         Flash(int kind, List<Vec3> points, int arg, long start, int ticks) {
             this(kind, points, arg, start, ticks, -1);
+        }
+
+        /** (3.16) a custom hero's colour: {@code rgb}, or it moved to the colour chosen for the flash. */
+        int c(int rgb) {
+            return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
         }
     }
 
@@ -120,10 +131,20 @@ public final class NanoClient {
         List<Vec3> points = payload.points();
         Vec3 first = points.isEmpty() ? null : points.get(0);
         long now = level.getGameTime();
+        // (3.16) a custom hero's colour: what he chose for the ability the effect is of (-1: the suit's own)
+        HeroAbility row = switch (payload.kind()) {
+            case IronFxPayload.BLADE_OUT, IronFxPayload.BLADE_IN, IronFxPayload.BLADE_SLASH ->
+                    HeroAbility.IRON_MAN_ENERGY_BLADES;
+            case IronFxPayload.SHIELD_HIT -> HeroAbility.IRON_MAN_SHIELD;
+            case IronFxPayload.CANNON_CHARGE, IronFxPayload.CANNON_FIRE -> HeroAbility.IRON_MAN_MISSILES;
+            case IronFxPayload.REFOCUSER -> HeroAbility.IRON_MAN_LIGHTNING_REFOCUSER;
+            default -> null;
+        };
+        int tint = row == null ? -1 : AbilityColors.chosen(level.getEntity(payload.entityId()), row);
         switch (payload.kind()) {
             case IronFxPayload.BLADE_OUT, IronFxPayload.BLADE_IN -> {
                 for (Vec3 at : points) {
-                    burst(level, at, 0x6FD8FF, 10, 0.12);
+                    burst(level, at, shade(tint, 0x6FD8FF), 10, 0.12);
                 }
             }
             case IronFxPayload.BLADE_SLASH -> {
@@ -132,12 +153,12 @@ public final class NanoClient {
                         level.addParticle(ParticleTypes.SWEEP_ATTACK, first.x + r.nextGaussian() * 0.3, first.y
                                 + r.nextGaussian() * 0.2, first.z + r.nextGaussian() * 0.3, 0, 0, 0);
                     }
-                    burst(level, first, 0x8FE8FF, 8, 0.2);
+                    burst(level, first, shade(tint, 0x8FE8FF), 8, 0.2);
                 }
             }
             case IronFxPayload.SHIELD_HIT -> {
                 if (first != null) {
-                    burst(level, first, 0x9FE8FF, 14, 0.25);
+                    burst(level, first, shade(tint, 0x9FE8FF), 14, 0.25);
                     for (int i = 0; i < 6; i++) {
                         level.addParticle(ParticleTypes.ELECTRIC_SPARK, first.x, first.y, first.z,
                                 r.nextGaussian() * 0.25, r.nextGaussian() * 0.25, r.nextGaussian() * 0.25);
@@ -146,20 +167,20 @@ public final class NanoClient {
             }
             case IronFxPayload.CANNON_CHARGE -> {
                 if (first != null) {
-                    burst(level, first, 0x9FE8FF, 12, 0.15);
+                    burst(level, first, shade(tint, 0x9FE8FF), 12, 0.15);
                 }
             }
             case IronFxPayload.CANNON_FIRE -> {
                 if (points.size() >= 2) {
-                    FLASHES.add(new Flash(payload.kind(), points, 0, now, 8));
+                    FLASHES.add(new Flash(payload.kind(), points, 0, now, 8, -1, tint));
                     burst(level, points.get(1), 0xFFFFFF, 18, 0.35);
                 }
             }
             case IronFxPayload.REFOCUSER -> {
                 if (points.size() >= 2) {
-                    FLASHES.add(new Flash(payload.kind(), points, payload.arg(), now, 10));
+                    FLASHES.add(new Flash(payload.kind(), points, payload.arg(), now, 10, -1, tint));
                     for (Vec3 at : points.subList(1, points.size())) {
-                        burst(level, at, 0xBFF4FF, 10, 0.3);
+                        burst(level, at, shade(tint, 0xBFF4FF), 10, 0.3);
                     }
                 }
             }
@@ -213,6 +234,11 @@ public final class NanoClient {
         }
     }
 
+    /** (3.16) a custom hero's colour: {@code rgb}, or it moved to {@code tint} (-1: as it is). */
+    private static int shade(int tint, int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
     private static void burst(ClientLevel level, Vec3 at, int color, int count, double spread) {
         RandomSource r = level.random;
         for (int i = 0; i < count; i++) {
@@ -248,7 +274,9 @@ public final class NanoClient {
                     mc.player.getBoundingBox().inflate(64.0), m -> m.kind() == IronMissileEntity.HOMING)) {
                 Vec3 at = missile.position();
                 Vec3 back = missile.getDeltaMovement().scale(-0.5);
-                level.addParticle(new EnergyParticleOptions(0x9FE8FF, 0.45F), at.x + back.x, at.y + back.y,
+                // (3.16) a custom hero's colour
+                level.addParticle(new EnergyParticleOptions(AbilityColors.shade(missile.getOwner(),
+                        HeroAbility.IRON_MAN_MISSILES, 0x9FE8FF), 0.45F), at.x + back.x, at.y + back.y,
                         at.z + back.z, 0, 0, 0);
             }
         }
@@ -307,7 +335,7 @@ public final class NanoClient {
                             f.points().get(1).subtract(cam), 0.09F, DRONE_CORE, DRONE_BODY, fade);
                 }
                 case IronFxPayload.CANNON_FIRE -> laser(pose, vc, f.points().get(0).subtract(cam),
-                        f.points().get(1).subtract(cam), 0.45F, 0xFFFFFF, 0x7FD8FF, fade);
+                        f.points().get(1).subtract(cam), 0.45F, 0xFFFFFF, f.c(0x7FD8FF), fade);
                 case IronFxPayload.REFOCUSER -> {
                     float width = f.arg() == 1 ? 0.12F : 0.08F;
                     long seed = f.start() * 31L + (long) (age / 2.0F);
@@ -315,8 +343,8 @@ public final class NanoClient {
                         Vec3 a = f.points().get(i).subtract(cam);
                         Vec3 b = f.points().get(i + 1).subtract(cam);
                         EnergyGeometry.bolt(pose, vc, a, b, width * 2.2F, 0.35F,
-                                EnergyGeometry.argb(BOLT_BODY, 0.55F * fade), seed + i);
-                        EnergyGeometry.bolt(pose, vc, a, b, width, 0.35F, EnergyGeometry.argb(BOLT_CORE, fade),
+                                EnergyGeometry.argb(f.c(BOLT_BODY), 0.55F * fade), seed + i);
+                        EnergyGeometry.bolt(pose, vc, a, b, width, 0.35F, EnergyGeometry.argb(f.c(BOLT_CORE), fade),
                                 seed + i);
                     }
                 }

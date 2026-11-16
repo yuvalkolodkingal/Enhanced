@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.falcon;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.render.EnergyGeometry;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.falcon.RedwingEntity;
@@ -47,8 +49,10 @@ public class RedwingRenderer extends MobRenderer<RedwingEntity, RedwingModel> {
         float fade = Math.max(0.0F, 1.0F - age / (FalconEffects.ZAP_TICKS + 1.0F));
         Matrix4f pose = new Matrix4f();
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-        EnergyGeometry.ribbon(pose, vc, from, to, 0.12F, EnergyGeometry.argb(BEAM, 0.6F * fade),
-                EnergyGeometry.argb(BEAM, 0.6F * fade));
+        // (3.16) a custom hero's colour: its Falcon's pick of Redwing
+        int beam = AbilityColors.shade(FalconEffects.owner(drone), HeroAbility.FALCON_REDWING, BEAM);
+        EnergyGeometry.ribbon(pose, vc, from, to, 0.12F, EnergyGeometry.argb(beam, 0.6F * fade),
+                EnergyGeometry.argb(beam, 0.6F * fade));
         EnergyGeometry.ribbon(pose, vc, from, to, 0.04F, EnergyGeometry.argb(CORE, fade),
                 EnergyGeometry.argb(CORE, fade));
     }

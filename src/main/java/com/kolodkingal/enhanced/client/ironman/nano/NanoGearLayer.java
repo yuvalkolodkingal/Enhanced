@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.ironman.nano;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.render.EnhancedRenderTypes;
 import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
@@ -106,6 +108,8 @@ public class NanoGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         }
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         PlayerModel<AbstractClientPlayer> body = getParentModel();
+        // (3.16) a custom hero's colour: each piece in the colour chosen for its ability
+        tint = AbilityColors.chosen(player, HeroAbility.IRON_MAN_ENERGY_BLADES);
         if (blades > 0.0F) {
             if (kind == SuitKind.MARK_50) {
                 onArm(poseStack, body.rightArm, () -> nanoBlade(poseStack, vc, blades, time));
@@ -114,6 +118,7 @@ public class NanoGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
                 onArm(poseStack, body.leftArm, () -> energyBlade(poseStack, vc, blades, time, true));
             }
         }
+        tint = AbilityColors.chosen(player, HeroAbility.IRON_MAN_SHIELD);
         if (shield > 0.0F) {
             if (kind == SuitKind.MARK_50) {
                 // Before the left side of his chest, facing out, wherever the arm is in its swing.
@@ -130,10 +135,12 @@ public class NanoGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
                 poseStack.popPose();
             }
         }
+        tint = AbilityColors.chosen(player, HeroAbility.IRON_MAN_MISSILES);
         if (cannon > 0.0F) {
             onArm(poseStack, body.rightArm, () -> muzzle(poseStack, vc, cannon, time, false));
             onArm(poseStack, body.leftArm, () -> muzzle(poseStack, vc, cannon, time, true));
         }
+        tint = -1;
     }
 
     private static void onArm(PoseStack poseStack, ModelPart arm, Runnable draw) {
@@ -309,8 +316,18 @@ public class NanoGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         }
     }
 
+    /** (3.16) a custom hero's colour: the colour chosen for the piece being drawn, or -1 (the suit's own). */
+    private static int tint = -1;
+
     private static void quad(Matrix4f m, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
                              float x2, float y2, float z2, float x3, float y3, float z3, int r, int g, int b, int a) {
+        if (tint >= 0) {
+            // (3.16) a custom hero's colour
+            int c = AbilityColors.recolor(r << 16 | g << 8 | b, tint);
+            r = c >> 16 & 0xFF;
+            g = c >> 8 & 0xFF;
+            b = c & 0xFF;
+        }
         vc.addVertex(m, x0, y0, z0).setColor(r, g, b, a);
         vc.addVertex(m, x1, y1, z1).setColor(r, g, b, a);
         vc.addVertex(m, x2, y2, z2).setColor(r, g, b, a);
@@ -350,6 +367,8 @@ public class NanoGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
             VertexConsumer vc = event.getMultiBufferSource().getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
             poseStack.pushPose();
             arm.translateAndRotate(poseStack);
+            // (3.16) a custom hero's colour
+            tint = AbilityColors.chosen(player, HeroAbility.IRON_MAN_ENERGY_BLADES);
             if (blades > 0.0F) {
                 if (kind == SuitKind.MARK_85) {
                     energyBlade(poseStack, vc, blades, time, !right);
@@ -357,12 +376,15 @@ public class NanoGearLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
                     nanoBlade(poseStack, vc, blades, time);
                 }
             }
+            tint = AbilityColors.chosen(player, HeroAbility.IRON_MAN_SHIELD);
             if (shield > 0.0F && kind == SuitKind.MARK_50 && !right) {
                 roundShield(poseStack, vc, shield, time, 11.0F);
             }
+            tint = AbilityColors.chosen(player, HeroAbility.IRON_MAN_MISSILES);
             if (cannon > 0.0F) {
                 muzzle(poseStack, vc, cannon, time, !right);
             }
+            tint = -1;
             poseStack.popPose();
         }
 

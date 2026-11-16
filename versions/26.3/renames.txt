@@ -579,3 +579,6 @@ protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float
 
 # ---- 26.3's dirt tag is dirt alone: grass, podzol, mycelium, moss and mud are in substrate_overworld with it ----
 \bBlockTags\.DIRT\b => BlockTags.SUBSTRATE_OVERWORLD
+# GUI (26.1): the mouse's buttons are SDL's (left 1, middle 2, right 3); the screens read and hand on 1.21.1's (left 0, right 1, middle 2)
+\bint (\w+) = legacyEvent\.button\(\); => int $1 = com.kolodkingal.enhanced.platform.client.MouseButtons.legacy(legacyEvent.button());
+new net\.minecraft\.client\.input\.MouseButtonInfo\(([^,()]+), 0\) => new net.minecraft.client.input.MouseButtonInfo(com.kolodkingal.enhanced.platform.client.MouseButtons.modern($1), 0)

@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.wolverine;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.render.WolverineActing;
 import com.kolodkingal.enhanced.network.WolverineFxPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -77,7 +79,9 @@ public final class WolverineEffects {
                         level.addParticle(ParticleTypes.ANGRY_VILLAGER, head.x + r.nextGaussian() * 0.4, head.y
                                 + r.nextDouble() * 0.3, head.z + r.nextGaussian() * 0.4, 0, 0, 0);
                     }
-                    burst(level, who.position().add(0, 1.0, 0), WolverineAbilities.RAGE_RED, 24, 0.35, r);
+                    // (3.16) a custom hero's colour
+                    burst(level, who.position().add(0, 1.0, 0), AbilityColors.color(who, HeroAbility.WOLVERINE_BERSERKER,
+                            WolverineAbilities.RAGE_RED), 24, 0.35, r);
                 }
             }
             case WolverineFxPayload.BERSERK_OFF -> {

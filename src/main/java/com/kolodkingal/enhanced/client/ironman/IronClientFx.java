@@ -4,6 +4,8 @@ import com.kolodkingal.enhanced.beam.AvengersBeams;
 import com.kolodkingal.enhanced.client.render.BeamRenderer;
 import com.kolodkingal.enhanced.client.render.IronManActing;
 import com.kolodkingal.enhanced.client.render.IronManBeamFx;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.ironman.IronManState;
 import com.kolodkingal.enhanced.ironman.IronSuits;
 import com.kolodkingal.enhanced.ironman.SuitKind;
@@ -65,9 +67,11 @@ public final class IronClientFx {
             case IronFxPayload.REPULSOR, IronFxPayload.DOUBLE_BLAST -> {
                 if (points.size() >= 2) {
                     boolean both = points.size() >= 3;
-                    IronWorldFx.ray(level, points.get(0), points.get(1), both ? 1.4F : 1.0F);
+                    // (3.16) a custom hero's colour
+                    int tint = AbilityColors.chosen(who, HeroAbility.IRON_MAN_REPULSOR);
+                    IronWorldFx.ray(level, points.get(0), points.get(1), both ? 1.4F : 1.0F, tint);
                     if (both) {
-                        IronWorldFx.ray(level, points.get(2), points.get(1), 1.4F);
+                        IronWorldFx.ray(level, points.get(2), points.get(1), 1.4F, tint);
                     }
                     burst(level, points.get(1), 0xFFFFFF, 8, 0.25);
                 }

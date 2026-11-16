@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.hulk;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.render.HulkActing;
 import com.kolodkingal.enhanced.hulk.HulkAbilities;
@@ -206,8 +208,10 @@ public final class HulkEffects {
             level.addParticle(ParticleTypes.CLOUD, head.x + d.x, head.y + d.y * 0.5, head.z + d.z, d.x * 0.5, d.y * 0.2,
                     d.z * 0.5);
         }
+        // (3.16) a custom hero's colour: the Roar is the Thunder Clap's other half (its pick, else the Clap's)
+        int gamma = AbilityColors.color(who, HeroAbility.HULK_ROAR, HulkAbilities.GAMMA);
         for (int i = 0; i < 12; i++) {
-            level.addParticle(new EnergyParticleOptions(HulkAbilities.GAMMA, 0.6F), head.x, head.y, head.z,
+            level.addParticle(new EnergyParticleOptions(gamma, 0.6F), head.x, head.y, head.z,
                     (r.nextDouble() - 0.5) * 0.4,
                     (r.nextDouble() - 0.5) * 0.2, (r.nextDouble() - 0.5) * 0.4);
         }

@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.falcon;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.client.EntityGlow;
 import com.kolodkingal.enhanced.client.render.FalconActing;
 import com.kolodkingal.enhanced.falcon.FalconAbilities;
@@ -22,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Falcon's effects on the client (3.8): the drawers of every {@link FalconFxPayload} kind (registered from the client
@@ -61,10 +64,15 @@ public final class FalconEffects {
         Vec3 at = points.isEmpty() ? null : points.get(0);
         RandomSource random = level.random;
         long now = level.getGameTime();
+        // (3.16) a custom hero's colour: the reds of the blasters and of Redwing moved to what he chose for them
+        Entity who = level.getEntity(payload.entityId());
+        int blast = AbilityColors.shade(who, HeroAbility.FALCON_BLASTERS, FalconAbilities.RED);
+        int redwing = AbilityColors.shade(who instanceof RedwingEntity drone ? owner(drone) : who,
+                HeroAbility.FALCON_REDWING, FalconAbilities.RED);
         switch (payload.kind()) {
             case FalconFxPayload.BLAST -> {
                 if (at != null) {
-                    burst(level, at, FalconAbilities.RED, 4, 0.05, 0.8F);
+                    burst(level, at, blast, 4, 0.05, 0.8F);
                 }
             }
             case FalconFxPayload.ROCKET -> {
@@ -129,7 +137,7 @@ public final class FalconEffects {
             }
             case FalconFxPayload.REDWING_OUT -> {
                 if (at != null) {
-                    burst(level, at, FalconAbilities.RED, 8, 0.12, 0.7F);
+                    burst(level, at, redwing, 8, 0.12, 0.7F);
                 }
             }
             case FalconFxPayload.REDWING_IN -> {
@@ -142,19 +150,19 @@ public final class FalconEffects {
                                 random.nextGaussian() * 0.2, random.nextGaussian() * 0.2, random.nextGaussian() * 0.2);
                     }
                 } else if (points.size() > 1) {
-                    line(level, at, points.get(1), FalconAbilities.RED, 0.4);
+                    line(level, at, points.get(1), redwing, 0.4);
                 }
             }
             case FalconFxPayload.REDWING_ZAP -> {
                 if (points.size() > 1) {
                     ZAPS.put(payload.entityId(), new Zap(at, points.get(1), now));
-                    burst(level, points.get(1), FalconAbilities.RED, 6, 0.1, 0.8F);
+                    burst(level, points.get(1), redwing, 6, 0.1, 0.8F);
                 }
             }
             case FalconFxPayload.REDWING_STRIKE -> {
                 if (at != null && payload.arg() < 0) {
                     level.addParticle(ParticleTypes.EXPLOSION, at.x, at.y, at.z, 0, 0, 0);
-                    burst(level, at, FalconAbilities.RED, 12, 0.25, 1.0F);
+                    burst(level, at, redwing, 12, 0.25, 1.0F);
                 }
             }
             case FalconFxPayload.MARK -> MARKS.put(payload.entityId(), now + Math.max(1, payload.arg()));
@@ -182,6 +190,13 @@ public final class FalconEffects {
     public static Zap zap(int droneId, long now) {
         Zap zap = ZAPS.get(droneId);
         return zap != null && now - zap.at() <= ZAP_TICKS ? zap : null;
+    }
+
+    /** (3.16) a custom hero's colour: a Redwing's Falcon as this client sees him, or null. */
+    @Nullable
+    static Player owner(RedwingEntity drone) {
+        UUID id = drone.ownerId();
+        return id == null ? null : drone.level().getPlayerByUUID(id);
     }
 
     /** The player's Redwing as his client sees it (near), or null. */
