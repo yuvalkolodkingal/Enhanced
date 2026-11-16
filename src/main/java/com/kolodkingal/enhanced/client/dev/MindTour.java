@@ -161,6 +161,14 @@ public final class MindTour {
             camera(CameraType.FIRST_PERSON);
             server(p -> p.setXRot(-25.0F), 20);
             shot("e03_up", 20);
+            // from far off: walking up to him across the water
+            STEPS.add(new Step(10, () -> Minecraft.getInstance().setScreen(null)));
+            server(p -> p.teleportTo(0.5, 66.0, 40.5), 40);
+            server(p -> { p.setYRot(180.0F); p.setXRot(-10.0F); }, 40);
+            shot("e04_far", 20);
+            server(p -> p.teleportTo(0.5, 66.0, 110.5), 40);
+            server(p -> { p.setYRot(180.0F); p.setXRot(-10.0F); }, 40);
+            shot("e05_farther", 20);
             return;
         }
         if ("palette".equals(System.getProperty("enhanced.mindtour.mode"))) {
