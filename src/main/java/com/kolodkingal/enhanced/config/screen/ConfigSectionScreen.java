@@ -112,7 +112,12 @@ public class ConfigSectionScreen extends OptionsSubScreen {
         if (list == null) {
             return;
         }
-        list.children().clear();
+        // (3.16.1) A list with rows is filled again by building the screen again (a new, empty list): from 1.21.2 the
+        // list's children() can't be changed, so clearing it threw and the settings screen stayed empty.
+        if (!list.children().isEmpty()) {
+            rebuildWidgets();
+            return;
+        }
         boolean editable = false;
         for (Map.Entry<String, Object> entry : spec.entries(path).entrySet()) {
             String key = entry.getKey();

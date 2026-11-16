@@ -56,6 +56,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 ## What's new in 3.16.1
 
 * **The official server is on your Multiplayer list:** the first time the game starts with Enhanced, *Enhanced Superhero SMP* (superheros.exaroton.me) is added at the end of your server list, once. Your own servers are never touched, it is not added twice if you already have it, and if you delete it, it stays deleted. Turn it off with `officialServer = false` in the client config (`official_server`).
+* **The client settings open again** (Mods > Enhanced > Config > Client Settings) on Minecraft 1.21.4, 1.21.11 and 26.3: the screen stayed empty, its list could not be filled on those versions.
 * **Minecraft 26.3: telekinesis on players works again,** and so does every power that pushes a player (throws, slams, shockwaves, pulls): the held or pushed player was never moved on their own screen.
 * **Glowing eyes are translucent again on Minecraft 1.21.4, 1.21.11 and 26.3.** Those versions drew every glow mask like paint, so the Scarlet Witch's eyes (and other heroes' glowing eyes, Vision's jewel and other glows) were solid blocks; they glow over the face as on 1.21.1 now.
 * **The Scarlet Witch shows one crown:** on Minecraft 1.21.4 and newer, Wanda's Crown was drawn over the crown her suit already has.

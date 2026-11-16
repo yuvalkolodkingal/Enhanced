@@ -50,7 +50,12 @@ public class ConfigListScreen extends OptionsSubScreen {
         if (list == null) {
             return;
         }
-        list.children().clear();
+        // (3.16.1) A list with rows is filled again by building the screen again (a new, empty list): from 1.21.2 the
+        // list's children() can't be changed, so clearing it threw and the settings screen stayed empty.
+        if (!list.children().isEmpty()) {
+            rebuildWidgets();
+            return;
+        }
         for (int i = 0; i < entries.size(); i++) {
             int index = i;
             Button remove = Button.builder(Component.translatable(ConfigScreen.UI + "remove", i + 1), b -> {

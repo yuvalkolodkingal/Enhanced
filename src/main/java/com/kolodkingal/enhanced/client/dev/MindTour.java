@@ -148,6 +148,42 @@ public final class MindTour {
     }
 
     private static void script() {
+        if ("config".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            // (3.16.1) the settings screen and its client section, in a world (a player's report: an empty screen)
+            STEPS.add(new Step(40, () -> Minecraft.getInstance().setScreen(
+                    new com.kolodkingal.enhanced.config.screen.ConfigScreen(null))));
+            shot("c01_settings", 10);
+            STEPS.add(new Step(40, () -> {
+                var file = com.kolodkingal.enhanced.config.core.Configs.of(
+                        com.kolodkingal.enhanced.config.core.ConfigFile.Type.CLIENT).get(0);
+                Minecraft.getInstance().setScreen(new com.kolodkingal.enhanced.config.screen.ConfigSectionScreen(
+                        new com.kolodkingal.enhanced.config.screen.ConfigScreen(null), file, java.util.List.of(),
+                        net.minecraft.network.chat.Component.literal(file.fileName())));
+            }));
+            shot("c02_client", 10);
+            // a section of values, filled again (as after a reset), which empties and refills its rows
+            STEPS.add(new Step(40, () -> {
+                var file = com.kolodkingal.enhanced.config.core.Configs.of(
+                        com.kolodkingal.enhanced.config.core.ConfigFile.Type.CLIENT).get(0);
+                var screen = new com.kolodkingal.enhanced.config.screen.ConfigSectionScreen(
+                        new com.kolodkingal.enhanced.config.screen.ConfigScreen(null), file, java.util.List.of("animation"),
+                        net.minecraft.network.chat.Component.literal("animation"));
+                Minecraft.getInstance().setScreen(screen);
+                try {
+                    java.lang.reflect.Method rebuild = com.kolodkingal.enhanced.config.screen.ConfigSectionScreen.class
+                            .getDeclaredMethod("rebuild");
+                    rebuild.setAccessible(true);
+                    rebuild.invoke(screen);
+                    rebuild.invoke(screen);
+                    com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: the section was filled again");
+                } catch (ReflectiveOperationException e) {
+                    com.kolodkingal.enhanced.Enhanced.LOGGER.error("Mind tour: refilling the section failed", e);
+                }
+            }));
+            shot("c03_values", 10);
+            STEPS.add(new Step(20, () -> Minecraft.getInstance().setScreen(null)));
+            return;
+        }
         if ("tk".equals(System.getProperty("enhanced.mindtour.mode"))) {
             // (3.16.1) -Denhanced.mindtour.mode=tk: the Scarlet Witch's telekinesis on a pig, then (Sneak) on a block
             server(p -> {
