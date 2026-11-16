@@ -139,7 +139,9 @@ public final class VisionAbilities {
             }
         }
         if (data.has(HeroAbility.VISION_DENSITY) && data.dense() && !player.isSpectator() && player.tickCount % 5 == 0) {
-            player.serverLevel().sendParticles(ParticleTypes.CRIT, player.getX(), player.getY() + 0.1, player.getZ(), 1, 0.3, 0, 0.3, 0);
+            // (3.16) Source Code Vision's density smoulders: flames instead of sparks
+            player.serverLevel().sendParticles("source_code".equals(data.variant()) ? ParticleTypes.FLAME : ParticleTypes.CRIT,
+                    player.getX(), player.getY() + 0.1, player.getZ(), 1, 0.3, 0, 0.3, 0);
         }
     }
 
@@ -226,6 +228,10 @@ public final class VisionAbilities {
         if (player.tickCount % 2 == 0) {
             level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_MIND_BEAM, Powers.glow(player)), 1.4F), end.x, end.y, end.z,
                     4, 0.12, 0.12, 0.12, 0.12);
+            // (3.16) Source Code Vision's beam is fire: flames where it strikes
+            if ("source_code".equals(Powers.get(player).variant())) {
+                level.sendParticles(ParticleTypes.FLAME, end.x, end.y, end.z, 3, 0.12, 0.12, 0.12, 0.03);
+            }
         }
     }
 
@@ -291,6 +297,11 @@ public final class VisionAbilities {
             player.serverLevel().sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_PHASE, Powers.glow(player)), 0.9F),
                     player.getX(), player.getY() + 1.0, player.getZ(),
                     1, 0.3, 0.7, 0.3, 0.0);
+            // (3.16) Source Code Vision phases in a shimmer of embers
+            if ("source_code".equals(data.variant())) {
+                player.serverLevel().sendParticles(ParticleTypes.SMALL_FLAME, player.getX(), player.getY() + 1.0, player.getZ(),
+                        1, 0.3, 0.7, 0.3, 0.0);
+            }
         }
     }
 

@@ -231,24 +231,34 @@ public final class MindTour {
         server(p -> com.kolodkingal.enhanced.registry.ModItems.SOURCE_CODE.get().use(p.level(), p, net.minecraft.world.InteractionHand.MAIN_HAND), 40);
         camera(CameraType.THIRD_PERSON_FRONT);
         shot("m25_source_code", 20);
-        // (3.16) Solar Jewel Vision: the Solar Beam, the eye beams, the Overload gathering and pouring out
-        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, true, false), 15);
-        shot("m25b_solar_beam_front", 5);
+        // (3.16) Source Code Vision's powers in fire (the default), in the hall where there is room
+        at(1, 0, -4, 90.0F, 2.0F, 30);
         camera(CameraType.THIRD_PERSON_BACK);
-        shot("m25c_solar_beam_back", 10);
+        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, true, false), 15);
+        shot("m25b_fire_beam_back", 5);
+        camera(CameraType.THIRD_PERSON_FRONT);
+        shot("m25c_fire_beam_front", 5);
+        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, false, false), 10);
+        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 4, true, false), 25);
+        shot("m25d_fire_density", 5);
+        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 4, true, false), 10);
+        // ...and with the Solar Jewel turned on (vision.solar_jewel.enabled)
+        server(p -> com.kolodkingal.enhanced.config.SolarJewelConfig.ENABLED.set(true), 10);
+        camera(CameraType.THIRD_PERSON_BACK);
+        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, true, false), 15);
+        shot("m25e_solar_beam", 5);
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, false, false), 10);
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 5, true, false), 15);
-        shot("m25d_eye_beams_back", 5);
-        camera(CameraType.THIRD_PERSON_FRONT);
-        shot("m25e_eye_beams_front", 5);
+        shot("m25f_eye_beams", 5);
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 5, false, false), 10);
+        camera(CameraType.THIRD_PERSON_FRONT);
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, true, true), 18);
-        shot("m25f_overload_gather", 12);
+        shot("m25g_overload_gather", 12);
         camera(CameraType.THIRD_PERSON_BACK);
-        shot("m25g_overload_fire", 6);
+        shot("m25h_overload_fire", 6);
+        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, false, true), 40);
+        server(p -> com.kolodkingal.enhanced.config.SolarJewelConfig.ENABLED.set(false), 10);
         camera(CameraType.FIRST_PERSON);
-        shot("m25h_overload_first_person", 30);
-        server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, false, true), 10);
         server(MindRealm::leave, 80);
         if ("manor".equals(System.getProperty("enhanced.mindtour.from"))) {
             // (-Denhanced.mindtour.from=manor: only the manor and Nano Ultron)

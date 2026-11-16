@@ -27,7 +27,7 @@ public final class VisionQuest {
 
     /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, Phase, Density, the solar ones). */
     public static boolean eyesLit(PowerData data) {
-        return solar(data) && !data.disguise()
+        return data.power() == Power.VISION && suit(data.variant()) && !data.disguise()
                 && (data.beamActive() || data.visionPhased() || data.dense() || data.is(Live.SOLAR_EYES)
                 || data.is(Live.SOLAR_GATHERING) || data.is(Live.SOLAR_OVERLOAD));
     }

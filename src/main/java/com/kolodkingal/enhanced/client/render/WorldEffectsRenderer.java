@@ -185,7 +185,8 @@ public final class WorldEffectsRenderer {
             return;
         }
         if (data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive()) {
-            Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION : MIND_STONE;
+            Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION
+                    : "source_code".equals(data.variant()) ? SOURCE_FIRE : MIND_STONE;
             renderBeam(mc, player, foreheadPosition(mc, player, partialTick),
                     palette.of(player, HeroAbility.VISION_MIND_BEAM), WandaAbilities.BEAM_TARGET, pose, beams, camera,
                     partialTick, time);
@@ -372,6 +373,8 @@ public final class WorldEffectsRenderer {
     private static final Palette MIND_STONE = new Palette(0xF5D77A, 0xFFF6D5, 0xF2C66A);
     /** White Vision's beam: pale cyan-white (WandaVision episode 9). */
     private static final Palette WHITE_VISION = new Palette(0x7EBADF, 0xE8FBFF, 0xA6E2F0);
+    /** (3.16) Source Code Vision's beam: fire, a red-orange glow round a yellow-white core, flame-coloured bolts. */
+    private static final Palette SOURCE_FIRE = new Palette(0xFF4A10, 0xFFE9A0, 0xFF9A1E);
 
     private static void renderBeam(Minecraft mc, AbstractClientPlayer player, Vec3 origin, Palette palette, Predicate<Entity> targets,
                                    Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick, float time) {

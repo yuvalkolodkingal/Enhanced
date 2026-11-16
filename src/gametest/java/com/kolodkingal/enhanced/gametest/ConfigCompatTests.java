@@ -170,6 +170,9 @@ public final class ConfigCompatTests {
         }
         Path dir = tempDir();
         List<String> failures = new ArrayList<>();
+        // (3.16) what this backend does now, in the record's form, written next to the game for a new record when the
+        // mod's config gains options (config_compat_actual.txt)
+        StringBuilder actual = new StringBuilder();
         int checked = 0;
         try {
             for (ConfigCompatCases.Case c : ConfigCompatCases.all()) {
@@ -181,11 +184,12 @@ public final class ConfigCompatTests {
                 Files.createDirectories(caseDir);
                 Path file = caseDir.resolve(fileName);
                 String input = c.input(defaults.get(c.kind()), c.resource() == null ? null : resource(c.resource()));
+                boolean inputDiffers = false;
                 if (input != null) {
                     write(file, input);
                     if (!ConfigCompatCases.sha256(input).equals(expected.input())) {
                         failures.add(c.name() + ": the input differs from the recorded one");
-                        continue;
+                        inputDiffers = true;
                     }
                 }
                 boolean parses = input != null && parses(input);
@@ -200,6 +204,17 @@ public final class ConfigCompatTests {
                             "a boolean written as a string reads as the boolean");
                 }
                 String dump = ConfigCompatCases.dump(values);
+                List<String> changed = new ArrayList<>(values);
+                changed.removeAll(values(spec, spec.defaults()));
+                actual.append("case ").append(c.name()).append(' ').append(c.kind().name())
+                        .append(" input=").append(input == null ? "none" : ConfigCompatCases.sha256(input))
+                        .append(" output=").append(ConfigCompatCases.sha256(output))
+                        .append(" backup=").append(backup).append(" recreated=").append(input != null && !parses)
+                        .append(" values=").append(ConfigCompatCases.sha256(dump)).append('\n');
+                changed.forEach(line -> actual.append("  ").append(line).append('\n'));
+                if (inputDiffers) {
+                    continue;
+                }
                 if (!ConfigCompatCases.sha256(output).equals(expected.output())) {
                     failures.add(c.name() + ": the file afterwards differs (" + caseDir + ")");
                 }
@@ -219,6 +234,11 @@ public final class ConfigCompatTests {
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+        try {
+            Files.writeString(Path.of("config_compat_actual.txt"), actual.toString());
+        } catch (IOException ignored) {
+            // only a help for a new record
         }
         check(failures.isEmpty(), failures.toString());
         check(checked == recorded.size(), "every recorded case was loaded: " + checked + " of " + recorded.size());

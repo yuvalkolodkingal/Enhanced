@@ -18,7 +18,8 @@ public final class Variants {
                 new Variant("white_vision", Power.VISION, Variant.suit("white_vision"), Variant.suit("white_vision_cape"), false, 0xA6E2F0, 0xE8FBFF),
                 // 3.12: earned from the Human Torch in Vision's mind (EarnedLooks)
                 // (3.15: in the VisionQuest suit, which was meant for him, its eyes glowing as the VisionQuest look's do)
-                new Variant("source_code", Power.VISION, Variant.suit("vision_visionquest"), Variant.suit("vision_cape"), false, 0xFFC93A, 0xFFF3C2),
+                // (3.16: his powers burn in fire's colours)
+                new Variant("source_code", Power.VISION, Variant.suit("vision_visionquest"), Variant.suit("vision_cape"), false, 0xFF5A14, 0xFFB43C),
                 // 3.12.1: the VisionQuest look, its eyes glowing while a power is in use (VisionQuestEyesLayer)
                 new Variant("vision_visionquest", Power.VISION, Variant.suit("vision_visionquest"), Variant.suit("vision_cape"), false, 0xFFC93A, 0xFFF3C2));
 
