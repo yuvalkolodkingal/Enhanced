@@ -12,7 +12,8 @@ public final class VisionQuest {
 
     /** Whether {@code variant} wears the VisionQuest suit: the look itself, and (3.15) the Source Code. */
     public static boolean suit(String variant) {
-        return LOOK.equals(variant) || "source_code".equals(variant);
+        // (3.16.1: only the Source Code; the VisionQuest look of 3.12.1 is gone, and a player saved in it is plain Vision)
+        return "source_code".equals(variant);
     }
 
     /**
