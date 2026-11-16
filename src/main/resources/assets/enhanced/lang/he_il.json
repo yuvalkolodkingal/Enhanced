@@ -5178,5 +5178,8 @@
   "config.enhanced.official_server": "הוספת השרת הרשמי",
   "config.enhanced.official_server.tooltip": "מוסיף את השרת הרשמי של Enhanced לרשימת מרובה המשתתפים בפעם הראשונה שהמשחק עולה עם המוד. נוסף פעם אחת: אם מוחקים אותו הוא לא חוזר.",
   "config.enhanced.added_official_server": "השרת הרשמי נוסף",
-  "config.enhanced.added_official_server.tooltip": "המוד מסמן את זה אחרי שהוסיף את השרת הרשמי (או מצא שהוא כבר שם)."
+  "config.enhanced.added_official_server.tooltip": "המוד מסמן את זה אחרי שהוסיף את השרת הרשמי (או מצא שהוא כבר שם).",
+  "enhanced.configuration.official_server": "השרת הרשמי",
+  "enhanced.configuration.official_server.tooltip": "השרת הרשמי של Enhanced ברשימת מרובה המשתתפים.",
+  "enhanced.configuration.official_server.button": "עריכה…"
 }

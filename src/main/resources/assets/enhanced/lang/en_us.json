@@ -5178,5 +5178,8 @@
   "config.enhanced.official_server": "Add the official server",
   "config.enhanced.official_server.tooltip": "Put the official Enhanced server on your Multiplayer list the first time the game starts with the mod. Added once: delete it and it stays deleted.",
   "config.enhanced.added_official_server": "Official server added",
-  "config.enhanced.added_official_server.tooltip": "Set by the mod once it has added the official server (or found it there already)."
+  "config.enhanced.added_official_server.tooltip": "Set by the mod once it has added the official server (or found it there already).",
+  "enhanced.configuration.official_server": "Official server",
+  "enhanced.configuration.official_server.tooltip": "The official Enhanced server on your Multiplayer list.",
+  "enhanced.configuration.official_server.button": "Edit…"
 }

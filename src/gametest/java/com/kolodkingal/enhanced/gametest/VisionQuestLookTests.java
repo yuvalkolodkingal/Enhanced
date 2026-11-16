@@ -46,6 +46,8 @@ public final class VisionQuestLookTests {
     public static void itsEyesGlowOnlyWhileAPowerIsInUse(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = f.player(10.5, FLOOR, 10.5);
+        // (the Source Code is earned in Vision's mind first)
+        com.kolodkingal.enhanced.power.EarnedLooks.earn(vision, Variants.get(Power.VISION, "source_code"));
         Powers.awaken(vision, Power.VISION, "source_code");
         PowerData data = Powers.get(vision);
         check("source_code".equals(data.variant()), "in the Source Code: " + data.variant());
