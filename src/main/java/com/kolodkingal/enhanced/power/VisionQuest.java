@@ -16,11 +16,13 @@ public final class VisionQuest {
     }
 
     /**
-     * (3.16) Whether this is Solar Jewel Vision: Vision as his Source Code, powered by the Solar Jewel in his brow (the
-     * Source Code look is Solar Jewel Vision; the plain VisionQuest look keeps the Mind Stone's powers).
+     * (3.16) Whether this is Solar Jewel Vision: Vision as his Source Code, powered by the Solar Jewel in his brow, when the
+     * server turns it on ({@code vision.solar_jewel.enabled}); otherwise the Source Code has Vision's powers, stronger.
      */
     public static boolean solar(PowerData data) {
-        return data.power() == Power.VISION && "source_code".equals(data.variant());
+        return data.power() == Power.VISION && "source_code".equals(data.variant())
+                && com.kolodkingal.enhanced.EnhancedConfig.SPEC.isLoaded()
+                && com.kolodkingal.enhanced.config.SolarJewelConfig.ENABLED.get();
     }
 
     /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, Phase, Density, the solar ones). */

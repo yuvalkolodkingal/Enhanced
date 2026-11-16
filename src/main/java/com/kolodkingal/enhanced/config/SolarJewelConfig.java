@@ -8,6 +8,8 @@ import com.kolodkingal.enhanced.config.core.ConfigSpec;
  * {@code EnhancedConfig}; read when used.
  */
 public final class SolarJewelConfig {
+    public static ConfigSpec.BooleanValue ENABLED;
+    public static ConfigSpec.DoubleValue SOURCE_CODE_BEAM_FACTOR;
     public static ConfigSpec.IntValue MAX_CHARGE;
     public static ConfigSpec.IntValue ABSORB_SUN;
     public static ConfigSpec.IntValue ABSORB_SHADE;
@@ -32,6 +34,11 @@ public final class SolarJewelConfig {
                 "brow, which drinks in sunlight and stores it. R: the Solar Beam from the jewel; Sneak + R: Jewel Overload, all",
                 "his stored light at once; N: infrared and microwave beams from his eyes. Flight, Phase and Density stay.")
                 .push("solar_jewel");
+        ENABLED = builder.comment("On: Source Code Vision has the Solar Jewel's powers below. Off (the default): he has Vision's own",
+                "powers, only stronger (sourceCodeBeamFactor, and his tougher body).")
+                .define("enabled", false);
+        SOURCE_CODE_BEAM_FACTOR = builder.comment("With the Solar Jewel off: how many times as strong Source Code Vision's Mind Stone beam is.")
+                .defineInRange("sourceCodeBeamFactor", 1.5, 1.0, 10.0);
         MAX_CHARGE = builder.comment("The most solar energy the jewel holds.")
                 .defineInRange("maxCharge", 1000, 100, 100000);
         ABSORB_SUN = builder.comment("Energy the jewel drinks in each tick in open daylight (the sky above him, no rain).")

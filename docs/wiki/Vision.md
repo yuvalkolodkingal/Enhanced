@@ -27,7 +27,7 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 * Vision's skin becomes the MCU Vision: red synthetic face and hands, the golden **Mind Stone in his forehead** (it glows in the dark), a green suit with gold trim and a yellow cape.
 * His second look is **White Vision**: the same body drained of colour, chalk white with glowing pale cyan eyes and no Mind Stone, only an empty hexagonal socket of copper circuitry in his forehead. His beam is pale cyan-white instead of gold, and he phases in a white aura. Press **H** to switch (see [Looks](Looks)).
 * **VisionQuest** (3.12.1): the look from *VisionQuest*, in its green, gold and maroon suit with yellow eyes. It has Vision's cape, powers and moves. While one of his powers is in use (the Mind Stone beam, Phase or Density) the eyes **glow**, fading in and out, bright even in the dark. At rest they are plain yellow.
-* **Source Code** (3.12): earned from the Human Torch in Vision's mind, and taken in as White Vision. Change Look skips it until then. Since 3.16 he is **Solar Jewel Vision** in it: see below.
+* **Source Code** (3.12): earned from the Human Torch in Vision's mind, and taken in as White Vision. Change Look skips it until then. Since 3.16 his Mind Stone beam hits 1.5 times as hard in it, and a server can make him **Solar Jewel Vision** instead: see below.
 * **Max health 30** (15 hearts) and **8 armor** from his vibranium body. Vibranium is metal: **Magneto can lift and throw you**, unless you are phased: then you slip out of his grip.
 * He never gets hungry and never runs out of air.
 * Vision is one of the worthy: he can claim a Mjolnir nobody owns yet, and fight with it, but he stays Vision. See [Thor](Thor).
@@ -47,7 +47,7 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 | 5 | **N** (toggle) | Human Disguise | Take on the human look from *WandaVision*: a 1950s sitcom husband in a shirt, tie and cardigan. Only the looks change. |
 ## Solar Jewel Vision (3.16)
 
-In his Source Code look, Vision runs on the **Solar Jewel** in his brow, as in the comics, instead of the Mind Stone. The jewel drinks in sunlight and stores it: about ten seconds of open daylight fill it, shade gives a little, the night nothing (he runs on what he stored). It glows brighter the more it holds, and the HUD shows how full it is.
+Off by default: a server turns it on with `vision.solar_jewel.enabled = true` (the server settings). Then, in his Source Code look, Vision runs on the **Solar Jewel** in his brow, as in the comics, instead of the Mind Stone. The jewel drinks in sunlight and stores it: about ten seconds of open daylight fill it, shade gives a little, the night nothing (he runs on what he stored). It glows brighter the more it holds, and the HUD shows how full it is.
 
 | Key | Power |
 |---|---|

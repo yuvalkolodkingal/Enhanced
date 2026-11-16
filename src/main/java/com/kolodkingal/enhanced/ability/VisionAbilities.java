@@ -216,8 +216,11 @@ public final class VisionAbilities {
             return;
         }
         if (hit instanceof EntityHitResult entityHit) {
+            // (3.16) Source Code Vision's beam is stronger
+            float factor = "source_code".equals(Powers.get(player).variant())
+                    ? com.kolodkingal.enhanced.config.SolarJewelConfig.SOURCE_CODE_BEAM_FACTOR.get().floatValue() : 1.0F;
             entityHit.getEntity().hurt(ModDamageTypes.source(level, ModDamageTypes.MIND_STONE_BEAM, player, player),
-                    EnhancedConfig.MIND_STONE_BEAM_DAMAGE.get().floatValue());
+                    EnhancedConfig.MIND_STONE_BEAM_DAMAGE.get().floatValue() * factor);
         }
         Vec3 end = hit.getLocation();
         if (player.tickCount % 2 == 0) {
