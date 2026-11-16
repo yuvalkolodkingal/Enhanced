@@ -5174,5 +5174,9 @@
   "commands.enhanced.build.materials.off": "Build Magic conjures its blocks from magic: the inventory is not used.",
   "item.enhanced.hero_creator.uses": "Uses left: %s of %s",
   "message.enhanced.hero_creator.uses_left": "The Hero Creator has %s use left",
-  "message.enhanced.hero_creator.spent": "The Hero Creator's power is spent"
+  "message.enhanced.hero_creator.spent": "The Hero Creator's power is spent",
+  "config.enhanced.official_server": "Add the official server",
+  "config.enhanced.official_server.tooltip": "Put the official Enhanced server on your Multiplayer list the first time the game starts with the mod. Added once: delete it and it stays deleted.",
+  "config.enhanced.added_official_server": "Official server added",
+  "config.enhanced.added_official_server.tooltip": "Set by the mod once it has added the official server (or found it there already)."
 }

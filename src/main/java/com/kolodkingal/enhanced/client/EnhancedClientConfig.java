@@ -33,6 +33,8 @@ public final class EnhancedClientConfig {
     public static final ConfigSpec.BooleanValue ETERNITY_FOG;
     public static final ConfigSpec.EnumValue<com.kolodkingal.enhanced.client.hud.PowerPanels.Style> HUD_STYLE;
     public static final ConfigSpec.BooleanValue HUD_RIGHT;
+    public static final ConfigSpec.BooleanValue OFFICIAL_SERVER;
+    public static final ConfigSpec.BooleanValue ADDED_OFFICIAL_SERVER;
 
     static {
         BUILDER.push("animation");
@@ -154,6 +156,16 @@ public final class EnhancedClientConfig {
                         "The classic panel is always top-left.")
                 .translation("config.enhanced.hud_right")
                 .define("hudOnTheRight", true);
+        BUILDER.pop();
+        // (3.16.1) the official server, added to the Multiplayer list once (OfficialServer)
+        BUILDER.push("official_server");
+        OFFICIAL_SERVER = BUILDER.comment("Add the official Enhanced server to your Multiplayer list the first time the game starts with",
+                        "the mod. It is added once: delete it and it stays deleted. Off: never added.")
+                .translation("config.enhanced.official_server")
+                .define("officialServer", true);
+        ADDED_OFFICIAL_SERVER = BUILDER.comment("Set by the mod once it has added the official server (or found it already there).")
+                .translation("config.enhanced.added_official_server")
+                .define("addedOfficialServer", false);
         BUILDER.pop();
     }
 

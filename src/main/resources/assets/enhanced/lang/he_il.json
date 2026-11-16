@@ -5174,5 +5174,9 @@
   "commands.enhanced.build.materials.off": "קסם הבנייה מכשף את הבלוקים מקסם: לא משתמשים בתיק.",
   "item.enhanced.hero_creator.uses": "שימושים שנשארו: %s מתוך %s",
   "message.enhanced.hero_creator.uses_left": "ליוצר הגיבורים נשאר %s שימוש",
-  "message.enhanced.hero_creator.spent": "הכוח של יוצר הגיבורים נגמר"
+  "message.enhanced.hero_creator.spent": "הכוח של יוצר הגיבורים נגמר",
+  "config.enhanced.official_server": "הוספת השרת הרשמי",
+  "config.enhanced.official_server.tooltip": "מוסיף את השרת הרשמי של Enhanced לרשימת מרובה המשתתפים בפעם הראשונה שהמשחק עולה עם המוד. נוסף פעם אחת: אם מוחקים אותו הוא לא חוזר.",
+  "config.enhanced.added_official_server": "השרת הרשמי נוסף",
+  "config.enhanced.added_official_server.tooltip": "המוד מסמן את זה אחרי שהוסיף את השרת הרשמי (או מצא שהוא כבר שם)."
 }
