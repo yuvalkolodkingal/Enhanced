@@ -193,8 +193,7 @@ public final class MindTour {
                     Powers.get(p).heldEntityId(), p.level().getEntity(Powers.get(p).heldEntityId())), 5);
             shot("tk02_block", 10);
             // her glowing eyes: in the open air, firing her chaos beam, seen from the front
-            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, true, true), 10);
-            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, true), 10);
+            server(p -> com.kolodkingal.enhanced.ability.Telekinesis.release(p, true), 10);
             server(p -> {
                 p.setGameMode(GameType.CREATIVE);
                 p.getAbilities().flying = true;

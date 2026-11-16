@@ -53,6 +53,14 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.16.1
+
+* **The official server is on your Multiplayer list:** the first time the game starts with Enhanced, *Enhanced Superhero SMP* (superheros.exaroton.me) is added at the end of your server list, once. Your own servers are never touched, it is not added twice if you already have it, and if you delete it, it stays deleted. Turn it off with `officialServer = false` in the client config (`official_server`).
+* **Minecraft 26.3: telekinesis on players works again,** and so does every power that pushes a player (throws, slams, shockwaves, pulls): the held or pushed player was never moved on their own screen.
+* **Glowing eyes are translucent again on Minecraft 1.21.4, 1.21.11 and 26.3.** Those versions drew every glow mask like paint, so the Scarlet Witch's eyes (and other heroes' glowing eyes, Vision's jewel and other glows) were solid blocks; they glow over the face as on 1.21.1 now.
+* **The Scarlet Witch shows one crown:** on Minecraft 1.21.4 and newer, Wanda's Crown was drawn over the crown her suit already has.
+* **The VisionQuest look is gone:** its suit is the Source Code's alone, the look earned in Vision's mind. A player who wore it is plain Vision.
+
 ## What's new in 3.16.0
 
 * **SMP Balance Mode.** One command sets how strong every power is for the whole server, so SMPs stay fair: `/enhanced balance full` (as configured, the default), `balanced` (the strongest powers brought down to the scale of the rest; Wanda's Build Magic on the scale of Billy's) or `hardcore` (heavily limited). `/enhanced balance set <power> <setting> <strength>` fine-tunes one power's range, size, duration, cooldown, cost or damage on top of the preset, and `info`, `reset` and `reload` do what they say. It applies to every player, operators included, every power stays usable (caps, not removals), and it is saved with the world (`serverconfig/enhanced-balance.json`, editable). See [Commands](Commands#smp-balance-mode-enhanced-balance).
