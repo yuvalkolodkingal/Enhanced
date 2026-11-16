@@ -45,7 +45,9 @@
 (?m)^import org\.lwjgl\.glfw\.GLFW; => // (26.3 has no GLFW)
 
 # ---- entities ----
-\.hurtMarked\b => .needsSync
+# (3.16.1) 1.21.1's hurtMarked is 26.1's syncVelocity: it sends the new velocity to the entity's own client too
+# (a player moved by a power); needsSync only tells the others, so a pushed or held player never moved
+\.hurtMarked\b => .syncVelocity
 \b(level|level\(\)|server|mc\.level|serverLevel|world)\.random\b(?!\s*=[^=]) => $1.getRandom()
 \.getType\(\)\.is\( => .getType().builtInRegistryHolder().is(
 # (a player's message: the overlay or the chat, compat.Msg)
@@ -461,7 +463,7 @@ public LootItemFunctionType<(\w+)> getType\(\) \{(\s*)return [^;]+; => public co
 @Override(\s+)protected MapCodec<\? extends \w*Block> codec\(\) \{\s*return CODEC;\s*\} => // (26.3: blocks have no codec)
 
 # ---- more entities and models ----
-\bhurtMarked\b => needsSync
+\bhurtMarked\b => syncVelocity
 (getPos\(\)|getChunkPos\(\)|\))\.toLong\(\) => $1.pack()
 \b(\w+)\.swingingArm\b => ($1.getCurrentSwing() == null ? null : $1.getCurrentSwing().hand())
 \b(p|player|other|living|entity|e)\.swinging\b(?!\s*=[^=]) => $1.isSwinging()

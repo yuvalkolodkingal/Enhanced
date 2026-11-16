@@ -148,6 +148,53 @@ public final class MindTour {
     }
 
     private static void script() {
+        if ("tk".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            // (3.16.1) -Denhanced.mindtour.mode=tk: the Scarlet Witch's telekinesis on a pig, then (Sneak) on a block
+            server(p -> {
+                p.setGameMode(GameType.SURVIVAL);
+                Powers.awaken(p, Power.SCARLET_WITCH, "", false);
+                p.teleportTo(p.getX(), p.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                        (int) p.getX(), (int) p.getZ()), p.getZ());
+                p.setYRot(0.0F);
+                p.setXRot(10.0F);
+            }, 40);
+            server(p -> {
+                net.minecraft.world.entity.Mob pig = net.minecraft.world.entity.EntityType.PIG.create(p.level());
+                if (pig != null) {
+                    pig.moveTo(p.getX(), p.getY(), p.getZ() + 4.0, 180.0F, 0.0F);
+                    pig.setNoAi(true);
+                    p.level().addFreshEntity(pig);
+                }
+            }, 30);
+            server(p -> p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
+                    p.position().add(0, 0.5, 4.0)), 10);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, true, false), 30);
+            server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: tk holds {} ({})",
+                    Powers.get(p).heldEntityId(), p.level().getEntity(Powers.get(p).heldEntityId())), 5);
+            shot("tk01_pig", 10);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, false), 10);
+            // a second press throws it
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, true, false), 5);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, false), 30);
+            server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: tk after the throw holds {}",
+                    Powers.get(p).heldEntityId()), 10);
+            // a block, with Sneak
+            server(p -> {
+                p.level().setBlockAndUpdate(net.minecraft.core.BlockPos.containing(p.getX(), p.getY(), p.getZ() + 3.0),
+                        net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
+                        net.minecraft.world.phys.Vec3.atCenterOf(net.minecraft.core.BlockPos.containing(p.getX(), p.getY(), p.getZ() + 3.0)));
+            }, 20);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, true, true), 30);
+            server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: tk block holds {} ({})",
+                    Powers.get(p).heldEntityId(), p.level().getEntity(Powers.get(p).heldEntityId())), 5);
+            shot("tk02_block", 10);
+            camera(CameraType.THIRD_PERSON_FRONT);
+            shot("tk03_face", 10);
+            camera(CameraType.FIRST_PERSON);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, true), 40);
+            return;
+        }
         if ("eternity".equals(System.getProperty("enhanced.mindtour.mode"))) {
             // (3.16) -Denhanced.mindtour.mode=eternity: Eternity's realm, and Eternity before you
             server(p -> p.setGameMode(GameType.CREATIVE), 40);
