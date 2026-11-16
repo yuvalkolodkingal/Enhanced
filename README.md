@@ -73,6 +73,12 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Install it on** the client, plus the server for multiplayer
 * **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
 
+## What's new in 3.16.0
+
+* **SMP Balance Mode.** One command sets how strong every power is for the whole server, so SMPs stay fair: `/enhanced balance full` (as configured, the default), `balanced` (the strongest powers brought down to the scale of the rest; Wanda's Build Magic on the scale of Billy's) or `hardcore` (heavily limited). `/enhanced balance set <power> <setting> <strength>` fine-tunes one power's range, size, duration, cooldown, cost or damage on top of the preset, and `info`, `reset` and `reload` do what they say. It applies to every player, operators included, every power stays usable (caps, not removals), and it is saved with the world (`serverconfig/enhanced-balance.json`, editable). See [Commands](docs/wiki/Commands.md#smp-balance-mode-enhanced-balance).
+* **Vision's mind: J.A.R.V.I.S. is gone.** He was deleted: he no longer stands in the hall, and only his grave in the mausoleum is left of him.
+* The server and every player need 3.16 (network protocol 16).
+
 ## What's new in 3.15.1
 
 * **Minecraft 1.21.11 and 26.3: coming near an Avengers Tower crashed the game.** The tower's refit (which brings old towers up to date) still used the chain's old name, which the game renamed to the iron chain. It reads the new name now, and if a refit ever fails again, it stops with a line in the log and never takes the game or the server down. (Thanks DrRic.)

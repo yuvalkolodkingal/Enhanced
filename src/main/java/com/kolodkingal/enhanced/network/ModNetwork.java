@@ -21,7 +21,7 @@ public final class ModNetwork {
      * states in two words), and once for 3.9 (the mod's own config files: the server's settings travel to a player
      * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once).
      */
-    public static final String PROTOCOL_VERSION = "15";
+    public static final String PROTOCOL_VERSION = "16";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -41,6 +41,10 @@ public final class ModNetwork {
         registrar.serverbound(BifrostActionPayload.TYPE, BifrostActionPayload.STREAM_CODEC, BifrostActionPayload::handle);
         registrar.serverbound(RoadChoicePayload.TYPE, RoadChoicePayload.STREAM_CODEC, RoadChoicePayload::handle);
         registrar.clientbound(SlowedProjectilePayload.TYPE, SlowedProjectilePayload.STREAM_CODEC, SlowedProjectilePayload::handle);
+        // 3.16: the server's SMP balance
+        registrar.clientbound(com.kolodkingal.enhanced.balance.BalanceSyncPayload.TYPE,
+                com.kolodkingal.enhanced.balance.BalanceSyncPayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.balance.BalanceSyncPayload::handle);
         registrar.clientbound(ThorFxPayload.TYPE, ThorFxPayload.STREAM_CODEC, ThorFxPayload::handle);
         registrar.clientbound(HexBoltPayload.TYPE, HexBoltPayload.STREAM_CODEC, HexBoltPayload::handle);
         registrar.clientbound(OpenRoadPayload.TYPE, OpenRoadPayload.STREAM_CODEC, OpenRoadPayload::handle);

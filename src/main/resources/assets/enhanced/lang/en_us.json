@@ -5144,5 +5144,22 @@
   "mind.enhanced.u.start": "Oh! Hi. I'm U. Don't mind Dum-E, he gets excited when someone comes home.",
   "mind.enhanced.u.start.0": "Who is Dum-E?",
   "mind.enhanced.u.dum_e": "My partner. We fixed everything in Tony's workshop, and broke most of it first. Now we fix things here.",
-  "message.enhanced.nano_ultron.form.no_powers": "Pure nanotech: no body, no powers. Take form again (Sneak + flight)."
+  "message.enhanced.nano_ultron.form.no_powers": "Pure nanotech: no body, no powers. Take form again (Sneak + flight).",
+  "sign.enhanced.mind.grave.jarvis": "J.A.R.V.I.S.",
+  "commands.enhanced.balance.unknown_power": "Unknown power: %s",
+  "commands.enhanced.balance.unknown_setting": "Unknown setting: %s (range, size, duration, cooldown, cost or damage)",
+  "commands.enhanced.balance.preset": "SMP balance: the %s preset now applies to every player on the server.",
+  "commands.enhanced.balance.set": "SMP balance: %s's %s is at %s of its full strength (on top of the %s preset).",
+  "commands.enhanced.balance.reset_all": "SMP balance: %s overrides cleared; every power follows the %s preset.",
+  "commands.enhanced.balance.reset": "SMP balance: %s overrides of %s cleared; it follows the %s preset.",
+  "commands.enhanced.balance.reload_failed": "The balance file could not be read (%s); nothing changed.",
+  "commands.enhanced.balance.info": "SMP balance: the %s preset, for every player.",
+  "commands.enhanced.balance.info.full": "Every power as the server config has it.",
+  "commands.enhanced.balance.info.balanced": "The strongest powers at 60% (Scarlet Witch, Phoenix, Thanos, Apocalypse, Odin, Hela, Love, the stones), the strong ones at 80%; Wanda's Build Magic on the scale of Billy's at his highest rank.",
+  "commands.enhanced.balance.info.hardcore": "Every power at half the balanced strength; Wanda's Build Magic on the scale of an Apprentice Billy.",
+  "commands.enhanced.balance.no_overrides": "No overrides.",
+  "commands.enhanced.balance.overrides": "Overrides:",
+  "commands.enhanced.balance.preset.full": "full",
+  "commands.enhanced.balance.preset.balanced": "balanced",
+  "commands.enhanced.balance.preset.hardcore": "hardcore"
 }

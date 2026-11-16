@@ -137,6 +137,10 @@ public final class ClientEvents {
     @Subscribe
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         java.util.Arrays.fill(SENT_DOWN, false);
+        // (3.16) a server's SMP balance stays with it (a world of this client keeps its own until its server stops)
+        if (!Minecraft.getInstance().hasSingleplayerServer()) {
+            com.kolodkingal.enhanced.balance.Balance.reset();
+        }
         SpeedsterMusic.stop();
         PowerLoopSounds.stopAll();
         Afterimages.clear();

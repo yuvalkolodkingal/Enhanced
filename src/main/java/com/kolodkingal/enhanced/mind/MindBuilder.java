@@ -161,7 +161,7 @@ public final class MindBuilder {
         List<Spot> out = new ArrayList<>();
         out.add(new Spot(MindNpcEntity.Role.DUM_E, Vec3.atBottomCenterOf(o.offset(2, GROUND, -8)), 180.0F));
         out.add(new Spot(MindNpcEntity.Role.U, Vec3.atBottomCenterOf(o.offset(3, GROUND, -9)), 180.0F));
-        out.add(new Spot(MindNpcEntity.Role.JARVIS, Vec3.atBottomCenterOf(o.offset(-3, GROUND, -4)), -90.0F));
+        // (3.16) JARVIS is gone (deleted): only his grave, in the mausoleum, is left of him
         out.add(new Spot(MindNpcEntity.Role.EDITH, Vec3.atBottomCenterOf(o.offset(8, GROUND, -7)), 0.0F));
         out.add(new Spot(MindNpcEntity.Role.FRIDAY, Vec3.atBottomCenterOf(o.offset(3, GROUND, 5)), 90.0F));
         out.add(new Spot(MindNpcEntity.Role.ROBOT, Vec3.atBottomCenterOf(o.offset(-11, TOP, 4)), 0.0F));
@@ -188,6 +188,8 @@ public final class MindBuilder {
             }
             b.build();
         }
+        // (3.16) the mausoleum's second grave is JARVIS's (in a mind built before too)
+        b.jarvisGrave();
         if (progress.gateOpen()) {
             b.openGate();
         }
@@ -974,8 +976,8 @@ public final class MindBuilder {
 
     /** South-west of the house: a little mausoleum with two graves. */
     private void mausoleum() {
-        int x0 = -32;
-        int z0 = 22;
+        int x0 = MAUSOLEUM_X;
+        int z0 = MAUSOLEUM_Z;
         BlockState wall = Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
         room(x0, -1, z0, x0 + 6, 4, z0 + 6, wall, Blocks.STONE_BRICKS.defaultBlockState(), Blocks.STONE_BRICK_SLAB.defaultBlockState());
         fill(x0 + 1, 5, z0 + 1, x0 + 5, 5, z0 + 5, Blocks.STONE_BRICK_SLAB.defaultBlockState());
@@ -987,6 +989,17 @@ public final class MindBuilder {
             sign(x, 1, z0 + 4, Direction.NORTH, "sign.enhanced.mind.grave.1", "sign.enhanced.mind.grave.2");
             candles(x, 1, z0 + 3, 1, true);
         }
+        jarvisGrave();
     }
+
+    /** (3.16) The mausoleum's second grave: JARVIS's, the only trace of him left in the mind. */
+    private void jarvisGrave() {
+        sign(MAUSOLEUM_X + 4, 1, MAUSOLEUM_Z + 4, Direction.NORTH, "sign.enhanced.mind.grave.1",
+                "sign.enhanced.mind.grave.jarvis");
+    }
+
+    /** The mausoleum's north-west corner. */
+    public static final int MAUSOLEUM_X = -32;
+    public static final int MAUSOLEUM_Z = 22;
 
 }

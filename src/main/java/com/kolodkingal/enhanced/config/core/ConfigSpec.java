@@ -501,6 +501,31 @@ public final class ConfigSpec {
 
     // ---- values ----
 
+    /**
+     * (3.16) Changes what {@link ConfigValue#get()} gives (never the file, nor {@link ConfigValue#getRaw()}): the SMP
+     * balance. Returns the value itself when it has nothing to change.
+     */
+    public interface Adjuster {
+        Object adjust(ConfigValue<?> value, Object raw);
+    }
+
+    /** The adjuster of every value, or null. */
+    @Nullable
+    private static volatile Adjuster adjuster;
+    /** Bumped when the adjuster's rules change, so every value adjusts itself again. */
+    private static volatile int adjusterEpoch;
+
+    /** Sets the adjuster (null: none) and makes every value adjust itself again. */
+    public static void setAdjuster(@Nullable Adjuster a) {
+        adjuster = a;
+        adjusterEpoch++;
+    }
+
+    /** Every value adjusts itself again (the adjuster's rules changed). */
+    public static void readjust() {
+        adjusterEpoch++;
+    }
+
     /** A config value: read with {@link #get()}. */
     public static class ConfigValue<T> implements Supplier<T> {
         private final List<String> path;
@@ -516,7 +541,10 @@ public final class ConfigSpec {
             parent.values.add(this);
         }
 
-        /** The value (read once from the loaded file, then kept until the file is read again). */
+        /**
+         * The value (read once from the loaded file, then kept until the file is read again), as the {@link #adjuster}
+         * (3.16: the SMP balance) makes it.
+         */
         @Override
         public T get() {
             T value = cachedValue;
@@ -524,8 +552,27 @@ public final class ConfigSpec {
                 value = getRaw();
                 cachedValue = value;
             }
-            return value;
+            Adjuster a = adjuster;
+            if (a == null) {
+                return value;
+            }
+            Adjusted<T> done = adjusted;
+            int epoch = adjusterEpoch;
+            if (done == null || done.epoch != epoch || done.raw != value) {
+                @SuppressWarnings("unchecked")
+                T made = (T) a.adjust(this, value);
+                done = new Adjusted<>(epoch, value, made);
+                adjusted = done;
+            }
+            return done.value;
         }
+
+        /** The last adjusted value: for this epoch of the adjuster and this value in the file. */
+        private record Adjusted<T>(int epoch, T raw, T value) {
+        }
+
+        @Nullable
+        private volatile Adjusted<T> adjusted;
 
         /** The value in the loaded file, read now (no cache). */
         public T getRaw() {

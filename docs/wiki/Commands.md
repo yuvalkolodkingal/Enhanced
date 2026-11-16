@@ -37,6 +37,34 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/road status` | **Anyone** may use it: how many trials you have won. |
 | `/road choose` | **Anyone** may use it, at the end of the Road: the choice of Billy or Tommy is asked again. |
 
+## SMP Balance Mode: /enhanced balance
+
+One server-wide rule for how strong every power is, so an SMP stays fair (3.16). It binds **every player alike, operators too**: there are no exceptions per player. Every power stays usable in every preset; only its limits change. Bosses, structures and realms are never touched. Operators only, saved with the world.
+
+| Command | What it does |
+|---|---|
+| `/enhanced balance full` | Every power as the server config has it (the default) |
+| `/enhanced balance balanced` | SMP-fair: the strongest powers (the Scarlet Witch, the Phoenix, Thanos, Apocalypse, Odin, Hela, Love, the Infinity Stones and the Gauntlet) at 60%, the strong ones (Magneto, Thor, Loki, Vision, Ultron, Quicksilver, Doctor Strange, the Hulks, Iron Man, Professor X, Agatha, Heimdall...) at 80%, and Wanda's Build Magic on the scale of Billy's at his highest rank (her reach, shapes, blocks per spell, selection, repeats and Instant level) |
+| `/enhanced balance hardcore` | Heavily limited: every power at half its balanced strength, and Wanda's Build Magic on the scale of an Apprentice Billy |
+| `/enhanced balance set <power> <setting> <strength>` | Overrides one setting of one power on top of the preset. `<setting>` is `range`, `size`, `duration`, `cooldown`, `cost` (energy and hunger) or `damage`; `<strength>` is a share of full strength, 0.05 to 4 (1 = as configured, 0.5 = half the range, size, duration or damage, twice the cooldown or cost) |
+| `/enhanced balance reset [power]` | Clears the overrides (of one power, or all) back to the preset |
+| `/enhanced balance info` | The active preset and every override |
+| `/enhanced balance reload` | Reads the balance file again after you edit it |
+
+`<power>` is the power's section of the server config (Tab completes it): `scarlet_witch`, `build_magic_wanda`, `magneto`, `thor`, `spider_man`, `iron_man`... The balance is kept in `world/serverconfig/enhanced-balance.json`, which you can edit by hand:
+
+```json
+{
+  "preset": "balanced",
+  "overrides": {
+    "scarlet_witch.range": 0.5,
+    "thor.cooldown": 1.0
+  }
+}
+```
+
+The server config file itself is never changed: the balance applies on top of it, and `full` gives you its numbers back.
+
 ## Asgard: /enhanced asgard
 
 ![The palace of Asgard](images/092-asgard-palace.png)

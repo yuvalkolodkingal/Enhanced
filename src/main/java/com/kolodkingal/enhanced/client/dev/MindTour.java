@@ -166,12 +166,7 @@ public final class MindTour {
         choose("1", 30);
         shot("m05_dume_floors", 10);
         choose("bye", 20);
-        // (3.15) J.A.R.V.I.S. in the hall, and U at the door with Dum-E
-        at(1, 0, -4, 90.0F, 5.0F, 40);
-        shot("m05b_jarvis", 10);
-        server(p -> MindTalk.start(p, "jarvis", MindQuest_find(p, "jarvis"), false), 30);
-        shot("m05c_jarvis_talk", 10);
-        choose("bye", 20);
+        // (3.15) U at the door with Dum-E (JARVIS is gone since 3.16: his grave is in the mausoleum)
         at(1, 0, -5, 160.0F, 5.0F, 40);
         shot("m05d_dume_u", 10);
         at(7, 0, -4, 135.0F, 10.0F, 40);

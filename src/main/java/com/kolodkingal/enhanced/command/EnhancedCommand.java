@@ -96,6 +96,8 @@ public final class EnhancedCommand {
                                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
                                                 Arrays.stream(Power.values()).flatMap(p -> lookIds(p).stream()).distinct(), builder))
                                         .executes(EnhancedCommand::look))))
+                // (3.16) SMP Balance Mode: how strong every power is, for everyone on the server
+                .then(com.kolodkingal.enhanced.balance.BalanceCommand.node())
                 .then(Commands.literal("hex")
                         .then(Commands.literal("list").executes(ctx -> listHexes(ctx.getSource())))
                         .then(Commands.literal("clear").executes(ctx -> clearHexes(ctx.getSource()))))

@@ -5144,5 +5144,22 @@
   "mind.enhanced.u.start": "אה! היי. אני יו. אל תשים לב לדאמי, הוא מתרגש כשמישהו חוזר הביתה.",
   "mind.enhanced.u.start.0": "מי זה דאמי?",
   "mind.enhanced.u.dum_e": "השותף שלי. תיקנו הכול בסדנה של טוני, ושברנו את רוב זה קודם. עכשיו אנחנו מתקנים דברים כאן.",
-  "message.enhanced.nano_ultron.form.no_powers": "ננו-טכנולוגיה טהורה: בלי גוף, בלי כוחות. חזור לצורה (התגנבות + תעופה)."
+  "message.enhanced.nano_ultron.form.no_powers": "ננו-טכנולוגיה טהורה: בלי גוף, בלי כוחות. חזור לצורה (התגנבות + תעופה).",
+  "sign.enhanced.mind.grave.jarvis": "ג'רוויס",
+  "commands.enhanced.balance.unknown_power": "כוח לא מוכר: %s",
+  "commands.enhanced.balance.unknown_setting": "הגדרה לא מוכרת: %s (range, size, duration, cooldown, cost או damage)",
+  "commands.enhanced.balance.preset": "איזון SMP: הפריסט %s חל עכשיו על כל השחקנים בשרת.",
+  "commands.enhanced.balance.set": "איזון SMP: ה-%2$s של %1$s על %3$s מהעוצמה המלאה (מעל הפריסט %4$s).",
+  "commands.enhanced.balance.reset_all": "איזון SMP: %s עקיפות נמחקו; כל הכוחות לפי הפריסט %s.",
+  "commands.enhanced.balance.reset": "איזון SMP: %s עקיפות של %s נמחקו; הוא לפי הפריסט %s.",
+  "commands.enhanced.balance.reload_failed": "לא ניתן לקרוא את קובץ האיזון (%s); שום דבר לא השתנה.",
+  "commands.enhanced.balance.info": "איזון SMP: הפריסט %s, לכל השחקנים.",
+  "commands.enhanced.balance.info.full": "כל הכוחות כמו בקונפיג של השרת.",
+  "commands.enhanced.balance.info.balanced": "הכוחות הכי חזקים על 60% (מכשפת השני, הפניקס, תאנוס, אפוקליפסה, אודין, הלה, לאב, האבנים), החזקים על 80%; קסם הבנייה של וונדה בקנה המידה של בילי בדרגה הכי גבוהה שלו.",
+  "commands.enhanced.balance.info.hardcore": "כל הכוחות על חצי מהעוצמה המאוזנת; קסם הבנייה של וונדה בקנה המידה של בילי מתלמד.",
+  "commands.enhanced.balance.no_overrides": "אין עקיפות.",
+  "commands.enhanced.balance.overrides": "עקיפות:",
+  "commands.enhanced.balance.preset.full": "מלא",
+  "commands.enhanced.balance.preset.balanced": "מאוזן",
+  "commands.enhanced.balance.preset.hardcore": "הארדקור"
 }

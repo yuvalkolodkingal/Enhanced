@@ -86,6 +86,7 @@ k("sign.enhanced.mind.gate.1", "Robots may", "רובוטים לא")
 k("sign.enhanced.mind.gate.2", "not pass.", "יכולים לעבור.")
 k("sign.enhanced.mind.grave.1", "Here lies", "כאן נחה")
 k("sign.enhanced.mind.grave.2", "Jocasta", "ג'וקסטה")
+k("sign.enhanced.mind.grave.jarvis", "J.A.R.V.I.S.", "ג'רוויס")
 facts = [
     ("A synthezoid's body is woven of vibranium; its mind came from a stone.", "הגוף של סינתזואיד ארוג מוויברניום; התודעה שלו באה מאבן."),
     ("The first android burst into flame the moment he met the air.", "האנדרואיד הראשון עלה בלהבות ברגע שפגש באוויר."),

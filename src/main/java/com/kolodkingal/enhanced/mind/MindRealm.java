@@ -151,6 +151,11 @@ public final class MindRealm {
         }
         // the ones who should no longer be (the floors below, after the Source Code)
         for (MindNpcEntity npc : present) {
+            // (3.16) JARVIS was deleted: one standing in a mind from before goes too
+            if (npc.role() == MindNpcEntity.Role.JARVIS) {
+                npc.discard();
+                continue;
+            }
             if (progress.torchDone() && (npc.role() == MindNpcEntity.Role.ULTRON || npc.role() == MindNpcEntity.Role.TORCH
                     || npc.role() == MindNpcEntity.Role.HORTON)) {
                 npc.discard();
