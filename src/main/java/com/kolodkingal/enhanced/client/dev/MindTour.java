@@ -153,6 +153,9 @@ public final class MindTour {
             server(p -> {
                 p.setGameMode(GameType.SURVIVAL);
                 Powers.awaken(p, Power.SCARLET_WITCH, "", false);
+                // (her crown: the suit's skin draws it, so the item's must not show over it)
+                p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,
+                        new net.minecraft.world.item.ItemStack(com.kolodkingal.enhanced.registry.ModItems.WANDA_CROWN.get()));
                 p.teleportTo(p.getX(), p.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
                         (int) p.getX(), (int) p.getZ()), p.getZ());
                 p.setYRot(0.0F);

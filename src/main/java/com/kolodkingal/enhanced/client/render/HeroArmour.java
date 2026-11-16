@@ -28,6 +28,14 @@ public final class HeroArmour {
 
     /** Whether the armour {@code entity} wears in {@code slot} is left undrawn. */
     public static boolean hidden(LivingEntity entity, EquipmentSlot slot) {
+        // (3.16.1) Wanda's Crown on the Scarlet Witch: her suit's skin draws the crown already. 1.21.1 hid the item's by an
+        // all-clear armour texture (WandaCrownItem.getArmorTexture), which the equipment models of 1.21.2+ never ask for,
+        // so two crowns showed; it is hidden here, on every version, whatever hideHeroArmour says.
+        if (slot == EquipmentSlot.HEAD && entity instanceof AbstractClientPlayer player
+                && Powers.is(player, Power.SCARLET_WITCH)
+                && entity.getItemBySlot(slot).getItem() instanceof com.kolodkingal.enhanced.item.WandaCrownItem) {
+            return true;
+        }
         if (!EnhancedClientConfig.hideHeroArmour() || !isHero(entity)) {
             return false;
         }

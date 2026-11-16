@@ -303,3 +303,6 @@ protected AABB makeBoundingBox\(\) \{ => protected AABB makeBoundingBox(net.mine
 # off the arm), so it is put back on its parent instead
 \b((?:\w+\.)*)(hat|jacket|rightSleeve|leftSleeve|rightPants|leftPants)\.copyFrom\(\1(?:head|body|rightArm|leftArm|rightLeg|leftLeg)\); => $1$2.resetPose();
 @in(client/hulk/HulkPlayerRenderer) \bsleeve\.copyFrom\(arm\); => sleeve.resetPose();
+# (3.16.1) glow masks: from 1.21.2 the eyes render type blends as translucency, so a mask's dim pixels painted the face
+# (the Scarlet Witch's eyes were red blocks); GlowTypes gives 1.21.1's additive glow again (the energy swirl, still)
+(?<![\w.])(?:net\.minecraft\.client\.renderer\.)?RenderType\.eyes\( => com.kolodkingal.enhanced.client.render.GlowTypes.eyes(
