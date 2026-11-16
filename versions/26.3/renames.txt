@@ -584,3 +584,5 @@ protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float
 # GUI (26.1): the mouse's buttons are SDL's (left 1, middle 2, right 3); the screens read and hand on 1.21.1's (left 0, right 1, middle 2)
 \bint (\w+) = legacyEvent\.button\(\); => int $1 = com.kolodkingal.enhanced.platform.client.MouseButtons.legacy(legacyEvent.button());
 new net\.minecraft\.client\.input\.MouseButtonInfo\(([^,()]+), 0\) => new net.minecraft.client.input.MouseButtonInfo(com.kolodkingal.enhanced.platform.client.MouseButtons.modern($1), 0)
+# (3.16.1) glow masks: 26.1's eyes blend as translucency (a mask's dim pixels painted the face); its energy swirl adds, as 1.21.1's eyes did
+\bnet\.minecraft\.client\.renderer\.rendertype\.RenderTypes\.eyes\( => com.kolodkingal.enhanced.compat.GlowTypes.eyes(
