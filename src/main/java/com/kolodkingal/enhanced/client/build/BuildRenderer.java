@@ -142,6 +142,18 @@ public final class BuildRenderer {
         static Look of(Power power) {
             return new Look(power.color, power.glow, power == Power.BILLY);
         }
+
+        /** (3.16) The look of this player's Build Magic: his hero's, or the colour a custom hero chose for it. */
+        static Look of(net.minecraft.world.entity.player.Player player) {
+            Power power = BuildClient.hero(player);
+            int chosen = com.kolodkingal.enhanced.custom.AbilityColors.chosen(player, power == Power.BILLY
+                    ? com.kolodkingal.enhanced.custom.HeroAbility.BILLY_BUILD_MAGIC
+                    : com.kolodkingal.enhanced.custom.HeroAbility.WANDA_BUILD_MAGIC);
+            if (chosen < 0) {
+                return of(power);
+            }
+            return new Look(chosen, com.kolodkingal.enhanced.custom.AbilityColors.glowOf(chosen), power == Power.BILLY);
+        }
     }
 
     /** A box in camera space, already drawn a little outside its blocks. */
@@ -191,7 +203,7 @@ public final class BuildRenderer {
         if (ghost) {
             // The ghost, after the world's translucent blocks: it blends over water (D-B 11.10).
             if (BuildClient.buildMode()) {
-                Look look = Look.of(BuildClient.hero(player));
+                Look look = Look.of(player);
                 Ghost.draw(event, player, look.core(), look.glow(), time, calm);
             }
             return;
@@ -210,7 +222,7 @@ public final class BuildRenderer {
             SelectGlow.clear();
             return;
         }
-        Look look = Look.of(BuildClient.hero(player));
+        Look look = Look.of(player);
         BuildGrammar g = BuildClient.grammar();
         MagicSelect flood = g.hasMask() ? BuildClient.flood() : null;
         BoundingBox box = g.box();

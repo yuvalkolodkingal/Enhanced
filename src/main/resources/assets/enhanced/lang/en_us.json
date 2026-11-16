@@ -1483,7 +1483,7 @@
   "item.enhanced.hero_creator.desc": "Become any hero, or make your own",
   "item.enhanced.hero_creator.choose": "Choose a hero of the mod and a look",
   "item.enhanced.hero_creator.create": "Create a hero: name, powers, keys, colours, skin",
-  "item.enhanced.hero_creator.creative": "Creative mode or operators only",
+  "item.enhanced.hero_creator.creative": "Unlimited in Creative mode or for operators",
   "beam.enhanced.custom": "Energy Beam",
   "death.attack.enhanced.hero_power": "%1$s was defeated by a hero's power",
   "death.attack.enhanced.hero_power.player": "%1$s was defeated by %2$s's powers",
@@ -5172,5 +5172,8 @@
   "ability.enhanced.vision.solar.5": "Infrared Eye Beams (Sneak: Mind Palace)",
   "hud.enhanced.solar.charge": "Solar Jewel %s%%",
   "commands.enhanced.build.materials.on": "Build Magic takes its blocks from the inventory (in Survival): one item per block, and vanished blocks go back into it.",
-  "commands.enhanced.build.materials.off": "Build Magic conjures its blocks from magic: the inventory is not used."
+  "commands.enhanced.build.materials.off": "Build Magic conjures its blocks from magic: the inventory is not used.",
+  "item.enhanced.hero_creator.uses": "Uses left: %s of %s",
+  "message.enhanced.hero_creator.uses_left": "The Hero Creator has %s use left",
+  "message.enhanced.hero_creator.spent": "The Hero Creator's power is spent"
 }

@@ -170,9 +170,13 @@ public final class ColorPickerScreen extends Screen {
         done();
     }
 
+    /**
+     * (3.16) Esc keeps the colour picked, as Done does: it used to cancel, so a colour chosen and left with Esc was lost
+     * and had to be picked again. Only the Cancel button puts the old one back.
+     */
     @Override
     public void onClose() {
-        cancel();
+        done();
     }
 
     @Override

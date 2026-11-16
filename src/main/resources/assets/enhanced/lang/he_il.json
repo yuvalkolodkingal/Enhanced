@@ -1483,7 +1483,7 @@
   "item.enhanced.hero_creator.desc": "הפכו לכל גיבור, או צרו גיבור משלכם",
   "item.enhanced.hero_creator.choose": "בחרו גיבור מהמוד ומראה",
   "item.enhanced.hero_creator.create": "צרו גיבור: שם, כוחות, מקשים, צבעים, סקין",
-  "item.enhanced.hero_creator.creative": "רק במצב יצירתי או למפעילים",
+  "item.enhanced.hero_creator.creative": "ללא הגבלה במצב יצירתי או למפעילים",
   "beam.enhanced.custom": "קרן אנרגיה",
   "death.attack.enhanced.hero_power": "%1$s הובס בכוחו של גיבור",
   "death.attack.enhanced.hero_power.player": "%1$s הובס בכוחות של %2$s",
@@ -5172,5 +5172,8 @@
   "ability.enhanced.vision.solar.5": "קרני אינפרא-אדום מהעיניים (Sneak: ארמון התודעה)",
   "hud.enhanced.solar.charge": "אבן השמש %s%%",
   "commands.enhanced.build.materials.on": "קסם הבנייה לוקח את הבלוקים מהתיק (בהישרדות): פריט אחד לכל בלוק, ובלוקים שנעלמים חוזרים לתיק.",
-  "commands.enhanced.build.materials.off": "קסם הבנייה מכשף את הבלוקים מקסם: לא משתמשים בתיק."
+  "commands.enhanced.build.materials.off": "קסם הבנייה מכשף את הבלוקים מקסם: לא משתמשים בתיק.",
+  "item.enhanced.hero_creator.uses": "שימושים שנשארו: %s מתוך %s",
+  "message.enhanced.hero_creator.uses_left": "ליוצר הגיבורים נשאר %s שימוש",
+  "message.enhanced.hero_creator.spent": "הכוח של יוצר הגיבורים נגמר"
 }

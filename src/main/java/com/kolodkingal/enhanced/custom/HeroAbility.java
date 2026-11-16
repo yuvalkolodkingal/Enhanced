@@ -82,7 +82,7 @@ public enum HeroAbility implements CatalogEntry {
             .fixed().traits(Trait.SORCERER, Trait.TELEPATH_STRONG).family(Family.MIND).on(d -> d.toggle(Toggle.THE_NOISE))),
     /** Billy's Build Magic: the sixth key (Y) and its wheel, with Billy's rules (the meter, no Instant). */
     BILLY_BUILD_MAGIC(Power.BILLY, 6, "build_magic", press().cost(2).group(Group.ELEMENT).icon("minecraft:bricks")
-            .fixed().res(Resource.BUILD).traits(Trait.SORCERER, Trait.TELEPATH_STRONG)),
+            .blocks().res(Resource.BUILD).traits(Trait.SORCERER, Trait.TELEPATH_STRONG)),
 
     // ===== tommy =====
     TOMMY_TIME(Power.TOMMY, 1, "time", toggle().alt(Act.TOGGLE).cost(3).group(Group.MOVE).icon("minecraft:clock")
@@ -418,7 +418,7 @@ public enum HeroAbility implements CatalogEntry {
     // (Not a variant: the Scarlet Witch's own Build Magic, with her numbers and her Instant switch, beside Billy's.)
     WANDA_BUILD_MAGIC(Power.SCARLET_WITCH, 6, "build_magic",
             press().cost(2).group(Group.ELEMENT).icon("minecraft:quartz_bricks")
-            .fixed().res(Resource.BUILD).traits(Trait.SORCERER, Trait.TELEPATH_STRONG)),
+            .blocks().res(Resource.BUILD).traits(Trait.SORCERER, Trait.TELEPATH_STRONG)),
     QUICKSILVER_WALKMAN(QUICKSILVER_TIME, "walkman", variant(QUICKSILVER_TIME).icon("minecraft:music_disc_cat")
             .requires("quicksilver.time").on(PowerData::walkman)),
     QUICKSILVER_DASH(QUICKSILVER_SPEED, "dash", variant(QUICKSILVER_SPEED).icon("minecraft:feather")),
@@ -553,7 +553,9 @@ public enum HeroAbility implements CatalogEntry {
         /** Its cooldown ({@code PowerData.startCooldown(HeroAbility, ...)}). */
         COOLDOWN,
         /** The amounts of the hero's body ({@code PowerData.bodyScale}). */
-        BODY
+        BODY,
+        /** (3.16) How much Build Magic builds: Billy's rank (his meter, reach and size), the Scarlet Witch's blocks per spell. */
+        BLOCKS
     }
 
     /** The two choices of a picked row: its Sneak variant too ({@link #BOTH}, the default), or the main action only. */
@@ -937,6 +939,12 @@ public enum HeroAbility implements CatalogEntry {
 
         Spec traits(Trait... traits) {
             this.traits.addAll(List.of(traits));
+            return this;
+        }
+
+        /** (3.16) Its strength is how much Build Magic builds ({@link Scales#BLOCKS}). */
+        Spec blocks() {
+            this.scales = EnumSet.of(Scales.BLOCKS);
             return this;
         }
 

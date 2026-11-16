@@ -316,7 +316,7 @@ public final class BuildFx {
         double sz = b.getZSpan();
         double faces = sx * sy + sy * sz + sx * sz;
         int count = (int) Mth.clamp(faces / 8.0, 12.0, EnhancedClientConfig.reducedMotion() ? 16.0 : 64.0);
-        int colour = run.hero == Power.BILLY ? BillyAbilities.MAIN : Power.SCARLET_WITCH.glow;
+        int colour = runColour(level, run);
         for (int i = 0; i < count; i++) {
             // A random point of the box's surface: pick a face (by its area), then a spot on it.
             double pick = random.nextDouble() * faces;
@@ -405,7 +405,7 @@ public final class BuildFx {
                 continue;
             }
             Vec3 target = wisp(run, run.sweep(time));
-            int colour = run.hero == Power.BILLY ? BillyAbilities.MAIN : Power.SCARLET_WITCH.glow;
+            int colour = runColour(level, run);
             boolean mine = firstPerson(mc, caster);
             for (HumanoidArm arm : HumanoidArm.values()) {
                 Vec3 hand = handOf(mc, caster, arm);
@@ -883,5 +883,14 @@ public final class BuildFx {
     }
 
     private BuildFx() {
+    }
+
+    /** (3.16) A spell's colour: the hero's, or the one a custom hero chose for his Build Magic. */
+    private static int runColour(net.minecraft.world.level.Level level, Run run) {
+        int builtIn = run.hero == Power.BILLY ? BillyAbilities.MAIN : Power.SCARLET_WITCH.glow;
+        net.minecraft.world.entity.Entity caster = level.getEntity(run.caster);
+        return com.kolodkingal.enhanced.custom.AbilityColors.color(caster, run.hero == Power.BILLY
+                ? com.kolodkingal.enhanced.custom.HeroAbility.BILLY_BUILD_MAGIC
+                : com.kolodkingal.enhanced.custom.HeroAbility.WANDA_BUILD_MAGIC, builtIn);
     }
 }

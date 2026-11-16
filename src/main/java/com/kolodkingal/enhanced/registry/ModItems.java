@@ -406,9 +406,12 @@ public final class ModItems {
     }
 
     /** Projectile sprites only; not in the creative tab. */
-    /** 3.3: the Hero Creator, a Creative-only item (the Creative tab, no recipe, no loot). */
+    /**
+     * 3.3: the Hero Creator (the Creative tab, no recipe, no loot). 3.16: two uses for a player who is neither an operator
+     * nor in Creative (one won from Eternity's wish): its durability.
+     */
     public static final ItemEntry<HeroCreatorItem> HERO_CREATOR = ITEMS.register("hero_creator",
-            () -> new HeroCreatorItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+            () -> new HeroCreatorItem(new Item.Properties().durability(HeroCreatorItem.USES).fireResistant().rarity(Rarity.EPIC)));
 
     public static final ItemEntry<Item> IRON_SHRAPNEL = ITEMS.registerSimpleItem("iron_shrapnel");
     public static final ItemEntry<Item> LOKI_DAGGER = ITEMS.registerSimpleItem("loki_dagger");

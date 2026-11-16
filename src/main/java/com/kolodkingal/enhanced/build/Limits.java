@@ -51,12 +51,27 @@ public final class Limits implements RecipeLimits {
     private final int rank;
     private final boolean limited;
     private final BoundingBox world;
+    /** (3.16) A custom hero's own ceiling of blocks per spell (his Build Magic's strength); 0 for none. */
+    private final int customCap;
 
     private Limits(Power hero, int rank, boolean limited, BoundingBox world) {
+        this(hero, rank, limited, world, 0);
+    }
+
+    private Limits(Power hero, int rank, boolean limited, BoundingBox world, int customCap) {
         this.hero = hero;
         this.rank = Mth.clamp(rank, BillyRanks.MIN_RANK, BillyRanks.MAX_RANK);
         this.limited = limited;
         this.world = world;
+        this.customCap = customCap;
+    }
+
+    /**
+     * (3.16) The blocks per spell of a custom hero's Scarlet Witch's Build Magic at {@code strength}: 2,000 at 1, doubling
+     * each step (32,000 at 5, the Hero Creator's default), none at 10 (as hers).
+     */
+    public static int customCap(int strength) {
+        return strength >= 10 ? 0 : 2000 << Math.max(0, Math.min(8, strength - 1));
     }
 
     /**
@@ -69,7 +84,14 @@ public final class Limits implements RecipeLimits {
         BoundingBox world = world(player.level());
         if (power == Power.SCARLET_WITCH || power == Power.CUSTOM
                 && Powers.get(player).has(HeroAbility.WANDA_BUILD_MAGIC)) {
-            // (3.5: a custom hero with the Scarlet Witch's Build Magic has her numbers and her Instant)
+            // (3.5: a custom hero with the Scarlet Witch's Build Magic has her numbers and her Instant;
+            // 3.16: his strength of it caps his blocks per spell)
+            if (power == Power.CUSTOM) {
+                com.kolodkingal.enhanced.custom.CustomHero.Pick pick = com.kolodkingal.enhanced.custom.CustomHeroes.hero(player)
+                        .pick(HeroAbility.WANDA_BUILD_MAGIC);
+                return new Limits(Power.SCARLET_WITCH, BillyRanks.MIN_RANK, false, world,
+                        pick == null ? 0 : customCap(pick.strength()));
+            }
             return wanda(world);
         }
         if (power == Power.BILLY || power == Power.CUSTOM && Powers.get(player).has(HeroAbility.BILLY_BUILD_MAGIC)) {
@@ -270,7 +292,11 @@ public final class Limits implements RecipeLimits {
         if (limited) {
             return 0;
         }
-        return loaded() ? BuildConfig.WANDA_MAX_BLOCKS.get() : 0;
+        int config = loaded() ? BuildConfig.WANDA_MAX_BLOCKS.get() : 0;
+        if (customCap > 0) {
+            return config > 0 ? Math.min(config, customCap) : customCap;
+        }
+        return config;
     }
 
     /** Whether the hero's spells may make TNT, lava or fire at all (C8: never Billy's, {@code VOLATILE}). */

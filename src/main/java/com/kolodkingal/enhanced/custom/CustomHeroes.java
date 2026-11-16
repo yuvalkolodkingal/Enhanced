@@ -112,6 +112,10 @@ public final class CustomHeroes {
         boolean operator = player.hasPermissions(2);
         boolean operatorsOnly = EnhancedConfig.SPEC.isLoaded() && CustomHeroConfig.OPERATORS_ONLY.get();
         if (!operator && (operatorsOnly || !player.isCreative())) {
+            // (3.16) out of Creative, a Hero Creator with a use left is enough (one won from Eternity's wish)
+            if (!operatorsOnly && !com.kolodkingal.enhanced.item.HeroCreatorItem.held(player).isEmpty()) {
+                return null;
+            }
             return operatorsOnly ? "message.enhanced.hero_creator.operators_only" : "message.enhanced.hero_creator.creative_only";
         }
         return null;
@@ -147,6 +151,7 @@ public final class CustomHeroes {
         }
         CustomHeroRules.Result result = CustomHeroRules.sanitize(wanted, CustomHeroRules.Limits.current());
         become(player, result.hero());
+        com.kolodkingal.enhanced.item.HeroCreatorItem.spendUse(player);
         for (CustomHeroRules.Note note : result.notes()) {
             player.sendSystemMessage(note(note).withStyle(ChatFormatting.GOLD));
         }
@@ -179,6 +184,16 @@ public final class CustomHeroes {
             PowerTicker.applyPassives(player, data);
         }
         CustomHeroServer.onBecome(player, hero, state);
+        // (3.16) Billy's Build Magic: its strength in the creator is his rank (his meter, reach and size)
+        CustomHero.Pick build = hero.pick(HeroAbility.BILLY_BUILD_MAGIC);
+        if (build != null) {
+            long time = player.serverLevel().getGameTime();
+            int rank = Math.max(com.kolodkingal.enhanced.build.BillyRanks.MIN_RANK,
+                    Math.min(com.kolodkingal.enhanced.build.BillyRanks.maxRank(), build.strength()));
+            com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA.set(player,
+                    com.kolodkingal.enhanced.build.BillyMagic.setRank(
+                            com.kolodkingal.enhanced.registry.ModAttachments.BUILD_DATA.get(player), time, rank));
+        }
         // (3.5: from one custom hero to another the power stays CUSTOM: a worn item of a hero he no longer has comes off.)
         HeroItems.takeOffForeign(player, Powers.get(player));
         syncState(player);
@@ -227,6 +242,7 @@ public final class CustomHeroes {
         }
         String id = Variants.of(power).stream().anyMatch(v -> v.id().equals(look)) ? look : "";
         Powers.awaken(player, power, id, false);
+        com.kolodkingal.enhanced.item.HeroCreatorItem.spendUse(player);
         // 3.4 (R8): and the hero's own items, as becoming him the usual way leaves them with him.
         HeroItems.give(player, power, Variants.current(Powers.get(player)).id());
         return true;
