@@ -121,6 +121,12 @@ public final class BeamRenderer {
                     : null;
             case "cyclops_optic" -> HeroAbility.CYCLOPS_OPTIC_BLAST;
             case "cyclops_unleashed" -> HeroAbility.CYCLOPS_OPEN_EYES;
+            // (3.16) every other hero's beam takes a custom hero's colour too (it kept the hero's own before)
+            case "billy_hex" -> HeroAbility.BILLY_HEX_BEAM;
+            case "unibeam", "chest_laser", "hulkbuster_unibeam" -> HeroAbility.IRON_MAN_UNIBEAM;
+            case "drone_laser" -> HeroAbility.IRON_MAN_DRONES;
+            case "flamethrower" -> HeroAbility.IRON_MAN_REPULSOR;
+            case "love_eyes" -> HeroAbility.LOVE_EYE_LASER;
             default -> null;
         };
         int chosen = row == null ? -1 : AbilityColors.chosen(player, row);
