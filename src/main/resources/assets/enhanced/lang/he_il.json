@@ -5149,7 +5149,7 @@
   "commands.enhanced.balance.unknown_power": "כוח לא מוכר: %s",
   "commands.enhanced.balance.unknown_setting": "הגדרה לא מוכרת: %s (range, size, duration, cooldown, cost או damage)",
   "commands.enhanced.balance.preset": "איזון SMP: הפריסט %s חל עכשיו על כל השחקנים בשרת.",
-  "commands.enhanced.balance.set": "איזון SMP: ה-%2$s של %1$s על %3$s מהעוצמה המלאה (מעל הפריסט %4$s).",
+  "commands.enhanced.balance.set": "איזון SMP: %s – %s על %s מהעוצמה המלאה (מעל הפריסט %s).",
   "commands.enhanced.balance.reset_all": "איזון SMP: %s עקיפות נמחקו; כל הכוחות לפי הפריסט %s.",
   "commands.enhanced.balance.reset": "איזון SMP: %s עקיפות של %s נמחקו; הוא לפי הפריסט %s.",
   "commands.enhanced.balance.reload_failed": "לא ניתן לקרוא את קובץ האיזון (%s); שום דבר לא השתנה.",
@@ -5161,5 +5161,16 @@
   "commands.enhanced.balance.overrides": "עקיפות:",
   "commands.enhanced.balance.preset.full": "מלא",
   "commands.enhanced.balance.preset.balanced": "מאוזן",
-  "commands.enhanced.balance.preset.hardcore": "הארדקור"
+  "commands.enhanced.balance.preset.hardcore": "הארדקור",
+  "message.enhanced.solar.empty": "לאבן השמש נגמר האור: עמדו בשמש כדי למלא אותה",
+  "message.enhanced.solar.drained": "אבן השמש התרוקנה: עוד %s שניות עד שאפשר להעמיס שוב",
+  "message.enhanced.solar.overload_low": "אין מספיק אור להעמסה: %s%% מתוך %s%%",
+  "death.attack.enhanced.solar_beam": "%1$s נשרף באור השמש",
+  "death.attack.enhanced.solar_beam.player": "%1$s נשרף באבן השמש של %2$s",
+  "death.attack.enhanced.solar_beam.item": "%1$s נשרף באבן השמש של %2$s",
+  "ability.enhanced.vision.solar.1": "קרן שמש (Sneak: העמסת האבן)",
+  "ability.enhanced.vision.solar.5": "קרני אינפרא-אדום מהעיניים (Sneak: ארמון התודעה)",
+  "hud.enhanced.solar.charge": "אבן השמש %s%%",
+  "commands.enhanced.build.materials.on": "קסם הבנייה לוקח את הבלוקים מהתיק (בהישרדות): פריט אחד לכל בלוק, ובלוקים שנעלמים חוזרים לתיק.",
+  "commands.enhanced.build.materials.off": "קסם הבנייה מכשף את הבלוקים מקסם: לא משתמשים בתיק."
 }

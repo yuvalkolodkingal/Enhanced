@@ -41,6 +41,10 @@ public final class ModNetwork {
         registrar.serverbound(BifrostActionPayload.TYPE, BifrostActionPayload.STREAM_CODEC, BifrostActionPayload::handle);
         registrar.serverbound(RoadChoicePayload.TYPE, RoadChoicePayload.STREAM_CODEC, RoadChoicePayload::handle);
         registrar.clientbound(SlowedProjectilePayload.TYPE, SlowedProjectilePayload.STREAM_CODEC, SlowedProjectilePayload::handle);
+        // 3.16: Build Magic's materials switched on or off
+        registrar.clientbound(com.kolodkingal.enhanced.build.BuildMaterialsPayload.TYPE,
+                com.kolodkingal.enhanced.build.BuildMaterialsPayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.build.BuildMaterialsPayload::handle);
         // 3.16: the server's SMP balance
         registrar.clientbound(com.kolodkingal.enhanced.balance.BalanceSyncPayload.TYPE,
                 com.kolodkingal.enhanced.balance.BalanceSyncPayload.STREAM_CODEC,

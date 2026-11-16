@@ -21,6 +21,8 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> MIND_STONE = key("mind_stone");
     public static final ResourceKey<DamageType> SPEED_BLITZ = key("speed_blitz");
     public static final ResourceKey<DamageType> MIND_STONE_BEAM = key("mind_stone_beam");
+    /** (3.16) Solar Jewel Vision's light: the Solar Beam, the Overload and the infrared eye beams. */
+    public static final ResourceKey<DamageType> SOLAR_BEAM = key("solar_beam");
     public static final ResourceKey<DamageType> MOLECULAR_ACCELERATION = key("molecular_acceleration");
     public static final ResourceKey<DamageType> MJOLNIR = key("mjolnir");
     public static final ResourceKey<DamageType> STORMBREAKER = key("stormbreaker");

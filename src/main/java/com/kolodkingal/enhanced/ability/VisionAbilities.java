@@ -54,6 +54,15 @@ public final class VisionAbilities {
      * explicitly, as a custom hero's key router calls it). None of Vision's keys has one.
      */
     static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        // (3.16) Solar Jewel Vision: the jewel's beam and Overload on R, the eye beams on N
+        boolean solar = SolarJewel.solar(data);
+        if (solar && ability == 1 && SolarJewel.onBeamKey(player, data, down, alt)) {
+            return;
+        }
+        if (solar && ability == 5 && !alt) {
+            SolarJewel.onEyesKey(player, data, down);
+            return;
+        }
         switch (ability) {
             case 1 -> {
                 boolean start = down && !player.isSpectator() && !data.visionPhased();
@@ -113,9 +122,18 @@ public final class VisionAbilities {
         if (phased) {
             phaseTick(player, data);
         }
+        // (3.16) the Solar Jewel: the sun, the eye beams, the Overload
+        boolean solar = SolarJewel.solar(data);
+        if (solar) {
+            SolarJewel.tick(player, data);
+        } else {
+            SolarJewel.end(player, data);
+        }
         if (data.beamActive() && data.has(HeroAbility.VISION_MIND_BEAM)) {
             if (phased) {
                 data.setBeamActive(false);
+            } else if (solar) {
+                SolarJewel.beamTick(player, data);
             } else {
                 beamTick(player);
             }

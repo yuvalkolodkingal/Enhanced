@@ -332,6 +332,8 @@ public final class EnhancedConfig {
         VISION_FLIGHT_SPEED = BUILDER.defineInRange("flightSpeed", 0.08, 0.01, 0.5);
         MIND_STONE_BEAM_DAMAGE = BUILDER.comment("Damage per hit of the Mind Stone beam (two hits per second at most).")
                 .defineInRange("mindStoneBeamDamage", 6.0, 0.0, 100.0);
+        // (3.16) Solar Jewel Vision: [vision.solar_jewel]
+        com.kolodkingal.enhanced.config.SolarJewelConfig.define(BUILDER);
         BUILDER.pop();
 
         BUILDER.push("quicksilver");

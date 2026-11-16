@@ -5161,5 +5161,16 @@
   "commands.enhanced.balance.overrides": "Overrides:",
   "commands.enhanced.balance.preset.full": "full",
   "commands.enhanced.balance.preset.balanced": "balanced",
-  "commands.enhanced.balance.preset.hardcore": "hardcore"
+  "commands.enhanced.balance.preset.hardcore": "hardcore",
+  "message.enhanced.solar.empty": "The Solar Jewel is out of light: stand in the sun to fill it",
+  "message.enhanced.solar.drained": "The Solar Jewel is drained: %s s before it can overload again",
+  "message.enhanced.solar.overload_low": "Not enough light to overload: %s%% of %s%%",
+  "death.attack.enhanced.solar_beam": "%1$s was burned away by solar light",
+  "death.attack.enhanced.solar_beam.player": "%1$s was burned away by %2$s's Solar Jewel",
+  "death.attack.enhanced.solar_beam.item": "%1$s was burned away by %2$s's Solar Jewel",
+  "ability.enhanced.vision.solar.1": "Solar Beam (Sneak: Jewel Overload)",
+  "ability.enhanced.vision.solar.5": "Infrared Eye Beams (Sneak: Mind Palace)",
+  "hud.enhanced.solar.charge": "Solar Jewel %s%%",
+  "commands.enhanced.build.materials.on": "Build Magic takes its blocks from the inventory (in Survival): one item per block, and vanished blocks go back into it.",
+  "commands.enhanced.build.materials.off": "Build Magic conjures its blocks from magic: the inventory is not used."
 }

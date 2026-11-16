@@ -290,6 +290,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedInEvent
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onLogin
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onLogin
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogin
+    NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onLogin
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerLoggedOutEvent
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.school.LabEvents#onLogout
@@ -317,6 +318,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEven
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onLogout
+    NORMAL - com.kolodkingal.enhanced.ability.SolarJewel#onLogout
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerRespawnEvent
     HIGH - com.kolodkingal.enhanced.death.DeathMeeting#onRespawn
     NORMAL - com.kolodkingal.enhanced.vormir.VormirEvents#onRespawn
@@ -433,6 +435,7 @@ event net.neoforged.neoforge.event.server.ServerStartingEvent -> com.kolodkingal
     HIGH - com.kolodkingal.enhanced.boss.ArenaJournalWriter#onServerStarting
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onServerStarting
     NORMAL - com.kolodkingal.enhanced.ultron.SokoviaEvents#onServerStarting
+    NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onServerStarting
 event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppedEvent
     NORMAL - com.kolodkingal.enhanced.asgard.AsgardRules#onServerStopped
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onServerStopped
@@ -462,6 +465,7 @@ event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onStopped
+    NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onServerStopped
     LOWEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStoppingEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppingEvent
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onServerStopping
@@ -1029,6 +1033,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedInEvent
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onLogin
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onLogin
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogin
+    NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onLogin
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerLoggedOutEvent
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.school.LabEvents#onLogout
@@ -1056,6 +1061,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEven
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onLogout
+    NORMAL - com.kolodkingal.enhanced.ability.SolarJewel#onLogout
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerRespawnEvent
     HIGH - com.kolodkingal.enhanced.death.DeathMeeting#onRespawn
     NORMAL - com.kolodkingal.enhanced.vormir.VormirEvents#onRespawn
@@ -1175,6 +1181,7 @@ event net.neoforged.neoforge.event.server.ServerStartingEvent -> com.kolodkingal
     HIGH - com.kolodkingal.enhanced.boss.ArenaJournalWriter#onServerStarting
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onServerStarting
     NORMAL - com.kolodkingal.enhanced.ultron.SokoviaEvents#onServerStarting
+    NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onServerStarting
 event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppedEvent
     NORMAL - com.kolodkingal.enhanced.asgard.AsgardRules#onServerStopped
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onServerStopped
@@ -1204,6 +1211,7 @@ event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onStopped
+    NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onServerStopped
     LOWEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStoppingEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppingEvent
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onServerStopping

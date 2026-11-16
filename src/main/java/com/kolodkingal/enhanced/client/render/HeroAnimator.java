@@ -392,6 +392,10 @@ public final class HeroAnimator {
                 && !data.shrapnelActive();
         on[Stance.BILLY_FREEZE.ordinal()] = data.has(HeroAbility.BILLY_FREEZE) && data.is(Live.FREEZING);
         on[Stance.VISION_BEAM.ordinal()] = data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive();
+        // (3.16) Solar Jewel Vision
+        on[Stance.SOLAR_EYES.ordinal()] = data.is(Live.SOLAR_EYES);
+        on[Stance.SOLAR_GATHER.ordinal()] = data.is(Live.SOLAR_GATHERING);
+        on[Stance.SOLAR_OVERLOAD.ordinal()] = data.is(Live.SOLAR_OVERLOAD);
         on[Stance.BEAM_WANDA.ordinal()] = data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive();
         on[Stance.SHIELD_WANDA.ordinal()] = data.has(HeroAbility.WANDA_CHAOS_SHIELD) && data.chaosShieldActive();
         on[Stance.THOR_BEAM.ordinal()] = data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING);

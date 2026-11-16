@@ -179,6 +179,11 @@ public final class WorldEffectsRenderer {
             renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS.of(player, HeroAbility.WANDA_CHAOS_BEAM),
                     WandaAbilities.beamTargets(player), pose, beams, camera, partialTick, time);
         }
+        // (3.16) Solar Jewel Vision: his own light (the Solar Beam, the eye beams, the Overload, the sun drunk in)
+        if (com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
+            SolarJewelFx.render(mc, player, data, pose, beams, camera, partialTick, time);
+            return;
+        }
         if (data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive()) {
             Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION : MIND_STONE;
             renderBeam(mc, player, foreheadPosition(mc, player, partialTick),

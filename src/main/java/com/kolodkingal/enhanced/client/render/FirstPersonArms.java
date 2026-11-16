@@ -268,6 +268,21 @@ public final class FirstPersonArms {
         if (custom) {
             customStances(s, m, o, age, calm);
         }
+        // (3.16) Solar Jewel Vision's hands in first person
+        float sw;
+        if ((sw = s.stance(Stance.SOLAR_EYES)) > 0.001F) {
+            m.add(sw, 0.06F, 0.40F, 0.02F, -62, 14, 6);
+        }
+        if ((sw = s.stance(Stance.SOLAR_GATHER)) > 0.001F) {
+            // both hands rise to the edges of the view, open to the light
+            both(sw, -0.18F, 0.42F, 0.10F, -58, 16, 0);
+            tremble(m, o, sw, 0.014F, 2.2F, age, calm);
+        }
+        if ((sw = s.stance(Stance.SOLAR_OVERLOAD)) > 0.001F) {
+            // thrown down and back out of the view by the blast
+            both(sw, 0.10F, -0.30F, -0.12F, 30, 0, 0);
+            tremble(m, o, sw, 0.02F, 3.0F, age, calm);
+        }
 
         // ---- the heroes of 3.0 ----
         HeroClient hero = HeroClients.of(s.power);

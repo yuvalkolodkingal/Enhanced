@@ -651,6 +651,8 @@ public final class GestureRoutes {
                     + " SHIELD_ON plays FALCON_SHIELD";
             case FALCON_GLIDING -> "vanilla's fall-flying turns the body; the stance FALCON_GLIDE holds the arms out"
                     + " along the wings, which the wings' layer lays flat";
+            // (3.16) Solar Jewel Vision
+            case SOLAR_EYES, SOLAR_GATHERING, SOLAR_OVERLOAD -> "stances (SOLAR_EYES, SOLAR_GATHER, SOLAR_OVERLOAD); the light is SolarJewelFx's";
         };
     }
 

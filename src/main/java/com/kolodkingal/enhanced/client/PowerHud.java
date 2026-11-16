@@ -108,7 +108,7 @@ public class PowerHud implements LayeredDraw.Layer {
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
                     .withStyle(ChatFormatting.YELLOW)
-                    .append(Component.translatable(power.abilityKey(i)).withStyle(ChatFormatting.WHITE));
+                    .append(Component.translatable(abilityKey(data, power, i)).withStyle(ChatFormatting.WHITE));
             Component status = status(player, data, i, now);
             if (status != null) {
                 line.append(Component.literal("  ")).append(status);
@@ -192,7 +192,7 @@ public class PowerHud implements LayeredDraw.Layer {
         model.sneaking = false;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             model.rows.add(new PowerPanels.Row(KeyBindings.ability(i).getTranslatedKeyMessage(),
-                    panelSlot(Component.translatable(power.abilityKey(i)), status(player, data, i, now), data, i, now)
+                    panelSlot(Component.translatable(abilityKey(data, power, i)), status(player, data, i, now), data, i, now)
                             .withIcon(symbol(power.abilityKey(i))), null));
         }
         Power builder = BuildClient.hero(player);
@@ -235,7 +235,22 @@ public class PowerHud implements LayeredDraw.Layer {
         return new PowerPanels.Slot(name, status, left > 0 ? left / 20.0F : 0.0F, on, -1, 0, null);
     }
 
+    /** The name of a key's ability: the hero's, or (3.16) Solar Jewel Vision's own on R and N. */
+    private static String abilityKey(PowerData data, Power power, int ability) {
+        if ((ability == 1 || ability == 5) && com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
+            return "ability.enhanced.vision.solar." + ability;
+        }
+        return power.abilityKey(ability);
+    }
+
     private static Component status(LocalPlayer player, PowerData data, int ability, long now) {
+        // (3.16) Solar Jewel Vision's R shows the light stored in his jewel
+        if (ability == 1 && com.kolodkingal.enhanced.power.VisionQuest.solar(data) && com.kolodkingal.enhanced.EnhancedConfig.SPEC.isLoaded()) {
+            int percent = Math.round(100.0F * data.ironCharge()
+                    / Math.max(1, com.kolodkingal.enhanced.config.SolarJewelConfig.MAX_CHARGE.get()));
+            return Component.translatable("hud.enhanced.solar.charge", percent)
+                    .withStyle(percent >= 40 ? ChatFormatting.GOLD : ChatFormatting.RED);
+        }
         // The heroes of 3.0 say for themselves (by default: the cooldown, as below).
         HeroClient hero = HeroClients.of(data.power());
         if (hero != null) {

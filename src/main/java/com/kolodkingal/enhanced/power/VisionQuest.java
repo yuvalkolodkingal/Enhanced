@@ -10,9 +10,23 @@ public final class VisionQuest {
     private VisionQuest() {
     }
 
-    /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, Phase, Density). */
+    /** Whether {@code variant} wears the VisionQuest suit: the look itself, and (3.15) the Source Code. */
+    public static boolean suit(String variant) {
+        return LOOK.equals(variant) || "source_code".equals(variant);
+    }
+
+    /**
+     * (3.16) Whether this is Solar Jewel Vision: Vision as his Source Code, powered by the Solar Jewel in his brow (the
+     * Source Code look is Solar Jewel Vision; the plain VisionQuest look keeps the Mind Stone's powers).
+     */
+    public static boolean solar(PowerData data) {
+        return data.power() == Power.VISION && "source_code".equals(data.variant());
+    }
+
+    /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, Phase, Density, the solar ones). */
     public static boolean eyesLit(PowerData data) {
-        return data.power() == Power.VISION && (LOOK.equals(data.variant()) || "source_code".equals(data.variant())) && !data.disguise()
-                && (data.beamActive() || data.visionPhased() || data.dense());
+        return solar(data) && !data.disguise()
+                && (data.beamActive() || data.visionPhased() || data.dense() || data.is(Live.SOLAR_EYES)
+                || data.is(Live.SOLAR_GATHERING) || data.is(Live.SOLAR_OVERLOAD));
     }
 }

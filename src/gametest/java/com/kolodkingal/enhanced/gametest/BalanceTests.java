@@ -85,8 +85,9 @@ public final class BalanceTests {
             Balance.apply(Balance.Preset.HARDCORE, Map.of());
             check(now("spider_man", "webShotRange") == Math.round(raw("spider_man", "webShotRange") * 0.5),
                     "hardcore: Spider-Man at half");
-            check(now("build_magic_wanda", "repeatMax") == raw("build_magic_billy", "repeatMax"),
-                    "hardcore: Wanda's repeats as an Apprentice Billy's");
+            check(now("build_magic_wanda", "repeatMax") == now("build_magic_billy", "repeatMax"),
+                    "hardcore: Wanda's repeats as an Apprentice Billy's (his hardcore ones): "
+                    + now("build_magic_wanda", "repeatMax") + " / " + now("build_magic_billy", "repeatMax"));
             check(now("magneto", "telekinesisRange") >= 1, "never removed: " + now("magneto", "telekinesisRange"));
 
             // an override wins over the preset, and lifts the cap of what it overrides

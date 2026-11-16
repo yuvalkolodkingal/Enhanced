@@ -40,6 +40,7 @@ import java.util.UUID;
  * /enhanced build rank &lt;player&gt; [1-4]         Billy's rank and practice; with a number, sets it
  * /enhanced build meter &lt;player&gt; &lt;value&gt;      sets Billy's meter (0 to its top)
  * /enhanced build forget &lt;player&gt;             clears his history and his pocket, in memory and on disk
+ * /enhanced build materials [on|off]          (3.16) whether Wanda's and Billy's spells take their blocks from the inventory
  * </pre>
  */
 public final class BuildCommands {
@@ -74,7 +75,30 @@ public final class BuildCommands {
                                                 IntegerArgumentType.getInteger(ctx, "value"))))))
                 .then(Commands.literal("forget")
                         .then(Commands.argument("player", EntityArgument.player())
-                                .executes(ctx -> forget(ctx.getSource(), EntityArgument.getPlayer(ctx, "player")))));
+                                .executes(ctx -> forget(ctx.getSource(), EntityArgument.getPlayer(ctx, "player")))))
+                // (3.16) the inventory's blocks for Wanda's and Billy's spells, on or off, at once and for everyone
+                .then(Commands.literal("materials")
+                        .executes(ctx -> materials(ctx.getSource(), null))
+                        .then(Commands.literal("on").executes(ctx -> materials(ctx.getSource(), true)))
+                        .then(Commands.literal("off").executes(ctx -> materials(ctx.getSource(), false))));
+    }
+
+    /**
+     * (3.16) {@code requireMaterials}: on, a Survival player's spells (Wanda's and Billy's) take one item per block from
+     * his inventory; off, they conjure their blocks from magic. Saved in the server config and sent to every player.
+     */
+    private static int materials(CommandSourceStack source, Boolean on) {
+        if (on != null) {
+            com.kolodkingal.enhanced.config.BuildConfig.REQUIRE_MATERIALS.set(on);
+            com.kolodkingal.enhanced.config.BuildConfig.REQUIRE_MATERIALS.save();
+            com.kolodkingal.enhanced.platform.net.Net.sendToAllPlayers(new BuildMaterialsPayload(on));
+        }
+        boolean now = com.kolodkingal.enhanced.config.BuildConfig.REQUIRE_MATERIALS.get();
+        source.sendSuccess(() -> Component.translatableWithFallback(
+                now ? "commands.enhanced.build.materials.on" : "commands.enhanced.build.materials.off",
+                now ? "Build Magic takes its blocks from the inventory (in Survival): one item per block, and vanished blocks go back into it."
+                        : "Build Magic conjures its blocks from magic: the inventory is not used."), on != null);
+        return now ? 1 : 0;
     }
 
     private static final SimpleCommandExceptionType UNKNOWN_PLAYER = new SimpleCommandExceptionType(

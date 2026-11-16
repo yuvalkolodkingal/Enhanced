@@ -147,6 +147,41 @@ final class Stances {
             c.occupy(true, w);
             c.occupy(false, w);
         }
+        // (3.16) Solar Jewel Vision
+        if ((w = st.stance(Stance.SOLAR_EYES)) > 0.001F) {
+            // a hand at his temple guiding the beams, the other braced, the chin a little down along them
+            c.arm(true, StancePoses.CYCLOPS_BLAST_M[0], StancePoses.CYCLOPS_BLAST_M[1], StancePoses.CYCLOPS_BLAST_M[2], w);
+            c.arm(false, -12, 12, -16, w);
+            c.tremble(true, 0.7F, 2.2F, w);
+            c.head(6, 0, 0, w);
+            c.occupy(true, w);
+        }
+        if ((w = st.stance(Stance.SOLAR_GATHER)) > 0.001F) {
+            // open to the sun: the arms wide and raised, the head thrown back, shaking more as the light grows
+            c.arm(true, -150, 12, 38, w);
+            c.arm(false, -150, -12, -38, w);
+            c.tremble(true, 2.4F, 2.6F, w);
+            c.tremble(false, 2.4F, 2.4F, w);
+            c.head(-26, 0, 0, w);
+            float planted = w * (1.0F - st.wAir);
+            c.leg(true, -10, 6, planted);
+            c.leg(false, 10, -6, planted);
+            c.occupy(true, w);
+            c.occupy(false, w);
+        }
+        if ((w = st.stance(Stance.SOLAR_OVERLOAD)) > 0.001F) {
+            // it pours from his brow: the arms flung back and open, the chest and head driven forward, the feet braced wide
+            c.arm(true, 38, 0, 42, w);
+            c.arm(false, 38, 0, -42, w);
+            c.tremble(true, 3.2F, 3.0F, w);
+            c.tremble(false, 3.2F, 3.1F, w);
+            c.head(10, 0, 0, w);
+            float planted = w * (1.0F - st.wAir);
+            c.leg(true, -16, 8, planted);
+            c.leg(false, 16, -8, planted);
+            c.occupy(true, w);
+            c.occupy(false, w);
+        }
         if ((w = st.stance(Stance.VISION_BEAM)) > 0.001F) {
             // The stone fires from his forehead: chest out, chin up, the arms pulled back.
             if ("white_vision".equals(st.look)) {
@@ -295,6 +330,8 @@ final class Stances {
         lean += -5.0F * st.stance(Stance.TK_STRAIN);
         lean += StancePoses.SHIELD_WANDA_LEAN * st.stance(Stance.SHIELD_WANDA);
         lean += ("white_vision".equals(st.look) ? -6.0F : -3.0F) * st.stance(Stance.VISION_BEAM);
+        // (3.16) the Overload's recoil leans him back; gathering, he arches
+        lean += -9.0F * st.stance(Stance.SOLAR_OVERLOAD) - 5.0F * st.stance(Stance.SOLAR_GATHER);
         lean += (st.weaponKind > 0 ? 6.0F : 4.0F) * st.stance(Stance.THOR_BEAM);
         lean += 10.0F * st.stance(Stance.TOMMY_WHIRL);
         lean += 2.0F * st.stance(Stance.NOISE);

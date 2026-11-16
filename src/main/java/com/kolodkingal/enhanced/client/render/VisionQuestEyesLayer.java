@@ -25,6 +25,8 @@ import java.util.Map;
 public class VisionQuestEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     private static final String LOOK = com.kolodkingal.enhanced.power.VisionQuest.LOOK;
     private static final RenderType EYES = RenderType.eyes(Enhanced.id("textures/entity/suit/vision_visionquest_eyes.png"));
+    /** (3.16) The Solar Jewel in his brow (the four gold pixels inside the plate). */
+    private static final RenderType JEWEL = RenderType.eyes(Enhanced.id("textures/entity/suit/vision_solar_jewel.png"));
     /** Per player: how strong the glow is (0 to 1) and when it was last drawn. */
     private static final Map<Integer, float[]> SHOWN = new HashMap<>();
 
@@ -36,9 +38,23 @@ public class VisionQuestEyesLayer extends RenderLayer<AbstractClientPlayer, Play
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
-        if (data.power() != Power.VISION || !LOOK.equals(data.variant()) || player.isInvisible()) {
+        if (data.power() != Power.VISION || !com.kolodkingal.enhanced.power.VisionQuest.suit(data.variant()) || player.isInvisible()) {
             SHOWN.remove(player.getId());
             return;
+        }
+        // (3.16) Solar Jewel Vision: the jewel glows with the light it holds, and blazes as it overloads
+        if (com.kolodkingal.enhanced.power.VisionQuest.solar(data) && !data.disguise()) {
+            float t0 = player.tickCount + partialTicks;
+            float max = com.kolodkingal.enhanced.EnhancedConfig.SPEC.isLoaded()
+                    ? com.kolodkingal.enhanced.config.SolarJewelConfig.MAX_CHARGE.get() : 1000.0F;
+            float fill = Mth.clamp(data.ironCharge() / max, 0.0F, 1.0F);
+            float jewel = 0.25F + 0.6F * fill + 0.15F * Mth.sin(t0 * 0.12F);
+            if (data.is(com.kolodkingal.enhanced.power.Live.SOLAR_GATHERING) || data.is(com.kolodkingal.enhanced.power.Live.SOLAR_OVERLOAD)
+                    || data.beamActive()) {
+                jewel = 1.0F;
+            }
+            int jg = Math.round(255.0F * Mth.clamp(jewel, 0.0F, 1.0F));
+            GlowingEyesLayer.drawEyes(poseStack, buffer, getParentModel(), JEWEL, 0xFF000000 | jg << 16 | jg << 8 | jg);
         }
         boolean on = com.kolodkingal.enhanced.power.VisionQuest.eyesLit(data);
         float t = player.tickCount + partialTicks;

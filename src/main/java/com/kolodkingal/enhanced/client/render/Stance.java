@@ -23,6 +23,12 @@ public enum Stance {
     MAG_CATCH(1, 3, true),
     BILLY_FREEZE(2, 4, true),
     VISION_BEAM(2, 3, true),
+    /** 3.16: Solar Jewel Vision's eye beams: a hand at his temple, the other braced, the chin down along the beams. */
+    SOLAR_EYES(1.5F, 3, true),
+    /** 3.16: the light gathers in his jewel: the arms open wide and up to the sun, the head back, trembling. */
+    SOLAR_GATHER(2, 4, true),
+    /** 3.16: the Overload pours out: the arms flung back, chest and brow thrust forward, shaking with it. */
+    SOLAR_OVERLOAD(1, 6, true),
     BEAM_WANDA(1.2F, 3, true),
     SHIELD_WANDA(1.5F, 3, true),
     THOR_BEAM(1, 3, true),

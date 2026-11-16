@@ -220,6 +220,13 @@ public enum Live {
     FALCON_WING_SHIELD,
     /** Falcon glides on his wings (Sneak + G: the elytra's flight). */
     FALCON_GLIDING,
+    // ===== solar jewel vision (3.16) =====
+    /** Solar Jewel Vision's infrared eye beams are on (N held). */
+    SOLAR_EYES,
+    /** The light gathers in his jewel before the Overload (Sneak + R). */
+    SOLAR_GATHERING,
+    /** The Overload's great beam pours from his jewel. */
+    SOLAR_OVERLOAD,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */
