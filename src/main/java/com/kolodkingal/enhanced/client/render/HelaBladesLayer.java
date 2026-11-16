@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hela.HelaRules;
 import com.kolodkingal.enhanced.power.Live;
@@ -42,14 +43,15 @@ public class HelaBladesLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         boolean grasping = data.is(Live.HELA_GRASPING);
         boolean rightMain = player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT;
         if (player.getItemBySlot(rightMain ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND).isEmpty() && !(grasping && rightMain)) {
-            draw(poseStack, buffer, packedLight, getParentModel().rightArm, true);
+            draw(poseStack, buffer, packedLight, getParentModel().rightArm, true, player);
         }
         if (player.getItemBySlot(rightMain ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND).isEmpty() && !(grasping && !rightMain)) {
-            draw(poseStack, buffer, packedLight, getParentModel().leftArm, false);
+            draw(poseStack, buffer, packedLight, getParentModel().leftArm, false, player);
         }
     }
 
-    private void draw(PoseStack poseStack, MultiBufferSource buffer, int light, ModelPart arm, boolean right) {
+    private void draw(PoseStack poseStack, MultiBufferSource buffer, int light, ModelPart arm, boolean right,
+                      AbstractClientPlayer player) {
         poseStack.pushPose();
         arm.translateAndRotate(poseStack);
         poseStack.translate((right ? -1.0F : 1.0F) / 16.0F, 10.0F / 16.0F, -1.0F / 16.0F);
@@ -58,7 +60,8 @@ public class HelaBladesLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         poseStack.scale(0.85F, 0.85F, 0.85F);
         blade.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(NecroswordModel.TEXTURE)), light, OverlayTexture.NO_OVERLAY, -1);
         blade.renderEdges(poseStack, buffer.getBuffer(RenderType.entityTranslucentEmissive(NecroswordModel.TEXTURE)), OverlayTexture.NO_OVERLAY,
-                EnergyGeometry.argb(HelaRules.PALE, 0.85F));
+                // (3.16) a custom hero's colour
+                EnergyGeometry.argb(AbilityColors.shade(player, HeroAbility.HELA_GODDESS, HelaRules.PALE), 0.85F));
         poseStack.popPose();
     }
 }

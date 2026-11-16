@@ -3,6 +3,8 @@ package com.kolodkingal.enhanced.client.render;
 import com.kolodkingal.enhanced.ability.AgathaAbilities;
 import com.kolodkingal.enhanced.ability.AgathaShield;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -116,11 +118,19 @@ final class AgathaActing {
                 motes(player, HumanoidArm.RIGHT, 5, 0.6F, 0.01);
                 motes(player, HumanoidArm.LEFT, 5, 0.6F, 0.01);
             }
-            case AGATHA_RUNES -> motes(player, HumanoidArm.RIGHT, 10, 0.7F, 0.03);
+            case AGATHA_RUNES -> {
+                // (3.16) a custom hero's colour
+                runeMotes = true;
+                motes(player, HumanoidArm.RIGHT, 10, 0.7F, 0.03);
+                runeMotes = false;
+            }
             default -> {
             }
         }
     }
+
+    /** (3.16) a custom hero's colour: whether the motes being thrown are the Runes' (in the colour chosen for them). */
+    private static boolean runeMotes;
 
     /** A few violet motes off a hand (smaller in the local player's own first-person view). */
     private static void motes(AbstractClientPlayer player, HumanoidArm side, int count, float size, double speed) {
@@ -139,6 +149,9 @@ final class AgathaActing {
         RandomSource random = level.random;
         for (int i = 0; i < count; i++) {
             int colour = i % 3 == 0 ? AgathaAbilities.LILAC : AgathaAbilities.VIOLET;
+            if (runeMotes) {
+                colour = AbilityColors.shade(player, HeroAbility.AGATHA_RUNES, colour);
+            }
             level.addParticle(new EnergyParticleOptions(colour, scale), hand.x + (random.nextDouble() - 0.5) * 0.2, hand.y + (random.nextDouble() - 0.5) * 0.2,
                     hand.z + (random.nextDouble() - 0.5) * 0.2, (random.nextDouble() - 0.5) * speed, 0.01 + random.nextDouble() * speed,
                     (random.nextDouble() - 0.5) * speed);

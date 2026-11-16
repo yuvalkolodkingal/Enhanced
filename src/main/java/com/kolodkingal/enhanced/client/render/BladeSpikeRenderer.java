@@ -37,7 +37,7 @@ public class BladeSpikeRenderer extends EntityRenderer<BladeSpikeEntity> {
         float height = spike.height(time);
         int delay = spike.delay();
         if (time < delay + 2.0F) {
-            cracks(poseStack, buffer, time, delay);
+            cracks(poseStack, buffer, time, delay, spike);
         }
         if (height > 0.001F) {
             float scale = spike.style() == 1 ? RING_SCALE : WALL_SCALE;
@@ -53,21 +53,23 @@ public class BladeSpikeRenderer extends EntityRenderer<BladeSpikeEntity> {
             model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(NecroswordModel.TEXTURE)), packedLight,
                     OverlayTexture.NO_OVERLAY, -1);
             model.renderEdges(poseStack, buffer.getBuffer(RenderType.entityTranslucentEmissive(NecroswordModel.TEXTURE)), OverlayTexture.NO_OVERLAY,
-                    EnergyGeometry.argb(HelaRules.PALE, 0.85F * height));
+                    EnergyGeometry.argb(spike.shade(HelaRules.PALE), 0.85F * height)); // (3.16) a custom hero's colour
             poseStack.popPose();
         }
         super.render(spike, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     /** The cracks: six rays of green light on the floor, growing to the spike's moment, flickering. */
-    private static void cracks(PoseStack poseStack, MultiBufferSource buffer, float time, int delay) {
+    private static void cracks(PoseStack poseStack, MultiBufferSource buffer, float time, int delay, BladeSpikeEntity spike) {
         float grow = delay <= 0 ? 1.0F : Mth.clamp(time / delay, 0.0F, 1.0F);
         float flash = time > delay ? Math.max(0.0F, 1.0F - (time - delay) / 2.0F) : 0.0F;
         float alpha = (0.35F + 0.4F * grow) * (0.8F + 0.2F * Mth.sin(time * 2.1F)) + flash * 0.6F;
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         Matrix4f m = poseStack.last().pose();
-        int bright = EnergyGeometry.argb(HelaRules.GREEN, Math.min(1.0F, alpha));
-        int dim = EnergyGeometry.argb(HelaRules.GREEN, 0.0F);
+        // (3.16) a custom hero's colour
+        int green = spike.shade(HelaRules.GREEN);
+        int bright = EnergyGeometry.argb(green, Math.min(1.0F, alpha));
+        int dim = EnergyGeometry.argb(green, 0.0F);
         float y = 0.03F;
         for (int i = 0; i < 6; i++) {
             float a = i * Mth.TWO_PI / 6.0F + (i % 2) * 0.3F;

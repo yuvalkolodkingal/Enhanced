@@ -65,7 +65,8 @@ public final class StrangeSpellFx {
     private record Whip(int caster, Vec3 end, int step, long start) {
     }
 
-    private record Bands(int target, long start, int ticks) {
+    // (3.16) a custom hero's colour: the caster, for the colour of his Bands
+    private record Bands(int target, int caster, long start, int ticks) {
     }
 
     private record Dome(int caster, Vec3 at, float radius, long start, int ticks) {
@@ -124,13 +125,16 @@ public final class StrangeSpellFx {
                     play(who, p.arg() == 2 ? GestureId.STRANGE_WHIP_2 : p.arg() == 3 ? GestureId.STRANGE_WHIP_3
                             : GestureId.STRANGE_WHIP_1);
                 }
-                sparks(level, first, StrangeAbilities.ORANGE, 8, 0.15);
+                // (3.16) a custom hero's colour
+                sparks(level, first, who, p.arg() == StrangeSignals.GRAPPLE ? HeroAbility.STRANGE_WHIP_GRAPPLE
+                        : HeroAbility.STRANGE_WHIP, StrangeAbilities.ORANGE, 8, 0.15);
             }
             case StrangeFxPayload.BANDS -> {
                 int ticks = pts.size() > 1 ? (int) pts.get(1).x : 80;
-                BANDS.add(new Bands(p.arg(), now, ticks));
+                BANDS.add(new Bands(p.arg(), p.entityId(), now, ticks));
                 play(who, GestureId.STRANGE_BANDS);
-                sparks(level, first.add(0, 1, 0), StrangeAbilities.CRIMSON, 14, 0.2);
+                // (3.16) a custom hero's colour
+                sparks(level, first.add(0, 1, 0), who, HeroAbility.STRANGE_BANDS, StrangeAbilities.CRIMSON, 14, 0.2);
             }
             case StrangeFxPayload.SHIELD -> {
                 if (p.arg() == 2) {
@@ -144,13 +148,15 @@ public final class StrangeSpellFx {
             case StrangeFxPayload.DOME -> {
                 if (p.arg() < 0) {
                     RINGS.add(new Rings(p.entityId(), first, now, -p.arg(), false));
-                    sparks(level, first, StrangeAbilities.TIME_GREEN, 30, 0.25);
+                    // (3.16) a custom hero's colour
+                    sparks(level, first, who, HeroAbility.STRANGE_EYE, StrangeAbilities.TIME_GREEN, 30, 0.25);
                 } else {
                     float radius = pts.size() > 1 ? (float) pts.get(1).x / 10.0F : 4.0F;
                     DOMES.add(new Dome(p.entityId(), first, radius, now, p.arg()));
                     seen(p.entityId()).domeUntil = now + p.arg();
                     play(who, GestureId.STRANGE_DOME);
-                    sparks(level, first, StrangeAbilities.ORANGE, 30, 0.3);
+                    // (3.16) a custom hero's colour
+                    sparks(level, first, who, HeroAbility.STRANGE_SERAPHIM_DOME, StrangeAbilities.ORANGE, 30, 0.3);
                 }
             }
             case StrangeFxPayload.PORTAL_OPEN -> {
@@ -159,16 +165,20 @@ public final class StrangeSpellFx {
                     play(who, GestureId.STRANGE_SLING);
                 }
                 for (Vec3 at : pts) {
-                    sparks(level, at, StrangeAbilities.ORANGE, 24, 0.25);
+                    // (3.16) a custom hero's colour
+                    sparks(level, at, who, HeroAbility.STRANGE_PORTAL, StrangeAbilities.ORANGE, 24, 0.25);
                 }
             }
             case StrangeFxPayload.PORTAL_CLOSE -> {
                 for (Vec3 at : pts) {
-                    sparks(level, at, StrangeAbilities.GOLD, 12, 0.12);
+                    // (3.16) a custom hero's colour
+                    sparks(level, at, who, HeroAbility.STRANGE_PORTAL, StrangeAbilities.GOLD, 12, 0.12);
                 }
             }
             case StrangeFxPayload.ASTRAL_OUT, StrangeFxPayload.ASTRAL_IN ->
-                    sparks(level, first.add(0, 1.0, 0), StrangeAbilities.ASTRAL_BLUE, 20, 0.12);
+                    // (3.16) a custom hero's colour
+                    sparks(level, first.add(0, 1.0, 0), who, HeroAbility.STRANGE_ASTRAL, StrangeAbilities.ASTRAL_BLUE,
+                            20, 0.12);
             case StrangeFxPayload.MIRROR_ON -> MirrorView.open(p.entityId(), first, p.arg() / 10.0F, now);
             case StrangeFxPayload.MIRROR_OFF -> MirrorView.close(p.entityId());
             default -> {
@@ -184,9 +194,20 @@ public final class StrangeSpellFx {
 
     /** Sparks thrown out from a point. */
     static void sparks(ClientLevel level, Vec3 at, int color, int count, double speed) {
+        sparks(level, at, color, StrangeAbilities.GOLD, count, speed);
+    }
+
+    /** (3.16) a custom hero's colour: sparks of {@code row}'s spell, in the colour the caster chose for it. */
+    static void sparks(ClientLevel level, Vec3 at, Entity caster, HeroAbility row, int color, int count,
+                       double speed) {
+        sparks(level, at, AbilityColors.color(caster, row, color), AbilityColors.shade(caster, row,
+                StrangeAbilities.GOLD), count, speed);
+    }
+
+    private static void sparks(ClientLevel level, Vec3 at, int color, int gold, int count, double speed) {
         RandomSource r = level.random;
         for (int i = 0; i < count; i++) {
-            int c = i % 3 == 0 ? StrangeAbilities.GOLD : color;
+            int c = i % 3 == 0 ? gold : color;
             level.addParticle(new EnergyParticleOptions(c, 0.6F), at.x, at.y, at.z, r.nextGaussian() * speed,
                     r.nextGaussian() * speed, r.nextGaussian() * speed);
         }
@@ -292,7 +313,9 @@ public final class StrangeSpellFx {
             for (Dome d : DOMES) {
                 Vec3 c = domeCenter(level, d, partial).subtract(camera);
                 float fade = fade(time - d.start(), d.ticks());
-                EnergyGeometry.veil(pose, veil, c, d.radius(), 24, 12, StrangeAbilities.ORANGE, 0.03F * fade, 0.18F * fade);
+                // (3.16) a custom hero's colour
+                EnergyGeometry.veil(pose, veil, c, d.radius(), 24, 12, AbilityColors.color(level.getEntity(d.caster()),
+                        HeroAbility.STRANGE_SERAPHIM_DOME, StrangeAbilities.ORANGE), 0.03F * fade, 0.18F * fade);
             }
             buffers.endBatch(EnhancedRenderTypes.ENERGY_VEIL);
         }
@@ -350,17 +373,20 @@ public final class StrangeSpellFx {
             Vec3 p = hand.add(path.scale(f)).add(uv[0].scale(wave)).add(uv[1].scale(droop));
             points.add(p.subtract(camera));
         }
-        int color = colour(player, HeroAbility.STRANGE_WHIP, StrangeAbilities.ORANGE);
+        // (3.16) a custom hero's colour: the Grapple's own pick, and the gold core in it too
+        HeroAbility row = grapple ? HeroAbility.STRANGE_WHIP_GRAPPLE : HeroAbility.STRANGE_WHIP;
+        int color = colour(player, row, StrangeAbilities.ORANGE);
+        int gold = AbilityColors.shade(player, row, StrangeAbilities.GOLD);
         for (int i = 1; i < points.size(); i++) {
             // Segments of sparks: every other one a little brighter, as the film's chain of embers.
             float lit = (i % 2 == 0 ? 0.95F : 0.7F) * alpha;
             EnergyGeometry.ribbon(pose, vc, points.get(i - 1), points.get(i), 0.16F, EnergyGeometry.argb(color, lit),
                     EnergyGeometry.argb(color, lit));
             EnergyGeometry.ribbon(pose, vc, points.get(i - 1), points.get(i), 0.06F,
-                    EnergyGeometry.argb(StrangeAbilities.GOLD, alpha), EnergyGeometry.argb(StrangeAbilities.GOLD, alpha));
+                    EnergyGeometry.argb(gold, alpha), EnergyGeometry.argb(gold, alpha));
         }
         if (age < 1.0F && reach >= 0.99F) {
-            sparks(level, end, color, 3, 0.1);
+            sparks(level, end, color, gold, 3, 0.1);
         }
     }
 
@@ -380,6 +406,10 @@ public final class StrangeSpellFx {
         Vec3 base = new Vec3((box.minX + box.maxX) * 0.5, box.minY, (box.minZ + box.maxZ) * 0.5).subtract(camera);
         double h = box.getYsize();
         int segments = 24;
+        // (3.16) a custom hero's colour
+        Entity caster = level.getEntity(b.caster());
+        int crimson = AbilityColors.shade(caster, HeroAbility.STRANGE_BANDS, StrangeAbilities.CRIMSON);
+        int core = AbilityColors.shade(caster, HeroAbility.STRANGE_BANDS, 0xFF9A7A);
         for (int band = 0; band < 3; band++) {
             double y = h * (0.28 + 0.24 * band);
             double tilt = 0.12 * (band - 1);
@@ -390,10 +420,10 @@ public final class StrangeSpellFx {
                 Vec3 p0 = base.add(Math.cos(a0) * radius, y + Math.sin(a0) * tilt * radius, Math.sin(a0) * radius);
                 Vec3 p1 = base.add(Math.cos(a1) * radius, y + Math.sin(a1) * tilt * radius, Math.sin(a1) * radius);
                 float glint = 0.6F + 0.4F * Mth.sin((float) (s * 0.9 + time * 0.4));
-                EnergyGeometry.ribbon(pose, vc, p0, p1, 0.13F, EnergyGeometry.argb(StrangeAbilities.CRIMSON,
-                        alpha * 0.85F * glint), EnergyGeometry.argb(StrangeAbilities.CRIMSON, alpha * 0.85F * glint));
-                EnergyGeometry.ribbon(pose, vc, p0, p1, 0.04F, EnergyGeometry.argb(0xFF9A7A, alpha * 0.7F),
-                        EnergyGeometry.argb(0xFF9A7A, alpha * 0.7F));
+                EnergyGeometry.ribbon(pose, vc, p0, p1, 0.13F, EnergyGeometry.argb(crimson,
+                        alpha * 0.85F * glint), EnergyGeometry.argb(crimson, alpha * 0.85F * glint));
+                EnergyGeometry.ribbon(pose, vc, p0, p1, 0.04F, EnergyGeometry.argb(core, alpha * 0.7F),
+                        EnergyGeometry.argb(core, alpha * 0.7F));
             }
         }
     }
@@ -409,8 +439,10 @@ public final class StrangeSpellFx {
         int color = colour(p, HeroAbility.STRANGE_SHIELDS, StrangeAbilities.ORANGE);
         float flicker = 0.85F + 0.15F * Mth.sin(time * 0.7F);
         disc(pose, vc, center, look, r, time * 0.05F, EnergyGeometry.argb(color, 0.95F * flicker));
+        // (3.16) a custom hero's colour: the gold inner mandala too
         disc(pose, vc, center.add(look.scale(0.04)), look, r * 0.82F, -time * 0.08F,
-                EnergyGeometry.argb(StrangeAbilities.GOLD, 0.6F * flicker));
+                EnergyGeometry.argb(AbilityColors.shade(p, HeroAbility.STRANGE_SHIELDS, StrangeAbilities.GOLD),
+                        0.6F * flicker));
     }
 
     /** The Dome's centre: its caster's middle as he moves (where he was cast if he is gone). */
@@ -429,7 +461,8 @@ public final class StrangeSpellFx {
         float r = d.radius() * (0.4F + 0.6F * grow);
         float panel = r * 0.62F;
         Entity caster = level.getEntity(d.caster());
-        int color = caster instanceof Player p ? colour(p, HeroAbility.STRANGE_SHIELDS, StrangeAbilities.ORANGE)
+        // (3.16) a custom hero's colour: the Dome's own pick (its parent's when it has none)
+        int color = caster instanceof Player p ? colour(p, HeroAbility.STRANGE_SERAPHIM_DOME, StrangeAbilities.ORANGE)
                 : StrangeAbilities.ORANGE;
         for (int i = 0; i < DOME_PANELS.length; i++) {
             Vec3 n = DOME_PANELS[i];
@@ -447,11 +480,14 @@ public final class StrangeSpellFx {
         float alpha = fade(age, r.ticks());
         float dir = r.backward() ? -1.0F : 1.0F;
         Vec3 up = new Vec3(0, 1, 0);
+        // (3.16) a custom hero's colour
+        int green = AbilityColors.color(who, r.backward() ? HeroAbility.STRANGE_EYE_REWIND : HeroAbility.STRANGE_EYE,
+                StrangeAbilities.TIME_GREEN);
         for (int i = 0; i < 3; i++) {
             float size = (r.backward() ? 0.9F : 1.3F) + 0.35F * i - (r.backward() ? 0 : 0.3F * Mth.clamp(age / r.ticks(),
                     0, 1));
             Vec3 c = at.add(0, -0.6 + 0.6 * i, 0).subtract(camera);
-            disc(pose, vc, c, up, size, dir * time * (0.12F + 0.05F * i), EnergyGeometry.argb(StrangeAbilities.TIME_GREEN,
+            disc(pose, vc, c, up, size, dir * time * (0.12F + 0.05F * i), EnergyGeometry.argb(green,
                     0.85F * alpha));
         }
     }

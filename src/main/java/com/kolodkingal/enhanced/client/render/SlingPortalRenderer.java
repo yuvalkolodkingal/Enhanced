@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.strange.SlingPortalEntity;
 import com.kolodkingal.enhanced.strange.StrangeAbilities;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -59,6 +60,12 @@ public class SlingPortalRenderer extends EntityRenderer<SlingPortalEntity> {
         Vec3 center = new Vec3(0, SlingPortalEntity.CENTER_UP, 0);
         Vec3 normal = portal.normal();
         Matrix4f pose = poseStack.last().pose();
+        // (3.16) a custom hero's colour: every colour of the ring moved to the one he chose
+        int tint = portal.tint();
+        int swirl = tint < 0 ? SWIRL : AbilityColors.recolor(SWIRL, tint);
+        int armsColor = tint < 0 ? ARMS : AbilityColors.recolor(ARMS, tint);
+        int orange = tint < 0 ? StrangeAbilities.ORANGE : tint;
+        int gold = tint < 0 ? StrangeAbilities.GOLD : AbilityColors.recolor(StrangeAbilities.GOLD, tint);
         // The dark-gold swirl inside (it hides most of what is behind).
         VertexConsumer veil = buffers.getBuffer(EnhancedRenderTypes.ENERGY_VEIL);
         Vec3[] uv = StrangeSpellFx.basis(normal);
@@ -67,8 +74,8 @@ public class SlingPortalRenderer extends EntityRenderer<SlingPortalEntity> {
             double a1 = Math.PI * 2 * (s + 1) / SEGMENTS;
             Vec3 p0 = center.add(uv[0].scale(Math.cos(a0) * r)).add(uv[1].scale(Math.sin(a0) * r));
             Vec3 p1 = center.add(uv[0].scale(Math.cos(a1) * r)).add(uv[1].scale(Math.sin(a1) * r));
-            int mid = EnergyGeometry.argb(SWIRL, 0.82F * open);
-            int edge = EnergyGeometry.argb(ARMS, 0.55F * open);
+            int mid = EnergyGeometry.argb(swirl, 0.82F * open);
+            int edge = EnergyGeometry.argb(armsColor, 0.55F * open);
             veil.addVertex(pose, (float) center.x, (float) center.y, (float) center.z).setColor(mid);
             veil.addVertex(pose, (float) center.x, (float) center.y, (float) center.z).setColor(mid);
             veil.addVertex(pose, (float) p0.x, (float) p0.y, (float) p0.z).setColor(edge);
@@ -76,17 +83,19 @@ public class SlingPortalRenderer extends EntityRenderer<SlingPortalEntity> {
         }
         // The swirl's turning arms.
         VertexConsumer arms = buffers.getBuffer(EnhancedRenderTypes.energyField(StrangeSpellFx.DOME_TEX));
-        StrangeSpellFx.disc(pose, arms, center, normal, r * 1.0F, -spin * 0.05F, EnergyGeometry.argb(ARMS, 0.6F * open));
-        StrangeSpellFx.disc(pose, arms, center, normal, r * 0.6F, spin * 0.09F, EnergyGeometry.argb(ARMS, 0.5F * open));
+        StrangeSpellFx.disc(pose, arms, center, normal, r * 1.0F, -spin * 0.05F, EnergyGeometry.argb(armsColor,
+                0.6F * open));
+        StrangeSpellFx.disc(pose, arms, center, normal, r * 0.6F, spin * 0.09F, EnergyGeometry.argb(armsColor,
+                0.5F * open));
         // The rim of sparks: two rings of streaks turning against each other, white-gold at the heart of it.
         VertexConsumer rim = buffers.getBuffer(EnhancedRenderTypes.energyField(RIM));
         float rq = r / 0.92F;
-        StrangeSpellFx.disc(pose, rim, center, normal, rq, spin * 0.35F, EnergyGeometry.argb(StrangeAbilities.ORANGE,
+        StrangeSpellFx.disc(pose, rim, center, normal, rq, spin * 0.35F, EnergyGeometry.argb(orange,
                 1.0F));
         StrangeSpellFx.disc(pose, rim, center, normal, rq * 1.03F, -spin * 0.22F + 1.0F,
-                EnergyGeometry.argb(StrangeAbilities.ORANGE, 0.8F));
+                EnergyGeometry.argb(orange, 0.8F));
         StrangeSpellFx.disc(pose, rim, center, normal, rq * 0.98F, spin * 0.5F + 2.0F,
-                EnergyGeometry.argb(StrangeAbilities.GOLD, 0.7F));
+                EnergyGeometry.argb(gold, 0.7F));
         super.render(portal, yaw, partialTicks, poseStack, buffers, light);
     }
 

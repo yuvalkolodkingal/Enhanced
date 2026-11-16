@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.asgard.AsgardDimension;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.HelaConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
@@ -515,7 +516,9 @@ public final class HelaAbilities {
             shot.discard();
             HelaFx.send(level, HelaFx.CRUMBLE, player.getId(), at, 0);
             level.sendParticles(ParticleTypes.SMOKE, at.x, at.y, at.z, 6, 0.1, 0.1, 0.1, 0.02);
-            level.sendParticles(new EnergyParticleOptions(HelaRules.GREEN, 0.7F), at.x, at.y, at.z, 4, 0.1, 0.1, 0.1, 0.03);
+            // (3.16) a custom hero's colour
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.HELA_GRASP,
+                    HelaRules.GREEN), 0.7F), at.x, at.y, at.z, 4, 0.1, 0.1, 0.1, 0.03);
         }
         boolean mayCrush = HelaConfig.SHATTER_MJOLNIR.get() && now >= CATCH_READY.getOrDefault(player.getUUID(), 0L);
         if (mayCrush && HelaCatch.catchNear(level, player, hand, GRASP_REACH)) {

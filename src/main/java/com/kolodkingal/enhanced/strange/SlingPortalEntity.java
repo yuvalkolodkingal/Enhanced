@@ -32,6 +32,9 @@ public class SlingPortalEntity extends Entity {
             EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> LIFE = SynchedEntityData.defineId(SlingPortalEntity.class,
             EntityDataSerializers.INT);
+    /** (3.16) a custom hero's colour: the one his Sling Ring's pick chose, or -1 (Strange's own). */
+    private static final EntityDataAccessor<Integer> TINT = SynchedEntityData.defineId(SlingPortalEntity.class,
+            EntityDataSerializers.INT);
 
     /** The pair this ring is of (server). */
     @Nullable
@@ -51,6 +54,16 @@ public class SlingPortalEntity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(FACING, 0.0F);
         builder.define(LIFE, 160);
+        builder.define(TINT, -1);
+    }
+
+    /** (3.16) a custom hero's colour: the colour chosen for the ring, or -1. */
+    public int tint() {
+        return entityData.get(TINT);
+    }
+
+    public void setTint(int rgb) {
+        entityData.set(TINT, rgb);
     }
 
     /** The yaw the ring faces (degrees, the game's: 0 south): a traveller crossing it forward goes this way. */
@@ -109,8 +122,12 @@ public class SlingPortalEntity extends Entity {
             Vec3 at = c.add(radial.scale(RADIUS));
             Vec3 tangent = side.scale(-Math.sin(a)).add(0, Math.cos(a), 0);
             Vec3 v = tangent.scale(0.12).add(radial.scale(0.05)).add(0, -0.02, 0);
-            level().addParticle(new com.kolodkingal.enhanced.particle.EnergyParticleOptions(i == 0 ? 0xFFE0A8 : 0xF29A2E,
-                    0.35F), at.x, at.y, at.z, v.x, v.y, v.z);
+            // (3.16) a custom hero's colour
+            int tint = tint();
+            int c0 = i == 0 ? 0xFFE0A8 : 0xF29A2E;
+            level().addParticle(new com.kolodkingal.enhanced.particle.EnergyParticleOptions(tint < 0 ? c0
+                    : com.kolodkingal.enhanced.custom.AbilityColors.recolor(c0, tint), 0.35F), at.x, at.y, at.z, v.x,
+                    v.y, v.z);
         }
     }
 

@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hela.HelaFx;
 import com.kolodkingal.enhanced.hela.HelaRules;
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
@@ -162,8 +164,18 @@ final class HelaActing {
             default -> 0;
         };
         Vec3 hand = player.getEyePosition().add(player.getLookAngle().scale(0.6)).subtract(0.0, 0.4, 0.0);
+        // (3.16) a custom hero's colour: each flourish in the colour of its ability's pick
+        HeroAbility row = switch (id) {
+            case HELA_FORM_ON -> HeroAbility.HELA_GODDESS;
+            case HELA_RAISE, HELA_FENRIS -> HeroAbility.HELA_ARMY;
+            case HELA_THROW -> HeroAbility.HELA_NECROSWORDS;
+            case HELA_BURST -> HeroAbility.HELA_BLADE_WALL;
+            case HELA_GRASP -> HeroAbility.HELA_GRASP;
+            default -> null;
+        };
+        int green = row == null ? HelaRules.GREEN : AbilityColors.color(player, row, HelaRules.GREEN);
         for (int i = 0; i < n; i++) {
-            level.addParticle(new EnergyParticleOptions(HelaRules.GREEN, 0.6F), hand.x + level.random.nextGaussian() * 0.25,
+            level.addParticle(new EnergyParticleOptions(green, 0.6F), hand.x + level.random.nextGaussian() * 0.25,
                     hand.y + level.random.nextGaussian() * 0.25, hand.z + level.random.nextGaussian() * 0.25, 0.0, 0.02, 0.0);
         }
     }

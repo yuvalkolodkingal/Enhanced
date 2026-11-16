@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.asgard.AsgardFx;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
 import com.kolodkingal.enhanced.odin.OdinAbilities;
@@ -63,6 +64,18 @@ public final class OdinFx {
         return who instanceof Player player ? Powers.color(player) : OdinAbilities.GOLD;
     }
 
+    /** (3.16) a custom hero's colour: {@link #glow(AsgardFxPayload)}, or the glow of the colour chosen for {@code row}. */
+    private static int glow(AsgardFxPayload p, HeroAbility row) {
+        ClientLevel level = level();
+        return AbilityColors.glow(level == null ? null : level.getEntity(p.entityId()), row, glow(p));
+    }
+
+    /** (3.16) a custom hero's colour: {@link #color(AsgardFxPayload)}, or the colour chosen for {@code row}. */
+    private static int color(AsgardFxPayload p, HeroAbility row) {
+        ClientLevel level = level();
+        return AbilityColors.color(level == null ? null : level.getEntity(p.entityId()), row, color(p));
+    }
+
     /** The bolt: a line of golden light from the spear's tip to where it struck, and a burst there. */
     private static void blast(AsgardFxPayload p) {
         ClientLevel level = level();
@@ -71,8 +84,9 @@ public final class OdinFx {
         }
         Vec3 from = p.points().get(0);
         Vec3 to = p.points().get(1);
-        int color = color(p);
-        int core = glow(p);
+        // (3.16) a custom hero's colour
+        int color = color(p, HeroAbility.ODIN_GUNGNIR);
+        int core = glow(p, HeroAbility.ODIN_GUNGNIR);
         double length = from.distanceTo(to);
         int steps = Math.max(2, (int) (length / 0.35));
         RandomSource r = level.random;
@@ -97,7 +111,9 @@ public final class OdinFx {
         for (Vec3 at : p.points()) {
             for (int i = 0; i < 10; i++) {
                 double a = r.nextDouble() * Math.PI * 2.0;
-                level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? glow(p) : color(p), 0.6F), at.x + Math.cos(a) * 0.5, at.y - 0.6,
+                // (3.16) a custom hero's colour (the heal is the Odinforce's other half)
+                level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? glow(p, HeroAbility.ODIN_ODINFORCE)
+                        : color(p, HeroAbility.ODIN_ODINFORCE), 0.6F), at.x + Math.cos(a) * 0.5, at.y - 0.6,
                         at.z + Math.sin(a) * 0.5, 0, 0.06 + r.nextDouble() * 0.05, 0);
             }
             level.addParticle(ParticleTypes.HEART, at.x, at.y + 0.9, at.z, 0, 0.05, 0);
@@ -115,7 +131,9 @@ public final class OdinFx {
         for (int i = 0; i < 40; i++) {
             double a = r.nextDouble() * Math.PI * 2.0;
             double rad = 0.2 + r.nextDouble() * 0.6;
-            level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? glow(p) : color(p), 1.0F), at.x + Math.cos(a) * rad, at.y - 1.0 + r.nextDouble(),
+            // (3.16) a custom hero's colour
+            level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? glow(p, HeroAbility.ODIN_BANISH)
+                    : color(p, HeroAbility.ODIN_BANISH), 1.0F), at.x + Math.cos(a) * rad, at.y - 1.0 + r.nextDouble(),
                     at.z + Math.sin(a) * rad, 0, 0.25 + r.nextDouble() * 0.25, 0);
         }
         if (p.arg() == 1) {
@@ -133,7 +151,9 @@ public final class OdinFx {
         Vec3 at = p.points().get(0);
         for (int i = 0; i < 32; i++) {
             double a = i * Math.PI * 2.0 / 32;
-            level.addParticle(new EnergyParticleOptions(color(p), 0.8F), at.x + Math.cos(a) * 1.4, at.y + 0.1, at.z + Math.sin(a) * 1.4,
+            // (3.16) a custom hero's colour
+            level.addParticle(new EnergyParticleOptions(color(p, HeroAbility.ODIN_COMMAND), 0.8F), at.x
+                    + Math.cos(a) * 1.4, at.y + 0.1, at.z + Math.sin(a) * 1.4,
                     Math.cos(a) * 0.12, 0.08, Math.sin(a) * 0.12);
         }
     }
@@ -185,7 +205,9 @@ public final class OdinFx {
         for (int i = 0; i < 56; i++) {
             Vec3 out = new Vec3(r.nextGaussian(), r.nextGaussian(), r.nextGaussian()).normalize();
             Vec3 at = c.add(out.scale(radius));
-            level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? glow(p) : color(p), 1.3F), at.x, at.y, at.z, out.x * 0.3, out.y * 0.3,
+            // (3.16) a custom hero's colour
+            level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? glow(p, HeroAbility.ODIN_ODINFORCE)
+                    : color(p, HeroAbility.ODIN_ODINFORCE), 1.3F), at.x, at.y, at.z, out.x * 0.3, out.y * 0.3,
                     out.z * 0.3);
         }
     }
@@ -213,9 +235,11 @@ public final class OdinFx {
             if (t.kind() == OdinAbilities.FX_WAVE) {
                 float radius = OdinHeroMath.waveRadius(age, t.size());
                 int n = Math.max(16, (int) (radius * 7));
+                // (3.16) a custom hero's colour (the wave is the Banish's other half)
+                int gold = AbilityColors.color(level.getEntity(t.entityId()), HeroAbility.ODIN_BANISH, OdinAbilities.GOLD);
                 for (int i = 0; i < n; i++) {
                     double a = i * Math.PI * 2.0 / n + r.nextDouble() * 0.1;
-                    level.addParticle(new EnergyParticleOptions(OdinAbilities.GOLD, 0.9F), t.at().x + Math.cos(a) * radius, t.at().y + 0.15,
+                    level.addParticle(new EnergyParticleOptions(gold, 0.9F), t.at().x + Math.cos(a) * radius, t.at().y + 0.15,
                             t.at().z + Math.sin(a) * radius, 0, 0.02, 0);
                 }
             } else if (t.kind() == OdinAbilities.FX_CORONATION) {

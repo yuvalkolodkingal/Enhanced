@@ -122,7 +122,9 @@ public class ThrownWeaponEntity extends Projectile {
                 level().addParticle(ParticleTypes.ELECTRIC_SPARK, getX(), getY(), getZ(), 0, 0, 0);
             }
             // 3.5: a custom hero's throw trails the colour his pick of the hammer chose.
-            int tint = AbilityColors.chosen(getOwner(), HeroAbility.THOR_HAMMER);
+            // (3.16) a custom hero's colour: Love's axe takes his pick of the axe
+            int tint = AbilityColors.chosen(getOwner(), AbilityColors.first(getOwner(), HeroAbility.THOR_HAMMER,
+                    HeroAbility.LOVE_AXE));
             if (tint >= 0) {
                 level().addParticle(new EnergyParticleOptions(tint, 0.8F), getX(), getY(), getZ(), 0, 0, 0);
             }

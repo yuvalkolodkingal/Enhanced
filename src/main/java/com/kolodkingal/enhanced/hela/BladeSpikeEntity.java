@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.hela;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEntities;
@@ -46,6 +48,8 @@ public class BladeSpikeEntity extends Entity {
     private static final EntityDataAccessor<Integer> DATA_STAND = SynchedEntityData.defineId(BladeSpikeEntity.class, EntityDataSerializers.INT);
     /** Which of the two looks: 0 a spike of the wall, 1 a smaller blade of a ring. */
     private static final EntityDataAccessor<Byte> DATA_STYLE = SynchedEntityData.defineId(BladeSpikeEntity.class, EntityDataSerializers.BYTE);
+    /** (3.16) a custom hero's colour: the one its maker chose for the Blade Wall, or -1 (Hela's own). */
+    private static final EntityDataAccessor<Integer> DATA_TINT = SynchedEntityData.defineId(BladeSpikeEntity.class, EntityDataSerializers.INT);
 
     private final Map<Integer, Integer> touched = new HashMap<>();
     @Nullable
@@ -72,6 +76,7 @@ public class BladeSpikeEntity extends Entity {
         spike.entityData.set(DATA_DELAY, Math.max(0, delay));
         spike.entityData.set(DATA_STAND, Math.max(1, stand));
         spike.entityData.set(DATA_STYLE, (byte) style);
+        spike.entityData.set(DATA_TINT, AbilityColors.chosen(owner, HeroAbility.HELA_BLADE_WALL)); // (3.16)
         return spike;
     }
 
@@ -80,6 +85,13 @@ public class BladeSpikeEntity extends Entity {
         builder.define(DATA_DELAY, 10);
         builder.define(DATA_STAND, 120);
         builder.define(DATA_STYLE, (byte) 0);
+        builder.define(DATA_TINT, -1);
+    }
+
+    /** (3.16) a custom hero's colour: {@code rgb}, or it moved to the colour its maker chose for the Blade Wall. */
+    public int shade(int rgb) {
+        int tint = entityData.get(DATA_TINT);
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
     }
 
     /** Ticks of telegraph before it rises. */
@@ -139,7 +151,8 @@ public class BladeSpikeEntity extends Entity {
         super.tick();
         if (level().isClientSide()) {
             if (tickCount < delay() && random.nextInt(3) == 0) {
-                level().addParticle(new EnergyParticleOptions(HelaRules.GREEN, 0.5F), getX() + (random.nextDouble() - 0.5) * 0.6, getY() + 0.05,
+                // (3.16) a custom hero's colour
+                level().addParticle(new EnergyParticleOptions(shade(HelaRules.GREEN), 0.5F), getX() + (random.nextDouble() - 0.5) * 0.6, getY() + 0.05,
                         getZ() + (random.nextDouble() - 0.5) * 0.6, 0.0, 0.02, 0.0);
             }
             return;
@@ -172,7 +185,8 @@ public class BladeSpikeEntity extends Entity {
         ServerLevel level = (ServerLevel) level();
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, level.getBlockState(blockPosition().below()).isAir()
                 ? Blocks.DEEPSLATE.defaultBlockState() : level.getBlockState(blockPosition().below())), getX(), getY() + 0.1, getZ(), 8, 0.2, 0.05, 0.2, 0.1);
-        level.sendParticles(new EnergyParticleOptions(HelaRules.GREEN, 0.9F), getX(), getY() + 0.8, getZ(), 4, 0.1, 0.5, 0.1, 0.03);
+        // (3.16) a custom hero's colour
+        level.sendParticles(new EnergyParticleOptions(shade(HelaRules.GREEN), 0.9F), getX(), getY() + 0.8, getZ(), 4, 0.1, 0.5, 0.1, 0.03);
         if (maker == null) {
             return;
         }

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.odin;
 
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.ShieldCost;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Powers;
@@ -113,7 +114,7 @@ public class GungnirEntity extends Projectile implements ShieldCost {
             // The server sends the real position every tick; meanwhile it keeps moving smoothly, shedding golden motes.
             setPos(from.add(getDeltaMovement()));
             if (random.nextInt(2) == 0) {
-                level().addParticle(new EnergyParticleOptions(OdinAbilities.GOLD, 0.5F), getX(), getY(), getZ(), 0, 0, 0);
+                level().addParticle(new EnergyParticleOptions(gold(), 0.5F), getX(), getY(), getZ(), 0, 0, 0);
             }
             return;
         }
@@ -138,7 +139,7 @@ public class GungnirEntity extends Projectile implements ShieldCost {
             travelled += to.distanceTo(from);
             if (hitWall) {
                 level.playSound(null, getX(), getY(), getZ(), ModSounds.GUNGNIR_BLAST.get(), SoundSource.PLAYERS, 0.7F, 1.4F);
-                level.sendParticles(new EnergyParticleOptions(OdinAbilities.GOLD, 1.0F), getX(), getY(), getZ(), 10, 0.2, 0.2, 0.2, 0.15);
+                level.sendParticles(new EnergyParticleOptions(gold(), 1.0F), getX(), getY(), getZ(), 10, 0.2, 0.2, 0.2, 0.15);
             }
             if (hitWall || stopped || travelled >= RANGE) {
                 setReturning(true);
@@ -187,7 +188,7 @@ public class GungnirEntity extends Projectile implements ShieldCost {
                 if (push.lengthSqr() > 1.0E-6) {
                     victim.knockback(0.8, -push.x, -push.z);
                 }
-                level.sendParticles(new EnergyParticleOptions(OdinAbilities.GOLD, 1.0F), victim.getX(), victim.getY(0.6), victim.getZ(),
+                level.sendParticles(new EnergyParticleOptions(gold(), 1.0F), victim.getX(), victim.getY(0.6), victim.getZ(),
                         8, 0.2, 0.3, 0.2, 0.1);
             }
             if (out && already.size() > PIERCE) {
@@ -195,6 +196,11 @@ public class GungnirEntity extends Projectile implements ShieldCost {
             }
         }
         return false;
+    }
+
+    /** (3.16) a custom hero's colour: the gold of its motes, or the colour its thrower chose for the Gungnir. */
+    private int gold() {
+        return AbilityColors.color(getOwner(), HeroAbility.ODIN_GUNGNIR, OdinAbilities.GOLD);
     }
 
     /** Its thrower, if he can still catch it: alive, in this realm, with the Gungnir ability (or Odin's spear in his kit). */

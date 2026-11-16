@@ -1,6 +1,8 @@
 package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.strange.AstralProjection;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.PlayerModel;
@@ -32,7 +34,8 @@ public class AstralLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<A
         }
         float breath = EnhancedClientConfig.reducedMotion() ? 0.8F : 0.7F + 0.2F * Mth.sin(ageInTicks * 0.08F);
         int alpha = (int) (110 * breath);
-        int color = (alpha << 24) | 0xA8DCFF;
+        // (3.16) a custom hero's colour
+        int color = (alpha << 24) | AbilityColors.color(player, HeroAbility.STRANGE_ASTRAL, 0xA8DCFF);
         getParentModel().renderToBuffer(poseStack, buffers.getBuffer(RenderType.entityTranslucentEmissive(
                 getTextureLocation(player))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, color);
     }

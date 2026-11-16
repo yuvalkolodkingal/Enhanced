@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.strange;
 
 import com.kolodkingal.enhanced.config.StrangeConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.Trait;
 import com.kolodkingal.enhanced.custom.Traits;
@@ -15,6 +16,8 @@ import com.kolodkingal.enhanced.stones.StoneUse;
 import com.kolodkingal.enhanced.thanos.StoneKind;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleOptions;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -201,7 +204,10 @@ public final class EyeOfAgamotto {
         double r = 1.4 - 0.6 * t;
         for (int i = 0; i < 2; i++) {
             double a = held * (0.25 + 0.25 * t) + i * Math.PI;
-            DustParticleOptions dust = new DustParticleOptions(new Vector3f(0.21F, 0.83F, 0.42F), 0.8F);
+            // (3.16) a custom hero's colour
+            int tint = AbilityColors.chosen(player, HeroAbility.STRANGE_EYE);
+            ParticleOptions dust = tint >= 0 ? new EnergyParticleOptions(tint, 0.8F)
+                    : new DustParticleOptions(new Vector3f(0.21F, 0.83F, 0.42F), 0.8F);
             level.sendParticles(dust, c.x + Math.cos(a) * r, c.y + 0.4 * Math.sin(a * 0.5), c.z + Math.sin(a) * r, 1,
                     0, 0, 0, 0);
         }

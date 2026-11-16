@@ -158,8 +158,9 @@ public final class ThorEffects {
                 }
                 case ThorFxPayload.BIFROST_ARRIVAL -> {
                     Entity traveller = level.getEntity(e.entityId());
+                    // (3.16) a custom hero's colour: Love's Bifrost too
                     tint = AbilityColors.chosen(traveller, AbilityColors.first(traveller, HeroAbility.THOR_BIFROST,
-                            HeroAbility.HEIMDALL_BIFROST));
+                            HeroAbility.LOVE_BIFROST, HeroAbility.HEIMDALL_BIFROST));
                     float fade = 1.0F - age / ARRIVAL_TICKS;
                     rainbowBeam(pose, vc, e.points().get(0).subtract(camera), 1.6F + 0.8F * fade, time, fade);
                 }
@@ -171,15 +172,18 @@ public final class ThorEffects {
             PowerData data = Powers.get(player);
             tint = -1;
             if (data.is(Live.BIFROST)) {
+                // (3.16) a custom hero's colour: Love's Bifrost too
                 tint = AbilityColors.chosen(player, AbilityColors.first(player, HeroAbility.THOR_BIFROST,
-                        HeroAbility.HEIMDALL_BIFROST));
+                        HeroAbility.LOVE_BIFROST, HeroAbility.HEIMDALL_BIFROST));
                 Vec3 feet = player.getPosition(partialTick).subtract(camera);
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.9F);
                 rainbowBeam(pose, vc, feet, 1.3F * pulse, time, 1.0F);
             }
             // 3.8 (lane L8): Love's lightning is Thor's beam in her lilac.
             if (loveBeam(data) && !OwnBeams.behind(mc, player)) {
-                tint = com.kolodkingal.enhanced.love.LoveAbilities.LIGHTNING;
+                // (3.16) a custom hero's colour
+                tint = AbilityColors.color(player, HeroAbility.LOVE_LIGHTNING,
+                        com.kolodkingal.enhanced.love.LoveAbilities.LIGHTNING);
                 beam(mc, player, ThorAbilities.holdsWeapon(player), false, pose, vc, camera, partialTick, time);
                 tint = -1;
             }
@@ -211,7 +215,9 @@ public final class ThorEffects {
             if (love || data.acts(Power.THOR) && data.has(HeroAbility.THOR_LIGHTNING)
                     && data.is(Live.CALLING_LIGHTNING)) {
                 VertexConsumer over = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM_OVER);
-                tint = love ? com.kolodkingal.enhanced.love.LoveAbilities.LIGHTNING
+                // (3.16) a custom hero's colour
+                tint = love ? AbilityColors.color(self, HeroAbility.LOVE_LIGHTNING,
+                        com.kolodkingal.enhanced.love.LoveAbilities.LIGHTNING)
                         : AbilityColors.chosen(self, HeroAbility.THOR_LIGHTNING);
                 beam(mc, self, ThorAbilities.holdsWeapon(self), data.toggle(Toggle.GOD_OF_THUNDER), pose, over, camera,
                         partialTick, time);

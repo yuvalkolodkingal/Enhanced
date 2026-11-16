@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.odin.OdinAbilities;
@@ -153,8 +154,18 @@ final class OdinActing {
         }
         RandomSource r = level.random;
         Vec3 hand = hand(player, id == GestureId.ODIN_HEAL || id == GestureId.ODIN_RAVENS);
+        // (3.16) a custom hero's colour: the motes of each spell in the colour chosen for it
+        HeroAbility row = switch (id) {
+            case ODIN_BLAST -> HeroAbility.ODIN_GUNGNIR;
+            case ODIN_BANISH, ODIN_WAVE -> HeroAbility.ODIN_BANISH;
+            case ODIN_HEAL -> HeroAbility.ODIN_ODINFORCE;
+            case ODIN_COMMAND -> HeroAbility.ODIN_COMMAND;
+            default -> null;
+        };
+        int glow = row == null ? Powers.glow(player) : AbilityColors.glow(player, row, Powers.glow(player));
+        int color = row == null ? Powers.color(player) : AbilityColors.color(player, row, Powers.color(player));
         for (int i = 0; i < count; i++) {
-            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? Powers.glow(player) : Powers.color(player), 0.5F),
+            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? glow : color, 0.5F),
                     hand.x + (r.nextDouble() - 0.5) * 0.3, hand.y + (r.nextDouble() - 0.5) * 0.3, hand.z + (r.nextDouble() - 0.5) * 0.3,
                     (r.nextDouble() - 0.5) * 0.04, 0.02, (r.nextDouble() - 0.5) * 0.04);
         }

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.PowerHud;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.custom.HeroKeys;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -324,22 +325,27 @@ final class StrangeActing {
     /** A gesture of his just began: the sparks that go with it, from his hands. */
     static void started(AbstractClientPlayer player, GestureId id) {
         switch (id) {
-            case STRANGE_SLING -> motes(player, HumanoidArm.RIGHT, 14, 0.6F, 0.05, StrangeAbilities.ORANGE);
+            // (3.16) a custom hero's colour: each flourish in the colour of its spell's pick
+            case STRANGE_SLING -> motes(player, HumanoidArm.RIGHT, 14, 0.6F, 0.05, StrangeAbilities.ORANGE,
+                    HeroAbility.STRANGE_PORTAL);
             case STRANGE_BANDS -> {
-                motes(player, HumanoidArm.RIGHT, 8, 0.6F, 0.05, StrangeAbilities.CRIMSON);
-                motes(player, HumanoidArm.LEFT, 8, 0.6F, 0.05, StrangeAbilities.CRIMSON);
+                motes(player, HumanoidArm.RIGHT, 8, 0.6F, 0.05, StrangeAbilities.CRIMSON, HeroAbility.STRANGE_BANDS);
+                motes(player, HumanoidArm.LEFT, 8, 0.6F, 0.05, StrangeAbilities.CRIMSON, HeroAbility.STRANGE_BANDS);
             }
             case STRANGE_EYE_OPEN, STRANGE_REWIND -> {
-                motes(player, HumanoidArm.RIGHT, 8, 0.5F, 0.03, StrangeAbilities.TIME_GREEN);
+                motes(player, HumanoidArm.RIGHT, 8, 0.5F, 0.03, StrangeAbilities.TIME_GREEN,
+                        id == GestureId.STRANGE_REWIND ? HeroAbility.STRANGE_EYE_REWIND : HeroAbility.STRANGE_EYE);
                 if (id == GestureId.STRANGE_REWIND) {
                     rewound(player, player.level().getGameTime());
                 }
             }
             case STRANGE_ASTRAL, STRANGE_ASTRAL_IN -> motes(player, HumanoidArm.LEFT, 10, 0.5F, 0.04,
-                    StrangeAbilities.ASTRAL_BLUE);
+                    StrangeAbilities.ASTRAL_BLUE, HeroAbility.STRANGE_ASTRAL);
             case STRANGE_MIRROR, STRANGE_DOME, STRANGE_SHIELD_UP -> {
-                motes(player, HumanoidArm.RIGHT, 8, 0.5F, 0.04, StrangeAbilities.ORANGE);
-                motes(player, HumanoidArm.LEFT, 8, 0.5F, 0.04, StrangeAbilities.GOLD);
+                HeroAbility row = id == GestureId.STRANGE_MIRROR ? HeroAbility.STRANGE_MIRROR
+                        : id == GestureId.STRANGE_DOME ? HeroAbility.STRANGE_SERAPHIM_DOME : HeroAbility.STRANGE_SHIELDS;
+                motes(player, HumanoidArm.RIGHT, 8, 0.5F, 0.04, StrangeAbilities.ORANGE, row);
+                motes(player, HumanoidArm.LEFT, 8, 0.5F, 0.04, StrangeAbilities.GOLD, row);
             }
             default -> {
             }
@@ -347,7 +353,10 @@ final class StrangeActing {
     }
 
     private static void motes(AbstractClientPlayer player, HumanoidArm side, int count, float size, double speed,
-                              int colour) {
+                              int colour, HeroAbility row) {
+        // (3.16) a custom hero's colour
+        int gold = AbilityColors.shade(player, row, StrangeAbilities.GOLD);
+        colour = AbilityColors.shade(player, row, colour);
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         if (level == null) {
@@ -362,7 +371,7 @@ final class StrangeActing {
         float scale = firstPerson ? size * 0.45F : size;
         RandomSource random = level.random;
         for (int i = 0; i < count; i++) {
-            int c = i % 3 == 0 ? StrangeAbilities.GOLD : colour;
+            int c = i % 3 == 0 ? gold : colour;
             level.addParticle(new EnergyParticleOptions(c, scale), hand.x + (random.nextDouble() - 0.5) * 0.2,
                     hand.y + (random.nextDouble() - 0.5) * 0.2, hand.z + (random.nextDouble() - 0.5) * 0.2,
                     (random.nextDouble() - 0.5) * speed, 0.01 + random.nextDouble() * speed,

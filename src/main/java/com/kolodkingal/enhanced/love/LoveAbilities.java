@@ -7,6 +7,7 @@ import com.kolodkingal.enhanced.ability.ThorAbilities;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.config.EternityConfig;
 import com.kolodkingal.enhanced.config.core.ConfigSpec;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.entity.ThrownWeaponEntity;
 import com.kolodkingal.enhanced.power.Live;
@@ -113,7 +114,10 @@ public final class LoveAbilities {
         // The held ones: letting go must always get through.
         if (ability == 3) {
             if (data.has(HeroAbility.LOVE_LIGHTNING)) {
-                ThorAbilities.lightningBeamFor(player, data, down, LIGHTNING, LIGHTNING_GLOW);
+                // (3.16) a custom hero's colour
+                ThorAbilities.lightningBeamFor(player, data, down, AbilityColors.color(player,
+                        HeroAbility.LOVE_LIGHTNING, LIGHTNING), AbilityColors.glow(player, HeroAbility.LOVE_LIGHTNING,
+                        LIGHTNING_GLOW));
             }
             return;
         }
@@ -280,7 +284,10 @@ public final class LoveAbilities {
     /** She loses the power: the beams stop (an axe in flight finds nobody to return to and drops by itself). */
     public static void endAll(ServerPlayer player, PowerData data) {
         if (data.is(Live.CALLING_LIGHTNING)) {
-            ThorAbilities.lightningBeamFor(player, data, false, LIGHTNING, LIGHTNING_GLOW);
+            // (3.16) a custom hero's colour
+            ThorAbilities.lightningBeamFor(player, data, false, AbilityColors.color(player,
+                    HeroAbility.LOVE_LIGHTNING, LIGHTNING), AbilityColors.glow(player, HeroAbility.LOVE_LIGHTNING,
+                    LIGHTNING_GLOW));
         }
         EyeLaser.stop(player, data, false);
         ThunderStrike.forget(player);

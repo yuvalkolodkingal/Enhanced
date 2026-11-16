@@ -1,5 +1,8 @@
 package com.kolodkingal.enhanced.love;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.ability.AreaTargets;
 import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.config.EternityConfig;
@@ -94,6 +97,11 @@ public final class ThunderStrike {
             }
         }
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y + 0.2, at.z, 30, 0.6, 0.3, 0.6, 0.4);
+        // (3.16) a custom hero's colour: the bolt is the game's own (white), so his colour crackles round where it struck
+        int chosen = AbilityColors.chosen(player, HeroAbility.LOVE_THUNDER_STRIKE);
+        if (chosen >= 0) {
+            level.sendParticles(new EnergyParticleOptions(chosen, 1.1F), at.x, at.y + 0.4, at.z, 36, 0.7, 0.6, 0.7, 0.2);
+        }
         level.playSound(null, at.x, at.y, at.z, ModSounds.LOVE_THUNDER_STRIKE.get(), SoundSource.PLAYERS, 1.5F, 1.0F);
         Net.sendToPlayersNear(level, null, at.x, at.y, at.z, 96,
                 new EternityFxPayload(EternityFxPayload.THUNDER_STRIKE, player.getId(), BlockPos.containing(at), 0));

@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.client.render;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hela.HelaRules;
 import com.kolodkingal.enhanced.hela.NecroswordEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -57,22 +59,27 @@ public class NecroswordRenderer extends EntityRenderer<NecroswordEntity> {
         model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(NecroswordModel.TEXTURE)), packedLight,
                 OverlayTexture.NO_OVERLAY, -1);
         model.renderEdges(poseStack, buffer.getBuffer(RenderType.entityTranslucentEmissive(NecroswordModel.TEXTURE)), OverlayTexture.NO_OVERLAY,
-                EnergyGeometry.argb(HelaRules.PALE, 0.9F));
+                EnergyGeometry.argb(shade(blade, HelaRules.PALE), 0.9F));
         poseStack.popPose();
         if (!hanging) {
-            streak(poseStack, buffer, motion, blade.falling());
+            streak(poseStack, buffer, motion, blade.falling(), shade(blade, HelaRules.GREEN));
         }
         super.render(blade, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     /** A thin green streak behind a flying blade. */
-    private static void streak(PoseStack poseStack, MultiBufferSource buffer, Vec3 motion, boolean falling) {
+    /** (3.16) a custom hero's colour: {@code rgb}, or it moved to the colour the thrower chose for the Necroswords. */
+    private static int shade(NecroswordEntity blade, int rgb) {
+        return AbilityColors.shade(blade.getOwner(), HeroAbility.HELA_NECROSWORDS, rgb);
+    }
+
+    private static void streak(PoseStack poseStack, MultiBufferSource buffer, Vec3 motion, boolean falling, int green) {
         Vec3 back = motion.normalize().scale(-1.8);
         Vec3 side = Math.abs(motion.normalize().y) > 0.9 ? new Vec3(0.06, 0, 0) : motion.normalize().cross(new Vec3(0, 1, 0)).normalize().scale(0.06);
         VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         Matrix4f m = poseStack.last().pose();
-        int head = EnergyGeometry.argb(HelaRules.GREEN, falling ? 0.45F : 0.6F);
-        int tail = EnergyGeometry.argb(HelaRules.GREEN, 0.0F);
+        int head = EnergyGeometry.argb(green, falling ? 0.45F : 0.6F);
+        int tail = EnergyGeometry.argb(green, 0.0F);
         vc.addVertex(m, (float) side.x, (float) side.y, (float) side.z).setColor(head);
         vc.addVertex(m, (float) -side.x, (float) -side.y, (float) -side.z).setColor(head);
         vc.addVertex(m, (float) (back.x - side.x), (float) (back.y - side.y), (float) (back.z - side.z)).setColor(tail);

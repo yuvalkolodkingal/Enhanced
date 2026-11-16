@@ -1,5 +1,7 @@
 package com.kolodkingal.enhanced.hela;
 
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.ability.ShieldCost;
 import com.kolodkingal.enhanced.ability.SlowMotion;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -124,7 +126,7 @@ public class NecroswordEntity extends ThrowableProjectile implements ShieldCost 
         super.tick();
         if (level().isClientSide()) {
             if (random.nextInt(2) == 0) {
-                level().addParticle(new EnergyParticleOptions(HelaRules.GREEN, 0.5F), getX(), getY(), getZ(), 0.0, 0.0, 0.0);
+                level().addParticle(new EnergyParticleOptions(green(), 0.5F), getX(), getY(), getZ(), 0.0, 0.0, 0.0);
             }
             return;
         }
@@ -172,10 +174,15 @@ public class NecroswordEntity extends ThrowableProjectile implements ShieldCost 
         }
     }
 
+    /** (3.16) a custom hero's colour: the green of its motes, or the colour its thrower chose for the Necroswords. */
+    private int green() {
+        return AbilityColors.color(getOwner(), HeroAbility.HELA_NECROSWORDS, HelaRules.GREEN);
+    }
+
     /** It breaks into black shards and green motes. */
     public void shatter(boolean loud) {
         if (level() instanceof ServerLevel server) {
-            server.sendParticles(new EnergyParticleOptions(HelaRules.GREEN, 0.8F), getX(), getY(), getZ(), loud ? 8 : 4, 0.15, 0.15, 0.15, 0.05);
+            server.sendParticles(new EnergyParticleOptions(green(), 0.8F), getX(), getY(), getZ(), loud ? 8 : 4, 0.15, 0.15, 0.15, 0.05);
             server.sendParticles(ParticleTypes.SMOKE, getX(), getY(), getZ(), loud ? 6 : 3, 0.1, 0.1, 0.1, 0.02);
         }
         discard();

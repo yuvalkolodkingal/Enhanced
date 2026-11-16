@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.Teleports;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.StrangeConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hex.HexManager;
 import com.kolodkingal.enhanced.network.StrangeFxPayload;
@@ -184,6 +185,10 @@ public final class SlingPortals {
         UUID id = UUID.randomUUID();
         SlingPortalEntity near = ring(nearLevel, nearFeet, nearYaw, life, id);
         SlingPortalEntity far = ring(farLevel, farFeet, farYaw, life, id);
+        // (3.16) a custom hero's colour
+        int tint = AbilityColors.chosen(owner, HeroAbility.STRANGE_PORTAL);
+        near.setTint(tint);
+        far.setTint(tint);
         ChunkPos chunk = new ChunkPos(BlockPos.containing(farFeet));
         farLevel.getChunkSource().addRegionTicket(ModTicketTypes.ENHANCED_SLING, chunk, TICKET_RADIUS, id);
         Pair pair = new Pair(id, owner.getUUID(), near.getUUID(), nearLevel.dimension(), far.getUUID(),

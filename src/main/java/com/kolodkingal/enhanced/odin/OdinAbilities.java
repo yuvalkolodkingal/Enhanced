@@ -13,6 +13,7 @@ import com.kolodkingal.enhanced.asgard.npc.Asgardians;
 import com.kolodkingal.enhanced.bifrost.Bifrost;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.config.OdinConfig;
+import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.network.AsgardFxPayload;
@@ -441,7 +442,9 @@ public final class OdinAbilities {
         data.startCooldown(HeroAbility.ODIN_GUNGNIR, now, OdinConfig.BLAST_COOLDOWN.get());
         send(level, player, FX_BLAST, List.of(from, at), Powers.glow(player));
         level.playSound(null, player.getX(), player.getEyeY(), player.getZ(), ModSounds.GUNGNIR_BLAST.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-        level.sendParticles(new EnergyParticleOptions(Powers.color(player), 1.2F), at.x, at.y, at.z, 14, 0.3, 0.3, 0.3, 0.12);
+        // (3.16) a custom hero's colour
+        level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.ODIN_GUNGNIR,
+                Powers.color(player)), 1.2F), at.x, at.y, at.z, 14, 0.3, 0.3, 0.3, 0.12);
         return hurt;
     }
 
@@ -609,7 +612,9 @@ public final class OdinAbilities {
         if (!data.chaosShieldUp(now)) {
             Vec3 out = new Vec3(player.getRandom().nextGaussian(), player.getRandom().nextGaussian(), player.getRandom().nextGaussian()).normalize();
             Vec3 at = center.add(out.scale(SHIELD_RADIUS * Math.max(0.3, data.chaosShieldProgress(now))));
-            level.sendParticles(new EnergyParticleOptions(Powers.glow(player), 0.9F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
+            // (3.16) a custom hero's colour
+            level.sendParticles(new EnergyParticleOptions(AbilityColors.glow(player, HeroAbility.ODIN_ODINFORCE,
+                    Powers.glow(player)), 0.9F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
             return;
         }
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(SHIELD_RADIUS + 4.0),

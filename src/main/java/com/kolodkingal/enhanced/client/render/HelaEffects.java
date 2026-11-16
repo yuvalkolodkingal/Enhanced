@@ -2,6 +2,8 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.client.BossBarOverride;
 import com.kolodkingal.enhanced.client.asgard.AsgardFx;
+import com.kolodkingal.enhanced.custom.AbilityColors;
+import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.hela.HelaFight;
 import com.kolodkingal.enhanced.hela.HelaFx;
 import com.kolodkingal.enhanced.hela.HelaRules;
@@ -76,10 +78,12 @@ public final class HelaEffects {
         long now = level.getGameTime();
         Vec3 at = p.points().get(0);
         RandomSource random = level.random;
+        // (3.16) a custom hero's colour: what his pick of the ability chose, for the moments of a hero's Hela
+        tint = tintOf(level, p.kind(), p.entityId());
         switch (p.kind()) {
             case HelaFx.VOLLEY, HelaFx.THROW -> {
                 for (Vec3 point : p.points()) {
-                    burst(level, point, 4, 0.12, HelaRules.PALE, 0.5F);
+                    burst(level, point, 4, 0.12, c(HelaRules.PALE), 0.5F);
                 }
             }
             case HelaFx.WALL -> {
@@ -90,7 +94,7 @@ public final class HelaEffects {
             case HelaFx.SHADOW_STEP, HelaFx.DASH -> {
                 for (Vec3 point : p.points()) {
                     smoke(level, point.add(0.0, 1.0, 0.0), 24, 0.45);
-                    burst(level, point.add(0.0, 1.0, 0.0), 10, 0.4, HelaRules.GREEN, 0.7F);
+                    burst(level, point.add(0.0, 1.0, 0.0), 10, 0.4, c(HelaRules.GREEN), 0.7F);
                 }
                 if (p.kind() == HelaFx.DASH && p.points().size() > 1) {
                     Vec3 to = p.points().get(1);
@@ -109,8 +113,8 @@ public final class HelaEffects {
                 }
             }
             case HelaFx.CHANNEL_BREAK -> {
-                burst(level, at, 40, 0.6, 0xE8C060, 1.0F);
-                burst(level, at, 30, 0.5, HelaRules.PALE, 0.9F);
+                burst(level, at, 40, 0.6, c(0xE8C060), 1.0F);
+                burst(level, at, 30, 0.5, c(HelaRules.PALE), 0.9F);
             }
             case HelaFx.ARRIVE -> LASTING.add(new Lasting(p.kind(), p.entityId(), p.points(), now, now + p.arg(), p.arg()));
             case HelaFx.DISSOLVE -> LASTING.add(new Lasting(p.kind(), p.entityId(), p.points(), now, now + p.arg(), p.arg()));
@@ -119,34 +123,55 @@ public final class HelaEffects {
                     level.addParticle(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, random.nextGaussian() * 0.4, random.nextGaussian() * 0.4,
                             random.nextGaussian() * 0.4);
                 }
-                burst(level, at, 16, 0.3, HelaRules.GREEN, 1.0F);
+                burst(level, at, 16, 0.3, c(HelaRules.GREEN), 1.0F);
             }
             case HelaFx.RISE, HelaFx.FENRIS -> {
                 int n = p.kind() == HelaFx.FENRIS ? 40 : 16;
                 smoke(level, at.add(0.0, 0.3, 0.0), n, p.kind() == HelaFx.FENRIS ? 1.0 : 0.5);
-                burst(level, at.add(0.0, 0.2, 0.0), n / 2, 0.6, HelaRules.GREEN, 0.7F);
+                burst(level, at.add(0.0, 0.2, 0.0), n / 2, 0.6, c(HelaRules.GREEN), 0.7F);
             }
             case HelaFx.BURST -> {
                 float r = p.arg() / 10.0F;
                 for (int i = 0; i < 24; i++) {
                     double a = i * Mth.TWO_PI / 24;
-                    level.addParticle(new EnergyParticleOptions(HelaRules.GREEN, 0.8F), at.x + Math.cos(a) * r, at.y + 0.1, at.z + Math.sin(a) * r,
+                    level.addParticle(new EnergyParticleOptions(c(HelaRules.GREEN), 0.8F), at.x + Math.cos(a) * r, at.y + 0.1, at.z + Math.sin(a) * r,
                             0.0, 0.05, 0.0);
                 }
             }
             case HelaFx.CRUMBLE -> {
                 smoke(level, at, 6, 0.15);
-                burst(level, at, 5, 0.15, HelaRules.GREEN, 0.6F);
+                burst(level, at, 5, 0.15, c(HelaRules.GREEN), 0.6F);
             }
             case HelaFx.FORM -> {
-                burst(level, at, p.arg() > 0 ? 30 : 12, 0.5, p.arg() > 0 ? HelaRules.PALE : HelaRules.GREEN, 0.9F);
+                burst(level, at, p.arg() > 0 ? 30 : 12, 0.5, p.arg() > 0 ? c(HelaRules.PALE) : c(HelaRules.GREEN), 0.9F);
                 smoke(level, at, p.arg() > 0 ? 16 : 8, 0.4);
             }
             case HelaFx.RAISE -> smoke(level, at.add(0.0, 0.2, 0.0), 12, 1.2);
             default -> {
             }
         }
+        tint = -1;
         HelaActing.onFx(p);
+    }
+
+    /** (3.16) a custom hero's colour: the one chosen for the ability of what is being drawn, or -1 (Hela's own). */
+    private static int tint = -1;
+
+    /** One of Hela's colours, or it moved to the colour chosen for what is being drawn. */
+    private static int c(int rgb) {
+        return tint < 0 ? rgb : AbilityColors.recolor(rgb, tint);
+    }
+
+    /** The colour a custom hero chose for the ability one of her kinds of moment belongs to, or -1. */
+    private static int tintOf(ClientLevel level, int kind, int entityId) {
+        HeroAbility row = switch (kind) {
+            case HelaFx.VOLLEY, HelaFx.THROW -> HeroAbility.HELA_NECROSWORDS;
+            case HelaFx.WALL, HelaFx.BURST, HelaFx.RAIN -> HeroAbility.HELA_BLADE_WALL;
+            case HelaFx.FORM, HelaFx.DASH -> HeroAbility.HELA_GODDESS;
+            case HelaFx.CRUMBLE -> HeroAbility.HELA_GRASP;
+            default -> null;
+        };
+        return row == null ? -1 : AbilityColors.chosen(level.getEntity(entityId), row);
     }
 
     private static void burst(ClientLevel level, Vec3 at, int n, double spread, int colour, float size) {
@@ -249,6 +274,7 @@ public final class HelaEffects {
                 continue;
             }
             Vec3 o = l.points().get(0).subtract(camera).add(0.0, 0.04, 0.0);
+            tint = tintOf(level, l.kind(), l.entityId()); // (3.16) a custom hero's colour
             switch (l.kind()) {
                 case HelaFx.RAIN -> rainCircle(pose, vc, o, l.arg() / 10.0F, t, l.end() - l.start());
                 case HelaFx.STORM -> stormRing(pose, vc, o, l.arg() / 10.0F, t);
@@ -262,6 +288,7 @@ public final class HelaEffects {
                 }
             }
         }
+        tint = -1;
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
 
@@ -274,13 +301,13 @@ public final class HelaEffects {
     private static void rainCircle(Matrix4f pose, VertexConsumer vc, Vec3 o, float radius, float t, float length) {
         float a = fade(t, length);
         float pulse = 0.6F + 0.4F * Mth.sin(t * (0.4F + t * 0.03F));
-        flatRing(pose, vc, o, radius, 0.22F, EnergyGeometry.argb(HelaRules.GREEN, a * pulse));
-        flatRing(pose, vc, o, radius * 0.55F, 0.12F, EnergyGeometry.argb(HelaRules.PALE, a * 0.7F * pulse));
+        flatRing(pose, vc, o, radius, 0.22F, EnergyGeometry.argb(c(HelaRules.GREEN), a * pulse));
+        flatRing(pose, vc, o, radius * 0.55F, 0.12F, EnergyGeometry.argb(c(HelaRules.PALE), a * 0.7F * pulse));
         for (int i = 0; i < 6; i++) {
             double ang = i * Mth.TWO_PI / 6 + t * 0.02;
             Vec3 in = o.add(Math.cos(ang) * radius * 0.55, 0, Math.sin(ang) * radius * 0.55);
             Vec3 out = o.add(Math.cos(ang) * radius, 0, Math.sin(ang) * radius);
-            flatLine(pose, vc, in, out, 0.08F, EnergyGeometry.argb(HelaRules.GREEN, a * 0.6F));
+            flatLine(pose, vc, in, out, 0.08F, EnergyGeometry.argb(c(HelaRules.GREEN), a * 0.6F));
         }
     }
 
@@ -289,14 +316,14 @@ public final class HelaEffects {
         float k = Mth.clamp(t / 40.0F, 0.0F, 1.0F);
         float r = radius * k;
         float a = (1.0F - Mth.clamp((t - 40.0F) / 6.0F, 0.0F, 1.0F)) * 0.85F;
-        flatRing(pose, vc, o, r, 0.5F, EnergyGeometry.argb(HelaRules.GREEN, a));
+        flatRing(pose, vc, o, r, 0.5F, EnergyGeometry.argb(c(HelaRules.GREEN), a));
         int blades = 28;
         for (int i = 0; i < blades; i++) {
             double ang = i * Mth.TWO_PI / blades;
             Vec3 foot = o.add(Math.cos(ang) * r, 0.0, Math.sin(ang) * r);
             Vec3 side = new Vec3(-Math.sin(ang), 0.0, Math.cos(ang)).scale(0.08);
-            int c = EnergyGeometry.argb(HelaRules.PALE, a);
-            int top = EnergyGeometry.argb(HelaRules.PALE, 0.0F);
+            int c = EnergyGeometry.argb(c(HelaRules.PALE), a);
+            int top = EnergyGeometry.argb(c(HelaRules.PALE), 0.0F);
             vertex(pose, vc, foot.add(side), c);
             vertex(pose, vc, foot.subtract(side), c);
             vertex(pose, vc, foot.add(0.0, 1.1, 0.0), top);
