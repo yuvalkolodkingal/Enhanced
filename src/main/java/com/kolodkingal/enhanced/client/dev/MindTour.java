@@ -189,8 +189,21 @@ public final class MindTour {
             server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: tk block holds {} ({})",
                     Powers.get(p).heldEntityId(), p.level().getEntity(Powers.get(p).heldEntityId())), 5);
             shot("tk02_block", 10);
+            // her glowing eyes: in the open air, firing her chaos beam, seen from the front
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, true, true), 10);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, true), 10);
+            server(p -> {
+                p.setGameMode(GameType.CREATIVE);
+                p.getAbilities().flying = true;
+                p.onUpdateAbilities();
+                p.teleportTo(p.getX(), p.getY() + 12.0, p.getZ() - 6.0);
+                p.setYRot(180.0F);
+                p.setXRot(0.0F);
+            }, 30);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, true, false), 15);
             camera(CameraType.THIRD_PERSON_FRONT);
             shot("tk03_face", 10);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, false, false), 10);
             camera(CameraType.FIRST_PERSON);
             server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, true), 40);
             return;
