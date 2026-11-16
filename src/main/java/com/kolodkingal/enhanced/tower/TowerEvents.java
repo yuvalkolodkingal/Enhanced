@@ -18,16 +18,32 @@ public final class TowerEvents {
 
     @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            TowerRefit.tick(player);
+        if (event.getEntity() instanceof ServerPlayer player && !broken) {
+            try {
+                TowerRefit.tick(player);
+            } catch (RuntimeException e) {
+                stop(e);
+            }
         }
     }
 
     @Subscribe
     public static void onLevelTick(LevelTickEvent.Post event) {
-        if (event.getLevel() instanceof ServerLevel level) {
-            TowerRefit.work(level);
+        if (event.getLevel() instanceof ServerLevel level && !broken) {
+            try {
+                TowerRefit.work(level);
+            } catch (RuntimeException e) {
+                stop(e);
+            }
         }
+    }
+
+    /** (3.15.1) A refit that fails stops for this run with a line in the log, and never takes the server down. */
+    private static boolean broken;
+
+    private static void stop(RuntimeException e) {
+        broken = true;
+        com.kolodkingal.enhanced.Enhanced.LOGGER.error("The Avengers Tower refit failed and is off until restart", e);
     }
 
     @Subscribe

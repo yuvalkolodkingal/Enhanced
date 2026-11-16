@@ -1,5 +1,7 @@
 # Enhanced
 
+**[Join the official Discord](https://discord.gg/dKNCxwM5JE)** for news, help, bug reports and ideas.
+
 A Minecraft mod where you can become one of the *Enhanced*:
 **Magneto**, the Master of Magnetism; **Wanda Maximoff, the Scarlet Witch**;
 **Quicksilver**, who slows the world down around him (to his own song) or just outruns it;
@@ -70,6 +72,11 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Mod loader** NeoForge 21.1.x, 21.4.x, 21.11.x or 26.3.x
 * **Install it on** the client, plus the server for multiplayer
 * **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
+
+## What's new in 3.15.1
+
+* **Minecraft 1.21.11 and 26.3: coming near an Avengers Tower crashed the game.** The tower's refit (which brings old towers up to date) still used the chain's old name, which the game renamed to the iron chain. It reads the new name now, and if a refit ever fails again, it stops with a line in the log and never takes the game or the server down. (Thanks DrRic.)
+* The official Discord is in the mod's description: https://discord.gg/dKNCxwM5JE
 
 ## What's new in 3.15.0
 

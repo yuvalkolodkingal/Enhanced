@@ -368,6 +368,11 @@ public final class TowerDisplayTests {
                     r, steps, String.format(java.util.Locale.ROOT, "%.3f", total),
                     String.format(java.util.Locale.ROOT, "%.3f", worst));
             int table = TowerRefit.table(new ArrayList<>()).size();
+            // (3.15.1) the table's chains read as iron chains where the game renamed them (1.21.9+): no crash near
+            check("iron_chain[axis=y]".equals(TowerRefit.renamed("chain[axis=y]"))
+                    && "iron_chain".equals(TowerRefit.renamed("minecraft:chain"))
+                    && TowerRefit.renamed("chainmail") == null && TowerRefit.renamed("air") == null,
+                    "the renamed chain: " + TowerRefit.renamed("chain[axis=y]"));
             check(done && !r.oldDesign() && r.changed() == table - 3 && r.skipped() == 3 && r.removed() == 5
                     && r.kept() == 1, "every block but the player's three (the dirt, the Mark 50's two halves), 4 stands "
                     + "and the frame: " + r + " of " + table);

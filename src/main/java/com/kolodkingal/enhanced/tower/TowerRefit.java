@@ -180,9 +180,32 @@ public final class TowerRefit {
         try {
             return BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), text, false).blockState();
         } catch (CommandSyntaxException e) {
+            // (3.15.1) The game renamed a few blocks since the table was written (the chain is the iron chain from
+            // 1.21.9): read the new name, as the game's own fixer does for the tower's blocks in the world
+            String renamed = renamed(text);
+            if (renamed != null) {
+                return state(renamed);
+            }
             throw new IllegalStateException("the tower's refit table: " + text, e);
         }
     }
+
+    /** The table's block under the game's newer name, or null when it has none. */
+    @Nullable
+    public static String renamed(String text) {
+        for (String[] r : RENAMED) {
+            if (text.equals(r[0]) || text.startsWith(r[0] + "[")) {
+                return r[1] + text.substring(r[0].length());
+            }
+            if (text.equals("minecraft:" + r[0]) || text.startsWith("minecraft:" + r[0] + "[")) {
+                return r[1] + text.substring(r[0].length() + 10);
+            }
+        }
+        return null;
+    }
+
+    /** Old name, new name: the blocks of the table that the game renamed after 1.21.1. */
+    private static final String[][] RENAMED = {{"chain", "iron_chain"}};
 
     /** The table's blocks: the model point, the 3.6.1 block and the 3.8.1 block of each (for the tests). */
     public static List<BlockState[]> table(List<BlockPos> points) {
