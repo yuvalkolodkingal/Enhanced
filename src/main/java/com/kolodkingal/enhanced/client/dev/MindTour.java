@@ -148,6 +148,29 @@ public final class MindTour {
     }
 
     private static void script() {
+        if ("eternity".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            // (3.16) -Denhanced.mindtour.mode=eternity: Eternity's realm, and Eternity before you
+            server(p -> p.setGameMode(GameType.CREATIVE), 40);
+            server(p -> com.kolodkingal.enhanced.eternity.EternityRealm.enter(p, p.blockPosition()), 200);
+            shot("e01_arrival", 20);
+            server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Eternity entities near: {}",
+                    p.serverLevel().getEntitiesOfClass(com.kolodkingal.enhanced.eternity.EternityEntity.class,
+                            p.getBoundingBox().inflate(256)).stream().map(e -> e.blockPosition().toShortString()).toList()), 20);
+            camera(CameraType.THIRD_PERSON_FRONT);
+            shot("e02_behind", 20);
+            camera(CameraType.FIRST_PERSON);
+            server(p -> p.setXRot(-25.0F), 20);
+            shot("e03_up", 20);
+            return;
+        }
+        if ("palette".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            // (3.16) -Denhanced.mindtour.mode=palette: the Scarlet Witch's block palette held open a minute, for clicks from
+            // outside (xdotool) to be tried on it (26.3's mouse buttons)
+            server(p -> Powers.awaken(p, Power.SCARLET_WITCH, "", false), 40);
+            STEPS.add(new Step(1200, () -> Minecraft.getInstance().setScreen(
+                    new com.kolodkingal.enhanced.client.build.BlockPaletteScreen())));
+            return;
+        }
         camera(CameraType.FIRST_PERSON);
         server(p -> {
             p.setGameMode(GameType.CREATIVE);
