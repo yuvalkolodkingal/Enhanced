@@ -106,8 +106,9 @@ jobs:
             --latest
 
   publish:
-    # Each new mod_version goes to CurseForge and Modrinth once: the first push to main that builds it. The tag
-    # published/<version> marks it as sent. Skipped until the secrets CURSEFORGE_TOKEN / MODRINTH_TOKEN and the
+    # Each new mod_version goes to CurseForge and Modrinth once each: the first push to main that builds it. The tags
+    # published/curseforge/<version> and published/modrinth/<version> mark it as sent, so a site that failed is
+    # tried again on the next push without sending the other one twice. Skipped until the secrets CURSEFORGE_TOKEN / MODRINTH_TOKEN and the
     # variables CURSEFORGE_ID / MODRINTH_ID are set in the repository settings (either pair alone is enough).
     name: Publish to CurseForge and Modrinth
     needs: [build, release]
@@ -131,14 +132,20 @@ jobs:
           MR_ID: ${{ vars.MODRINTH_ID }}
         run: |
           go=true
-          if git ls-remote --exit-code --tags origin "refs/tags/published/${VERSION}" >/dev/null; then
-            echo "Enhanced ${VERSION} is already published"; go=false
-          fi
           cf=false; mr=false
-          [ -n "$CF_TOKEN" ] && [ -n "$CF_ID" ] && cf=true
-          [ -n "$MR_TOKEN" ] && [ -n "$MR_ID" ] && mr=true
+          # sent: a published/<site>/<version> tag, or a line "<site> <version>" in .github/published.txt
+          sent() {
+            git ls-remote --exit-code --tags origin "refs/tags/published/$1/${VERSION}" >/dev/null \
+              || grep -qx "$1 ${VERSION}" .github/published.txt 2>/dev/null
+          }
+          if [ -n "$CF_TOKEN" ] && [ -n "$CF_ID" ]; then
+            if sent curseforge; then echo "Already on CurseForge"; else cf=true; fi
+          fi
+          if [ -n "$MR_TOKEN" ] && [ -n "$MR_ID" ]; then
+            if sent modrinth; then echo "Already on Modrinth"; else mr=true; fi
+          fi
           if [ "$cf" = false ] && [ "$mr" = false ]; then
-            echo "::notice::No CurseForge or Modrinth token and project id set: not publishing"; go=false
+            echo "Nothing to send (already sent, or no token and project id set)"; go=false
           fi
           echo "go=$go" >> "$GITHUB_OUTPUT"
           echo "cf=$cf" >> "$GITHUB_OUTPUT"
@@ -155,13 +162,11 @@ jobs:
           name: enhanced-${{ needs.build.outputs.label }}
           path: dist
 
-      - name: Upload to CurseForge and Modrinth
-        if: steps.go.outputs.go == 'true'
+      - name: Upload to CurseForge
+        if: steps.go.outputs.cf == 'true'
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          modrinth-id: ${{ steps.go.outputs.mr == 'true' && vars.MODRINTH_ID || '' }}
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          curseforge-id: ${{ steps.go.outputs.cf == 'true' && vars.CURSEFORGE_ID || '' }}
+          curseforge-id: ${{ vars.CURSEFORGE_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           files: dist/*.jar
           name: Enhanced ${{ needs.build.outputs.version }}
@@ -179,10 +184,40 @@ jobs:
             21
           retry-attempts: 2
 
-      - name: Mark the version as published
-        if: steps.go.outputs.go == 'true'
+      - name: Mark the version as sent to CurseForge
+        if: steps.go.outputs.cf == 'true'
         env:
           VERSION: ${{ needs.build.outputs.version }}
         run: |
-          git tag "published/${VERSION}" "$GITHUB_SHA"
-          git push origin "published/${VERSION}"
+          git tag "published/curseforge/${VERSION}" "$GITHUB_SHA"
+          git push origin "published/curseforge/${VERSION}"
+
+      - name: Upload to Modrinth
+        if: steps.go.outputs.mr == 'true'
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: dist/*.jar
+          name: Enhanced ${{ needs.build.outputs.version }}
+          version: ${{ needs.build.outputs.version }}
+          version-type: release
+          changelog-file: changelog.txt
+          loaders: neoforge
+          game-versions: |
+            1.21.1
+            1.21.4
+            1.21.11
+            26.3
+          game-version-filter: none
+          java: |
+            21
+          retry-attempts: 2
+
+      - name: Mark the version as sent to Modrinth
+        if: steps.go.outputs.mr == 'true'
+        env:
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          git tag "published/modrinth/${VERSION}" "$GITHUB_SHA"
+          git push origin "published/modrinth/${VERSION}"

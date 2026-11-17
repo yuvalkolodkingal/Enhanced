@@ -1,0 +1,2 @@
+# Versions sent to CurseForge or Modrinth before the workflow could tag them: "<site> <version>"
+curseforge 3.16.1
