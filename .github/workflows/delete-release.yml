@@ -1,0 +1,31 @@
+# Deletes a release and its tag, by hand only (Actions, Delete a release, Run workflow, with the tag): for a release
+# published by mistake. The next push to main publishes a new build.
+name: Delete a release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The release tag to delete, e.g. v3.17.0-build.62'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  delete:
+    name: Delete the release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete it and its tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          case "$TAG" in
+            v[0-9]*) ;;
+            *) echo "::error::Not a release tag: $TAG"; exit 1 ;;
+          esac
+          gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes
+          echo "Deleted the release $TAG and its tag."

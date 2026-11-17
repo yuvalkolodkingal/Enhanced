@@ -73,10 +73,6 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Install it on** the client, plus the server for multiplayer
 * **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
 
-## What's new in 3.17.1
-
-* **3.17.0 is taken back.** Ultimate Mode and everything else that came with 3.17.0 (witchcraft, the grimoire, the new keys) are removed: that version broke the game. 3.17.1 plays exactly as 3.16.1 did. A world or config that was opened with 3.17.0 keeps working; what 3.17.0 added to it is ignored.
-
 ## What's new in 3.16.1
 
 * **The official server is on your Multiplayer list:** the first time the game starts with Enhanced, *Enhanced Superhero SMP* (superheros.exaroton.me) is added at the end of your server list, once. Your own servers are never touched, it is not added twice if you already have it, and if you delete it, it stays deleted. Turn it off with `officialServer = false` in the client config (`official_server`).
