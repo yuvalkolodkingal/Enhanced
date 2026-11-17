@@ -227,15 +227,6 @@ public enum Live {
     SOLAR_GATHERING,
     /** The Overload's great beam pours from his jewel. */
     SOLAR_OVERLOAD,
-    // ===== magic and Ultimate Mode (3.17) =====
-    /** A caster chants an incantation (K): the hands weave, runes circle them. */
-    CHANTING,
-    /** A caster rides a broom of light (Hexenbesen). */
-    BROOM,
-    /** A hero rises into their ultimate form (O): the awakening's moment. */
-    ULTIMATE_AWAKENING,
-    /** A hero's ultimate form lasts: its aura is drawn round them (the Demiurge's star form is Billy's). */
-    ULTIMATE,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

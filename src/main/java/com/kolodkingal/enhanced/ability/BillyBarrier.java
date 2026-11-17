@@ -185,9 +185,6 @@ public final class BillyBarrier {
 
     /** Whether a point is in the arc the barrier covers: within the half-angle of the way he looks, seen from his body. */
     public static boolean covers(Player billy, Vec3 point) {
-        if (com.kolodkingal.enhanced.magic.Magic.isDemiurge(billy)) {
-            return true; // (3.17: the Demiurge's barrier wraps his whole body)
-        }
         Vec3 to = point.subtract(body(billy));
         double length = to.length();
         if (length < 1.0E-4) {

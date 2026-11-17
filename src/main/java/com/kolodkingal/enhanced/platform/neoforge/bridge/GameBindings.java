@@ -139,9 +139,6 @@ public final class GameBindings {
                 NeoItemEntityPickupEventPre::new);
         Binding.put(table, ItemTossEvent.class, net.neoforged.neoforge.event.entity.item.ItemTossEvent.class,
                 NeoItemTossEvent::new);
-        // 3.17: chat in the Witches' Mindscape is heard only there
-        Binding.put(table, com.kolodkingal.enhanced.platform.event.ServerChatEvent.class,
-                net.neoforged.neoforge.event.ServerChatEvent.class, NeoServerChatEvent::new);
         Binding.put(table, LivingIncomingDamageEvent.class,
                 net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent.class,
                 NeoLivingIncomingDamageEvent::new);
@@ -653,35 +650,6 @@ public final class GameBindings {
         NeoItemTossEvent(net.neoforged.neoforge.event.entity.item.ItemTossEvent n) {
             super(n.getEntity(), n.getPlayer());
             this.n = n;
-        }
-
-        @Override
-        public boolean isCanceled() {
-            return n.isCanceled();
-        }
-
-        @Override
-        public void setCanceled(boolean canceled) {
-            n.setCanceled(canceled);
-        }
-    }
-
-    private static final class NeoServerChatEvent extends com.kolodkingal.enhanced.platform.event.ServerChatEvent {
-        private final net.neoforged.neoforge.event.ServerChatEvent n;
-
-        NeoServerChatEvent(net.neoforged.neoforge.event.ServerChatEvent n) {
-            super(n.getPlayer(), n.getRawText(), n.getMessage());
-            this.n = n;
-        }
-
-        @Override
-        public net.minecraft.network.chat.Component getMessage() {
-            return n.getMessage();
-        }
-
-        @Override
-        public void setMessage(net.minecraft.network.chat.Component message) {
-            n.setMessage(message);
         }
 
         @Override

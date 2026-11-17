@@ -371,8 +371,8 @@ public final class MindTour {
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 4, true, false), 25);
         shot("m25d_fire_density", 5);
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 4, true, false), 10);
-        // ...and with the Solar Jewel turned on (Ultimate Mode, 3.17)
-        server(p -> com.kolodkingal.enhanced.ultimate.Ultimate.set(true), 10);
+        // ...and with the Solar Jewel turned on (vision.solar_jewel.enabled)
+        server(p -> com.kolodkingal.enhanced.config.SolarJewelConfig.ENABLED.set(true), 10);
         camera(CameraType.THIRD_PERSON_BACK);
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, true, false), 15);
         shot("m25e_solar_beam", 5);
@@ -386,7 +386,7 @@ public final class MindTour {
         camera(CameraType.THIRD_PERSON_BACK);
         shot("m25h_overload_fire", 6);
         server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 1, false, true), 40);
-        server(p -> com.kolodkingal.enhanced.ultimate.Ultimate.set(null), 10);
+        server(p -> com.kolodkingal.enhanced.config.SolarJewelConfig.ENABLED.set(false), 10);
         camera(CameraType.FIRST_PERSON);
         server(MindRealm::leave, 80);
         if ("manor".equals(System.getProperty("enhanced.mindtour.from"))) {

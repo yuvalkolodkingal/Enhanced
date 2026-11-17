@@ -79,8 +79,7 @@ public final class HexRunes {
 
     /** Whether the runes of a Hex hold this player: they cannot use powers. Both sides. */
     public static boolean silences(Player player) {
-        // (3.17: an Unbinding, or the Coven's Road, breaks the hold of a Hex's runes on him)
-        return silencing(player) != null && !com.kolodkingal.enhanced.magic.Magic.unbound(player);
+        return silencing(player) != null;
     }
 
     // ---- Wanda inscribes them ----

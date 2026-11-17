@@ -653,9 +653,6 @@ public final class GestureRoutes {
                     + " along the wings, which the wings' layer lays flat";
             // (3.16) Solar Jewel Vision
             case SOLAR_EYES, SOLAR_GATHERING, SOLAR_OVERLOAD -> "stances (SOLAR_EYES, SOLAR_GATHER, SOLAR_OVERLOAD); the light is SolarJewelFx's";
-            // (3.17) magic and Ultimate Mode
-            case CHANTING, BROOM, ULTIMATE_AWAKENING, ULTIMATE -> "stances (MAGIC_CHANT, MAGIC_BROOM, ULTIMATE_AWAKEN,"
-                    + " ULTIMATE_POWER); the runes, the broom and the auras are MagicFxRenderer's";
         };
     }
 

@@ -79,11 +79,6 @@ With a crafted **Infinity Gauntlet** in your hand:
 
 The same goes for a bare stone in your hand (no J needed). **J** is also Spider-Man's Web Assist: each answers only for its own player. See [Infinity Stones](Infinity-Stones#the-infinity-gauntlet).
 
-## Spells: K, and the ultimate form: O (3.17)
-
-* **K** casts your chosen spell ([Witchcraft](Witchcraft)): a witch, a sorcerer, Billy, or a hero sorcerer who has read a grimoire. **Sneak + K** opens the Spell Wheel to choose it. Hold K while you chant to chant twice as fast. A witch's **R G V B N** (and with Sneak) cast her first ten spells.
-* **O**, with [Ultimate Mode](Ultimate-Mode) on, awakens your hero's ultimate form; O again while it lasts fires its signature move. **Sneak + O**: the Demiurge's Magic types (Billy), or ending the Nexus Being's form (the Scarlet Witch).
-
 ## Build Magic: Y
 
 ![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)

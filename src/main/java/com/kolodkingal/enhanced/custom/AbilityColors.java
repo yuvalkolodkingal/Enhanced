@@ -34,23 +34,12 @@ public final class AbilityColors {
      * parent's pick (the parent's card holds both halves), and a parent he has not picked its variant row's (the
      * variant's code is the parent's).
      */
-    /** (3.17) The Demiurge's blue, brighter than Billy's own. */
-    public static final int DEMIURGE_BLUE = 0x7FE6FF;
-
     public static int chosen(@Nullable Entity entity, HeroAbility row) {
         if (!(entity instanceof Player player)) {
             return -1;
         }
         PowerData data = Powers.get(player);
         if (data.power() != Power.CUSTOM) {
-            // 3.17, Ultimate Mode: the Demiurge's abilities (and a magic user's he took on) in his bright blue; the
-            // Nexus Being's in her bright red.
-            if (data.power() == Power.BILLY && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
-                return DEMIURGE_BLUE;
-            }
-            if (data.power() == Power.SCARLET_WITCH && com.kolodkingal.enhanced.ultimate.NexusBeing.is(player)) {
-                return com.kolodkingal.enhanced.ultimate.NexusBeing.RED;
-            }
             return -1;
         }
         return chosen(CustomHeroes.hero(player), row);

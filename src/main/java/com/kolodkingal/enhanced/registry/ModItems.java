@@ -19,7 +19,6 @@ import com.kolodkingal.enhanced.thanos.StoneKind;
 import com.kolodkingal.enhanced.item.GungnirItem;
 import com.kolodkingal.enhanced.item.HelaHeaddressItem;
 import com.kolodkingal.enhanced.item.HofundItem;
-import com.kolodkingal.enhanced.item.CagliostroGrimoireItem;
 import com.kolodkingal.enhanced.item.DarkholdItem;
 import com.kolodkingal.enhanced.item.EssenceItem;
 import com.kolodkingal.enhanced.item.HeroCreatorItem;
@@ -99,10 +98,6 @@ public final class ModItems {
     /** Agatha's book (3.2): a purple beam, a retaliation against magic, a hex mark and a mind glimpse for a sorcerer who holds it. Craftable, and costly. */
     public static final ItemEntry<DarkholdItem> DARKHOLD = ITEMS.register("darkhold",
             () -> new DarkholdItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
-
-    /** 3.17: the spells of time, for a caster who reads it ({@code magic.Grimoires}). Found in the Sanctum's library. */
-    public static final ItemEntry<CagliostroGrimoireItem> CAGLIOSTROS_GRIMOIRE = ITEMS.register("cagliostros_grimoire",
-            () -> new CagliostroGrimoireItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
     // The items of 3.0, in one region per hero (the // ===== lines). All stack to one, are fire-resistant and epic,
     // except the spider, which stacks to sixteen.

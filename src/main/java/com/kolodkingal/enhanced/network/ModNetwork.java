@@ -19,11 +19,9 @@ public final class ModNetwork {
      * Deadpool, the healing factor, the X-Men lower lab, the amplified Cerebro and the Stone Locator), and once for 3.8
      * (the serum, Captain America, Red Hulk, Iron Man, Falcon, the tower's armoury, Eternity and Love; the momentary
      * states in two words), and once for 3.9 (the mod's own config files: the server's settings travel to a player
-     * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once). 3.16 (16):
-     * the SMP balance and Solar Jewel Vision; 3.17 (17): witchcraft, the spells and their light, the Demiurge's screen,
-     * the Coven's Road, and Ultimate Mode.
+     * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once).
      */
-    public static final String PROTOCOL_VERSION = "17";
+    public static final String PROTOCOL_VERSION = "16";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -51,16 +49,6 @@ public final class ModNetwork {
         registrar.clientbound(com.kolodkingal.enhanced.balance.BalanceSyncPayload.TYPE,
                 com.kolodkingal.enhanced.balance.BalanceSyncPayload.STREAM_CODEC,
                 com.kolodkingal.enhanced.balance.BalanceSyncPayload::handle);
-        // 3.17: Ultimate Mode, and the magic of the witches, the sorcerers and Billy
-        registrar.clientbound(com.kolodkingal.enhanced.ultimate.UltimateSyncPayload.TYPE,
-                com.kolodkingal.enhanced.ultimate.UltimateSyncPayload.STREAM_CODEC,
-                com.kolodkingal.enhanced.ultimate.UltimateSyncPayload::handle);
-        registrar.clientbound(com.kolodkingal.enhanced.magic.MagicFxPayload.TYPE,
-                com.kolodkingal.enhanced.magic.MagicFxPayload.STREAM_CODEC, com.kolodkingal.enhanced.magic.MagicFxPayload::handle);
-        registrar.clientbound(com.kolodkingal.enhanced.magic.MagicScreenPayload.TYPE,
-                com.kolodkingal.enhanced.magic.MagicScreenPayload.STREAM_CODEC, com.kolodkingal.enhanced.magic.MagicScreenPayload::handle);
-        registrar.serverbound(com.kolodkingal.enhanced.magic.MagicActionPayload.TYPE,
-                com.kolodkingal.enhanced.magic.MagicActionPayload.STREAM_CODEC, com.kolodkingal.enhanced.magic.MagicActionPayload::handle);
         registrar.clientbound(ThorFxPayload.TYPE, ThorFxPayload.STREAM_CODEC, ThorFxPayload::handle);
         registrar.clientbound(HexBoltPayload.TYPE, HexBoltPayload.STREAM_CODEC, HexBoltPayload::handle);
         registrar.clientbound(OpenRoadPayload.TYPE, OpenRoadPayload.STREAM_CODEC, OpenRoadPayload::handle);

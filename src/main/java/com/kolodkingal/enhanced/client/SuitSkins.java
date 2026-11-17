@@ -37,18 +37,6 @@ public final class SuitSkins {
     private static final PlayerSkin QUICKSILVER = new PlayerSkin(
             Enhanced.id("textures/entity/suit/quicksilver.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
-    /** 3.17, Ultimate Mode: the Demiurge at rest (the starry suit, red scarf and cape) and powered (the star body in the hood). */
-    private static final PlayerSkin DEMIURGE = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/billy_demiurge.png"), null,
-            Enhanced.id("textures/entity/suit/billy_demiurge_cape.png"), null, PlayerSkin.Model.WIDE, true);
-    private static final PlayerSkin DEMIURGE_POWERED = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/billy_demiurge_powered.png"), null,
-            Enhanced.id("textures/entity/suit/billy_demiurge_powered_cape.png"), null, PlayerSkin.Model.WIDE, true);
-    /** 3.17, Ultimate Mode: the Nexus Being's cosmic suit. */
-    private static final PlayerSkin NEXUS = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/scarlet_witch_nexus.png"), null,
-            Enhanced.id("textures/entity/suit/scarlet_witch_nexus_cape.png"), null, PlayerSkin.Model.SLIM, true);
-
     private static final PlayerSkin VISION_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/vision_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -79,13 +67,6 @@ public final class SuitSkins {
     @Nullable
     public static PlayerSkin suitFor(AbstractClientPlayer player) {
         Power power = Powers.power(player);
-        // 3.17: the Demiurge (Billy, Ultimate Mode) and the Nexus Being (Wanda's ultimate form) wear theirs
-        if (power == Power.BILLY && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
-            return com.kolodkingal.enhanced.client.magic.DemiurgeFx.powered(player) ? DEMIURGE_POWERED : DEMIURGE;
-        }
-        if (power == Power.SCARLET_WITCH && com.kolodkingal.enhanced.ultimate.NexusBeing.is(player)) {
-            return NEXUS;
-        }
         if (power == Power.MAGNETO && MagnetoAbilities.wearsHelmet(player)) {
             return MAGNETO;
         }

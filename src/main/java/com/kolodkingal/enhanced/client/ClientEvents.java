@@ -113,7 +113,6 @@ public final class ClientEvents {
         GestureEffects.tick(mc.level);
         MagnetStreams.tick(mc.level);
         handleKeys(mc, player);
-        handleMagicKeys(mc, player);
         QuickHands.tick(mc, player);
         spawnSpeedTrails(mc.level);
         spawnFrostParticles(mc);
@@ -161,11 +160,6 @@ public final class ClientEvents {
         BarrierRenderer.clear();
         MagnetStreams.clear();
         HeroClients.clear();
-        // 3.17: a server's Ultimate Mode stays with it; the spells' light goes
-        if (!Minecraft.getInstance().hasSingleplayerServer()) {
-            com.kolodkingal.enhanced.ultimate.Ultimate.reset();
-        }
-        com.kolodkingal.enhanced.client.magic.MagicFxRenderer.clear();
     }
 
     /**
@@ -347,9 +341,7 @@ public final class ClientEvents {
                 clicked = true;
             }
             // (3.3: the Hex Runes hold a sorcerer's powers: no gesture is predicted for a press the server refuses)
-            // (3.17: a witch's R G V B N are her spells)
-            boolean usable = mine && (power.hasPowers() || com.kolodkingal.enhanced.magic.Magic.isWitch(player)) && mc.screen == null
-                    && !player.isSpectator() && !HexRunes.silences(player);
+            boolean usable = mine && power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
             boolean down = usable && key.isDown();
             // (3.5: the Sneak the key was pressed with, not the one the tick read; see PRESS_SNEAK)
             boolean sneak = PRESS_SNEAK[i] != 0 ? PRESS_SNEAK[i] == 2 : mc.options.keyShift.isDown();
@@ -368,37 +360,6 @@ public final class ClientEvents {
                 Net.sendToServer(new AbilityKeyPayload(i, false, mc.options.keyShift.isDown()));
                 SENT_DOWN[i] = false;
             }
-        }
-    }
-
-    /** Whether K was sent down (its release is sent once, as for the ability keys). */
-    private static boolean spellSent;
-
-    /** 3.17: K (with Sneak, the Spell Wheel) and O. */
-    private static void handleMagicKeys(Minecraft mc, LocalPlayer player) {
-        boolean spellClicked = false;
-        while (KeyBindings.SPELLS.consumeClick()) {
-            spellClicked = true;
-        }
-        boolean caster = com.kolodkingal.enhanced.magic.Magic.isCaster(player);
-        if (spellClicked && caster && mc.screen == null && !player.isSpectator()) {
-            if (mc.options.keyShift.isDown()) {
-                com.kolodkingal.enhanced.client.magic.SpellWheelScreen.open(mc);
-            } else if (!spellSent) {
-                Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.SPELL, true, false));
-                spellSent = true;
-            }
-        }
-        if (spellSent && !KeyBindings.SPELLS.isDown()) {
-            Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.SPELL, false, false));
-            spellSent = false;
-        }
-        boolean ultimateClicked = false;
-        while (KeyBindings.ULTIMATE.consumeClick()) {
-            ultimateClicked = true;
-        }
-        if (ultimateClicked && mc.screen == null && !player.isSpectator()) {
-            Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.ULTIMATE, true, mc.options.keyShift.isDown()));
         }
     }
 

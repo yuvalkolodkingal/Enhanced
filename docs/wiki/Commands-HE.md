@@ -68,31 +68,6 @@
 
 קובץ הקונפיג של השרת עצמו לא משתנה לעולם: האיזון חל מעליו, ו-`full` מחזיר את המספרים שלו.
 
-## מצב אולטימטיבי: /enhanced ultimate
-
-הגרסה האולטימטיבית של כל גיבור, לכל השרת (3.17; מפעילים). ראו [מצב אולטימטיבי](Ultimate-Mode-HE).
-
-| פקודה | מה היא עושה |
-|---|---|
-| `/enhanced ultimate on` | מדליקה את המצב האולטימטיבי בעולם הזה: O מעורר את הצורה האולטימטיבית של כל גיבור, ויז'ן של קוד המקור פועל על אבן השמש, בילי הוא הדמיאורג, סקרלט ויץ' יכולה להפוך לישות הנקסוס |
-| `/enhanced ultimate off` | מכבה אותו בעולם הזה (כל הצורות האולטימטיביות נגמרות) |
-| `/enhanced ultimate info` | האם הוא דולק, והאם זו ההגדרה של העולם או של הגדרות השרת |
-| `/enhanced ultimate default` | מבטלת את ההגדרה של העולם: `[ultimate] enabled` בהגדרות השרת מחליט שוב |
-
-ההגדרה של העולם נשמרת ב-`world/serverconfig/enhanced-ultimate.json` וגוברת על ההגדרות. כל השחקנים מקבלים הודעה מיד.
-
-## כישוף: /enhanced witch
-
-הכישוף של השחקנים (3.17; מפעילים). ראו [כישוף](Witchcraft-HE).
-
-| פקודה | מה היא עושה |
-|---|---|
-| `/enhanced witch info [player]` | הדרך, הרמה, המאנה, ההשחתה ומספר הכישופים של שחקן |
-| `/enhanced witch grant <player> <path> [level]` | הופכת שחקן בלי כוח של גיבור למכשפה: `green`, `potions`, `protection`, `divination`, `spirit` או `sorcerer`, רמה 1 עד 5 |
-| `/enhanced witch revoke <player>` | לוקחת ממנו את הכישוף |
-| `/enhanced witch grimoire <player> <darkhold\|vishanti\|cagliostro>` | מלמדת אותו את הכישופים של ספר כשפים כאילו קרא אותו |
-| `/enhanced witch cleanse <player>` | מנקה את ההשחתה של הדארקהולד מהקסם שלו |
-
 ## אסגרד: /enhanced asgard
 
 ![ארמון אסגרד](images/092-asgard-palace.png)

@@ -2295,45 +2295,6 @@ Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-dar
 | `darkhold.glimpseCooldown` | `200` | 0 to 72000 | Cooldown of the mind glimpse, in ticks. |
 | `darkhold.glimpseExhaustion` | `1.0` | 0.0 to 40.0 | Food exhaustion of a mind glimpse (4.0 = 1 food point). Creative players pay nothing. |
 
-## Ultimate Mode
-
-Section `[ultimate]` (3.17): [Ultimate Mode](Ultimate-Mode), every hero's ultimate version. `/enhanced ultimate on|off` saves a world's own setting, which wins over `enabled` here (`/enhanced ultimate default` drops it). It replaced 3.16's `vision.solar_jewel.enabled`; an old file with that on turns `enabled` on.
-
-| Option | Default | Allowed values | Meaning |
-|---|---|---|---|
-| `ultimate.enabled` | `false` | `true` or `false` | Ultimate Mode for every player: O awakens the ultimate forms, Source Code Vision runs on the Solar Jewel, Billy is the Demiurge, Wanda can become the Nexus Being. |
-| `ultimate.awakenTicks` | `30` | 5 to 200 | Ticks the awakening takes before the form is the hero's. |
-| `ultimate.durationSeconds` | `45` | 5 to 3600 | Seconds an ultimate form lasts (the Nexus Being's has no limit). |
-| `ultimate.cooldownSeconds` | `180` | 0 to 36000 | Seconds after a form ends before it can be awakened again (none for the Nexus Being). |
-| `ultimate.signatureCooldownSeconds` | `10` | 1 to 600 | Seconds between two signature moves (O while the form lasts). |
-| `ultimate.signatureDamage` | `14.0` | 0 to 200 | The damage of a signature move to each creature it strikes. |
-| `ultimate.signatureRadius` | `10` | 2 to 64 | How far a signature move reaches round the hero, in blocks. |
-| `ultimate.damageBonus` | `0.25` | 0 to 5 | How much more damage a hero does in their ultimate form (0.25: a quarter more). |
-| `ultimate.signatureHurtsPlayers` | `true` | `true` or `false` | Whether signature moves strike other players too (PvP must be on). |
-| `ultimate.nexusFlashRange` | `50` | 4 to 128 | How far from the Nexus Being her chaos flashes strike her enemies, in blocks. |
-| `ultimate.nexusFlashDamage` | `15.0` | 0 to 200 | The damage of each chaos flash (they never touch her). |
-
-## Witchcraft
-
-Section `[witchcraft]` (3.17): [Witchcraft](Witchcraft), the spells, the grimoires, the Coven's Road and the Mindscape.
-
-| Option | Default | Allowed values | Meaning |
-|---|---|---|---|
-| `witchcraft.enabled` | `true` | `true` or `false` | Whether witchcraft and the spells (K) are in the game at all. |
-| `witchcraft.manaRegen` | `3.0` | 0 to 100 | Mana a caster gets back each second, before their level (twice as much in a coven). |
-| `witchcraft.covenRadius` | `16` | 1 to 128 | How near another caster must be for the coven's faster mana, in blocks. |
-| `witchcraft.spellDamageFactor` | `1.0` | 0 to 10 | How many times as much the spells hurt. |
-| `witchcraft.interruptDamage` | `4.0` | 0 to 100 | A blow of at least this much breaks an incantation off (0: nothing does). |
-| `witchcraft.chantHeldSpeed` | `2.0` | 1 to 10 | How many times as fast an incantation goes while K is held. |
-| `witchcraft.corruptionPerSpell` | `6` | 0 to 100 | The corruption each of the Darkhold's spells adds (out of 100). |
-| `witchcraft.spellsHurtPlayers` | `true` | `true` or `false` | Whether harmful spells touch other players (PvP must be on too). |
-| `witchcraft.conjuredBlockSeconds` | `30` | 3 to 600 | Seconds a conjured block (a bridge, a wall, a platform, thorns) lasts. |
-| `witchcraft.hallwayMaxSeconds` | `29` | 3 to 120 | The longest an Infinite Hallway holds anyone (it grows with Billy's rank up to this). |
-| `witchcraft.roadRevives` | `true` | `true` or `false` | Whether the Coven's Road may bring back the dead (a hardcore world's fallen players). |
-| `witchcraft.roadPortalSeconds` | `15` | 3 to 120 | Seconds a portal to the Coven's Road stays open for others to step in. |
-| `witchcraft.mindscapePrivateChat` | `true` | `true` or `false` | Whether chat in the Witches' Mindscape is heard only by those in it. |
-| `witchcraft.roadOffersWitchcraft` | `true` | `true` or `false` | Whether the end of the Coven's Road offers witchcraft to someone with no power. |
-
 ## Structures
 
 The four stone sites of 3.6 can each be switched off: see [The stone sites](#the-stone-sites). Since 3.7 the schools' lower labs are [`[school_lab]`](#the-x-men-lower-lab) and Agatha's Cottages [`[agatha_cottage]`](#agathas-cottage). Since 3.8 the Shrines of the Cosmic Entities in the End are switched by `eternity.enabled` ([Eternity and Love](#eternity-and-love); their spacing is the data file `worldgen/structure_set/eternity_shrines.json`, 40 / 14 chunks, 4 chunks from an End tunnel, and the biome tag `has_structure/eternity_shrine.json`), and the Avengers Tower's armoury and the refit of old towers are [`[avengers_tower]`](#the-avengers-towers-armoury). The garrison of the Hydra outposts is the section [`[hydra]`](#hydra-soldiers). The three structures of 3.3 ([Hydra outposts, Mjolnir's craters and the Mutant School](Structures)) have **no server option**: they are data, so a data pack tunes them. `data/enhanced/worldgen/structure_set/` holds their spacing and separation (`hydra_outposts` 36 / 12 chunks, `mjolnir_craters` 32 / 10, `mutant_schools` 40 / 14; outposts and craters keep 6 chunks from a school), the biome tags `data/enhanced/tags/worldgen/biome/has_structure/hydra_outpost.json`, `mjolnir_crater.json` and `mutant_school.json` say where they stand (empty a tag to stop that structure in new chunks), `data/enhanced/worldgen/structure/` holds the structures themselves (`max_slope`, the crater's `radius` and `depth`), `data/enhanced/structure/` the building templates, and `data/enhanced/loot_table/chests/hydra_outpost/` and `chests/mutant_school/` what the chests hold.

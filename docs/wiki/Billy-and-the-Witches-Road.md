@@ -120,12 +120,6 @@ Billy is a sorcerer: he may hold and use the **Time Stone** (Slow Time; Sneak: R
 
 Billy's **chaos magic** (the Hex Bolt and the Hex Beam) is one of the few things a [healing factor](Healing-Factor) can't stop: it defeats Wolverine and Deadpool, where anything else only knocks them down. He may use the [Cerebro console](Mutant-School-Lab#cerebro) too. At [Agatha's Cottage](Agathas-Cottage), Agatha calls him "Teen", and Nicky wants a spell.
 
-## Spells, and the Demiurge (3.17)
-
-Billy casts spells of his own on **K** ("I want ..."), opening with his rank: the Unbinding, the broomstick, sigils and runes of protection, ghosts, dreams, a pocket dimension, the Infinite Hallway, conjured things, gravity, clairvoyance, familiars, portals and more: see [Witchcraft](Witchcraft#billys-spells). He can open the Witches' Road for his whole coven (the Coven's Road).
-
-With [Ultimate Mode](Ultimate-Mode) on, Billy is **the Demiurge**: twenty hearts, Netherite's protection, a barrier round his whole body, a brighter blue with stars in it, every spell, the **Magic types** (Sneak + O: the Scarlet Witch's, Doctor Strange's, Agatha's or Loki's abilities on his keys) and **Grant Magic** (he gives witchcraft to players with no hero). He wears the Demiurge's starry suit, and the great red hooded cloak while he flies or uses a power.
-
 ## Numbers you can change
 
 Billy's flight speed, the Hex Beam (whether it is a beam at all, its damage, range, hit rate, hunger and how much it grows with his rank), the Hex Bolt's damage (when the beam is off), the Hex Barrier (its health, how fast it mends, the wait after it shattered, its arc, size, walking speed and rank growth), how long Freeze holds (5 seconds), how far The Noise reaches (32 blocks), whether he tears blocks out at all, how far and how hard a block, and his recharge between blocks are the `billy.*` options on [Server Configuration](Server-Configuration#billy-wiccan). His Build Magic numbers (the meter, the refill, the ten ranks and their practice, his reach and side, Mom's help) are the `build_magic_billy.*` options.

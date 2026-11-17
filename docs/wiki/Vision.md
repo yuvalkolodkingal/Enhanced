@@ -45,13 +45,9 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 | 3 | **V** (toggle) | Phase | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you are only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
 | 4 | **B** (toggle) | Density | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Phasing ends density, and you can't turn dense while phased. |
 | 5 | **N** (toggle) | Human Disguise | Take on the human look from *WandaVision*: a 1950s sitcom husband in a shirt, tie and cardigan. Only the looks change. |
-## On fire while he flies (3.17)
-
-In his Source Code look Vision **burns while he flies**, like the Human Torch: living flames of his own wrap his body from his feet to his head and bend back from where he flies, in his orange and gold, a crown of flame over his head and a trail of fire streaming behind him, embers and smoke shed as he goes, a crackle while he burns and a whoosh as he lights. It is only light: nothing is set on fire and he never burns (it is never the game's fire). In first person it stays faint and low, out of your view.
-
 ## Solar Jewel Vision (3.16)
 
-Part of [Ultimate Mode](Ultimate-Mode) since 3.17 (off by default: `/enhanced ultimate on`, or `[ultimate] enabled = true` in the server settings; 3.16's `vision.solar_jewel.enabled` is gone, and a config that had it on turns Ultimate Mode on). Then, in his Source Code look (and in any look while his ultimate form lasts), Vision runs on the **Solar Jewel** in his brow, as in the comics, instead of the Mind Stone. The jewel drinks in sunlight and stores it: about ten seconds of open daylight fill it, shade gives a little, the night nothing (he runs on what he stored). It glows brighter the more it holds, and the HUD shows how full it is.
+Off by default: a server turns it on with `vision.solar_jewel.enabled = true` (the server settings). Then, in his Source Code look, Vision runs on the **Solar Jewel** in his brow, as in the comics, instead of the Mind Stone. The jewel drinks in sunlight and stores it: about ten seconds of open daylight fill it, shade gives a little, the night nothing (he runs on what he stored). It glows brighter the more it holds, and the HUD shows how full it is.
 
 | Key | Power |
 |---|---|
