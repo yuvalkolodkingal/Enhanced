@@ -139,6 +139,22 @@
           "chance": 0.15
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "enhanced:cagliostros_grimoire",
+          "weight": 1
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.18
+        }
+      ]
     }
   ],
   "random_sequence": "enhanced:chests/sanctum/library"

@@ -111,6 +111,7 @@ public final class ConfigFile {
     public static Toml.Table read(Path file, ConfigSpec spec, String fileName) {
         try {
             Toml.Table table = parse(file);
+            migrate(table);
             if (!spec.isCorrect(table)) {
                 Enhanced.LOGGER.warn("Configuration file {} is not correct. Correcting", file);
                 backUp(file);
@@ -136,6 +137,19 @@ public final class ConfigFile {
                 e.addSuppressed(failure);
                 throw new RuntimeException("Failed to recreate config file " + fileName, e);
             }
+        }
+    }
+
+    /**
+     * (3.17) Settings that moved: a 3.16 file that turned Solar Jewel Vision on ({@code vision.solar_jewel.enabled = true})
+     * turns Ultimate Mode on ({@code ultimate.enabled}), which replaced it, unless the file says otherwise already. The old
+     * key is then removed as any unknown one is.
+     */
+    public static void migrate(Toml.Table table) {
+        if (Boolean.TRUE.equals(table.get(List.of("vision", "solar_jewel", "enabled")))
+                && table.get(List.of("ultimate", "enabled")) == null) {
+            table.set(List.of("ultimate", "enabled"), Boolean.TRUE);
+            Enhanced.LOGGER.info("vision.solar_jewel.enabled was on: Ultimate Mode ([ultimate] enabled), which replaced it, is on");
         }
     }
 

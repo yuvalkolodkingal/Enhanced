@@ -62,6 +62,9 @@ public final class PowerTicker {
                 && !(power == Power.FALCON && !com.kolodkingal.enhanced.falcon.FalconWings.canFly(player))
                 && !(power == Power.LOVE && !com.kolodkingal.enhanced.love.LoveAbilities.canFly(player))
                 && !HexRunes.silences(player) && !player.hasEffect(ModEffects.DRAINED); // 3.3: the Hex Runes hold a sorcerer's powers, flight too
+        // (3.17: a broom of light carries a witch, or anyone it was conjured for, for its while)
+        boolean broom = com.kolodkingal.enhanced.magic.Broom.riding(player);
+        canFly = canFly || broom;
         setModifier(player, Platform.get().attributes().creativeFlight(), FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
@@ -70,7 +73,8 @@ public final class PowerTicker {
         float speed = !survivalLike || !canFly ? 0.05F : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
-                : power.flightSpeed() * lookFlight(data);
+                : broom && !power.canFly() ? com.kolodkingal.enhanced.magic.Broom.SPEED
+                : power.flightSpeed() * lookFlight(data) * (broom ? 1.25F : 1.0F);
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);
@@ -108,7 +112,13 @@ public final class PowerTicker {
             case SCARLET_WITCH -> WandaAbilities.tick(player, data);
             case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
             case VISION -> VisionAbilities.tick(player, data);
-            case BILLY -> BillyAbilities.tick(player, data);
+            case BILLY -> {
+                BillyAbilities.tick(player, data);
+                // 3.17: the upkeep of the magic user the Demiurge took on (Magic types)
+                if (data.borrowed() != Power.NONE && data.borrowed() != Power.BILLY) {
+                    heroTick(data.borrowed(), player, data);
+                }
+            }
             case TOMMY -> TommyAbilities.tick(player, data);
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
@@ -132,7 +142,12 @@ public final class PowerTicker {
             case SCARLET_WITCH -> WandaAbilities.endAll(player, data);
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);
-            case BILLY -> BillyAbilities.endAll(player, data);
+            case BILLY -> {
+                BillyAbilities.endAll(player, data);
+                if (data.borrowed() != Power.NONE && data.borrowed() != Power.BILLY) {
+                    heroEnd(data.borrowed(), player, data); // (3.17: and the magic the Demiurge took on)
+                }
+            }
             case TOMMY -> TommyAbilities.endAll(player, data);
             case QUICKSILVER -> QuicksilverAbilities.endAll(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,

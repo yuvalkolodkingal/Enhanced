@@ -42,6 +42,11 @@ public class DarkholdItem extends Item implements ItemExt.StopUsing {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        // 3.17: a caster's first use reads it: its forbidden spells are his (then it is the book it always was)
+        if (com.kolodkingal.enhanced.magic.Grimoires.read(player, com.kolodkingal.enhanced.magic.MagicData.DARKHOLD,
+                stack.getHoverName())) {
+            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        }
         if (DarkholdBook.awakens(player)) {
             // (3.3) Someone with no power reads it, held: Agatha wakes in them (see AgathaAbilities.reading).
             player.startUsingItem(hand);

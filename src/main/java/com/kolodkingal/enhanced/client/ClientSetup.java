@@ -189,6 +189,9 @@ public final class ClientSetup {
         }
         // 3.6: the Stone Wheel (J).
         registrar.keyMapping(KeyBindings.STONE_WHEEL);
+        // 3.17: the spells (K) and the ultimate form (O).
+        registrar.keyMapping(KeyBindings.SPELLS);
+        registrar.keyMapping(KeyBindings.ULTIMATE);
         // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).
         for (KeyMapping key : BuildKeys.ALL) {
             registrar.keyMapping(key);
@@ -587,6 +590,9 @@ public final class ClientSetup {
                 new SpeedSurfaceFx.SpeedLines());
         registrar.guiLayer(Enhanced.id("anim_state"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new AnimStateOverlay());
+        // 3.17: the magic's panel (mana, the chosen spell, the chant) and the ultimate form's line.
+        registrar.guiLayer(Enhanced.id("magic"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
+                new com.kolodkingal.enhanced.client.magic.MagicHud());
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
         registrar.guiLayer(Enhanced.id("mind_read"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,

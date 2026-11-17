@@ -26,6 +26,12 @@ public class VishantiBookItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        // 3.17: a caster's first use reads it: its spells of light are his (then it is the book it always was)
+        ItemStack stack = player.getItemInHand(hand);
+        if (com.kolodkingal.enhanced.magic.Grimoires.read(player, com.kolodkingal.enhanced.magic.MagicData.VISHANTI,
+                stack.getHoverName())) {
+            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        }
         return VishantiBook.use(level, player, hand);
     }
 

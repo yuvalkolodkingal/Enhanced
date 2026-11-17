@@ -126,7 +126,7 @@ public final class MutantSkeletonTests {
             Defeat.CHAOS, Set.of("chaos_beam", "hex_wall", "hex_bolt", "hex_beam"),
             Defeat.ODIN, Set.of("odinforce", "gungnir"),
             Defeat.PHOENIX, Set.of("phoenix_burst"),
-            Defeat.DARKHOLD, Set.of("darkhold_beam", "agatha_drain", "agatha_runes"));
+            Defeat.DARKHOLD, Set.of("darkhold_beam", "agatha_drain", "agatha_runes", "dark_spell")); // (3.17: the Darkhold's spells)
 
     // ---- the heroes, the bits, the protocol ----
 

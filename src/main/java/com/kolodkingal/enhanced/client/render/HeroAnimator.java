@@ -119,7 +119,9 @@ public final class HeroAnimator {
             PowerData data = Powers.get(player);
             // Anyone holding Thor's weapon can ride the Bifrost, so that state exists for everyone.
             // (3.6: so does anyone firing a beam: the Scepter's Mind Beam is anyone's, and raises his arm.)
-            boolean tracked = data.power().hasPowers() || data.is(Live.BIFROST) || data.is(Live.BEAMING);
+            boolean tracked = data.power().hasPowers() || data.is(Live.BIFROST) || data.is(Live.BEAMING)
+                    // (3.17: a witch with no hero power chants, rides her broom, awakens)
+                    || data.is(Live.CHANTING) || data.is(Live.BROOM) || data.is(Live.ULTIMATE) || data.is(Live.ULTIMATE_AWAKENING);
             HeroAnimState s = STATES.get(player.getUUID());
             if (!tracked) {
                 if (s != null) {
@@ -396,6 +398,11 @@ public final class HeroAnimator {
         on[Stance.SOLAR_EYES.ordinal()] = data.is(Live.SOLAR_EYES);
         on[Stance.SOLAR_GATHER.ordinal()] = data.is(Live.SOLAR_GATHERING);
         on[Stance.SOLAR_OVERLOAD.ordinal()] = data.is(Live.SOLAR_OVERLOAD);
+        // (3.17) a chant, a broom, an ultimate form
+        on[Stance.MAGIC_CHANT.ordinal()] = data.is(Live.CHANTING);
+        on[Stance.MAGIC_BROOM.ordinal()] = data.is(Live.BROOM);
+        on[Stance.ULTIMATE_AWAKEN.ordinal()] = data.is(Live.ULTIMATE_AWAKENING);
+        on[Stance.ULTIMATE_POWER.ordinal()] = data.is(Live.ULTIMATE) && !data.is(Live.BROOM);
         on[Stance.BEAM_WANDA.ordinal()] = data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive();
         on[Stance.SHIELD_WANDA.ordinal()] = data.has(HeroAbility.WANDA_CHAOS_SHIELD) && data.chaosShieldActive();
         on[Stance.THOR_BEAM.ordinal()] = data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING);

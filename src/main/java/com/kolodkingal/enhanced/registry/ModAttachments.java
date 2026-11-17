@@ -263,6 +263,19 @@ public final class ModAttachments {
                     .sync(SyncTo.SELF, com.kolodkingal.enhanced.eternity.EternityProgress.STREAM_CODEC)
                     .build();
 
+    // ===== magic (3.17) =====
+    /**
+     * 3.17: a player's magic (his witch's path and level, mana, chosen spell, the grimoires he has read, the Darkhold's
+     * corruption). Saved, kept on death, synced to everyone who sees him (their clients colour his broom, his chant and
+     * his aura by his path).
+     */
+    public static final AttachKey<com.kolodkingal.enhanced.magic.MagicData> MAGIC =
+            Attach.builder("magic", () -> com.kolodkingal.enhanced.magic.MagicData.EMPTY)
+                    .serialize(com.kolodkingal.enhanced.magic.MagicData.CODEC)
+                    .copyOnDeath()
+                    .sync(com.kolodkingal.enhanced.magic.MagicData.STREAM_CODEC)
+                    .build();
+
     // ===== port P0 =====
     /**
      * What NeoForge's {@code getPersistentData()} held for the mod: a compound saved with an entity, its keys starting

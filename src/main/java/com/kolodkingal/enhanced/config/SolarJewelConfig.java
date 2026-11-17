@@ -4,11 +4,11 @@ import com.kolodkingal.enhanced.config.core.ConfigSpec;
 
 /**
  * Solar Jewel Vision (3.16): Vision as his Source Code (in the VisionQuest suit) runs on the Solar Jewel in his brow
- * instead of the Mind Stone. TOML section {@code [vision.solar_jewel]}, defined inside {@code [vision]} by
+ * instead of the Mind Stone, while Ultimate Mode is on (3.17, {@link UltimateConfig}; it replaced this section's own
+ * {@code enabled}). TOML section {@code [vision.solar_jewel]}, defined inside {@code [vision]} by
  * {@code EnhancedConfig}; read when used.
  */
 public final class SolarJewelConfig {
-    public static ConfigSpec.BooleanValue ENABLED;
     public static ConfigSpec.DoubleValue SOURCE_CODE_BEAM_FACTOR;
     public static ConfigSpec.IntValue MAX_CHARGE;
     public static ConfigSpec.IntValue ABSORB_SUN;
@@ -30,14 +30,13 @@ public final class SolarJewelConfig {
     public static ConfigSpec.IntValue EYE_BEAM_BURN_SECONDS;
 
     public static void define(ConfigSpec.Builder builder) {
-        builder.comment("Solar Jewel Vision (3.16): the Source Code look (in the VisionQuest suit) runs on the Solar Jewel in his",
-                "brow, which drinks in sunlight and stores it. R: the Solar Beam from the jewel; Sneak + R: Jewel Overload, all",
-                "his stored light at once; N: infrared and microwave beams from his eyes. Flight, Phase and Density stay.")
+        builder.comment("Solar Jewel Vision (3.16): with Ultimate Mode on ([ultimate], 3.17), the Source Code look runs on the Solar",
+                "Jewel in his brow, which drinks in sunlight and stores it (any Vision does while his ultimate form lasts). R: the",
+                "Solar Beam from the jewel; Sneak + R: Jewel Overload, all his stored light at once; N: infrared and microwave beams",
+                "from his eyes. Flight, Phase and Density stay. With Ultimate Mode off, the Source Code has Vision's own powers,",
+                "only stronger (sourceCodeBeamFactor, and his tougher body).")
                 .push("solar_jewel");
-        ENABLED = builder.comment("On: Source Code Vision has the Solar Jewel's powers below. Off (the default): he has Vision's own",
-                "powers, only stronger (sourceCodeBeamFactor, and his tougher body).")
-                .define("enabled", false);
-        SOURCE_CODE_BEAM_FACTOR = builder.comment("With the Solar Jewel off: how many times as strong Source Code Vision's Mind Stone beam is.")
+        SOURCE_CODE_BEAM_FACTOR = builder.comment("With Ultimate Mode off: how many times as strong Source Code Vision's Mind Stone beam is.")
                 .defineInRange("sourceCodeBeamFactor", 1.5, 1.0, 10.0);
         MAX_CHARGE = builder.comment("The most solar energy the jewel holds.")
                 .defineInRange("maxCharge", 1000, 100, 100000);

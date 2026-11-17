@@ -19,6 +19,8 @@
     "enhanced:mind_blast",
     "enhanced:agatha_drain",
     "enhanced:agatha_runes",
-    "enhanced:hero_magic"
+    "enhanced:hero_magic",
+    "enhanced:spell",
+    "enhanced:dark_spell"
   ]
 }
