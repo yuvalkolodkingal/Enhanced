@@ -18,11 +18,14 @@ public final class UltimateConfig {
     public static ConfigSpec.IntValue SIGNATURE_RADIUS;
     public static ConfigSpec.DoubleValue DAMAGE_BONUS;
     public static ConfigSpec.BooleanValue SIGNATURE_HURTS_PLAYERS;
+    public static ConfigSpec.IntValue NEXUS_FLASH_RANGE;
+    public static ConfigSpec.DoubleValue NEXUS_FLASH_DAMAGE;
 
     public static void define(ConfigSpec.Builder builder) {
         builder.comment("Ultimate Mode (3.17): every hero gets an ultimate version. Off by default. On: press O (Ultimate) to awaken",
                 "your hero's ultimate form for a while (O again: its signature move); Source Code Vision runs on the Solar Jewel;",
-                "Billy is the Demiurge (every spell, instant casting in his star form, and he can grant magic to others).",
+                "Billy is the Demiurge (every spell, instant casting in his star form, and he can grant magic to others); the Scarlet Witch",
+                "becomes the Nexus Being.",
                 "Operators: /enhanced ultimate on|off|info (saved with the world, it then wins over 'enabled' here).")
                 .push("ultimate");
         ENABLED = builder.comment("On: Ultimate Mode for every player (unless the world's own setting, /enhanced ultimate, says otherwise).")
@@ -43,6 +46,11 @@ public final class UltimateConfig {
                 .defineInRange("damageBonus", 0.25, 0.0, 5.0);
         SIGNATURE_HURTS_PLAYERS = builder.comment("Whether signature moves strike other players too (PvP must be on).")
                 .define("signatureHurtsPlayers", true);
+        NEXUS_FLASH_RANGE = builder.comment("The Nexus Being (the Scarlet Witch's ultimate form): how far (blocks) from her the chaos",
+                "flashes strike her enemies, every second and a half. They never touch her.")
+                .defineInRange("nexusFlashRange", 50, 4, 128);
+        NEXUS_FLASH_DAMAGE = builder.comment("The Nexus Being: the damage of each chaos flash.")
+                .defineInRange("nexusFlashDamage", 15.0, 0.0, 200.0);
         builder.pop();
     }
 

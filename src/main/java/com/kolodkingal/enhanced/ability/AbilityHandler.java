@@ -75,6 +75,11 @@ public final class AbilityHandler {
             player.displayClientMessage(Component.translatable("message.enhanced.spell.stripped"), true);
             return;
         }
+        // 3.17: in a world the Nexus Being holds, her runes strip every hero of his powers.
+        if (down && com.kolodkingal.enhanced.ultimate.NexusBeing.strips(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.nexus.stripped"), true);
+            return;
+        }
         // 3.17: K casts a spell, O awakens the ultimate form (or fires its signature).
         if (ability == com.kolodkingal.enhanced.magic.MagicKeys.SPELL) {
             com.kolodkingal.enhanced.magic.Casting.key(player, down);
@@ -83,7 +88,7 @@ public final class AbilityHandler {
         }
         if (ability == com.kolodkingal.enhanced.magic.MagicKeys.ULTIMATE) {
             if (down) {
-                com.kolodkingal.enhanced.ultimate.UltimateForms.key(player);
+                com.kolodkingal.enhanced.ultimate.UltimateForms.key(player, player.isShiftKeyDown());
             }
             Powers.syncIfDirty(player);
             return;
@@ -115,7 +120,14 @@ public final class AbilityHandler {
             case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down, alt);
             case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down, alt);
             case VISION -> VisionAbilities.onKey(player, data, ability, down, alt);
-            case BILLY -> BillyAbilities.onKey(player, data, ability, down, alt);
+            case BILLY -> {
+                // 3.17: the Demiurge's keys are those of the magic user he took on (Magic types), if any
+                if (data.borrowed() != Power.NONE && data.borrowed() != Power.BILLY) {
+                    heroKey(data.borrowed(), player, data, ability, down, alt);
+                } else {
+                    BillyAbilities.onKey(player, data, ability, down, alt);
+                }
+            }
             case TOMMY -> TommyAbilities.onKey(player, data, ability, down, alt);
             case LOKI -> LokiAbilities.onKey(player, data, ability, down, alt);
             case THOR -> ThorAbilities.onKey(player, data, ability, down, alt);

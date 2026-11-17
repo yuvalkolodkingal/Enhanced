@@ -94,7 +94,23 @@ public final class UltimateForms {
 
     /** O went down: awaken the form, or (while it lasts) fire its signature move. */
     public static void key(ServerPlayer player) {
+        key(player, false);
+    }
+
+    /**
+     * O went down ({@code alt}: with Sneak): awaken the form, or (while it lasts) fire its signature move. Sneak + O is the
+     * Demiurge's Magic types ({@link Demiurge#cycle}), and ends the Nexus Being's form (it has no time limit).
+     */
+    public static void key(ServerPlayer player, boolean alt) {
         if (player.isSpectator() || !player.isAlive()) {
+            return;
+        }
+        if (alt && Ultimate.on() && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
+            Demiurge.cycle(player);
+            return;
+        }
+        if (alt && active(player) && untimed(player)) {
+            end(player, false);
             return;
         }
         if (!Ultimate.on()) {
@@ -112,7 +128,7 @@ public final class UltimateForms {
             return; // (it is awakening)
         }
         if (st != null && now < st.activeUntil) {
-            if (now < st.signatureReady) {
+            if (now < st.signatureReady && !untimed(player)) {
                 player.displayClientMessage(Component.translatable("message.enhanced.ultimate.signature_wait",
                         (st.signatureReady - now + 19) / 20), true);
                 return;
@@ -154,7 +170,7 @@ public final class UltimateForms {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         st.awakenStart = -1;
-        st.activeUntil = now + 20L * (loaded() ? UltimateConfig.DURATION_SECONDS.get() : 45);
+        st.activeUntil = untimed(player) ? Long.MAX_VALUE : now + 20L * (loaded() ? UltimateConfig.DURATION_SECONDS.get() : 45);
         st.signatureReady = now + 20;
         PowerData data = Powers.get(player);
         data.set(Live.ULTIMATE_AWAKENING, false);
@@ -193,9 +209,10 @@ public final class UltimateForms {
         st.activeUntil = 0;
         st.stormUntil = 0;
         st.vortexAt = 0;
-        if (cooldown && was) {
+        if (cooldown && was && !untimed(player)) {
             st.cooldownUntil = now + 20L * (loaded() ? UltimateConfig.COOLDOWN_SECONDS.get() : 180);
         }
+        NexusBeing.release(player);
         PowerData data = Powers.get(player);
         if (data.is(Live.ULTIMATE) || data.is(Live.ULTIMATE_AWAKENING)) {
             data.set(Live.ULTIMATE, false);
@@ -252,6 +269,9 @@ public final class UltimateForms {
         }
         if (now % 40 == 0) {
             strengths(player, form);
+        }
+        if (form == UltimateForm.SCARLET_WITCH) {
+            NexusBeing.tick(player);
         }
         if (st.stormUntil > now && (st.stormUntil - now) % 10 == 0) {
             strike(player, form, 6, 0.8F);
@@ -476,12 +496,31 @@ public final class UltimateForms {
 
     // ---- damage ----
 
-    /** How many times as much damage this attacker does now (its form: a quarter more by default). */
+    /**
+     * How many times as much damage this attacker does now: its form (a quarter more by default); the Demiurge's
+     * abilities always hit {@link Demiurge#DAMAGE_FACTOR} times as hard; the Nexus Being's twice, and a quarter more for
+     * each hero her runes strip.
+     */
     public static float damageFactor(LivingEntity attacker) {
-        if (attacker instanceof ServerPlayer player && active(player)) {
-            return 1.0F + (float) (loaded() ? UltimateConfig.DAMAGE_BONUS.get() : 0.25);
+        if (!(attacker instanceof ServerPlayer player)) {
+            return 1.0F;
         }
-        return 1.0F;
+        float factor = 1.0F;
+        if (active(player)) {
+            factor += (float) (loaded() ? UltimateConfig.DAMAGE_BONUS.get() : 0.25);
+        }
+        if (com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
+            factor *= Demiurge.DAMAGE_FACTOR;
+        }
+        if (NexusBeing.is(player) && active(player)) {
+            factor *= 2.0F + 0.25F * Math.min(8, NexusBeing.stripped(player));
+        }
+        return factor;
+    }
+
+    /** Whether this player's form has no time limit and no cooldown (the Nexus Being's: until she ends it). */
+    static boolean untimed(Player player) {
+        return Powers.power(player) == Power.SCARLET_WITCH;
     }
 
     // ---- lifecycle ----
@@ -500,5 +539,6 @@ public final class UltimateForms {
 
     public static void clear() {
         STATES.clear();
+        NexusBeing.clear();
     }
 }

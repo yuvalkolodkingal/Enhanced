@@ -60,6 +60,8 @@ public final class MagicFxRenderer {
 
     public static void clear() {
         ACTIVE.clear();
+        com.kolodkingal.enhanced.client.render.VisionFlameFx.clear();
+        DemiurgeFx.clear();
     }
 
     /** Draws everything for this frame. */
@@ -76,12 +78,28 @@ public final class MagicFxRenderer {
             draw(level, a.fx(), Mth.clamp(age / Math.max(1, a.fx().duration()), 0.0F, 1.0F), age, pose, vc, camera,
                     partialTick, time);
         }
+        com.kolodkingal.enhanced.client.render.VisionFlameFx.forgetCold(level);
+        if (com.kolodkingal.enhanced.ultimate.NexusBeing.heldOnClient(level)) {
+            DemiurgeFx.nexusSky(mc, pose, vc, partialTick, time);
+        }
         for (AbstractClientPlayer player : level.players()) {
             if (player.isInvisible() && player != mc.player) {
                 continue;
             }
             PowerData data = Powers.get(player);
+            data.setBorrowed(com.kolodkingal.enhanced.ultimate.Demiurge.borrowed(player)); // (the Demiurge's Magic types)
             boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
+            if (com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
+                DemiurgeFx.render(mc, player, data, pose, vc, camera, partialTick, time, firstPerson);
+            }
+            if (com.kolodkingal.enhanced.ultimate.NexusBeing.is(player)) {
+                DemiurgeFx.nexus(player, pose, vc, camera, partialTick, time, firstPerson);
+            }
+            // (Source Code Vision burns while he flies: his own living flames, never the game's fire)
+            if (com.kolodkingal.enhanced.client.render.VisionFlameFx.burning(player, data)) {
+                com.kolodkingal.enhanced.client.render.VisionFlameFx.render(mc, player, pose, vc, camera, partialTick, time,
+                        firstPerson);
+            }
             if (data.is(Live.CHANTING)) {
                 chant(player, pose, vc, camera, partialTick, time, firstPerson);
             }

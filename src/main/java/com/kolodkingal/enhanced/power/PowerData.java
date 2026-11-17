@@ -232,14 +232,31 @@ public final class PowerData {
     public boolean has(HeroAbility a) {
         // (3.6: a custom hero in the Hulk's Human Form has none of his rows but the Transform that ends it; 3.8: Red
         // Hulk's Transform ends it too.)
+        // (3.17: the Demiurge has the abilities of the magic he took on, Magic types: Demiurge.borrowed)
         return power == a.hero || power == Power.CUSTOM && kit != null && kit.has(a)
                 && (a == HeroAbility.HULK_TRANSFORM || a == HeroAbility.RED_HULK_TRANSFORM
-                || !toggle(Toggle.HUMAN_FORM));
+                || !toggle(Toggle.HUMAN_FORM))
+                || power == Power.BILLY && borrowed != Power.NONE && a.hero == borrowed;
     }
 
     /** Whether any of this built-in hero's upkeep runs for the player: he is the hero, or a custom hero with one of his abilities. */
     public boolean acts(Power hero) {
-        return power == hero || power == Power.CUSTOM && kit != null && kit.acts(hero);
+        return power == hero || power == Power.CUSTOM && kit != null && kit.acts(hero)
+                || power == Power.BILLY && borrowed != Power.NONE && hero == borrowed;
+    }
+
+    /**
+     * (3.17) The magic user whose abilities the Demiurge has taken on (his Magic types, {@code ultimate.Demiurge}), or
+     * {@link Power#NONE}. Not saved or synced with the rest: each side sets it from the player's synced magic every tick.
+     */
+    private Power borrowed = Power.NONE;
+
+    public Power borrowed() {
+        return borrowed;
+    }
+
+    public void setBorrowed(Power value) {
+        borrowed = value == null ? Power.NONE : value;
     }
 
     /**

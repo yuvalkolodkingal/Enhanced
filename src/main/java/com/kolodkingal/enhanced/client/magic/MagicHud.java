@@ -83,6 +83,14 @@ public class MagicHud implements LayeredDraw.Layer {
         }
         if (Ultimate.on()) {
             UltimateForm form = UltimateForm.of(player);
+            if (Magic.isDemiurge(player)) {
+                // (3.17) the Demiurge's magic type: whose abilities his keys have now (Sneak + O changes it)
+                com.kolodkingal.enhanced.power.Power borrowed = com.kolodkingal.enhanced.ultimate.Demiurge.borrowed(player);
+                Component type = borrowed == com.kolodkingal.enhanced.power.Power.NONE
+                        ? Component.translatable("message.enhanced.demiurge.own") : borrowed.displayName();
+                graphics.drawString(font, Component.translatable("hud.enhanced.demiurge.type", type,
+                        KeyBindings.ULTIMATE.getTranslatedKeyMessage()), x, (Magic.isCaster(player) ? y - 40 : y - 20), 0xFF7FE0FF, true);
+            }
             if (form != null) {
                 int uy = Magic.isCaster(player) ? y - 30 : y - 10;
                 int c = 0xFF000000 | form.color(player);
@@ -90,10 +98,16 @@ public class MagicHud implements LayeredDraw.Layer {
                     if (formStart < 0) {
                         formStart = now;
                     }
-                    int total = EnhancedConfig.SPEC.isLoaded() ? UltimateConfig.DURATION_SECONDS.get() : 45;
-                    int left = Math.max(0, total - (int) ((now - formStart) / 20));
-                    graphics.drawString(font, Component.translatable("hud.enhanced.ultimate.active", form.displayName(), left,
-                            KeyBindings.ULTIMATE.getTranslatedKeyMessage(), form.signatureName()), x, uy, c, true);
+                    if (form == UltimateForm.SCARLET_WITCH) {
+                        // (the Nexus Being has no time limit: Sneak + O ends it)
+                        graphics.drawString(font, Component.translatable("hud.enhanced.ultimate.untimed", form.displayName(),
+                                KeyBindings.ULTIMATE.getTranslatedKeyMessage(), form.signatureName()), x, uy, c, true);
+                    } else {
+                        int total = EnhancedConfig.SPEC.isLoaded() ? UltimateConfig.DURATION_SECONDS.get() : 45;
+                        int left = Math.max(0, total - (int) ((now - formStart) / 20));
+                        graphics.drawString(font, Component.translatable("hud.enhanced.ultimate.active", form.displayName(), left,
+                                KeyBindings.ULTIMATE.getTranslatedKeyMessage(), form.signatureName()), x, uy, c, true);
+                    }
                 } else {
                     formStart = -1;
                     graphics.drawString(font, Component.translatable("hud.enhanced.ultimate.ready", KeyBindings.ULTIMATE.getTranslatedKeyMessage(),

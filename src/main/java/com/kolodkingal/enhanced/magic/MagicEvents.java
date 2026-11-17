@@ -66,6 +66,7 @@ public final class MagicEvents {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
+        com.kolodkingal.enhanced.ultimate.Demiurge.tick(player);
         UltimateForms.tick(player);
         Casting.tick(player);
         Broom.tick(player);

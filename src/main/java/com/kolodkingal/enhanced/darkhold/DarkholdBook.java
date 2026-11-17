@@ -124,7 +124,8 @@ public final class DarkholdBook {
      * (even where {@code anyoneCanUse} would let them fire it). Both sides.
      */
     public static boolean awakens(Player player) {
-        return enabled() && loaded() && AgathaConfig.DARKHOLD_AWAKENS.get() && !inTheRoad(player) && !Powers.power(player).hasPowers();
+        return enabled() && loaded() && AgathaConfig.DARKHOLD_AWAKENS.get() && !inTheRoad(player) && !Powers.power(player).hasPowers()
+                && !com.kolodkingal.enhanced.magic.Magic.isWitch(player); // (3.17: a witch reads it instead)
     }
 
     /** Whether the player holds the book and may use it: what the retaliation asks, and the abilities. */

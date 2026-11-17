@@ -112,7 +112,13 @@ public final class PowerTicker {
             case SCARLET_WITCH -> WandaAbilities.tick(player, data);
             case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
             case VISION -> VisionAbilities.tick(player, data);
-            case BILLY -> BillyAbilities.tick(player, data);
+            case BILLY -> {
+                BillyAbilities.tick(player, data);
+                // 3.17: the upkeep of the magic user the Demiurge took on (Magic types)
+                if (data.borrowed() != Power.NONE && data.borrowed() != Power.BILLY) {
+                    heroTick(data.borrowed(), player, data);
+                }
+            }
             case TOMMY -> TommyAbilities.tick(player, data);
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
@@ -136,7 +142,12 @@ public final class PowerTicker {
             case SCARLET_WITCH -> WandaAbilities.endAll(player, data);
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);
-            case BILLY -> BillyAbilities.endAll(player, data);
+            case BILLY -> {
+                BillyAbilities.endAll(player, data);
+                if (data.borrowed() != Power.NONE && data.borrowed() != Power.BILLY) {
+                    heroEnd(data.borrowed(), player, data); // (3.17: and the magic the Demiurge took on)
+                }
+            }
             case TOMMY -> TommyAbilities.endAll(player, data);
             case QUICKSILVER -> QuicksilverAbilities.endAll(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,
