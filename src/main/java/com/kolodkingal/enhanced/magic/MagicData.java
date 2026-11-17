@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * @param level      1 to {@link WitchPath#MAX_LEVEL} (meaningless without a path)
  * @param flags      the grimoires read ({@link #DARKHOLD}, {@link #VISHANTI}, {@link #CAGLIOSTRO}) and {@link #GRANTED}
  * @param corruption 0 to 100: how far the Darkhold has darkened his magic
- * @param selected   the id of the spell K casts ("" for none yet)
+ * @param selected   the id of the spell the Spells key casts ("" for none yet)
  * @param mana       the mana he has now
  */
 public record MagicData(int path, int level, int flags, int corruption, String selected, float mana) {

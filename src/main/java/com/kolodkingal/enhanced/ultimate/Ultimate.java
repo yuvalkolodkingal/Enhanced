@@ -18,7 +18,7 @@ import java.nio.file.Path;
 /**
  * Ultimate Mode (3.17): one switch for every hero's ultimate version. It replaced the separate switches of before
  * (3.16's {@code vision.solar_jewel.enabled}): with it on, every hero can awaken an ultimate form ({@link UltimateForm},
- * the O key), Source Code Vision runs on the Solar Jewel, and Billy is the Demiurge.
+ * the Ultimate Form key), Source Code Vision runs on the Solar Jewel, and Billy is the Demiurge.
  *
  * <p>Where it is decided: {@code [ultimate] enabled} in the server config, unless the world has its own setting, made by
  * {@code /enhanced ultimate on|off} and kept in {@code <world>/serverconfig/enhanced-ultimate.json} (like the SMP

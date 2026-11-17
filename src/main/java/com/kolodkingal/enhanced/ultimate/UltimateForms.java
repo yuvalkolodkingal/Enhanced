@@ -37,9 +37,9 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * The ultimate forms at work (3.17, Ultimate Mode): O awakens the player's {@link UltimateForm} (the awakening's column
+ * The ultimate forms at work (3.17, Ultimate Mode): the Ultimate Form key awakens the player's {@link UltimateForm} (the awakening's column
  * of light and pose, then the form's aura, its strengths and a quarter more damage for {@code ultimate.durationSeconds}),
- * and O again, while it lasts, fires its signature move. Everything ends when the form does, the power changes, Ultimate
+ * and the key again, while it lasts, fires its signature move. Everything ends when the form does, the power changes, Ultimate
  * Mode is turned off, the player dies or leaves.
  */
 public final class UltimateForms {
@@ -92,14 +92,14 @@ public final class UltimateForms {
 
     // ---- the key ----
 
-    /** O went down: awaken the form, or (while it lasts) fire its signature move. */
+    /** The Ultimate Form key went down: awaken the form, or (while it lasts) fire its signature move. */
     public static void key(ServerPlayer player) {
         key(player, false);
     }
 
     /**
-     * O went down ({@code alt}: with Sneak): awaken the form, or (while it lasts) fire its signature move. Sneak + O is the
-     * Demiurge's Magic types ({@link Demiurge#cycle}), and ends the Nexus Being's form (it has no time limit).
+     * The Ultimate Form key went down ({@code alt}: with Sneak): awaken the form, or (while it lasts) fire its signature move. with Sneak it ends the
+     * Nexus Being's form (it has no time limit), and is the second move of the forms that have one ({@link BespokeForms}).
      */
     public static void key(ServerPlayer player, boolean alt) {
         if (player.isSpectator() || !player.isAlive()) {

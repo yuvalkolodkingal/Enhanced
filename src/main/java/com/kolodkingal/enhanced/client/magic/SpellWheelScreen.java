@@ -18,10 +18,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * The Spell Wheel (3.17): Sneak + K opens the caster's spells as rings of glowing seals round the crosshair (twelve on the
+ * The Spell Wheel (3.17): Sneak + the Spells key opens the caster's spells as rings of glowing seals round the crosshair (twelve on the
  * first ring, more on each ring out), each in its spell's colour with its first letter; the one the mouse points at
- * swells, and its name, mana, incantation and what it does are written in the middle. Letting go of K (or a click)
- * chooses it for K ({@code MagicActionPayload.SELECT_SPELL}). The game goes on behind it (it does not pause).
+ * swells, and its name, mana, incantation and what it does are written in the middle. Letting go of the key (or a click)
+ * chooses it ({@code MagicActionPayload.SELECT_SPELL}). The game goes on behind it (it does not pause).
  */
 public class SpellWheelScreen extends Screen {
     private static final int[] RING_SIZES = {12, 18, 24, 30};

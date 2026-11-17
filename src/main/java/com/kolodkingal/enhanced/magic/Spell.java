@@ -8,7 +8,7 @@ import java.util.Locale;
 /**
  * Every spell of 3.17's magic: the witches' paths, the grimoires, Billy's spells and his powers over space and reality.
  * A spell has a group (who may learn it: a path, any witch, a grimoire's reader, Billy, the Demiurge), the level of
- * witchcraft and the rank of Billy it needs, its mana, how long its incantation is (ticks; holding K chants faster, a
+ * witchcraft and the rank of Billy it needs, its mana, how long its incantation is (ticks; holding the Spells key chants faster, a
  * heavy blow breaks it off; the Demiurge's star form needs none), its cooldown (ticks) and its colour. What each does is
  * {@link SpellEffects}; who knows which is {@link Magic#known}.
  *

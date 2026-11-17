@@ -42,7 +42,7 @@ public final class UltimateCommand {
             UltimateForms.endEveryone(source.getServer());
         }
         source.sendSuccess(() -> Component.translatableWithFallback(KEY + (Ultimate.on() ? "on" : "off"),
-                Ultimate.on() ? "Ultimate Mode is on: every hero can awaken an ultimate form (O)."
+                Ultimate.on() ? "Ultimate Mode is on: every hero can awaken an ultimate form (the Ultimate Form key)."
                         : "Ultimate Mode is off.").withStyle(Ultimate.on() ? ChatFormatting.GOLD : ChatFormatting.GRAY), true);
         return Ultimate.on() ? 1 : 0;
     }
@@ -55,7 +55,7 @@ public final class UltimateCommand {
                         world == null ? "from the server config, [ultimate] enabled" : "the world's own setting, /enhanced ultimate"))
                 .withStyle(ChatFormatting.GOLD);
         text.append("\n").append(Component.translatableWithFallback(KEY + "explain",
-                "When on, O awakens every hero's ultimate form; Source Code Vision runs on the Solar Jewel; Billy is the Demiurge.")
+                "When on, the Ultimate Form key awakens every hero's ultimate form; Source Code Vision runs on the Solar Jewel and burns; Billy is the Demiurge.")
                 .withStyle(ChatFormatting.GRAY));
         source.sendSuccess(() -> text, false);
         return Ultimate.on() ? 1 : 0;

@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Ultimate Wanda (3.17): the Nexus Being. With Ultimate Mode on, the Scarlet Witch's ultimate form (O) is Wanda of the
+ * Ultimate Wanda (3.17): the Nexus Being. With Ultimate Mode on, the Scarlet Witch's ultimate form is Wanda of the
  * films in the cosmic Nexus suit, deep scarlet with a star field, red chaos round her. While she is the Nexus Being:
  * <ul>
  *   <li>every hurt heals back within two seconds (while she lives through it);</li>
@@ -52,7 +52,7 @@ import java.util.UUID;
  *   ({@code ultimate.nexusFlashDamage} each, never her);</li>
  *   <li>nobody can step inside her Chaos Shield.</li>
  * </ul>
- * The form lasts until she ends it (Sneak + O), dies, or Ultimate Mode goes off; it has no cooldown.
+ * The form lasts until she ends it (Sneak + the Ultimate Form key), dies, or Ultimate Mode goes off; it has no cooldown.
  */
 public final class NexusBeing {
     /** Her red, bright: her abilities and her sky. */

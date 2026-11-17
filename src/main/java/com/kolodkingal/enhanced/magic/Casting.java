@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Casting a spell (3.17): K casts the chosen spell (the Spell Wheel, Sneak + K, chooses it); a witch's R G V B N, and the
+ * Casting a spell (3.17): the Spells key casts the chosen spell (the Spell Wheel, with Sneak, chooses it); a witch's R G V B N, and the
  * same with Sneak, cast her first ten. Most spells must be chanted first: Billy's "I want ..." and the witches' words
- * are spoken aloud to everyone near, runes circle the caster's hands ({@link Live#CHANTING}), holding K chants faster
+ * are spoken aloud to everyone near, runes circle the caster's hands ({@link Live#CHANTING}), holding the key chants faster
  * ({@code witchcraft.chantHeldSpeed}), and a heavy blow ({@code witchcraft.interruptDamage} or more) breaks it off and
  * loses half its mana. The Demiurge in his star form needs no incantation: his spells come at once.
  */
@@ -57,7 +57,7 @@ public final class Casting {
 
     // ---- the keys ----
 
-    /** K went down (or up: the chant goes on at its usual pace). */
+    /** The Spells key went down (or up: the chant goes on at its usual pace). */
     public static void key(ServerPlayer player, boolean down) {
         Chant chant = CHANTS.get(player.getUUID());
         if (!down) {
@@ -111,7 +111,7 @@ public final class Casting {
                 .withStyle(s -> s.withColor(Magic.color(player, spell))), true);
     }
 
-    /** The spell K casts: the one chosen, or (none chosen yet) the first he knows. */
+    /** The spell the Spells key casts: the one chosen, or (none chosen yet) the first he knows. */
     public static Spell selected(ServerPlayer player) {
         Spell chosen = Spell.byId(Magic.data(player).selected());
         if (chosen != null && Magic.knows(player, chosen)) {

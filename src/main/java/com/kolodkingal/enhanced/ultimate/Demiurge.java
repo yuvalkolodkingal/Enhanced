@@ -30,7 +30,7 @@ import java.util.List;
  *   knockback resistance), on top of what he wears, and he heals faster (a heart back every two seconds).</li>
  *   <li>His barrier wraps his whole body ({@code BillyBarrier.covers}); his abilities are a brighter blue with stars in
  *   them ({@code AbilityColors}) and hit {@link #DAMAGE_FACTOR} times as hard ({@code UltimateForms.damageFactor}).</li>
- *   <li>Magic types (Sneak + O): his keys take on another magic user's abilities, in his blue with stars: the Scarlet
+ *   <li>Magic types (their own key): his keys become another magic user's, every one of them, in his blue with stars: the Scarlet
  *   Witch's, Doctor Strange's, Agatha's, Loki's; and back to his own. Kept in his magic ({@link MagicData}'s flags, so it is
  *   synced to everyone who sees him) and read into his {@link PowerData#borrowed} on both sides every tick.</li>
  *   <li>The Grant Magic spell and every spell of 3.17 (the Demiurge knows them all, {@code Magic.knows}).</li>
@@ -39,7 +39,7 @@ import java.util.List;
  * while he flies or casts: {@code client.SuitSkins}, {@code client.magic.DemiurgeFx}).
  */
 public final class Demiurge {
-    /** The magic users whose abilities the Demiurge can take on, in the order Sneak + O goes through them. */
+    /** The magic users whose abilities the Demiurge can take on, in the order the Magic Types key goes through them. */
     public static final List<Power> MAGIC_TYPES = List.of(Power.SCARLET_WITCH, Power.DOCTOR_STRANGE, Power.AGATHA, Power.LOKI);
     /** How many times as hard his abilities (and a borrowed magic user's) hit. */
     public static final float DAMAGE_FACTOR = 1.75F;
@@ -70,7 +70,7 @@ public final class Demiurge {
         return type >= 1 && type <= MAGIC_TYPES.size() ? MAGIC_TYPES.get(type - 1) : Power.NONE;
     }
 
-    /** Sneak + O: on to the next magic type (after the last, his own again). */
+    /** The Magic Types key: on to the next magic type (after the last, his own again). */
     public static void cycle(ServerPlayer player) {
         if (!Magic.isDemiurge(player)) {
             return;

@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Every hero's ultimate form (3.17, Ultimate Mode): what O awakens, as the films and comics have each one at their
+ * Every hero's ultimate form (3.17, Ultimate Mode): what the Ultimate Form key awakens, as the films and comics have each one at their
  * strongest. A form has its colours, the aura every client draws round the hero while it lasts ({@link Aura}, drawn by
- * {@code client.magic.MagicFx}), the signature move O fires while it lasts ({@link Signature}, {@link UltimateForms})
+ * {@code client.magic.MagicFx}), the signature move the key fires while it lasts ({@link Signature}, {@link UltimateForms})
  * and the strengths it gives (status effects, kept up while it lasts).
  *
  * <p>Two forms change the hero's powers themselves: Vision's is the Solar Jewel (his beam, Overload and eye beams are
@@ -121,7 +121,7 @@ public enum UltimateForm {
         WINGS
     }
 
-    /** What O does while the form lasts: the hero's signature move. */
+    /** What the key does while the form lasts: the hero's signature move. */
     public enum Signature {
         /** A shockwave runs out along the ground, hurting and throwing back everything it passes. */
         NOVA,

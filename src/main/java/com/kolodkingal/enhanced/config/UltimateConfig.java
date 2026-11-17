@@ -37,7 +37,7 @@ public final class UltimateConfig {
                 .defineInRange("durationSeconds", 45, 5, 3600);
         COOLDOWN_SECONDS = builder.comment("Seconds after a form ends before it can be awakened again.")
                 .defineInRange("cooldownSeconds", 180, 0, 36000);
-        SIGNATURE_COOLDOWN_SECONDS = builder.comment("Seconds between two signature moves (O while the form lasts).")
+        SIGNATURE_COOLDOWN_SECONDS = builder.comment("Seconds between two signature moves (the Ultimate Form key while the form lasts).")
                 .defineInRange("signatureCooldownSeconds", 10, 1, 600);
         SIGNATURE_DAMAGE = builder.comment("Damage of a signature move to each creature it strikes (some moves strike several times).")
                 .defineInRange("signatureDamage", 14.0, 0.0, 200.0);

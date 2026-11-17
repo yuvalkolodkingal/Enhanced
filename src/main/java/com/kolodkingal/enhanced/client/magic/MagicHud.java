@@ -23,8 +23,8 @@ import java.util.List;
 
 /**
  * The magic's panel (3.17), to the right of the hotbar: a caster's mana (a bar of his magic's colour, brighter in a coven),
- * the spell K casts with its key, the incantation's progress while he chants (its words fill as he speaks them), the
- * Darkhold's corruption when there is any; and, with Ultimate Mode on, the ultimate form: ready on O, or the time it
+ * the chosen spell with its key, the incantation's progress while he chants (its words fill as he speaks them), the
+ * Darkhold's corruption when there is any; and, with Ultimate Mode on, the ultimate form: ready on its key, or the time it
  * has left while it lasts.
  */
 public class MagicHud implements LayeredDraw.Layer {
@@ -113,7 +113,7 @@ public class MagicHud implements LayeredDraw.Layer {
                         formStart = now;
                     }
                     if (form == UltimateForm.SCARLET_WITCH) {
-                        // (the Nexus Being has no time limit: Sneak + O ends it)
+                        // (the Nexus Being has no time limit: Sneak + the key ends it)
                         line(graphics, font, Component.translatable("hud.enhanced.ultimate.untimed", form.displayName(),
                                 KeyBindings.ULTIMATE.getTranslatedKeyMessage(), form.signatureName()), x, uy, c, true);
                     } else {
