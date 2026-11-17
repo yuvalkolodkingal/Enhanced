@@ -136,6 +136,8 @@ public final class WorldEffectsRenderer {
             }
         }
 
+        // 3.17: a world the Nexus Being holds has a red sky (nothing is drawn anywhere else)
+        com.kolodkingal.enhanced.client.magic.DemiurgeFx.nexusVeil(level, buffers, pose);
         VertexConsumer beams = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);

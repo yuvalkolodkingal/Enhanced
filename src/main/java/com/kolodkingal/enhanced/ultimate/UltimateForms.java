@@ -105,7 +105,7 @@ public final class UltimateForms {
         if (player.isSpectator() || !player.isAlive()) {
             return;
         }
-        if (alt && active(player) && untimed(player)) {
+        if (alt && active(player) && Powers.power(player) == Power.SCARLET_WITCH) {
             end(player, false);
             return;
         }
@@ -130,11 +130,20 @@ public final class UltimateForms {
                 return;
             }
             st.signatureReady = now + 20L * (loaded() ? UltimateConfig.SIGNATURE_COOLDOWN_SECONDS.get() : 10);
+            if (BespokeForms.signature(player, alt)) {
+                st.signatureReady = now + 30; // (the forms with moves of their own: their own short wait)
+                return;
+            }
             signature(player, form, st);
             return;
         }
         if (st != null && now < st.cooldownUntil && !player.getAbilities().instabuild) {
             player.displayClientMessage(Component.translatable("message.enhanced.ultimate.cooldown", cooldownSeconds(player)), true);
+            return;
+        }
+        if (Powers.power(player) == Power.SPIDER_MAN && !BespokeForms.cosmicReady(player)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.cosmic.recharging",
+                    Math.round(BespokeForms.cosmicEnergy(player)), BespokeForms.COSMIC_ENERGY).withStyle(ChatFormatting.GRAY), true);
             return;
         }
         awaken(player, form);
@@ -515,12 +524,14 @@ public final class UltimateForms {
         if (NexusBeing.is(player) && active(player)) {
             factor *= 2.0F + 0.25F * Math.min(8, NexusBeing.stripped(player));
         }
+        factor *= BespokeForms.dealt(player);
         return factor;
     }
 
     /** Whether this player's form has no time limit and no cooldown (the Nexus Being's: until she ends it). */
     static boolean untimed(Player player) {
-        return Powers.power(player) == Power.SCARLET_WITCH;
+        // (Cosmic Spider-Man's lasts as long as his Uni-Power does: BespokeForms)
+        return Powers.power(player) == Power.SCARLET_WITCH || Powers.power(player) == Power.SPIDER_MAN;
     }
 
     // ---- lifecycle ----

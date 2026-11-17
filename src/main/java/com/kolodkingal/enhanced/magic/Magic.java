@@ -88,7 +88,8 @@ public final class Magic {
         if (!enabled()) {
             return false;
         }
-        return isWitch(player) || Ultimate.on() && (Powers.power(player) == Power.BILLY || heroSorcerer(player));
+        return isWitch(player) || Ultimate.on() && (Powers.power(player) == Power.BILLY || heroSorcerer(player)
+                || com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(player)); // (the Uni-Power's matter and portals)
     }
 
     /** Billy's rank (1-10), or 0 for anyone else. */
@@ -117,6 +118,9 @@ public final class Magic {
         }
         if (isDemiurge(player)) {
             return true; // (every spell of every path and grimoire, and his own)
+        }
+        if (com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(player)) {
+            return com.kolodkingal.enhanced.ultimate.BespokeForms.cosmicSpell(spell);
         }
         MagicData data = data(player);
         int grimoire = spell.group.grimoire();
@@ -177,6 +181,9 @@ public final class Magic {
         }
         if (isWitch(player)) {
             return 0.9F + 0.15F * (data(player).level() - 1);
+        }
+        if (com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(player)) {
+            return 1.15F; // (two thirds of Billy's at his highest rank)
         }
         return 1.0F;
     }

@@ -58,6 +58,12 @@ public final class SuitSkins {
     private static final PlayerSkin VISION_MOLTEN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/vision_molten.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    /** 3.17, Ultimate Mode: Cosmic Spider-Man (Captain Universe) and the Godkiller armour. */
+    private static final PlayerSkin COSMIC_SPIDER = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/spider_man_cosmic.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+    private static final PlayerSkin GODKILLER = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/iron_man_godkiller.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+
     private static final PlayerSkin VISION_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/vision_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -91,6 +97,12 @@ public final class SuitSkins {
         // 3.17: the Demiurge (Billy, Ultimate Mode) and the Nexus Being (Wanda's ultimate form) wear theirs
         if (power == Power.BILLY && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
             return com.kolodkingal.enhanced.client.magic.DemiurgeFx.powered(player) ? DEMIURGE_POWERED : DEMIURGE;
+        }
+        if (com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(player)) {
+            return COSMIC_SPIDER;
+        }
+        if (com.kolodkingal.enhanced.ultimate.BespokeForms.godkiller(player)) {
+            return GODKILLER;
         }
         if (power == Power.VISION && !Powers.get(player).disguise()
                 && com.kolodkingal.enhanced.client.render.VisionFlameFx.burning(player, Powers.get(player))) {

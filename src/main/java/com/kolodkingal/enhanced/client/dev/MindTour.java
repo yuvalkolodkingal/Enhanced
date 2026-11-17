@@ -165,6 +165,10 @@ public final class MindTour {
         server(p -> {
             p.setGameMode(GameType.CREATIVE);
             Powers.awaken(p, power, variant, false);
+            if (!variant.isEmpty()) {
+                Powers.setVariant(p, com.kolodkingal.enhanced.power.Variants.get(power, variant)); // (an earned look, given)
+            }
+            p.connection.send(new net.minecraft.network.protocol.game.ClientboundClearTitlesPacket(true));
             p.getAbilities().flying = flying;
             p.onUpdateAbilities();
             if (!flying) {
@@ -236,8 +240,9 @@ public final class MindTour {
         // Source Code Vision: his whole body in fire while he flies
         portrait("u10_vision_fire_front", CameraType.THIRD_PERSON_FRONT, false);
         portrait("u11_vision_fire_back", CameraType.THIRD_PERSON_BACK, false);
-        server(p -> p.setDeltaMovement(0.0, 0.0, 1.2), 4);
-        portrait("u12_vision_fire_moving", CameraType.THIRD_PERSON_BACK, false);
+        client(() -> Minecraft.getInstance().player.setDeltaMovement(0.0, 0.0, 1.4), 2);
+        client(() -> Minecraft.getInstance().player.setDeltaMovement(0.0, 0.0, 1.4), 2);
+        shot("u12_vision_fire_moving", 6);
         // the Nexus Being
         become(Power.SCARLET_WITCH, "", false);
         server(p -> p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,
@@ -267,7 +272,7 @@ public final class MindTour {
         client(() -> Minecraft.getInstance().options.fov().set(90), 4);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 7);
         portrait("u23_chaos_burst", CameraType.THIRD_PERSON_BACK, false);
-        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: after the burst {} of the zombies near her live",
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: after the burst {} of the ten zombies near her live",
                 p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, p.getBoundingBox().inflate(60),
                         e -> e.getType() == net.minecraft.world.entity.EntityType.ZOMBIE && e.isAlive()).size()), 30);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 5);
@@ -295,8 +300,14 @@ public final class MindTour {
         client(() -> Minecraft.getInstance().options.fov().set(30), 4);
         portrait("u35_demiurge_powered_close", CameraType.THIRD_PERSON_FRONT, false);
         client(() -> Minecraft.getInstance().options.fov().set(60), 4);
-        server(p -> p.setDeltaMovement(0.0, 0.0, 1.0), 5);
-        portrait("u36_demiurge_powered_flying", CameraType.THIRD_PERSON_BACK, false);
+        client(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            mc.options.hideGui = true;
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+        }, 6);
+        client(() -> Minecraft.getInstance().player.setDeltaMovement(0.0, 0.0, 1.2), 3);
+        client(() -> Minecraft.getInstance().player.setDeltaMovement(0.0, 0.0, 1.2), 3);
+        shot("u36_demiurge_powered_flying", 6);
         // his magic types: the Scarlet Witch's keys are his, and her beam
         server(com.kolodkingal.enhanced.ultimate.Demiurge::cycle, 30);
         portrait("u37_magic_type_hud", CameraType.THIRD_PERSON_BACK, true);
@@ -314,9 +325,6 @@ public final class MindTour {
         server(com.kolodkingal.enhanced.magic.Grants::openScreen, 30);
         shot("u40_grant_magic", 10);
         client(() -> Minecraft.getInstance().setScreen(null), 10);
-        client(() -> com.kolodkingal.enhanced.client.magic.SpellWheelScreen.open(Minecraft.getInstance()), 30);
-        shot("u41_spell_wheel", 10);
-        client(() -> Minecraft.getInstance().setScreen(null), 10);
         // the Mindscape
         server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: the Mindscape opens to the Demiurge: {}",
                 com.kolodkingal.enhanced.magic.Realms.toggleMindscape(p)), 120);
@@ -324,7 +332,103 @@ public final class MindTour {
         server(p -> { p.setYRot(120.0F); p.setXRot(10.0F); }, 20);
         shot("u51_mindscape_round", 10);
         portrait("u52_mindscape_demiurge", CameraType.THIRD_PERSON_FRONT, false);
+        client(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            mc.options.hideGui = false;
+        }, 4);
+        client(() -> com.kolodkingal.enhanced.client.magic.SpellWheelScreen.open(Minecraft.getInstance()), 30);
+        shot("u41_spell_wheel", 10);
+        client(() -> Minecraft.getInstance().setScreen(null), 10);
         server(p -> com.kolodkingal.enhanced.magic.Realms.toggleMindscape(p), 80);
+        // ---- the three forms with rules of their own ----
+        // Cosmic Spider-Man
+        become(Power.SPIDER_MAN, "", false);
+        client(() -> Minecraft.getInstance().options.fov().set(40), 4);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 70);
+        portrait("u60_cosmic_spider_front", CameraType.THIRD_PERSON_FRONT, false);
+        portrait("u61_cosmic_spider_back", CameraType.THIRD_PERSON_BACK, false);
+        portrait("u62_cosmic_spider_hud", CameraType.THIRD_PERSON_BACK, true);
+        server(p -> {
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+            p.teleportTo(p.getX(), p.getY() + 8.0, p.getZ());
+        }, 20);
+        client(() -> Minecraft.getInstance().options.fov().set(70), 4);
+        client(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            mc.options.hideGui = true;
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+        }, 6);
+        client(() -> Minecraft.getInstance().player.setDeltaMovement(0.0, 0.0, 1.8), 2);
+        client(() -> Minecraft.getInstance().player.setDeltaMovement(0.0, 0.0, 1.8), 2);
+        shot("u63_cosmic_spider_flying", 6);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 5);
+        shot("u64_cosmic_spider_blast", 6);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Cosmic Spider-Man: armour {}, attack {}, Uni-Power {}, flies {}",
+                p.getArmorValue(), p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
+                com.kolodkingal.enhanced.ultimate.BespokeForms.cosmicEnergy(p), com.kolodkingal.enhanced.ultimate.BespokeForms.flies(p)), 10);
+        // the Godkiller
+        become(Power.IRON_MAN, "", false);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 80);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: the Godkiller: {} blocks tall, {} wide, armour {}, scale {}",
+                p.getBbHeight(), p.getBbWidth(), p.getArmorValue(),
+                p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE)), 10);
+        portrait("u70_godkiller_front", CameraType.THIRD_PERSON_FRONT, false);
+        portrait("u71_godkiller_back", CameraType.THIRD_PERSON_BACK, false);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 6);
+        shot("u72_godkiller_cannons", 6);
+        // Ultimate Tommy
+        become(Power.TOMMY, "", false);
+        client(() -> Minecraft.getInstance().options.fov().set(60), 4);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 70);
+        portrait("u80_ultimate_tommy_front", CameraType.THIRD_PERSON_FRONT, false);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 16);
+        portrait("u81_ultimate_tommy_tornado", CameraType.THIRD_PERSON_BACK, false);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Ultimate Tommy: armour {}, time-proof {}",
+                p.getArmorValue(), com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(p)), 10);
+        server(p -> com.kolodkingal.enhanced.ultimate.Ultimate.set(null), 20);
+    }
+
+    /**
+     * (3.17) -Denhanced.mindtour.mode=keys: the keyboard itself. The tour waits twice while something outside presses real
+     * keys (xdotool): with Ultimate Mode off, an ordinary Scarlet Witch whose new keys must do nothing and whose R must
+     * fire her beam as ever; then, with it on, the Demiurge, whose Magic Types key and Spell Wheel (Sneak + the Spells key,
+     * held) must answer.
+     */
+    private static void keysTour() {
+        server(p -> {
+            p.server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "time set noon");
+            com.kolodkingal.enhanced.ultimate.Ultimate.set(Boolean.FALSE);
+        }, 20);
+        become(Power.SCARLET_WITCH, "", false);
+        server(p -> p.setGameMode(GameType.SURVIVAL), 10);
+        client(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            mc.options.hideGui = false;
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: KEYS A");
+        }, 110);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: keys A: beam {}, ultimate {}, awakening {}, chanting {}, caster {}, screen {}",
+                Powers.get(p).beamActive(), Powers.get(p).is(com.kolodkingal.enhanced.power.Live.ULTIMATE),
+                Powers.get(p).is(com.kolodkingal.enhanced.power.Live.ULTIMATE_AWAKENING),
+                Powers.get(p).is(com.kolodkingal.enhanced.power.Live.CHANTING), com.kolodkingal.enhanced.magic.Magic.isCaster(p),
+                Minecraft.getInstance().screen), 2);
+        shot("k01_off_wanda_real_keys", 60);
+        server(p -> {
+            com.kolodkingal.enhanced.ultimate.Ultimate.set(Boolean.TRUE);
+            com.kolodkingal.enhanced.platform.net.Net.sendToAllPlayers(com.kolodkingal.enhanced.ultimate.UltimateSyncPayload.now());
+        }, 20);
+        become(Power.BILLY, "", true);
+        client(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            mc.options.hideGui = false;
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: KEYS B");
+        }, 120);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: keys B: magic type {}, screen {}",
+                com.kolodkingal.enhanced.ultimate.Demiurge.borrowed(p), Minecraft.getInstance().screen), 2);
+        shot("k02_spell_wheel_real_keys", 80);
         server(p -> com.kolodkingal.enhanced.ultimate.Ultimate.set(null), 20);
     }
 
@@ -367,6 +471,10 @@ public final class MindTour {
         }
         if ("ultimate".equals(System.getProperty("enhanced.mindtour.mode"))) {
             ultimateTour();
+            return;
+        }
+        if ("keys".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            keysTour();
             return;
         }
         if ("tk".equals(System.getProperty("enhanced.mindtour.mode"))) {

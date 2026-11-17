@@ -122,7 +122,7 @@ public final class VisionFlameFx {
         // The body's own cross: across his shoulders (side) and through his chest (front), both square to its line.
         Vec3 front = axis.cross(side).normalize();
         // The tongues: out of the skin on every side of him.
-        int tongues = firstPerson ? 30 : 84;
+        int tongues = firstPerson ? 24 : 56;
         for (int i = 0; i < tongues; i++) {
             float t = (i * 0.61803F + 0.07F) % 1.0F;                    // spread from his feet to his head
             float ang = i * 2.39996F;                                    // and round him (the golden angle)
@@ -142,12 +142,12 @@ public final class VisionFlameFx {
             Vec3 tip = base.add(dir.scale(len * 0.55)).add(stream.scale(len * 0.5)).add(sway.scale(2.2))
                     .add(0, 0.08 * Mth.sin(phase * 1.7F), 0);
             float w = (0.2F + 0.1F * flick) * (firstPerson ? 0.7F : 1.0F);
-            tongue(pose, vc, base, mid, tip, w * 1.6F, OUTER, 0.34F * alpha);
-            tongue(pose, vc, base, mid, tip.subtract(stream.scale(len * 0.25)), w, INNER, 0.56F * alpha);
+            tongue(pose, vc, base, mid, tip, w * 1.6F, OUTER, 0.26F * alpha);
+            tongue(pose, vc, base, mid, tip.subtract(stream.scale(len * 0.25)), w, INNER, 0.34F * alpha);
             tongue(pose, vc, base, base.add(dir.scale(len * 0.3)), base.add(dir.scale(len * 0.5)), w * 0.45F, CORE,
-                    0.7F * alpha);
+                    0.3F * alpha);
             // (white-yellow at the flame's edge, as fire is brightest where it meets the air)
-            tongue(pose, vc, mid, tip, tip.add(stream.scale(len * 0.35)), w * 0.3F, CORE, 0.5F * alpha);
+            tongue(pose, vc, mid, tip, tip.add(stream.scale(len * 0.35)), w * 0.3F, CORE, 0.4F * alpha);
         }
         if (!firstPerson) {
             // the crown of flame over his head

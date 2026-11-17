@@ -55,6 +55,8 @@ public final class DemiurgeFx {
     private static final Map<Integer, Look> LOOKS = new HashMap<>();
     /** How red the fog is (0 to 1, eased toward whether a Nexus Being holds this world). */
     private static float nexusFog;
+    /** How red the sky's shell is (0 to 1, eased the same way, a frame at a time). */
+    private static float nexusSky;
 
     private DemiurgeFx() {
     }
@@ -119,11 +121,11 @@ public final class DemiurgeFx {
             if (casting) {
                 handStars(pose, vc, hand, time, s, firstPerson ? 0.5F : 1.0F);
             }
-            if (out > 0.02F) {
-                // the rings of blue energy at his hands
+            if (out > 0.02F && !firstPerson) {
+                // the rings of blue energy at his hands (not over his own view)
                 Vec3 normal = firstPerson ? player.getViewVector(partialTick) : side.scale(s).add(fwd.scale(0.4));
                 float pulse = 0.85F + 0.15F * Mth.sin(time * 0.3F + s);
-                float a = out * (firstPerson ? 0.35F : 0.9F);
+                float a = out * 0.7F;
                 EnergyGeometry.ring(pose, vc, hand, normal, 0.32F * pulse, 0.05F, 24, EnergyGeometry.argb(BLUE, a));
                 EnergyGeometry.ring(pose, vc, hand, normal, 0.5F * pulse, 0.03F, 28, EnergyGeometry.argb(BLUE, 0.6F * a));
                 EnergyGeometry.ring(pose, vc, hand, normal, 0.18F, 0.04F, 16, EnergyGeometry.argb(STAR, 0.8F * a));
@@ -208,6 +210,22 @@ public final class DemiurgeFx {
                 }
             }
         }
+    }
+
+    /**
+     * A world the Nexus Being holds: the sky itself red. A great shell of deep red round the camera, see-through (not
+     * light: it reddens the blue behind it instead of bleaching it), behind everything nearer than it. It comes and
+     * goes over a second or two; in any other world nothing is drawn.
+     */
+    public static void nexusVeil(ClientLevel level, net.minecraft.client.renderer.MultiBufferSource.BufferSource buffers, Matrix4f pose) {
+        boolean held = NexusBeing.heldOnClient(level);
+        nexusSky = Mth.clamp(nexusSky + (held ? 0.03F : -0.05F), 0.0F, 1.0F);
+        if (nexusSky <= 0.01F) {
+            return;
+        }
+        VertexConsumer veil = buffers.getBuffer(com.kolodkingal.enhanced.client.render.EnhancedRenderTypes.ENERGY_VEIL);
+        EnergyGeometry.veil(pose, veil, Vec3.ZERO, 92.0F, 24, 12, 0xB00012, 0.74F * nexusSky, 0.1F * nexusSky);
+        buffers.endBatch(com.kolodkingal.enhanced.client.render.EnhancedRenderTypes.ENERGY_VEIL);
     }
 
     /** A world the Nexus Being holds: the sky washed red, and rings of runes turning across it. */

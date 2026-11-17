@@ -100,6 +100,9 @@ public final class MagicFxRenderer {
                 com.kolodkingal.enhanced.client.render.VisionFlameFx.render(mc, player, pose, vc, camera, partialTick, time,
                         firstPerson);
             }
+            if (!firstPerson && com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(player)) {
+                cosmicTrail(player, pose, vc, camera, partialTick, time);
+            }
             if (data.is(Live.CHANTING)) {
                 chant(player, pose, vc, camera, partialTick, time, firstPerson);
             }
@@ -112,6 +115,31 @@ public final class MagicFxRenderer {
                     aura(player, form, data.is(Live.ULTIMATE_AWAKENING), pose, vc, camera, partialTick, time, firstPerson);
                 }
             }
+        }
+    }
+
+    /** Cosmic Spider-Man in flight: streams of the Uni-Power's light pouring off him, behind the way he flies. */
+    private static void cosmicTrail(AbstractClientPlayer player, Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick,
+                                    float time) {
+        Vec3 vel = player.getDeltaMovement();
+        double speed = vel.length();
+        if (speed < 0.12) {
+            return;
+        }
+        Vec3 back = vel.scale(-1.0 / speed);
+        Vec3 side = back.cross(UP);
+        side = side.lengthSqr() < 1.0E-4 ? new Vec3(1, 0, 0) : side.normalize();
+        Vec3 up = side.cross(back).normalize();
+        Vec3 mid = player.getPosition(partialTick).subtract(camera).add(0, player.getBbHeight() * 0.5, 0);
+        float len = (float) Math.min(9.0, 2.0 + speed * 9.0);
+        for (int i = 0; i < 14; i++) {
+            float ang = i * 2.399F;
+            float r = 0.25F + 0.35F * ((i * 0.37F) % 1.0F);
+            Vec3 from = mid.add(side.scale(Mth.cos(ang) * r)).add(up.scale(Mth.sin(ang) * r * 1.6));
+            float wob = Mth.sin(time * 0.5F + i * 1.3F);
+            Vec3 to = from.add(back.scale(len * (0.6 + 0.4 * ((i * 0.61F) % 1.0F)))).add(side.scale(0.25 * wob)).add(up.scale(0.2 * Mth.cos(time * 0.4F + i)));
+            int c = i % 3 == 0 ? 0xFFFFFF : i % 3 == 1 ? 0x7FD8FF : 0x3F8CFF;
+            EnergyGeometry.ribbon(pose, vc, from, to, 0.3F, 0.0F, EnergyGeometry.argb(c, 0.7F), EnergyGeometry.argb(c, 0.0F));
         }
     }
 
@@ -158,9 +186,10 @@ public final class MagicFxRenderer {
                 for (Vec3 p : fx.points()) {
                     Vec3 at = p.subtract(camera);
                     float pulse = 0.85F + 0.15F * Mth.sin(time * 1.3F);
-                    EnergyGeometry.ribbon(pose, vc, o, at, 0.5F * pulse, EnergyGeometry.argb(c, 0.3F * a), EnergyGeometry.argb(c, 0.3F * a));
-                    EnergyGeometry.ribbon(pose, vc, o, at, 0.12F, EnergyGeometry.argb(g, 0.9F * a), EnergyGeometry.argb(g, 0.9F * a));
-                    EnergyGeometry.ring(pose, vc, at, at.subtract(o), 0.5F, 0.12F, 16, EnergyGeometry.argb(g, 0.7F * a));
+                    float wide = Math.max(1.0F, fx.size()); // (a size over 1: a greater beam, the Godkiller's cannons)
+                    EnergyGeometry.ribbon(pose, vc, o, at, 0.5F * pulse * wide, EnergyGeometry.argb(c, 0.3F * a), EnergyGeometry.argb(c, 0.3F * a));
+                    EnergyGeometry.ribbon(pose, vc, o, at, 0.12F * wide, EnergyGeometry.argb(g, 0.9F * a), EnergyGeometry.argb(g, 0.9F * a));
+                    EnergyGeometry.ring(pose, vc, at, at.subtract(o), 0.5F * wide, 0.12F * wide, 16, EnergyGeometry.argb(g, 0.7F * a));
                 }
             }
             case MagicFx.DRAIN -> {
@@ -301,7 +330,7 @@ public final class MagicFxRenderer {
         float grow = Math.min(1.0F, t * 2.5F);
         RandomSource random = RandomSource.create(fx.origin().hashCode() * 31L + fx.duration());
         long flicker = (long) (age / 2);
-        int streams = 150;
+        int streams = 120;
         for (int i = 0; i < streams; i++) {
             // a place within the range, spread evenly over its disc
             double ang = random.nextDouble() * Math.PI * 2;
@@ -310,7 +339,7 @@ public final class MagicFxRenderer {
             double wz = fx.origin().z + Math.sin(ang) * d;
             Vec3 dir = new Vec3(random.nextGaussian(), 0, random.nextGaussian());
             float len = 7.0F + random.nextFloat() * 13.0F;
-            float w = 0.5F + random.nextFloat() * 0.7F;
+            float w = 1.1F + random.nextFloat() * 1.5F;
             long seed = random.nextLong();
             boolean sky = i % 2 == 1;
             double ground = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, Mth.floor(wx), Mth.floor(wz));
@@ -331,9 +360,10 @@ public final class MagicFxRenderer {
                 Vec3 way = new Vec3(dir.x * 0.55, 1.0, dir.z * 0.55).normalize();
                 to = from.add(way.scale(len * grow));
             }
-            EnergyGeometry.bolt(pose, vc, from, to, w * 1.7F, 1.3F, EnergyGeometry.argb(c, 0.42F * a), seed + flicker);
-            EnergyGeometry.bolt(pose, vc, from, to, w * 0.7F, 1.3F, EnergyGeometry.argb(0xFF6A7C, 0.8F * a), seed + flicker);
-            EnergyGeometry.bolt(pose, vc, from, to, w * 0.22F, 1.3F, EnergyGeometry.argb(0xFFE8EC, 0.95F * a), seed + flicker);
+            // (red through and through: a wide body of deep red, a bright red heart, only a thread of pale light in it)
+            EnergyGeometry.bolt(pose, vc, from, to, w * 1.9F, 1.3F, EnergyGeometry.argb(0xE0001C, 0.5F * a), seed + flicker);
+            EnergyGeometry.bolt(pose, vc, from, to, w * 0.8F, 1.3F, EnergyGeometry.argb(0xFF1028, 0.9F * a), seed + flicker);
+            EnergyGeometry.bolt(pose, vc, from, to, w * 0.12F, 1.3F, EnergyGeometry.argb(0xFF8090, 0.7F * a), seed + flicker);
             Vec3 foot = sky ? to : from;
             EnergyGeometry.ring(pose, vc, foot.add(0, 0.12, 0), UP, 0.8F + 2.6F * t, 0.35F, 16, EnergyGeometry.argb(c, 0.7F * a));
             if (i % 3 == 0) {
@@ -341,7 +371,7 @@ public final class MagicFxRenderer {
                 for (int k = 0; k < 5; k++) {
                     Vec3 s = new Vec3(random.nextGaussian(), Math.abs(random.nextGaussian()) + 0.2, random.nextGaussian()).normalize();
                     EnergyGeometry.ribbon(pose, vc, foot.add(s.scale(1.0 + 5.0 * t)), foot.add(s.scale(2.5 + 8.0 * t)), 0.3F * a, 0.0F,
-                            EnergyGeometry.argb(g, 0.9F * a), EnergyGeometry.argb(c, 0.0F));
+                            EnergyGeometry.argb(0xFF2038, 0.9F * a), EnergyGeometry.argb(c, 0.0F));
                 }
             }
         }
@@ -349,20 +379,15 @@ public final class MagicFxRenderer {
         Vec3 at = o.add(0, 0.2, 0);
         float wave = r * (1.0F - (1.0F - t) * (1.0F - t));
         EnergyGeometry.ring(pose, vc, at, UP, wave, 3.0F * (1.0F - t) + 0.3F, 72, EnergyGeometry.argb(c, 0.6F * (1.0F - t)));
-        EnergyGeometry.ring(pose, vc, at, UP, wave * 0.96F, 0.6F, 72, EnergyGeometry.argb(0xFFE8EC, 0.85F * (1.0F - t)));
+        EnergyGeometry.ring(pose, vc, at, UP, wave * 0.96F, 0.5F, 72, EnergyGeometry.argb(0xFF4058, 0.85F * (1.0F - t)));
         EnergyGeometry.ring(pose, vc, at, UP, wave * 0.6F, 2.0F * (1.0F - t), 56, EnergyGeometry.argb(c, 0.35F * (1.0F - t)));
-        for (int band = 0; band < 7; band++) {
-            float lat = Mth.DEG_TO_RAD * (8 + band * 12);
-            EnergyGeometry.ring(pose, vc, o.add(0, Mth.sin(lat) * r * 0.9F, 0), UP, Mth.cos(lat) * r * 0.9F, 5.0F, 56,
-                    EnergyGeometry.argb(c, 0.2F * a));
-        }
         // down onto each one it strikes
         long seed = fx.origin().hashCode() * 17L + flicker;
         for (Vec3 p : fx.points()) {
             Vec3 hit = p.subtract(camera);
             Vec3 top = hit.add(0, 30, 0);
             EnergyGeometry.bolt(pose, vc, top, hit, 1.1F, 1.8F, EnergyGeometry.argb(c, 0.5F * a), seed);
-            EnergyGeometry.bolt(pose, vc, top, hit, 0.3F, 1.8F, EnergyGeometry.argb(0xFFE8EC, 0.95F * a), seed);
+            EnergyGeometry.bolt(pose, vc, top, hit, 0.3F, 1.8F, EnergyGeometry.argb(0xFF6070, 0.95F * a), seed);
             EnergyGeometry.ring(pose, vc, hit, UP, 1.0F + 2.0F * t, 0.4F, 20, EnergyGeometry.argb(g, 0.9F * a));
             seed += 7919L;
         }

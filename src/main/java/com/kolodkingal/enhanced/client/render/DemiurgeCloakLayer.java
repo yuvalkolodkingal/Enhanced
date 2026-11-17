@@ -159,8 +159,7 @@ public class DemiurgeCloakLayer extends RenderLayer<AbstractClientPlayer, Player
                 float u1 = (float) (s + 1) / SCARF_SEGS * 0.5F;
                 float v0 = (56.0F + 4.0F * r) / 64.0F;
                 float v1 = (60.0F + 4.0F * r) / 64.0F;
-                quad(vc, pose, a, b, c, d, u0, u1, v0, v1, n, light, overlay);
-                quad(vc, pose, a, d, c, b, 0.5F + u0, 0.5F + u1, v0, v1, new Vector3f(n).negate(), light, overlay);
+                quad(vc, pose, a, b, c, d, u0, u1, v0, v1, n, light, overlay); // (one skin: its inside is never seen)
             }
         }
     }
@@ -169,9 +168,10 @@ public class DemiurgeCloakLayer extends RenderLayer<AbstractClientPlayer, Player
     private static Vec3 scarfPoint(float phi, float h, float breathe) {
         float front = Math.max(0.0F, -Mth.cos(phi));               // 1 at the throat
         float bulge = Mth.sin(h * Mth.PI);                         // thickest in its middle
-        float rx = 4.3F + 1.0F * bulge + breathe;
-        float rz = 2.7F + 0.9F * bulge + 0.5F * front + breathe;
-        float y = Mth.lerp(h, -1.9F, 1.9F + 1.5F * front);        // it hangs lower at the throat
+        // (it lies on his shoulders round the foot of the neck, under the chin: never over the face)
+        float rx = 4.4F + 0.9F * bulge + breathe;
+        float rz = 2.5F + 0.9F * bulge + 0.4F * front + breathe;
+        float y = Mth.lerp(h, -0.9F, 2.3F + 2.0F * front);        // it hangs lower at the throat
         return new Vec3(rx * Mth.sin(phi), y, rz * Mth.cos(phi));
     }
 
@@ -193,7 +193,7 @@ public class DemiurgeCloakLayer extends RenderLayer<AbstractClientPlayer, Player
                 Vec3 b = hoodPoint(p1, h0, flutter);
                 Vec3 c = hoodPoint(p1, h1, flutter);
                 Vec3 d = hoodPoint(p0, h1, flutter);
-                Vector3f n = normal(a, b, d);
+                Vector3f n = normal(a, d, b); // (outward: away from the head)
                 float u0 = (float) s / HOOD_ROUND * 0.5F;
                 float u1 = (float) (s + 1) / HOOD_ROUND * 0.5F;
                 float v0 = (56.0F - 8.0F * h0) / 64.0F;

@@ -68,6 +68,7 @@ public final class MagicEvents {
         }
         com.kolodkingal.enhanced.ultimate.Demiurge.tick(player);
         UltimateForms.tick(player);
+        com.kolodkingal.enhanced.ultimate.BespokeForms.tick(player);
         Casting.tick(player);
         Broom.tick(player);
         Realms.tick(player);
@@ -147,6 +148,7 @@ public final class MagicEvents {
         var server = event.getServer();
         MagicZones.tick(server);
         TempBlocks.tick(server);
+        com.kolodkingal.enhanced.ultimate.BespokeForms.serverTick(server);
         long now = server.overworld().getGameTime();
         if (now % 10 == 0) {
             Spirits.tick(server);
@@ -181,6 +183,16 @@ public final class MagicEvents {
             if (factor != 1.0F) {
                 event.setAmount(event.getAmount() * factor);
             }
+        }
+        // Ultimate Mode's own forms: a tornado stops what is shot or cast into it; their weaknesses and strengths
+        if (com.kolodkingal.enhanced.ultimate.BespokeForms.blockedByTornado(victim, source)) {
+            event.setCanceled(true);
+            MagicFx.burst((ServerLevel) victim.level(), victim.position().add(0, 1, 0), 0xA8F0D4, 8, 0.4, 0.8F);
+            return;
+        }
+        float taken = com.kolodkingal.enhanced.ultimate.BespokeForms.taken(victim, source);
+        if (taken != 1.0F) {
+            event.setAmount(event.getAmount() * taken);
         }
         if (MagicZones.has(victim, "transmuted")) {
             event.setAmount(event.getAmount() * 1.3F);
@@ -326,6 +338,7 @@ public final class MagicEvents {
         Ultimate.reset();
         Casting.clear();
         UltimateForms.clear();
+        com.kolodkingal.enhanced.ultimate.BespokeForms.clear();
         Spirits.clear();
         Familiars.clear();
         TimeLoop.clear();
@@ -347,6 +360,7 @@ public final class MagicEvents {
             CovenRoad.logout(player);
             Casting.forget(player);
             UltimateForms.forget(player);
+            com.kolodkingal.enhanced.ultimate.BespokeForms.forget(player.getUUID());
             TimeLoop.forget(player.getUUID());
             MagicZones.endOf(player.server, player.getUUID());
             UNBOUND_UNTIL.remove(player.getUUID());

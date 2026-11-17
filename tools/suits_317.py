@@ -4,7 +4,8 @@ powered (Billy: his Teen face; the body of stars), the Nexus cape and the Demiur
 import math, random, sys
 from PIL import Image
 
-SUIT = '/home/user/Enhanced/src/main/resources/assets/enhanced/textures/entity/suit/'
+import os
+SUIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'main', 'resources', 'assets', 'enhanced', 'textures', 'entity', 'suit', '')
 
 def hx(h): return ((h >> 16) & 255, (h >> 8) & 255, h & 255)
 def mix(a, b, t): return tuple(int(round(a[i] + (b[i] - a[i]) * t)) for i in range(3))
@@ -625,7 +626,7 @@ def cracks(frame):
                 glow[c] = max(glow.get(c, 0.0), k * run)
         def fn(face, x, y, w, hh, offs=offs, glow=glow):
             if face in ('top', 'bottom'):
-                return (40, 10, 0)
+                return (10, 3, 0)
             u = offs[face] + x
             g = glow.get((u, y))
             if g:
@@ -633,11 +634,146 @@ def cracks(frame):
             near = max([glow.get((u + a, y + b), 0.0) for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))] or [0.0])
             # the whole body glows a little of itself, more beside a crack, and at its edges (the fire's rim)
             edge = 0.16 if x in (0, w - 1) else 0.0
-            return mul(hx(0xFF6A1A), 0.14 + 0.4 * near + edge)
+            return mul(hx(0xFF6A1A), 0.02 + 0.3 * near + edge * 0.5)
         paint(im, faces, fn)
     x0, y0, _, _ = P['head']['front']
     for x in (1, 2, 5, 6):
         im.putpixel((x0 + x, y0 + 4), (255, 250, 220, 255))
+    return im
+
+# =====================================================================================================================
+# Cosmic Spider-Man (Captain Universe) and the Godkiller armour
+def cosmic_spider():
+    im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+    P = parts(False)
+    W, w2, w3 = hx(0xF4F7FC), hx(0xCFD6E4), hx(0x9AA4BA)
+    blue, red, redd = hx(0x3FA8F0), hx(0xD8242C), hx(0x8E1018)
+    def white(face, x, y, w, h):
+        k = FACE_LIGHT[face] * round_shade(x, w, 0.22)
+        c = mix(W, w2, min(1.0, y / max(1.0, h - 1.0) * 0.8))
+        return mul(c, k)
+    # the starfield of the Uni-Power over the head, shoulders, chest and arms; white from the ribs down
+    for part, seed, n in (('head', 51, 16), ('body', 53, 14), ('rarm', 57, 9), ('larm', 59, 9)):
+        cosmic(im, P[part], seed, True, n, 3, 0.12)
+    for part in ('rleg', 'lleg'):
+        paint(im, P[part], white)
+    def lower(part, start, edge):
+        faces = P[part]
+        for f in ('front', 'back', 'left', 'right'):
+            x0, y0, x1, y1 = faces[f]
+            wdt = x1 - x0
+            for x in range(wdt):
+                # the white rises to a point in the middle of the chest, as on the suit
+                rise = 0
+                if part == 'body' and f in ('front', 'back'):
+                    rise = 2 - min(2, abs(int(x - (wdt - 1) / 2.0)))
+                for y in range(start - rise, y1 - y0):
+                    c = white(f, x, y, wdt, y1 - y0)
+                    if y == start - rise:
+                        c = mul(blue, FACE_LIGHT[f])
+                    im.putpixel((x0 + x, y0 + y), c + (255,))
+        paint(im, faces, lambda f, x, y, w, h: mul(w3, 0.9), ('bottom',))
+    lower('body', 6, True)
+    lower('rarm', 7, True)
+    lower('larm', 7, True)
+    # the constellation: white stars joined by lines across the chest and shoulders
+    x0, y0, _, _ = P['body']['front']
+    for (x, y) in ((1, 1), (2, 2), (3, 2), (4, 1), (5, 2), (6, 1), (3, 3), (4, 4)):
+        im.putpixel((x0 + x, y0 + y), (255, 255, 255, 255) if (x, y) in ((1, 1), (4, 1), (6, 1), (4, 4)) else hx(0xAFC4E8) + (255,))
+    # the mask: the great white eyes rimmed in blue, the red web over the mouth and chin
+    rows(im, P['head']['front'], [
+        '. . . . . . . .',
+        '. . . . . . . .',
+        'B B . . . . B B',
+        'B W B . . B W B',
+        'B W W B B W W B',
+        '. B B R R B B .',
+        '. . R r r R . .',
+        '. . r R R r . .'], dict(B=blue, W=W, R=red, r=redd))
+    return im
+
+def godkiller():
+    im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+    P = parts(False)
+    n = vnoise(61)
+    G, g, d, D, K = hx(0xF0B43A), hx(0xC98A26), hx(0x8E5E1E), hx(0x54381A), hx(0x16110C)
+    V = hx(0x6E5A78)       # the violet of its shadowed plates
+    Lg, R = hx(0xFFF6C0), hx(0xFF3020)
+    def plate(face, x, y, w, h, seams):
+        k = FACE_LIGHT[face] * round_shade(x, w, 0.3)
+        t = 0.55 + 0.45 * (n(x * 0.6 + face.__hash__() % 7, y * 0.5) - 0.5)
+        c = mix(g, G, min(1.0, max(0.0, t + 0.25 - y / (h * 2.5))))
+        if y in seams or x in ((0, w - 1) if w > 3 else ()):
+            c = d
+        if y - 1 in seams:
+            c = mix(c, Lg, 0.25)                    # the lit edge under a seam
+        if face == 'back':
+            c = mix(c, V, 0.22)
+        return mul(c, k)
+    for part, seams in (('head', (0, 7)), ('body', (0, 5, 8, 11)), ('rarm', (4, 7, 11)), ('larm', (4, 7, 11)), ('rleg', (0, 5, 9)), ('lleg', (0, 5, 9))):
+        paint(im, P[part], lambda f, x, y, w, h, seams=seams: mul(G, 1.02) if f == 'top' else (mul(D, 0.8) if f == 'bottom' else plate(f, x, y, w, h, seams)))
+    pal = dict(G=G, g=g, d=d, D=D, K=K, L=Lg, R=R, V=V, l=hx(0xFFE27A))
+    def merge(box, lines):
+        x0, y0, _, _ = box
+        for y, line in enumerate(lines):
+            for x, ch in enumerate(line.split()):
+                if ch in pal:
+                    im.putpixel((x0 + x, y0 + y), pal[ch] + (255,))
+    # the helm: a blunt faceplate, two red slits, the grille of the mouth
+    merge(P['head']['front'], [
+        'd G G G G G G d',
+        'G G G g g G G G',
+        'G g d d d d g G',
+        'G K K d d K K G',
+        'G R R d d R R G',
+        'g G d g g d G g',
+        'd g K d d K g d',
+        'D d K K K K d D'])
+    # the chest: the two reactors side by side, the black vents on the shoulders, the plated belly
+    merge(P['body']['front'], [
+        'K K d G G d K K',
+        'K K d G G d K K',
+        'G d l l d l l G',
+        'G l L l d L l G',
+        'G l L l d l L G',
+        'd d l l d l l d',
+        'V g G d d G g V',
+        'V g G d d G g V',
+        'd d d d d d d d',
+        'D g G g g G g D',
+        'D g G g g G g D',
+        'D d d K K d d D'])
+    # the back: the great plates of the shoulders, the spine's ridge, the thrusters' two vents
+    merge(P['body']['back'], [
+        'K K d G G d K K',
+        'G G d G G d G G',
+        'G g G d d G g G',
+        'g G G d d G G g',
+        'g G g K K g G g',
+        'd d d d d d d d',
+        'V g l d d l g V',
+        'V g l d d l g V',
+        'd d d d d d d d',
+        'D g G g g G g D',
+        'D g G g g G g D',
+        'D d d K K d d D'])
+    merge(P['head']['back'], [
+        'd G G G G G G d',
+        'G G g g g g G G',
+        'G g G G G G g G',
+        'G g G d d G g G',
+        'G g G d d G g G',
+        'g G g g g g G g',
+        'd g d d d d g d',
+        'D d K K K K d D'])
+    for part in ('rarm', 'larm'):
+        x0, y0, _, _ = P[part]['front']
+        for x in (1, 2):
+            im.putpixel((x0 + x, y0 + 9), pal['l'] + (255,)); im.putpixel((x0 + x, y0 + 10), pal['L'] + (255,))   # the palm cannon's glow
+        tx0, ty0, _, _ = P[part]['top']
+        for x in range(1, 3):
+            for y in range(1, 3):
+                im.putpixel((tx0 + x, ty0 + y), K + (255,))   # the shoulder's vent
     return im
 
 if __name__ == '__main__':
@@ -648,6 +784,8 @@ if __name__ == '__main__':
     demiurge_idle().save(out + 'billy_demiurge.png')
     demiurge_powered().save(out + 'billy_demiurge_powered.png')
     cloak().save(out + 'billy_demiurge_cloak.png')
+    cosmic_spider().save(out + 'spider_man_cosmic.png')
+    godkiller().save(out + 'iron_man_godkiller.png')
     molten().save(out + 'vision_molten.png')
     for i in range(4):
         cracks(i).save(out + 'vision_molten_cracks_%d.png' % i)

@@ -124,6 +124,12 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         int halo = starry ? DEMIURGE_HALO : tint < 0 ? BillyAbilities.MAIN : tint;
         poseStack.pushPose();
         head.translateAndRotate(poseStack);
+        if (starry) {
+            // (it sits outside his hood: a little larger, about the middle of the head)
+            poseStack.translate(0.0F, -4.0F / 16.0F, 0.0F);
+            poseStack.scale(1.24F, 1.24F, 1.24F);
+            poseStack.translate(0.0F, 4.0F / 16.0F, 0.0F);
+        }
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         Matrix4f m = poseStack.last().pose();
         float pulse = 0.85F + 0.15F * Mth.sin(ageInTicks * 0.15F);

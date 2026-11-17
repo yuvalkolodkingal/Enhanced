@@ -31,9 +31,12 @@ public class VisionFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
     private static final RenderType CRACKS_2 = RenderType.eyes(Enhanced.id("textures/entity/suit/vision_molten_cracks_2.png"));
     private static final RenderType CRACKS_3 = RenderType.eyes(Enhanced.id("textures/entity/suit/vision_molten_cracks_3.png"));
     private static final RenderType[] CRACKS = {CRACKS_0, CRACKS_1, CRACKS_2, CRACKS_3};
-    /** The sheath's colours (ARGB, the alpha their full strength): the orange tongues, the pale gold behind them. */
-    private static final int FLAME = 0xA0FF7A18;
-    private static final int GLOW = 0x66FFE08A;
+    /**
+     * The sheath's colours: the orange tongues, the gold behind them. Dim on purpose: the sheath is light added to the
+     * body (its strength is in the colour itself), and the body under it must stay a figure of red, not bleach to white.
+     */
+    private static final int FLAME = 0xFF6A2A08;
+    private static final int GLOW = 0xFF30200A;
     /** Ticks each picture of the cracks lasts before the next has taken its place. */
     private static final float FRAME_TICKS = 5.0F;
 

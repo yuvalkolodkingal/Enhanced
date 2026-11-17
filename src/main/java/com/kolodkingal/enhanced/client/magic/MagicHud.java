@@ -31,6 +31,11 @@ public class MagicHud implements LayeredDraw.Layer {
     private long chantStart = -1;
     private long formStart = -1;
 
+    /** A line of the panel, moved left if it would run off the screen's right edge. */
+    private static void line(GuiGraphics graphics, Font font, Component text, int x, int y, int color, boolean shadow) {
+        graphics.drawString(font, text, Math.max(2, Math.min(x, graphics.guiWidth() - font.width(text) - 3)), y, color, shadow);
+    }
+
     @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
@@ -51,7 +56,7 @@ public class MagicHud implements LayeredDraw.Layer {
             int w = 82;
             graphics.fill(x - 1, y - 1, x + w + 1, y + 5, 0xC0000000);
             graphics.fill(x, y, x + Math.round(w * Math.min(1.0F, mana / Math.max(1.0F, max))), y + 4, 0xFF000000 | color);
-            graphics.drawString(font, Component.translatable("hud.enhanced.mana", (int) mana, (int) max), x, y - 10, 0xFF000000 | Magic.casterGlow(player), true);
+            line(graphics, font, Component.translatable("hud.enhanced.mana", (int) mana, (int) max), x, y - 10, 0xFF000000 | Magic.casterGlow(player), true);
             Spell spell = Spell.byId(magic.selected());
             if (spell == null || !Magic.knows(player, spell)) {
                 List<Spell> known = Magic.known(player);
@@ -59,7 +64,7 @@ public class MagicHud implements LayeredDraw.Layer {
             }
             if (spell != null) {
                 Component line = Component.translatable("hud.enhanced.spell", KeyBindings.SPELLS.getTranslatedKeyMessage(), spell.displayName());
-                graphics.drawString(font, line, x, y - 20, 0xFF000000 | Magic.color(player, spell), true);
+                line(graphics, font, line, x, y - 20, 0xFF000000 | Magic.color(player, spell), true);
             }
             if (data.is(Live.CHANTING)) {
                 if (chantStart < 0) {
@@ -78,18 +83,27 @@ public class MagicHud implements LayeredDraw.Layer {
                 chantStart = -1;
             }
             if (magic.corruption() > 0) {
-                graphics.drawString(font, Component.translatable("hud.enhanced.corruption", magic.corruption()), x, y + 7, 0xFFB45CFF, true);
+                line(graphics, font, Component.translatable("hud.enhanced.corruption", magic.corruption()), x, y + 7, 0xFFB45CFF, true);
             }
         }
         if (Ultimate.on()) {
             UltimateForm form = UltimateForm.of(player);
             if (Magic.isDemiurge(player)) {
-                // (3.17) the Demiurge's magic type: whose abilities his keys have now (Sneak + O changes it)
+                // (3.17) the Demiurge's magic type: whose abilities his keys have now (the Magic Types key changes it)
                 com.kolodkingal.enhanced.power.Power borrowed = com.kolodkingal.enhanced.ultimate.Demiurge.borrowed(player);
                 Component type = borrowed == com.kolodkingal.enhanced.power.Power.NONE
                         ? Component.translatable("message.enhanced.demiurge.own") : borrowed.displayName();
-                graphics.drawString(font, Component.translatable("hud.enhanced.demiurge.type", type,
-                        KeyBindings.ULTIMATE.getTranslatedKeyMessage()), x, (Magic.isCaster(player) ? y - 40 : y - 20), 0xFF7FE0FF, true);
+                line(graphics, font, Component.translatable("hud.enhanced.demiurge.type", type,
+                        KeyBindings.MAGIC_TYPES.getTranslatedKeyMessage()), x, (Magic.isCaster(player) ? y - 40 : y - 20), 0xFF7FE0FF, true);
+            }
+            if (data.power() == com.kolodkingal.enhanced.power.Power.SPIDER_MAN) {
+                // (3.17) the Uni-Power: it runs down in the form and climbs back out of it
+                int top = com.kolodkingal.enhanced.ultimate.BespokeForms.COSMIC_ENERGY;
+                int have = Math.min(top, data.ironCharge());
+                int cy = Magic.isCaster(player) ? y - 40 : y - 20;
+                line(graphics, font, Component.translatable("hud.enhanced.cosmic.energy", have, top), x, cy - 10, 0xFF9FE0FF, true);
+                graphics.fill(x - 1, cy - 1, x + 83, cy + 4, 0xC0000000);
+                graphics.fill(x, cy, x + Math.round(82.0F * have / top), cy + 3, have >= top ? 0xFFFFFFFF : 0xFF5FB8FF);
             }
             if (form != null) {
                 int uy = Magic.isCaster(player) ? y - 30 : y - 10;
@@ -100,17 +114,17 @@ public class MagicHud implements LayeredDraw.Layer {
                     }
                     if (form == UltimateForm.SCARLET_WITCH) {
                         // (the Nexus Being has no time limit: Sneak + O ends it)
-                        graphics.drawString(font, Component.translatable("hud.enhanced.ultimate.untimed", form.displayName(),
+                        line(graphics, font, Component.translatable("hud.enhanced.ultimate.untimed", form.displayName(),
                                 KeyBindings.ULTIMATE.getTranslatedKeyMessage(), form.signatureName()), x, uy, c, true);
                     } else {
                         int total = EnhancedConfig.SPEC.isLoaded() ? UltimateConfig.DURATION_SECONDS.get() : 45;
                         int left = Math.max(0, total - (int) ((now - formStart) / 20));
-                        graphics.drawString(font, Component.translatable("hud.enhanced.ultimate.active", form.displayName(), left,
+                        line(graphics, font, Component.translatable("hud.enhanced.ultimate.active", form.displayName(), left,
                                 KeyBindings.ULTIMATE.getTranslatedKeyMessage(), form.signatureName()), x, uy, c, true);
                     }
                 } else {
                     formStart = -1;
-                    graphics.drawString(font, Component.translatable("hud.enhanced.ultimate.ready", KeyBindings.ULTIMATE.getTranslatedKeyMessage(),
+                    line(graphics, font, Component.translatable("hud.enhanced.ultimate.ready", KeyBindings.ULTIMATE.getTranslatedKeyMessage(),
                             form.displayName()), x, uy, data.is(Live.ULTIMATE_AWAKENING) ? 0xFFFFFFFF : c, true);
                 }
             }

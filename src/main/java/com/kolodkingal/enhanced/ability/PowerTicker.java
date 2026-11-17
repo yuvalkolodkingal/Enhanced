@@ -64,7 +64,9 @@ public final class PowerTicker {
                 && !HexRunes.silences(player) && !player.hasEffect(ModEffects.DRAINED); // 3.3: the Hex Runes hold a sorcerer's powers, flight too
         // (3.17: a broom of light carries a witch, or anyone it was conjured for, for its while)
         boolean broom = com.kolodkingal.enhanced.magic.Broom.riding(player);
-        canFly = canFly || broom;
+        // (and, Ultimate Mode: Cosmic Spider-Man flies of himself)
+        boolean cosmic = com.kolodkingal.enhanced.ultimate.BespokeForms.flies(player);
+        canFly = canFly || broom || cosmic;
         setModifier(player, Platform.get().attributes().creativeFlight(), FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
@@ -73,8 +75,11 @@ public final class PowerTicker {
         float speed = !survivalLike || !canFly ? 0.05F : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
+                : cosmic ? 0.17F
                 : broom && !power.canFly() ? com.kolodkingal.enhanced.magic.Broom.SPEED
                 : power.flightSpeed() * lookFlight(data) * (broom ? 1.25F : 1.0F);
+        // (Ultimate Mode: while an Ultimate Tommy's speed is on, everyone else in his world flies a third as fast; else 1)
+        speed *= com.kolodkingal.enhanced.ultimate.BespokeForms.flightFactor(player);
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);

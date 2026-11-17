@@ -155,7 +155,7 @@ public final class UltimateMagicTests {
                     + UltimateForms.damageFactor(wanda));
             UltimateForms.key(wanda, true);
             check(!UltimateForms.active(wanda) && NexusBeing.worlds(wanda).isEmpty() && !NexusBeing.strips(thor),
-                    "Sneak + O ends it: the world is free");
+                    "Sneak + the key ends it: the world is free");
             check(UltimateForms.cooldownSeconds(wanda) == 0, "and it has no cooldown");
             helper.succeed();
         });
@@ -201,6 +201,149 @@ public final class UltimateMagicTests {
         helper.succeed();
     }
 
+    // ---- with Ultimate Mode off, the heroes are the heroes of 3.16 ----
+
+    @EnhancedTest(template = ARENA, batch = SWITCH, timeoutTicks = 100)
+    public static void withTheModeOffNoHeroHasAnythingOfIt(GameTestHelper helper) {
+        TestKit.Fixture f = ultimate(helper, false);
+        f.onClose(() -> Ultimate.set(null));
+        ServerPlayer wanda = f.player(3.5, FLOOR, 3.5, Power.SCARLET_WITCH);
+        ServerPlayer billy = f.player(5.5, FLOOR, 3.5, Power.BILLY);
+        ServerPlayer strange = f.player(7.5, FLOOR, 3.5, Power.DOCTOR_STRANGE);
+        ServerPlayer spider = f.player(9.5, FLOOR, 3.5, Power.SPIDER_MAN);
+        ServerPlayer tony = f.player(3.5, FLOOR, 6.5, Power.IRON_MAN);
+        ServerPlayer tommy = f.player(5.5, FLOOR, 6.5, Power.TOMMY);
+        ServerPlayer witch = f.player(7.5, FLOOR, 6.5);
+        Magic.set(witch, MagicData.EMPTY.withCraft(WitchPath.GREEN, 1, false));
+        for (ServerPlayer hero : new ServerPlayer[]{wanda, billy, strange, spider, tony, tommy}) {
+            double armour = hero.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
+            double scale = hero.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE);
+            float health = hero.getMaxHealth();
+            Demiurge.tick(hero);
+            UltimateForms.tick(hero);
+            com.kolodkingal.enhanced.ultimate.BespokeForms.tick(hero);
+            check(!Magic.isCaster(hero), Powers.power(hero) + " casts no spells: no mana, no spell key");
+            check(!Grimoires.read(hero, MagicData.DARKHOLD, Component.literal("book")) && !Magic.data(hero).has(MagicData.DARKHOLD),
+                    Powers.power(hero) + " learns nothing from a grimoire: the book is the book it was");
+            UltimateForms.key(hero, false);
+            check(!UltimateForms.active(hero) && !Powers.get(hero).is(Live.ULTIMATE) && !Powers.get(hero).is(Live.ULTIMATE_AWAKENING),
+                    Powers.power(hero) + " awakens nothing");
+            check(hero.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR) == armour
+                    && hero.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) == scale
+                    && hero.getMaxHealth() == health, Powers.power(hero) + "'s body is unchanged");
+            check(UltimateForms.damageFactor(hero) == 1.0F, Powers.power(hero) + " hits as hard as ever");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.flightFactor(hero) == 1.0F
+                    && com.kolodkingal.enhanced.ultimate.BespokeForms.runHunger(hero) == 1.0F
+                    && !com.kolodkingal.enhanced.ultimate.BespokeForms.flies(hero)
+                    && !com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(hero), "nothing of the forms on " + Powers.power(hero));
+            check(Powers.get(hero).acting() == Powers.power(hero) && Powers.get(hero).borrowed() == Power.NONE, "his keys are his own");
+        }
+        check(!Magic.isDemiurge(billy) && !Magic.mindscapeOpen(billy), "Billy is Billy: no Demiurge, no Mindscape");
+        check(Magic.isCaster(witch) && Magic.knows(witch, Spell.VINE_SNARE), "a witch is a witch with the mode off too");
+        Ultimate.set(true);
+        check(Magic.isCaster(billy) && Magic.isCaster(strange) && Magic.isCaster(wanda), "on: the Demiurge and the hero sorcerers cast");
+        Ultimate.set(false);
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    public static void theMindscapeIsBillysAndTheirsWhoseMagicIsHisGift(GameTestHelper helper) {
+        TestKit.Fixture f = ultimate(helper, true);
+        ServerPlayer billy = f.player(3.5, FLOOR, 3.5, Power.BILLY);
+        ServerPlayer gifted = f.player(5.5, FLOOR, 3.5);
+        ServerPlayer other = f.player(7.5, FLOOR, 3.5);
+        ServerPlayer strange = f.player(9.5, FLOOR, 3.5, Power.DOCTOR_STRANGE);
+        com.kolodkingal.enhanced.magic.Grants.fromScreen(billy, gifted.getGameProfile().getName(), WitchPath.GREEN.id(), 2, false);
+        com.kolodkingal.enhanced.magic.Grants.give(other, WitchPath.GREEN, 2, true);
+        check(Magic.isWitch(gifted) && Magic.data(gifted).has(MagicData.BILLYS), "the Demiurge's gift is marked his");
+        check(Magic.mindscapeOpen(billy) && Magic.knows(billy, Spell.MINDSCAPE), "Billy himself");
+        check(Magic.mindscapeOpen(gifted) && Magic.knows(gifted, Spell.MINDSCAPE), "and the witch he made");
+        check(Magic.isWitch(other) && !Magic.mindscapeOpen(other) && !Magic.knows(other, Spell.MINDSCAPE),
+                "not a witch made by a command or the Road");
+        check(!Magic.mindscapeOpen(strange) && !Magic.knows(strange, Spell.MINDSCAPE), "nor a hero sorcerer");
+        check(!com.kolodkingal.enhanced.magic.Realms.toggleMindscape(other), "and the spell itself refuses her");
+        com.kolodkingal.enhanced.magic.Grants.give(gifted, WitchPath.POTIONS, 1, true);
+        check(!Magic.mindscapeOpen(gifted), "a craft given anew by someone else is no longer Billy's gift");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    public static void theChaosBurstStrikesEveryoneNearButHer(GameTestHelper helper) {
+        TestKit.Fixture f = ultimate(helper, true);
+        ServerPlayer wanda = f.player(3.5, FLOOR, 3.5, Power.SCARLET_WITCH);
+        Zombie near = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, 5, 2, 5);
+        Zombie far = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, 12, 2, 12);
+        UltimateForms.awaken(wanda, UltimateForm.SCARLET_WITCH);
+        helper.onEachTick(() -> UltimateForms.tick(wanda));
+        helper.runAfterDelay(UltimateConfig.AWAKEN_TICKS.get() + 3, () -> {
+            float mine = wanda.getHealth();
+            float a = near.getHealth();
+            float b = far.getHealth();
+            UltimateForms.key(wanda, false);
+            check(near.getHealth() < a || !near.isAlive(), "her signature, the great burst, strikes the one beside her");
+            check(far.getHealth() < b || !far.isAlive(), "and the one far off (within " + UltimateConfig.NEXUS_FLASH_RANGE.get() + " blocks)");
+            check(wanda.getHealth() >= mine, "never her");
+            UltimateForms.key(wanda, true);
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    public static void cosmicSpiderManTheGodkillerAndUltimateTommy(GameTestHelper helper) {
+        TestKit.Fixture f = ultimate(helper, true);
+        ServerPlayer spider = f.player(3.5, FLOOR, 3.5, Power.SPIDER_MAN);
+        ServerPlayer tony = f.player(8.5, FLOOR, 8.5, Power.IRON_MAN);
+        ServerPlayer tommy = f.player(3.5, FLOOR, 8.5, Power.TOMMY);
+        ServerPlayer[] all = {spider, tony, tommy};
+        for (ServerPlayer p : all) {
+            UltimateForms.awaken(p, UltimateForm.of(p));
+        }
+        helper.onEachTick(() -> {
+            for (ServerPlayer p : all) {
+                UltimateForms.tick(p);
+                com.kolodkingal.enhanced.ultimate.BespokeForms.tick(p);
+            }
+        });
+        helper.runAfterDelay(UltimateConfig.AWAKEN_TICKS.get() + 3, () -> {
+            var forms = com.kolodkingal.enhanced.ultimate.BespokeForms.class;
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(spider) && com.kolodkingal.enhanced.ultimate.BespokeForms.godkiller(tony)
+                    && com.kolodkingal.enhanced.ultimate.BespokeForms.tommy(tommy), "the three forms: " + forms.getSimpleName());
+            // Cosmic Spider-Man
+            check(spider.getArmorValue() >= 20, "Netherite's protection: " + spider.getArmorValue());
+            check(spider.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE) >= 22.0, "three Hulks' strength");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.flies(spider), "he flies");
+            check(Magic.isCaster(spider) && Magic.knows(spider, Spell.TRANSMUTE) && Magic.knows(spider, Spell.DIMENSION_GATE)
+                    && !Magic.knows(spider, Spell.UNMAKING), "matter and portals are his spells, no more");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.cosmicEnergy(spider) <= 170.0F, "the Uni-Power's meter");
+            var dark = com.kolodkingal.enhanced.registry.ModDamageTypes.source(spider.level(), com.kolodkingal.enhanced.registry.ModDamageTypes.DARK_SPELL, null, null);
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(spider, dark) == 1.5F, "dark magic hurts him half as much again");
+            // the Godkiller
+            check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) == 16.0, "the Godkiller's size: "
+                    + tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE));
+            check(tony.getArmorValue() >= 24 && tony.getBbHeight() > 25.0F, "more than Netherite, " + tony.getBbHeight() + " blocks tall");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, tony.damageSources().generic()) < 1.0F
+                    && com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, dark) > 1.0F, "blows glance off; magic bites a little more");
+            check(UltimateForms.damageFactor(tony) >= 2.5F, "its weapons are greater");
+            // Ultimate Tommy
+            check(tommy.getArmorValue() >= 20, "Netherite's protection");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tommy, dark) == 0.6F, "spells hurt him less");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(tommy) && com.kolodkingal.enhanced.ultimate.BespokeForms.runHunger(tommy) == 0.0F,
+                    "time's powers pass him by, his running costs no hunger");
+            Powers.get(tommy).setSlowMo(true);
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.slowedByTommy(spider) || spider.isCreative(), "his speed slows the whole world's players");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.flightFactor(spider) < 0.5F || spider.isCreative(), "their flight too");
+            check(!com.kolodkingal.enhanced.ultimate.BespokeForms.slowedByTommy(tommy), "not him");
+            Powers.get(tommy).setSlowMo(false);
+            for (ServerPlayer p : all) {
+                UltimateForms.end(p, false);
+                com.kolodkingal.enhanced.ultimate.BespokeForms.tick(p);
+            }
+            check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) == 1.0 && spider.getArmorValue() < 20,
+                    "the forms end: their bodies are their own again");
+            helper.succeed();
+        });
+    }
+
     private static final Pattern PLACEHOLDER = Pattern.compile("%(\\d+\\$)?[sd%]");
 
     private static String placeholders(String text) {
@@ -231,7 +374,9 @@ public final class UltimateMagicTests {
             keys.add("ultimate.enhanced." + u.id() + ".desc");
             keys.add("ultimate.enhanced." + u.id() + ".signature");
         }
-        for (String k : new String[]{"key.enhanced.spells", "key.enhanced.ultimate", "enhanced.configuration.ultimate",
+        for (String k : new String[]{"key.enhanced.spells", "key.enhanced.ultimate", "key.enhanced.magic_types",
+                "message.enhanced.mindscape.closed", "message.enhanced.cosmic.spent", "message.enhanced.cosmic.recharging",
+                "hud.enhanced.cosmic.energy", "message.enhanced.tommy.too_hungry", "enhanced.configuration.ultimate",
                 "enhanced.configuration.witchcraft", "message.enhanced.nexus.stripped", "message.enhanced.demiurge.magic_type",
                 "item.enhanced.cagliostros_grimoire", "commands.enhanced.ultimate.info"}) {
             keys.add(k);

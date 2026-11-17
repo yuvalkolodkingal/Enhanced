@@ -59,7 +59,7 @@ public final class NexusBeing {
     public static final int RED = 0xFF1E3C;
     public static final int GLOW = 0xFFB0C0;
     /** The red of her Chaos Burst: brighter still. */
-    public static final int BRIGHT = 0xFF2A48;
+    public static final int BRIGHT = 0xFF0A22;
 
     /** Per Nexus Being (server): the worlds she holds, and how many heroes her runes strip. */
     private static final class Hold {
