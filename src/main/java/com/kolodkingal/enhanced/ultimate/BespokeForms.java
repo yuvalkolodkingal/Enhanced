@@ -388,7 +388,8 @@ public final class BespokeForms {
             return true;
         }
         if (godkiller(player)) {
-            if (!SuitEnergy.spend(player, sneak ? 6.0 : 12.0)) {
+            // (its weapons draw on the suit he wears under it, if he wears one: the armour itself needs none)
+            if (SuitEnergy.get(player) > 0.0F && !SuitEnergy.spend(player, sneak ? 6.0 : 12.0)) {
                 return true;
             }
             if (sneak) {

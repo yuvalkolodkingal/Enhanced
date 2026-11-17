@@ -376,6 +376,7 @@ public final class MindTour {
                 p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE)), 10);
         portrait("u70_godkiller_front", CameraType.THIRD_PERSON_FRONT, false);
         portrait("u71_godkiller_back", CameraType.THIRD_PERSON_BACK, false);
+        client(() -> Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_FRONT), 6);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 6);
         shot("u72_godkiller_cannons", 6);
         // Ultimate Tommy
