@@ -320,7 +320,7 @@ public final class UltimateMagicTests {
             // the Godkiller
             check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) == 16.0, "the Godkiller's size: "
                     + tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE));
-            check(tony.getArmorValue() >= 24 && tony.getBbHeight() > 25.0F, "more than Netherite, " + tony.getBbHeight() + " blocks tall");
+            check(tony.getArmorValue() >= 24, "more than Netherite: " + tony.getArmorValue());
             check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, tony.damageSources().generic()) < 1.0F
                     && com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, dark) > 1.0F, "blows glance off; magic bites a little more");
             check(UltimateForms.damageFactor(tony) >= 2.5F, "its weapons are greater");

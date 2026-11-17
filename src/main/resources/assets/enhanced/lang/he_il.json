@@ -5730,7 +5730,7 @@
   "message.enhanced.grimoire.known": "אתם כבר מכירים את הכישופים של הספר הזה.",
   "message.enhanced.grimoire.cannot": "האותיות זזות על הדף: רק מכשפה, מכשף או בילי יכולים לקרוא אותו.",
   "key.enhanced.magic_types": "סוגי הקסם של הדמיאורג",
-  "message.enhanced.mindscape.closed": "רק בילי, ומי שהקסם שלו הוא מתנה מבילי, מוצאים את הדרך אל מרחב התודעה.",
+  "message.enhanced.mindscape.closed": "רק בילי, ומי שהקסם שלו הוא מתנה מבילי, מוצאים את הדרך אל נוף התודעה.",
   "message.enhanced.cosmic.spent": "כוח היקום אזל: אתם שוב ספיידרמן עד שיחזור.",
   "message.enhanced.cosmic.recharging": "כוח היקום חוזר: %s/%s.",
   "hud.enhanced.cosmic.energy": "כוח היקום %s/%s",

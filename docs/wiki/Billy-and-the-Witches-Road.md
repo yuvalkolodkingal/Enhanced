@@ -122,9 +122,9 @@ Billy's **chaos magic** (the Hex Bolt and the Hex Beam) is one of the few things
 
 ## Spells, and the Demiurge (3.17)
 
-Billy casts spells of his own on **K** ("I want ..."), opening with his rank: the Unbinding, the broomstick, sigils and runes of protection, ghosts, dreams, a pocket dimension, the Infinite Hallway, conjured things, gravity, clairvoyance, familiars, portals and more: see [Witchcraft](Witchcraft#billys-spells). He can open the Witches' Road for his whole coven (the Coven's Road).
+With [Ultimate Mode](Ultimate-Mode) off, Billy is exactly the Billy of before 3.17: his crown, his barrier, his powers and his ranks are unchanged, and he has no spells. With it on he casts every spell of [Witchcraft](Witchcraft) on the Spells key ("I want ..."): the Unbinding, the broomstick, sigils and runes of protection, ghosts, dreams, a pocket dimension, the Infinite Hallway, conjured matter, gravity, portals and the rest.
 
-With [Ultimate Mode](Ultimate-Mode) on, Billy is **the Demiurge**: twenty hearts, Netherite's protection, a barrier round his whole body, a brighter blue with stars in it, every spell, the **Magic types** (Sneak + O: the Scarlet Witch's, Doctor Strange's, Agatha's or Loki's abilities on his keys) and **Grant Magic** (he gives witchcraft to players with no hero). He wears the Demiurge's starry suit, and the great red hooded cloak while he flies or uses a power.
+With [Ultimate Mode](Ultimate-Mode) on, Billy is **the Demiurge**: twenty hearts, Netherite's protection, a barrier round his whole body, a brighter blue with stars in it, every spell, the **Magic types** (the Magic Types key, `,`: he has the Scarlet Witch's, Doctor Strange's, Agatha's or Loki's powers, every key working exactly as on that character) and **Grant Magic** (he gives witchcraft to players with no hero; only they, and he, find the way into the Witches' Mindscape). He wears the Demiurge's starry suit with a red scarf and cape, and while he flies or uses a power the great red hooded cloak, of real cloth; his crown is his own crown, brighter and bluer, with stars alive in it.
 
 ## Numbers you can change
 

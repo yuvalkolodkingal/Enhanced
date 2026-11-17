@@ -72,7 +72,7 @@ Every hero's ultimate version, for the whole server (3.17; operators). See [Ulti
 
 | Command | What it does |
 |---|---|
-| `/enhanced ultimate on` | Turns Ultimate Mode on for this world: O awakens every hero's ultimate form, Source Code Vision runs on the Solar Jewel, Billy is the Demiurge, the Scarlet Witch can become the Nexus Being |
+| `/enhanced ultimate on` | Turns Ultimate Mode on for this world: the Ultimate Form key awakens every hero's ultimate form, Source Code Vision runs on the Solar Jewel, Billy is the Demiurge, the Scarlet Witch can become the Nexus Being |
 | `/enhanced ultimate off` | Turns it off for this world (every ultimate form ends) |
 | `/enhanced ultimate info` | Whether it is on, and whether that is the world's own setting or the server config's |
 | `/enhanced ultimate default` | Drops the world's own setting: `[ultimate] enabled` in the server config decides again |

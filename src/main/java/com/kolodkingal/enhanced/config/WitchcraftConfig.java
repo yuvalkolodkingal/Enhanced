@@ -24,12 +24,12 @@ public final class WitchcraftConfig {
 
     public static void define(ConfigSpec.Builder builder) {
         builder.comment("Witchcraft (3.17): a witch chooses a path (Green, Potions, Protection, Divination, or the rare Spirit witch",
-                "who learns them all); a sorcerer has the mystic arts. K casts the chosen spell (hold K while chanting to chant",
-                "faster; a heavy blow breaks the incantation off), Sneak + K opens the Spell Wheel; a witch's R G V B N (and with",
-                "Sneak) are her first ten spells. The grimoires teach their own spells (the Darkhold's corrupt). Billy has his",
-                "own spells and powers over space and reality, by rank; the Demiurge (Ultimate Mode) has all of them.")
+                "who learns them all); a sorcerer has the mystic arts. The Spells key (the semicolon key unless changed) casts the",
+                "chosen spell (hold it while chanting to chant faster; a heavy blow breaks the incantation off), and with Sneak opens",
+                "the Spell Wheel; a witch's R G V B N (and with Sneak) are her first ten spells. The grimoires teach their own spells",
+                "(the Darkhold's corrupt). A hero casts spells only with Ultimate Mode on: Billy as the Demiurge has all of them.")
                 .push("witchcraft");
-        ENABLED = builder.comment("Whether witchcraft and the spells (K) are in the game at all.")
+        ENABLED = builder.comment("Whether witchcraft and the spells are in the game at all.")
                 .define("enabled", true);
         MANA_REGEN = builder.comment("Mana a caster gets back each second, before their level (twice as much near another caster: a coven).")
                 .defineInRange("manaRegen", 3.0, 0.0, 100.0);
@@ -39,7 +39,7 @@ public final class WitchcraftConfig {
                 .defineInRange("spellDamageFactor", 1.0, 0.0, 10.0);
         INTERRUPT_DAMAGE = builder.comment("A blow of at least this much damage breaks an incantation off (0: nothing does).")
                 .defineInRange("interruptDamage", 4.0, 0.0, 100.0);
-        CHANT_HELD_SPEED = builder.comment("How many times as fast an incantation goes while K is held.")
+        CHANT_HELD_SPEED = builder.comment("How many times as fast an incantation goes while the Spells key is held.")
                 .defineInRange("chantHeldSpeed", 2.0, 1.0, 10.0);
         CORRUPTION_PER_SPELL = builder.comment("How much corruption each of the Darkhold's spells adds (out of 100).")
                 .defineInRange("corruptionPerSpell", 6, 0, 100);

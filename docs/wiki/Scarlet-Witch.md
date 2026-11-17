@@ -203,7 +203,7 @@ Her **chaos magic** is one of the few things a [healing factor](Healing-Factor) 
 
 ## The Nexus Being (3.17)
 
-With [Ultimate Mode](Ultimate-Mode) on, **O** makes Wanda **the Nexus Being**, in the cosmic Nexus suit: her hurts heal within two seconds, her abilities have no cooldowns and burn a brighter red, the whole world she stands in becomes hers (a red sky of runes that strip every other hero's powers; she grows stronger for each, and holds several worlds at once), chaos flashes strike her enemies within 50 blocks, and nobody can enter her shield. It has no time limit: Sneak + O ends it.
+With [Ultimate Mode](Ultimate-Mode) on, the **Ultimate Form key** (`'` unless you change it) makes Wanda **the Nexus Being**: her own face, a sleek red suit with touches of black and a red cape (no new crown: her crown is her own, shown when she wears it). Her hurts heal within two seconds, her abilities have no cooldowns and burn a brighter red, the whole world she stands in becomes hers (a red sky of runes that strip every other hero's powers; she grows stronger for each, and holds several worlds at once), her **Chaos Burst** throws red energy out of all the ground and the sky within 50 blocks at everyone there but her, and nobody can enter her shield. It has no time limit: Sneak + the Ultimate Form key ends it. With Ultimate Mode off nothing of this exists: she is the Scarlet Witch of before.
 
 ## Numbers you can change
 

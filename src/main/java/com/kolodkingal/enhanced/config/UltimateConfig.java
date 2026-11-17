@@ -22,10 +22,11 @@ public final class UltimateConfig {
     public static ConfigSpec.DoubleValue NEXUS_FLASH_DAMAGE;
 
     public static void define(ConfigSpec.Builder builder) {
-        builder.comment("Ultimate Mode (3.17): every hero gets an ultimate version. Off by default. On: press O (Ultimate) to awaken",
-                "your hero's ultimate form for a while (O again: its signature move); Source Code Vision runs on the Solar Jewel;",
-                "Billy is the Demiurge (every spell, instant casting in his star form, and he can grant magic to others); the Scarlet Witch",
-                "becomes the Nexus Being.",
+        builder.comment("Ultimate Mode (3.17): every hero gets an ultimate version. Off by default, and while it is off every hero is",
+                "exactly the hero of before 3.17. On: the Ultimate Form key (the apostrophe key unless changed) awakens your hero's",
+                "ultimate form for a while (the key again: its signature move); Source Code Vision runs on the Solar Jewel and burns;",
+                "Billy is the Demiurge (every spell, the other magic users' abilities on the Magic Types key, and he can grant magic",
+                "to others); the Scarlet Witch becomes the Nexus Being; Spider-Man becomes Cosmic Spider-Man, Iron Man the Godkiller.",
                 "Operators: /enhanced ultimate on|off|info (saved with the world, it then wins over 'enabled' here).")
                 .push("ultimate");
         ENABLED = builder.comment("On: Ultimate Mode for every player (unless the world's own setting, /enhanced ultimate, says otherwise).")

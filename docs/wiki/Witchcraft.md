@@ -23,10 +23,10 @@ A witch has a **level**, 1 to 5: each path's spells open by level, and the highe
 
 ## Casting
 
-* **K** casts the chosen spell. **Sneak + K** opens the **Spell Wheel**: rings of glowing seals round the crosshair, one per spell you know, each in its colour; point at one and let go of K (or click) to choose it. The game goes on behind it.
+* the **Spells key** (`;` unless you change it) casts the chosen spell. **Sneak + the Spells key** opens the **Spell Wheel**: rings of glowing seals round the crosshair, one per spell you know, each in its colour; point at one and let go of the key (or click) to choose it. The game goes on behind it.
 * A witch's **R G V B N** (and the same with **Sneak**) cast her first ten spells directly.
-* Most spells are **chanted** first: the words are spoken aloud to everyone near (Billy's are *"I want ..."*), runes circle the caster's hands and a circle forms at the feet. **Holding K chants twice as fast.** A heavy blow (4 damage or more) **breaks the incantation off** and loses half its mana. The Demiurge in his star form needs no incantation.
-* The panel to the right of the hotbar shows your mana, the spell on K, the incantation as you speak it, and the Darkhold's corruption.
+* Most spells are **chanted** first: the words are spoken aloud to everyone near (Billy's are *"I want ..."*), runes circle the caster's hands and a circle forms at the feet. **Holding the key chants twice as fast.** A heavy blow (4 damage or more) **breaks the incantation off** and loses half its mana. The Demiurge in his star form needs no incantation.
+* The panel to the right of the hotbar shows your mana, the chosen spell, the incantation as you speak it, and the Darkhold's corruption.
 
 ## The grimoires
 
@@ -38,12 +38,12 @@ The first time a witch, a sorcerer, Billy or a hero sorcerer uses a grimoire, th
 
 ## Billy's spells
 
-Billy has spells of his own on **K**, opening with his rank (see [Billy and the Witches' Road](Billy-and-the-Witches-Road)): the **Unbinding** (*"Dimitte eam..."*: frees you and your friends of mind control, stuns, curses and Wanda's hold; it breaks a Hex's runes), the **broomstick**, sigils (the **Silencing Sigil** hides your name and blocks every chant near it) and the **Rune of Protection** (a dome where enemies lose their magic and powers), ghosts raised and banished, the **Dream Binding** (Sneak: you go into the dream with them), the **Siphon** and the **Coven Circle**, and his powers over space and reality: a **pocket dimension** (a hidden room with chests for your things; Sneak takes your friends in), the **Infinite Hallway** (up to half a minute by rank), **Spatial Crush** and **Spatial Fold** (pull what you look at into your hand), conjured weapons, food, armour, bridges, walls and platforms of solid light, **Zero Gravity** and the **Gravity Slam**, **Clairvoyance** (a player's world and place and a trail of light to them, or the nearest item of a name), enchanted and cursed items, **familiars** (a black cat, a crow or a spectral hound that scouts and warns you), **Reality Shatter**, **Transmute**, the **Probability Hex**, the **Unmaking** (a hero's powers taken for a while), **Combat Portals** that send projectiles back at whoever shot them, and **Dimension Gates** for a whole squad.
+**A hero casts spells only with [Ultimate Mode](Ultimate-Mode) on** (with it off every hero is exactly the hero of before 3.17: no mana, no spells). Then Billy is the Demiurge and has every spell, his own among them: the **Unbinding** (*"Dimitte eam..."*: frees you and your friends of mind control, stuns, curses and Wanda's hold; it breaks a Hex's runes), the **broomstick**, sigils and the **Rune of Protection**, ghosts raised and banished, the **Dream Binding**, the **Siphon** and the **Coven Circle**, and his powers over space and reality (the table below lists them all); the hero sorcerers (the Scarlet Witch, Agatha, Doctor Strange, Loki) cast the coven's first spells and what the grimoires taught them; Cosmic Spider-Man has matter and portals.
 
 ## The Coven's Road and the Mindscape
 
 * **The Coven's Road:** a Green Witch (or Billy) opens a portal to the Witches' Road; **everyone who steps in** while it is open walks it together, to the Road's End, a round hall with an amethyst dais. There each one chooses **a prize of their own**: to be **unbound** (nothing holds you until you die), to **find a player**, to **bring back the dead** (a hardcore world's fallen players), **witchcraft** (someone with no power), or **the Road's blessing**. A prize you already have is never offered.
-* **The Witches' Mindscape** (every witch and sorcerer, and Billy): your mind goes to one round hall shared by all of them, where what you say in chat is **heard only there**. Cast it again to come back.
+* **The Witches' Mindscape** (**Billy, and only the witches and sorcerers whose magic is Billy's own gift**, given on the Demiurge's Grant Magic screen; a witch made by a command or by the Road does not find the way in, nor does a hero sorcerer): your mind goes to one round hall shared by all of them, Billy's place of meditation, where what you say in chat is **heard only there**. Cast it again to come back.
 
 ## Every spell
 
@@ -176,7 +176,7 @@ Billy has spells of his own on **K**, opening with his rank (see [Billy and the 
 |---|---|---|---|---|---|
 | **Grant Magic** | - | - | 0 | at once: *Accipe.* | The Demiurge gives witchcraft or a sorcerer's art to a player with no power, or takes it back. |
 
-Mana is the spell's cost; the incantation is how long it is chanted (half as long while K is held). Level is the witch's level that opens it; Billy's rank is the rank that opens it for Billy. The Demiurge knows every spell.
+Mana is the spell's cost; the incantation is how long it is chanted (half as long while the Spells key is held). Level is the witch's level that opens it; Billy's rank is the rank that opens it for Billy. The Demiurge knows every spell.
 
 ## Settings
 

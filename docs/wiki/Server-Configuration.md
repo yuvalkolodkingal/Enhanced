@@ -2301,11 +2301,11 @@ Section `[ultimate]` (3.17): [Ultimate Mode](Ultimate-Mode), every hero's ultima
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
-| `ultimate.enabled` | `false` | `true` or `false` | Ultimate Mode for every player: O awakens the ultimate forms, Source Code Vision runs on the Solar Jewel, Billy is the Demiurge, Wanda can become the Nexus Being. |
+| `ultimate.enabled` | `false` | `true` or `false` | Ultimate Mode for every player: the Ultimate Form key awakens the ultimate forms, Source Code Vision runs on the Solar Jewel, Billy is the Demiurge, Wanda can become the Nexus Being. |
 | `ultimate.awakenTicks` | `30` | 5 to 200 | Ticks the awakening takes before the form is the hero's. |
 | `ultimate.durationSeconds` | `45` | 5 to 3600 | Seconds an ultimate form lasts (the Nexus Being's has no limit). |
 | `ultimate.cooldownSeconds` | `180` | 0 to 36000 | Seconds after a form ends before it can be awakened again (none for the Nexus Being). |
-| `ultimate.signatureCooldownSeconds` | `10` | 1 to 600 | Seconds between two signature moves (O while the form lasts). |
+| `ultimate.signatureCooldownSeconds` | `10` | 1 to 600 | Seconds between two signature moves (the Ultimate Form key while the form lasts). |
 | `ultimate.signatureDamage` | `14.0` | 0 to 200 | The damage of a signature move to each creature it strikes. |
 | `ultimate.signatureRadius` | `10` | 2 to 64 | How far a signature move reaches round the hero, in blocks. |
 | `ultimate.damageBonus` | `0.25` | 0 to 5 | How much more damage a hero does in their ultimate form (0.25: a quarter more). |
@@ -2319,12 +2319,12 @@ Section `[witchcraft]` (3.17): [Witchcraft](Witchcraft), the spells, the grimoir
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
-| `witchcraft.enabled` | `true` | `true` or `false` | Whether witchcraft and the spells (K) are in the game at all. |
+| `witchcraft.enabled` | `true` | `true` or `false` | Whether witchcraft and the spells are in the game at all. |
 | `witchcraft.manaRegen` | `3.0` | 0 to 100 | Mana a caster gets back each second, before their level (twice as much in a coven). |
 | `witchcraft.covenRadius` | `16` | 1 to 128 | How near another caster must be for the coven's faster mana, in blocks. |
 | `witchcraft.spellDamageFactor` | `1.0` | 0 to 10 | How many times as much the spells hurt. |
 | `witchcraft.interruptDamage` | `4.0` | 0 to 100 | A blow of at least this much breaks an incantation off (0: nothing does). |
-| `witchcraft.chantHeldSpeed` | `2.0` | 1 to 10 | How many times as fast an incantation goes while K is held. |
+| `witchcraft.chantHeldSpeed` | `2.0` | 1 to 10 | How many times as fast an incantation goes while the Spells key is held. |
 | `witchcraft.corruptionPerSpell` | `6` | 0 to 100 | The corruption each of the Darkhold's spells adds (out of 100). |
 | `witchcraft.spellsHurtPlayers` | `true` | `true` or `false` | Whether harmful spells touch other players (PvP must be on too). |
 | `witchcraft.conjuredBlockSeconds` | `30` | 3 to 600 | Seconds a conjured block (a bridge, a wall, a platform, thorns) lasts. |

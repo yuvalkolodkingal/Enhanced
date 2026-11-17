@@ -45,9 +45,9 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 | 3 | **V** (toggle) | Phase | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you are only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
 | 4 | **B** (toggle) | Density | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Phasing ends density, and you can't turn dense while phased. |
 | 5 | **N** (toggle) | Human Disguise | Take on the human look from *WandaVision*: a 1950s sitcom husband in a shirt, tie and cardigan. Only the looks change. |
-## On fire while he flies (3.17)
+## On fire, in Ultimate Mode (3.17)
 
-In his Source Code look Vision **burns while he flies**, like the Human Torch: living flames of his own wrap his body from his feet to his head and bend back from where he flies, in his orange and gold, a crown of flame over his head and a trail of fire streaming behind him, embers and smoke shed as he goes, a crackle while he burns and a whoosh as he lights. It is only light: nothing is set on fire and he never burns (it is never the game's fire). In first person it stays faint and low, out of your view.
+With [Ultimate Mode](Ultimate-Mode) on (and only then), Source Code Vision **burns** while he flies or uses a power, like the Human Torch: his **whole body** is a figure of molten red with bright cracks of fire running over every part of it, a sheath of flame hugging his silhouette, long tongues of flame and a trail of fire streaming behind him, embers and sparks, a crackle while he burns and a whoosh as he lights. It is only light: nothing is set on fire and he never burns (it is never the game's fire). In first person it stays faint and low, out of the view. With Ultimate Mode off he is the Source Code Vision of 3.16 and does not burn.
 
 ## Solar Jewel Vision (3.16)
 
