@@ -46,6 +46,8 @@ import static com.kolodkingal.enhanced.gametest.TestKit.check;
  */
 public final class UltimateMagicTests {
     private static final String BATCH = "ultimate_magic";
+    /** The test that turns the switch itself runs alone (the tests of a batch run together and share the switch). */
+    private static final String SWITCH = "ultimate_switch";
 
     private UltimateMagicTests() {
     }
@@ -53,16 +55,15 @@ public final class UltimateMagicTests {
     /** Ultimate Mode on for this test (the config, and no world setting in the way), off again when it ends. */
     private static TestKit.Fixture ultimate(GameTestHelper helper, boolean on) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        Boolean world = Ultimate.worldSetting();
-        Ultimate.set(null);
+        check(Ultimate.worldSetting() == null || Ultimate.worldSetting() == on, "no world setting in the way");
         f.config(UltimateConfig.ENABLED, on);
-        f.onClose(() -> Ultimate.set(world));
         return f;
     }
 
-    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    @EnhancedTest(template = ARENA, batch = SWITCH, timeoutTicks = 100)
     public static void oneSwitchMakesEveryHeroUltimate(GameTestHelper helper) {
         TestKit.Fixture f = ultimate(helper, false);
+        f.onClose(() -> Ultimate.set(null));
         ServerPlayer vision = f.player(3.5, FLOOR, 3.5, Power.VISION);
         Powers.setVariant(vision, com.kolodkingal.enhanced.power.Variants.get(Power.VISION, "source_code"));
         check(!Ultimate.on() && !VisionQuest.solar(Powers.get(vision)), "off: Source Code Vision has Vision's own powers");
@@ -75,8 +76,20 @@ public final class UltimateMagicTests {
                 check(UltimateForm.of(p) != null, p + " has an ultimate form");
             }
         }
-        check(UltimateForm.of(Power.SCARLET_WITCH).displayName().getString().contains("Nexus")
-                || UltimateForm.of(Power.SCARLET_WITCH) == UltimateForm.SCARLET_WITCH, "Wanda's is the Nexus Being");
+        check(UltimateForm.of(Power.SCARLET_WITCH) == UltimateForm.SCARLET_WITCH, "Wanda's is the Nexus Being");
+        // Billy is the Demiurge while it is on, and only then
+        Ultimate.set(true);
+        ServerPlayer billy = f.player(6.5, FLOOR, 3.5, Power.BILLY);
+        Demiurge.tick(billy);
+        Demiurge.cycle(billy);
+        Vec3 behind = BillyBarrier.body(billy).subtract(billy.getLookAngle().scale(2.0));
+        check(Magic.isDemiurge(billy) && billy.getMaxHealth() == 40.0F && BillyBarrier.covers(billy, behind)
+                && Demiurge.borrowed(billy) == Power.SCARLET_WITCH, "on: the Demiurge");
+        Ultimate.set(false);
+        Demiurge.tick(billy);
+        check(!Magic.isDemiurge(billy) && billy.getMaxHealth() == 20.0F, "off: Billy again, ten hearts: " + billy.getMaxHealth());
+        check(!BillyBarrier.covers(billy, behind), "and his barrier is a plate in front of him");
+        check(Demiurge.borrowed(billy) == Power.NONE && Powers.get(billy).borrowed() == Power.NONE, "no Demiurge, no magic types");
         helper.succeed();
     }
 
@@ -91,10 +104,6 @@ public final class UltimateMagicTests {
         check(AbilityColors.chosen(billy, HeroAbility.BILLY_HEX_BARRIER) == AbilityColors.DEMIURGE_BLUE, "his bright blue");
         Vec3 behind = BillyBarrier.body(billy).subtract(billy.getLookAngle().scale(2.0));
         check(BillyBarrier.covers(billy, behind), "his barrier wraps his whole body (behind him too)");
-        UltimateConfig.ENABLED.set(false);
-        Demiurge.tick(billy);
-        check(!Magic.isDemiurge(billy) && billy.getMaxHealth() == 20.0F, "off: Billy again, ten hearts: " + billy.getMaxHealth());
-        check(!BillyBarrier.covers(billy, behind), "and his barrier is a plate in front of him");
         helper.succeed();
     }
 
@@ -115,9 +124,6 @@ public final class UltimateMagicTests {
         Demiurge.cycle(billy);
         Demiurge.cycle(billy);
         check(Demiurge.borrowed(billy) == Power.DOCTOR_STRANGE, "Doctor Strange's next");
-        UltimateConfig.ENABLED.set(false);
-        Demiurge.tick(billy);
-        check(Demiurge.borrowed(billy) == Power.NONE && data.borrowed() == Power.NONE, "no Demiurge, no magic types");
         helper.succeed();
     }
 
@@ -128,32 +134,36 @@ public final class UltimateMagicTests {
         ServerPlayer thor = f.player(8.5, FLOOR, 3.5, Power.THOR);
         Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, 6, 2, 8);
         UltimateForms.awaken(wanda, UltimateForm.SCARLET_WITCH);
-        int ticks = UltimateConfig.AWAKEN_TICKS.get() + 1;
-        for (int i = 0; i < ticks; i++) {
-            UltimateForms.tick(wanda);
-        }
-        check(UltimateForms.active(wanda) && NexusBeing.is(wanda), "the Nexus Being");
-        check(NexusBeing.worlds(wanda).contains(wanda.level().dimension()), "the world is hers");
-        check(NexusBeing.strips(thor) && !NexusBeing.strips(wanda), "her runes strip Thor, not her");
-        wanda.setHealth(6.0F);
-        float zombieHealth = zombie.getHealth();
-        for (int i = 0; i < 41; i++) {
-            UltimateForms.tick(wanda);
-        }
-        check(wanda.getHealth() == wanda.getMaxHealth(), "her hurt healed within two seconds: " + wanda.getHealth());
-        check(zombie.getHealth() < zombieHealth || !zombie.isAlive(), "the chaos flashes struck the zombie near");
-        check(thor.hasEffect(com.kolodkingal.enhanced.registry.ModEffects.DRAINED), "Thor's powers are stripped");
-        check(UltimateForms.damageFactor(wanda) >= 2.0F, "her chaos hits at least twice as hard: " + UltimateForms.damageFactor(wanda));
-        UltimateForms.key(wanda, true);
-        check(!UltimateForms.active(wanda) && NexusBeing.worlds(wanda).isEmpty() && !NexusBeing.strips(thor),
-                "Sneak + O ends it: the world is free");
-        check(UltimateForms.cooldownSeconds(wanda) == 0, "and it has no cooldown");
-        helper.succeed();
+        // (nothing ticks a player without a client: the test ticks her form)
+        helper.onEachTick(() -> UltimateForms.tick(wanda));
+        int awaken = UltimateConfig.AWAKEN_TICKS.get() + 2;
+        float[] zombieHealth = new float[1];
+        helper.runAfterDelay(awaken, () -> {
+            check(UltimateForms.active(wanda) && NexusBeing.is(wanda), "the Nexus Being: active " + UltimateForms.active(wanda)
+                    + ", ultimate " + Powers.get(wanda).is(Live.ULTIMATE) + ", awakening " + Powers.get(wanda).is(Live.ULTIMATE_AWAKENING)
+                    + ", on " + Ultimate.on() + ", time " + wanda.level().getGameTime());
+            check(NexusBeing.worlds(wanda).contains(wanda.level().dimension()), "the world is hers");
+            check(NexusBeing.strips(thor) && !NexusBeing.strips(wanda), "her runes strip Thor, not her");
+            wanda.setHealth(6.0F);
+            zombieHealth[0] = zombie.getHealth();
+        });
+        helper.runAfterDelay(awaken + 42, () -> {
+            check(wanda.getHealth() == wanda.getMaxHealth(), "her hurt healed within two seconds: " + wanda.getHealth());
+            check(zombie.getHealth() < zombieHealth[0] || !zombie.isAlive(), "the chaos flashes struck the zombie near");
+            check(thor.hasEffect(com.kolodkingal.enhanced.registry.ModEffects.DRAINED), "Thor's powers are stripped");
+            check(UltimateForms.damageFactor(wanda) >= 2.0F, "her chaos hits at least twice as hard: "
+                    + UltimateForms.damageFactor(wanda));
+            UltimateForms.key(wanda, true);
+            check(!UltimateForms.active(wanda) && NexusBeing.worlds(wanda).isEmpty() && !NexusBeing.strips(thor),
+                    "Sneak + O ends it: the world is free");
+            check(UltimateForms.cooldownSeconds(wanda) == 0, "and it has no cooldown");
+            helper.succeed();
+        });
     }
 
     @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
     public static void thePathsTeachByLevelAndTheGrimoiresWhenRead(GameTestHelper helper) {
-        TestKit.Fixture f = ultimate(helper, false);
+        TestKit.Fixture f = ultimate(helper, true);
         ServerPlayer witch = f.player(3.5, FLOOR, 3.5);
         Magic.set(witch, MagicData.EMPTY.withCraft(WitchPath.GREEN, 1, false));
         check(Magic.isWitch(witch) && Magic.knows(witch, Spell.VINE_SNARE) && !Magic.knows(witch, Spell.THORN_WALL),
@@ -165,13 +175,29 @@ public final class UltimateMagicTests {
         ServerPlayer nobody = f.player(6.5, FLOOR, 3.5);
         check(!Grimoires.read(nobody, MagicData.DARKHOLD, Component.literal("book")), "someone with no magic cannot read it");
         check(ModItems.CAGLIOSTROS_GRIMOIRE.get() != null, "the grimoire is an item");
-        Ultimate.set(true);
         ServerPlayer billy = f.player(9.5, FLOOR, 3.5, Power.BILLY);
         int known = 0;
         for (Spell s : Spell.values()) {
             known += Magic.knows(billy, s) ? 1 : 0;
         }
         check(known == Spell.values().length, "the Demiurge knows every spell: " + known + " of " + Spell.values().length);
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    public static void anOldSolarJewelSwitchTurnsUltimateModeOn(GameTestHelper helper) throws Exception {
+        com.kolodkingal.enhanced.config.core.Toml.Table old = com.kolodkingal.enhanced.config.core.Toml.parse(
+                "[vision.solar_jewel]\nenabled = true\nmaxCharge = 900\n");
+        com.kolodkingal.enhanced.config.core.ConfigFile.migrate(old);
+        check(Boolean.TRUE.equals(old.get(java.util.List.of("ultimate", "enabled"))), "3.16's switch on: Ultimate Mode on");
+        com.kolodkingal.enhanced.config.core.Toml.Table off = com.kolodkingal.enhanced.config.core.Toml.parse(
+                "[vision.solar_jewel]\nenabled = false\n");
+        com.kolodkingal.enhanced.config.core.ConfigFile.migrate(off);
+        check(off.get(java.util.List.of("ultimate", "enabled")) == null, "off: nothing changes");
+        com.kolodkingal.enhanced.config.core.Toml.Table both = com.kolodkingal.enhanced.config.core.Toml.parse(
+                "[vision.solar_jewel]\nenabled = true\n[ultimate]\nenabled = false\n");
+        com.kolodkingal.enhanced.config.core.ConfigFile.migrate(both);
+        check(Boolean.FALSE.equals(both.get(java.util.List.of("ultimate", "enabled"))), "the new setting wins");
         helper.succeed();
     }
 
