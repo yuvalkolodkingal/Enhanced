@@ -20,13 +20,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Source Code Vision on fire while he flies (3.17): living flames of his own, like the Human Torch's, never Minecraft's
- * fire overlay. Drawn with the other energy effects ({@link WorldEffectsRenderer}, additive), by every client, for every
- * Source Code Vision in the air:
+ * Ultimate Source Code Vision on fire (3.17, Ultimate Mode only): while he flies or uses a power, his whole body is wrapped
+ * in living flames of his own, like the Human Torch's, never Minecraft's fire overlay. With Ultimate Mode off nothing of
+ * this is drawn: he is the Source Code Vision of 3.16. Drawn with the other energy effects ({@link WorldEffectsRenderer},
+ * additive), by every client, for every such Vision:
  * <ul>
- *   <li>tongues of flame wrapping his body from his feet to his head, each one bending away from where he flies and up,
- *   flickering in length and swaying, in three layers (the outer orange {@link #OUTER}, the gold {@link #INNER}, a pale
- *   core);</li>
+ *   <li>(on the model itself, {@link VisionFlameLayer}: the molten body, its cracks of fire, the sheath of flame;)</li>
+ *   <li>tongues of flame growing out of the body on every side (front, back, both flanks, the arms, the legs, the head),
+ *   each one bending away from where he flies and up, flickering in length and swaying, in three layers (the outer orange
+ *   {@link #OUTER}, the gold {@link #INNER}, a pale core);</li>
  *   <li>a trail of fire streaming behind him, fading and narrowing;</li>
  *   <li>embers and a little smoke shed from his body, a crackle while he burns and a whoosh as he lights.</li>
  * </ul>
@@ -55,12 +57,20 @@ public final class VisionFlameFx {
     private VisionFlameFx() {
     }
 
-    /** Whether this player burns now: Vision in his Source Code look, flying. */
+    /**
+     * Whether this player burns now: Ultimate Mode on, Vision as his Source Code (the Solar Jewel's Vision), and he flies
+     * or uses a power (his beam, Phase, Density, the jewel's beams).
+     */
     public static boolean burning(AbstractClientPlayer player, PowerData data) {
-        if (data.power() != Power.VISION || !"source_code".equals(data.variant())) {
+        if (data.power() != Power.VISION || !"source_code".equals(data.variant()) || data.disguise()
+                || !com.kolodkingal.enhanced.ultimate.Ultimate.on()) {
             return false;
         }
-        return player instanceof LocalPlayer lp ? lp.getAbilities().flying : data.flying();
+        boolean flying = player instanceof LocalPlayer lp ? lp.getAbilities().flying : data.flying();
+        return flying || data.beamActive() || data.visionPhased() || data.dense()
+                || data.is(com.kolodkingal.enhanced.power.Live.SOLAR_EYES)
+                || data.is(com.kolodkingal.enhanced.power.Live.SOLAR_GATHERING)
+                || data.is(com.kolodkingal.enhanced.power.Live.SOLAR_OVERLOAD);
     }
 
     /** Forgets the players who stopped burning (or left), once a frame. */
@@ -109,24 +119,35 @@ public final class VisionFlameFx {
         float alpha = (firstPerson ? 0.32F : 1.0F) * fade;
         float eye = player.getEyeHeight();
         int seedBase = player.getId() * 7919;
-        for (int i = 0; i < 26; i++) {
+        // The body's own cross: across his shoulders (side) and through his chest (front), both square to its line.
+        Vec3 front = axis.cross(side).normalize();
+        // The tongues: out of the skin on every side of him.
+        int tongues = firstPerson ? 30 : 84;
+        for (int i = 0; i < tongues; i++) {
             float t = (i * 0.61803F + 0.07F) % 1.0F;                    // spread from his feet to his head
-            float off = Mth.sin(i * 2.4F) * (t < 0.45F ? 0.18F : 0.3F); // legs close, arms and shoulders wider
+            float ang = i * 2.39996F;                                    // and round him (the golden angle)
             if (firstPerson && t * h > eye - 0.9F) {
                 continue; // nothing over the view
             }
-            Vec3 base = feet.add(axis.scale(h * (0.04 + 0.92 * t))).add(side.scale(off));
+            float rad = girth(t);
+            Vec3 out = side.scale(Mth.cos(ang)).add(front.scale(Mth.sin(ang) * 0.62));
+            Vec3 base = feet.add(axis.scale(h * (0.0 + 1.02 * t))).add(out.scale(rad));
             float phase = time * (0.55F + 0.07F * (i % 5)) + i * 1.7F;
             float flick = 0.55F + 0.45F * noise(seedBase + i, time * 0.35F);
-            float len = (0.32F + 0.32F * (1.0F - Math.abs(t - 0.55F))) * flick * (1.0F + lean * 0.8F);
+            float len = (0.5F + 0.4F * (1.0F - Math.abs(t - 0.55F))) * flick * (1.0F + lean * 1.4F);
             Vec3 sway = side.scale(0.12 * Mth.sin(phase)).add(axis.scale(0.05 * Mth.cos(phase * 1.3F)));
-            Vec3 mid = base.add(stream.scale(len * 0.5)).add(sway);
-            Vec3 tip = base.add(stream.scale(len)).add(sway.scale(2.2)).add(0, 0.08 * Mth.sin(phase * 1.7F), 0);
+            // (a tongue leaves the body outward, then the wind of his flight and the heat take it)
+            Vec3 dir = stream.add(out.scale(0.55)).normalize();
+            Vec3 mid = base.add(dir.scale(len * 0.5)).add(sway);
+            Vec3 tip = base.add(dir.scale(len * 0.55)).add(stream.scale(len * 0.5)).add(sway.scale(2.2))
+                    .add(0, 0.08 * Mth.sin(phase * 1.7F), 0);
             float w = (0.2F + 0.1F * flick) * (firstPerson ? 0.7F : 1.0F);
-            tongue(pose, vc, base, mid, tip, w * 1.6F, OUTER, 0.38F * alpha);
-            tongue(pose, vc, base, mid, tip.subtract(stream.scale(len * 0.25)), w, INNER, 0.62F * alpha);
-            tongue(pose, vc, base, base.add(stream.scale(len * 0.3)), base.add(stream.scale(len * 0.5)), w * 0.45F, CORE,
-                    0.8F * alpha);
+            tongue(pose, vc, base, mid, tip, w * 1.6F, OUTER, 0.34F * alpha);
+            tongue(pose, vc, base, mid, tip.subtract(stream.scale(len * 0.25)), w, INNER, 0.56F * alpha);
+            tongue(pose, vc, base, base.add(dir.scale(len * 0.3)), base.add(dir.scale(len * 0.5)), w * 0.45F, CORE,
+                    0.7F * alpha);
+            // (white-yellow at the flame's edge, as fire is brightest where it meets the air)
+            tongue(pose, vc, mid, tip, tip.add(stream.scale(len * 0.35)), w * 0.3F, CORE, 0.5F * alpha);
         }
         if (!firstPerson) {
             // the crown of flame over his head
@@ -141,6 +162,17 @@ public final class VisionFlameFx {
             }
         }
         trail(pose, vc, burn, camera, feet.add(axis.scale(h * 0.5)), h, alpha, time, firstPerson);
+    }
+
+    /** How far the body's surface is from its middle line at {@code t} (0 his feet, 1 the top of his head). */
+    private static float girth(float t) {
+        if (t < 0.45F) {
+            return 0.26F;                                   // the legs
+        }
+        if (t < 0.78F) {
+            return 0.44F;                                   // the chest and the arms
+        }
+        return Mth.lerp((t - 0.78F) / 0.22F, 0.36F, 0.3F);  // the shoulders up to the head
     }
 
     /** A tongue of flame: base, bend and tip, wide at the base and pointed at the tip. */

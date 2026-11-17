@@ -112,10 +112,15 @@ public final class Realms {
     }
 
     /** The Mindscape spell: in, or (from inside) back out. */
-    static boolean toggleMindscape(ServerPlayer player) {
+    public static boolean toggleMindscape(ServerPlayer player) {
         if (inMindscape(player)) {
             MindRealm.leave(player);
             return true;
+        }
+        if (!Magic.mindscapeOpen(player)) {
+            // (only Billy, and those whose magic is his gift, find the way in)
+            player.displayClientMessage(Component.translatable("message.enhanced.mindscape.closed").withStyle(ChatFormatting.GRAY), true);
+            return false;
         }
         if (player.level().dimension() == MindRealm.LEVEL) {
             player.displayClientMessage(Component.translatable("message.enhanced.spell.mind_world").withStyle(ChatFormatting.GRAY), true);

@@ -105,10 +105,6 @@ public final class UltimateForms {
         if (player.isSpectator() || !player.isAlive()) {
             return;
         }
-        if (alt && Ultimate.on() && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
-            Demiurge.cycle(player);
-            return;
-        }
         if (alt && active(player) && untimed(player)) {
             end(player, false);
             return;
@@ -328,6 +324,10 @@ public final class UltimateForms {
         Vec3 at = player.position();
         List<LivingEntity> near = targets(player, r);
         player.swing(net.minecraft.world.InteractionHand.MAIN_HAND, true);
+        if (form == UltimateForm.SCARLET_WITCH) {
+            NexusBeing.burst(player, level, true); // (her signature: the great Chaos Burst, as far as her flashes reach)
+            return;
+        }
         switch (form.signature) {
             case NOVA -> {
                 MagicFx.send(level, MagicFx.RING, at, List.of(), c, g, (float) r, 20);

@@ -22,7 +22,7 @@ public final class Grants {
     }
 
     /** The Demiurge opens his screen: every player online, with what magic each has. */
-    static void openScreen(ServerPlayer demiurge) {
+    public static void openScreen(ServerPlayer demiurge) {
         List<String> names = new ArrayList<>();
         List<String> states = new ArrayList<>();
         for (ServerPlayer other : demiurge.level().getServer().getPlayerList().getPlayers()) {
@@ -86,6 +86,8 @@ public final class Grants {
             return;
         }
         give(target, path, level, true);
+        // (his power is Billy's own gift: Billy's Mindscape is open to him)
+        Magic.set(target, Magic.data(target).with(MagicData.BILLYS));
         MagicFx.send(demiurge.serverLevel(), MagicFx.BEAMS, demiurge.getEyePosition(), java.util.List.of(target.position().add(0, 1, 0)),
                 0xFFFFFF, path.color, 1.0F, 20);
         demiurge.displayClientMessage(Component.translatable("message.enhanced.witch.you_granted", target.getDisplayName(), path.displayName(), level), true);

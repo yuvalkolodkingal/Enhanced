@@ -29,11 +29,11 @@ import java.util.Map;
 /**
  * The light of Ultimate Mode's two great forms (3.17), drawn with the other energy effects (additive):
  * <ul>
- *   <li>the Demiurge (Billy): a crown of bright blue starry energy over his head always; small stars turning round his hands
- *   while he casts; and while he flies or uses a power, the powered look: the great red hooded cloak flaring out behind
- *   and round him in long waving tongues, stars caught in it, and rings of blue energy at his hands. The cloak grows out
- *   and falls back with the change (idle to powered and back), with a burst of stars and a chime at the moment the suit
- *   changes ({@link #powered}, read by {@code client.SuitSkins});</li>
+ *   <li>the Demiurge (Billy): small stars turning round his hands while he casts; and while he flies or uses a power, the
+ *   powered look's light: rings of blue energy at his hands and the red star at his brow. How far the powered look is out
+ *   ({@link #out}) eases in and back, with a burst of stars and a chime at the moment the suit changes ({@link #powered},
+ *   read by {@code client.SuitSkins}). His red cloak is cloth, not light ({@code client.render.DemiurgeCloakLayer}), and
+ *   his crown is Billy's own, brighter ({@code client.render.BillyCrownLayer});</li>
  *   <li>the Nexus Being (Wanda): a star field drifting round her and red chaos curling off her hands;</li>
  *   <li>a world the Nexus Being holds: the sky red, with turning rings of runes across it, and red fog.</li>
  * </ul>
@@ -43,7 +43,6 @@ public final class DemiurgeFx {
     static final int BLUE = 0x7FE6FF;
     static final int STAR = 0xEAF8FF;
     static final int CLOAK = 0xD01020;
-    static final int CLOAK_DEEP = 0x700812;
     private static final Vec3 UP = new Vec3(0, 1, 0);
 
     /** Per player (entity id): how far the powered look is out (0 to 1, eased), whether it was on, when it changed. */
@@ -74,6 +73,15 @@ public final class DemiurgeFx {
         return look != null ? look.powered : poweredNow(player);
     }
 
+    /** How far the powered look is out for him now (0 at rest to 1, eased): the cloak's layer grows the cloth by it. */
+    public static float out(Player player) {
+        Look look = LOOKS.get(player.getId());
+        if (look == null) {
+            return poweredNow(player) ? 1.0F : 0.0F;
+        }
+        return look.amount * look.amount * (3.0F - 2.0F * look.amount);
+    }
+
     public static void clear() {
         LOOKS.clear();
     }
@@ -101,9 +109,6 @@ public final class DemiurgeFx {
         float yaw = Mth.lerp(partialTick, player.yBodyRotO, player.yBodyRot) * Mth.DEG_TO_RAD;
         Vec3 fwd = new Vec3(-Mth.sin(yaw), 0, Mth.cos(yaw));
         Vec3 side = new Vec3(Mth.cos(yaw), 0, Mth.sin(yaw));
-        if (!firstPerson) {
-            crown(pose, vc, feet.add(0, h + 0.18, 0), 0.32F, time, 1.0F);
-        }
         boolean casting = data.is(Live.CASTING) || data.beamActive() || data.is(Live.FREEZING) || data.is(Live.CHANTING);
         for (int s = -1; s <= 1; s += 2) {
             Vec3 hand = feet.add(0, h * 0.42, 0).add(fwd.scale(0.25)).add(side.scale(0.42 * s));
@@ -125,7 +130,9 @@ public final class DemiurgeFx {
             }
         }
         if (out > 0.02F && !firstPerson) {
-            cloak(pose, vc, feet, h, fwd, side, player.getDeltaMovement(), out, time, player.getId());
+            // the red star at his brow, in the hood's shadow (the cloak itself is cloth: render.DemiurgeCloakLayer)
+            Vec3 head = feet.add(0, h * 0.9, 0).add(fwd.scale(0.3));
+            twinkle(pose, vc, head, 0.14F * out, time * 0.3F, 0.8F * out);
         }
     }
 
@@ -140,20 +147,6 @@ public final class DemiurgeFx {
         }
         level.playLocalSound(c.x, c.y, c.z, powered ? SoundEvents.AMETHYST_BLOCK_RESONATE : SoundEvents.AMETHYST_BLOCK_CHIME,
                 SoundSource.PLAYERS, powered ? 0.9F : 0.6F, powered ? 1.5F : 1.1F, false);
-    }
-
-    /** The crown of starry blue energy: a ring of points over the head, stars twinkling in it. */
-    static void crown(Matrix4f pose, VertexConsumer vc, Vec3 at, float r, float time, float a) {
-        EnergyGeometry.ring(pose, vc, at, UP, r, 0.05F, 24, EnergyGeometry.argb(BLUE, 0.8F * a));
-        for (int i = 0; i < 7; i++) {
-            float ang = i * Mth.TWO_PI / 7 + time * 0.02F;
-            Vec3 base = at.add(Mth.cos(ang) * r, 0, Mth.sin(ang) * r);
-            float tall = 0.22F + 0.06F * Mth.sin(time * 0.25F + i);
-            Vec3 tip = base.add(Mth.cos(ang) * 0.05F, tall, Mth.sin(ang) * 0.05F);
-            EnergyGeometry.ribbon(pose, vc, base, tip, 0.08F, 0.0F, EnergyGeometry.argb(BLUE, 0.85F * a),
-                    EnergyGeometry.argb(STAR, 0.0F));
-            twinkle(pose, vc, tip, 0.05F, time * 0.5F + i * 1.3F, a);
-        }
     }
 
     /** A small four-pointed star that twinkles. */
@@ -174,48 +167,6 @@ public final class DemiurgeFx {
             Vec3 at = hand.add(Mth.cos(ang) * rr, 0.1F * Mth.sin(ang * 2), Mth.sin(ang) * rr);
             twinkle(pose, vc, at, 0.05F, time * 0.6F + i, a);
         }
-    }
-
-    /**
-     * The great red hooded cloak: long tongues from his shoulders and the hood, flaring out behind and to the sides and
-     * waving, deep red at the root and bright at the edges, stars caught in it.
-     */
-    private static void cloak(Matrix4f pose, VertexConsumer vc, Vec3 feet, float h, Vec3 fwd, Vec3 side, Vec3 vel, float out,
-                              float time, int id) {
-        Vec3 back = fwd.scale(-1);
-        Vec3 stream = vel.lengthSqr() > 0.01 ? vel.normalize().scale(-1) : back;
-        Vec3 neck = feet.add(0, h * 0.86, 0).add(back.scale(0.12));
-        int tongues = 22;
-        for (int i = 0; i < tongues; i++) {
-            float f = (i + 0.5F) / tongues;               // across the cloak, one side to the other
-            float across = (f - 0.5F) * 2.0F;
-            float phase = time * 0.09F + i * 0.7F + id;
-            Vec3 root = neck.add(side.scale(across * 0.28)).add(0, -Math.abs(across) * 0.08, 0);
-            Vec3 dir = back.scale(0.6).add(stream.scale(0.4)).add(side.scale(across * 1.3)).add(0, 0.35 - 0.55 * Math.abs(across), 0);
-            dir = dir.normalize();
-            float len = (2.2F + 1.4F * (1.0F - Math.abs(across)) + 0.5F * Mth.sin(phase * 1.3F)) * out;
-            Vec3 prev = root;
-            int segs = 6;
-            for (int k = 1; k <= segs; k++) {
-                float t = (float) k / segs;
-                Vec3 wave = side.scale(0.35 * t * Mth.sin(phase + t * 4.0F)).add(0, 0.3 * t * Mth.cos(phase * 0.8F + t * 3.0F), 0);
-                Vec3 p = root.add(dir.scale(len * t)).add(wave).add(0, -0.6 * t * t * (1.0F - out * 0.5F), 0);
-                float w0 = (0.42F - 0.25F * (t - 1.0F / segs)) * out;
-                float w1 = (0.42F - 0.25F * t) * out;
-                int c0 = EnergyGeometry.argb(k == 1 ? CLOAK_DEEP : CLOAK, 0.55F * out * (1.0F - 0.5F * (t - 1.0F / segs)));
-                int c1 = EnergyGeometry.argb(CLOAK, 0.55F * out * (1.0F - 0.5F * t));
-                EnergyGeometry.ribbon(pose, vc, prev, p, Math.max(0.02F, w0), Math.max(0.02F, w1), c0, c1);
-                if (((i * 7 + k * 3) % 5) == 0) {
-                    twinkle(pose, vc, p, 0.04F, time * 0.4F + i + k, 0.8F * out);
-                }
-                prev = p;
-            }
-        }
-        // the hood: a red ring round the head
-        Vec3 head = feet.add(0, h * 0.94, 0).add(back.scale(0.05));
-        EnergyGeometry.ring(pose, vc, head, fwd, 0.36F, 0.09F, 20, EnergyGeometry.argb(CLOAK, 0.5F * out));
-        // the red star at the brow
-        twinkle(pose, vc, head.add(fwd.scale(0.3)), 0.18F * out, time * 0.3F, 0.8F * out);
     }
 
     // ==================================================================================================================

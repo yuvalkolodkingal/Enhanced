@@ -255,6 +255,14 @@ public final class PowerData {
         return borrowed;
     }
 
+    /**
+     * (3.17) The hero whose keys this player's keys are now: the magic user the Demiurge took on, else his own power (for
+     * everyone but a Demiurge with a magic type, simply {@link #power()}).
+     */
+    public Power acting() {
+        return power == Power.BILLY && borrowed != Power.NONE ? borrowed : power;
+    }
+
     public void setBorrowed(Power value) {
         borrowed = value == null ? Power.NONE : value;
     }

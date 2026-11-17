@@ -282,8 +282,89 @@ public final class MagicFxRenderer {
                             EnergyGeometry.argb(i % 3 == 0 ? g : c, 0.85F * (1.0F - t)), EnergyGeometry.argb(c, 0.0F));
                 }
             }
+            case MagicFx.CHAOS_BURST -> chaosBurst(level, fx, t, age, o, pose, vc, camera, c, g);
             default -> {
             }
+        }
+    }
+
+    /**
+     * The Nexus Being's Chaos Burst: red energy thrown in every direction by all the ground (pillars and sprays bursting up
+     * out of it) and all the sky (bolts and sheets coming down out of it) within {@code size} blocks of her, a wave of red
+     * running out along the ground, a dome of red light over it all, and a bolt down onto each one it strikes. Bright: every
+     * stream has a wide red body and a hot pale core.
+     */
+    private static void chaosBurst(ClientLevel level, MagicFxPayload fx, float t, float age, Vec3 o, Matrix4f pose,
+                                   VertexConsumer vc, Vec3 camera, int c, int g) {
+        float r = fx.size();
+        float a = t < 0.15F ? t / 0.15F : 1.0F - (t - 0.15F) / 0.85F;   // it flares up at once and dies away
+        float grow = Math.min(1.0F, t * 2.5F);
+        RandomSource random = RandomSource.create(fx.origin().hashCode() * 31L + fx.duration());
+        long flicker = (long) (age / 2);
+        int streams = 150;
+        for (int i = 0; i < streams; i++) {
+            // a place within the range, spread evenly over its disc
+            double ang = random.nextDouble() * Math.PI * 2;
+            double d = Math.sqrt(random.nextDouble()) * r;
+            double wx = fx.origin().x + Math.cos(ang) * d;
+            double wz = fx.origin().z + Math.sin(ang) * d;
+            Vec3 dir = new Vec3(random.nextGaussian(), 0, random.nextGaussian());
+            float len = 7.0F + random.nextFloat() * 13.0F;
+            float w = 0.5F + random.nextFloat() * 0.7F;
+            long seed = random.nextLong();
+            boolean sky = i % 2 == 1;
+            double ground = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, Mth.floor(wx), Mth.floor(wz));
+            if (ground <= level.getMinBuildHeight() + 1) {
+                ground = fx.origin().y; // (nothing loaded there: her own height)
+            }
+            Vec3 from;
+            Vec3 to;
+            if (sky) {
+                // out of the sky: from high over the place, down and aslant, all the way to the ground
+                double top = Math.max(ground, fx.origin().y) + 34.0 + random.nextDouble() * 14.0;
+                from = new Vec3(wx + dir.x * 6.0, top, wz + dir.z * 6.0).subtract(camera);
+                Vec3 end = new Vec3(wx, ground, wz).subtract(camera);
+                to = from.add(end.subtract(from).scale(grow));
+            } else {
+                // out of the ground: up and outward, any way
+                from = new Vec3(wx, ground + 0.1, wz).subtract(camera);
+                Vec3 way = new Vec3(dir.x * 0.55, 1.0, dir.z * 0.55).normalize();
+                to = from.add(way.scale(len * grow));
+            }
+            EnergyGeometry.bolt(pose, vc, from, to, w * 1.7F, 1.3F, EnergyGeometry.argb(c, 0.42F * a), seed + flicker);
+            EnergyGeometry.bolt(pose, vc, from, to, w * 0.7F, 1.3F, EnergyGeometry.argb(0xFF6A7C, 0.8F * a), seed + flicker);
+            EnergyGeometry.bolt(pose, vc, from, to, w * 0.22F, 1.3F, EnergyGeometry.argb(0xFFE8EC, 0.95F * a), seed + flicker);
+            Vec3 foot = sky ? to : from;
+            EnergyGeometry.ring(pose, vc, foot.add(0, 0.12, 0), UP, 0.8F + 2.6F * t, 0.35F, 16, EnergyGeometry.argb(c, 0.7F * a));
+            if (i % 3 == 0) {
+                // a spray of sparks thrown every way from where it breaks out
+                for (int k = 0; k < 5; k++) {
+                    Vec3 s = new Vec3(random.nextGaussian(), Math.abs(random.nextGaussian()) + 0.2, random.nextGaussian()).normalize();
+                    EnergyGeometry.ribbon(pose, vc, foot.add(s.scale(1.0 + 5.0 * t)), foot.add(s.scale(2.5 + 8.0 * t)), 0.3F * a, 0.0F,
+                            EnergyGeometry.argb(g, 0.9F * a), EnergyGeometry.argb(c, 0.0F));
+                }
+            }
+        }
+        // the wave of red running out along the ground, and the dome of red light over everything
+        Vec3 at = o.add(0, 0.2, 0);
+        float wave = r * (1.0F - (1.0F - t) * (1.0F - t));
+        EnergyGeometry.ring(pose, vc, at, UP, wave, 3.0F * (1.0F - t) + 0.3F, 72, EnergyGeometry.argb(c, 0.6F * (1.0F - t)));
+        EnergyGeometry.ring(pose, vc, at, UP, wave * 0.96F, 0.6F, 72, EnergyGeometry.argb(0xFFE8EC, 0.85F * (1.0F - t)));
+        EnergyGeometry.ring(pose, vc, at, UP, wave * 0.6F, 2.0F * (1.0F - t), 56, EnergyGeometry.argb(c, 0.35F * (1.0F - t)));
+        for (int band = 0; band < 7; band++) {
+            float lat = Mth.DEG_TO_RAD * (8 + band * 12);
+            EnergyGeometry.ring(pose, vc, o.add(0, Mth.sin(lat) * r * 0.9F, 0), UP, Mth.cos(lat) * r * 0.9F, 5.0F, 56,
+                    EnergyGeometry.argb(c, 0.2F * a));
+        }
+        // down onto each one it strikes
+        long seed = fx.origin().hashCode() * 17L + flicker;
+        for (Vec3 p : fx.points()) {
+            Vec3 hit = p.subtract(camera);
+            Vec3 top = hit.add(0, 30, 0);
+            EnergyGeometry.bolt(pose, vc, top, hit, 1.1F, 1.8F, EnergyGeometry.argb(c, 0.5F * a), seed);
+            EnergyGeometry.bolt(pose, vc, top, hit, 0.3F, 1.8F, EnergyGeometry.argb(0xFFE8EC, 0.95F * a), seed);
+            EnergyGeometry.ring(pose, vc, hit, UP, 1.0F + 2.0F * t, 0.4F, 20, EnergyGeometry.argb(g, 0.9F * a));
+            seed += 7919L;
         }
     }
 
@@ -569,7 +650,6 @@ public final class MagicFxRenderer {
                     EnergyGeometry.ribbon(pose, vc, p.add(0, -0.12, 0), p.add(0, 0.12, 0), 0.08F, EnergyGeometry.argb(g, 0.9F * a),
                             EnergyGeometry.argb(g, 0.9F * a));
                 }
-                crown(pose, vc, head.add(0, 0.3 * s, 0), 0.32F * s, c, g, time, a);
             }
             case SPEED -> {
                 for (int i = 0; i < 6; i++) {
@@ -750,16 +830,6 @@ public final class MagicFxRenderer {
                 }
             }
             case WINGS -> wings(pose, vc, feet.add(0, h * 0.72, 0), fwd, side, s, c, g, time, a, false);
-        }
-    }
-
-    private static void crown(Matrix4f pose, VertexConsumer vc, Vec3 at, float r, int c, int g, float time, float a) {
-        EnergyGeometry.ring(pose, vc, at, UP, r, 0.06F, 24, EnergyGeometry.argb(c, 0.85F * a));
-        for (int i = 0; i < 7; i++) {
-            float ang = i * Mth.TWO_PI / 7 + time * 0.01F;
-            Vec3 p = at.add(Mth.cos(ang) * r, 0, Mth.sin(ang) * r);
-            EnergyGeometry.ribbon(pose, vc, p, p.add(Mth.cos(ang) * 0.12, (i % 2 == 0 ? 0.45 : 0.28), Mth.sin(ang) * 0.12), 0.07F, 0.0F,
-                    EnergyGeometry.argb(g, 0.9F * a), EnergyGeometry.argb(c, 0.0F));
         }
     }
 

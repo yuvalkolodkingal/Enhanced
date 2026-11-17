@@ -46,10 +46,11 @@ public final class UltimateConfig {
                 .defineInRange("damageBonus", 0.25, 0.0, 5.0);
         SIGNATURE_HURTS_PLAYERS = builder.comment("Whether signature moves strike other players too (PvP must be on).")
                 .define("signatureHurtsPlayers", true);
-        NEXUS_FLASH_RANGE = builder.comment("The Nexus Being (the Scarlet Witch's ultimate form): how far (blocks) from her the chaos",
-                "flashes strike her enemies, every second and a half. They never touch her.")
+        NEXUS_FLASH_RANGE = builder.comment("The Nexus Being (the Scarlet Witch's ultimate form): how far (blocks) from her the Chaos",
+                "Burst reaches: all the ground and the sky that near throw red energy every two seconds, and it strikes everyone",
+                "there but her (her signature move is the same burst at once, twice as hard).")
                 .defineInRange("nexusFlashRange", 50, 4, 128);
-        NEXUS_FLASH_DAMAGE = builder.comment("The Nexus Being: the damage of each chaos flash.")
+        NEXUS_FLASH_DAMAGE = builder.comment("The Nexus Being: the damage of each Chaos Burst to each one it strikes.")
                 .defineInRange("nexusFlashDamage", 15.0, 0.0, 200.0);
         builder.pop();
     }

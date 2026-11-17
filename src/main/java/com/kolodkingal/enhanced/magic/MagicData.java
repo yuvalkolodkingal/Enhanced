@@ -36,6 +36,11 @@ public record MagicData(int path, int level, int flags, int corruption, String s
     public static final int ROAD_UNBOUND = 512;
     /** Billy's Unbinding freed him a while ago: the same, for a minute (the server takes the flag away again). */
     public static final int UNBOUND = 1024;
+    /**
+     * His witchcraft is Billy's own gift (the Demiurge's Grant Magic, not an operator's command or the Road's prize): the
+     * Witches' Mindscape, Billy's place of meditation, is open to him. (Bits 12 to 15 are the Demiurge's magic type.)
+     */
+    public static final int BILLYS = 2048;
 
     public static final Codec<MagicData> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.optionalFieldOf("path", "").forGetter(d -> d.witchPath() == null ? "" : d.witchPath().id()),
@@ -89,7 +94,7 @@ public record MagicData(int path, int level, int flags, int corruption, String s
 
     /** A witch (or sorcerer) of {@code path} at {@code level}; {@code granted}: a Demiurge's gift. */
     public MagicData withCraft(@Nullable WitchPath newPath, int newLevel, boolean granted) {
-        int f = granted ? flags | GRANTED : flags & ~GRANTED;
+        int f = (granted ? flags | GRANTED : flags & ~GRANTED) & ~BILLYS; // (Billy's own gift is marked after, Grants)
         return new MagicData(newPath == null ? -1 : newPath.ordinal(), newLevel, f, corruption, "", mana);
     }
 

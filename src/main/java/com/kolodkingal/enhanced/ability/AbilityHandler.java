@@ -40,8 +40,8 @@ public final class AbilityHandler {
     public static void onKey(ServerPlayer player, int ability, boolean down) {
         // Releases always go through, so a hold ability can't get stuck on (e.g. when the player died holding the key).
         // (3.6: key 6 is the Y key of a hero whose Y row is not Build Magic: HeroKeys.pressY.)
-        // (3.17: key 7 is K, the spells; key 8 is O, the ultimate form: MagicKeys)
-        if (ability < 1 || ability > com.kolodkingal.enhanced.magic.MagicKeys.ULTIMATE || (down && !player.isAlive())) {
+        // (3.17: keys 7 to 9 are the spells, the ultimate form and the Demiurge's Magic types: MagicKeys)
+        if (ability < 1 || ability > com.kolodkingal.enhanced.magic.MagicKeys.MAGIC_TYPE || (down && !player.isAlive())) {
             return;
         }
         // In a trial of the Witches' Road no power works (and only one without powers is let in).
@@ -80,7 +80,8 @@ public final class AbilityHandler {
             player.displayClientMessage(Component.translatable("message.enhanced.nexus.stripped"), true);
             return;
         }
-        // 3.17: K casts a spell, O awakens the ultimate form (or fires its signature).
+        // 3.17: the spell key casts a spell, the ultimate key awakens the ultimate form (or fires its signature), the
+        // Magic types key gives the Demiurge another magic user's abilities.
         if (ability == com.kolodkingal.enhanced.magic.MagicKeys.SPELL) {
             com.kolodkingal.enhanced.magic.Casting.key(player, down);
             Powers.syncIfDirty(player);
@@ -91,6 +92,12 @@ public final class AbilityHandler {
                 com.kolodkingal.enhanced.ultimate.UltimateForms.key(player, player.isShiftKeyDown());
             }
             Powers.syncIfDirty(player);
+            return;
+        }
+        if (ability == com.kolodkingal.enhanced.magic.MagicKeys.MAGIC_TYPE) {
+            if (down) {
+                com.kolodkingal.enhanced.ultimate.Demiurge.cycle(player);
+            }
             return;
         }
         // Drained by Agatha (3.3): the power is hers for a while. (A release still goes through.)

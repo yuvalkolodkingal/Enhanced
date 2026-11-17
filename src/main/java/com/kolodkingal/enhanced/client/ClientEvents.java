@@ -371,10 +371,13 @@ public final class ClientEvents {
         }
     }
 
-    /** Whether K was sent down (its release is sent once, as for the ability keys). */
+    /** Whether the spell key was sent down (its release is sent once, as for the ability keys). */
     private static boolean spellSent;
 
-    /** 3.17: K (with Sneak, the Spell Wheel) and O. */
+    /**
+     * 3.17: the spell key (with Sneak, the Spell Wheel), the ultimate key and the Magic types key. Nothing is sent for a
+     * player they are not for: the spell key is a caster's, the ultimate key needs Ultimate Mode on, Magic types the Demiurge.
+     */
     private static void handleMagicKeys(Minecraft mc, LocalPlayer player) {
         boolean spellClicked = false;
         while (KeyBindings.SPELLS.consumeClick()) {
@@ -397,8 +400,15 @@ public final class ClientEvents {
         while (KeyBindings.ULTIMATE.consumeClick()) {
             ultimateClicked = true;
         }
-        if (ultimateClicked && mc.screen == null && !player.isSpectator()) {
+        if (ultimateClicked && com.kolodkingal.enhanced.ultimate.Ultimate.on() && mc.screen == null && !player.isSpectator()) {
             Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.ULTIMATE, true, mc.options.keyShift.isDown()));
+        }
+        boolean typesClicked = false;
+        while (KeyBindings.MAGIC_TYPES.consumeClick()) {
+            typesClicked = true;
+        }
+        if (typesClicked && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player) && mc.screen == null && !player.isSpectator()) {
+            Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.MAGIC_TYPE, true, false));
         }
     }
 

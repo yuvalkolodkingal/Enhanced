@@ -79,12 +79,16 @@ public final class Magic {
         return power != Power.BILLY && power != Power.NONE && WardStrength.isSorcerer(player);
     }
 
-    /** Whether this player casts spells with K at all. */
+    /**
+     * Whether this player casts spells with the spell key at all: a witch or sorcerer of the witchcraft; and, only with
+     * Ultimate Mode on, Billy (the Demiurge) and the hero sorcerers. With Ultimate Mode off a hero is the hero he was
+     * before 3.17: no mana, no spell key, no spells.
+     */
     public static boolean isCaster(Player player) {
         if (!enabled()) {
             return false;
         }
-        return isWitch(player) || Powers.power(player) == Power.BILLY || heroSorcerer(player);
+        return isWitch(player) || Ultimate.on() && (Powers.power(player) == Power.BILLY || heroSorcerer(player));
     }
 
     /** Billy's rank (1-10), or 0 for anyone else. */
@@ -92,9 +96,23 @@ public final class Magic {
         return Powers.power(player) == Power.BILLY ? BillyRanks.rank(ModAttachments.BUILD_DATA.get(player)) : 0;
     }
 
+    /**
+     * Whether the Witches' Mindscape, Billy's place of meditation, is open to him: Billy himself (the Demiurge), and the
+     * witches and sorcerers whose power is Billy's own gift ({@link MagicData#BILLYS}). Nobody else finds the way in.
+     */
+    public static boolean mindscapeOpen(Player player) {
+        if (!isCaster(player)) {
+            return false;
+        }
+        return Powers.power(player) == Power.BILLY || isWitch(player) && data(player).has(MagicData.BILLYS);
+    }
+
     /** Whether he knows the spell (and may cast it now, mana and cooldown aside). */
     public static boolean knows(Player player, Spell spell) {
         if (!isCaster(player)) {
+            return false;
+        }
+        if (spell == Spell.MINDSCAPE && !mindscapeOpen(player)) {
             return false;
         }
         if (isDemiurge(player)) {

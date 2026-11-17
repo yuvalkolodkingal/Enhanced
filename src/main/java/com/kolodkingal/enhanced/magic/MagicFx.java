@@ -55,6 +55,11 @@ public final class MagicFx {
     public static final int CANCEL = 18;
     /** A broom of light under {@code entity} (drawn from its state; this is its appearing). */
     public static final int SPARKLE = 19;
+    /**
+     * The Nexus Being's Chaos Burst: all the ground and all the sky within {@code size} blocks of {@code origin} throw red
+     * energy in every direction ({@code points}: those it strikes).
+     */
+    public static final int CHAOS_BURST = 20;
 
     private static final AtomicInteger NEXT_ID = new AtomicInteger(1);
 

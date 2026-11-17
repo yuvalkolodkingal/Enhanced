@@ -58,6 +58,8 @@ public final class NexusBeing {
     /** Her red, bright: her abilities and her sky. */
     public static final int RED = 0xFF1E3C;
     public static final int GLOW = 0xFFB0C0;
+    /** The red of her Chaos Burst: brighter still. */
+    public static final int BRIGHT = 0xFF2A48;
 
     /** Per Nexus Being (server): the worlds she holds, and how many heroes her runes strip. */
     private static final class Hold {
@@ -173,8 +175,8 @@ public final class NexusBeing {
         }
         // chaos flashes out of everything near at her enemies
         if (now >= hold.nextFlash) {
-            hold.nextFlash = now + 30;
-            flashes(wanda, level);
+            hold.nextFlash = now + 40;
+            burst(wanda, level, false);
         }
         // nobody steps inside her shield
         if (data.chaosShieldActive()) {
@@ -201,30 +203,36 @@ public final class NexusBeing {
         return (float) (loaded() ? UltimateConfig.NEXUS_FLASH_DAMAGE.get() : 15.0);
     }
 
-    /** Chaos flashes out of the ground, the air and the walls round each of her enemies near: it never touches her. */
-    private static void flashes(ServerPlayer wanda, ServerLevel level) {
+    /**
+     * The Chaos Burst: all the ground and all the sky within {@code ultimate.nexusFlashRange} blocks of her throw red energy
+     * in every direction, from under everyone's feet and down out of the sky, and it strikes everyone there but her (those
+     * a power of hers may hurt: {@code UltimateForms.targets}). It comes of itself every two seconds while she is the Nexus
+     * Being; her signature move ({@code great}) is the same burst at once, twice as hard.
+     */
+    static void burst(ServerPlayer wanda, ServerLevel level, boolean great) {
         double r = flashRange();
         List<LivingEntity> targets = UltimateForms.targets(wanda, r);
-        int n = 0;
+        List<Vec3> struck = new ArrayList<>();
+        float damage = flashDamage() * (great ? 2.0F : 1.0F);
         for (LivingEntity e : targets) {
-            if (n++ >= 24) {
-                break;
+            if (struck.size() < 48) {
+                struck.add(e.position().add(0, e.getBbHeight() * 0.5, 0));
             }
-            Vec3 at = e.position().add(0, e.getBbHeight() * 0.5, 0);
-            List<Vec3> from = new ArrayList<>();
-            for (int k = 0; k < 3; k++) {
-                double a = wanda.getRandom().nextDouble() * Math.PI * 2;
-                double d = 2.5 + wanda.getRandom().nextDouble() * 2.5;
-                from.add(at.add(Math.cos(a) * d, -1.0 + wanda.getRandom().nextDouble() * 3.0, Math.sin(a) * d));
-            }
-            MagicFx.send(level, MagicFx.BEAMS, at, from, RED, GLOW, 1.0F, 8);
-            MagicFx.send(level, MagicFx.STARBURST, at, List.of(), RED, GLOW, 1.2F, 10);
             e.invulnerableTime = 0;
-            e.hurt(ModDamageTypes.source(level, ModDamageTypes.ULTIMATE, wanda, wanda), flashDamage());
+            e.hurt(ModDamageTypes.source(level, ModDamageTypes.ULTIMATE, wanda, wanda), damage);
         }
-        if (n > 0) {
-            level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK,
-                    SoundSource.PLAYERS, 1.0F, 0.6F);
+        MagicFx.send(level, MagicFx.CHAOS_BURST, wanda.position(), struck, BRIGHT, GLOW, (float) r, great ? 40 : 26);
+        if (great) {
+            MagicFx.send(level, MagicFx.RING, wanda.position(), List.of(), BRIGHT, GLOW, (float) r, 30);
+            MagicFx.send(level, MagicFx.STARBURST, wanda.position().add(0, 1.4, 0), List.of(), BRIGHT, GLOW, 12.0F, 24);
+        }
+        level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK,
+                SoundSource.PLAYERS, 1.6F, 0.5F);
+        level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER,
+                SoundSource.PLAYERS, great ? 1.4F : 0.6F, 1.5F);
+        if (great) {
+            level.playSound(null, wanda.getX(), wanda.getY(), wanda.getZ(), SoundEvents.GENERIC_EXPLODE,
+                    SoundSource.PLAYERS, 1.2F, 0.6F);
         }
     }
 

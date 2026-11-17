@@ -1,14 +1,16 @@
 package com.kolodkingal.enhanced.magic;
 
 /**
- * The numbers of 3.17's two keys in {@code AbilityKeyPayload} (after the five ability keys and Y, {@code HeroKeys.Y}):
- * K, the spells, and O, the ultimate form.
+ * The numbers of 3.17's three keys in {@code AbilityKeyPayload} (after the five ability keys and Y, {@code HeroKeys.Y}):
+ * the spells, the ultimate form, and the Demiurge's Magic types (their keys: {@code client.KeyBindings}).
  */
 public final class MagicKeys {
-    /** K: casts the chosen spell (held: chants faster). */
+    /** Casts the chosen spell (held: chants faster). */
     public static final int SPELL = 7;
-    /** O: awakens the ultimate form, or fires its signature move while it lasts. */
+    /** Awakens the ultimate form, or fires its signature move while it lasts. */
     public static final int ULTIMATE = 8;
+    /** The Demiurge's Magic types: on to the next magic user's abilities (after the last, his own). */
+    public static final int MAGIC_TYPE = 9;
 
     private MagicKeys() {
     }

@@ -93,6 +93,11 @@ public class PowerHud implements LayeredDraw.Layer {
         // Heroes with several looks show the current one, and the key that changes it, after their name.
         int titleColor = Variants.hasChoice(power) ? look.color() : power.titleColor();
         MutableComponent title = com.kolodkingal.enhanced.power.Characters.name(data).copy().withStyle(s -> s.withColor(titleColor).withBold(true));
+        if (data.acting() != power) {
+            // (3.17) the Demiurge with a magic type: whose keys his are now
+            title.append(Component.literal(" \u2726 ").withStyle(s -> s.withBold(false)))
+                    .append(data.acting().displayName().copy().withStyle(s -> s.withColor(data.acting().titleColor())));
+        }
         if (Variants.hasChoice(power)) {
             title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
                     .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
@@ -108,7 +113,7 @@ public class PowerHud implements LayeredDraw.Layer {
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
                     .withStyle(ChatFormatting.YELLOW)
-                    .append(Component.translatable(abilityKey(data, power, i)).withStyle(ChatFormatting.WHITE));
+                    .append(Component.translatable(abilityKey(data, data.acting(), i)).withStyle(ChatFormatting.WHITE));
             Component status = status(player, data, i, now);
             if (status != null) {
                 line.append(Component.literal("  ")).append(status);
@@ -124,7 +129,7 @@ public class PowerHud implements LayeredDraw.Layer {
         if (yLine) {
             MutableComponent line = Component.literal("[").append(BuildKeys.MAGIC.getTranslatedKeyMessage()).append("] ")
                     .withStyle(ChatFormatting.YELLOW)
-                    .append(Component.translatable(power.abilityKey(com.kolodkingal.enhanced.custom.HeroKeys.Y))
+                    .append(Component.translatable(data.acting().abilityKey(com.kolodkingal.enhanced.custom.HeroKeys.Y))
                             .withStyle(ChatFormatting.WHITE));
             Component status = status(player, data, com.kolodkingal.enhanced.custom.HeroKeys.Y, now);
             if (status != null) {
@@ -187,13 +192,14 @@ public class PowerHud implements LayeredDraw.Layer {
         Variant look = Variants.current(data);
         PowerPanels.Model model = new PowerPanels.Model();
         model.color = Variants.hasChoice(power) ? look.color() : power.titleColor();
-        model.title = com.kolodkingal.enhanced.power.Characters.name(data);
+        model.title = data.acting() == power ? com.kolodkingal.enhanced.power.Characters.name(data)
+                : com.kolodkingal.enhanced.power.Characters.name(data).copy().append(" \u2726 ").append(data.acting().displayName());
         model.identity = power.getSerializedName() + "/" + look.displayName().getString();
         model.sneaking = false;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             model.rows.add(new PowerPanels.Row(KeyBindings.ability(i).getTranslatedKeyMessage(),
-                    panelSlot(Component.translatable(abilityKey(data, power, i)), status(player, data, i, now), data, i, now)
-                            .withIcon(symbol(power.abilityKey(i))), null));
+                    panelSlot(Component.translatable(abilityKey(data, data.acting(), i)), status(player, data, i, now), data, i, now)
+                            .withIcon(symbol(data.acting().abilityKey(i))), null));
         }
         Power builder = BuildClient.hero(player);
         if (extraLines(builder) > 0) {
@@ -252,17 +258,17 @@ public class PowerHud implements LayeredDraw.Layer {
                     .withStyle(percent >= 40 ? ChatFormatting.GOLD : ChatFormatting.RED);
         }
         // The heroes of 3.0 say for themselves (by default: the cooldown, as below).
-        HeroClient hero = HeroClients.of(data.power());
+        HeroClient hero = HeroClients.of(data.acting());
         if (hero != null) {
             return hero.hudStatus(player, data, ability, now);
         }
         // (Magneto's R says which of its recharges runs: the Magnetic Pull's, never a bare cooldown.)
-        Component cooldown = data.power() == Power.MAGNETO && ability == 1 ? null : cooldown(data, ability, now);
+        Component cooldown = data.acting() == Power.MAGNETO && ability == 1 ? null : cooldown(data, ability, now);
         if (cooldown != null) {
             return cooldown;
         }
         boolean holding = data.heldEntityId() != -1;
-        return switch (data.power()) {
+        return switch (data.acting()) { // (3.17: the magic user a Demiurge took on, else the hero himself)
             case MAGNETO -> switch (ability) {
                 case 1 -> holding ? active("hud.enhanced.holding") : pullCooldown(data, now);
                 case 2 -> Component.translatable("hud.enhanced.shards", MagnetoAbilities.countAmmo(player, data))

@@ -113,11 +113,12 @@ public final class Demiurge {
         boolean demiurge = Magic.isDemiurge(player);
         PowerData data = Powers.get(player);
         data.setBorrowed(demiurge ? borrowed(player) : Power.NONE);
-        setModifier(player, Attributes.MAX_HEALTH, HEALTH_ID, HEALTH, demiurge);
+        // (nothing of this touches a player who is not the Demiurge and never was: no modifier of his is there to remove)
+        boolean changed = setModifier(player, Attributes.MAX_HEALTH, HEALTH_ID, HEALTH, demiurge);
         setModifier(player, Attributes.ARMOR, ARMOR_ID, ARMOR, demiurge);
         setModifier(player, Attributes.ARMOR_TOUGHNESS, TOUGHNESS_ID, TOUGHNESS, demiurge);
         setModifier(player, Attributes.KNOCKBACK_RESISTANCE, KNOCKBACK_ID, KNOCKBACK, demiurge);
-        if (player.getHealth() > player.getMaxHealth()) {
+        if (changed && !demiurge && player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
         if (!demiurge) {
@@ -133,20 +134,24 @@ public final class Demiurge {
         }
     }
 
-    private static void setModifier(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id, double amount,
-                                    boolean present) {
+    /** Puts the modifier there or takes it away; whether anything changed. */
+    private static boolean setModifier(ServerPlayer player, Holder<Attribute> attribute, ResourceLocation id, double amount,
+                                       boolean present) {
         AttributeInstance instance = player.getAttribute(attribute);
         if (instance == null) {
-            return;
+            return false;
         }
         AttributeModifier existing = instance.getModifier(id);
         if (present) {
             if (existing == null || existing.amount() != amount) {
                 instance.removeModifier(id);
                 instance.addPermanentModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
+                return true;
             }
         } else if (existing != null) {
             instance.removeModifier(id);
+            return true;
         }
+        return false;
     }
 }
