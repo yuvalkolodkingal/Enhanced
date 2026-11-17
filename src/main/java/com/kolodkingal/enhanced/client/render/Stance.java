@@ -186,6 +186,15 @@ public enum Stance {
     FALCON_SHIELDING(1.5F, 3.0F, true),
     /** In the Dive: the body tipped head first, the arms tight along his sides, the legs together. */
     FALCON_DIVING(2.0F, 4.0F, true),
+    // ===== magic and Ultimate Mode (3.17) =====
+    /** A caster chants: the hands up before the chest, weaving, the head a little bowed. */
+    MAGIC_CHANT(2.0F, 3.0F, true),
+    /** Astride a broom of light: the legs drawn up, the hands forward on the stick. */
+    MAGIC_BROOM(3.0F, 4.0F, false),
+    /** The ultimate form awakens: the arms spread wide and up, the head thrown back, trembling with it. */
+    ULTIMATE_AWAKEN(2.0F, 5.0F, true),
+    /** The ultimate form lasts: the chest out, the arms a little open, power held. */
+    ULTIMATE_POWER(6.0F, 8.0F, false),
     // ===== love (3.8) =====
     ;
 

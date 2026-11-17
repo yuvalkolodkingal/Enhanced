@@ -62,6 +62,9 @@ public final class PowerTicker {
                 && !(power == Power.FALCON && !com.kolodkingal.enhanced.falcon.FalconWings.canFly(player))
                 && !(power == Power.LOVE && !com.kolodkingal.enhanced.love.LoveAbilities.canFly(player))
                 && !HexRunes.silences(player) && !player.hasEffect(ModEffects.DRAINED); // 3.3: the Hex Runes hold a sorcerer's powers, flight too
+        // (3.17: a broom of light carries a witch, or anyone it was conjured for, for its while)
+        boolean broom = com.kolodkingal.enhanced.magic.Broom.riding(player);
+        canFly = canFly || broom;
         setModifier(player, Platform.get().attributes().creativeFlight(), FLIGHT_ID, 1.0, canFly);
 
         Abilities abilities = player.getAbilities();
@@ -70,7 +73,8 @@ public final class PowerTicker {
         float speed = !survivalLike || !canFly ? 0.05F : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
-                : power.flightSpeed() * lookFlight(data);
+                : broom && !power.canFly() ? com.kolodkingal.enhanced.magic.Broom.SPEED
+                : power.flightSpeed() * lookFlight(data) * (broom ? 1.25F : 1.0F);
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);

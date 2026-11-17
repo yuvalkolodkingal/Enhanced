@@ -17,13 +17,13 @@ public final class VisionQuest {
     }
 
     /**
-     * (3.16) Whether this is Solar Jewel Vision: Vision as his Source Code, powered by the Solar Jewel in his brow, when the
-     * server turns it on ({@code vision.solar_jewel.enabled}); otherwise the Source Code has Vision's powers, stronger.
+     * (3.16) Whether this is Solar Jewel Vision: Vision as his Source Code, powered by the Solar Jewel in his brow, when
+     * Ultimate Mode is on (3.17: {@code /enhanced ultimate}, {@code [ultimate] enabled}; it replaced 3.16's own switch),
+     * and any Vision while his ultimate form lasts; otherwise the Source Code has Vision's powers, stronger.
      */
     public static boolean solar(PowerData data) {
-        return data.power() == Power.VISION && "source_code".equals(data.variant())
-                && com.kolodkingal.enhanced.EnhancedConfig.SPEC.isLoaded()
-                && com.kolodkingal.enhanced.config.SolarJewelConfig.ENABLED.get();
+        return data.power() == Power.VISION && com.kolodkingal.enhanced.ultimate.Ultimate.on()
+                && ("source_code".equals(data.variant()) || data.is(Live.ULTIMATE));
     }
 
     /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, Phase, Density, the solar ones). */

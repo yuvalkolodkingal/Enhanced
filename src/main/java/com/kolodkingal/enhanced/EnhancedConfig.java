@@ -572,6 +572,9 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.EternityConfig.define(BUILDER);
         // 3.5: the world's own music (section [music]).
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
+        // 3.17: Ultimate Mode (section [ultimate]) and witchcraft (section [witchcraft]).
+        com.kolodkingal.enhanced.config.UltimateConfig.define(BUILDER);
+        com.kolodkingal.enhanced.config.WitchcraftConfig.define(BUILDER);
     }
 
     public static final ConfigSpec SPEC = BUILDER.build();

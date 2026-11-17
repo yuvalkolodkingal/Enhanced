@@ -65,6 +65,17 @@ public final class KeyBindings {
     public static final KeyMapping STONE_WHEEL = Keys.newKey("key.enhanced.stone_wheel", KeyBindings.STONES,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
 
+    /**
+     * 3.17: the spells (default K): casts the chosen spell (held while chanting: faster); with Sneak, the Spell Wheel, to
+     * choose one. For witches, sorcerers, Billy and the hero sorcerers.
+     */
+    public static final KeyMapping SPELLS = Keys.newKey("key.enhanced.spells", KeyContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORY);
+
+    /** 3.17: Ultimate Mode (default O): awakens the hero's ultimate form; while it lasts, its signature move. */
+    public static final KeyMapping ULTIMATE = Keys.newKey("key.enhanced.ultimate", KeyContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, CATEGORY);
+
     private static KeyMapping create(int ability, int key) {
         return Keys.newKey("key.enhanced.ability_" + ability, KeyContext.IN_GAME, InputConstants.Type.KEYSYM, key,
                 CATEGORY);
