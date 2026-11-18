@@ -35,7 +35,7 @@ Every hero, how to unlock them, where to find each item, the controls and the st
 
 ## Install
 
-Minecraft **1.21.1, 1.21.4, 1.21.11 or 26.3** (the same jar), with **NeoForge** 21.1, 21.4, 21.11 or 26.3. Put the jar in the `mods` folder of the client and, for multiplayer, of the server too. **Lithium** causes visual bugs with Enhanced, so remove it.
+Minecraft **1.21.1, 1.21.4, 1.21.11 or 26.3** (the same jar), with **NeoForge** 21.1, 21.4, 21.11 or 26.3. Put the jar in the `mods` folder of the client and, for multiplayer, of the server too.
 
 ## Community
 
