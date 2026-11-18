@@ -82,7 +82,7 @@ Captain Universe: the Uni-Power in Spider-Man, in the starry black, blue and whi
 
 * **Strength three times the Hulk's** at full rage, **protection like Netherite**, and he heals twice as fast as a man;
 * he **flies at great speed**, energy streaming behind him;
-* the Ultimate Form key fires an **energy blast from his hands**; with Sneak, a thinner, longer one **from his eyes**;
+* the Ultimate Form key fires an **energy blast**: from his hands, then from his eyes (thinner and longer), turn about; **Sneak + the Ultimate Form key leaves the form early** (the Uni-Power he has left stays, and climbs back);
 * **matter and portals** are his as spells on the Spells key (conjured weapons, food, armour, bridges, walls and platforms of light, transmutation; the sling portal, combat portals and the Dimension Gate), at about two thirds of Billy's strength;
 * a **sharper spider-sense**: whatever means him harm within 40 blocks shows through walls;
 * **the Uni-Power is a meter of 170.** It only runs down while the form lasts (a little over four minutes; each blast costs some) and does not come back in the form. Empty, he is Spider-Man again and it climbs back; at 170 he can awaken the form again. The form has no other time limit;
@@ -92,7 +92,7 @@ Captain Universe: the Uni-Power in Spider-Man, in the starry black, blue and whi
 
 The Godkiller armour, a giant of gold.
 
-* **As tall as the game lets a body be: sixteen times a man, about 29 blocks** (the game's own limit on a body's size; the armour of the comics is 65). The whole of that body can be struck, and he reaches and strikes what stands far below him;
+* **65 blocks tall.** His whole body is that size (the mod raises the game's limit on a body's size for it): he can be struck anywhere on it, from his boots to his helm, and he reaches and strikes what stands right under his feet, 65 blocks below his eyes;
 * **more than Netherite's protection**: blows and energy do 30% less to it, magic 10% more;
 * his suit's **energy lasts as 230 would**; great strength; every move of his suit hits two and a half times as hard;
 * the Ultimate Form key fires the **giant repulsor cannons of the chest and both hands**; with Sneak, the **stamp**: everything under him, all the way down.
@@ -103,6 +103,8 @@ The Godkiller armour, a giant of gold.
 * **protection like Netherite**;
 * the Ultimate Form key raises the **great tornado**: he spins on the spot and a whirlwind nine blocks wide stands for ten seconds, throwing his enemies round and out and **stopping whatever is shot or cast into it, energy too**; with Sneak, **time quickened** on himself or a friend he looks at: a great healing, for some hunger;
 * **spells hurt him less** (40% less), and **no power of time touches him** (a Time Stone's slow, another speedster's slow time);
+* his blows go **through magic shields** (the Chaos Shield, Billy's barrier, Agatha's shield, Doctor Strange's Shield of the Seraphim, a circle of protection), and he **runs through the wall of a Hex**, in or out;
+* **his look** is the comics' Speed (the dark green suit with the lighter green bolt, pale sleeves, spiky white hair, silver goggles with yellow lenses), and his speed's light, his trail and his tornado run **green and light pink-purple**;
 * the **cosmic battery**: the Scarlet Witch and Billy within 16 blocks of him are fed (strength, healing, their magic refilled);
 * his **running costs no hunger**.
 

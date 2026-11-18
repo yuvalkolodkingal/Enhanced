@@ -643,7 +643,7 @@ def cracks(frame):
 
 # =====================================================================================================================
 # Cosmic Spider-Man (Captain Universe) and the Godkiller armour
-def cosmic_spider():
+def cosmic_spider_64():
     im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
     P = parts(False)
     W, w2, w3 = hx(0xF4F7FC), hx(0xCFD6E4), hx(0x9AA4BA)
@@ -692,7 +692,7 @@ def cosmic_spider():
         '. . r R R r . .'], dict(B=blue, W=W, R=red, r=redd))
     return im
 
-def godkiller():
+def godkiller_64():
     im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
     P = parts(False)
     n = vnoise(61)
@@ -776,6 +776,532 @@ def godkiller():
                 im.putpixel((tx0 + x, ty0 + y), K + (255,))   # the shoulder's vent
     return im
 
+# =====================================================================================================================
+# Round three: suits painted four times as fine (256x256: the model's picture is read by its proportions, so a finer
+# one fits the same body), for the forms that are seen large or close: the Godkiller, Cosmic Spider-Man, Ultimate Tommy
+from PIL import ImageDraw
+HD = 4
+
+def hd_parts(slim=False):
+    return {name: {f: tuple(v * HD for v in box) for f, box in faces.items()} for name, faces in parts(slim).items()}
+
+class Face:
+    """One face of a part at the fine scale: draws in its own pixels (0,0 its top left), clipped to it."""
+    def __init__(self, im, box, light=1.0):
+        self.im, self.box, self.light = im, box, light
+        self.w, self.h = box[2] - box[0], box[3] - box[1]
+        self.layer = Image.new('RGBA', (self.w, self.h), (0, 0, 0, 0))
+        self.d = ImageDraw.Draw(self.layer)
+    def c(self, col, k=1.0):
+        return mul(col, self.light * k) + (255,)
+    def fill(self, col, k=1.0):
+        self.d.rectangle((0, 0, self.w, self.h), fill=self.c(col, k))
+    def rect(self, x0, y0, x1, y1, col, k=1.0):
+        self.d.rectangle((x0, y0, x1, y1), fill=self.c(col, k))
+    def poly(self, pts, col, k=1.0):
+        self.d.polygon(pts, fill=self.c(col, k))
+    def oval(self, x0, y0, x1, y1, col, k=1.0):
+        self.d.ellipse((x0, y0, x1, y1), fill=self.c(col, k))
+    def line(self, pts, col, width=1, k=1.0):
+        self.d.line(pts, fill=self.c(col, k), width=width)
+    def px(self, x, y, col, k=1.0):
+        if 0 <= x < self.w and 0 <= y < self.h:
+            self.layer.putpixel((x, y), self.c(col, k))
+    def shade(self, strength=0.22):
+        """The roundness of the limb: darker toward the face's left and right edges."""
+        px = self.layer.load()
+        for x in range(self.w):
+            k = round_shade(x, self.w, strength)
+            for y in range(self.h):
+                r, g, b, a = px[x, y]
+                px[x, y] = (min(255, int(r * k)), min(255, int(g * k)), min(255, int(b * k)), a)
+    def done(self):
+        self.im.alpha_composite(self.layer, (self.box[0], self.box[1]))
+
+def faces_of(im, part, which=('front', 'back', 'left', 'right', 'top', 'bottom')):
+    return {f: Face(im, part[f], FACE_LIGHT[f]) for f in which}
+
+def godkiller():
+    im = Image.new('RGBA', (64 * HD, 64 * HD), (0, 0, 0, 0))
+    P = hd_parts()
+    G, Lt, g, d, D, K = hx(0xE2A22C), hx(0xFFDC78), hx(0xB67C22), hx(0x7E5418), hx(0x3E2A12), hx(0x120E0A)
+    V, Lg, R, Rg = hx(0x6A5878), hx(0xFFF8D0), hx(0xFF2A1A), hx(0xFFB090)
+    n = vnoise(61)
+    def metal(F, seed):
+        """Brushed gold with a soft sheen from the top left."""
+        px = F.layer.load()
+        for y in range(F.h):
+            for x in range(F.w):
+                t = 0.5 + 0.5 * (n(x * 0.11 + seed, y * 0.05 + seed) - 0.5) + 0.25 * (1 - y / F.h) - 0.1 * (x / F.w)
+                c = mix(g, G, max(0.0, min(1.0, t)))
+                if t > 0.8:
+                    c = mix(c, Lt, (t - 0.8) * 2.5)
+                px[x, y] = mul(c, F.light) + (255,)
+    def plate(F, x0, y0, x1, y1, inset=False):
+        """A plate's edges: lit along its top and left, dark along its bottom and right (or the other way: a recess)."""
+        hi, lo = (D, Lt) if inset else (Lt, D)
+        F.line([(x0, y0), (x1, y0)], hi); F.line([(x0, y0), (x0, y1)], hi, k=0.9)
+        F.line([(x0, y1), (x1, y1)], lo); F.line([(x1, y0), (x1, y1)], lo)
+    def rivets(F, pts):
+        for x, y in pts:
+            F.px(x, y, Lt); F.px(x + 1, y + 1, D)
+    def base(part, seed, seams, shade=0.26):
+        fs = faces_of(im, part)
+        for i, (f, F) in enumerate(fs.items()):
+            metal(F, seed + i * 3)
+            if f in ('top', 'bottom'):
+                if f == 'bottom':
+                    F.fill(D)
+                continue
+            last = 0
+            for sy in list(seams) + [F.h]:
+                plate(F, 1, last + 1, F.w - 2, sy - 2)
+                rivets(F, [(3, last + 3), (F.w - 5, last + 3)])
+                F.rect(0, sy - 1, F.w, sy, d)
+                last = sy
+        return fs
+    # ---- the helm: a blunt dome, a heavy brow, two slits of red light, a barred mouth-grille (no face of a man)
+    fs = base(P['head'], 1, (9, 26))
+    F = fs['front']
+    F.poly([(0, 9), (32, 9), (32, 13), (20, 15), (16, 13), (12, 15), (0, 13)], d)          # the brow, drawn down to the nose
+    F.line([(0, 9), (32, 9)], Lt)
+    F.poly([(3, 15), (13, 17), (13, 19), (4, 18)], K); F.poly([(29, 15), (19, 17), (19, 19), (28, 18)], K)   # the eyes' sockets
+    F.poly([(5, 16), (12, 17.5), (12, 18.5), (5, 17.5)], R); F.poly([(27, 16), (20, 17.5), (20, 18.5), (27, 17.5)], R)
+    F.px(8, 17, Rg); F.px(23, 17, Rg)
+    F.rect(15, 13, 16, 22, d); F.line([(14, 13), (14, 22)], Lt, k=0.9)                      # the ridge of the nose
+    F.poly([(8, 22), (24, 22), (22, 31), (10, 31)], D)                                      # the jaw's plate
+    for x in range(10, 23, 3):
+        F.rect(x, 24, x + 1, 30, K)                                                         # the grille's bars
+    F.line([(8, 22), (24, 22)], Lt, k=0.8)
+    F.poly([(0, 14), (3, 20), (3, 31), (0, 31)], g); F.poly([(32, 14), (29, 20), (29, 31), (32, 31)], g)   # the cheek guards
+    F.line([(3, 20), (3, 31)], D); F.line([(28, 20), (28, 31)], D)
+    for f in ('left', 'right'):
+        F2 = fs[f]
+        F2.oval(11, 12, 21, 22, d); F2.oval(13, 14, 19, 20, D); F2.oval(15, 16, 17, 18, Lt)   # the ear's hub
+        F2.rect(4, 26, 28, 27, D)
+    F2 = fs['back']
+    for x in (8, 16, 24):
+        F2.rect(x - 1, 12, x, 24, D)                                                        # the vents of the neck
+    F2.rect(4, 27, 28, 28, D)
+    fs['top'].rect(13, 4, 18, 28, g); fs['top'].line([(13, 4), (13, 28)], Lt); fs['top'].line([(19, 4), (19, 28)], D)   # the crest
+    for F in fs.values():
+        F.shade(0.2); F.done()
+    # ---- the chest: two round reactors, black vents in the shoulders, a keel down the breast, a plated belly
+    fs = base(P['body'], 9, (23, 34), 0.2)
+    F = fs['front']
+    F.poly([(0, 0), (9, 0), (7, 6), (0, 8)], K); F.poly([(32, 0), (23, 0), (25, 6), (32, 8)], K)    # the shoulder vents
+    F.line([(0, 8), (7, 6), (9, 0)], Lt, k=0.8); F.line([(32, 8), (25, 6), (23, 0)], Lt, k=0.8)
+    for cx in (9, 23):
+        F.oval(cx - 7, 9, cx + 7, 23, D); F.oval(cx - 6, 10, cx + 6, 22, d)
+        F.oval(cx - 5, 11, cx + 5, 21, hx(0xFFC850)); F.oval(cx - 4, 12, cx + 4, 20, hx(0xFFE9A0)); F.oval(cx - 2, 14, cx + 2, 18, Lg)
+    F.rect(15, 0, 16, 23, d); F.line([(14, 0), (14, 23)], Lt, k=0.9)
+    for y in (26, 30):
+        F.line([(4, y), (28, y)], D); F.line([(4, y + 1), (28, y + 1)], Lt, k=0.85)
+    F.poly([(0, 24), (4, 24), (6, 34), (0, 34)], V); F.poly([(32, 24), (28, 24), (26, 34), (32, 34)], V)   # the waist's shadowed plates
+    F.rect(12, 36, 20, 40, D); F.rect(13, 37, 19, 39, g); F.rect(15, 41, 16, 47, D)         # the belt's block, the groin's split
+    F2 = fs['back']
+    F2.poly([(4, 2), (14, 2), (13, 20), (6, 18)], g); F2.poly([(28, 2), (18, 2), (19, 20), (26, 18)], g)   # the shoulder blades
+    F2.line([(4, 2), (14, 2)], Lt); F2.line([(18, 2), (28, 2)], Lt); F2.line([(6, 18), (13, 20)], D); F2.line([(26, 18), (19, 20)], D)
+    F2.rect(15, 0, 16, 34, D)
+    for cx in (9, 23):
+        F2.oval(cx - 4, 24, cx + 4, 32, D); F2.oval(cx - 3, 25, cx + 3, 31, K); F2.oval(cx - 1, 27, cx + 1, 29, hx(0xFFB040))   # the thrusters
+    for F in fs.values():
+        F.shade(0.16); F.done()
+    # ---- the arms: a great shoulder with its black slot, the elbow's joint, the gauntlet and its palm cannon
+    for name, seed, mirror in (('rarm', 17, False), ('larm', 23, True)):
+        fs = base(P[name], seed, (17, 26))
+        outer = fs['right' if not mirror else 'left']
+        outer.poly([(3, 3), (13, 3), (12, 12), (4, 12)], K); outer.line([(3, 13), (13, 13)], Lt, k=0.8)     # the shoulder's slot
+        for f in ('front', 'back', 'left', 'right'):
+            F = fs[f]
+            F.rect(0, 18, F.w, 24, d); F.rect(0, 20, F.w, 22, D)                           # the elbow
+            F.rect(0, 40, F.w, 47, D); F.line([(0, 40), (F.w, 40)], Lt, k=0.7)              # the hand
+            for x in range(2, F.w, 4):
+                F.rect(x, 42, x + 1, 46, d)
+        F = fs['front']
+        F.oval(4, 30, 12, 38, D); F.oval(5, 31, 11, 37, hx(0xFFD060)); F.oval(7, 33, 9, 35, Lg)   # the repulsor of the forearm
+        fs['bottom'].oval(3, 3, 13, 13, hx(0xFFE9A0)); fs['bottom'].oval(6, 6, 10, 10, Lg)
+        for F in fs.values():
+            F.shade(0.28); F.done()
+    # ---- the legs: the thigh's plate, the knee's cap, the shin, the heavy boot
+    for name, seed in (('rleg', 31), ('lleg', 37)):
+        fs = base(P[name], seed, (18, 26, 40))
+        for f in ('front', 'back', 'left', 'right'):
+            F = fs[f]
+            F.rect(0, 40, F.w, 47, d); F.rect(0, 45, F.w, 47, D)
+        F = fs['front']
+        F.oval(3, 17, 13, 27, d); F.oval(4, 18, 12, 26, G); F.oval(6, 20, 9, 23, Lt)        # the knee
+        F.poly([(5, 28), (11, 28), (10, 39), (6, 39)], g); F.line([(5, 28), (6, 39)], Lt, k=0.9); F.line([(11, 28), (10, 39)], D)
+        F.poly([(4, 2), (12, 2), (11, 15), (5, 15)], G); F.line([(4, 2), (5, 15)], Lt); F.line([(12, 2), (11, 15)], D)
+        for F in fs.values():
+            F.shade(0.28); F.done()
+    # ---- the second layer, standing off the body: the pauldrons, the collar round the helm, the chest's rim
+    for name, mirror in (('rsleeve', False), ('lsleeve', True)):
+        fs = faces_of(im, P[name])
+        fs['top'].fill(G); fs['top'].rect(2, 2, 13, 13, Lt, 0.92); fs['top'].rect(5, 5, 10, 10, K)
+        for f in ('front', 'back', 'left', 'right'):
+            F = fs[f]
+            F.rect(0, 0, F.w, 13, G); F.line([(0, 0), (F.w, 0)], Lt); F.rect(0, 12, F.w, 14, d)
+            F.shade(0.3)
+        outer = fs['right' if not mirror else 'left']
+        outer.poly([(3, 3), (13, 3), (12, 10), (4, 10)], K)
+        for f in ('front', 'back', 'left', 'right', 'top'):
+            fs[f].done()
+    fs = faces_of(im, P['jacket'], ('front', 'back', 'left', 'right'))
+    for f, F in fs.items():
+        F.rect(0, 0, F.w, 3, g); F.line([(0, 0), (F.w, 0)], Lt); F.line([(0, 4), (F.w, 4)], D)
+        F.done()
+    return im
+
+def cosmic_spider():
+    im = Image.new('RGBA', (64 * HD, 64 * HD), (0, 0, 0, 0))
+    P = hd_parts()
+    r = random.Random(170)
+    N0, N1 = hx(0x04050E), hx(0x10143A)
+    W, w2, w3, w4 = hx(0xFBFCFF), hx(0xDDE3EE), hx(0xB4BED0), hx(0x8490A8)
+    blue, blued, red, redd = hx(0x3AA8F4), hx(0x1E6EC8), hx(0xE02830), hx(0x7A0E16)
+    def night(F, seed, stars):
+        px = F.layer.load()
+        for y in range(F.h):
+            for x in range(F.w):
+                t = NEB(x * 0.06 + seed, y * 0.06 + seed * 2)
+                px[x, y] = mul(mix(N0, N1, t), F.light) + (255,)
+        for _ in range(stars):
+            x, y = r.randrange(F.w), r.randrange(F.h)
+            b = r.choice((0.5, 0.7, 1.0))
+            F.px(x, y, mix(N1, hx(0xFFFFFF), b))
+            if b == 1.0:
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    F.px(x + dx, y + dy, mix(N1, hx(0xBFD8FF), 0.55))
+    def white(F, x0, y0, x1, y1):
+        """The white of the Uni-Power's suit: bright, with soft grey modelling."""
+        for y in range(max(0, y0), min(F.h, y1)):
+            for x in range(max(0, x0), min(F.w, x1)):
+                t = (y - y0) / max(1, y1 - y0)
+                F.px(x, y, mix(W, w2, 0.55 * t))
+    def constellation(F, pts, links):
+        for a, b in links:
+            F.line([pts[a], pts[b]], hx(0xDCE8FF), 1)
+        for x, y in pts:
+            F.oval(x - 1, y - 1, x + 1, y + 1, hx(0xFFFFFF))
+    # ---- the head: night and stars, the great white eyes rimmed in blue, the red web over the mouth
+    fs = faces_of(im, P['head'])
+    for i, F in enumerate(fs.values()):
+        night(F, 3 + i, 26)
+    F = fs['front']
+    for sgn in (1, -1):
+        def mx(x):
+            return x if sgn == 1 else 31 - x
+        eye = [(mx(2), 11), (mx(6), 10), (mx(12), 15), (mx(12), 18), (mx(8), 19), (mx(4), 17)]
+        rim = [(mx(1), 9), (mx(7), 8), (mx(14), 14), (mx(14), 19), (mx(8), 21), (mx(2), 18)]
+        F.poly(rim, blue); F.poly(eye, W)
+        F.line([eye[0], eye[1]], w2)
+    F.poly([(12, 21), (20, 21), (22, 26), (19, 31), (13, 31), (10, 26)], red)                 # the web over the mouth and chin
+    for x in (13, 16, 19):
+        F.line([(16, 21), (x - 1 if x < 16 else x + 1 if x > 16 else 16, 31)], redd)
+    for y, half in ((24, 5), (28, 4)):
+        F.line([(16 - half, y), (16, y + 1), (16 + half, y)], redd)
+    F.line([(12, 21), (20, 21), (22, 26), (19, 31)], blued); F.line([(12, 21), (10, 26), (13, 31)], blued)
+    for f in ('front', 'left', 'right', 'back'):                                             # the blue line round the head's edge
+        fs[f].line([(0, 0), (fs[f].w - 1, 0)], blue, 1)
+    constellation(fs['top'], [(8, 8), (16, 5), (24, 9), (20, 18), (11, 20)], [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)])
+    for F in fs.values():
+        F.shade(0.14); F.done()
+    # ---- the body: night over the shoulders and breast; from the ribs down, white, rising to a point in the middle
+    fs = faces_of(im, P['body'])
+    for i, F in enumerate(fs.values()):
+        night(F, 11 + i, 30)
+    for f in ('front', 'back'):
+        F = fs[f]
+        edge = [(0, 22), (8, 20), (16, 14), (24, 20), (32, 22)]
+        F.poly(edge + [(32, 48), (0, 48)], W)
+        px = F.layer.load()
+        for y in range(14, 48):
+            for x in range(32):
+                if px[x, y][:3] == mul(W, F.light):
+                    t = (y - 14) / 34.0
+                    c = mix(W, w2, 0.5 * t)
+                    if x in (15, 16) and y > 26:
+                        c = w3                                                               # the line down the middle of the belly
+                    if abs(x - 16) in (7, 8) and 24 < y < 40:
+                        c = mix(c, w3, 0.5)                                                  # the ribs' shadow
+                    px[x, y] = mul(c, F.light) + (255,)
+        F.line(edge, blue, 2)
+        F.line([(4, 44), (16, 47), (28, 44)], w3)
+    for f in ('left', 'right'):
+        F = fs[f]
+        white(F, 0, 22, F.w, 48); F.line([(0, 22), (F.w, 22)], blue, 2)
+    constellation(fs['front'], [(4, 4), (11, 8), (16, 4), (21, 8), (28, 4), (16, 11)], [(0, 1), (1, 2), (2, 3), (3, 4), (1, 5), (3, 5)])
+    constellation(fs['back'], [(5, 5), (13, 9), (20, 5), (27, 10)], [(0, 1), (1, 2), (2, 3)])
+    fs['bottom'].fill(w3)
+    for F in fs.values():
+        F.shade(0.14); F.done()
+    # ---- the arms: night to below the elbow, then the white gloves, a blue line between
+    for name, seed in (('rarm', 23), ('larm', 29)):
+        fs = faces_of(im, P[name])
+        for i, F in enumerate(fs.values()):
+            night(F, seed + i, 14)
+        for f in ('front', 'back', 'left', 'right'):
+            F = fs[f]
+            white(F, 0, 27, F.w, 48); F.line([(0, 27), (F.w, 27)], blue, 2)
+            F.line([(0, 41), (F.w, 41)], w3)
+            for x in range(3, F.w, 4):
+                F.line([(x, 43), (x, 47)], w3)                                               # the fingers
+        constellation(fs['front'], [(4, 5), (11, 11), (6, 19)], [(0, 1), (1, 2)])
+        fs['bottom'].fill(w2)
+        for F in fs.values():
+            F.shade(0.24); F.done()
+    # ---- the legs: white all the way, the muscles' soft lines, the boots' soles
+    for name in ('rleg', 'lleg'):
+        fs = faces_of(im, P[name])
+        for f, F in fs.items():
+            white(F, 0, 0, F.w, F.h)
+            if f in ('front', 'back'):
+                F.line([(7, 4), (8, 20)], w3); F.line([(4, 22), (11, 22)], w3); F.line([(8, 26), (8, 40)], w3)
+            if f not in ('top', 'bottom'):
+                F.rect(0, 44, F.w, 47, w3); F.line([(0, 44), (F.w, 44)], w4)
+        fs['bottom'].fill(w4)
+        for F in fs.values():
+            F.shade(0.26); F.done()
+    return im
+
+def tommy_ultimate():
+    """The comics' Speed: a dark green suit with the lighter green bolt on its chest and pale sleeves, spiky white hair,
+    silver goggles with yellow lenses."""
+    im = Image.new('RGBA', (64 * HD, 64 * HD), (0, 0, 0, 0))
+    P = hd_parts()
+    Gd, Gm, Gl, Gp = hx(0x103A2A), hx(0x1C5A40), hx(0x4FC890), hx(0xBDF2D6)
+    Gk = hx(0x08241A)
+    skin, skin2, skin3 = hx(0xF2CDB0), hx(0xDDB092), hx(0xBE8A6E)
+    hair, hair2, hair3 = hx(0xFAFCFF), hx(0xD8E2EE), hx(0xA8B6C8)
+    silver, silver2, lens, lens2 = hx(0xD8DEE8), hx(0x8E98A8), hx(0xF2E85A), hx(0xFFFAB0)
+    # ---- the head: the face, the goggles, white hair swept up in spikes
+    fs = faces_of(im, P['head'])
+    for f, F in fs.items():
+        F.fill(hair if f != 'bottom' else skin2)
+    F = fs['front']
+    F.rect(0, 9, 32, 32, skin)
+    F.poly([(0, 0), (32, 0), (32, 10), (28, 7), (25, 12), (21, 6), (17, 11), (13, 5), (9, 11), (5, 7), (0, 12)], hair)   # the fringe's spikes
+    for x in (5, 13, 21, 28):
+        F.line([(x, 2), (x - 1, 8)], hair2)
+    F.rect(1, 13, 31, 20, silver2)                                                           # the goggles' strap and frame
+    for x0 in (3, 18):
+        F.poly([(x0, 13), (x0 + 11, 13), (x0 + 11, 19), (x0 + 9, 21), (x0 + 2, 21), (x0, 19)], silver)
+        F.poly([(x0 + 1, 14), (x0 + 10, 14), (x0 + 10, 18), (x0 + 8, 20), (x0 + 3, 20), (x0 + 1, 18)], lens)
+        F.line([(x0 + 2, 15), (x0 + 6, 15)], lens2, 1); F.px(x0 + 6, 17, hx(0x5A4A20)); F.px(x0 + 5, 17, hx(0x5A4A20))
+    F.rect(14, 15, 17, 17, silver)
+    F.line([(15, 21), (15, 25), (17, 25)], skin3)                                            # the nose
+    F.rect(11, 27, 21, 29, hx(0xFFFFFF)); F.line([(11, 28), (21, 28)], skin3); F.line([(11, 27), (21, 27)], skin3)   # the gritted teeth
+    for x in (14, 17):
+        F.line([(x, 27), (x, 29)], skin3)
+    F.line([(0, 22), (0, 31)], skin2); F.line([(31, 22), (31, 31)], skin2); F.line([(4, 31), (27, 31)], skin2)
+    for f in ('left', 'right'):
+        F2 = fs[f]
+        front_x = (20, 32) if f == 'right' else (0, 12)
+        F2.rect(front_x[0], 12, front_x[1], 32, skin)
+        F2.rect(0, 14, 32, 18, silver2); F2.line([(0, 14), (32, 14)], silver)
+        ex = 22 if f == 'right' else 6
+        F2.oval(ex, 19, ex + 5, 25, skin2)                                                   # the ear
+        for x in range(2, 30, 6):
+            F2.line([(x, 2), (x + 2, 11)], hair2)
+    F2 = fs['back']
+    F2.rect(0, 14, 32, 18, silver2)
+    for x in range(3, 30, 5):
+        F2.line([(x, 2), (x + 1, 26)], hair2)
+    F2.rect(0, 27, 32, 32, hair3)
+    for x in range(3, 30, 6):
+        fs['top'].line([(x, 3), (x + 3, 28)], hair2)
+    for F in fs.values():
+        F.shade(0.12); F.done()
+    # (the second layer: the hair standing up in spikes off the head)
+    hs = faces_of(im, P['hat'], ('front', 'back', 'left', 'right', 'top'))
+    hs['top'].fill(hair)
+    for x in range(2, 30, 5):
+        hs['top'].line([(x, 4), (x + 3, 27)], hair2)
+    for f in ('front', 'back', 'left', 'right'):
+        F = hs[f]
+        pts = [(0, 0), (F.w, 0)]
+        tips = [(F.w, 6 if f != 'front' else 4)]
+        for i in range(6, -1, -1):
+            x = int(i * F.w / 6)
+            tips.append((x, (9 if f != 'front' else 6) if i % 2 else 3))
+        F.poly(pts + tips, hair)
+        for i in range(1, 6, 2):
+            x = int(i * F.w / 6)
+            F.line([(x, 0), (x, 5)], hair2)
+        F.done()
+    hs['top'].done()
+    # ---- the body: dark green, the lighter bolt on the chest
+    fs = faces_of(im, P['body'])
+    for f, F in fs.items():
+        F.fill(Gd if f != 'bottom' else Gk)
+    F = fs['front']
+    F.poly([(10, 0), (22, 0), (20, 6), (16, 9), (12, 6)], skin2)                              # the open collar's throat
+    F.poly([(4, 0), (10, 0), (12, 6), (16, 9), (20, 6), (22, 0), (28, 0), (30, 4), (21, 14), (25, 14), (14, 34), (17, 20), (11, 20)], Gl)   # the bolt
+    F.line([(4, 0), (10, 0), (12, 6), (16, 9), (20, 6), (22, 0), (28, 0)], Gp)
+    F.line([(30, 4), (21, 14), (25, 14), (14, 34)], Gm); F.line([(11, 20), (17, 20)], Gp)
+    F.line([(8, 30), (8, 46)], Gm); F.line([(24, 30), (24, 46)], Gm); F.rect(0, 38, 32, 40, Gk); F.rect(13, 37, 19, 41, Gm)   # the seams, the belt
+    F2 = fs['back']
+    F2.line([(16, 2), (16, 36)], Gk); F2.poly([(6, 0), (26, 0), (20, 8), (12, 8)], Gm); F2.rect(0, 38, 32, 40, Gk)
+    for f in ('left', 'right'):
+        fs[f].rect(0, 38, fs[f].w, 40, Gk); fs[f].line([(8, 4), (8, 36)], Gm)
+    fs['top'].fill(Gm)
+    for F in fs.values():
+        F.shade(0.18); F.done()
+    # ---- the arms: the pale sleeves of the picture, darker at the shoulder, the gloves' cuffs
+    for name in ('rarm', 'larm'):
+        fs = faces_of(im, P[name])
+        for f, F in fs.items():
+            F.fill(Gl)
+            if f in ('top', 'bottom'):
+                F.fill(Gd if f == 'top' else Gp)
+                continue
+            F.rect(0, 0, F.w, 7, Gd); F.poly([(0, 7), (F.w, 7), (F.w // 2, 13)], Gd)          # the shoulder's point
+            F.line([(0, 7), (F.w // 2, 13), (F.w, 7)], Gm)
+            px = F.layer.load()
+            for y in range(14, 48):
+                for x in range(F.w):
+                    px[x, y] = mul(mix(Gl, Gp, (y - 14) / 34.0), F.light) + (255,)
+            F.rect(0, 32, F.w, 34, Gm); F.line([(0, 31), (F.w, 31)], Gp)                      # the glove's cuff
+            for x in range(3, F.w, 4):
+                F.line([(x, 43), (x, 47)], Gl)
+        for F in fs.values():
+            F.shade(0.26); F.done()
+    # ---- the legs: dark green, a lighter flash down the outside, pale boots
+    for name, mirror in (('rleg', False), ('lleg', True)):
+        fs = faces_of(im, P[name])
+        for f, F in fs.items():
+            F.fill(Gd if f != 'bottom' else Gp)
+            if f in ('top', 'bottom'):
+                continue
+            F.rect(0, 34, F.w, 48, Gl); F.poly([(0, 34), (F.w, 34), (F.w // 2, 29)], Gl); F.line([(0, 34), (F.w // 2, 29), (F.w, 34)], Gp)
+            F.rect(0, 45, F.w, 47, Gm)
+            if f in ('front', 'back'):
+                F.line([(8, 2), (8, 26)], Gm)
+        outer = fs['right' if not mirror else 'left']
+        outer.poly([(6, 0), (10, 0), (9, 28), (7, 28)], Gl)
+        for F in fs.values():
+            F.shade(0.26); F.done()
+    return im
+
+def tommy_visionquest():
+    """Tommy as the VisionQuest picture shows him from the chest up: short dark brown hair, a worn grey-green denim jacket
+    with its collar, a cream T-shirt. (The picture ends at the chest: the dark jeans and shoes are plain guesses.)"""
+    im = Image.new('RGBA', (64 * HD, 64 * HD), (0, 0, 0, 0))
+    P = hd_parts()
+    n = vnoise(88)
+    skin, skin2, skin3 = hx(0xE8C0A2), hx(0xCFA284), hx(0xA87A62)
+    hair, hair2, hair3 = hx(0x33241A), hx(0x4A3626), hx(0x21160F)
+    J, J2, J3, Jl = hx(0x55605A), hx(0x424C47), hx(0x2E3632), hx(0x76827A)
+    tee, tee2 = hx(0xE6DFCC), hx(0xC8C0AA)
+    jean, jean2, jean3 = hx(0x232C3C), hx(0x18202C), hx(0x34405A)
+    shoe, sole = hx(0x1A1816), hx(0x3A3632)
+    def cloth(F, a, b, seed, x0=0, y0=0, x1=None, y1=None):
+        px = F.layer.load()
+        for y in range(y0, F.h if y1 is None else y1):
+            for x in range(x0, F.w if x1 is None else x1):
+                t = 0.5 + 0.9 * (n(x * 0.35 + seed, y * 0.18 + seed) - 0.5)
+                px[x, y] = mul(mix(b, a, max(0.0, min(1.0, t))), F.light) + (255,)
+    # ---- the head
+    fs = faces_of(im, P['head'])
+    for f, F in fs.items():
+        F.fill(hair if f != 'bottom' else skin2)
+    F = fs['front']
+    F.rect(0, 8, 32, 32, skin)
+    F.poly([(0, 0), (32, 0), (32, 12), (29, 9), (24, 8), (18, 9), (12, 7), (6, 8), (2, 10), (0, 13)], hair)        # the short fringe, brushed up
+    for x in (4, 10, 17, 24):
+        F.line([(x, 1), (x + 2, 7)], hair2)
+    for x0 in (5, 19):
+        F.line([(x0, 14), (x0 + 8, 14)], hair3, 2)                                            # the brows
+        F.rect(x0 + 1, 17, x0 + 7, 19, hx(0xF4F1EC)); F.rect(x0 + 3, 17, x0 + 5, 19, hx(0x4A6A7A)); F.px(x0 + 4, 18, hx(0x101418))
+        F.line([(x0 + 1, 16), (x0 + 7, 16)], skin3)
+    F.line([(15, 18), (15, 23), (17, 24)], skin3); F.line([(14, 24), (17, 24)], skin2)        # the nose
+    F.line([(12, 27), (20, 27)], hx(0x9A5A52)); F.line([(13, 28), (19, 28)], skin2)           # the mouth
+    F.line([(0, 14), (0, 31)], skin2); F.line([(31, 14), (31, 31)], skin2); F.line([(6, 31), (25, 31)], skin2)
+    for x in range(4, 28, 3):
+        F.px(x, 29, skin2)                                                                    # a little stubble
+    for f in ('left', 'right'):
+        F2 = fs[f]
+        front_x = (18, 32) if f == 'right' else (0, 14)
+        F2.rect(front_x[0], 13, front_x[1], 32, skin)
+        ex = 20 if f == 'right' else 7
+        F2.oval(ex, 16, ex + 5, 23, skin2)
+        for x in range(2, 30, 5):
+            F2.line([(x, 1), (x + 1, 10)], hair2)
+    for x in range(3, 30, 5):
+        fs['back'].line([(x, 1), (x, 24)], hair2)
+    fs['back'].rect(8, 28, 24, 32, skin2)
+    for x in range(3, 30, 5):
+        fs['top'].line([(x, 3), (x + 2, 28)], hair2)
+    for F in fs.values():
+        F.shade(0.12); F.done()
+    hs = faces_of(im, P['hat'], ('front', 'top'))
+    hs['top'].fill(hair)
+    for x in range(3, 30, 5):
+        hs['top'].line([(x, 4), (x + 2, 27)], hair2)
+    hs['front'].poly([(0, 0), (32, 0), (32, 7), (26, 5), (19, 7), (12, 4), (5, 6), (0, 8)], hair)
+    hs['front'].done(); hs['top'].done()
+    # ---- the body: the cream T-shirt between the jacket's open fronts, the collar, the pockets
+    fs = faces_of(im, P['body'])
+    for i, (f, F) in enumerate(fs.items()):
+        cloth(F, J, J2, 5 + i)
+    F = fs['front']
+    F.poly([(10, 0), (22, 0), (20, 40), (12, 40)], tee)
+    F.poly([(12, 0), (20, 0), (16, 5)], skin2)                                                # the throat
+    F.line([(12, 0), (16, 5), (20, 0)], tee2, 1)
+    for y in (16, 28):
+        F.line([(13, y), (19, y + 1)], tee2)                                                  # the shirt's folds
+    F.poly([(4, 0), (11, 0), (12, 12), (8, 9)], Jl); F.poly([(28, 0), (21, 0), (20, 12), (24, 9)], Jl)   # the collar's points
+    F.line([(4, 0), (8, 9), (12, 12)], J3); F.line([(28, 0), (24, 9), (20, 12)], J3)
+    F.line([(11, 12), (12, 40)], J3, 1); F.line([(21, 12), (20, 40)], J3, 1)                  # the open fronts' edges
+    for x0 in (2, 22):
+        F.rect(x0, 16, x0 + 7, 24, J2); F.line([(x0, 16), (x0 + 7, 16)], Jl); F.poly([(x0, 16), (x0 + 7, 16), (x0 + 3, 20)], J3)   # the chest pockets
+        F.px(x0 + 3, 18, hx(0xB0A890))
+    for x in (9, 23):
+        for y in range(14, 40, 6):
+            F.px(x, y, hx(0xB0A890))                                                          # the buttons
+    F.rect(0, 40, 32, 42, J3); F.rect(0, 42, 32, 48, jean)
+    F2 = fs['back']
+    F2.line([(4, 10), (28, 10)], J3); F2.line([(16, 10), (16, 40)], J3); F2.rect(4, 0, 28, 3, Jl); F2.rect(0, 40, 32, 42, J3); F2.rect(0, 42, 32, 48, jean)
+    for f in ('left', 'right'):
+        fs[f].rect(0, 40, fs[f].w, 42, J3); fs[f].rect(0, 42, fs[f].w, 48, jean); fs[f].line([(8, 6), (8, 40)], J3)
+    fs['top'].fill(J)
+    for F in fs.values():
+        F.shade(0.18); F.done()
+    # ---- the arms: the jacket's sleeves, their seams and cuffs, the hands
+    for k, name in enumerate(('rarm', 'larm')):
+        fs = faces_of(im, P[name])
+        for i, (f, F) in enumerate(fs.items()):
+            cloth(F, J, J2, 21 + k * 7 + i)
+            if f == 'bottom':
+                F.fill(skin2)
+            if f in ('top', 'bottom'):
+                continue
+            F.line([(0, 6), (F.w, 6)], J3)
+            for y in (18, 27):
+                F.line([(1, y), (F.w - 2, y + 1)], J2)                                        # the elbow's creases
+            F.rect(0, 36, F.w, 39, J3); F.line([(0, 36), (F.w, 36)], Jl)
+            F.rect(0, 40, F.w, 48, skin)
+            for x in range(3, F.w, 4):
+                F.line([(x, 44), (x, 47)], skin2)
+        for F in fs.values():
+            F.shade(0.26); F.done()
+    # ---- the legs (not in the picture): plain dark jeans, dark shoes
+    for k, name in enumerate(('rleg', 'lleg')):
+        fs = faces_of(im, P[name])
+        for i, (f, F) in enumerate(fs.items()):
+            cloth(F, jean3, jean2, 41 + k * 5 + i)
+            if f == 'bottom':
+                F.fill(sole)
+            if f in ('top', 'bottom'):
+                continue
+            F.line([(8, 0), (8, 40)], jean2)
+            F.line([(2, 22), (13, 23)], jean2)
+            F.rect(0, 40, F.w, 48, shoe); F.rect(0, 46, F.w, 48, sole); F.line([(0, 40), (F.w, 40)], jean2)
+        for F in fs.values():
+            F.shade(0.26); F.done()
+    return im
+
 if __name__ == '__main__':
     out = sys.argv[1] if len(sys.argv) > 1 else SUIT
     nexus(True).save(out + 'scarlet_witch_nexus.png')
@@ -786,6 +1312,8 @@ if __name__ == '__main__':
     cloak().save(out + 'billy_demiurge_cloak.png')
     cosmic_spider().save(out + 'spider_man_cosmic.png')
     godkiller().save(out + 'iron_man_godkiller.png')
+    tommy_ultimate().save(out + 'tommy_ultimate.png')
+    tommy_visionquest().save(out + 'tommy_visionquest.png')
     molten().save(out + 'vision_molten.png')
     for i in range(4):
         cracks(i).save(out + 'vision_molten_cracks_%d.png' % i)

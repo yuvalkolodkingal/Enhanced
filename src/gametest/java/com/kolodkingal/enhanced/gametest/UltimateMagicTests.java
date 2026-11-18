@@ -235,10 +235,15 @@ public final class UltimateMagicTests {
             check(com.kolodkingal.enhanced.ultimate.BespokeForms.flightFactor(hero) == 1.0F
                     && com.kolodkingal.enhanced.ultimate.BespokeForms.runHunger(hero) == 1.0F
                     && !com.kolodkingal.enhanced.ultimate.BespokeForms.flies(hero)
-                    && !com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(hero), "nothing of the forms on " + Powers.power(hero));
+                    && !com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(hero)
+                    && !com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(hero.damageSources().playerAttack(hero)),
+                    "nothing of the forms on " + Powers.power(hero));
             check(Powers.get(hero).acting() == Powers.power(hero) && Powers.get(hero).borrowed() == Power.NONE, "his keys are his own");
         }
         check(!Magic.isDemiurge(billy) && !Magic.mindscapeOpen(billy), "Billy is Billy: no Demiurge, no Mindscape");
+        // (Tommy's one new look is there to choose; the look he starts in is the one he always started in)
+        check("halloween".equals(com.kolodkingal.enhanced.power.Variants.get(Power.TOMMY, "").id()), "Tommy's default look is unchanged");
+        check("visionquest".equals(com.kolodkingal.enhanced.power.Variants.get(Power.TOMMY, "visionquest").id()), "and VisionQuest is a look of his");
         check(Magic.isCaster(witch) && Magic.knows(witch, Spell.VINE_SNARE), "a witch is a witch with the mode off too");
         Ultimate.set(true);
         check(Magic.isCaster(billy) && Magic.isCaster(strange) && Magic.isCaster(wanda), "on: the Demiurge and the hero sorcerers cast");
@@ -318,8 +323,10 @@ public final class UltimateMagicTests {
             var dark = com.kolodkingal.enhanced.registry.ModDamageTypes.source(spider.level(), com.kolodkingal.enhanced.registry.ModDamageTypes.DARK_SPELL, null, null);
             check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(spider, dark) == 1.5F, "dark magic hurts him half as much again");
             // the Godkiller
-            check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) == 16.0, "the Godkiller's size: "
-                    + tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE));
+            double scale = tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE);
+            check(Math.abs(scale * 1.8 - 65.0) < 0.01, "the Godkiller stands 65 blocks tall: " + scale * 1.8 + " (scale " + scale + ")");
+            check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ENTITY_INTERACTION_RANGE) >= 65.0,
+                    "and reaches what stands under his feet");
             check(tony.getArmorValue() >= 24, "more than Netherite: " + tony.getArmorValue());
             check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, tony.damageSources().generic()) < 1.0F
                     && com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, dark) > 1.0F, "blows glance off; magic bites a little more");
@@ -329,16 +336,31 @@ public final class UltimateMagicTests {
             check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tommy, dark) == 0.6F, "spells hurt him less");
             check(com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(tommy) && com.kolodkingal.enhanced.ultimate.BespokeForms.runHunger(tommy) == 0.0F,
                     "time's powers pass him by, his running costs no hunger");
+            // through magic shields: his blows, nobody else's
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(tommy.damageSources().playerAttack(tommy))
+                    && !com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(spider.damageSources().playerAttack(spider)),
+                    "Ultimate Tommy's blows go through magic shields");
+            ServerPlayer wanda = f.player(8.5, FLOOR, 3.5, Power.SCARLET_WITCH);
+            com.kolodkingal.enhanced.hex.Hex hex = com.kolodkingal.enhanced.hex.HexManager.create(wanda);
+            check(com.kolodkingal.enhanced.hex.HexManager.judge(hex, tommy) == com.kolodkingal.enhanced.hex.HexManager.Verdict.PASS
+                    && com.kolodkingal.enhanced.hex.HexManager.judge(hex, tommy, true) == com.kolodkingal.enhanced.hex.HexManager.Verdict.PASS,
+                    "and he passes through the Hex, in and out");
+            check(com.kolodkingal.enhanced.hex.HexManager.judge(hex, tony) != com.kolodkingal.enhanced.hex.HexManager.Verdict.PASS,
+                    "which still stops another hero");
+            com.kolodkingal.enhanced.hex.HexManager.dissolve(wanda.serverLevel(), hex);
+            // Cosmic Spider-Man leaves his form with Sneak + the key
+            UltimateForms.key(spider, true);
+            check(!com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(spider) && !UltimateForms.active(spider), "Sneak + the key: Spider-Man again");
             Powers.get(tommy).setSlowMo(true);
-            check(com.kolodkingal.enhanced.ultimate.BespokeForms.slowedByTommy(spider) || spider.isCreative(), "his speed slows the whole world's players");
-            check(com.kolodkingal.enhanced.ultimate.BespokeForms.flightFactor(spider) < 0.5F || spider.isCreative(), "their flight too");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.slowedByTommy(tony) || tony.isCreative(), "his speed slows the whole world's players");
+            check(com.kolodkingal.enhanced.ultimate.BespokeForms.flightFactor(tony) < 0.5F || tony.isCreative(), "their flight too");
             check(!com.kolodkingal.enhanced.ultimate.BespokeForms.slowedByTommy(tommy), "not him");
             Powers.get(tommy).setSlowMo(false);
             for (ServerPlayer p : all) {
                 UltimateForms.end(p, false);
                 com.kolodkingal.enhanced.ultimate.BespokeForms.tick(p);
             }
-            check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) == 1.0 && spider.getArmorValue() < 20,
+            check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) == 1.0 && tommy.getArmorValue() < 20,
                     "the forms end: their bodies are their own again");
             helper.succeed();
         });

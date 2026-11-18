@@ -217,6 +217,7 @@ public final class MindTour {
         server(p -> {
             p.server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "time set noon");
             p.server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "weather clear");
+            p.server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "gamerule doMobSpawning false");
             com.kolodkingal.enhanced.ultimate.Ultimate.set(Boolean.FALSE);
         }, 20);
         // ---- Ultimate Mode off: the heroes as they were ----
@@ -232,6 +233,13 @@ public final class MindTour {
         become(Power.VISION, "source_code", true);
         portrait("u05_off_source_code_flying_front", CameraType.THIRD_PERSON_FRONT, true);
         portrait("u06_off_source_code_flying_back", CameraType.THIRD_PERSON_BACK, true);
+        // (3.17) Tommy's default look as ever, and his new one to choose
+        become(Power.TOMMY, "", false);
+        portrait("u07_off_tommy_default_front", CameraType.THIRD_PERSON_FRONT, true);
+        become(Power.TOMMY, "visionquest", false);
+        portrait("u08_off_tommy_visionquest_front", CameraType.THIRD_PERSON_FRONT, false);
+        portrait("u09_off_tommy_visionquest_back", CameraType.THIRD_PERSON_BACK, false);
+        become(Power.VISION, "source_code", true);
         // ---- Ultimate Mode on ----
         server(p -> {
             com.kolodkingal.enhanced.ultimate.Ultimate.set(Boolean.TRUE);
@@ -349,6 +357,9 @@ public final class MindTour {
         portrait("u60_cosmic_spider_front", CameraType.THIRD_PERSON_FRONT, false);
         portrait("u61_cosmic_spider_back", CameraType.THIRD_PERSON_BACK, false);
         portrait("u62_cosmic_spider_hud", CameraType.THIRD_PERSON_BACK, true);
+        client(() -> Minecraft.getInstance().options.fov().set(30), 4);
+        portrait("u65_cosmic_spider_close", CameraType.THIRD_PERSON_FRONT, false);
+        client(() -> Minecraft.getInstance().options.fov().set(40), 4);
         server(p -> {
             p.getAbilities().flying = true;
             p.onUpdateAbilities();
@@ -368,22 +379,77 @@ public final class MindTour {
         server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Cosmic Spider-Man: armour {}, attack {}, Uni-Power {}, flies {}",
                 p.getArmorValue(), p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
                 com.kolodkingal.enhanced.ultimate.BespokeForms.cosmicEnergy(p), com.kolodkingal.enhanced.ultimate.BespokeForms.flies(p)), 10);
-        // the Godkiller
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, true), 20);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Sneak + the key: Cosmic Spider-Man still {}, Uni-Power {}",
+                com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(p), com.kolodkingal.enhanced.ultimate.BespokeForms.cosmicEnergy(p)), 10);
+        // the Godkiller: 65 blocks tall, with villagers, an iron golem and a marked pillar of 65 blocks beside him for scale
+        client(() -> Minecraft.getInstance().options.renderDistance().set(16), 4);
         become(Power.IRON_MAN, "", false);
+        server(p -> {
+            p.setGameMode(GameType.SURVIVAL);
+            p.getInventory().clearContent();
+            p.setXRot(18.0F);
+            net.minecraft.core.BlockPos foot = p.blockPosition().offset(14, 0, 2);
+            for (int y = 0; y < 65; y++) {
+                p.level().setBlockAndUpdate(foot.above(y), (y / 5 % 2 == 0 ? net.minecraft.world.level.block.Blocks.RED_CONCRETE
+                        : net.minecraft.world.level.block.Blocks.WHITE_CONCRETE).defaultBlockState());
+            }
+            for (int i = 0; i < 6; i++) {
+                net.minecraft.world.entity.Mob mob = (i == 0 ? net.minecraft.world.entity.EntityType.IRON_GOLEM
+                        : net.minecraft.world.entity.EntityType.VILLAGER).create(p.level());
+                if (mob != null) {
+                    mob.moveTo(p.getX() + 9 + i * 1.5, p.getY(), p.getZ() + 6, 0.0F, 0.0F);
+                    mob.setNoAi(true);
+                    p.level().addFreshEntity(mob);
+                }
+            }
+        }, 20);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 80);
-        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: the Godkiller: {} blocks tall, {} wide, armour {}, scale {}",
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: the Godkiller: {} blocks tall, {} wide, armour {}, scale {}, reach {}, health {}",
                 p.getBbHeight(), p.getBbWidth(), p.getArmorValue(),
-                p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE)), 10);
+                p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE),
+                p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ENTITY_INTERACTION_RANGE), p.getHealth()), 10);
+        // struck high on the body by an arrow shot at his chest, 40 blocks up; and his stamp on what stands under his feet
+        server(p -> {
+            net.minecraft.world.entity.Mob zombie = net.minecraft.world.entity.EntityType.ZOMBIE.create(p.level());
+            if (zombie != null) {
+                zombie.moveTo(p.getX() + 2, p.getY(), p.getZ() + 2, 0.0F, 0.0F);
+                zombie.setNoAi(true);
+                zombie.addTag("enhanced_tour_under");
+                p.level().addFreshEntity(zombie);
+            }
+            float before = p.getHealth();
+            boolean struck = p.hurt(p.damageSources().generic(), 4.0F);
+            var box = p.getBoundingBox();
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: the Godkiller's body is {} to {} high; a point 40 blocks up his chest is inside it: {}; hurt {} ({} to {})",
+                    box.minY, box.maxY, box.contains(p.getX(), p.getY() + 40.0, p.getZ()), struck, before, p.getHealth());
+        }, 10);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, true), 20);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: after the stamp, the zombies under his feet alive: {}",
+                p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, p.getBoundingBox().inflate(8),
+                        e -> e.getTags().contains("enhanced_tour_under") && e.isAlive()).size()), 40);
+        client(() -> Minecraft.getInstance().options.fov().set(70), 200);
         portrait("u70_godkiller_front", CameraType.THIRD_PERSON_FRONT, false);
+        client(() -> Minecraft.getInstance().options.fov().set(30), 4);
+        portrait("u73_godkiller_close", CameraType.THIRD_PERSON_FRONT, false);
+        client(() -> Minecraft.getInstance().options.fov().set(70), 4);
         portrait("u71_godkiller_back", CameraType.THIRD_PERSON_BACK, false);
-        client(() -> Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_FRONT), 6);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 6);
         shot("u72_godkiller_cannons", 6);
         // Ultimate Tommy
         become(Power.TOMMY, "", false);
         client(() -> Minecraft.getInstance().options.fov().set(60), 4);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 70);
+        client(() -> { Minecraft.getInstance().options.renderDistance().set(6); Minecraft.getInstance().options.fov().set(40); }, 4);
         portrait("u80_ultimate_tommy_front", CameraType.THIRD_PERSON_FRONT, false);
+        portrait("u82_ultimate_tommy_back", CameraType.THIRD_PERSON_BACK, false);
+        // his speed on (G): the trail of green and light pink-purple as he runs
+        server(p -> p.setGameMode(GameType.SURVIVAL), 10);
+        client(() -> { Minecraft mc = Minecraft.getInstance(); mc.options.keyUp.setDown(true); mc.options.keySprint.setDown(true); }, 30);
+        shot("u83_ultimate_tommy_running", 6);
+        client(() -> { Minecraft mc = Minecraft.getInstance(); mc.options.keyUp.setDown(false); mc.options.keySprint.setDown(false); }, 20);
+        server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Ultimate Tommy: super speed {}, through shields {}",
+                Powers.get(p).superSpeed(), com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(p.damageSources().playerAttack(p))), 10);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 16);
         portrait("u81_ultimate_tommy_tornado", CameraType.THIRD_PERSON_BACK, false);
         server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Ultimate Tommy: armour {}, time-proof {}",

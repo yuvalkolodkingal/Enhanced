@@ -27,6 +27,9 @@ public final class TonyGlow {
     /** The reactor's glow for this Iron Man right now, or null. */
     @Nullable
     public static RenderType eyes(AbstractClientPlayer player, PowerData data) {
+        if (com.kolodkingal.enhanced.ultimate.BespokeForms.godkiller(player)) {
+            return null; // (3.17, Ultimate Mode: the Godkiller's body has reactors of its own; Tony's chest does not glow through it)
+        }
         Variant look = Variants.current(data);
         if (look.ownSkin()) {
             return null;
