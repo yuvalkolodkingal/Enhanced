@@ -57,6 +57,10 @@ public final class ModNetwork {
         registrar.serverbound(com.kolodkingal.enhanced.config.core.ConfigEditPayload.TYPE,
                 com.kolodkingal.enhanced.config.core.ConfigEditPayload.STREAM_CODEC,
                 com.kolodkingal.enhanced.config.core.ConfigEditPayload::handle);
+        // Spellbooks: the Ethereal witch's hat (its colour, off and on) and giving the book up, from her hat's screen
+        registrar.serverbound(com.kolodkingal.enhanced.spellbook.SpellbookHatPayload.TYPE,
+                com.kolodkingal.enhanced.spellbook.SpellbookHatPayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.spellbook.SpellbookHatPayload::handle);
         registrar.clientbound(ThorFxPayload.TYPE, ThorFxPayload.STREAM_CODEC, ThorFxPayload::handle);
         registrar.clientbound(HexBoltPayload.TYPE, HexBoltPayload.STREAM_CODEC, HexBoltPayload::handle);
         registrar.clientbound(OpenRoadPayload.TYPE, OpenRoadPayload.STREAM_CODEC, OpenRoadPayload::handle);

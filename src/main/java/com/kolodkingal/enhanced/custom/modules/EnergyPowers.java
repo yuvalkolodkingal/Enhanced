@@ -248,6 +248,10 @@ public final class EnergyPowers {
                 return;
             }
             ServerPlayer p = c.player;
+            if (c.option("orb")) {
+                com.kolodkingal.enhanced.spellbook.SpellMagic.orb(c); // (the spellbooks' Ethereal Orb)
+                return;
+            }
             if (c.option("ward")) {
                 WARDS.put(p.getUUID(), new Ward(c.level(), p.position(), c.v(ModuleStats.WARD_RADIUS), c.now() + c.ticks(ModuleStats.WARD_TIME), c.color()));
                 c.sound(ModSounds.CUSTOM_SPELL.get(), 1.0F, 1.0F);
@@ -299,6 +303,7 @@ public final class EnergyPowers {
 
         @Override
         public void tick(Ctx c) {
+            com.kolodkingal.enhanced.spellbook.SpellShots.tick(c.player, com.kolodkingal.enhanced.spellbook.SpellShots.Kind.ORB);
             Ward ward = WARDS.get(c.player.getUUID());
             if (ward == null) {
                 return;
@@ -329,16 +334,19 @@ public final class EnergyPowers {
         @Override
         public void end(Ctx c) {
             WARDS.remove(c.player.getUUID());
+            com.kolodkingal.enhanced.spellbook.SpellShots.forget(c.player.getUUID(), com.kolodkingal.enhanced.spellbook.SpellShots.Kind.ORB);
         }
 
         @Override
         public void forget(ServerPlayer player) {
             WARDS.remove(player.getUUID());
+            com.kolodkingal.enhanced.spellbook.SpellShots.forget(player.getUUID());
         }
 
         @Override
         public void clear() {
             WARDS.clear();
+            com.kolodkingal.enhanced.spellbook.SpellShots.clear();
         }
     }
 

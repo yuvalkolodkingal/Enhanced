@@ -96,6 +96,8 @@ public final class EnhancedCommand {
                                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
                                                 Arrays.stream(Power.values()).flatMap(p -> lookIds(p).stream()).distinct(), builder))
                                         .executes(EnhancedCommand::look))))
+                // Spellbooks: make players a book's caster, or give it up
+                .then(com.kolodkingal.enhanced.spellbook.SpellbookCommand.node())
                 // (3.16) SMP Balance Mode: how strong every power is, for everyone on the server
                 .then(com.kolodkingal.enhanced.balance.BalanceCommand.node())
                 // 3.17: every server setting, read and changed from inside the game

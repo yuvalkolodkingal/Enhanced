@@ -300,6 +300,19 @@ public final class ModuleStats {
     public static final Stat UPDRAFT_COOLDOWN = s("cooldown", 80, 30, Kind.COOLDOWN);
     public static final Stat FALL_GUARD = s("fall", 0.3F, 0.9F, Kind.PERCENT);
 
+    // ---- the spellbooks' magic: the Ethereal Orb (Magic "orb"), the thrown earth and the earth wall (Earth), Nature ----
+    public static final Stat ORB_DAMAGE = s("damage", 4, 14, Kind.DAMAGE);
+    public static final Stat ORB_RADIUS = s("radius", 1.5F, 3.5F, Kind.BLOCKS);
+    public static final Stat ORB_COOLDOWN = s("cooldown", 40, 14, Kind.COOLDOWN);
+    public static final Stat THROW_DAMAGE = s("damage", 3, 10, Kind.DAMAGE);
+    public static final Stat THROW_KNOCKBACK = s("knockback", 0.8F, 2.2F, Kind.NUMBER);
+    public static final Stat THROW_COOLDOWN = s("cooldown", 30, 10, Kind.COOLDOWN);
+    public static final Stat WALL_LENGTH = s("distance", 3, 7, Kind.BLOCKS);
+    public static final Stat WALL_TIME = s("duration", 100, 300, Kind.TICKS);
+    public static final Stat WALL_COOLDOWN = s("cooldown", 200, 80, Kind.COOLDOWN);
+    public static final Stat BLOOM_RADIUS = s("radius", 3, 8, Kind.BLOCKS);
+    public static final Stat BLOOM_COOLDOWN = s("cooldown", 160, 50, Kind.COOLDOWN);
+
     /** The numbers of a module in one of its options, in the order the editor's preview lists them. */
     public static List<Stat> of(PowerModule module, String option) {
         List<Stat> list = new ArrayList<>();
@@ -334,6 +347,7 @@ public final class ModuleStats {
             case MIND_CONTROL -> list.addAll(List.of(MIND_RANGE, MIND_TIME, MIND_COOLDOWN));
             case MAGIC -> list.addAll(switch (option) {
                 case "ward" -> List.of(WARD_RADIUS, WARD_TIME, WARD_COOLDOWN);
+                case "orb" -> List.of(ORB_DAMAGE, ORB_RADIUS, ORB_COOLDOWN);
                 case "curse" -> List.of(CURSE_RANGE, CURSE_TIME, CURSE_COOLDOWN);
                 default -> List.of(MYSTIC_DAMAGE, MYSTIC_RANGE, MYSTIC_COOLDOWN);
             });
@@ -372,8 +386,13 @@ public final class ModuleStats {
                     : List.of(HACK_RADIUS, HACK_COOLDOWN));
             case SONIC_SCREAM -> list.addAll(option.equals("ring") ? List.of(RING_DAMAGE, RING_RADIUS, RING_COOLDOWN)
                     : List.of(SCREAM_DAMAGE, SCREAM_RANGE, SCREAM_COOLDOWN));
-            case EARTH -> list.addAll(option.equals("spikes") ? List.of(SPIKES_DAMAGE, SPIKES_LENGTH, SPIKES_COOLDOWN)
-                    : List.of(TREMOR_DAMAGE, TREMOR_RADIUS, TREMOR_COOLDOWN));
+            case EARTH -> list.addAll(switch (option) {
+                case "spikes" -> List.of(SPIKES_DAMAGE, SPIKES_LENGTH, SPIKES_COOLDOWN);
+                case "throw" -> List.of(THROW_DAMAGE, THROW_KNOCKBACK, THROW_COOLDOWN);
+                case "wall" -> List.of(WALL_LENGTH, WALL_TIME, WALL_COOLDOWN);
+                default -> List.of(TREMOR_DAMAGE, TREMOR_RADIUS, TREMOR_COOLDOWN);
+            });
+            case NATURE -> list.addAll(List.of(BLOOM_RADIUS, BLOOM_COOLDOWN));
             case WIND -> {
                 list.addAll(option.equals("updraft") ? List.of(UPDRAFT_LIFT, UPDRAFT_COOLDOWN) : List.of(GUST_PUSH, GUST_RANGE, GUST_DAMAGE, GUST_COOLDOWN));
                 list.add(FALL_GUARD);

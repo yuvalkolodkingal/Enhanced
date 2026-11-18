@@ -48,6 +48,8 @@ public final class CustomHeroServer implements HeroServer {
         EnergyPowers.register(LOGIC);
         ElementPowers.register(LOGIC);
         MindPowers.register(LOGIC);
+        // (the spellbooks' own power, Nature)
+        com.kolodkingal.enhanced.spellbook.SpellMagic.register(LOGIC);
     }
 
     /** The logic of a module (every module has one). */

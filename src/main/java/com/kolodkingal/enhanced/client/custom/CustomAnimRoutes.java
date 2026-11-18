@@ -145,7 +145,13 @@ public final class CustomAnimRoutes {
             };
             case TECHNOPATHY -> "command".equals(option) ? GestureId.ULTRON_COMMAND : GestureId.ULTRON_HACK;
             case SONIC_SCREAM -> GestureId.TOMMY_BOOM;
-            case EARTH -> "spikes".equals(option) ? GestureId.APOC_SAND_WAVE : GestureId.ULTRON_SLAM;
+            case EARTH -> switch (option) {
+                case "spikes", "wall" -> GestureId.APOC_SAND_WAVE;
+                case "throw" -> GestureId.BILLY_BOLT;
+                default -> GestureId.ULTRON_SLAM;
+            };
+            // (Spellbooks: the green magic's growth is a blessing given with both hands.)
+            case NATURE -> GestureId.APOC_BESTOW;
             case WIND -> "updraft".equals(option) ? GestureId.APOC_STORM_START : GestureId.WANDA_BEAM_KICK;
             // Passive, or acted elsewhere: Flight by the take-off of its style, Telekinesis by the grab and the throw.
             case DURABILITY, FLIGHT, TELEKINESIS -> null;

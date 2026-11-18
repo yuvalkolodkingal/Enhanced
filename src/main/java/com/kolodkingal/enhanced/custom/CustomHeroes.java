@@ -97,6 +97,11 @@ public final class CustomHeroes {
 
     /** The hero's name as the HUD and the messages show it: his own, or "Custom Hero" before he has one. */
     public static Component name(Player player) {
+        // (a spellbook's caster is named in the player's language: "Ethereal Witch")
+        Component book = com.kolodkingal.enhanced.spellbook.Spellbook.title(hero(player));
+        if (book != null) {
+            return book;
+        }
         String name = hero(player).name();
         return name.isEmpty() ? Power.CUSTOM.displayName() : Component.literal(name);
     }
@@ -163,6 +168,11 @@ public final class CustomHeroes {
      * Used by the creator and by the tests.
      */
     public static void become(ServerPlayer player, CustomHero hero) {
+        become(player, hero, true);
+    }
+
+    /** {@link #become(ServerPlayer, CustomHero)}, with the awakening's title and burst only if {@code announce} (a spellbook has its own). */
+    public static void become(ServerPlayer player, CustomHero hero, boolean announce) {
         PowerData data = Powers.get(player);
         if (data.power() == Power.CUSTOM) {
             CustomHeroServer.endPowers(player, data);
@@ -198,7 +208,9 @@ public final class CustomHeroes {
         HeroItems.takeOffForeign(player, Powers.get(player));
         syncState(player);
         Powers.syncIfDirty(player);
-        announce(player, hero);
+        if (announce) {
+            announce(player, hero);
+        }
     }
 
     private static void announce(ServerPlayer player, CustomHero hero) {

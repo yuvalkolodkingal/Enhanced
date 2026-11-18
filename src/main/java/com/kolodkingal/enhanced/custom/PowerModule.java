@@ -36,7 +36,9 @@ public enum PowerModule implements CatalogEntry {
     PHASING("phasing", 3, Group.BODY, "minecraft:phantom_membrane", opt("phase", Act.TOGGLE), opt("ghost", Act.TOGGLE)),
     ANIMAL_CONTROL("animal_control", 1, Group.MIND, "minecraft:lead", opt("pack", Act.PRESS), opt("calm", Act.PRESS)),
     MIND_CONTROL("mind_control", 3, Group.MIND, "minecraft:name_tag", opt("ally", Act.PRESS), opt("calm", Act.PRESS)),
-    MAGIC("magic", 2, Group.ENERGY, "minecraft:enchanted_book", opt("bolts", Act.PRESS), opt("ward", Act.PRESS), opt("curse", Act.PRESS)),
+    // (Spellbooks: "orb" is the Book of Ethereal Witchcraft's purple energy ball, a slow orb that bursts where it strikes.)
+    MAGIC("magic", 2, Group.ENERGY, "minecraft:enchanted_book", opt("bolts", Act.PRESS), opt("ward", Act.PRESS), opt("curse", Act.PRESS),
+            opt("orb", Act.PRESS)),
     ICE("ice", 2, Group.ELEMENT, "minecraft:snowball", opt("freeze_ray", Act.PRESS), opt("ice_path", Act.TOGGLE), opt("blizzard", Act.PRESS)),
     WEATHER("weather", 2, Group.ELEMENT, "minecraft:sunflower", opt("storm", Act.PRESS), opt("cycle", Act.PRESS)),
     LIGHTNING("lightning", 2, Group.ELEMENT, "minecraft:lightning_rod", opt("strike", Act.PRESS), opt("chain", Act.PRESS)),
@@ -49,8 +51,13 @@ public enum PowerModule implements CatalogEntry {
     TIME("time", 3, Group.MIND, "minecraft:clock", opt("slow", Act.TOGGLE), opt("stop", Act.PRESS), opt("rewind", Act.PRESS)),
     TECHNOPATHY("technopathy", 1, Group.MIND, "minecraft:redstone", opt("hack", Act.PRESS), opt("command", Act.PRESS)),
     SONIC_SCREAM("sonic_scream", 2, Group.ENERGY, "minecraft:goat_horn", opt("cone", Act.PRESS), opt("ring", Act.PRESS)),
-    EARTH("earth", 2, Group.ELEMENT, "minecraft:cobblestone", opt("tremor", Act.PRESS), opt("spikes", Act.PRESS)),
-    WIND("wind", 1, Group.ELEMENT, "minecraft:wind_charge", opt("gust", Act.PRESS), opt("updraft", Act.PRESS));
+    // (Spellbooks: the green magic of the Book of Green Witchcraft throws a clod of earth ("throw") and raises a short wall of
+    // earth that crumbles by itself ("wall").)
+    EARTH("earth", 2, Group.ELEMENT, "minecraft:cobblestone", opt("tremor", Act.PRESS), opt("spikes", Act.PRESS),
+            opt("throw", Act.PRESS), opt("wall", Act.PRESS)),
+    WIND("wind", 1, Group.ELEMENT, "minecraft:wind_charge", opt("gust", Act.PRESS), opt("updraft", Act.PRESS)),
+    // (Spellbooks: the green magic's growth: the plants round the caster grow and flower, as bone meal makes them.)
+    NATURE("nature", 1, Group.ELEMENT, "minecraft:bone_meal", opt("bloom", Act.PRESS));
 
     /** The strongest any power can be (a server may allow less: {@code custom_hero.maxStrength}). */
     public static final int MAX_STRENGTH = 10;
