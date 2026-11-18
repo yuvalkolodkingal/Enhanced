@@ -203,7 +203,7 @@ public final class AvengersSkeletonTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTwelve(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("16"), "protocol 16 (3.16's SMP balance and Solar Jewel Vision)");
+        check(ModNetwork.PROTOCOL_VERSION.equals("17"), "protocol 17 (3.17's settings changed in the game)");
         check(Live.values().length == 78 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) = 78: "
                 + Live.values().length);
         check(Toggle.values().length == 24 && Toggle.values().length <= 32, "Toggle: 22 + 2 = 24: "

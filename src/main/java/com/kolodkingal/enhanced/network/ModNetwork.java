@@ -19,9 +19,10 @@ public final class ModNetwork {
      * Deadpool, the healing factor, the X-Men lower lab, the amplified Cerebro and the Stone Locator), and once for 3.8
      * (the serum, Captain America, Red Hulk, Iron Man, Falcon, the tower's armoury, Eternity and Love; the momentary
      * states in two words), and once for 3.9 (the mod's own config files: the server's settings travel to a player
-     * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once).
+     * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once),
+     * ... and once for 3.17 (the server's settings changed in the game: two new messages).
      */
-    public static final String PROTOCOL_VERSION = "16";
+    public static final String PROTOCOL_VERSION = "17";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -49,6 +50,13 @@ public final class ModNetwork {
         registrar.clientbound(com.kolodkingal.enhanced.balance.BalanceSyncPayload.TYPE,
                 com.kolodkingal.enhanced.balance.BalanceSyncPayload.STREAM_CODEC,
                 com.kolodkingal.enhanced.balance.BalanceSyncPayload::handle);
+        // 3.17: the server's settings changed in game (/enhanced config, an operator's settings screen)
+        registrar.clientbound(com.kolodkingal.enhanced.config.core.ConfigValuePayload.TYPE,
+                com.kolodkingal.enhanced.config.core.ConfigValuePayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.config.core.ConfigValuePayload::handle);
+        registrar.serverbound(com.kolodkingal.enhanced.config.core.ConfigEditPayload.TYPE,
+                com.kolodkingal.enhanced.config.core.ConfigEditPayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.config.core.ConfigEditPayload::handle);
         registrar.clientbound(ThorFxPayload.TYPE, ThorFxPayload.STREAM_CODEC, ThorFxPayload::handle);
         registrar.clientbound(HexBoltPayload.TYPE, HexBoltPayload.STREAM_CODEC, HexBoltPayload::handle);
         registrar.clientbound(OpenRoadPayload.TYPE, OpenRoadPayload.STREAM_CODEC, OpenRoadPayload::handle);

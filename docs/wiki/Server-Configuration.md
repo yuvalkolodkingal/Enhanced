@@ -9,6 +9,8 @@ The file has one section per hero (a boss has a section for his fight and one fo
     hexDeathChance = 0.95
 ```
 
+**Changing the settings in the game (3.17).** An operator does not need the file: `/enhanced config set <section.key> <value>` (also `get`, `reset`, `list`; Tab completes every key, see [Commands](Commands#the-servers-settings-enhanced-config)) changes any option listed here, and `/enhanced config` opens the mod's settings screen, where an operator on a server now edits the **Server Options** too (the same sections, tooltips, Undo and Reset as in a world of your own). Each change is checked by the server (who asks, and whether the value is within the option's range), used at once, written to this file and sent to every player; a value out of range is refused and nothing changes. Players who are not operators see the server's options greyed out, as before.
+
 Every number has an allowed range, and a value outside it is reset to the default when the file is loaded. A *tick* is 1/20 of a second. Food exhaustion of 4.0 costs 1 food point (one drumstick half). Flying speeds are in Minecraft's own units, where Creative flight is 0.05.
 
 The mod has no server option for anything that is not listed here. Everything else (what counts as metal, what can be lifted, which bosses resist) is decided by datapack tags: see [Datapack tags](#datapack-tags) below.
