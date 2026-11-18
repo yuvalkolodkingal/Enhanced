@@ -202,12 +202,15 @@ public final class SolarJewel {
         }
         if (hit instanceof EntityHitResult entityHit) {
             Entity target = entityHit.getEntity();
-            if (target.hurt(ModDamageTypes.source(level, ModDamageTypes.SOLAR_BEAM, player, player),
-                    SolarJewelConfig.BEAM_DAMAGE.get().floatValue()) && SolarJewelConfig.BEAM_BURN_SECONDS.get() > 0) {
-                target.igniteForSeconds(SolarJewelConfig.BEAM_BURN_SECONDS.get());
-            }
+            target.hurt(ModDamageTypes.source(level, ModDamageTypes.SOLAR_BEAM, player, player),
+                    SolarJewelConfig.BEAM_DAMAGE.get().floatValue());
+            BeamFire.ignite(target, SolarJewelConfig.BEAM_BURN_SECONDS.get());
         }
         Vec3 end = hit.getLocation();
+        // (3.17) the ground burns where the light lands
+        if (SolarJewelConfig.BEAM_FIRE.get() && player.tickCount % BeamFire.GROUND_INTERVAL == 0) {
+            BeamFire.strike(player, level, hit, 0, 2);
+        }
         if (player.tickCount % 2 == 0) {
             level.sendParticles(new EnergyParticleOptions(GOLD, 1.6F), end.x, end.y, end.z, 5, 0.15, 0.15, 0.15, 0.14);
             level.sendParticles(ParticleTypes.SMALL_FLAME, end.x, end.y, end.z, 2, 0.1, 0.1, 0.1, 0.02);

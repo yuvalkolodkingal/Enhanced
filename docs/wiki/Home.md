@@ -56,6 +56,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 ## What's new in 3.17.0
 
 * **The server's settings, changed in the game.** An operator reads and changes every setting and limit of the server config without leaving the game: `/enhanced config get|set|reset|list` (Tab completes every key, such as `custom_hero.budget`), and `/enhanced config` opens the mod's settings screen, where on a server an operator now edits the Server Options too. The server checks every change (who asks, the option's own range), uses it at once, writes it to the config file and sends it to every player; a bad value is refused and nothing changes. No setting is renamed and no default changes. See [Commands](Commands).
+* **Source Code Vision's beam burns, and starts at his Solar Jewel.** What it hits is set alight, and where it hits the ground it leaves fire and lights what can burn (fire is placed, no block is deleted; never with `mobGriefing` off). See [Vision](Vision).
 * The server and every player need 3.17 (network protocol 17).
 
 ## What's new in 3.16.2

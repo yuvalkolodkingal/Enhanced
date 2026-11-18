@@ -52,7 +52,7 @@ public final class SolarJewelFx {
     /** All of one Solar Jewel Vision's light this frame (the beam itself too, in place of the Mind Stone's). */
     static void render(Minecraft mc, AbstractClientPlayer player, PowerData data, Matrix4f pose, VertexConsumer vc,
                        Vec3 camera, float partialTick, float time) {
-        Vec3 jewel = WorldEffectsRenderer.foreheadPosition(mc, player, partialTick);
+        Vec3 jewel = WorldEffectsRenderer.jewelPosition(mc, player, partialTick);
         Vec3 look = player.getViewVector(partialTick);
         if (data.beamActive() && !data.visionPhased()) {
             solarBeam(mc, player, jewel, look, pose, vc, camera, partialTick, time);

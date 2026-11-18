@@ -16,6 +16,8 @@ public final class SolarJewelConfig {
     public static ConfigSpec.DoubleValue BEAM_DAMAGE;
     public static ConfigSpec.IntValue BEAM_COST;
     public static ConfigSpec.IntValue BEAM_BURN_SECONDS;
+    public static ConfigSpec.BooleanValue BEAM_FIRE;
+    public static ConfigSpec.IntValue SOURCE_CODE_BURN_SECONDS;
     public static ConfigSpec.IntValue OVERLOAD_MIN_CHARGE;
     public static ConfigSpec.IntValue OVERLOAD_CHARGE_TICKS;
     public static ConfigSpec.IntValue OVERLOAD_FIRE_TICKS;
@@ -52,6 +54,14 @@ public final class SolarJewelConfig {
                 .defineInRange("beamCost", 3, 0, 1000);
         BEAM_BURN_SECONDS = builder.comment("Seconds a creature the Solar Beam strikes burns.")
                 .defineInRange("beamBurnSeconds", 3, 0, 60);
+        BEAM_FIRE = builder.comment("Source Code Vision's beam (the Solar Beam, and with the jewel off his Mind Stone beam) is fire: it sets",
+                "what it strikes alight and, where it hits the ground, leaves fire there and lights what can burn (fire is placed;",
+                "no block is deleted). Never with the game rule mobGriefing off, nor where the mod's block rules refuse. Off: it only",
+                "burns the creatures it hits.")
+                .define("beamFire", true);
+        SOURCE_CODE_BURN_SECONDS = builder.comment("With the Solar Jewel off: seconds a creature Source Code Vision's beam strikes burns",
+                "(0: they are not set alight). With it on, beamBurnSeconds is used.")
+                .defineInRange("sourceCodeBurnSeconds", 4, 0, 60);
         OVERLOAD_MIN_CHARGE = builder.comment("Energy the jewel needs to overload (it then spends all it holds).")
                 .defineInRange("overloadMinCharge", 400, 1, 100000);
         OVERLOAD_CHARGE_TICKS = builder.comment("Ticks the light gathers in the jewel before the Overload fires.")

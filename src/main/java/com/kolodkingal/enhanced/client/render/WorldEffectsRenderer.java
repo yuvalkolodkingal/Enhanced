@@ -187,7 +187,8 @@ public final class WorldEffectsRenderer {
         if (data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive()) {
             Palette palette = "white_vision".equals(data.variant()) ? WHITE_VISION
                     : "source_code".equals(data.variant()) ? SOURCE_FIRE : MIND_STONE;
-            renderBeam(mc, player, foreheadPosition(mc, player, partialTick),
+            boolean source = "source_code".equals(data.variant());
+            renderBeam(mc, player, source ? jewelPosition(mc, player, partialTick) : foreheadPosition(mc, player, partialTick),
                     palette.of(player, HeroAbility.VISION_MIND_BEAM), WandaAbilities.BEAM_TARGET, pose, beams, camera,
                     partialTick, time);
         }
@@ -616,6 +617,27 @@ public final class WorldEffectsRenderer {
             return eye.add(look.scale(0.9)).add(up.scale(0.24));
         }
         return BodyLean.follow(player, eye, partialTick).add(look.scale(0.28)).add(0, 0.18, 0);
+    }
+
+    /**
+     * (3.17) The Solar Jewel on Source Code Vision's brow, where his beams start: the gem of the skin, followed in every pose
+     * by the head it is drawn on; in first person the point where it sits in front of and above the eyes.
+     */
+    public static Vec3 jewelPosition(Minecraft mc, AbstractClientPlayer player, float partialTick) {
+        Vec3 tracked = HandTracker.jewel(player, partialTick);
+        if (tracked != null) {
+            return tracked;
+        }
+        Vec3 eye = player.getEyePosition(partialTick);
+        Vec3 look = player.getViewVector(partialTick);
+        boolean firstPerson = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
+        Vec3 right = look.cross(UP);
+        right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
+        Vec3 up = right.cross(look).normalize();
+        if (firstPerson) {
+            return eye.add(look.scale(0.34)).add(up.scale(0.27));
+        }
+        return BodyLean.follow(player, eye, partialTick).add(look.scale(0.29)).add(up.scale(0.29));
     }
 
     /** Where energy leaves the player's hands: in front of the chest, or bottom-right of the screen in first person. */

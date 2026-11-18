@@ -59,6 +59,12 @@ Off by default: a server turns it on with `vision.solar_jewel.enabled = true` (t
 
 The numbers are in the server config, `[vision.solar_jewel]`.
 
+## The Source Code's beam burns (3.17)
+
+In his Source Code look the beam is fire, with or without the Solar Jewel. It starts at the **Solar Jewel on his brow** (the gem you see in his skin, followed in every pose and in flight; in first person from the matching point above the view), not from the middle of the forehead. What it strikes **burns**, and where it hits a block it **leaves fire on the ground** and lights what can burn (fire is placed as flint and steel does; no block is ever deleted). Nothing is lit with the game rule `mobGriefing` off, nor where the mod's block rules refuse (boss arenas, Asgard, a Hex, spawn protection, claims). The other Vision looks are unchanged.
+
+Settings in `[vision.solar_jewel]`: `beamFire` (default on: the fire on the ground), `sourceCodeBurnSeconds` (default 4; with the jewel on, `beamBurnSeconds`).
+
 ## Wanda's Hex holds him
 
 ![White Vision's beam](images/011-vision-white-vision.png)

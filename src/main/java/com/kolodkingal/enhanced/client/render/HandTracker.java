@@ -34,6 +34,7 @@ public final class HandTracker {
         Vec3 shoulderRight;
         Vec3 shoulderLeft;
         Vec3 forehead;
+        Vec3 jewel;
         Vec3 weapon;
         double weaponAge = Double.NEGATIVE_INFINITY;
     }
@@ -68,6 +69,13 @@ public final class HandTracker {
         return p == null ? null : p.forehead;
     }
 
+    /** (3.17) The Solar Jewel set in Source Code Vision's brow: the gem on his skin, a little above the Mind Stone's place. */
+    @Nullable
+    public static Vec3 jewel(Player player, float partialTick) {
+        Points p = fresh(player, partialTick);
+        return p == null ? null : p.jewel;
+    }
+
     /** The centre of the head of the weapon in Thor's hand, while it is drawn there. */
     @Nullable
     public static Vec3 weaponHead(Player player, float partialTick) {
@@ -89,7 +97,7 @@ public final class HandTracker {
 
     /** Called by the layer: records the hands, feet, shoulders and forehead of the player drawn with this pose stack. */
     static void record(Player player, float age, Vec3 handRight, Vec3 handLeft, Vec3 footRight, Vec3 footLeft, Vec3 shoulderRight,
-                       Vec3 shoulderLeft, Vec3 forehead) {
+                       Vec3 shoulderLeft, Vec3 forehead, Vec3 jewel) {
         Points p = POINTS.computeIfAbsent(player.getId(), id -> new Points());
         p.age = age;
         p.handRight = handRight;
@@ -99,6 +107,7 @@ public final class HandTracker {
         p.shoulderRight = shoulderRight;
         p.shoulderLeft = shoulderLeft;
         p.forehead = forehead;
+        p.jewel = jewel;
     }
 
     /**

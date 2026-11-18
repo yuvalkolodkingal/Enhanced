@@ -221,10 +221,19 @@ public final class VisionAbilities {
             // (3.16) Source Code Vision's beam is stronger
             float factor = "source_code".equals(Powers.get(player).variant())
                     ? com.kolodkingal.enhanced.config.SolarJewelConfig.SOURCE_CODE_BEAM_FACTOR.get().floatValue() : 1.0F;
+            boolean source = "source_code".equals(Powers.get(player).variant());
             entityHit.getEntity().hurt(ModDamageTypes.source(level, ModDamageTypes.MIND_STONE_BEAM, player, player),
                     EnhancedConfig.MIND_STONE_BEAM_DAMAGE.get().floatValue() * factor);
+            if (source) {
+                // (3.17) Source Code Vision's beam is fire: what it strikes burns
+                BeamFire.ignite(entityHit.getEntity(), com.kolodkingal.enhanced.config.SolarJewelConfig.SOURCE_CODE_BURN_SECONDS.get());
+            }
         }
         Vec3 end = hit.getLocation();
+        if ("source_code".equals(Powers.get(player).variant())
+                && com.kolodkingal.enhanced.config.SolarJewelConfig.BEAM_FIRE.get() && player.tickCount % BeamFire.GROUND_INTERVAL == 0) {
+            BeamFire.strike(player, level, hit, 0, 2);
+        }
         if (player.tickCount % 2 == 0) {
             level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_MIND_BEAM, Powers.glow(player)), 1.4F), end.x, end.y, end.z,
                     4, 0.12, 0.12, 0.12, 0.12);
