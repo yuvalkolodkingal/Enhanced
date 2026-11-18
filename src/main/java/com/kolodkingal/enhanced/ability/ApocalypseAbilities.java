@@ -159,7 +159,7 @@ public final class ApocalypseAbilities {
 
     static void tick(ServerPlayer player, PowerData data) {
         // (3.4: each part for the ability it belongs to: a custom hero ticks here with any of Apocalypse's abilities.)
-        if (data.has(HeroAbility.APOCALYPSE_BODY)) {
+        if (data.has(HeroAbility.APOCALYPSE_BODY) || data.has(HeroAbility.APOCALYPSE_REGENERATION)) {
             healingFactor(player);
         }
         if (data.chaosShieldActive() && data.has(HeroAbility.APOCALYPSE_SHIELD)) {

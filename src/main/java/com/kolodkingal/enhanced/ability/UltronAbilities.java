@@ -202,14 +202,14 @@ public final class UltronAbilities {
 
     static void tick(ServerPlayer player, PowerData data) {
         // (3.4: each part for the ability it belongs to: a custom hero ticks here with any of Ultron's abilities.)
+        // A machine: never hungry, never out of breath (the same code as Vision's body: BodyPassives, which Vision's own picks
+        // call too), and no poison runs in it (3.17: by his body or its own pick).
         if (data.has(HeroAbility.ULTRON_BODY)) {
-            // A machine: never hungry, never out of breath, and no poison runs in it.
-            if (player.getFoodData().getFoodLevel() < 20) {
-                player.getFoodData().setFoodLevel(20);
-            }
-            player.setAirSupply(player.getMaxAirSupply());
-            player.removeEffect(MobEffects.POISON);
-            player.removeEffect(MobEffects.WITHER);
+            BodyPassives.neverHungry(player);
+            BodyPassives.neverBreathless(player);
+        }
+        if (data.has(HeroAbility.ULTRON_BODY) || data.has(HeroAbility.ULTRON_NO_POISON)) {
+            BodyPassives.noPoison(player);
         }
         if (data.has(HeroAbility.ULTRON_REPULSOR)) {
             plasmaTick(player, data);

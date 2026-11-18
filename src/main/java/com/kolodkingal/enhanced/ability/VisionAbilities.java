@@ -6,6 +6,7 @@ import com.kolodkingal.enhanced.custom.AbilityColors;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.item.InfinityStone;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
+import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
@@ -104,12 +105,12 @@ public final class VisionAbilities {
      * (the synthetic body, the phasing, the beam, the charged beam).
      */
     static void tick(ServerPlayer player, PowerData data) {
-        if (data.has(HeroAbility.VISION_BODY)) {
-            // A synthetic body: never hungry, never out of breath.
-            if (player.getFoodData().getFoodLevel() < 20) {
-                player.getFoodData().setFoodLevel(20);
-            }
-            player.setAirSupply(player.getMaxAirSupply());
+        // A synthetic body: never hungry, never out of breath (3.17: each by his body or by its own pick, the shared helper)
+        if (data.has(HeroAbility.VISION_BODY) || data.has(HeroAbility.VISION_NO_HUNGER)) {
+            BodyPassives.neverHungry(player);
+        }
+        if (data.has(HeroAbility.VISION_BODY) || data.has(HeroAbility.VISION_WATER_BREATHING)) {
+            BodyPassives.neverBreathless(player);
         }
 
         boolean phased = data.has(HeroAbility.VISION_PHASE) && data.visionPhased();
@@ -205,9 +206,9 @@ public final class VisionAbilities {
         }
         if (hit instanceof EntityHitResult entityHit) {
             // (3.16) Source Code Vision's beam is stronger
-            float factor = "source_code".equals(Powers.get(player).variant())
+            boolean source = burning(Powers.get(player));
+            float factor = source
                     ? com.kolodkingal.enhanced.config.SolarJewelConfig.SOURCE_CODE_BEAM_FACTOR.get().floatValue() : 1.0F;
-            boolean source = "source_code".equals(Powers.get(player).variant());
             entityHit.getEntity().hurt(ModDamageTypes.source(level, ModDamageTypes.MIND_STONE_BEAM, player, player),
                     EnhancedConfig.MIND_STONE_BEAM_DAMAGE.get().floatValue() * factor);
             if (source) {
@@ -216,7 +217,7 @@ public final class VisionAbilities {
             }
         }
         Vec3 end = hit.getLocation();
-        if ("source_code".equals(Powers.get(player).variant())
+        if (burning(Powers.get(player))
                 && com.kolodkingal.enhanced.config.SolarJewelConfig.BEAM_FIRE.get() && player.tickCount % BeamFire.GROUND_INTERVAL == 0) {
             BeamFire.strike(player, level, hit, 0, 2);
         }
@@ -224,10 +225,20 @@ public final class VisionAbilities {
             level.sendParticles(new EnergyParticleOptions(AbilityColors.color(player, HeroAbility.VISION_MIND_BEAM, Powers.glow(player)), 1.4F), end.x, end.y, end.z,
                     4, 0.12, 0.12, 0.12, 0.12);
             // (3.16) Source Code Vision's beam is fire: flames where it strikes
-            if ("source_code".equals(Powers.get(player).variant())) {
+            if (burning(Powers.get(player))) {
                 Embers.burst(level, end.x, end.y, end.z, 3, 0.12, 0.12, 0.12, 0.03);
             }
         }
+    }
+
+    /**
+     * (3.17) Whether his beams burn: Source Code Vision's (his look), or a custom hero's with {@link HeroAbility#VISION_BURNING_BEAMS}.
+     * The Mind Stone beam and the Charged Beam ask it; both sides.
+     */
+    public static boolean burning(PowerData data) {
+        // (The hero has every row of his, so the row alone says nothing for him: his look does. A custom hero has it by the pick.)
+        return data.power() == Power.VISION ? "source_code".equals(data.variant())
+                : data.power() == Power.CUSTOM && data.has(HeroAbility.VISION_BURNING_BEAMS);
     }
 
     // ---- Ability 3: Phase (intangibility) ----

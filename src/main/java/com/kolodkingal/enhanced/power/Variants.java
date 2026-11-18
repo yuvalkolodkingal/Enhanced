@@ -234,6 +234,25 @@ public final class Variants {
         return new Variant("own", power, null, null, false, power.color, power.glow);
     }
 
+    /** (3.17) The "own skin" look of any hero: his listed one, or the same look made for a hero that lists none. */
+    public static Variant ownLook(Power power) {
+        for (Variant v : of(power)) {
+            if (v.ownSkin()) {
+                return v;
+            }
+        }
+        return OWN.get(power);
+    }
+
+    /**
+     * (3.17) The look to DRAW: the player's own skin when he chose it (every hero, see {@link PowerData#ownSkin}), else the hero's
+     * current look. What a look is for in the game (its colours, its armour, Banner the human) is always {@link #current}; the
+     * costume (helmet, cowl, hat, visor, cape) follows this one, so with the own skin it is the own look's: none.
+     */
+    public static Variant drawn(PowerData data) {
+        return data.ownSkin() ? ownLook(data.power()) : current(data);
+    }
+
     /** The hero's looks, or an empty list if it has only its one suit. */
     public static List<Variant> of(Power power) {
         return BY_POWER.getOrDefault(power, List.of());
@@ -281,6 +300,15 @@ public final class Variants {
 
     private static Variant plain(Power power) {
         return PLAIN.get(power);
+    }
+
+    /** The own-skin look of each hero (built up front, for the same reason as {@link #PLAIN}). */
+    private static final Map<Power, Variant> OWN = new EnumMap<>(Power.class);
+
+    static {
+        for (Power power : Power.values()) {
+            OWN.put(power, own(power));
+        }
     }
 
     private Variants() {

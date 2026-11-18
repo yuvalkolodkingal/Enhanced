@@ -41,14 +41,18 @@ public final class UltronEvents {
         LivingEntity target = event.getEntity();
         boolean robot = target.getType().is(ModTags.ULTRON_ROBOTS);
         boolean hero = target instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.ULTRON_BODY); // (3.4: his body's)
-        if (!robot && !hero) {
+        // (3.17: the anti-gravity palms that catch a fall are a pick of their own too)
+        boolean palms = hero || target instanceof ServerPlayer catcher && Powers.get(catcher).has(HeroAbility.ULTRON_SOFT_LANDING);
+        if (!robot && !hero && !palms) {
             return;
         }
         if (event.getSource().is(DamageTypeTags.IS_LIGHTNING)) {
-            event.setAmount(event.getAmount() * UltronConfig.LIGHTNING_FACTOR.get().floatValue());
+            if (robot || hero) {
+                event.setAmount(event.getAmount() * UltronConfig.LIGHTNING_FACTOR.get().floatValue());
+            }
         } else if (robot && event.getSource().is(ModDamageTypes.MIND_STONE_BEAM)) {
             event.setAmount(event.getAmount() * UltronBossConfig.VISION_BEAM_BONUS.get().floatValue());
-        } else if (hero && event.getSource().is(DamageTypeTags.IS_FALL) && !event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+        } else if (palms && event.getSource().is(DamageTypeTags.IS_FALL) && !event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             // The anti-gravity palms catch him.
             event.setCanceled(true);
         }
@@ -57,7 +61,8 @@ public final class UltronEvents {
     /** HIGH: a machine takes no Poison and no Wither. */
     @Subscribe(priority = Priority.HIGH)
     public static void onEffectApplicable(MobEffectEvent.Applicable event) {
-        if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.ULTRON_BODY)
+        if (event.getEntity() instanceof ServerPlayer player && (Powers.get(player).has(HeroAbility.ULTRON_BODY)
+                || Powers.get(player).has(HeroAbility.ULTRON_NO_POISON))
                 && (event.getEffectInstance().is(MobEffects.POISON) || event.getEffectInstance().is(MobEffects.WITHER))) {
             event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
         }

@@ -103,7 +103,7 @@ public final class ChargedBeam {
             ChargedBeam::sourceCodeImpact, null, Live.BEAM_CHARGING, Live.BEAM_FIRING, null);
 
     public static Profile visionProfile(PowerData data) {
-        return "source_code".equals(data.variant()) ? SOURCE_CODE : VISION;
+        return VisionAbilities.burning(data) ? SOURCE_CODE : VISION;
     }
 
     private static final Map<UUID, Long> CHARGING = new HashMap<>();

@@ -103,7 +103,8 @@ public final class ApocalypseEvents {
     /** The healing factor of the hero waits for quiet: any damage that reached him starts the wait over. */
     @Subscribe
     public static void onDamaged(LivingDamageEvent.Post event) {
-        if (event.getEntity() instanceof ServerPlayer player && Powers.get(player).has(HeroAbility.APOCALYPSE_BODY)) {
+        if (event.getEntity() instanceof ServerPlayer player && (Powers.get(player).has(HeroAbility.APOCALYPSE_BODY)
+                || Powers.get(player).has(HeroAbility.APOCALYPSE_REGENERATION))) {
             ApocalypseAbilities.hurt(player);
         }
     }

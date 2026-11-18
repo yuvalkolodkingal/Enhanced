@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * The hero suits. While Magneto wears his helmet, the Scarlet Witch her crown or Quicksilver his goggles, their whole skin (and cape) is
  * replaced by the suit. Vision and the newer heroes always wear the suit of their current look (unless the look is
- * "your own skin"). Loki can also wear another player's skin, or turn his into a Frost Giant's. Hooked into
+ * "your own skin", or the player chose it for any hero: {@link com.kolodkingal.enhanced.power.PowerData#ownSkin}). Loki can also wear another player's skin, or turn his into a Frost Giant's. Hooked into
  * {@link AbstractClientPlayer#getSkin()} by a mixin, so it applies everywhere the skin is drawn: the body, first-person
  * arms and the cape (and Loki's illusions, which copy his skin).
  */
@@ -70,6 +70,10 @@ public final class SuitSkins {
     @Nullable
     public static PlayerSkin suitFor(AbstractClientPlayer player) {
         Power power = Powers.power(player);
+        if (power.hasPowers() && Powers.get(player).ownSkin()) {
+            // (3.17: he chose his own skin: any hero, built-in or custom, wears it instead of the suit)
+            return null;
+        }
         if (power == Power.MAGNETO && MagnetoAbilities.wearsHelmet(player)) {
             return MAGNETO;
         }

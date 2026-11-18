@@ -354,7 +354,7 @@ public final class ThanosAbilities {
         if (data.has(HeroAbility.THANOS_TIME)) {
             TimeRewind.remember(player, now, ThanosConfig.REWIND_SECONDS.get() * 20L);
         }
-        if (data.has(HeroAbility.THANOS_BODY)) {
+        if (data.has(HeroAbility.THANOS_BODY) || data.has(HeroAbility.THANOS_REGENERATION)) {
             healingFactor(player, state, now, data.bodyScale(HeroAbility.THANOS_BODY));
         }
         if (data.has(HeroAbility.THANOS_REALITY)) {

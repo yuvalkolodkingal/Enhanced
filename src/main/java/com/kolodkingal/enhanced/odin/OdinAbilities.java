@@ -309,7 +309,7 @@ public final class OdinAbilities {
         if (data.toggle(Toggle.ODINSLEEP) && data.has(HeroAbility.ODIN_COMMAND)) {
             sleepTick(player, data);
         }
-        if (data.has(HeroAbility.ODIN_BODY) && player.tickCount % 20 == 0 && player.getHealth() < player.getMaxHealth() * 0.5F
+        if ((data.has(HeroAbility.ODIN_BODY) || data.has(HeroAbility.ODIN_REGENERATION)) && player.tickCount % 20 == 0 && player.getHealth() < player.getMaxHealth() * 0.5F
                 && !player.hasEffect(MobEffects.REGENERATION)) {
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, true, false, true));
         }

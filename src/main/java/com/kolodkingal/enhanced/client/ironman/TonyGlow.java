@@ -27,7 +27,7 @@ public final class TonyGlow {
     /** The reactor's glow for this Iron Man right now, or null. */
     @Nullable
     public static RenderType eyes(AbstractClientPlayer player, PowerData data) {
-        Variant look = Variants.current(data);
+        Variant look = Variants.drawn(data);
         if (look.ownSkin()) {
             return null;
         }

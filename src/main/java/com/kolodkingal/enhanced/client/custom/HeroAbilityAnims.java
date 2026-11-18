@@ -327,6 +327,12 @@ public final class HeroAbilityAnims {
         // row plays the parent's variant gesture on the marker when a cooldown tells it, and may start all the parent's
         // moves.)
         row(HeroAbility.WANDA_BUILD_MAGIC);
+        // ===== passives (3.17): nothing to act =====
+        for (HeroAbility a : HeroAbility.values()) {
+            if (a.passive() && !ROWS.containsKey(a)) {
+                row(a);
+            }
+        }
         for (HeroAbility a : HeroAbility.values()) {
             HeroAbility parent = a.parent();
             if (parent == null || ROWS.containsKey(a)) {

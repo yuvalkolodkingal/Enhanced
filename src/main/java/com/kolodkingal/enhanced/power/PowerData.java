@@ -40,6 +40,11 @@ public final class PowerData {
     private boolean disguise;
     /** The hero's current look (see {@link Variants}); empty means the default one. */
     private String variant = "";
+    /**
+     * (3.17) The player wears his own Minecraft skin instead of the hero's suit: his choice, whatever the hero (built-in or
+     * custom), kept when he becomes another. Saved and synced, so everyone sees it; nothing but the drawing reads it.
+     */
+    private boolean ownSkin;
     /** On/off states of the newer heroes, one bit per {@link Toggle}. */
     private int toggles;
     /** Loki: the creature he has shapeshifted into (an entity type id), or empty. */
@@ -89,8 +94,9 @@ public final class PowerData {
             Codec.BOOL.optionalFieldOf("disguise", false).forGetter(d -> d.disguise),
             Codec.STRING.optionalFieldOf("variant", "").forGetter(d -> d.variant),
             Codec.INT.optionalFieldOf("toggles", 0).forGetter(d -> d.toggles),
-            Codec.STRING.optionalFieldOf("form", "").forGetter(d -> d.form)
-    ).apply(i, (power, shield, iron, qsTime, superSpeed, wallRun, walkman, phased, dense, disguise, variant, toggles, form) -> {
+            Codec.STRING.optionalFieldOf("form", "").forGetter(d -> d.form),
+            Codec.BOOL.optionalFieldOf("own_skin", false).forGetter(d -> d.ownSkin)
+    ).apply(i, (power, shield, iron, qsTime, superSpeed, wallRun, walkman, phased, dense, disguise, variant, toggles, form, ownSkin) -> {
         PowerData d = new PowerData();
         d.power = power;
         d.magneticShield = shield;
@@ -104,6 +110,7 @@ public final class PowerData {
         d.variant = variant;
         d.toggles = toggles;
         d.form = form;
+        d.ownSkin = ownSkin;
         return d;
     }));
 
@@ -115,7 +122,7 @@ public final class PowerData {
         int flags = (magneticShield ? 1 : 0) | (beamActive ? 2 : 0)
                 | (chaosShieldActive ? 4 : 0) | (shrapnelActive ? 8 : 0) | (flying ? 16 : 0)
                 | (quicksilverTime ? 32 : 0) | (wallRun ? 64 : 0) | (walkman ? 128 : 0) | (slowMo ? 256 : 0)
-                | (visionPhased ? 512 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0);
+                | (visionPhased ? 512 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0) | (ownSkin ? 8192 : 0);
         ByteBufCodecs.VAR_INT.encode(buf, flags);
         if (chaosShieldActive) {
             ByteBufCodecs.VAR_LONG.encode(buf, shieldStart);
@@ -153,6 +160,7 @@ public final class PowerData {
         d.visionPhased = (flags & 512) != 0;
         d.disguise = (flags & 2048) != 0;
         d.superSpeed = (flags & 4096) != 0;
+        d.ownSkin = (flags & 8192) != 0;
         if (d.chaosShieldActive) {
             d.shieldStart = ByteBufCodecs.VAR_LONG.decode(buf);
             d.shieldFormedAt = ByteBufCodecs.VAR_LONG.decode(buf);
@@ -433,6 +441,19 @@ public final class PowerData {
     void setVariantRaw(String v) {
         if (!variant.equals(v)) {
             variant = v;
+            dirty = true;
+        }
+    }
+
+    /** (3.17) Whether the player wears his own skin instead of the hero's suit (his choice, for every hero). */
+    public boolean ownSkin() {
+        return ownSkin;
+    }
+
+    /** (3.17) Changes the choice of skin. Use {@link Powers#setOwnSkin} from game code, which also sends the change. */
+    void setOwnSkinRaw(boolean v) {
+        if (ownSkin != v) {
+            ownSkin = v;
             dirty = true;
         }
     }

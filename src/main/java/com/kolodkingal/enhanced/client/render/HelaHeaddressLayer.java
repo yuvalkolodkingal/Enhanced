@@ -190,6 +190,6 @@ public class HelaHeaddressLayer extends RenderLayer<AbstractClientPlayer, Player
 
     /** The look of a hero Hela (for the arrival look: the cowl's hair is swept back, there is no headdress until the form). */
     static boolean arrival(PowerData data) {
-        return data.power() == Power.HELA && "arrival".equals(Variants.current(data).id());
+        return data.power() == Power.HELA && "arrival".equals(Variants.drawn(data).id());
     }
 }

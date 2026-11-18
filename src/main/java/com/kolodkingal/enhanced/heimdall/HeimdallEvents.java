@@ -57,7 +57,8 @@ public final class HeimdallEvents {
     @Subscribe
     public static void onFall(LivingFallEvent event) {
         if (event.getEntity() instanceof Player player && !player.level().isClientSide()
-                && Powers.get(player).has(HeroAbility.HEIMDALL_BODY) && event.getDistance() < HeimdallAbilities.SAFE_FALL) {
+                && (Powers.get(player).has(HeroAbility.HEIMDALL_BODY) || Powers.get(player).has(HeroAbility.HEIMDALL_SAFE_FALLS))
+                && event.getDistance() < HeimdallAbilities.SAFE_FALL) {
             event.setDamageMultiplier(0.0F);
         }
     }
