@@ -110,7 +110,11 @@ public final class NexusBeing {
     private static ServerPlayer holder(ServerLevel level) {
         for (Map.Entry<UUID, Hold> e : HOLDS.entrySet()) {
             if (e.getValue().worlds.contains(level.dimension())) {
-                return level.getServer().getPlayerList().getPlayer(e.getKey());
+                // (a Nexus Being who has left the server holds nothing: the next one's hold counts)
+                ServerPlayer wanda = level.getServer().getPlayerList().getPlayer(e.getKey());
+                if (wanda != null) {
+                    return wanda;
+                }
             }
         }
         return null;
@@ -122,6 +126,10 @@ public final class NexusBeing {
             return false;
         }
         if (Powers.power(player) == Power.NONE && !Magic.isWitch(player)) {
+            return false;
+        }
+        // (one Nexus Being's runes do not strip another: each holds the world for herself)
+        if (HOLDS.containsKey(player.getUUID())) {
             return false;
         }
         ServerPlayer wanda = holder(level);
