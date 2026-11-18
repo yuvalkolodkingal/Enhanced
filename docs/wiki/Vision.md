@@ -43,7 +43,7 @@ Hold **Loki's Scepter** in one hand and the core in the other, and use the scept
 | 1 | **R** (hold) | Mind Stone Beam | A pale gold beam from the stone in his forehead, 32 blocks long: 6 damage per hit (two hits per second). Hits creatures, players, the Ender Dragon and End Crystals. The stone sings its own chime-hum as the beam starts. |
 | 2 | **G** (toggle) | Flight | Survival flight at 0.08, upright and calm. You can also double-tap **Space**. |
 | 3 | **V** (toggle) | Phase | Become intangible: walk and float **through walls, floors and creatures**. Nothing can hurt you and projectiles pass through you, but you can't attack or fire the beam. You float instead of falling. You can't turn solid again inside a block (if you are only a little sunk into the floor, you rise out of it). Phasing doesn't get you through Wanda's Hex wall: it is a wall of reality, not of stone. |
-| 4 | **B** (toggle) | Density | Become as hard as diamond: +12 armor, no knockback, +6 punch damage with heavy knockback. Too heavy to fly, 30% slower, and he falls faster. Phasing ends density, and you can't turn dense while phased. |
+| 4 | **B** (hold, release) | Charged Beam | **Hold to charge**: a glow builds at his brow (the Solar Jewel in his Source Code look), rings close in, a note rises and the HUD line counts the charge. **Release to fire** one beam: the longer the charge, the more damage, the longer the reach and the wider it is (a full charge takes 2.5 seconds, a tap is weak). It strikes everything in its path once, then needs a cooldown (5 seconds). Not while phased. In the **Source Code** look it also **burns** (as above) and **explodes where it strikes**, scaled with the charge: creatures nearby are hurt (never you) and blocks of the blast are broken only where the mod's block rules allow it and never with `mobGriefing` off. This key was **Density** before 3.17; Density is gone in every look. Settings: `[vision.charged_beam]`. |
 | 5 | **N** (toggle) | Human Disguise | Take on the human look from *WandaVision*: a 1950s sitcom husband in a shirt, tie and cardigan. Only the looks change. |
 ## Solar Jewel Vision (3.16)
 
@@ -55,7 +55,7 @@ Off by default: a server turns it on with `vision.solar_jewel.enabled = true` (t
 | **Sneak + R** | **Jewel Overload**: he opens his arms to the sun, gold rings close in on his brow and sparks spiral into it, then everything he stored pours out at once in one great beam that strikes everything in its path and throws it back. It needs 40% of a full jewel, takes all of it, and leaves the jewel drained for 20 seconds. |
 | **N** (hold) | **Infrared eye beams**: two thin beams of heat from his eyes that burn creatures and melt snow and ice. |
 | **Sneak + N** | The Mind Palace, as before. |
-| **G, V, B** | Flight, Phase and Density, as before (the synthezoid body's, not the stone's). |
+| **G, V, B** | Flight, Phase and the Charged Beam, as before (the synthezoid body's, not the stone's). |
 
 The numbers are in the server config, `[vision.solar_jewel]`.
 

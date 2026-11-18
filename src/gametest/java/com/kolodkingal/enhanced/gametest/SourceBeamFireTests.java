@@ -64,7 +64,6 @@ public final class SourceBeamFireTests {
     public static void theBeamLeavesFireOnTheGroundAndDeletesNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = source(f, true);
-        HulkTests.mobGriefing(f, true);
         BlockPos fire = fireAtWall(helper, vision, Blocks.OAK_PLANKS);
         check(helper.getLevel().getBlockState(fire).is(Blocks.FIRE), "fire stands on the air at the face it hit: "
                 + helper.getLevel().getBlockState(fire));
@@ -73,7 +72,7 @@ public final class SourceBeamFireTests {
         helper.succeed();
     }
 
-    @EnhancedTest(template = ARENA)
+    @EnhancedTest(template = ARENA, batch = "mob_griefing_off")
     public static void withMobGriefingOffNothingIsLit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = source(f, true);
@@ -89,7 +88,6 @@ public final class SourceBeamFireTests {
     public static void theServerCanSwitchTheGroundFireOff(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = source(f, true);
-        HulkTests.mobGriefing(f, true);
         f.config(SolarJewelConfig.BEAM_FIRE, false);
         BlockPos fire = fireAtWall(helper, vision, Blocks.OAK_PLANKS);
         check(helper.getLevel().getBlockState(fire).isAir(), "beamFire off: no fire on the ground");
@@ -119,7 +117,6 @@ public final class SourceBeamFireTests {
         f.config(SolarJewelConfig.ENABLED, true);
         ServerPlayer vision = source(f, true);
         Powers.get(vision).setIronCharge(1000);
-        HulkTests.mobGriefing(f, true);
         BlockPos fire = fireAtWall(helper, vision, Blocks.OAK_PLANKS);
         check(helper.getLevel().getBlockState(fire).is(Blocks.FIRE), "the Solar Beam leaves fire too");
         helper.succeed();
@@ -129,7 +126,6 @@ public final class SourceBeamFireTests {
     public static void otherVisionLooksDoNotBurn(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = source(f, false);
-        HulkTests.mobGriefing(f, true);
         BlockPos fire = fireAtWall(helper, vision, Blocks.OAK_PLANKS);
         check(helper.getLevel().getBlockState(fire).isAir(), "plain Vision lights nothing");
         Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));

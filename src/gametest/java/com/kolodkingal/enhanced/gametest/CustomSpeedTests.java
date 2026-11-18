@@ -426,19 +426,19 @@ public final class CustomSpeedTests {
         CustomKitSupport.tickN(ghost, 1);
         check(!ghost.mayFly() && !ghost.getAbilities().flying, "and on his feet again");
 
+        // (3.17: Density is gone: a hero saved with it has the Charged Beam on that key)
         ServerPlayer heavy = CustomKitSupport.hero(f, 12.5, 12.5, CustomKitSupport.def().pick("flight", 5).key(5, "flight")
                 .pick("vision.density", 5).key(2, "vision.density").build());
         CustomKitSupport.tickN(heavy, 1);
         check(heavy.mayFly(), "his Flight flies");
         double armor = heavy.getAttributeValue(Attributes.ARMOR);
-        CustomKitSupport.tap(heavy, 2, false);
+        check(com.kolodkingal.enhanced.custom.HeroAbility.byId("vision.density")
+                == com.kolodkingal.enhanced.custom.HeroAbility.VISION_CHARGED_BEAM, "the old id is the Charged Beam");
+        CustomKitSupport.press(heavy, 2, false, true);
         CustomKitSupport.tickN(heavy, 1);
-        check(Powers.get(heavy).dense() && VisionAbilities.isDense(heavy), "G: dense");
-        assertNear(heavy.getAttributeValue(Attributes.ARMOR), armor + 12.0, 1.0E-6, "much harder");
-        check(!heavy.mayFly(), "too heavy to fly");
-        CustomKitSupport.tap(heavy, 2, false);
-        CustomKitSupport.tickN(heavy, 1);
-        check(heavy.mayFly() && !Powers.get(heavy).dense(), "light again, he flies");
+        check(Powers.get(heavy).is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING), "G held: the beam charges");
+        assertNear(heavy.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "he is not harder");
+        check(heavy.mayFly(), "and still flies");
         helper.succeed();
     }
 

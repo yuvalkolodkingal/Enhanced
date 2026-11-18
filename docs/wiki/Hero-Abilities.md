@@ -62,7 +62,7 @@ See [Vision](Vision) for the full story of each ability.
 |---|---|---|---|---|
 | **Mind Stone Beam** `vision.mind_beam` | **R** (hold) | — | 2 a point | Hold: a golden beam from your forehead. |
 | **Phase** `vision.phase` | **V** (on/off) | — | 15 (no slider) | A switch: float through walls, floors and attacks like a ghost (you float even without Flight). |
-| **Density** `vision.density` | **B** (on/off) | — | 5 (no slider) | A switch: heavy as a building: hard to hurt, you hit hard, and you cannot fly. |
+| **Charged Beam** `vision.charged_beam` | **B** (hold, release) | — | 5 (no slider) | Hold to charge, release to fire: more charge, more damage and reach; a tap is weak; then a cooldown. (A hero saved with the old **Density** `vision.density` has this one instead.) |
 | **Human Disguise** `vision.disguise` | **N** (on/off) | — | 5 (no slider) | A switch: look like an ordinary person. |
 | **Synthetic Body** `vision.body` | no key (always on) | — | 1 a point | Always: more health and armour, never hungry, never out of breath, made of metal (Magneto can lift you). New in 3.4. |
 

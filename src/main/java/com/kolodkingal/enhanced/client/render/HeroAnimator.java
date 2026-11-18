@@ -303,9 +303,6 @@ public final class HeroAnimator {
             } else if (flier == Power.THOR) {
                 start(s, GestureId.LAND_SOFT, 0.0F, age);
                 soft = 1.4F;
-            } else if (data.has(com.kolodkingal.enhanced.custom.HeroAbility.VISION_DENSITY) && data.dense()) {
-                soft = 1.8F;
-                FlightEffects.denseLanding(p, s);
             } else {
                 start(s, GestureId.LAND_SOFT, 0.0F, age);
             }
@@ -375,7 +372,6 @@ public final class HeroAnimator {
         // (3.4: each by the ability, so a custom hero who has it stands as its hero does; for the hero it is the same.)
         on[Stance.MAG_FIELD.ordinal()] = data.has(HeroAbility.MAGNETO_SHIELD) && data.magneticShield();
         on[Stance.VISION_PHASED.ordinal()] = data.has(HeroAbility.VISION_PHASE) && data.visionPhased();
-        on[Stance.VISION_DENSE.ordinal()] = data.has(HeroAbility.VISION_DENSITY) && data.dense();
         on[Stance.LOKI_FROST.ordinal()] = data.has(HeroAbility.LOKI_FROST_GIANT) && data.toggle(Toggle.FROST_GIANT);
         on[Stance.THOR_UNLEASHED.ordinal()] = data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER);
         on[Stance.NOISE.ordinal()] = data.has(HeroAbility.BILLY_NOISE) && data.toggle(Toggle.THE_NOISE);
@@ -391,7 +387,8 @@ public final class HeroAnimator {
         on[Stance.MAG_CATCH.ordinal()] = data.has(HeroAbility.MAGNETO_SHIELD) && data.magneticShield() && s.caughtCount > 0 && !holding
                 && !data.shrapnelActive();
         on[Stance.BILLY_FREEZE.ordinal()] = data.has(HeroAbility.BILLY_FREEZE) && data.is(Live.FREEZING);
-        on[Stance.VISION_BEAM.ordinal()] = data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive();
+        on[Stance.VISION_BEAM.ordinal()] = data.has(HeroAbility.VISION_MIND_BEAM) && data.beamActive()
+                || data.has(HeroAbility.VISION_CHARGED_BEAM) && (data.is(Live.BEAM_CHARGING) || data.is(Live.BEAM_FIRING));
         // (3.16) Solar Jewel Vision
         on[Stance.SOLAR_EYES.ordinal()] = data.is(Live.SOLAR_EYES);
         on[Stance.SOLAR_GATHER.ordinal()] = data.is(Live.SOLAR_GATHERING);

@@ -78,18 +78,6 @@ final class FieldGestures {
                 .key(4, O).m(5, 0, 3).o(5, 0, -3).drop(0.03F)
                 .key(10, S).m(5, 0, 3).o(5, 0, -3).drop(0);
 
-        // He becomes heavy: a brace, the body sinks, then the dense stance.
-        define(GestureId.VISION_DENSE_ON)
-                .key(0, S).m(0, 0, 6).o(0, 0, -6).drop(0)
-                .key(4, O).m(-30, 0, 30).o(-30, 0, -30).drop(0.05F).head(4, 0, 0)
-                .key(14, S).m(StancePoses.VISION_DENSE_M).o(StancePoses.VISION_DENSE_O).drop(0.03F);
-
-        // The weight goes: the arms lift and the body rises a little.
-        define(GestureId.VISION_DENSE_OFF)
-                .key(0, S).m(StancePoses.VISION_DENSE_M).o(StancePoses.VISION_DENSE_O).drop(0.03F)
-                .key(3, O).m(-24, 0, 12).o(-24, 0, -12).drop(-0.02F)
-                .key(8, S).m(0, 0, 6).o(0, 0, -6).drop(0);
-
         // A hand wipes down his face: the human disguise.
         define(GestureId.VISION_DISGUISE)
                 .key(0, S).m(-10, 0, 6).head(0, 0, 0)

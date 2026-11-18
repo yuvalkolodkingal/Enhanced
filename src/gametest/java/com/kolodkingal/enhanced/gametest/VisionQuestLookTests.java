@@ -55,9 +55,9 @@ public final class VisionQuestLookTests {
         data.setVisionPhased(true);
         check(VisionQuest.eyesLit(data), "phasing: they glow");
         data.setVisionPhased(false);
-        data.setDense(true);
-        check(VisionQuest.eyesLit(data), "dense: they glow");
-        data.setDense(false);
+        data.set(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING, true);
+        check(VisionQuest.eyesLit(data), "charging a beam: they glow");
+        data.set(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING, false);
         check(!VisionQuest.eyesLit(data), "and stop");
         Powers.setVariant(vision, Variants.get(Power.VISION, "vision"));
         data = Powers.get(vision);

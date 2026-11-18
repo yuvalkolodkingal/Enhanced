@@ -11,7 +11,7 @@ Every hero has five abilities (Doctor Strange has a sixth, on **Y**). They are b
 | [Magneto](Magneto) | Metal Telekinesis (Sneak: Magnetic Pull) | Iron Shrapnel Storm (hold) | Armor & Weapon Strip | Magnetic Shield (toggle) | Magnetic Flight (toggle) |
 | [Scarlet Witch](Scarlet-Witch) | Chaos Energy Beam (hold) | Enhanced Flight (toggle) | Telekinesis (creatures, items, blocks; Sneak: a block) | Chaos Shield (hold) | The Hex (again: Hex Control; Sneak: dissolve) |
 | [Quicksilver](Quicksilver) | Quicksilver Time on/off (Sneak: Walkman on/off) | Super Speed on/off (Sneak: Dash Strike) | Speed Blitz (Sneak: Pickpocket) | Wall & Water Run (toggle) | Pebble Barrage |
-| [Vision](Vision) | Mind Stone Beam (hold) | Flight (toggle) | Phase through walls (toggle) | Density (toggle) | Human Disguise (toggle) |
+| [Vision](Vision) | Mind Stone Beam (hold) | Flight (toggle) | Phase through walls (toggle) | Charged Beam (hold, release) | Human Disguise (toggle) |
 | [Tommy](Tommy) | Slow Time on/off (Sneak: Wall & Water Run on/off) | Super Speed on/off (Sneak: Dash Strike) | Whirlwind (Sneak: Sonic Boom) | Vibrate Through Walls (Sneak: Disarm Blitz) | Molecular Acceleration |
 | [Billy](Billy-and-the-Witches-Road) | Hex Beam (hold) | Flight (toggle) | Telekinesis (creatures, items, arrows, blocks; Sneak: a block) | Freeze (Sneak, hold: Hex Barrier) | The Noise (toggle) |
 | [Loki](Loki) | Daggers (Sneak: a fan of three) | Duplicates | Shapeshift | Vanish | Frost Giant (toggle) |

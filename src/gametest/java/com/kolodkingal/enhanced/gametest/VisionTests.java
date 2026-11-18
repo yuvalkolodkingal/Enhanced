@@ -110,33 +110,25 @@ public final class VisionTests {
     }
 
     @EnhancedTest(template = ARENA)
-    public static void densityMakesHimHeavyAndHard(GameTestHelper helper) {
+    public static void densityIsGoneAndBIsTheChargedBeam(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = f.player(10.5, FLOOR, 10.5, Power.VISION);
         PowerTicker.tick(vision);
         double armor = vision.getAttributeValue(Attributes.ARMOR);
-        double damage = vision.getAttributeValue(Attributes.ATTACK_DAMAGE);
-
         AbilityHandler.onKey(vision, 4, true);
         PowerTicker.tick(vision);
-        check(Powers.get(vision).dense(), "B makes Vision dense");
-        assertNear(vision.getAttributeValue(Attributes.ARMOR), armor + 12.0, 1.0E-6, "dense: much harder");
-        assertNear(vision.getAttributeValue(Attributes.ATTACK_DAMAGE), damage + 6.0, 1.0E-6, "and his punches land like a falling building");
-        assertNear(vision.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 1.0, 1.0E-6, "he can't be pushed");
-        check(!vision.mayFly(), "too heavy to fly");
-
-        AbilityHandler.onKey(vision, 4, true);
+        check(Powers.get(vision).is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING), "B held charges a beam");
+        assertNear(vision.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "he does not turn dense");
+        check(vision.mayFly(), "and flies as ever");
+        AbilityHandler.onKey(vision, 4, false);
+        check(!Powers.get(vision).is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING), "released: it is fired");
+        // the modifiers of a Density from before 3.17 are taken off a player who still carries them
+        var instance = vision.getAttribute(Attributes.ARMOR);
+        instance.addPermanentModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(
+                com.kolodkingal.enhanced.Enhanced.id("vision_dense_armor"), 12.0,
+                net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE));
         PowerTicker.tick(vision);
-        assertNear(vision.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "normal density again");
-        check(vision.mayFly(), "and he can fly again");
-
-        // Phasing while dense simply switches from one to the other.
-        AbilityHandler.onKey(vision, 4, true);
-        AbilityHandler.onKey(vision, 3, true);
-        check(Powers.get(vision).visionPhased() && !Powers.get(vision).dense(), "phasing ends the density");
-        // But he can't turn dense while phased.
-        AbilityHandler.onKey(vision, 4, true);
-        check(!Powers.get(vision).dense(), "can't be dense while phased");
+        assertNear(vision.getAttributeValue(Attributes.ARMOR), armor, 1.0E-6, "an old dense body is a normal one");
         helper.succeed();
     }
 

@@ -63,8 +63,12 @@ public enum HeroAbility implements CatalogEntry {
             .res(Resource.BEAM_FLAG).family(Family.BEAM).on(PowerData::beamActive)),
     VISION_PHASE(Power.VISION, 3, "phase", toggle().cost(3).group(Group.BODY).icon("minecraft:phantom_membrane")
             .fixed().res(Resource.PHASE).family(Family.PHASE).on(PowerData::visionPhased)),
-    VISION_DENSITY(Power.VISION, 4, "density", toggle().cost(1).group(Group.BODY).icon("minecraft:iron_block")
-            .fixed().traits(Trait.METAL_BODY).on(PowerData::dense)),
+    /**
+     * (3.17) The Charged Beam, on the key of Vision's old Density (which is gone): hold to charge, release to fire. A saved
+     * custom hero that picked {@code vision.density} gets this one ({@link #byId}).
+     */
+    VISION_CHARGED_BEAM(Power.VISION, 4, "charged_beam", hold().cost(2).group(Group.ENERGY).icon("minecraft:end_rod")
+            .on(d -> d.is(Live.BEAM_CHARGING))),
     VISION_DISGUISE(Power.VISION, 5, "disguise", toggle().alt(Act.PRESS).cost(1).group(Group.BODY).icon("minecraft:leather_chestplate")
             .fixed().on(PowerData::disguise)),
     /** Vision's synthetic body (L2): more health and armour, never hungry nor out of breath, metal (Magneto may lift it). */
@@ -806,6 +810,11 @@ public enum HeroAbility implements CatalogEntry {
 
     // ---- lookup ----
 
+    /** (3.17) The id a saved hero names, as this version knows it: Vision's removed Density is the Charged Beam. */
+    public static String canonicalId(@Nullable String id) {
+        return id != null && id.trim().equalsIgnoreCase("vision.density") ? "vision.charged_beam" : id;
+    }
+
     /** The row of this id ({@code thor.lightning}, any case), or null. */
     @Nullable
     public static HeroAbility byId(@Nullable String id) {
@@ -813,6 +822,9 @@ public enum HeroAbility implements CatalogEntry {
             return null;
         }
         String wanted = id.trim().toLowerCase(Locale.ROOT);
+        if (wanted.equals("vision.density")) {
+            wanted = "vision.charged_beam"; // (3.17: Density is gone; a hero saved with it has the Charged Beam on that key)
+        }
         for (HeroAbility a : values()) {
             if (a.id.equals(wanted)) {
                 return a;

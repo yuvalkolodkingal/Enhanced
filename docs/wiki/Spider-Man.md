@@ -205,7 +205,7 @@ His arm thrusts at what he aims at and a silver strand flies to it, with a splat
 | **Telekinesis** | Held, he can't act (and a held Spider-Man drops off the wall). Spider-sense warns of a held player's slam. |
 | **Loki** | Loki's duplicates dissolve at a web or a leg, and are never a threat. A shapeshifted Loki is webbed as himself. Loki's Scepter makes a Spider-Man dizzy and slow: nothing else. |
 | **Quicksilver** | Slowness, Quicksilver Time's slowed zone and the Webbed effect slow his crawl, zip and swing (they all lower his speed). Quicksilver can be webbed, and a webbed speedster is slowed hard. |
-| **Vision** | Phased, Vision is nothing to web; a dense Vision can be webbed. |
+| **Vision** | Phased, Vision is nothing to web; otherwise he can be webbed. |
 | **PvP off** | Webs, bursts and kicks don't touch players, and Instant Kill never targets one. |
 | **Creative and Spectator** | In Creative everything works and costs nothing (but while you fly in Creative the keys do nothing), and Creative players are not webbed or struck. A Spectator can use no key. |
 | **Claims and protection** | A web block is only placed where a player may place a block, and never inside a boss arena. A shot still wraps creatures there. |

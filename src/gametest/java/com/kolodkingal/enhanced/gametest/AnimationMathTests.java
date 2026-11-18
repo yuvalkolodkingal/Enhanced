@@ -637,7 +637,6 @@ public final class AnimationMathTests {
                 {GestureId.WANDA_SHIELD_SNAP, StancePoses.SHIELD_WANDA_M, StancePoses.SHIELD_WANDA_O},
                 {GestureId.MAG_SHIELD_ON, StancePoses.MAG_FIELD_M, StancePoses.MAG_FIELD_O},
                 {GestureId.VISION_PHASE_IN, StancePoses.VISION_PHASED_M, StancePoses.VISION_PHASED_O},
-                {GestureId.VISION_DENSE_ON, StancePoses.VISION_DENSE_M, StancePoses.VISION_DENSE_O},
                 {GestureId.BILLY_FREEZE_CAST, StancePoses.BILLY_FREEZE_M, StancePoses.BILLY_FREEZE_O},
                 // The gestures of 3.0 that hand over to a stance, one row each in the region of their lane.
                 // ===== phoenix =====

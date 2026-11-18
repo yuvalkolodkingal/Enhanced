@@ -334,6 +334,8 @@ public final class EnhancedConfig {
                 .defineInRange("mindStoneBeamDamage", 6.0, 0.0, 100.0);
         // (3.16) Solar Jewel Vision: [vision.solar_jewel]
         com.kolodkingal.enhanced.config.SolarJewelConfig.define(BUILDER);
+        // (3.17) Vision's Charged Beam: [vision.charged_beam]
+        com.kolodkingal.enhanced.config.ChargedBeamConfig.define(BUILDER);
         BUILDER.pop();
 
         BUILDER.push("quicksilver");

@@ -51,11 +51,9 @@ public final class PowerTicker {
     /** Flight permission and speed, plus the Scarlet Witch's crown bonuses. */
     public static void applyPassives(ServerPlayer player, PowerData data) {
         Power power = data.power();
-        // Vision's dense body is too heavy to fly, and Thor needs his weapon to fly.
+        // Thor needs his weapon to fly.
         // (3.3: a power Agatha has drained does not fly either.)
-        // (3.4: so is a custom hero's with Vision's density.)
-        boolean canFly = power.canFly() && !(data.has(HeroAbility.VISION_DENSITY) && data.dense())
-                && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
+        boolean canFly = power.canFly() && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
                 && !(power == Power.CUSTOM && !CustomHeroes.canFly(player))
                 // (3.8: Iron Man flies in a powered suit that flies, Falcon with his Exo-Wings on, Love with her axe.)
                 && !(power == Power.IRON_MAN && !com.kolodkingal.enhanced.ironman.IronSuits.canFly(player))

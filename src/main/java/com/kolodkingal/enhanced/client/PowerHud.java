@@ -244,6 +244,10 @@ public class PowerHud implements LayeredDraw.Layer {
     }
 
     private static Component status(LocalPlayer player, PowerData data, int ability, long now) {
+        // (3.17) a charged beam shows its charge on its key's line
+        if (data.is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING) && ability == com.kolodkingal.enhanced.client.render.ChargedBeamFx.hudKey(data.power())) {
+            return com.kolodkingal.enhanced.client.render.ChargedBeamFx.hudLine(player, data, now);
+        }
         // (3.16) Solar Jewel Vision's R shows the light stored in his jewel
         if (ability == 1 && com.kolodkingal.enhanced.power.VisionQuest.solar(data) && com.kolodkingal.enhanced.EnhancedConfig.SPEC.isLoaded()) {
             int percent = Math.round(100.0F * data.ironCharge()
@@ -291,7 +295,7 @@ public class PowerHud implements LayeredDraw.Layer {
                 case 1 -> data.beamActive() ? active("hud.enhanced.active") : null;
                 case 2 -> onOff(data.flying());
                 case 3 -> onOff(data.visionPhased());
-                case 4 -> onOff(data.dense());
+                case 4 -> null;
                 case 5 -> onOff(data.disguise());
                 default -> null;
             };

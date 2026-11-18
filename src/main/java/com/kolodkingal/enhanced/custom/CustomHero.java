@@ -78,7 +78,7 @@ public record CustomHero(int version, String name, int color, int glow, String l
      */
     public record Pick(String id, int strength, String option, int color, String stance) {
         public Pick {
-            id = id == null ? "" : id;
+            id = id == null ? "" : HeroAbility.canonicalId(id);
             option = option == null ? "" : option;
             stance = stance == null || stance.isEmpty() ? AUTO : stance;
         }
@@ -227,7 +227,7 @@ public record CustomHero(int version, String name, int color, int glow, String l
 
     private static List<String> fill(@Nullable List<String> in, int size, String blank) {
         List<String> k = new ArrayList<>(in == null ? List.of() : in);
-        k.replaceAll(s -> s == null || s.isEmpty() ? blank : s);
+        k.replaceAll(s -> s == null || s.isEmpty() ? blank : HeroAbility.canonicalId(s));
         while (k.size() < size) {
             k.add(blank);
         }

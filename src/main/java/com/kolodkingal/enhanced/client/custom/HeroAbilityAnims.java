@@ -81,7 +81,7 @@ public final class HeroAbilityAnims {
         // ===== vision =====
         row(HeroAbility.VISION_MIND_BEAM).main(GestureId.VISION_FOCUS).stances(Stance.VISION_BEAM);
         row(HeroAbility.VISION_PHASE).main(GestureId.VISION_PHASE_IN).also(GestureId.VISION_PHASE_OUT).stances(Stance.VISION_PHASED);
-        row(HeroAbility.VISION_DENSITY).main(GestureId.VISION_DENSE_ON).also(GestureId.VISION_DENSE_OFF).stances(Stance.VISION_DENSE);
+        row(HeroAbility.VISION_CHARGED_BEAM).stances(Stance.VISION_BEAM); // (held: the stance is the pose; no gesture of its own)
         row(HeroAbility.VISION_DISGUISE).main(GestureId.VISION_DISGUISE);
         row(HeroAbility.VISION_BODY); // (L2's row, 3.4: a passive body, nothing to act)
         // ===== billy =====
@@ -432,7 +432,6 @@ public final class HeroAbilityAnims {
         flag(GestureRoutes.Flag.CHAOS_SHIELD, HeroAbility.WANDA_CHAOS_SHIELD, HeroAbility.APOCALYPSE_SHIELD, HeroAbility.AGATHA_SHIELD,
                 HeroAbility.BILLY_FREEZE, HeroAbility.ODIN_ODINFORCE);
         flag(GestureRoutes.Flag.VISION_PHASED, HeroAbility.VISION_PHASE);
-        flag(GestureRoutes.Flag.DENSE, HeroAbility.VISION_DENSITY);
         flag(GestureRoutes.Flag.DISGUISE, HeroAbility.VISION_DISGUISE);
         flag(GestureRoutes.Flag.QUICKSILVER_TIME, HeroAbility.QUICKSILVER_TIME);
         flag(GestureRoutes.Flag.SUPER_SPEED, HeroAbility.QUICKSILVER_SPEED);

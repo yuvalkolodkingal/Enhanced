@@ -179,6 +179,13 @@ public final class WorldEffectsRenderer {
             renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS.of(player, HeroAbility.WANDA_CHAOS_BEAM),
                     WandaAbilities.beamTargets(player), pose, beams, camera, partialTick, time);
         }
+        // (3.17) a charged beam: the build-up and the shot (Vision's B; from the Solar Jewel in his Source Code look)
+        if (data.has(HeroAbility.VISION_CHARGED_BEAM) && (data.is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING)
+                || data.is(com.kolodkingal.enhanced.power.Live.BEAM_FIRING))) {
+            boolean source = "source_code".equals(data.variant());
+            ChargedBeamFx.render(mc, player, data, source ? jewelPosition(mc, player, partialTick) : foreheadPosition(mc, player, partialTick),
+                    source ? ChargedBeamFx.FIRE : ChargedBeamFx.MIND, pose, beams, camera, partialTick, time);
+        }
         // (3.16) Solar Jewel Vision: his own light (the Solar Beam, the eye beams, the Overload, the sun drunk in)
         if (com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
             SolarJewelFx.render(mc, player, data, pose, beams, camera, partialTick, time);
@@ -635,7 +642,7 @@ public final class WorldEffectsRenderer {
         right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
         Vec3 up = right.cross(look).normalize();
         if (firstPerson) {
-            return eye.add(look.scale(0.34)).add(up.scale(0.27));
+            return eye.add(look.scale(0.62)).add(up.scale(0.60));
         }
         return BodyLean.follow(player, eye, partialTick).add(look.scale(0.29)).add(up.scale(0.29));
     }

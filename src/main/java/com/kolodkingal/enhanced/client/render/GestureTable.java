@@ -312,7 +312,6 @@ public final class GestureTable {
             case BEAM -> data.beamActive();
             case CHAOS_SHIELD -> data.chaosShieldActive();
             case VISION_PHASED -> data.visionPhased();
-            case DENSE -> data.dense();
             case DISGUISE -> data.disguise();
             case QUICKSILVER_TIME -> data.quicksilverTime();
             case SUPER_SPEED -> data.superSpeed();

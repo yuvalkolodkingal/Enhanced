@@ -26,10 +26,10 @@ public final class VisionQuest {
                 && com.kolodkingal.enhanced.config.SolarJewelConfig.ENABLED.get();
     }
 
-    /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, Phase, Density, the solar ones). */
+    /** Whether this Vision's VisionQuest eyes glow now: the look, and a power of his in use (beam, charged beam, Phase, the solar ones). */
     public static boolean eyesLit(PowerData data) {
         return data.power() == Power.VISION && suit(data.variant()) && !data.disguise()
-                && (data.beamActive() || data.visionPhased() || data.dense() || data.is(Live.SOLAR_EYES)
+                && (data.beamActive() || data.visionPhased() || data.is(Live.BEAM_CHARGING) || data.is(Live.BEAM_FIRING) || data.is(Live.SOLAR_EYES)
                 || data.is(Live.SOLAR_GATHERING) || data.is(Live.SOLAR_OVERLOAD));
     }
 }

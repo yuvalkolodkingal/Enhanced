@@ -64,8 +64,6 @@ public enum GestureId {
     VISION_FOCUS(Group.CAST, 12, 2, 5, false),
     VISION_PHASE_IN(Group.CAST, 16, 3, 5, false),
     VISION_PHASE_OUT(Group.CAST, 10, 1, 4, false),
-    VISION_DENSE_ON(Group.CAST, 14, 2, 5, false),
-    VISION_DENSE_OFF(Group.CAST, 8, 1, 4, false),
     VISION_DISGUISE(Group.CAST, 12, 2, 4, false),
 
     TOMMY_READY(Group.CAST, 8, 1, 3, false),

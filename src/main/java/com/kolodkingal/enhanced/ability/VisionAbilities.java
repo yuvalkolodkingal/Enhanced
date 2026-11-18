@@ -29,18 +29,16 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Vision: a synthetic body with the Mind Stone in its forehead. Flies, fires the Mind Stone's beam (the stone's voice
- * sounds as it starts), and controls his own density: intangible enough to walk through walls, or dense enough to hit
- * like a falling building.
+ * sounds as it starts), phases through walls, and (3.17) charges a beam that grows with the charge.
  */
 public final class VisionAbilities {
     private static final ResourceLocation BODY_HEALTH = Enhanced.id("vision_body_health");
     private static final ResourceLocation BODY_ARMOR = Enhanced.id("vision_body_armor");
-    private static final ResourceLocation DENSE_ARMOR = Enhanced.id("vision_dense_armor");
-    private static final ResourceLocation DENSE_KNOCKBACK = Enhanced.id("vision_dense_knockback");
-    private static final ResourceLocation DENSE_DAMAGE = Enhanced.id("vision_dense_damage");
-    private static final ResourceLocation DENSE_PUNCH = Enhanced.id("vision_dense_punch");
-    private static final ResourceLocation DENSE_SPEED = Enhanced.id("vision_dense_speed");
-    private static final ResourceLocation DENSE_GRAVITY = Enhanced.id("vision_dense_gravity");
+
+    /** (3.17) The modifiers Density added (before it was removed): taken off any player who still carries them. */
+    private static final String[][] OLD_DENSE = {{"armor", "vision_dense_armor"}, {"knockback", "vision_dense_knockback"},
+            {"damage", "vision_dense_damage"}, {"punch", "vision_dense_punch"}, {"speed", "vision_dense_speed"},
+            {"gravity", "vision_dense_gravity"}};
 
     // ---- input ----
 
@@ -83,11 +81,7 @@ public final class VisionAbilities {
                     togglePhase(player, data);
                 }
             }
-            case 4 -> {
-                if (down) {
-                    toggleDensity(player, data);
-                }
-            }
+            case 4 -> ChargedBeam.onKey(player, data, down, ChargedBeam.visionProfile(data), HeroAbility.VISION_CHARGED_BEAM);
             case 5 -> {
                 if (down && alt) {
                     com.kolodkingal.enhanced.mind.MindPalace.press(player);
@@ -107,7 +101,7 @@ public final class VisionAbilities {
 
     /**
      * His upkeep, every tick; 3.4: also a custom hero's with any of his abilities, each part only for the ability it is
-     * (the synthetic body, the phasing, the beam, the density).
+     * (the synthetic body, the phasing, the beam, the charged beam).
      */
     static void tick(ServerPlayer player, PowerData data) {
         if (data.has(HeroAbility.VISION_BODY)) {
@@ -138,29 +132,26 @@ public final class VisionAbilities {
                 beamTick(player);
             }
         }
-        if (data.has(HeroAbility.VISION_DENSITY) && data.dense() && !player.isSpectator() && player.tickCount % 5 == 0) {
-            // (3.16) Source Code Vision's density smoulders: flames instead of sparks
-            player.serverLevel().sendParticles("source_code".equals(data.variant()) ? ParticleTypes.FLAME : ParticleTypes.CRIT,
-                    player.getX(), player.getY() + 0.1, player.getZ(), 1, 0.3, 0, 0.3, 0);
+        if (data.has(HeroAbility.VISION_CHARGED_BEAM)) {
+            ChargedBeam.tick(player, data, ChargedBeam.visionProfile(data), HeroAbility.VISION_CHARGED_BEAM);
         }
     }
 
     /**
-     * The synthetic body's stats and the dense mode's, kept in sync with the player's state (3.4: a custom hero's by his
-     * body and density rows, the body's amounts by its strength).
+     * The synthetic body's stats, kept in sync with the player's state (3.4: a custom hero's by his body row, the body's
+     * amounts by its strength).
      */
     static void applyBody(ServerPlayer player, PowerData data) {
         boolean vision = data.has(HeroAbility.VISION_BODY);
-        boolean dense = data.has(HeroAbility.VISION_DENSITY) && data.dense();
         float scale = data.bodyScale(HeroAbility.VISION_BODY);
         PowerTicker.setModifier(player, Attributes.MAX_HEALTH, BODY_HEALTH, 10.0 * scale, vision);
         PowerTicker.setModifier(player, Attributes.ARMOR, BODY_ARMOR, 8.0 * scale, vision);
-        PowerTicker.setModifier(player, Attributes.ARMOR, DENSE_ARMOR, 12.0, dense);
-        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, DENSE_KNOCKBACK, 1.0, dense);
-        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, DENSE_DAMAGE, 6.0, dense);
-        PowerTicker.setModifier(player, Attributes.ATTACK_KNOCKBACK, DENSE_PUNCH, 1.5, dense);
-        PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, DENSE_SPEED, -0.3, dense, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        PowerTicker.setModifier(player, Attributes.GRAVITY, DENSE_GRAVITY, 0.04, dense);
+        PowerTicker.setModifier(player, Attributes.ARMOR, Enhanced.id(OLD_DENSE[0][1]), 12.0, false);
+        PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, Enhanced.id(OLD_DENSE[1][1]), 1.0, false);
+        PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, Enhanced.id(OLD_DENSE[2][1]), 6.0, false);
+        PowerTicker.setModifier(player, Attributes.ATTACK_KNOCKBACK, Enhanced.id(OLD_DENSE[3][1]), 1.5, false);
+        PowerTicker.setModifier(player, Attributes.MOVEMENT_SPEED, Enhanced.id(OLD_DENSE[4][1]), -0.3, false, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        PowerTicker.setModifier(player, Attributes.GRAVITY, Enhanced.id(OLD_DENSE[5][1]), 0.04, false);
         // 3.12: Vision as his Source Code: stronger, harder to hurt, and fire does not touch him
         boolean source = vision && "source_code".equals(data.variant());
         PowerTicker.setModifier(player, Attributes.ATTACK_DAMAGE, SOURCE_DAMAGE, 5.0, source);
@@ -193,11 +184,6 @@ public final class VisionAbilities {
         return data.has(HeroAbility.VISION_PHASE) && data.visionPhased() || com.kolodkingal.enhanced.custom.CustomHeroes.isPhased(player)
                 // (3.6: Doctor Strange's spirit out of his body passes through walls as Vision does: lane L3.)
                 || com.kolodkingal.enhanced.strange.AstralProjection.isAstral(player);
-    }
-
-    public static boolean isDense(Player player) {
-        PowerData data = Powers.get(player);
-        return data.has(HeroAbility.VISION_DENSITY) && data.dense();
     }
 
     // ---- Ability 1: Mind Stone beam ----
@@ -260,7 +246,6 @@ public final class VisionAbilities {
             data.setVisionPhased(false);
             player.displayClientMessage(Component.translatable("message.enhanced.phase.off"), true);
         } else {
-            data.setDense(false);
             data.setBeamActive(false);
             data.setVisionPhased(true);
             // Start floating right away, so he doesn't sink into the floor before the next tick.
@@ -312,25 +297,6 @@ public final class VisionAbilities {
                         1, 0.3, 0.7, 0.3, 0.0);
             }
         }
-    }
-
-    // ---- Ability 4: Density ----
-
-    private static void toggleDensity(ServerPlayer player, PowerData data) {
-        if (data.visionPhased()) {
-            player.displayClientMessage(Component.translatable("message.enhanced.dense.phased"), true);
-            return;
-        }
-        boolean dense = !data.dense();
-        data.setDense(dense);
-        if (dense && player.getAbilities().flying && !player.isCreative() && !player.isSpectator()) {
-            player.getAbilities().flying = false;
-            player.onUpdateAbilities();
-        }
-        player.displayClientMessage(Component.translatable(dense ? "message.enhanced.dense.on" : "message.enhanced.dense.off"), true);
-        AbilityColors.mark(player, HeroAbility.VISION_DENSITY);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                dense ? SoundEvents.ANVIL_PLACE : SoundEvents.ARMOR_EQUIP_ELYTRA.value(), SoundSource.PLAYERS, 0.7F, dense ? 0.6F : 1.4F);
     }
 
     private VisionAbilities() {

@@ -28,7 +28,7 @@
       "option": "both"
     },
     {
-      "id": "vision.density",
+      "id": "vision.charged_beam",
       "strength": 5,
       "option": "both"
     },
@@ -42,7 +42,7 @@
     "vision.mind_beam",
     "flight",
     "vision.phase",
-    "vision.density",
+    "vision.charged_beam",
     "vision.disguise"
   ],
   "sneakKeys": [

@@ -36,8 +36,6 @@ public final class PowerData {
     private boolean walkman = true;
     /** Vision: intangible, passing through walls (saved, so he can't log back in stuck inside a wall). */
     private boolean visionPhased;
-    /** Vision: super-dense body. */
-    private boolean dense;
     /** Vision: human disguise from WandaVision. */
     private boolean disguise;
     /** The hero's current look (see {@link Variants}); empty means the default one. */
@@ -86,7 +84,8 @@ public final class PowerData {
             Codec.BOOL.optionalFieldOf("wall_run", true).forGetter(d -> d.wallRun),
             Codec.BOOL.optionalFieldOf("walkman", true).forGetter(d -> d.walkman),
             Codec.BOOL.optionalFieldOf("vision_phased", false).forGetter(d -> d.visionPhased),
-            Codec.BOOL.optionalFieldOf("dense", false).forGetter(d -> d.dense),
+            // (3.17: Vision's Density is gone; the field stays in the saved form so an older save still reads, and is never set)
+            Codec.BOOL.optionalFieldOf("dense", false).forGetter(d -> false),
             Codec.BOOL.optionalFieldOf("disguise", false).forGetter(d -> d.disguise),
             Codec.STRING.optionalFieldOf("variant", "").forGetter(d -> d.variant),
             Codec.INT.optionalFieldOf("toggles", 0).forGetter(d -> d.toggles),
@@ -101,7 +100,6 @@ public final class PowerData {
         d.wallRun = wallRun;
         d.walkman = walkman;
         d.visionPhased = phased;
-        d.dense = dense;
         d.disguise = disguise;
         d.variant = variant;
         d.toggles = toggles;
@@ -117,7 +115,7 @@ public final class PowerData {
         int flags = (magneticShield ? 1 : 0) | (beamActive ? 2 : 0)
                 | (chaosShieldActive ? 4 : 0) | (shrapnelActive ? 8 : 0) | (flying ? 16 : 0)
                 | (quicksilverTime ? 32 : 0) | (wallRun ? 64 : 0) | (walkman ? 128 : 0) | (slowMo ? 256 : 0)
-                | (visionPhased ? 512 : 0) | (dense ? 1024 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0);
+                | (visionPhased ? 512 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0);
         ByteBufCodecs.VAR_INT.encode(buf, flags);
         if (chaosShieldActive) {
             ByteBufCodecs.VAR_LONG.encode(buf, shieldStart);
@@ -153,7 +151,6 @@ public final class PowerData {
         d.walkman = (flags & 128) != 0;
         d.slowMo = (flags & 256) != 0;
         d.visionPhased = (flags & 512) != 0;
-        d.dense = (flags & 1024) != 0;
         d.disguise = (flags & 2048) != 0;
         d.superSpeed = (flags & 4096) != 0;
         if (d.chaosShieldActive) {
@@ -192,7 +189,6 @@ public final class PowerData {
         this.walkman = true;
         this.slowMo = false;
         this.visionPhased = false;
-        this.dense = false;
         this.disguise = false;
         this.variant = "";
         this.toggles = Toggle.defaults(power);
@@ -325,7 +321,7 @@ public final class PowerData {
     public int flagBits() {
         return (magneticShield ? 1 : 0) | (beamActive ? 2 : 0) | (chaosShieldActive ? 4 : 0) | (shrapnelActive ? 8 : 0)
                 | (quicksilverTime ? 32 : 0) | (wallRun ? 64 : 0) | (walkman ? 128 : 0) | (slowMo ? 256 : 0)
-                | (visionPhased ? 512 : 0) | (dense ? 1024 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0)
+                | (visionPhased ? 512 : 0) | (disguise ? 2048 : 0) | (superSpeed ? 4096 : 0)
                 | (heldEntityId >= 0 ? 8192 : 0) | (hammerEntityId >= 0 ? 16384 : 0) | (form.isEmpty() ? 0 : 32768);
     }
 
@@ -413,17 +409,6 @@ public final class PowerData {
     public void setVisionPhased(boolean v) {
         if (visionPhased != v) {
             visionPhased = v;
-            dirty = true;
-        }
-    }
-
-    public boolean dense() {
-        return dense;
-    }
-
-    public void setDense(boolean v) {
-        if (dense != v) {
-            dense = v;
             dirty = true;
         }
     }

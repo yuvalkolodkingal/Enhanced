@@ -24,7 +24,7 @@ Hebrew: [עברית, דף הבית](Home-HE)
 | [Magneto](Magneto) | The Master of Magnetism | Craft Magneto's Helmet and put it on | Metal telekinesis, the magnetic pull, iron shrapnel storm, magnetic shield |
 | [Scarlet Witch](Scarlet-Witch) | Wanda Maximoff | Touch the Mind Stone in Loki's Scepter (or use the Tesseract) while holding the Scarlet Witch Gene | Chaos beam, an unlimited shield, telekinesis, the Hex, Build Magic with an Instant level |
 | [Quicksilver](Quicksilver) | Peter Maximoff | Craft Quicksilver's Goggles and put them on | Quicksilver Time: the world slows down and plays his song; Super Speed (a key of its own); running up walls and across ceilings; the Dash Strike and the Pebble Barrage |
-| [Vision](Vision) | The Mind Stone in a synthetic body | Touch the Mind Stone while holding a Synthezoid Core | Mind Stone beam, phasing through walls, density; White Vision look |
+| [Vision](Vision) | The Mind Stone in a synthetic body | Touch the Mind Stone while holding a Synthezoid Core | Mind Stone beam, phasing through walls, a Charged Beam; White Vision look |
 | [Tommy](Tommy) | Tommy Maximoff (Speed) | Open the Witches' Road Door with a Scarlet Witch Gene, walk the Road's three trials and choose Tommy | Super speed and Slow Time, running up walls and across ceilings, disarm blitz, whirlwind, the Sonic Boom |
 | [Billy](Billy-and-the-Witches-Road) | Billy Maximoff (Wiccan) | Open the Witches' Road Door with a Scarlet Witch Gene, walk the Road's three trials and choose Billy | Hex Beam and Hex Barrier, flight, freeze, The Noise, Build Magic with ten ranks |
 | [Loki](Loki) | The God of Mischief | Use the Tesseract (without a gene in your other hand) | Daggers, duplicates, shapeshifting, vanishing, Frost Giant form |
@@ -57,6 +57,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 
 * **The server's settings, changed in the game.** An operator reads and changes every setting and limit of the server config without leaving the game: `/enhanced config get|set|reset|list` (Tab completes every key, such as `custom_hero.budget`), and `/enhanced config` opens the mod's settings screen, where on a server an operator now edits the Server Options too. The server checks every change (who asks, the option's own range), uses it at once, writes it to the config file and sends it to every player; a bad value is refused and nothing changes. No setting is renamed and no default changes. See [Commands](Commands).
 * **Source Code Vision's beam burns, and starts at his Solar Jewel.** What it hits is set alight, and where it hits the ground it leaves fire and lights what can burn (fire is placed, no block is deleted; never with `mobGriefing` off). See [Vision](Vision).
+* **Vision's Density is gone; B is now a Charged Beam** in every look (hold to charge, release to fire; more charge, more damage and reach; in the Source Code look it burns and explodes where it strikes). See [Vision](Vision).
 * The server and every player need 3.17 (network protocol 17).
 
 ## What's new in 3.16.2

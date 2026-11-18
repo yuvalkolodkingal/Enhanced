@@ -227,6 +227,11 @@ public enum Live {
     SOLAR_GATHERING,
     /** The Overload's great beam pours from his jewel. */
     SOLAR_OVERLOAD,
+    // ===== charged beam (3.17) =====
+    /** A charged beam gathers (Vision's B, Jim Hammond's R held): the glow builds at his brow; released, it fires. */
+    BEAM_CHARGING,
+    /** A charged beam has just been fired (a few ticks): every client draws it, as wide and as far as its charge made it. */
+    BEAM_FIRING,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

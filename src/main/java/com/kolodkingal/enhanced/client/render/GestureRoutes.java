@@ -47,7 +47,7 @@ public final class GestureRoutes {
 
     /** A Boolean flag of the synced power data (the ones that are not a {@link Toggle} or a {@link Live} bit). */
     public enum Flag {
-        MAGNETIC_SHIELD, SHRAPNEL, BEAM, CHAOS_SHIELD, VISION_PHASED, DENSE, DISGUISE, QUICKSILVER_TIME, SUPER_SPEED, WALKMAN
+        MAGNETIC_SHIELD, SHRAPNEL, BEAM, CHAOS_SHIELD, VISION_PHASED, DISGUISE, QUICKSILVER_TIME, SUPER_SPEED, WALKMAN
     }
 
     /** What happened to Thor's weapon. */
@@ -223,7 +223,6 @@ public final class GestureRoutes {
             case CHAOS_SHIELD -> power != Power.SCARLET_WITCH ? null
                     : on ? (SHIELD_FLAG_AT_PRESS ? GestureId.WANDA_SHIELD_RAISE : GestureId.WANDA_SHIELD_SNAP) : GestureId.WANDA_SHIELD_DROP;
             case VISION_PHASED -> power == Power.VISION ? (on ? GestureId.VISION_PHASE_IN : GestureId.VISION_PHASE_OUT) : null;
-            case DENSE -> power == Power.VISION ? (on ? GestureId.VISION_DENSE_ON : GestureId.VISION_DENSE_OFF) : null;
             case DISGUISE -> power == Power.VISION ? GestureId.VISION_DISGUISE : null;
             case QUICKSILVER_TIME -> power == Power.QUICKSILVER && on ? GestureId.QS_GOGGLES : null;
             // (3.3: Super Speed is G now, a key of its own.)
@@ -333,7 +332,7 @@ public final class GestureRoutes {
                 case 1 -> "flag:BEAM";
                 case 2 -> "flight";
                 case 3 -> "flag:VISION_PHASED";
-                case 4 -> "flag:DENSE";
+                case 4 -> "none: the Charged Beam is a stance (VISION_BEAM, the arm out along the look) while it charges and fires; the glow and the beam are ChargedBeamFx's";
                 default -> "flag:DISGUISE";
             };
             // (3.3: Sneak + R, Wall Run, is a message; Sneak + G, the Dash Strike, the cooldown of G; Sneak + V, the Sonic Boom,
@@ -652,6 +651,7 @@ public final class GestureRoutes {
             case FALCON_GLIDING -> "vanilla's fall-flying turns the body; the stance FALCON_GLIDE holds the arms out"
                     + " along the wings, which the wings' layer lays flat";
             // (3.16) Solar Jewel Vision
+            case BEAM_CHARGING, BEAM_FIRING -> "a stance (VISION_BEAM, the arm out along the look); the build-up and the beam are ChargedBeamFx's";
             case SOLAR_EYES, SOLAR_GATHERING, SOLAR_OVERLOAD -> "stances (SOLAR_EYES, SOLAR_GATHER, SOLAR_OVERLOAD); the light is SolarJewelFx's";
         };
     }

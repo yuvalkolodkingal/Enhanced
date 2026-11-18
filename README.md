@@ -76,6 +76,7 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 
 * **The server's settings, changed in the game.** An operator reads and changes every setting and limit of the server config without leaving the game: `/enhanced config get|set|reset|list` (Tab completes every key, such as `custom_hero.budget`), and `/enhanced config` opens the mod's settings screen, where on a server an operator now edits the Server Options too. The server checks every change (who asks, the option's own range), uses it at once, writes it to the config file and sends it to every player; a bad value is refused and nothing changes. No setting is renamed and no default changes. See [Commands](docs/wiki/Commands.md).
 * **Source Code Vision's beam burns, and starts at his Solar Jewel.** What it hits is set alight, and where it hits the ground it leaves fire and lights what can burn (fire is placed, no block is deleted; never with `mobGriefing` off or where the mod's block rules refuse). The beam leaves the jewel on his brow, in every pose and in first person. Other looks are unchanged. Settings `vision.solar_jewel.beamFire` and `sourceCodeBurnSeconds`.
+* **Vision's Density is gone; B is now a Charged Beam** in every look: hold B to charge (a glow builds, a note rises, the HUD counts the charge), release to fire a beam whose damage, reach and width grow with the charge; a tap fires a weak one; then a cooldown. In the Source Code look it also burns and explodes where it strikes, scaled with the charge, breaking blocks only where the mod's block rules allow (never with `mobGriefing` off). Hero Creator: the module Density is replaced by Charged Beam, and a saved hero that picked `vision.density` has the Charged Beam on that key; old saves of a dense Vision load as a normal one. Settings in `vision.charged_beam`.
 * The server and every player need 3.17 (network protocol 17).
 
 ## What's new in 3.16.2
@@ -218,7 +219,7 @@ owner can **pin someone down** with it (Sneak + right-click on a creature or pla
 | **R** | Metal Telekinesis (Sneak: Magnetic Pull) | Chaos Energy Beam (hold) | Quicksilver Time on/off (Sneak: Walkman) | Mind Stone Beam (hold) |
 | **G** | Iron Shrapnel Storm (hold) | Enhanced Flight | Super Speed on/off (Sneak: Dash Strike) | Flight |
 | **V** | Armor & Weapon Strip | Telekinesis (creatures, items, blocks; Sneak: a block) | Speed Blitz (Sneak: Pickpocket) | Phase through walls (toggle) |
-| **B** | Magnetic Shield (toggle) | Chaos Shield (hold; unlimited) | Wall & Water Run: walls, ceilings, water (toggle) | Density (toggle) |
+| **B** | Magnetic Shield (toggle) | Chaos Shield (hold; unlimited) | Wall & Water Run: walls, ceilings, water (toggle) | Charged Beam (hold, release) |
 | **N** | Magnetic Flight | The Hex (again: Hex Control, Sneak: dissolve) | Pebble Barrage | Human disguise (toggle) |
 | **Y** | | Build Magic (tap: on or off; hold: the Spell Wheel; Ctrl + I: Instant) | | |
 

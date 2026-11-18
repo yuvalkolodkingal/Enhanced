@@ -157,6 +157,7 @@ public final class ClientEvents {
         WorldEffectsRenderer.clearHexes();
         WorldEffectsRenderer.clearShields();
         BeamRenderer.clear();
+        com.kolodkingal.enhanced.client.render.ChargedBeamFx.clear();
         BarrierRenderer.clear();
         MagnetStreams.clear();
         HeroClients.clear();
