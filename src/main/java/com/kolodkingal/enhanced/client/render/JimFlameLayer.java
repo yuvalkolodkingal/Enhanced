@@ -173,9 +173,9 @@ public class JimFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         Vector3f rise = new Vector3f(flow).mul(height);
         out.add(sheet(foot, rise, halfWidth, seed, 0.020F, 1.0F));
         out.add(sheet(new Vector3f(foot).sub(new Vector3f(flow).mul(0.05F)), new Vector3f(flow).mul(height * 1.35F), halfWidth * 1.4F,
-                seed + 0.5F, 0.013F, 0.7F));
+                seed + 0.5F, 0.013F, 0.8F));
         out.add(sheet(new Vector3f(foot).add(new Vector3f(toCamera).mul(0.28F)), new Vector3f(flow).mul(height * 0.8F), halfWidth * 0.85F,
-                seed + 0.25F, 0.024F, 0.45F));
+                seed + 0.25F, 0.024F, 0.6F));
     }
 
     private static float[] sheet(Vector3f foot, Vector3f rise, float halfWidth, float seed, float speed, float strength) {

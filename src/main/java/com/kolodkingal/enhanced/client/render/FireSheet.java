@@ -80,7 +80,7 @@ public final class FireSheet {
         float along = pass == SMOKE
                 // smoke: nothing at the foot, it gathers where the flames end and thins away above
                 ? Mth.clamp((yf - 0.35F) / 0.3F, 0.0F, 1.0F) * (float) Math.pow(1.0F - yf, 0.8)
-                : Math.min(1.0F, yf / 0.12F + 0.25F) * (float) Math.pow(1.0F - yf, 1.25);
+                : Math.min(1.0F, yf / 0.12F + 0.25F) * (float) Math.pow(1.0F - yf, 0.9);
         float k = across * along * strength;
         int r;
         int g;
@@ -97,19 +97,20 @@ public final class FireSheet {
                 g = Math.round(Mth.lerp(tip, g, 24));
                 b = Math.round(Mth.lerp(tip, b, 8));
             }
-            a = 0.62F * k;
+            // strong enough to read on a bright sky (the texture's own alpha already makes it see-through between tongues)
+            a = Math.min(1.0F, 1.15F * k);
         } else if (pass == SMOKE) {
             // thin dark smoke, warm-grey low down and cooler higher up
             r = Math.round(Mth.lerp(yf, 70, 46));
             g = Math.round(Mth.lerp(yf, 54, 44));
             b = Math.round(Mth.lerp(yf, 44, 44));
-            a = 0.42F * k;
+            a = 0.5F * k;
         } else {
             // the glow of the hot cores, strongest low down
             r = 255;
             g = Math.round(Mth.lerp(yf, 200, 90));
             b = Math.round(Mth.lerp(yf, 90, 20));
-            a = 0.5F * k * (1.0F - 0.5F * yf);
+            a = 0.6F * k * (1.0F - 0.5F * yf);
         }
         vc.addVertex(m, x, y, z).setUv(u, v).setColor(r, g, b, Math.round(Mth.clamp(a, 0.0F, 1.0F) * 255.0F));
     }

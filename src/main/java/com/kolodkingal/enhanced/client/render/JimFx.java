@@ -256,7 +256,7 @@ public final class JimFx {
             float r = 0.12F + 0.22F * charge;
             float pulse = 0.9F + 0.1F * Mth.sin(time * 0.8F);
             ChargedBeamFx.flareAt(pose, vc, at, r * pulse, ChargedBeamFx.FIRE);
-            ChargedBeamFx.flareAt(pose, vc, at, r * 1.8F * pulse, new ChargedBeamFx.Colors(0xFF5A10, 0xFFB030, 0xFF7A18));
+            ChargedBeamFx.flareAt(pose, vc, at, r * 1.3F * pulse, new ChargedBeamFx.Colors(0x8A2A06, 0xA05A10, 0x903A0A));
             for (int i = 0; i < 6; i++) {
                 float angle = i * 1.047F + time * 0.15F;
                 float wave = 0.5F + 0.5F * Mth.sin(time * 0.35F + i * 1.7F);

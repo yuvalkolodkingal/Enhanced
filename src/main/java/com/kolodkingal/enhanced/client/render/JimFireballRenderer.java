@@ -36,9 +36,11 @@ public class JimFireballRenderer extends EntityRenderer<JimFireballEntity> {
         Matrix4f m = poseStack.last().pose();
         // the heart: a white-hot core in an orange halo that breathes
         float pulse = 0.92F + 0.08F * Mth.sin(age * 0.9F);
+        // (added light washes to white on a bright sky, so only the small heart is added; the orange body is see-through colour)
+        VertexConsumer body = buffer.getBuffer(EnhancedRenderTypes.ENERGY_VEIL);
+        EnergyGeometry.veil(m, body, Vec3.ZERO, 0.30F * size * pulse, 14, 7, HALO, 0.75F, 0.15F);
         VertexConsumer glow = buffer.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
-        EnergyGeometry.veil(m, glow, Vec3.ZERO, 0.20F * size * pulse, 12, 6, CORE, 0.85F, 0.3F);
-        EnergyGeometry.veil(m, glow, Vec3.ZERO, 0.42F * size * pulse, 14, 7, HALO, 0.30F, 0.45F);
+        EnergyGeometry.veil(m, glow, Vec3.ZERO, 0.15F * size * pulse, 12, 6, CORE, 0.7F, 0.2F);
         // the flames: where it is (camera-relative) and which way it flies
         Matrix4f inverse = new Matrix4f(m).invert();
         Vector3f centre = m.transformPosition(new Vector3f());
@@ -62,7 +64,7 @@ public class JimFireballRenderer extends EntityRenderer<JimFireballEntity> {
             }
             // the tail: long sheets streaming back from the ball, a little up (flames rise)
             Vector3f tail = new Vector3f(back).add(0, 0.25F, 0).normalize(1.9F * size);
-            FireSheet.frame(inverse, new Vector3f(centre).sub(new Vector3f(back).mul(0.15F * size)), tail, 0.32F * size, base, right, up);
+            FireSheet.frame(inverse, new Vector3f(centre).sub(new Vector3f(back).mul(0.15F * size)), tail, 0.40F * size, base, right, up);
             FireSheet.draw(pass, m, vc, base, right, up, age, seed, 0.05F, 1.0F);
             Vector3f tail2 = new Vector3f(back).add(0, 0.45F, 0).normalize(1.3F * size);
             FireSheet.frame(inverse, new Vector3f(centre).sub(new Vector3f(back).mul(0.05F * size)), tail2, 0.42F * size, base, right, up);
@@ -71,6 +73,9 @@ public class JimFireballRenderer extends EntityRenderer<JimFireballEntity> {
             Vector3f rise = new Vector3f(0, 1, 0).add(new Vector3f(back).mul(0.6F)).normalize(0.9F * size);
             FireSheet.frame(inverse, new Vector3f(centre).sub(0, 0.28F * size, 0), rise, 0.36F * size, base, right, up);
             FireSheet.draw(pass, m, vc, base, right, up, age, seed + 0.8F, 0.06F, 1.0F);
+            // and a shorter, wider sheet low round the ball, so it reads as a ball of fire from every side
+            FireSheet.frame(inverse, new Vector3f(centre).sub(0, 0.38F * size, 0), new Vector3f(0, 0.75F * size, 0), 0.46F * size, base, right, up);
+            FireSheet.draw(pass, m, vc, base, right, up, age, seed + 1.9F, 0.07F, 0.9F);
         }
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
