@@ -161,6 +161,11 @@ public final class MindTour {
         shot(name, 6);
     }
 
+    /** Where the portraits' stone floor stands (built the first time it is needed), and how high. */
+    private static final int STAGE_X = 40;
+    private static final int STAGE_Z = 40;
+    private static int stageY = Integer.MIN_VALUE;
+
     private static void become(Power power, String variant, boolean flying) {
         server(p -> {
             p.setGameMode(GameType.CREATIVE);
@@ -171,7 +176,21 @@ public final class MindTour {
             p.connection.send(new net.minecraft.network.protocol.game.ClientboundClearTitlesPacket(true));
             p.getAbilities().flying = flying;
             p.onUpdateAbilities();
-            if (!flying) {
+            if (!flying && power != Power.IRON_MAN) {
+                // (a stone floor in the open air: no hill, tree or hollow ever stands between the camera and the hero)
+                net.minecraft.core.BlockPos floor = new net.minecraft.core.BlockPos(STAGE_X, p.level().getHeight(
+                        net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, STAGE_X, STAGE_Z) + 24, STAGE_Z);
+                if (stageY == Integer.MIN_VALUE) {
+                    stageY = floor.getY();
+                    for (int dx = -9; dx <= 9; dx++) {
+                        for (int dz = -9; dz <= 9; dz++) {
+                            p.level().setBlockAndUpdate(new net.minecraft.core.BlockPos(STAGE_X + dx, stageY, STAGE_Z + dz),
+                                    net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                        }
+                    }
+                }
+                p.teleportTo(STAGE_X + 0.5, stageY + 1.0, STAGE_Z + 0.5);
+            } else if (!flying) {
                 p.teleportTo(p.getX(), p.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
                         (int) p.getX(), (int) p.getZ()), p.getZ());
             } else {
@@ -193,6 +212,9 @@ public final class MindTour {
         client(() -> {
             Minecraft mc = Minecraft.getInstance();
             mc.options.fov().set(40);
+            // (drawn far from the first moment: the game draws a creature only once the piece of world at its feet is
+            // built for drawing, and a change of this setting builds everything anew; the Godkiller is seen from 144 blocks)
+            mc.options.renderDistance().set(16);
             // the new keys against every other key's default
             for (net.minecraft.client.KeyMapping mine : new net.minecraft.client.KeyMapping[]{
                     com.kolodkingal.enhanced.client.KeyBindings.SPELLS, com.kolodkingal.enhanced.client.KeyBindings.ULTIMATE,
@@ -446,8 +468,10 @@ public final class MindTour {
                 p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, p.getBoundingBox().inflate(8),
                         e -> e.getTags().contains("enhanced_tour_under") && e.isAlive()).size()), 40);
         // (the camera stands 144 blocks off a body this size: the world is drawn far enough to show the ground round him)
-        client(() -> { Minecraft.getInstance().options.renderDistance().set(26); Minecraft.getInstance().options.fov().set(40); }, 400);
+        client(() -> Minecraft.getInstance().options.fov().set(40), 20);
         portrait("u70_godkiller_front", CameraType.THIRD_PERSON_FRONT, false);
+        watcher("u75_godkiller_from_the_ground_80_blocks_off", 80, 30.0);
+        watcher("u76_godkiller_from_the_ground_30_blocks_off", 30, 30.0);
         // from his own eyes, looking down at the villagers, the golem and the pillar of 65 blocks at his feet
         client(() -> { Minecraft.getInstance().player.setYRot(-80.0F); Minecraft.getInstance().player.setXRot(68.0F);
             Minecraft.getInstance().options.fov().set(70); }, 10);
@@ -463,7 +487,7 @@ public final class MindTour {
         become(Power.TOMMY, "", false);
         client(() -> Minecraft.getInstance().options.fov().set(60), 4);
         server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 70);
-        client(() -> { Minecraft.getInstance().options.renderDistance().set(6); Minecraft.getInstance().options.fov().set(40); }, 4);
+        client(() -> Minecraft.getInstance().options.fov().set(40), 4);
         portrait("u80_ultimate_tommy_front", CameraType.THIRD_PERSON_FRONT, false);
         portrait("u82_ultimate_tommy_back", CameraType.THIRD_PERSON_BACK, false);
         // his speed on (G): the trail of green and light pink-purple as he runs
@@ -477,6 +501,104 @@ public final class MindTour {
         portrait("u81_ultimate_tommy_tornado", CameraType.THIRD_PERSON_BACK, false);
         server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Ultimate Tommy: armour {}, time-proof {}",
                 p.getArmorValue(), com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(p)), 10);
+        server(p -> com.kolodkingal.enhanced.ultimate.Ultimate.set(null), 20);
+    }
+
+    /** The view from a watcher standing on the ground {@code distance} blocks from the player, looking up at his middle. */
+    private static void watcher(String name, int distance, double aimHeight) {
+        server(p -> {
+            net.minecraft.world.entity.decoration.ArmorStand stand = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(p.level());
+            if (stand == null) {
+                return;
+            }
+            double x = p.getX() + distance * 0.8;
+            double z = p.getZ() - distance * 0.6;
+            double y = p.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, (int) x, (int) z);
+            double dx = p.getX() - x;
+            double dy = p.getY() + aimHeight - (y + 1.7);
+            double dz = p.getZ() - z;
+            float yaw = (float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0);
+            float pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
+            stand.moveTo(x, y, z, yaw, pitch);
+            stand.setYHeadRot(yaw);
+            stand.setYBodyRot(yaw);
+            stand.setInvisible(true);
+            stand.setNoGravity(true);
+            stand.setCustomName(net.minecraft.network.chat.Component.literal(name));
+            stand.setGlowingTag(false);
+            p.level().addFreshEntity(stand);
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: a watcher {} blocks off at {} {} {}, looking {} {}; the player's body {}",
+                    distance, x, y, z, yaw, pitch, p.getBoundingBox());
+        }, 30);
+        client(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+                if (e.getCustomName() != null && name.equals(e.getCustomName().getString())) {
+                    mc.setCameraEntity(e);
+                    mc.options.setCameraType(CameraType.FIRST_PERSON);
+                    mc.options.hideGui = true;
+                    com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: the camera is the watcher {}", name);
+                }
+            }
+        }, 20);
+        shot(name, 10);
+        client(() -> Minecraft.getInstance().setCameraEntity(Minecraft.getInstance().player), 6);
+    }
+
+    /**
+     * (3.17) -Denhanced.mindtour.mode=godkiller: the Godkiller seen as others see him, from the ground 30, 80 and 150
+     * blocks away (a house and a tower of 65 blocks beside him), and as he sees himself in third person, level and looking
+     * down.
+     */
+    private static void godkillerTour() {
+        client(() -> { Minecraft.getInstance().options.renderDistance().set(16); Minecraft.getInstance().options.fov().set(70); }, 10);
+        server(p -> {
+            p.server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "time set noon");
+            p.server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "weather clear");
+            p.server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), "gamerule doMobSpawning false");
+            com.kolodkingal.enhanced.ultimate.Ultimate.set(Boolean.TRUE);
+            com.kolodkingal.enhanced.platform.net.Net.sendToAllPlayers(com.kolodkingal.enhanced.ultimate.UltimateSyncPayload.now());
+        }, 20);
+        become(Power.IRON_MAN, "", false);
+        server(p -> {
+            p.setGameMode(GameType.SURVIVAL);
+            p.getInventory().clearContent();
+            net.minecraft.core.BlockPos house = p.blockPosition().offset(-18, 0, 4);
+            for (int dx = -4; dx <= 4; dx++) {
+                for (int dz = -4; dz <= 4; dz++) {
+                    for (int y = 0; y < 9; y++) {
+                        boolean roof = y >= 5;
+                        if (roof && Math.abs(dx) > 9 - y) {
+                            continue;
+                        }
+                        p.level().setBlockAndUpdate(house.offset(dx, y, dz), (roof ? net.minecraft.world.level.block.Blocks.BRICKS
+                                : net.minecraft.world.level.block.Blocks.SPRUCE_PLANKS).defaultBlockState());
+                    }
+                }
+            }
+            net.minecraft.core.BlockPos tower = p.blockPosition().offset(18, 0, 4);
+            for (int y = 0; y < 65; y++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dz = -1; dz <= 1; dz++) {
+                        p.level().setBlockAndUpdate(tower.offset(dx, y, dz), (y / 5 % 2 == 0 ? net.minecraft.world.level.block.Blocks.RED_CONCRETE
+                                : net.minecraft.world.level.block.Blocks.BLACK_CONCRETE).defaultBlockState());
+                    }
+                }
+            }
+        }, 20);
+        server(p -> com.kolodkingal.enhanced.ultimate.UltimateForms.key(p, false), 200);
+        watcher("g01_from_30_blocks", 30, 30.0);
+        watcher("g02_from_80_blocks", 80, 30.0);
+        watcher("g03_from_110_blocks", 110, 30.0);
+        // his own third-person views: level, then looking down a little, front and back
+        client(() -> { Minecraft.getInstance().player.setXRot(0.0F); Minecraft.getInstance().options.fov().set(40); }, 10);
+        portrait("g10_own_front_level", CameraType.THIRD_PERSON_FRONT, false);
+        portrait("g11_own_back_level", CameraType.THIRD_PERSON_BACK, false);
+        client(() -> Minecraft.getInstance().player.setXRot(18.0F), 10);
+        portrait("g12_own_front_looking_down", CameraType.THIRD_PERSON_FRONT, false);
+        portrait("g13_own_back_looking_down", CameraType.THIRD_PERSON_BACK, false);
+        client(() -> Minecraft.getInstance().player.setXRot(-18.0F), 10);
+        portrait("g14_own_front_looking_up", CameraType.THIRD_PERSON_FRONT, false);
         server(p -> com.kolodkingal.enhanced.ultimate.Ultimate.set(null), 20);
     }
 
@@ -561,6 +683,10 @@ public final class MindTour {
         }
         if ("ultimate".equals(System.getProperty("enhanced.mindtour.mode"))) {
             ultimateTour();
+            return;
+        }
+        if ("godkiller".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            godkillerTour();
             return;
         }
         if ("keys".equals(System.getProperty("enhanced.mindtour.mode"))) {
