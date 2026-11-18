@@ -32,6 +32,9 @@ public class HulkPlayerRenderer extends PlayerRenderer {
     public static final ResourceLocation RAGNAROK = Enhanced.id("textures/entity/hulk/ragnarok.png");
     public static final ResourceLocation BRAND_NEW_DAY = Enhanced.id("textures/entity/hulk/brand_new_day.png");
 
+    /** How much smaller than his body's the arm in the first-person view is drawn (about its wrist). */
+    public static final float FIRST_PERSON_ARM = 0.62F;
+
     /** The one made at the last resource reload, or null before it. */
     @Nullable
     private static HulkPlayerRenderer instance;
@@ -69,6 +72,11 @@ public class HulkPlayerRenderer extends PlayerRenderer {
 
     @Override
     public ResourceLocation getTextureLocation(AbstractClientPlayer player) {
+        return bodySkin(player);
+    }
+
+    /** The 128 x 128 skin this player's Hulk body wears. */
+    public static ResourceLocation bodySkin(AbstractClientPlayer player) {
         // (3.8: Red Hulk's skin first, when lane L2's RedHulkLooks gives one.)
         ResourceLocation red = com.kolodkingal.enhanced.client.redhulk.RedHulkLooks.texture(player);
         return red != null ? red : skin(HulkAbilities.look(Powers.get(player)));
@@ -93,14 +101,32 @@ public class HulkPlayerRenderer extends PlayerRenderer {
         // (The view's arm hangs where a player's would: the Hulk's shoulder stands 3.5 pixels further out, which would
         // take his huge forearm out of view.)
         arm.x = right ? -5.0F : 5.0F;
+        arm.y = 2.0F;
         arm.z = 0.0F;
+        // (3.17: the arm exactly as the game holds a player's in the view, whatever pose the body was last drawn in)
+        arm.yRot = 0.0F;
+        arm.zRot = right ? 0.1F : -0.1F;
         sleeve.copyFrom(arm);
         arm.xRot = 0.0F;
         sleeve.xRot = 0.0F;
-        ResourceLocation texture = getTextureLocation(player);
+        // (3.17) His forearm is 7 pixels thick where a player's arm is 4, and it stands 1.5 pixels nearer the eye: drawn
+        // at its own size it filled a quarter of the screen. It is drawn smaller about its wrist, so the fist stays
+        // where a player's hand is and the arm is a little thicker than a player's, not three times.
+        float px = (right ? -6.5F : 6.5F) / 16.0F;
+        float py = 14.0F / 16.0F;
+        poseStack.translate(px, py, 0.0F);
+        poseStack.scale(FIRST_PERSON_ARM, FIRST_PERSON_ARM, FIRST_PERSON_ARM);
+        poseStack.translate(-px, -py, 0.0F);
+        // (3.17: his body's own skin. From 1.21.2 a texture asked of "the renderer" was the player renderer's, the
+        // player's 64 x 64 skin, laid wrongly over the Hulk's 128 x 128 arm.)
+        ResourceLocation texture = bodySkin(player);
         arm.render(poseStack, buffer.getBuffer(RenderType.entitySolid(texture)), light, OverlayTexture.NO_OVERLAY);
-        sleeve.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), light,
-                OverlayTexture.NO_OVERLAY);
+        // (from 1.21.2 the sleeve is a part of the arm and was drawn with it: drawn again by itself it stood in the
+        // air beside the arm)
+        if (!arm.hasChild(right ? "right_sleeve" : "left_sleeve")) {
+            sleeve.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), light,
+                    OverlayTexture.NO_OVERLAY);
+        }
         HulkLayers.firstPersonExtras(poseStack, buffer, light, player, arm, right);
         if (right) {
             GauntletLayer.renderFirstPerson(poseStack, buffer, light, player, arm, this);

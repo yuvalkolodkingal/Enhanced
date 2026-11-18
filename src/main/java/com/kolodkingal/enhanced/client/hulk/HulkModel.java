@@ -40,7 +40,15 @@ public class HulkModel extends PlayerModel<AbstractClientPlayer> {
         super(root, false);
     }
 
-    /** The boxes on their 128 x 128 atlas; {@code grow} inflates every box (the energy layer). */
+    /**
+     * The boxes on their 128 x 128 atlas; {@code grow} inflates every box (the energy layer).
+     *
+     * <p>Every part is baked where the PLAYER's part is (the shoulders 5 out, the head at 0, the legs at 12), not where
+     * the Hulk's is: {@link #setupAnim} moves them to the Hulk's places after the vanilla animation, every frame. From
+     * 1.21.2 the vanilla animation starts from the baked places instead of setting the player's own numbers, so parts
+     * baked at the Hulk's places were moved twice there (until 3.16.2 his arms hung in the air 6 pixels out from his
+     * shoulders, and his head and legs sat a pixel or so low, on 1.21.4, 1.21.11 and 26.3).
+     */
     public static LayerDefinition createLayer(float grow) {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
@@ -48,10 +56,9 @@ public class HulkModel extends PlayerModel<AbstractClientPlayer> {
         PartDefinition head = root.addOrReplaceChild("head", CubeListBuilder.create()
                 .texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, g)
                 // The heavy brow ridge over the eyes.
-                .texOffs(60, 66).addBox(-4.5F, -6.5F, -4.6F, 9, 1, 1, g), PartPose.offset(0.0F, HEAD_DY, HEAD_DZ));
+                .texOffs(60, 66).addBox(-4.5F, -6.5F, -4.6F, 9, 1, 1, g), PartPose.ZERO);
         root.addOrReplaceChild("hat", CubeListBuilder.create()
-                .texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, g.extend(0.5F)), PartPose.offset(0.0F, HEAD_DY,
-                        HEAD_DZ));
+                .texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, g.extend(0.5F)), PartPose.ZERO);
         root.addOrReplaceChild("body", CubeListBuilder.create()
                 .texOffs(64, 0).addBox(-7.0F, 0.0F, -4.5F, 14, 8, 9, g)
                 .texOffs(0, 16).addBox(-5.5F, 8.0F, -3.5F, 11, 5, 7, g)
@@ -62,28 +69,24 @@ public class HulkModel extends PlayerModel<AbstractClientPlayer> {
                 .texOffs(76, 17).addBox(-6.0F, 13.5F, -4.0F, 12, 6, 8, g.extend(0.3F)), PartPose.ZERO);
         root.addOrReplaceChild("right_arm", CubeListBuilder.create()
                 .texOffs(0, 32).addBox(-4.5F, -2.0F, -3.0F, 6, 6, 6, g)
-                .texOffs(24, 32).addBox(-5.0F, 4.0F, -3.5F, 7, 8, 7, g), PartPose.offset(-SHOULDER_X, 2.0F, 0.0F));
+                .texOffs(24, 32).addBox(-5.0F, 4.0F, -3.5F, 7, 8, 7, g), PartPose.offset(-5.0F, 2.0F, 0.0F));
         root.addOrReplaceChild("left_arm", CubeListBuilder.create()
                 .texOffs(52, 32).addBox(-1.5F, -2.0F, -3.0F, 6, 6, 6, g)
-                .texOffs(76, 32).addBox(-2.0F, 4.0F, -3.5F, 7, 8, 7, g), PartPose.offset(SHOULDER_X, 2.0F, 0.0F));
+                .texOffs(76, 32).addBox(-2.0F, 4.0F, -3.5F, 7, 8, 7, g), PartPose.offset(5.0F, 2.0F, 0.0F));
         root.addOrReplaceChild("right_sleeve", CubeListBuilder.create()
-                .texOffs(88, 48).addBox(-5.0F, 6.0F, -3.5F, 7, 4, 7, g.extend(0.3F)), PartPose.offset(-SHOULDER_X, 2.0F,
-                        0.0F));
+                .texOffs(88, 48).addBox(-5.0F, 6.0F, -3.5F, 7, 4, 7, g.extend(0.3F)), PartPose.offset(-5.0F, 2.0F, 0.0F));
         root.addOrReplaceChild("left_sleeve", CubeListBuilder.create()
                 .texOffs(0, 66).addBox(-2.0F, 6.0F, -3.5F, 7, 4, 7, g.extend(0.3F))
                 // The steel pauldron of the arena.
-                .texOffs(28, 66).addBox(-2.5F, -3.0F, -4.0F, 8, 4, 8, g.extend(0.2F)), PartPose.offset(SHOULDER_X, 2.0F,
-                        0.0F));
+                .texOffs(28, 66).addBox(-2.5F, -3.0F, -4.0F, 8, 4, 8, g.extend(0.2F)), PartPose.offset(5.0F, 2.0F, 0.0F));
         root.addOrReplaceChild("right_leg", CubeListBuilder.create()
-                .texOffs(0, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g), PartPose.offset(-HIP_X, 12.0F + LEG_DY, 0.0F));
+                .texOffs(0, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g), PartPose.offset(-1.9F, 12.0F, 0.0F));
         root.addOrReplaceChild("left_leg", CubeListBuilder.create()
-                .texOffs(22, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g), PartPose.offset(HIP_X, 12.0F + LEG_DY, 0.0F));
+                .texOffs(22, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g), PartPose.offset(1.9F, 12.0F, 0.0F));
         root.addOrReplaceChild("right_pants", CubeListBuilder.create()
-                .texOffs(44, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g.extend(0.25F)), PartPose.offset(-HIP_X, 12.0F
-                        + LEG_DY, 0.0F));
+                .texOffs(44, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g.extend(0.25F)), PartPose.offset(-1.9F, 12.0F, 0.0F));
         root.addOrReplaceChild("left_pants", CubeListBuilder.create()
-                .texOffs(66, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g.extend(0.25F)), PartPose.offset(HIP_X, 12.0F
-                        + LEG_DY, 0.0F));
+                .texOffs(66, 48).addBox(-2.5F, 0.0F, -3.0F, 5, 11, 6, g.extend(0.25F)), PartPose.offset(1.9F, 12.0F, 0.0F));
         root.addOrReplaceChild("ear", CubeListBuilder.create(), PartPose.ZERO);
         root.addOrReplaceChild("cloak", CubeListBuilder.create(), PartPose.ZERO);
         return LayerDefinition.create(mesh, 128, 128);
