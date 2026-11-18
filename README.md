@@ -71,7 +71,6 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Minecraft** 1.21.1, 1.21.4, 1.21.11 or 26.3 (the same jar)
 * **Mod loader** NeoForge 21.1.x, 21.4.x, 21.11.x or 26.3.x
 * **Install it on** the client, plus the server for multiplayer
-* **Lithium** causes visual bugs with Enhanced: remove it when you play Enhanced.
 
 ## What's new in 3.16.1
 
