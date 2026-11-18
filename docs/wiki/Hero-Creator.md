@@ -6,6 +6,33 @@ Hebrew: [עברית](Hero-Creator-HE)
 
 ![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
 
+## What's new in 3.17
+
+* **Every always-on power of a built-in hero is a card of its own.** A hero's *body* gives a bundle of them; each now also has its own card, so you can take just the one you want and mix them. The hero's own code runs for the card (nothing is copied), and the built-in heroes are unchanged.
+
+| Card | What it does | Of |
+|---|---|---|
+| **Never Hungry** | your hunger bar never empties | Vision |
+| **Water Breathing** | you are never out of breath, on land or under water | Vision |
+| **Burning Beams** | the Mind Stone Beam and the Charged Beam hit harder, set what they strike alight and burn the ground (you need one of those beams) | Source Code Vision |
+| **Poison-Proof** | no Poison and no Wither can touch you | Ultron |
+| **Anti-Gravity Landing** | no fall ever hurts | Ultron |
+| **Safe Falls** | a fall of a few blocks does no harm | Heimdall |
+| **Cloak Catches Falls** | the Cloak of Levitation softens your falls | Doctor Strange |
+| **Fast Healing** | you heal five times as fast | Jim Hammond |
+| **Fire Immunity** | fire, lava, burning and fire attacks never hurt you | Jim Hammond (also the Phoenix's and Red Hulk's) |
+| **Titan Regeneration** | when nothing has hurt you for a while you heal slowly, for a little hunger | Thanos |
+| **First Mutant's Healing** | after a while without a blow you heal every second | Apocalypse |
+| **Allfather's Recovery** | below half your health you regenerate | Odin |
+| **Asgard's Healing**, **Asgard's Strength** | in Asgard you regenerate, and your blows are stronger | Hela |
+| **Healing Factor** | blows that would kill you leave you down and you rise; only the Infinity Stones, chaos magic, the Allfather's power, the Phoenix or poison defeat you | Wolverine and Deadpool |
+
+  Every hero's body (Super-Soldier, the Asgardian body, the Titan body, the machine body...) is still a card, too. A passive card has no strength slider; it costs like a body at middle strength, and a few points more when it is as strong as the Healing Factor.
+* **Clear Sight in Lava** is a new always-on power (no hero has it): the lava's fog is gone while your eyes are in lava, so you see clearly, on every Minecraft version. It only changes what you see, so pair it with **Fire Immunity** to swim in lava. It is listed under the Phoenix.
+* **The Stone-Bearer body** (30 points: the highest price of a body): your hero can **carry and use every Infinity Stone**, including the Time Stone, and **wield the Infinity Gauntlet and the Snap**, exactly as the Scarlet Witch does. A plain custom hero still cannot hold a stone. It is listed under the Scarlet Witch, and it is no more than a Bearer: it does not make you a sorcerer, so the books stay closed to you and the Hex Runes do not hold you. The Scarlet Witch herself is unchanged. See [Infinity Stones](Infinity-Stones#who-may-hold-a-stone).
+* **Every hero and every ability is there.** *Jim Hammond-like* is on the **Start** tab, with all his looks (the android suit, the classic suit, the human disguise) on the Look tab, and every ability of every hero is a card, including Jim's **Fire Beam**, **Fireball**, **Nova Flame** and **Human Disguise** and Vision's **Charged Beam** (a hero saved with the old Density has the Charged Beam).
+* **Your own skin on any hero.** On the **Look** tab, the button at the bottom of the **Skin** part, *Wearing my own Minecraft skin / Wearing the hero's suit*, puts your own Minecraft skin on whichever hero you are now, built-in or your own, instead of the suit; click again to get the suit back. The **Change Look** key has it as the last look of every hero (also for the heroes who only have one suit, and for your own hero), and an operator can use `/enhanced skin <players> own|suit`. It is your choice, not the hero's: it stays when you become another hero, and **other players see it**. Your powers, auras, glows and flames stay; the costume pieces of the look (a helmet, a cowl, a hat) are not drawn, as in the "your own skin" look some heroes already had. The **Hulk** and **Red Hulk** keep their size, but their special 128 x 128 body does not fit an ordinary skin, so they wear it on the normal player model.
+
 ## What's new in 3.8
 
 * **Captain America, Red Hulk, Iron Man, Falcon and Love**: their twenty-seven abilities are cards, and so are their eighteen Sneak variants (Ricochet Throw, Super-Soldier Leap, Shield Bash, Inspire, Flip Kick; Grab & Slam, Roar, Bound, Energy Absorb; Energy Blades, Lightning Refocuser, Nanotech Drones; Wrist Rocket, Boost Climb, Wing Slash, Redwing Strike; Thunder Strike, Bifrost to where you look): **221 cards** in all. Ready-made heroes: *Captain America-like*, *Red Hulk-like*, *Iron Man-like*, *Falcon-like* and *Love-like*.

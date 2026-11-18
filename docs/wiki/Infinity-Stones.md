@@ -29,7 +29,7 @@ The four places, and how to find them with `/locate`, are on [Structures](Struct
 
 ## Who may hold a stone
 
-The stones are too strong for most hands. The **Bearers** may hold every bare stone: the gods **Thor**, **Loki**, **Heimdall**, **Odin** and **Hela**, the **Scarlet Witch** and the **Phoenix** (and a [custom hero](Hero-Creator) with one of their "god's" abilities). Two more may hold one stone each:
+The stones are too strong for most hands. The **Bearers** may hold every bare stone: the gods **Thor**, **Loki**, **Heimdall**, **Odin** and **Hela**, the **Scarlet Witch** and the **Phoenix** (and a [custom hero](Hero-Creator) with one of their "god's" abilities, or with the **Stone-Bearer** body of the Hero Creator (3.17), which also lets him use the Time Stone, as the Scarlet Witch does). Two more may hold one stone each:
 
 * **A sorcerer** may hold the **Time Stone**: Billy, Agatha, Doctor Strange and a custom sorcerer.
 * **Vision** may hold the **Mind Stone**: it is his own.
