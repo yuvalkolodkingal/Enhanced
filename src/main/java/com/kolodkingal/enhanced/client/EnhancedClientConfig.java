@@ -33,6 +33,7 @@ public final class EnhancedClientConfig {
     public static final ConfigSpec.BooleanValue ETERNITY_FOG;
     public static final ConfigSpec.EnumValue<com.kolodkingal.enhanced.client.hud.PowerPanels.Style> HUD_STYLE;
     public static final ConfigSpec.BooleanValue HUD_RIGHT;
+    public static final ConfigSpec.EnumValue<com.kolodkingal.enhanced.client.hud.PassiveHudRules.Mode> PASSIVE_HUD;
     public static final ConfigSpec.BooleanValue OFFICIAL_SERVER;
     public static final ConfigSpec.BooleanValue ADDED_OFFICIAL_SERVER;
 
@@ -156,6 +157,11 @@ public final class EnhancedClientConfig {
                         "The classic panel is always top-left.")
                 .translation("config.enhanced.hud_right")
                 .define("hudOnTheRight", true);
+        PASSIVE_HUD = BUILDER.comment("Show always-on powers on the HUD: the passive lines (a custom hero's \"Always on\" list, Captain America's",
+                        "super-soldier line). ALWAYS: as long as you are the hero. BRIEFLY: for 8 seconds when you join, become the hero or",
+                        "change loadout or look, then they fade. NEVER: hidden. Ability rows, cooldowns, meters and charges always show.")
+                .translation("config.enhanced.passive_hud")
+                .defineEnum("showAlwaysOn", com.kolodkingal.enhanced.client.hud.PassiveHudRules.Mode.BRIEFLY);
         BUILDER.pop();
         // (3.16.1) the official server, added to the Multiplayer list once (OfficialServer)
         BUILDER.push("official_server");
@@ -178,6 +184,10 @@ public final class EnhancedClientConfig {
 
     public static com.kolodkingal.enhanced.client.hud.PowerPanels.Style hudStyle() {
         return SPEC.isLoaded() ? HUD_STYLE.get() : com.kolodkingal.enhanced.client.hud.PowerPanels.Style.CLASSIC;
+    }
+
+    public static com.kolodkingal.enhanced.client.hud.PassiveHudRules.Mode passiveHud() {
+        return SPEC.isLoaded() ? PASSIVE_HUD.get() : com.kolodkingal.enhanced.client.hud.PassiveHudRules.Mode.BRIEFLY;
     }
 
     public static boolean hudRight() {

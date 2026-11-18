@@ -115,20 +115,30 @@ public final class CaptainHud implements LayeredDraw.Layer {
             return;
         }
         PowerData data = Powers.get(player);
-        if (!data.has(HeroAbility.CAPTAIN_BODY)) {
+        // (3.17) a custom hero's passives are in its own "Always on" list: no second line for him; built-in Captain America keeps his
+        if (!data.has(HeroAbility.CAPTAIN_BODY) || data.power() == com.kolodkingal.enhanced.power.Power.CUSTOM) {
             return;
+        }
+        float shown = com.kolodkingal.enhanced.client.hud.PassiveHud.visibility(mc, "captain/" + data.variant());
+        int alpha = Math.round(255.0F * shown);
+        if (alpha < 8) {
+            return; // (the setting: briefly or never; faded out)
         }
         Component line = Component.translatable("hud.enhanced.captain.body");
         Font font = mc.font;
         int x = 4;
         int y = HealingHud.bottom(data) - (HealingFactor.has(player) ? 0 : HealingHud.HEIGHT + 2);
         int width = 11 + font.width(line) + 2;
-        g.fill(x - 2, y - 2, x + width + 2, y + HealingHud.HEIGHT - 2, 0x70000000);
-        icon(g, x, y + 1);
-        g.drawString(font, line, x + 10, y + 1, 0xFFE8EEF5, true);
+        g.fill(x - 2, y - 2, x + width + 2, y + HealingHud.HEIGHT - 2, (Math.round(0x70 * shown) << 24));
+        icon(g, x, y + 1, alpha);
+        g.drawString(font, line, x + 10, y + 1, (alpha << 24) | 0xE8EEF5, true);
     }
 
     static void icon(GuiGraphics g, int x, int y) {
+        icon(g, x, y, 255);
+    }
+
+    static void icon(GuiGraphics g, int x, int y, int alpha) {
         for (int r = 0; r < ICON.length; r++) {
             for (int c = 0; c < ICON[r].length(); c++) {
                 int color = switch (ICON[r].charAt(c)) {
@@ -139,7 +149,7 @@ public final class CaptainHud implements LayeredDraw.Layer {
                     default -> 0;
                 };
                 if (color != 0) {
-                    g.fill(x + c, y + r, x + c + 1, y + r + 1, color);
+                    g.fill(x + c, y + r, x + c + 1, y + r + 1, (alpha << 24) | (color & 0xFFFFFF));
                 }
             }
         }

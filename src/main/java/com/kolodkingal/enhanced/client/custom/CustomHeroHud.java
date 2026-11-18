@@ -9,6 +9,7 @@ import com.kolodkingal.enhanced.client.Coexist;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.client.KeyBindings;
 import com.kolodkingal.enhanced.client.PowerHud;
+import com.kolodkingal.enhanced.client.hud.PassiveHud;
 import com.kolodkingal.enhanced.client.hud.PowerPanels;
 import com.kolodkingal.enhanced.custom.CatalogEntry;
 import com.kolodkingal.enhanced.custom.CustomHero;
@@ -115,6 +116,9 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                 lines.add(sub);
             }
         }
+        // (3.17) the setting "Show always-on powers": the list shows for a few seconds, always, or never; the key rows always show
+        float shown = PassiveHud.visibility(mc, identity(hero, data, player));
+        int passiveAlpha = Math.round(255.0F * shown);
         List<Component> passive = new ArrayList<>();
         for (CustomHero.Pick pick : hero.powers()) {
             CatalogEntry entry = pick.entry();
@@ -124,7 +128,8 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                         : pick.color())));
             }
         }
-        if (!passive.isEmpty()) {
+        int passiveLine = -1;
+        if (!passive.isEmpty() && passiveAlpha >= 8) {
             MutableComponent line = Component.translatable("hud.enhanced.custom.always").withStyle(ChatFormatting.GRAY).append(" ");
             for (int i = 0; i < passive.size(); i++) {
                 if (i > 0) {
@@ -132,6 +137,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                 }
                 line.append(passive.get(i).copy());
             }
+            passiveLine = lines.size();
             lines.add(line);
         }
 
@@ -149,10 +155,15 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         graphics.fill(x, y + 9, x + font.width(title), y + 10, 0x90000000 | hero.color());
         graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);
         y += 12;
-        for (Component line : lines) {
-            graphics.drawString(font, line, x, y, 0xFFFFFFFF, true);
+        for (int i = 0; i < lines.size(); i++) {
+            graphics.drawString(font, lines.get(i), x, y, i == passiveLine ? (passiveAlpha << 24) | 0xFFFFFF : 0xFFFFFFFF, true);
             y += 10;
         }
+    }
+
+    /** Which hero, loadout and look this is: when it changes, the passive lines show again for a few seconds. */
+    private static String identity(CustomHero hero, PowerData data, LocalPlayer player) {
+        return "custom/" + CustomHeroes.name(player).getString() + "/" + data.variant() + "/" + hero.powers();
     }
 
     /** What the new panel styles and the wheel draw: the classic panel's content, as data (null: not a custom hero). */
@@ -195,7 +206,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                 always.append(CreatorUi.name(entry).withStyle(s -> s.withColor(pick.color() < 0 ? hero.glow() : pick.color())));
             }
         }
-        if (always != null) {
+        if (always != null && PassiveHud.visibility(mc, identity(hero, data, player)) > 0.0F) {
             model.notes.add(always);
         }
         return model;

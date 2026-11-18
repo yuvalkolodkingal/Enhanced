@@ -366,6 +366,8 @@ The panel of your powers can be drawn in six styles. Choose one in the settings 
 | **Scroll** | A scroll pinned to the corner. |
 | **Cluster** | A small cluster of tiles and nothing else. |
 
+**Always-on powers** (3.17): the passive lines of the panel (a custom hero's *Always on* list, Captain America's super-soldier line) do not need to be shown all the time. In the settings (*Show always-on powers on the HUD*) choose **Always**, **Briefly** (the default: for 8 seconds when you join, become the hero or change loadout or look, then they fade out) or **Never**. Ability rows, cooldowns, meters and charges always show. A custom hero's passives are in the one *Always on* line of its panel; the super-soldier line is only for Captain America himself.
+
 The new styles sit in the top-right corner (*Panel on the right* off: top-left), under the status effect icons, and follow the *Reduced motion* setting. Each power has its own symbol; a custom hero's powers show their initials.
 
 **The ability wheel: U (hold).** Shows your powers as a wheel around your face; point at one to read its name, key and state. Let go to close it. It only shows: nothing is cast from it.

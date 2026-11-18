@@ -4951,6 +4951,8 @@
   "config.enhanced.hud_style.tooltip": "Classic: the text panel. Key stack: one bar per key. Dial: tiles around an emblem. Comic panels. Scroll: a scroll pinned to the corner. Cluster: a small cluster of tiles.",
   "config.enhanced.hud_right": "Panel on the right",
   "config.enhanced.hud_right.tooltip": "The new panel styles sit in the top-right corner (off: top-left). The classic panel is always top-left.",
+  "config.enhanced.passive_hud": "Show always-on powers on the HUD",
+  "config.enhanced.passive_hud.tooltip": "Always: the passive lines (a custom hero's \"Always on\" list, Captain America's super-soldier line) stay. Briefly: they show for 8 seconds when you join, become the hero or change loadout or look, then fade out. Never: hidden. Ability rows, cooldowns, meters and charges always show.",
   "item.enhanced.source_code": "The Source Code",
   "item.enhanced.source_code.desc": "The code Vision was made of.",
   "item.enhanced.source_code.desc2": "Use it as White Vision. Anyone else who uses it becomes Jim Hammond.",
