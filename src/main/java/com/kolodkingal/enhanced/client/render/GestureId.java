@@ -600,6 +600,8 @@ public enum GestureId {
     LOVE_LIGHTNING(Group.CAST, 8, 1, 5, true),
     /** The Eye Laser lights: the chin thrust forward, the fists pulled down to her sides. */
     LOVE_EYE_LASER(Group.CAST, 10, 1, 5, false),
+    /** Jim Hammond's fireball (V): the throwing arm wound back, then hurled forward at the release. */
+    JIM_THROW(Group.CAST, 14, 2, 6, true),
     // (3.8: each lane appends its gestures in its region, with their keys in Gestures in the same commit:
     // AnimationMathTests wants keys for every gesture.)
     ;

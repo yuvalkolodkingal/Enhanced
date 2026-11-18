@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Jim Hammond's HUD lines (3.17, for {@code JimClient.hudStatus}): the Fire Beam's charge is the shared one ({@code PowerHud}
- * asks {@code ChargedBeamFx} for R), the Nova Flame's gathering shows its percent on B, and then the cooldowns; G and N say ON or OFF.
+ * Jim Hammond's HUD lines (3.17, for {@code JimClient.hudStatus}): the Fire Beam's line (R) shows the solar charge (and "Firing" while it is held), the Nova Flame's gathering
+ * shows its percent on B, and then the cooldowns; G and N say ON or OFF.
  */
 public final class JimHud {
     /** When each player's Nova began gathering, as the HUD saw it. */
@@ -33,7 +33,7 @@ public final class JimHud {
             return Component.translatable("hud.enhanced.charged", percent).withStyle(percent >= 100 ? ChatFormatting.GOLD : ChatFormatting.YELLOW);
         }
         NOVA_SINCE.remove(player.getId());
-        Component cooldown = PowerHud.cooldown(data, ability, now);
+        Component cooldown = ability == 1 && data.is(Live.BEAM_FIRING) ? null : PowerHud.cooldown(data, ability, now);
         if (cooldown != null) {
             return cooldown;
         }
@@ -41,7 +41,7 @@ public final class JimHud {
             // the solar charge, 0 to 100% (the Fire Beam's line; the cooldown above has it for a moment after each shot)
             int percent = Math.round(100.0F * data.ironCharge() / Math.max(1, JimConfig.SOLAR_CAPACITY.get()));
             percent = Math.max(0, Math.min(100, percent));
-            return Component.translatable("hud.enhanced.solar", percent).withStyle(percent >= 50 ? ChatFormatting.GOLD
+            return Component.translatable(data.is(Live.BEAM_FIRING) ? "hud.enhanced.solar_firing" : "hud.enhanced.solar", percent).withStyle(percent >= 50 ? ChatFormatting.GOLD
                     : percent >= 20 ? ChatFormatting.YELLOW : ChatFormatting.RED);
         }
         return switch (ability) {

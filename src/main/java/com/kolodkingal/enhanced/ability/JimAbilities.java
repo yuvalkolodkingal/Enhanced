@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.Enhanced;
+import com.kolodkingal.enhanced.config.ChargedBeamConfig;
 import com.kolodkingal.enhanced.config.JimConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
@@ -36,12 +37,13 @@ import java.util.UUID;
 /**
  * Jim Hammond (3.17), the android first Human Torch, as the designer specified him (and nothing more):
  * <ol>
- *   <li>R, the Fire Beam ({@link ChargedBeam}: tap fires, hold charges; it burns what it hits and the ground where it
- *   strikes; charged enough it turns the ground into magma);</li>
+ *   <li>R, the Fire Beam ({@link JimBeam}: a continuous beam while it is held, fed by his solar charge; it burns what it
+ *   touches and the ground along it);</li>
  *   <li>total immunity to fire ({@link #FIRE_IMMUNITY});</li>
  *   <li>a body almost as durable as Vision's, healing five times as fast ({@link #BODY});</li>
  *   <li>V, fireballs ({@link JimFireballs});</li>
- *   <li>B, the Nova Flame: he gathers his energy (hold B), the blast goes off when it is full, then a long cooldown;</li>
+ *   <li>B, the Nova Flame ({@link ChargedBeam}'s own mechanism: hold to charge, release to fire; stronger the longer; burns
+ *   everything along and around its path, explodes where it strikes, makes magma when charged; then a long cooldown);</li>
  *   <li>his whole body burns while he flies, and whoever strikes him then is set alight ({@link JimEvents}).</li>
  * </ol>
  * G is flight (a flame form the client draws), N the human disguise (the look, android and human).
@@ -50,37 +52,33 @@ public final class JimAbilities {
     private static final ResourceLocation BODY_HEALTH = Enhanced.id("jim_body_health");
     private static final ResourceLocation BODY_ARMOR = Enhanced.id("jim_body_armor");
 
-    /** When each player began gathering a Nova Flame, and when each blast went off. */
-    private static final Map<UUID, Long> NOVA_START = new HashMap<>();
-    private static final Map<UUID, Long> NOVA_FIRED = new HashMap<>();
     private static final Map<UUID, Long> LAST_HEAL = new HashMap<>();
 
     private JimAbilities() {
     }
 
-    /** Jim's Fire Beam: the shared charged beam with his numbers, his fire and his magma. */
-    public static final ChargedBeam.Profile BEAM = new ChargedBeam.Profile(JimConfig.BEAM_CHARGE_TICKS::get,
-            JimConfig.BEAM_TAP_TICKS::get, JimConfig.BEAM_COOLDOWN::get, JimConfig.BEAM_MIN_DAMAGE::get,
-            JimConfig.BEAM_MAX_DAMAGE::get, JimConfig.BEAM_MIN_RANGE::get, JimConfig.BEAM_MAX_RANGE::get,
-            JimConfig.BEAM_MAX_WIDTH::get, ModDamageTypes.SOLAR_BEAM,
-            c -> Math.round(JimConfig.BEAM_BURN_SECONDS.get() * (1.0F + (float) c)), JimAbilities::beamImpact,
+    /** The Nova Flame: the Charged Beam's own mechanism (hold to charge, release to fire), with Jim's numbers, jewel and fire. */
+    public static final ChargedBeam.Profile NOVA = new ChargedBeam.Profile(JimConfig.NOVA_CHARGE_TICKS::get,
+            JimConfig.NOVA_TAP_TICKS::get, JimConfig.NOVA_COOLDOWN::get, JimConfig.NOVA_MIN_DAMAGE::get,
+            JimConfig.NOVA_DAMAGE::get, JimConfig.NOVA_MIN_RANGE::get, JimConfig.NOVA_RANGE::get, JimConfig.NOVA_WIDTH::get,
+            ModDamageTypes.SOLAR_BEAM, c -> Math.round(JimConfig.NOVA_BURN_SECONDS.get() * (1.0F + (float) c)), JimAbilities::novaImpact,
             new ChargedBeam.Gate() {
                 @Override
                 public boolean start(ServerPlayer player, PowerData data) {
-                    return JimSolar.has(player, data, JimSolar.beamCost(0.0F));
+                    return JimSolar.has(player, data, JimConfig.NOVA_MIN_CHARGE.get());
                 }
 
                 @Override
                 public boolean fire(ServerPlayer player, PowerData data, float charge) {
-                    return JimSolar.spend(player, data, JimSolar.beamCost(charge));
+                    return JimSolar.spend(player, data, JimSolar.novaCost(charge));
                 }
-            });
+            }, Live.JIM_NOVA_CHARGING, Live.JIM_NOVA_BLAST, JimConfig.NOVA_DURATION_TICKS::get);
 
     // ---- keys ----
 
     static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         switch (ability) {
-            case 1 -> ChargedBeam.onKey(player, data, down, BEAM, HeroAbility.JIM_BEAM);
+            case 1 -> JimBeam.onKey(player, data, down);
             case 2 -> {
                 if (down) {
                     PowerTicker.toggleFlight(player);
@@ -92,11 +90,7 @@ public final class JimAbilities {
                 }
             }
             case 4 -> {
-                if (down) {
-                    startNova(player, data);
-                } else {
-                    cancelNova(player, data);
-                }
+                ChargedBeam.onKey(player, data, down, NOVA, HeroAbility.JIM_NOVA);
             }
             case 5 -> {
                 if (down) {
@@ -124,13 +118,13 @@ public final class JimAbilities {
     static void tick(ServerPlayer player, PowerData data) {
         JimSolar.tick(player, data);
         if (data.has(HeroAbility.JIM_BEAM)) {
-            ChargedBeam.tick(player, data, BEAM, HeroAbility.JIM_BEAM);
+            JimBeam.tick(player, data);
         }
         if (data.has(HeroAbility.JIM_FIREBALL)) {
             JimFireballs.tick(player, data);
         }
         if (data.has(HeroAbility.JIM_NOVA)) {
-            novaTick(player, data);
+            ChargedBeam.tick(player, data, NOVA, HeroAbility.JIM_NOVA);
         }
         if (data.has(HeroAbility.JIM_FIRE_IMMUNITY)) {
             fireImmunity(player);
@@ -185,16 +179,84 @@ public final class JimAbilities {
         }
     }
 
-    // ---- the Fire Beam's mark on the world ----
+    // ---- the Nova Flame's mark on the world ----
 
-    private static void beamImpact(ServerPlayer player, ServerLevel level, HitResult hit, float charge) {
-        if (JimConfig.BEAM_FIRE.get()) {
-            BeamFire.strike(player, level, hit, 0, 2);
+    /**
+     * Where the Nova Flame strikes: an explosion scaled by the charge (as Source Code Vision's charged beam has), then everything
+     * along and around the beam's line burns: every creature within a radius of it (about 2 blocks for a tap, about 4 at a full
+     * charge) is set alight, fire is placed on the open faces of the blocks of that band, and a charge of 80% or more turns
+     * the ground along the path into magma. All through the mod's rules: never with {@code mobGriefing} off, never against
+     * {@link BlockRights}; never him.
+     */
+    private static void novaImpact(ServerPlayer player, ServerLevel level, HitResult hit, float charge) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 end = hit.getLocation();
+        Vec3 axis = end.subtract(eye);
+        double length = axis.length();
+        double radius = Mth.lerp(charge, (float) JimConfig.NOVA_BURN_RADIUS_MIN.get().doubleValue(),
+                (float) Math.max(JimConfig.NOVA_BURN_RADIUS_MIN.get(), JimConfig.NOVA_BURN_RADIUS_MAX.get()));
+        int seconds = Math.round(JimConfig.NOVA_BURN_SECONDS.get() * (1.0F + charge));
+        // the creatures beside the line burn too
+        if (seconds > 0 && radius > 0.0) {
+            for (net.minecraft.world.entity.Entity e : level.getEntities(player, new AABB(eye, end).inflate(radius + 1.0), WandaAbilities.BEAM_TARGET)) {
+                if (e instanceof LivingEntity living && !AreaTargets.mayHurt(player, living, true)) {
+                    continue;
+                }
+                Vec3 c = e.getBoundingBox().getCenter();
+                Vec3 ab = end.subtract(eye);
+                double len2 = ab.lengthSqr();
+                double t = len2 < 1.0E-9 ? 0 : Math.max(0, Math.min(1, c.subtract(eye).dot(ab) / len2));
+                if (c.distanceTo(eye.add(ab.scale(t))) <= radius + e.getBbWidth() / 2.0) {
+                    BeamFire.ignite(e, seconds);
+                }
+            }
         }
-        if (JimConfig.MAGMA.get() && charge >= JimConfig.MAGMA_MIN_CHARGE.get() && hit instanceof BlockHitResult block
-                && hit.getType() == HitResult.Type.BLOCK) {
-            magma(player, level, block.getBlockPos(), JimConfig.MAGMA_RADIUS.get());
+        if (length > 1.0 && radius > 0.0) {
+            boolean magma = JimConfig.NOVA_MAGMA.get() && charge >= JimConfig.NOVA_MAGMA_MIN_CHARGE.get();
+            boolean fire = JimConfig.NOVA_FIRE.get();
+            if (magma || fire) {
+                Vec3 dir = axis.scale(1.0 / length);
+                int steps = (int) Math.min(48, length / 2.0);
+                int fires = 0;
+                for (int i = 0; i <= steps; i++) {
+                    Vec3 c = eye.add(dir.scale(Math.min(length, 1.5 + i * 2.0)));
+                    if (magma) {
+                        BlockPos ground = groundBelow(level, BlockPos.containing(c), 10);
+                        if (ground != null) {
+                            magma(player, level, ground, JimConfig.NOVA_MAGMA_RADIUS.get());
+                        }
+                    }
+                    for (int k = 0; fire && k < 4 && fires < 80; k++) {
+                        Vec3 at = c.add((level.random.nextDouble() - 0.5) * 2.0 * radius, (level.random.nextDouble() - 0.5) * radius,
+                                (level.random.nextDouble() - 0.5) * 2.0 * radius);
+                        BlockPos ground = groundBelow(level, BlockPos.containing(at), 8);
+                        // (never near him: the fire is not for the shooter's own feet)
+                        if (ground != null && ground.above().distToCenterSqr(eye) > 9.0 && BeamFire.place(player, level, ground.above())) {
+                            fires++;
+                        }
+                    }
+                }
+            }
         }
+        if (JimConfig.NOVA_EXPLOSION.get() && hit.getType() == HitResult.Type.BLOCK) {
+            float r = Mth.lerp(charge, (float) ChargedBeamConfig.EXPLOSION_MIN_RADIUS.get().doubleValue(),
+                    (float) Math.max(ChargedBeamConfig.EXPLOSION_MIN_RADIUS.get(), ChargedBeamConfig.EXPLOSION_MAX_RADIUS.get()));
+            ChargedBeam.explode(player, level, end, r, charge, (float) ChargedBeamConfig.EXPLOSION_MAX_DAMAGE.get().doubleValue(),
+                    ChargedBeamConfig.EXPLOSION_BREAKS_BLOCKS.get());
+        }
+    }
+
+    /** The first solid block at or below {@code from} within {@code down} blocks (the ground under a point of the beam), or null. */
+    private static BlockPos groundBelow(ServerLevel level, BlockPos from, int down) {
+        BlockPos pos = from;
+        for (int i = 0; i <= down; i++) {
+            BlockState state = level.getBlockState(pos);
+            if (!state.isAir() && state.getFluidState().isEmpty() && !state.canBeReplaced()) {
+                return pos;
+            }
+            pos = pos.below();
+        }
+        return null;
     }
 
     /** A charged beam turns the ground it strikes into magma: the struck block and the ones round it on its layer. */
@@ -225,155 +287,19 @@ public final class JimAbilities {
         return made;
     }
 
-    // ---- B: the Nova Flame ----
-
     /** Where the Nova starts by look: the classic suit's jewel is on the forehead (the head part); the android's gold diamond and the human disguise are on the chest. */
     public static boolean novaStartsAtHead(PowerData data) {
         return !data.disguise() && "classic".equals(data.variant());
     }
 
-    public static boolean gatheringNova(ServerPlayer player) {
-        return NOVA_START.containsKey(player.getUUID());
-    }
-
-    private static void startNova(ServerPlayer player, PowerData data) {
-        if (gatheringNova(player) || player.isSpectator()) {
-            return;
-        }
-        long now = player.level().getGameTime();
-        long until = data.cooldownUntil(data.slot(HeroAbility.JIM_NOVA));
-        if (until > now && !player.getAbilities().instabuild) {
-            player.displayClientMessage(Component.translatable("message.enhanced.jim.nova_cooldown", (until - now + 19) / 20), true);
-            return;
-        }
-        if (!JimSolar.has(player, data, JimConfig.NOVA_MIN_CHARGE.get())) {
-            return;
-        }
-        data.setBeamActive(false);
-        NOVA_START.put(player.getUUID(), now);
-        data.set(Live.JIM_NOVA_CHARGING, true);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.RESPAWN_ANCHOR_CHARGE,
-                SoundSource.PLAYERS, 1.0F, 0.7F);
-    }
-
-    /** He let go before it was full: the energy is lost, and he must wait a little. */
-    private static void cancelNova(ServerPlayer player, PowerData data) {
-        if (NOVA_START.remove(player.getUUID()) != null) {
-            data.set(Live.JIM_NOVA_CHARGING, false);
-            data.startCooldown(HeroAbility.JIM_NOVA, player.level().getGameTime(), JimConfig.NOVA_CANCEL_COOLDOWN.get());
-            player.displayClientMessage(Component.translatable("message.enhanced.jim.nova_lost"), true);
-        }
-    }
-
-    private static void novaTick(ServerPlayer player, PowerData data) {
-        ServerLevel level = player.serverLevel();
-        long now = level.getGameTime();
-        Long start = NOVA_START.get(player.getUUID());
-        if (start != null) {
-            long held = now - start;
-            int full = JimConfig.NOVA_CHARGE_TICKS.get();
-            if (!data.is(Live.JIM_NOVA_CHARGING) || !player.isAlive() || player.isSpectator()) {
-                NOVA_START.remove(player.getUUID());
-                data.set(Live.JIM_NOVA_CHARGING, false);
-            } else if (held >= full) {
-                NOVA_START.remove(player.getUUID());
-                data.set(Live.JIM_NOVA_CHARGING, false);
-                novaBlast(player, data);
-            } else {
-                float t = held / (float) full;
-                if (held % 5 == 0) {
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS,
-                            1.0F, 0.6F + 1.4F * t);
-                }
-                // he braces: slowed, the heat gathering round him
-                player.setDeltaMovement(player.getDeltaMovement().multiply(0.5, 0.5, 0.5));
-                player.hurtMarked = true;
-                Embers.burst(level, player.getX(), player.getY() + 1.0, player.getZ(), 2 + (int) (6 * t), 0.5, 0.8, 0.5, 0.02);
-            }
-        } else if (data.is(Live.JIM_NOVA_CHARGING)) {
-            data.set(Live.JIM_NOVA_CHARGING, false);
-        }
-        Long fired = NOVA_FIRED.get(player.getUUID());
-        if (fired != null && (now - fired >= JimConfig.NOVA_DURATION_TICKS.get() || !player.isAlive() || player.isSpectator())) {
-            NOVA_FIRED.remove(player.getUUID());
-            data.set(Live.JIM_NOVA_BLAST, false);
-        } else if (fired != null) {
-            novaBeamTick(player, level, now - fired);
-        } else if (data.is(Live.JIM_NOVA_BLAST)) {
-            data.set(Live.JIM_NOVA_BLAST, false);
-        }
-    }
-
-    /** The charge is full: the great beam begins (it burns for {@code novaDurationTicks}), and the long cooldown starts. */
-    static void novaBlast(ServerPlayer player, PowerData data) {
-        ServerLevel level = player.serverLevel();
-        long now = level.getGameTime();
-        if (!JimSolar.spend(player, data, JimConfig.NOVA_COST.get())) {
-            data.startCooldown(HeroAbility.JIM_NOVA, now, JimConfig.NOVA_CANCEL_COOLDOWN.get()); // (the charge was drained while it gathered)
-            return;
-        }
-        data.set(Live.JIM_NOVA_BLAST, true);
-        NOVA_FIRED.put(player.getUUID(), now);
-        data.startCooldown(HeroAbility.JIM_NOVA, now, JimConfig.NOVA_COOLDOWN.get() + JimConfig.NOVA_DURATION_TICKS.get());
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 2.0F, 0.5F);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 1.2F, 0.6F);
-    }
-
-    /**
-     * One tick of the great beam, from his eyes where he looks: everything within its width along it is struck every 4 ticks (never
-     * him), the creatures it crosses burn, and where it strikes the ground it burns it and turns it to magma, so the path it sweeps
-     * is a path of fire and magma. The magma and the fire obey the Fire Beam's rules (mobGriefing, {@link BlockRights}).
-     */
-    private static void novaBeamTick(ServerPlayer player, ServerLevel level, long age) {
-        Vec3 eye = player.getEyePosition();
-        BlockHitResult block = Raycasts.block(player, JimConfig.NOVA_RANGE.get(), 1.0F);
-        Vec3 end = block.getLocation();
-        double width = JimConfig.NOVA_WIDTH.get();
-        if (age % 4 == 0) {
-            AABB box = new AABB(eye, end).inflate(width + 1.0);
-            for (net.minecraft.world.entity.Entity e : level.getEntities(player, box, WandaAbilities.BEAM_TARGET)) {
-                double reach = width + e.getBbWidth() / 2.0;
-                if (distanceToSegment(e.getBoundingBox().getCenter(), eye, end) > reach && e.getBoundingBox().inflate(width).clip(eye, end).isEmpty()) {
-                    continue;
-                }
-                if (e instanceof LivingEntity living && !AreaTargets.mayHurt(player, living, true)) {
-                    continue;
-                }
-                e.hurt(ModDamageTypes.source(level, ModDamageTypes.SOLAR_BEAM, player, player), JimConfig.NOVA_DAMAGE.get().floatValue());
-                BeamFire.ignite(e, JimConfig.NOVA_BURN_SECONDS.get());
-            }
-        }
-        if (block.getType() == HitResult.Type.BLOCK && age % 3 == 0) {
-            if (JimConfig.NOVA_FIRE.get()) {
-                BeamFire.strike(player, level, block, 0, 3);
-            }
-            if (JimConfig.NOVA_MAGMA.get()) {
-                magma(player, level, block.getBlockPos(), JimConfig.NOVA_MAGMA_RADIUS.get());
-            }
-            Embers.burst(level, end.x, end.y, end.z, 6, 0.5, 0.4, 0.5, 0.2);
-        }
-        if (age % 6 == 0) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.5F, 0.5F);
-        }
-        // the recoil: he is held where he stands
-        player.setDeltaMovement(player.getDeltaMovement().multiply(0.6, 0.6, 0.6));
-        player.hurtMarked = true;
-    }
-
-    private static double distanceToSegment(Vec3 p, Vec3 a, Vec3 b) {
-        Vec3 ab = b.subtract(a);
-        double len = ab.lengthSqr();
-        double t = len < 1.0E-9 ? 0 : Math.max(0, Math.min(1, p.subtract(a).dot(ab) / len));
-        return p.distanceTo(a.add(ab.scale(t)));
-    }
-
     // ---- ending ----
 
     static void endAll(ServerPlayer player, PowerData data) {
-        NOVA_START.remove(player.getUUID());
-        NOVA_FIRED.remove(player.getUUID());
         LAST_HEAL.remove(player.getUUID());
         JimFireballs.forget(player.getUUID());
+        JimBeam.forget(player.getUUID());
+        ChargedBeam.forget(player.getUUID());
+        data.set(Live.JIM_THROW, false);
         data.set(Live.JIM_NOVA_CHARGING, false);
         data.set(Live.JIM_NOVA_BLAST, false);
         data.set(Live.JIM_FLAMING, false);
@@ -389,9 +315,9 @@ public final class JimAbilities {
     }
 
     static void forget(UUID player) {
-        NOVA_START.remove(player);
-        NOVA_FIRED.remove(player);
         LAST_HEAL.remove(player);
         JimFireballs.forget(player);
+        JimBeam.forget(player);
+        ChargedBeam.forget(player);
     }
 }

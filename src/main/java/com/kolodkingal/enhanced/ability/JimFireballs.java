@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.ability;
 
 import com.kolodkingal.enhanced.config.JimConfig;
 import com.kolodkingal.enhanced.custom.HeroAbility;
+import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.core.particles.ParticleTypes;
@@ -44,6 +45,13 @@ public final class JimFireballs {
     }
 
     private static final Map<UUID, List<Ball>> BALLS = new HashMap<>();
+    /** When each player began a throw (the ball is released {@link #THROW_DELAY} ticks later). */
+    private static final Map<UUID, Long> THROWN_AT = new HashMap<>();
+    private static final Map<UUID, Integer> PULSE_OFF = new HashMap<>();
+    /** Ticks from the press to the release of the ball (the wind-up of the throw). */
+    public static final int THROW_DELAY = 4;
+    /** How long (ticks) the throw's state stays on after the release, for every client to see it begin and play the gesture. */
+    private static final int PULSE_TICKS = 4;
 
     private JimFireballs() {
     }
@@ -60,10 +68,18 @@ public final class JimFireballs {
         if (!JimSolar.spend(player, data, JimConfig.FIREBALL_COST.get())) {
             return;
         }
+        // the throw: every client plays the wind-up now, and the ball leaves his hand at the release, THROW_DELAY ticks on
+        data.set(Live.JIM_THROW, true);
+        THROWN_AT.put(player.getUUID(), now);
+        data.startCooldown(HeroAbility.JIM_FIREBALL, now, JimConfig.FIREBALL_COOLDOWN.get());
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 0.7F, 1.4F);
+    }
+
+    /** The release: the ball leaves where he looks now. */
+    private static void release(ServerPlayer player) {
         Vec3 look = player.getLookAngle();
         Vec3 from = player.getEyePosition().add(look.scale(0.7)).add(0, -0.25, 0);
         BALLS.computeIfAbsent(player.getUUID(), u -> new ArrayList<>()).add(new Ball(from, look.scale(JimConfig.FIREBALL_SPEED.get())));
-        data.startCooldown(HeroAbility.JIM_FIREBALL, now, JimConfig.FIREBALL_COOLDOWN.get());
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.0F, 1.2F);
     }
 
@@ -74,6 +90,29 @@ public final class JimFireballs {
     }
 
     static void tick(ServerPlayer player, PowerData data) {
+        Long thrown = THROWN_AT.get(player.getUUID());
+        if (thrown != null) {
+            long age = player.level().getGameTime() - thrown;
+            if (!player.isAlive() || player.isSpectator()) {
+                THROWN_AT.remove(player.getUUID());
+                data.set(Live.JIM_THROW, false);
+            } else if (age >= THROW_DELAY) {
+                THROWN_AT.remove(player.getUUID());
+                PULSE_OFF.put(player.getUUID(), 0);
+                release(player);
+            }
+        }
+        Integer shown = PULSE_OFF.get(player.getUUID());
+        if (shown != null) {
+            if (shown + 1 >= PULSE_TICKS) {
+                PULSE_OFF.remove(player.getUUID());
+                data.set(Live.JIM_THROW, false);
+            } else {
+                PULSE_OFF.put(player.getUUID(), shown + 1);
+            }
+        } else if (thrown == null && data.is(Live.JIM_THROW)) {
+            data.set(Live.JIM_THROW, false); // (a stale state)
+        }
         List<Ball> list = BALLS.get(player.getUUID());
         if (list == null) {
             return;
@@ -172,10 +211,14 @@ public final class JimFireballs {
 
     static void forget(UUID player) {
         BALLS.remove(player);
+        THROWN_AT.remove(player);
+        PULSE_OFF.remove(player);
     }
 
     /** The server stopped: no fireball is left. */
     public static void clear() {
         BALLS.clear();
+        THROWN_AT.clear();
+        PULSE_OFF.clear();
     }
 }

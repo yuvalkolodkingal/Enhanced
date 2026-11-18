@@ -414,7 +414,7 @@ public enum HeroAbility implements CatalogEntry {
     // (The designer's six: R the Fire Beam, the fire immunity, the durable body that heals fast, V fireballs, B the Nova
     // Flame, the burning body in flight. G is flight, N the human disguise.)
     JIM_BEAM(Power.JIM_HAMMOND, 1, "fire_beam", hold().cost(2).group(Group.ENERGY).icon("minecraft:blaze_rod")
-            .on(d -> d.is(Live.BEAM_CHARGING))),
+            .on(d -> d.is(Live.BEAM_FIRING))),
     JIM_FIREBALL(Power.JIM_HAMMOND, 3, "fireball", press().cost(2).group(Group.ENERGY).icon("minecraft:fire_charge")),
     JIM_NOVA(Power.JIM_HAMMOND, 4, "nova_flame", hold().cost(3).group(Group.ENERGY).icon("minecraft:magma_block")
             .on(d -> d.is(Live.JIM_NOVA_CHARGING))),

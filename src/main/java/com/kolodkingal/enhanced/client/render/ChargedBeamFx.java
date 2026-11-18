@@ -42,13 +42,10 @@ public final class ChargedBeamFx {
 
     /** The key whose line of the HUD shows the charge: B for Vision. */
     public static int hudKey(Power power) {
-        return power == Power.VISION ? 4 : power == Power.JIM_HAMMOND ? 1 : -1;
+        return power == Power.VISION ? 4 : -1;
     }
 
     private static int chargeTicks(Power power) {
-        if (power == Power.JIM_HAMMOND) {
-            return EnhancedConfig.SPEC.isLoaded() ? com.kolodkingal.enhanced.config.JimConfig.BEAM_CHARGE_TICKS.get() : 40;
-        }
         return EnhancedConfig.SPEC.isLoaded() ? ChargedBeamConfig.CHARGE_TICKS.get() : 50;
     }
 
@@ -56,11 +53,34 @@ public final class ChargedBeamFx {
         if (!EnhancedConfig.SPEC.isLoaded()) {
             return 32;
         }
-        if (power == Power.JIM_HAMMOND) {
-            return Mth.lerp(charge, com.kolodkingal.enhanced.config.JimConfig.BEAM_MIN_RANGE.get(),
-                    Math.max(com.kolodkingal.enhanced.config.JimConfig.BEAM_MIN_RANGE.get(), com.kolodkingal.enhanced.config.JimConfig.BEAM_MAX_RANGE.get()));
-        }
         return Mth.lerp(charge, ChargedBeamConfig.MIN_RANGE.get(), Math.max(ChargedBeamConfig.MIN_RANGE.get(), ChargedBeamConfig.MAX_RANGE.get()));
+    }
+
+    /** When each player's continuous beam began (the client's time), for its ramp-up. */
+    private static final Map<Integer, Float> HELD_SINCE = new HashMap<>();
+
+    /**
+     * Jim Hammond's Fire Beam (R held): a steady beam in fire colours from his brow along his look, the same beam as Vision's
+     * (white-yellow core, orange glow, red edge, flicker) but unbroken for as long as he holds it; slimmer in first person.
+     */
+    static void continuous(Minecraft mc, AbstractClientPlayer player, Vec3 origin, Matrix4f pose, VertexConsumer vc, Vec3 camera,
+                           float partialTick, float time) {
+        Float since = HELD_SINCE.computeIfAbsent(player.getId(), k -> time);
+        float strength = Mth.clamp((time - since) / 3.0F, 0.0F, 1.0F);
+        double range = EnhancedConfig.SPEC.isLoaded() ? com.kolodkingal.enhanced.config.JimConfig.BEAM_RANGE.get() : 40;
+        Vec3 end = Raycasts.block(player, range, partialTick).getLocation();
+        Vec3 a = origin.subtract(camera);
+        Vec3 b = end.subtract(camera);
+        boolean first = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
+        float w = (first ? 0.3F : 0.6F) * strength;
+        beam(pose, vc, a, b, FIRE, w, strength, time, player.getId() * 7349L);
+        flare(pose, vc, a, 0.25F * strength + 0.03F, FIRE);
+        flare(pose, vc, b, (0.45F + 0.1F * Mth.sin(time * 1.9F)) * strength + 0.05F, FIRE);
+    }
+
+    /** The player's continuous beam is off (so the next one ramps up again). */
+    static void heldOff(int playerId) {
+        HELD_SINCE.remove(playerId);
     }
 
     /** How charged the player's beam is at this time: 0 (just begun, or a tap) to 1 (full). */
@@ -91,6 +111,7 @@ public final class ChargedBeamFx {
     /** Forgets the players (a world was left). */
     public static void clear() {
         SEEN.clear();
+        HELD_SINCE.clear();
     }
 
     // ---- drawing ----

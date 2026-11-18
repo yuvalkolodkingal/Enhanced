@@ -75,9 +75,8 @@ public final class JimSolar {
         return true;
     }
 
-    /** The Fire Beam's price: a tap's, rising to a full charge's. */
-    static int beamCost(float charge) {
-        return Math.round(Mth.lerp(charge, JimConfig.BEAM_TAP_COST.get(),
-                Math.max(JimConfig.BEAM_TAP_COST.get(), JimConfig.BEAM_FULL_COST.get())));
+    /** The Nova Flame's price: a tap's, rising to a full charge's. */
+    static int novaCost(float charge) {
+        return Math.round(Mth.lerp(charge, JimConfig.NOVA_MIN_COST.get(), Math.max(JimConfig.NOVA_MIN_COST.get(), JimConfig.NOVA_COST.get())));
     }
 }

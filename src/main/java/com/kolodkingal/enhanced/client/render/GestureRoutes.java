@@ -534,9 +534,9 @@ public final class GestureRoutes {
             case LOVE -> ability == 2 ? "flight" : "none: Love's keys are acted by her plug-in (lane L8 of 3.8)";
             // ===== jim_hammond (3.17) =====
             case JIM_HAMMOND -> ability == 2 ? "flight" : switch (ability) {
-                case 1 -> "none: the Fire Beam is a stance (VISION_BEAM, the arm out along the look) while it charges and fires; the build-up and the beam are ChargedBeamFx's";
-                case 3 -> "none: a fireball is thrown with the game's own swing; its flames are the server's particles";
-                case 4 -> "none: the Nova Flame is a stance (SOLAR_GATHER while he gathers it, SOLAR_OVERLOAD as it goes off); its light is JimFx's";
+                case 1 -> "none: the Fire Beam is a stance (VISION_BEAM, the arm out along the look) while it is held on; the beam is ChargedBeamFx's";
+                case 3 -> "none: the throw is the gesture JIM_THROW, played by the state JIM_THROW (Live); the ball is JimFx's";
+                case 4 -> "none: the Nova Flame is a stance (SOLAR_GATHER while he gathers it, SOLAR_OVERLOAD as it fires); its light is JimFx's";
                 default -> "none: the human disguise changes the look, not the pose";
             };
             default -> "none: no abilities";
@@ -660,6 +660,7 @@ public final class GestureRoutes {
             // (3.16) Solar Jewel Vision
             case BEAM_CHARGING, BEAM_FIRING -> "a stance (VISION_BEAM, the arm out along the look); the build-up and the beam are ChargedBeamFx's";
             case JIM_NOVA_CHARGING, JIM_NOVA_BLAST -> "stances (SOLAR_GATHER, SOLAR_OVERLOAD); the light is JimFx's";
+            case JIM_THROW -> "the throw gesture JIM_THROW (the arm wound back and hurled forward), from JimClient.liveGesture; the ball and the flare are JimFx's";
             case JIM_FLAMING -> "drawn, not acted: the flames are JimFlameLayer's (the model again, in fire) and JimFx's (the sparks)";
             case SOLAR_EYES, SOLAR_GATHERING, SOLAR_OVERLOAD -> "stances (SOLAR_EYES, SOLAR_GATHER, SOLAR_OVERLOAD); the light is SolarJewelFx's";
         };

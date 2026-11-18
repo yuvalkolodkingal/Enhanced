@@ -372,9 +372,9 @@ New in 3.17. See [Jim Hammond](Jim-Hammond) for the full story of each ability.
 
 | Ability | Key | Strength | What it does |
 |---|---|---|---|
-| **Fire Beam** `jim_hammond.fire_beam` | **R** (hold) | 5 | Tap: a weak beam; hold to charge: more damage and reach, it burns the ground, and charged enough it turns the ground to magma. |
-| **Fireball** `jim_hammond.fireball` | **V** | 5 | Throw a ball of fire: it hurts and sets alight what it hits and leaves fire on the ground. |
-| **Nova Flame** `jim_hammond.nova_flame` | **B** (hold) | 5 | Gather your energy at your jewel; when it is full one huge fire beam pours from it for a moment, sweeping where you look (far more damage and reach than the Fire Beam, burning, magma along its path); then a long cooldown. |
+| **Fire Beam** `jim_hammond.fire_beam` | **R** (hold) | 5 | A continuous beam of fire follows where you look while R is held: it hurts and sets alight what it touches and burns the ground along it, draining the solar charge each second, until you let go or it runs out. |
+| **Fireball** `jim_hammond.fireball` | **V** | 5 | Wind up and hurl a ball of fire: a glowing, turning core with flames behind it; it hurts and sets alight what it hits and leaves fire on the ground. |
+| **Nova Flame** `jim_hammond.nova_flame` | **B** (hold) | 5 | Hold to charge at your jewel, release to fire one huge beam (damage, reach and width grow with the charge; a tap is weak), exploding where it strikes and burning everything along and around its path; 80% or more also turns the ground along the path to magma. Costs solar charge; a long cooldown. |
 | **Human Disguise** `jim_hammond.human_disguise` | **N** (on/off) | none | A switch: look human, or as the android. |
 | **Android Body** `jim_hammond.body` | body | 5 | Almost as durable as Vision, and you heal five times as fast. |
 | **Fire Immunity** `jim_hammond.fire_immunity` | body | none | Fire, lava, burning, magma and fire attacks cannot hurt you. |

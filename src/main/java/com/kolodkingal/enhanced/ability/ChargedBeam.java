@@ -65,7 +65,12 @@ public final class ChargedBeam {
     /** The numbers and the extras of one hero's charged beam. */
     public record Profile(IntSupplier chargeTicks, IntSupplier tapTicks, IntSupplier cooldown, DoubleSupplier minDamage,
                           DoubleSupplier maxDamage, IntSupplier minRange, IntSupplier maxRange, DoubleSupplier maxWidth,
-                          ResourceKey<DamageType> damageType, DoubleToIntFunction burnSeconds, Impact impact, Gate gate) {
+                          ResourceKey<DamageType> damageType, DoubleToIntFunction burnSeconds, Impact impact, Gate gate, Live charging, Live firing,
+                          IntSupplier firingTicks) {
+        int firingFor() {
+            return firingTicks == null ? FIRING_TICKS : firingTicks.getAsInt();
+        }
+
         float charge(long heldTicks) {
             if (heldTicks < tapTicks.getAsInt()) {
                 return 0.0F;
@@ -90,13 +95,13 @@ public final class ChargedBeam {
     private static final Profile VISION = new Profile(ChargedBeamConfig.CHARGE_TICKS::get, ChargedBeamConfig.TAP_TICKS::get,
             ChargedBeamConfig.COOLDOWN::get, ChargedBeamConfig.MIN_DAMAGE::get, ChargedBeamConfig.MAX_DAMAGE::get,
             ChargedBeamConfig.MIN_RANGE::get, ChargedBeamConfig.MAX_RANGE::get, ChargedBeamConfig.MAX_WIDTH::get,
-            ModDamageTypes.MIND_STONE_BEAM, c -> 0, null, null);
+            ModDamageTypes.MIND_STONE_BEAM, c -> 0, null, null, Live.BEAM_CHARGING, Live.BEAM_FIRING, null);
     private static final Profile SOURCE_CODE = new Profile(ChargedBeamConfig.CHARGE_TICKS::get, ChargedBeamConfig.TAP_TICKS::get,
             ChargedBeamConfig.COOLDOWN::get, ChargedBeamConfig.MIN_DAMAGE::get, ChargedBeamConfig.MAX_DAMAGE::get,
             ChargedBeamConfig.MIN_RANGE::get, ChargedBeamConfig.MAX_RANGE::get, ChargedBeamConfig.MAX_WIDTH::get,
             ModDamageTypes.SOLAR_BEAM,
             c -> Math.round(SolarJewelConfig.SOURCE_CODE_BURN_SECONDS.get() * (1.0F + (float) c)),
-            ChargedBeam::sourceCodeImpact, null);
+            ChargedBeam::sourceCodeImpact, null, Live.BEAM_CHARGING, Live.BEAM_FIRING, null);
 
     public static Profile visionProfile(PowerData data) {
         return "source_code".equals(data.variant()) ? SOURCE_CODE : VISION;
@@ -106,6 +111,12 @@ public final class ChargedBeam {
     private static final Map<UUID, Long> FIRED_AT = new HashMap<>();
 
     private ChargedBeam() {
+    }
+
+    /** A player left, died or lost the power: no charge or shot of his is remembered. */
+    public static void forget(UUID player) {
+        CHARGING.remove(player);
+        FIRED_AT.remove(player);
     }
 
     public static boolean charging(ServerPlayer player) {
@@ -140,7 +151,7 @@ public final class ChargedBeam {
             }
             data.setBeamActive(false);
             CHARGING.put(player.getUUID(), now);
-            data.set(Live.BEAM_CHARGING, true);
+            data.set(profile.charging(), true);
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT,
                     SoundSource.PLAYERS, 0.8F, 0.6F);
         } else if (charging(player)) {
@@ -151,7 +162,7 @@ public final class ChargedBeam {
     private static void release(ServerPlayer player, PowerData data, Profile profile, HeroAbility ability) {
         long now = player.level().getGameTime();
         long held = now - CHARGING.remove(player.getUUID());
-        data.set(Live.BEAM_CHARGING, false);
+        data.set(profile.charging(), false);
         fire(player, data, profile, ability, profile.charge(held));
     }
 
@@ -163,23 +174,23 @@ public final class ChargedBeam {
         Long start = CHARGING.get(player.getUUID());
         if (start != null) {
             long held = now - start;
-            if (!data.is(Live.BEAM_CHARGING) || !player.isAlive() || player.isSpectator() || data.visionPhased()) {
+            if (!data.is(profile.charging()) || !player.isAlive() || player.isSpectator() || data.visionPhased()) {
                 CHARGING.remove(player.getUUID());
-                data.set(Live.BEAM_CHARGING, false);
+                data.set(profile.charging(), false);
             } else if (held > profile.chargeTicks.getAsInt() + OVER_HOLD) {
                 release(player, data, profile, ability);
             } else {
                 chargingTick(player, level, profile, held);
             }
-        } else if (data.is(Live.BEAM_CHARGING)) {
-            data.set(Live.BEAM_CHARGING, false); // (a state left by another hero's, or a stale one)
+        } else if (data.is(profile.charging())) {
+            data.set(profile.charging(), false); // (a state left by another hero's, or a stale one)
         }
         Long fired = FIRED_AT.get(player.getUUID());
-        if (fired != null && now - fired >= FIRING_TICKS) {
+        if (fired != null && now - fired >= profile.firingFor()) {
             FIRED_AT.remove(player.getUUID());
-            data.set(Live.BEAM_FIRING, false);
-        } else if (fired == null && data.is(Live.BEAM_FIRING)) {
-            data.set(Live.BEAM_FIRING, false);
+            data.set(profile.firing(), false);
+        } else if (fired == null && data.is(profile.firing())) {
+            data.set(profile.firing(), false);
         }
     }
 
@@ -234,7 +245,7 @@ public final class ChargedBeam {
                 profile.impact().strike(player, level, block, charge);
             }
         }
-        data.set(Live.BEAM_FIRING, true);
+        data.set(profile.firing(), true);
         FIRED_AT.put(player.getUUID(), now);
         data.startCooldown(ability, now, profile.cooldown().getAsInt());
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS,

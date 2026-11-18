@@ -228,9 +228,9 @@ public enum Live {
     /** The Overload's great beam pours from his jewel. */
     SOLAR_OVERLOAD,
     // ===== charged beam (3.17) =====
-    /** A charged beam gathers (Vision's B, Jim Hammond's R held): the glow builds at his brow; released, it fires. */
+    /** A charged beam gathers (Vision's B): the glow builds at his brow; released, it fires. */
     BEAM_CHARGING,
-    /** A charged beam has just been fired (a few ticks): every client draws it, as wide and as far as its charge made it. */
+    /** A charged beam has just been fired (a few ticks: Vision's), or Jim Hammond's Fire Beam is held on (R): every client draws it. */
     BEAM_FIRING,
     // ===== jim hammond (3.17) =====
     /** Jim Hammond gathers the Nova Flame (B held): the heat builds round his chest. */
@@ -239,6 +239,8 @@ public enum Live {
     JIM_NOVA_BLAST,
     /** Jim Hammond's whole body burns (he flies in flames). */
     JIM_FLAMING,
+    /** Jim Hammond throws a fireball (a few ticks): every client plays the throw and shows the ball. */
+    JIM_THROW,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */
