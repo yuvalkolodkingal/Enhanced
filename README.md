@@ -72,7 +72,7 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Mod loader** NeoForge 21.1.x, 21.4.x, 21.11.x or 26.3.x
 * **Install it on** the client, plus the server for multiplayer
 
-## What's new in 3.17.0
+## What's new in 3.16.2
 
 * **The Hulk's and Red Hulk's arms are on their shoulders again** (Minecraft 1.21.4, 1.21.11 and 26.3): on those versions both arms hung in the air about an arm's width out from the body, with the gladiator's shoulder pad and armbands, and the head and legs sat a little low. Every Hulk look (Ragnarok, Brand New Day) and Red Hulk.
 * **The Hulk's arm in first person is the size of an arm:** his huge forearm filled the lower corner of the screen. It is drawn a little thicker than a player's arm now, on every version, and on Minecraft 1.21.4 and newer it wears the Hulk's own skin (it wore a wrong one).
