@@ -61,6 +61,9 @@ public final class SuitSkins {
     /** 3.17, Ultimate Mode: Cosmic Spider-Man (Captain Universe) and the Godkiller armour. */
     private static final PlayerSkin COSMIC_SPIDER = new PlayerSkin(
             Enhanced.id("textures/entity/suit/spider_man_cosmic.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+    /** Ultimate Tommy: the comics' Speed (green suit, white hair, silver goggles). */
+    private static final PlayerSkin ULTIMATE_TOMMY = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/tommy_ultimate.png"), null, null, null, PlayerSkin.Model.WIDE, true);
     private static final PlayerSkin GODKILLER = new PlayerSkin(
             Enhanced.id("textures/entity/suit/iron_man_godkiller.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -103,6 +106,9 @@ public final class SuitSkins {
         }
         if (com.kolodkingal.enhanced.ultimate.BespokeForms.godkiller(player)) {
             return GODKILLER;
+        }
+        if (com.kolodkingal.enhanced.ultimate.BespokeForms.tommy(player)) {
+            return ULTIMATE_TOMMY;
         }
         if (power == Power.VISION && !Powers.get(player).disguise()
                 && com.kolodkingal.enhanced.client.render.VisionFlameFx.burning(player, Powers.get(player))) {

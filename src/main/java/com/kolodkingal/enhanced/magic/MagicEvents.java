@@ -198,7 +198,7 @@ public final class MagicEvents {
             event.setAmount(event.getAmount() * 1.3F);
         }
         // a circle of protection, the Vishanti's shield: magic from outside (or from an enemy) does not reach in
-        if (magic && MagicZones.shields(victim, attacker)) {
+        if (magic && MagicZones.shields(victim, attacker) && !com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(source)) {
             event.setCanceled(true);
             MagicFx.burst((ServerLevel) victim.level(), victim.position().add(0, 1, 0), 0xFFE2A8, 8, 0.4, 0.8F);
             return;

@@ -13,6 +13,7 @@
     "MobEffectInstanceAccessor",
     "MobInvoker",
     "PlayerMixin",
+    "RangedAttributeAccessor",
     "ServerGamePacketListenerImplAccessor",
     "TamableAnimalMixin"
   ],

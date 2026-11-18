@@ -487,6 +487,9 @@ public final class HexManager {
             if (player.isCreative() || player.isSpectator() || player.getUUID().equals(hex.owner())) {
                 return Verdict.PASS;
             }
+            if (com.kolodkingal.enhanced.ultimate.BespokeForms.tommy(player)) {
+                return Verdict.PASS; // (3.17, Ultimate Mode: Ultimate Tommy runs through a Hex's wall, in or out)
+            }
             if (leaving && Powers.is(player, Power.VISION)) {
                 // While Wanda holds the Hex he can't go; once she can't, he walks out, allowed in or not.
                 return holdsVision(hex, player) ? Verdict.HELD : Verdict.PASS;

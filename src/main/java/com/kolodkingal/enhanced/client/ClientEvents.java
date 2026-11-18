@@ -237,6 +237,8 @@ public final class ClientEvents {
                     int color = AbilityColors.shade(player, HeroAbility.TOMMY_SPEED, i == 0 ? 0xE6FFF5 : i == 1
                             ? CustomActing.tint(player, Power.TOMMY.glow, true)
                             : CustomActing.tint(player, Power.TOMMY.color, false));
+                    // (3.17: Ultimate Tommy's speed runs green and light pink-purple; anyone else's colour is unchanged)
+                    color = com.kolodkingal.enhanced.ultimate.BespokeForms.speedColor(player, color, i != 2);
                     level.addParticle(new EnergyParticleOptions(color, 1.0F + random.nextFloat() * 0.4F),
                             player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.6, player.getY() - dy * back + random.nextDouble() * random.nextDouble() * 1.6,
                             player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.6, 0, 0.005, 0);
@@ -270,6 +272,7 @@ public final class ClientEvents {
             int color = AbilityColors.shade(player, HeroAbility.TOMMY_WHIRLWIND, random.nextInt(3) == 0 ? 0xE6FFF5 : random.nextBoolean()
                     ? CustomActing.tint(player, Power.TOMMY.glow, true) : CustomActing.tint(player, Power.TOMMY.color,
                             false));
+            color = com.kolodkingal.enhanced.ultimate.BespokeForms.speedColor(player, color, random.nextBoolean()); // (3.17)
             level.addParticle(new EnergyParticleOptions(color, 1.1F), x, player.getY() + height, z, vx, 0.02, vz);
         }
     }

@@ -47,12 +47,13 @@ import java.util.UUID;
  * modifier of it is on anyone):
  * <ul>
  *   <li><b>Cosmic Spider-Man</b> (Captain Universe): three times the Hulk's strength at full rage, flight at great speed,
- *   Netherite's protection, twice a man's healing, energy blasts from his hands (the signature) or his eyes (with Sneak),
+ *   Netherite's protection, twice a man's healing, energy blasts from his hands and from his eyes, turn about (the signature),
  *   matter and portals as spells (two thirds of Billy's strength), a sharper spider-sense. The Uni-Power is a meter of
  *   {@link #COSMIC_ENERGY}: it only runs down while the form lasts, and when it is empty he is Spider-Man again; it climbs
  *   back out of the form and must be full to awaken it. It is life itself: dark magic hurts him half as much again.</li>
- *   <li><b>The Godkiller</b> (Iron Man): the armour as tall as the game lets a body be ({@link #GODKILLER_SCALE} times a
- *   man), struck anywhere on that body, reaching what stands under it; more than Netherite's protection (best against
+ *   <li><b>The Godkiller</b> (Iron Man): the armour 65 blocks tall ({@link #GODKILLER_SCALE} times a man: the scale
+ *   attribute's top is raised for it, {@link #raiseScaleCap}), struck anywhere on that body, reaching what stands under
+ *   its feet; more than Netherite's protection (best against
  *   blows and energy, a little less against magic); his suit's energy lasts as 230 would; great strength; the giant
  *   repulsor cannons of the chest and hands (the signature), the stamp under him (with Sneak).</li>
  *   <li><b>Ultimate Tommy</b>: while his speed or his slow time is on, every other player in his world is slowed three
@@ -68,8 +69,22 @@ public final class BespokeForms {
     /** Ticks one point of it lasts in the form (a little over four minutes in all), and takes to come back out of it. */
     private static final int COSMIC_DRAIN_TICKS = 30;
     private static final int COSMIC_REFILL_TICKS = 14;
-    /** How many times a man's size the Godkiller is: the most the game's scale attribute allows. */
-    public static final double GODKILLER_SCALE = 16.0;
+    /** How tall the Godkiller stands (blocks), and so how many times a man's size (1.8 blocks) he is. */
+    public static final double GODKILLER_HEIGHT = 65.0;
+    public static final double GODKILLER_SCALE = GODKILLER_HEIGHT / 1.8;
+    /** The top of the game's scale attribute once the mod has raised it (the game's own is 16). */
+    public static final double SCALE_CAP = 40.0;
+
+    /**
+     * Raises the top of the game's scale attribute so the Godkiller can stand 65 blocks tall (once, as the mod starts, on
+     * both sides). No body changes for it: only the Godkiller's own modifier asks for more than the game's 16.
+     */
+    public static void raiseScaleCap() {
+        if (Attributes.SCALE.value() instanceof com.kolodkingal.enhanced.mixin.RangedAttributeAccessor scale
+                && scale.enhanced$getMaxValue() < SCALE_CAP) {
+            scale.enhanced$setMaxValue(SCALE_CAP);
+        }
+    }
     /** The Godkiller's suit energy lasts as this much would, against the suit's own meter. */
     public static final double GODKILLER_ENERGY = 230.0;
     /** The spells the Uni-Power gives: matter made and changed, and portals. */
@@ -77,6 +92,25 @@ public final class BespokeForms {
             Spell.CONJURE_BRIDGE, Spell.CONJURE_WALL, Spell.CONJURE_ARMOR, Spell.LIGHT_PLATFORM, Spell.SLING_PORTAL,
             Spell.COMBAT_PORTALS, Spell.DIMENSION_GATE);
 
+    /** Ultimate Tommy's speed energy: his green, and the light pink-purple that runs through it. */
+    public static final int SPEED_GREEN = 0x35E08A;
+    public static final int SPEED_PINK = 0xF0A0FF;
+
+    /** A colour of his speed's light as Ultimate Tommy shows it: his own green, or (every other mote) the pink-purple. */
+    public static int speedColor(Player player, int color, boolean other) {
+        return tommy(player) ? (other ? SPEED_PINK : SPEED_GREEN) : color;
+    }
+
+    /**
+     * Whether this blow goes through magic shields (the Chaos Shield, Billy's barrier, Agatha's and Doctor Strange's
+     * shields, a circle of protection): Ultimate Tommy's does, he is through before the shield knows.
+     */
+    public static boolean piercesShields(DamageSource source) {
+        return source.getEntity() instanceof Player attacker && tommy(attacker);
+    }
+
+    /** Which of his blasts Cosmic Spider-Man fires next: his hands, then his eyes, turn about. */
+    private static final Map<UUID, Boolean> EYES_NEXT = new HashMap<>();
     private static final Map<UUID, Float> COSMIC = new HashMap<>();
     private static final Map<UUID, Float> SUIT_ENERGY = new HashMap<>();
 
@@ -185,9 +219,9 @@ public final class BespokeForms {
         set(player, Attributes.ATTACK_DAMAGE, STRENGTH, godkiller ? 34.0 : 21.0, cosmic || godkiller, AttributeModifier.Operation.ADD_VALUE);
         set(player, Attributes.KNOCKBACK_RESISTANCE, KNOCKBACK, 1.0, godkiller, AttributeModifier.Operation.ADD_VALUE);
         set(player, Attributes.SCALE, SCALE, GODKILLER_SCALE - 1.0, godkiller, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-        set(player, Attributes.STEP_HEIGHT, STEP, 9.0, godkiller, AttributeModifier.Operation.ADD_VALUE);
-        set(player, Attributes.ENTITY_INTERACTION_RANGE, REACH, 66.0, godkiller, AttributeModifier.Operation.ADD_VALUE);
-        set(player, Attributes.BLOCK_INTERACTION_RANGE, BLOCK_REACH, 66.0, godkiller, AttributeModifier.Operation.ADD_VALUE);
+        set(player, Attributes.STEP_HEIGHT, STEP, 9.4, godkiller, AttributeModifier.Operation.ADD_VALUE);
+        set(player, Attributes.ENTITY_INTERACTION_RANGE, REACH, 84.0, godkiller, AttributeModifier.Operation.ADD_VALUE);
+        set(player, Attributes.BLOCK_INTERACTION_RANGE, BLOCK_REACH, 84.0, godkiller, AttributeModifier.Operation.ADD_VALUE);
         if (!Ultimate.on()) {
             return;
         }
@@ -269,7 +303,7 @@ public final class BespokeForms {
                     if (Magic.isCaster(other)) {
                         Magic.set(other, Magic.data(other).withMana(Math.min(Magic.maxMana(other), Magic.data(other).mana() + 12.0F)));
                     }
-                    MagicFx.line(level, player.position().add(0, 1, 0), other.position().add(0, 1, 0), 0xA8F0D4, 0.5F);
+                    MagicFx.line(level, player.position().add(0, 1, 0), other.position().add(0, 1, 0), SPEED_PINK, 0.5F);
                 }
             }
         }
@@ -310,7 +344,8 @@ public final class BespokeForms {
                 }
             }
             if (now % 12 == 0) {
-                MagicFx.send(level, MagicFx.VORTEX, t.center(), List.of(), 0x2E9C7E, 0xA8F0D4, (float) t.radius(), 16);
+                MagicFx.send(level, MagicFx.VORTEX, t.center(), List.of(), SPEED_GREEN, SPEED_PINK, (float) t.radius(), 16);
+                MagicFx.send(level, MagicFx.VORTEX, t.center().add(0, 3.0, 0), List.of(), SPEED_PINK, SPEED_GREEN, (float) t.radius() * 0.8F, 16);
                 level.playSound(null, t.center().x, t.center().y, t.center().z, SoundEvents.ELYTRA_FLYING, SoundSource.PLAYERS, 0.9F, 0.6F);
             }
         }
@@ -369,6 +404,9 @@ public final class BespokeForms {
     static boolean signature(ServerPlayer player, boolean sneak) {
         ServerLevel level = player.serverLevel();
         if (cosmic(player)) {
+            // (Sneak + the key leaves the form, UltimateForms.key; his blasts take turns: his hands, then his eyes)
+            sneak = Boolean.TRUE.equals(EYES_NEXT.get(player.getUUID()));
+            EYES_NEXT.put(player.getUUID(), !sneak);
             float cost = sneak ? 4.0F : 6.0F;
             COSMIC.put(player.getUUID(), Math.max(0.0F, cosmicEnergy(player) - (player.getAbilities().instabuild ? 0.0F : cost)));
             Vec3 eye = player.getEyePosition();
@@ -395,12 +433,12 @@ public final class BespokeForms {
             if (sneak) {
                 // the stamp: everything under him, all the way down
                 Vec3 at = player.position();
-                for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(6.0, 0, 6.0).expandTowards(0, -70, 0),
+                for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(4.0, 0, 4.0).expandTowards(0, -70, 0),
                         e -> e != player && Magic.enemy(player, e))) {
                     e.hurt(ModDamageTypes.source(level, ModDamageTypes.ULTIMATE, player, player), 44.0F);
                     Shots.push(e, at, 1.6, 0.6);
                 }
-                MagicFx.send(level, MagicFx.RING, at, List.of(), 0xFFC83A, 0xFFF3C2, 22.0F, 24);
+                MagicFx.send(level, MagicFx.RING, at, List.of(), 0xFFC83A, 0xFFF3C2, 40.0F, 30);
                 level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.0F, 0.5F);
                 return true;
             }
@@ -439,14 +477,14 @@ public final class BespokeForms {
                 }
                 target.heal(14.0F);
                 target.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 2, true, true, true), player);
-                MagicFx.sendOn(level, MagicFx.AWAKEN, target, List.of(), 0x2E9C7E, 0xA8F0D4, 1.0F, 24);
+                MagicFx.sendOn(level, MagicFx.AWAKEN, target, List.of(), SPEED_GREEN, SPEED_PINK, 1.0F, 24);
                 level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 1.0F, 1.8F);
                 return true;
             }
             TORNADOES.removeIf(t -> t.owner().equals(player.getUUID()));
             TORNADOES.add(new Tornado(level.dimension(), player.position(), 9.0, player.getUUID(), level.getGameTime() + 200));
-            MagicFx.send(level, MagicFx.VORTEX, player.position(), List.of(), 0x2E9C7E, 0xA8F0D4, 9.0F, 16);
-            MagicFx.send(level, MagicFx.RING, player.position(), List.of(), 0x2E9C7E, 0xA8F0D4, 9.0F, 20);
+            MagicFx.send(level, MagicFx.VORTEX, player.position(), List.of(), SPEED_GREEN, SPEED_PINK, 9.0F, 16);
+            MagicFx.send(level, MagicFx.RING, player.position(), List.of(), SPEED_PINK, SPEED_GREEN, 9.0F, 20);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ELYTRA_FLYING, SoundSource.PLAYERS, 1.4F, 0.5F);
             return true;
         }
@@ -474,6 +512,7 @@ public final class BespokeForms {
 
     public static void forget(UUID id) {
         SUIT_ENERGY.remove(id);
+        EYES_NEXT.remove(id);
         TORNADOES.removeIf(t -> t.owner().equals(id));
     }
 

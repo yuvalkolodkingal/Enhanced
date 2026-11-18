@@ -246,7 +246,9 @@ public final class CommonEvents {
             return;
         }
         DamageSource source = event.getSource();
-        boolean unstoppable = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
+        // (3.17, Ultimate Mode: Ultimate Tommy's blows go through magic shields; nobody else's, and never with the mode off)
+        boolean unstoppable = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)
+                || com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(source);
 
         if (VisionAbilities.isPhased(player) && !unstoppable) {
             event.setCanceled(true);

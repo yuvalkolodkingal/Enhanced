@@ -105,7 +105,8 @@ public final class UltimateForms {
         if (player.isSpectator() || !player.isAlive()) {
             return;
         }
-        if (alt && active(player) && Powers.power(player) == Power.SCARLET_WITCH) {
+        // (Sneak + the key leaves a form that has no time of its own: the Nexus Being's, Cosmic Spider-Man's)
+        if (alt && active(player) && untimed(player)) {
             end(player, false);
             return;
         }

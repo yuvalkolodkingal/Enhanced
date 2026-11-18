@@ -31,7 +31,7 @@ public enum UltimateForm {
             fx(MobEffects.DAMAGE_RESISTANCE, 0), fx(MobEffects.FIRE_RESISTANCE, 0)),
     BILLY(Power.BILLY, 0x7FD0FF, 0xFFFFFF, Aura.STARS, Signature.STORM,
             fx(MobEffects.DAMAGE_RESISTANCE, 1), fx(MobEffects.REGENERATION, 1)),
-    TOMMY(Power.TOMMY, 0x2E9C7E, 0xA8F0D4, Aura.SPEED, Signature.VORTEX,
+    TOMMY(Power.TOMMY, 0x35E08A, 0xF0A0FF, Aura.SPEED, Signature.VORTEX,
             fx(MobEffects.MOVEMENT_SPEED, 2), fx(MobEffects.DIG_SPEED, 1)),
     LOKI(Power.LOKI, 0x76B154, 0xE4FFB8, Aura.TIMELINES, Signature.BIND,
             fx(MobEffects.DAMAGE_RESISTANCE, 1), fx(MobEffects.REGENERATION, 0)),
