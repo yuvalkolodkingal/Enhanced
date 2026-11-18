@@ -445,7 +445,7 @@ public final class JimTests {
         });
     }
 
-    @EnhancedTest(template = ARENA)
+    @EnhancedTest(template = ARENA, batch = "jim_solar_cap")
     public static void solarChargeNeverPassesItsCapacityAndFlightCostsNothing(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(JimConfig.SOLAR_CAPACITY, 300);
@@ -508,7 +508,7 @@ public final class JimTests {
         Powers.get(jim).setIronCharge(JimConfig.NOVA_MIN_CHARGE.get() - 1);
         AbilityHandler.onKey(jim, 4, true);
         check(!Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "just under the minimum: he cannot even gather it");
-        Powers.get(jim).setIronCharge(JimConfig.SOLAR_CAPACITY.get());
+        Powers.get(jim).setIronCharge(JimConfig.NOVA_MIN_CHARGE.get() + 1);
         AbilityHandler.onKey(jim, 4, true);
         check(Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "with enough he gathers it");
         helper.succeed();
