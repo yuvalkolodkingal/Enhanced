@@ -53,12 +53,15 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.17.0
+
+* **The server's settings, changed in the game.** An operator reads and changes every setting and limit of the server config without leaving the game: `/enhanced config get|set|reset|list` (Tab completes every key, such as `custom_hero.budget`), and `/enhanced config` opens the mod's settings screen, where on a server an operator now edits the Server Options too. The server checks every change (who asks, the option's own range), uses it at once, writes it to the config file and sends it to every player; a bad value is refused and nothing changes. No setting is renamed and no default changes. See [Commands](Commands).
+* The server and every player need 3.17 (network protocol 17).
+
 ## What's new in 3.16.2
 
 * **The Hulk's and Red Hulk's arms are on their shoulders again** (Minecraft 1.21.4, 1.21.11 and 26.3): on those versions both arms hung in the air about an arm's width out from the body, with the gladiator's shoulder pad and armbands, and the head and legs sat a little low. Every Hulk look (Ragnarok, Brand New Day) and Red Hulk.
 * **The Hulk's arm in first person is the size of an arm:** his huge forearm filled the lower corner of the screen. It is drawn a little thicker than a player's arm now, on every version, and on Minecraft 1.21.4 and newer it wears the Hulk's own skin (it wore a wrong one).
-* **The server's settings, changed in the game.** An operator reads and changes every setting and limit of the server config without leaving the game: `/enhanced config get|set|reset|list` (Tab completes every key, such as `custom_hero.budget`), and `/enhanced config` opens the mod's settings screen, where on a server an operator now edits the Server Options too. The server checks every change (who asks, the option's own range), uses it at once, writes it to the config file and sends it to every player; a bad value is refused and nothing changes. No setting is renamed and no default changes. See [Commands](Commands).
-* The server and every player need 3.17 (network protocol 17).
 
 ## What's new in 3.16.1
 
