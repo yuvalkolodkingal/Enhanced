@@ -60,6 +60,7 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 * **Source Code Vision's beam burns, and starts at his Solar Jewel.** What it hits is set alight, and where it hits the ground it leaves fire and lights what can burn (fire is placed, no block is deleted; never with `mobGriefing` off). See [Vision](Vision).
 * **Vision's Density is gone; B is now a Charged Beam** in every look (hold to charge, release to fire; more charge, more damage and reach; in the Source Code look it burns and explodes where it strikes). See [Vision](Vision).
 * **A new hero: [Jim Hammond](Jim-Hammond)**, the android first Human Torch. The only way in survival: use the Source Code as a player who is not Vision. The six things he can do: a charged Fire Beam that burns the ground (charged, it makes magma blocks), total fire immunity, a body almost as durable as Vision's that heals five times as fast, fireballs, the Nova Flame, and a body in flames while he flies that sets whoever strikes him alight. Three looks (the white android suit, the classic red suit, the human disguise); also in the Hero Creator.
+* **Source Code Vision burns while he flies** (setting `vision.source_code_flight_fire`): see [Vision](Vision).
 * The server and every player need 3.17 (network protocol 17).
 
 ## What's new in 3.16.2

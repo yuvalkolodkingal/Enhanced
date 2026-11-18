@@ -35,6 +35,7 @@ public final class HandTracker {
         Vec3 shoulderLeft;
         Vec3 forehead;
         Vec3 jewel;
+        Vec3 chest;
         Vec3 weapon;
         double weaponAge = Double.NEGATIVE_INFINITY;
     }
@@ -76,6 +77,13 @@ public final class HandTracker {
         return p == null ? null : p.jewel;
     }
 
+    /** (3.17) The gold diamond on Jim Hammond's chest (on a look without one, the centre of the chest at the same place). */
+    @Nullable
+    public static Vec3 chest(Player player, float partialTick) {
+        Points p = fresh(player, partialTick);
+        return p == null ? null : p.chest;
+    }
+
     /** The centre of the head of the weapon in Thor's hand, while it is drawn there. */
     @Nullable
     public static Vec3 weaponHead(Player player, float partialTick) {
@@ -97,7 +105,7 @@ public final class HandTracker {
 
     /** Called by the layer: records the hands, feet, shoulders and forehead of the player drawn with this pose stack. */
     static void record(Player player, float age, Vec3 handRight, Vec3 handLeft, Vec3 footRight, Vec3 footLeft, Vec3 shoulderRight,
-                       Vec3 shoulderLeft, Vec3 forehead, Vec3 jewel) {
+                       Vec3 shoulderLeft, Vec3 forehead, Vec3 jewel, Vec3 chest) {
         Points p = POINTS.computeIfAbsent(player.getId(), id -> new Points());
         p.age = age;
         p.handRight = handRight;
@@ -108,6 +116,7 @@ public final class HandTracker {
         p.shoulderLeft = shoulderLeft;
         p.forehead = forehead;
         p.jewel = jewel;
+        p.chest = chest;
     }
 
     /**

@@ -57,6 +57,9 @@ public final class JimFireballs {
         if (data.cooldownUntil(data.slot(HeroAbility.JIM_FIREBALL)) > now && !player.getAbilities().instabuild) {
             return;
         }
+        if (!JimSolar.spend(player, data, JimConfig.FIREBALL_COST.get())) {
+            return;
+        }
         Vec3 look = player.getLookAngle();
         Vec3 from = player.getEyePosition().add(look.scale(0.7)).add(0, -0.25, 0);
         BALLS.computeIfAbsent(player.getUUID(), u -> new ArrayList<>()).add(new Ball(from, look.scale(JimConfig.FIREBALL_SPEED.get())));
@@ -119,10 +122,10 @@ public final class JimFireballs {
         }
         // the fireball itself: a core of flame, sparks falling away behind it
         Vec3 p = ball.pos;
-        level.sendParticles(ParticleTypes.FLAME, p.x, p.y, p.z, 4, 0.12, 0.12, 0.12, 0.01);
-        level.sendParticles(ParticleTypes.SMALL_FLAME, p.x, p.y, p.z, 3, 0.2, 0.2, 0.2, 0.02);
+        Embers.burst(level, p.x, p.y, p.z, 4, 0.12, 0.12, 0.12, 0.01);
+        Embers.burst(level, p.x, p.y, p.z, 3, 0.2, 0.2, 0.2, 0.02);
         if (level.getGameTime() % 2 == 0) {
-            level.sendParticles(ParticleTypes.LAVA, p.x, p.y, p.z, 1, 0.1, 0.1, 0.1, 0.0);
+            Embers.burst(level, p.x, p.y, p.z, 1, 0.1, 0.1, 0.1, 0.0);
         }
         return true;
     }
@@ -162,8 +165,8 @@ public final class JimFireballs {
 
     private static void burst(ServerLevel level, Vec3 at) {
         level.sendParticles(ParticleTypes.EXPLOSION, at.x, at.y, at.z, 1, 0, 0, 0, 0);
-        level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, 24, 0.4, 0.4, 0.4, 0.08);
-        level.sendParticles(ParticleTypes.LAVA, at.x, at.y, at.z, 6, 0.3, 0.3, 0.3, 0.0);
+        Embers.burst(level, at.x, at.y, at.z, 24, 0.4, 0.4, 0.4, 0.08);
+        Embers.burst(level, at.x, at.y, at.z, 6, 0.3, 0.3, 0.3, 0.0);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0F, 0.8F);
     }
 

@@ -37,11 +37,22 @@ public final class JimHud {
         if (cooldown != null) {
             return cooldown;
         }
+        if (ability == 1 && solarOn(data)) {
+            // the solar charge, 0 to 100% (the Fire Beam's line; the cooldown above has it for a moment after each shot)
+            int percent = Math.round(100.0F * data.ironCharge() / Math.max(1, JimConfig.SOLAR_CAPACITY.get()));
+            percent = Math.max(0, Math.min(100, percent));
+            return Component.translatable("hud.enhanced.solar", percent).withStyle(percent >= 50 ? ChatFormatting.GOLD
+                    : percent >= 20 ? ChatFormatting.YELLOW : ChatFormatting.RED);
+        }
         return switch (ability) {
             case 2 -> onOff(data.flying());
             case 5 -> onOff(data.disguise());
             default -> null;
         };
+    }
+
+    private static boolean solarOn(PowerData data) {
+        return EnhancedConfig.SPEC.isLoaded() && JimConfig.SOLAR_CHARGE.get() && data.power() == com.kolodkingal.enhanced.power.Power.JIM_HAMMOND;
     }
 
     private static Component onOff(boolean on) {

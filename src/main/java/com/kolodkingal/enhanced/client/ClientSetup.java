@@ -79,7 +79,6 @@ public final class ClientSetup {
     /** A slightly inflated player model, for energy drawn just above the skin. */
     public static final ModelLayerLocation ENERGY_WIDE = new ModelLayerLocation(Enhanced.id("player_energy"), "wide");
     public static final ModelLayerLocation ENERGY_SLIM = new ModelLayerLocation(Enhanced.id("player_energy"), "slim");
-
     @Subscribe
     public static void onClientSetup(FMLClientSetupEvent event) {
         CustomMusic.prepareFolder();

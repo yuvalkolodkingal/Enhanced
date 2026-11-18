@@ -31,7 +31,7 @@ public final class ChargedBeamFx {
     }
 
     static final Colors MIND = new Colors(0xF5D77A, 0xFFF6D5, 0xF2C66A);
-    static final Colors FIRE = new Colors(0xFF4A10, 0xFFE9A0, 0xFF9A1E);
+    static final Colors FIRE = new Colors(0xFF6A14, 0xFFF4C0, 0xFFA830);
     private static final Vec3 UP = new Vec3(0, 1, 0);
 
     /** When each player's charge began (game time), and the charge it had when it last was seen. */
@@ -165,6 +165,36 @@ public final class ChargedBeamFx {
         flare(pose, vc, a, (0.05F + 0.28F * charge + 0.02F * Mth.sin(time * 1.4F)) * scale, c);
     }
 
+    /**
+     * The beam itself, from {@code a} to {@code b} (camera-relative): the wide soft glow, the brighter glow, the hot core, strands
+     * of bolts and, for a fire beam, a red outer edge with flames licking along it. {@code w} is its width (a full Charged Beam is 1;
+     * the Nova Flame's is about 2.8).
+     */
+    static void beam(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 b, Colors c, float w, float strength, float time, long seed) {
+        float near = (float) Mth.clamp(a.length() / 1.5, 0.25, 1.0);
+        float flicker = 0.9F + 0.1F * Mth.sin(time * 2.7F);
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.18F * w * near, 0.9F * w * flicker, EnergyGeometry.argb(c.glow, 0.12F * strength), EnergyGeometry.argb(c.glow, 0.28F * strength));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.09F * w * near, 0.45F * w, EnergyGeometry.argb(c.glow, 0.45F * strength), EnergyGeometry.argb(c.glow, 0.55F * strength));
+        EnergyGeometry.ribbon(pose, vc, a, b, 0.035F * w * near, 0.14F * w, EnergyGeometry.argb(c.core, 0.85F * strength), EnergyGeometry.argb(c.core, 0.9F * strength));
+        if (c == FIRE) {
+            // a fire beam: a red outer edge, and flames licking along it (the glow swelling and dying segment by segment)
+            int n = 14;
+            for (int i = 0; i < n; i++) {
+                Vec3 p = a.lerp(b, i / (float) n);
+                Vec3 q = a.lerp(b, (i + 1) / (float) n);
+                float lick = 0.7F + 0.3F * Mth.sin(time * 0.8F + i * 1.3F);
+                float lick2 = 0.7F + 0.3F * Mth.sin(time * 0.8F + (i + 1) * 1.3F);
+                EnergyGeometry.ribbon(pose, vc, p, q, 0.34F * w * lick, 0.34F * w * lick2, EnergyGeometry.argb(0xC01808, 0.11F * strength),
+                        EnergyGeometry.argb(0xC01808, 0.11F * strength));
+                EnergyGeometry.ribbon(pose, vc, p, q, 0.12F * w * lick, 0.12F * w * lick2, EnergyGeometry.argb(0xFF8A1E, 0.30F * strength),
+                        EnergyGeometry.argb(0xFF8A1E, 0.30F * strength));
+            }
+        }
+        for (int k = 0; k < 2; k++) {
+            EnergyGeometry.bolt(pose, vc, a, b, 0.025F, 0.2F * w + 0.05F, EnergyGeometry.argb(c.spark, 0.7F * strength), seed + k * 104729L, time / 2.0F);
+        }
+    }
+
     static void flareAt(Matrix4f pose, VertexConsumer vc, Vec3 at, float size, Colors c) {
         flare(pose, vc, at, size, c);
     }
@@ -176,15 +206,7 @@ public final class ChargedBeamFx {
         Vec3 b = end.subtract(camera);
         float strength = 1.0F - t * t;
         float w = (0.3F + 0.7F * charge) * strength;
-        float near = (float) Mth.clamp(a.length() / 1.5, 0.25, 1.0);
-        float flicker = 0.9F + 0.1F * Mth.sin(time * 2.7F);
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.18F * w * near, 0.9F * w * flicker, EnergyGeometry.argb(c.glow, 0.12F * strength), EnergyGeometry.argb(c.glow, 0.28F * strength));
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.09F * w * near, 0.45F * w, EnergyGeometry.argb(c.glow, 0.45F * strength), EnergyGeometry.argb(c.glow, 0.55F * strength));
-        EnergyGeometry.ribbon(pose, vc, a, b, 0.035F * w * near, 0.14F * w, EnergyGeometry.argb(c.core, 0.85F * strength), EnergyGeometry.argb(c.core, 0.9F * strength));
-        long seed = player.getId() * 7349L;
-        for (int k = 0; k < 2; k++) {
-            EnergyGeometry.bolt(pose, vc, a, b, 0.025F, 0.2F * w + 0.05F, EnergyGeometry.argb(c.spark, 0.7F * strength), seed + k * 104729L, time / 2.0F);
-        }
+        beam(pose, vc, a, b, c, w, strength, time, player.getId() * 7349L);
         flare(pose, vc, b, (0.5F + 0.9F * charge) * strength + 0.05F, c);
     }
 

@@ -182,7 +182,7 @@ public final class PowerData {
     void setPowerRaw(Power power) {
         this.power = power;
         this.magneticShield = false;
-        this.ironCharge = 0;
+        this.ironCharge = power == Power.JIM_HAMMOND ? com.kolodkingal.enhanced.ability.JimSolar.capacity() : 0; // (Jim starts full)
         this.quicksilverTime = false;
         this.superSpeed = false;
         this.wallRun = true;

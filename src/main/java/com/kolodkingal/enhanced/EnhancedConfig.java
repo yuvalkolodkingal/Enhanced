@@ -96,6 +96,7 @@ public final class EnhancedConfig {
     // ---- Vision ----
     public static final ConfigSpec.DoubleValue VISION_FLIGHT_SPEED;
     public static final ConfigSpec.DoubleValue MIND_STONE_BEAM_DAMAGE;
+    public static final ConfigSpec.BooleanValue SOURCE_CODE_FLIGHT_FIRE;
 
     // ---- Quicksilver ----
     public static final ConfigSpec.IntValue SLOW_MOTION_FACTOR;
@@ -332,6 +333,9 @@ public final class EnhancedConfig {
         VISION_FLIGHT_SPEED = BUILDER.defineInRange("flightSpeed", 0.08, 0.01, 0.5);
         MIND_STONE_BEAM_DAMAGE = BUILDER.comment("Damage per hit of the Mind Stone beam (two hits per second at most).")
                 .defineInRange("mindStoneBeamDamage", 6.0, 0.0, 100.0);
+        SOURCE_CODE_FLIGHT_FIRE = BUILDER.comment("(3.17) Source Code Vision burns while he flies (G on, in the air): his Source Code skin glows and",
+                        "flames rise off his whole body and sweep back with his motion. Off: he flies as before.")
+                .define("source_code_flight_fire", true);
         // (3.16) Solar Jewel Vision: [vision.solar_jewel]
         com.kolodkingal.enhanced.config.SolarJewelConfig.define(BUILDER);
         // (3.17) Vision's Charged Beam: [vision.charged_beam]

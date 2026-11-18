@@ -225,7 +225,7 @@ public final class VisionAbilities {
                     4, 0.12, 0.12, 0.12, 0.12);
             // (3.16) Source Code Vision's beam is fire: flames where it strikes
             if ("source_code".equals(Powers.get(player).variant())) {
-                level.sendParticles(ParticleTypes.FLAME, end.x, end.y, end.z, 3, 0.12, 0.12, 0.12, 0.03);
+                Embers.burst(level, end.x, end.y, end.z, 3, 0.12, 0.12, 0.12, 0.03);
             }
         }
     }

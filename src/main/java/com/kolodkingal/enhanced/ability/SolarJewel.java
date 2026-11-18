@@ -97,13 +97,18 @@ public final class SolarJewel {
 
     /** How much light he drinks in this tick where he stands: open daylight, daylight out of the sun, or none. */
     static int absorbing(ServerPlayer player) {
+        return absorbing(player, SolarJewelConfig.ABSORB_SUN.get(), SolarJewelConfig.ABSORB_SHADE.get());
+    }
+
+    /** The jewel's rule with the rates of {@code sun} (open sky) and {@code shade}: Jim Hammond's solar charge reads it too (3.17). */
+    static int absorbing(ServerPlayer player, int sun, int shade) {
         ServerLevel level = player.serverLevel();
         if (!level.dimensionType().hasSkyLight() || !level.isDay()) {
             return 0;
         }
         BlockPos head = BlockPos.containing(player.getEyePosition());
         boolean open = level.canSeeSky(head) && !level.isRainingAt(head);
-        return open ? SolarJewelConfig.ABSORB_SUN.get() : SolarJewelConfig.ABSORB_SHADE.get();
+        return open ? sun : shade;
     }
 
     // ---- the keys ----
@@ -213,7 +218,7 @@ public final class SolarJewel {
         }
         if (player.tickCount % 2 == 0) {
             level.sendParticles(new EnergyParticleOptions(GOLD, 1.6F), end.x, end.y, end.z, 5, 0.15, 0.15, 0.15, 0.14);
-            level.sendParticles(ParticleTypes.SMALL_FLAME, end.x, end.y, end.z, 2, 0.1, 0.1, 0.1, 0.02);
+            Embers.burst(level, end.x, end.y, end.z, 2, 0.1, 0.1, 0.1, 0.02);
         }
     }
 
@@ -386,7 +391,7 @@ public final class SolarJewel {
         if (player.tickCount % 2 == 0) {
             level.sendParticles(new EnergyParticleOptions(WHITE_GOLD, 2.4F), end.x, end.y, end.z, 10, 0.4, 0.4, 0.4, 0.3);
             level.sendParticles(ParticleTypes.FLASH, end.x, end.y, end.z, 1, 0, 0, 0, 0);
-            level.sendParticles(ParticleTypes.LAVA, end.x, end.y, end.z, 3, 0.3, 0.3, 0.3, 0.1);
+            Embers.burst(level, end.x, end.y, end.z, 3, 0.3, 0.3, 0.3, 0.1);
         }
     }
 

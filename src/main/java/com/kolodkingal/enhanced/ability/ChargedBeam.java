@@ -55,10 +55,17 @@ public final class ChargedBeam {
         void strike(ServerPlayer player, ServerLevel level, HitResult hit, float charge);
     }
 
+    /** What a beam costs: asked before it starts charging and again as it fires (Jim's solar charge); false refuses (it says why). */
+    public interface Gate {
+        boolean start(ServerPlayer player, PowerData data);
+
+        boolean fire(ServerPlayer player, PowerData data, float charge);
+    }
+
     /** The numbers and the extras of one hero's charged beam. */
     public record Profile(IntSupplier chargeTicks, IntSupplier tapTicks, IntSupplier cooldown, DoubleSupplier minDamage,
                           DoubleSupplier maxDamage, IntSupplier minRange, IntSupplier maxRange, DoubleSupplier maxWidth,
-                          ResourceKey<DamageType> damageType, DoubleToIntFunction burnSeconds, Impact impact) {
+                          ResourceKey<DamageType> damageType, DoubleToIntFunction burnSeconds, Impact impact, Gate gate) {
         float charge(long heldTicks) {
             if (heldTicks < tapTicks.getAsInt()) {
                 return 0.0F;
@@ -83,13 +90,13 @@ public final class ChargedBeam {
     private static final Profile VISION = new Profile(ChargedBeamConfig.CHARGE_TICKS::get, ChargedBeamConfig.TAP_TICKS::get,
             ChargedBeamConfig.COOLDOWN::get, ChargedBeamConfig.MIN_DAMAGE::get, ChargedBeamConfig.MAX_DAMAGE::get,
             ChargedBeamConfig.MIN_RANGE::get, ChargedBeamConfig.MAX_RANGE::get, ChargedBeamConfig.MAX_WIDTH::get,
-            ModDamageTypes.MIND_STONE_BEAM, c -> 0, null);
+            ModDamageTypes.MIND_STONE_BEAM, c -> 0, null, null);
     private static final Profile SOURCE_CODE = new Profile(ChargedBeamConfig.CHARGE_TICKS::get, ChargedBeamConfig.TAP_TICKS::get,
             ChargedBeamConfig.COOLDOWN::get, ChargedBeamConfig.MIN_DAMAGE::get, ChargedBeamConfig.MAX_DAMAGE::get,
             ChargedBeamConfig.MIN_RANGE::get, ChargedBeamConfig.MAX_RANGE::get, ChargedBeamConfig.MAX_WIDTH::get,
             ModDamageTypes.SOLAR_BEAM,
             c -> Math.round(SolarJewelConfig.SOURCE_CODE_BURN_SECONDS.get() * (1.0F + (float) c)),
-            ChargedBeam::sourceCodeImpact);
+            ChargedBeam::sourceCodeImpact, null);
 
     public static Profile visionProfile(PowerData data) {
         return "source_code".equals(data.variant()) ? SOURCE_CODE : VISION;
@@ -126,6 +133,9 @@ public final class ChargedBeam {
             long until = data.cooldownUntil(data.slot(ability));
             if (until > now && !player.getAbilities().instabuild) {
                 player.displayClientMessage(Component.translatable("message.enhanced.charged.cooldown", (until - now + 19) / 20), true);
+                return;
+            }
+            if (profile.gate() != null && !profile.gate().start(player, data)) {
                 return;
             }
             data.setBeamActive(false);
@@ -191,6 +201,9 @@ public final class ChargedBeam {
     private static void fire(ServerPlayer player, PowerData data, Profile profile, HeroAbility ability, float charge) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
+        if (profile.gate() != null && !profile.gate().fire(player, data, charge)) {
+            return; // (the sun's charge ran out while it gathered: it does not fire)
+        }
         Vec3 eye = player.getEyePosition();
         double range = profile.range(charge);
         BlockHitResult block = Raycasts.block(player, range, 1.0F);
@@ -267,7 +280,7 @@ public final class ChargedBeam {
             return;
         }
         level.sendParticles(radius >= 2.5F ? ParticleTypes.EXPLOSION_EMITTER : ParticleTypes.EXPLOSION, at.x, at.y, at.z, 1, 0, 0, 0, 0);
-        level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, 12 + (int) (20 * charge), radius * 0.3, radius * 0.3, radius * 0.3, 0.08);
+        Embers.burst(level, at.x, at.y, at.z, 12 + (int) (20 * charge), radius * 0.3, radius * 0.3, radius * 0.3, 0.08);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.6F + 0.6F * charge,
                 1.1F - 0.3F * charge);
         float damage = Mth.lerp(charge, 0.2F, 1.0F) * maxDamage;

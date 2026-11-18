@@ -175,6 +175,10 @@ public final class WorldEffectsRenderer {
     /** The Chaos Beam and Vision's Mind Beam of one player (3.4: by the ability, so a custom hero who has it fires it too). */
     private static void heroBeams(Minecraft mc, AbstractClientPlayer player, PowerData data, Matrix4f pose,
                                   VertexConsumer beams, Vec3 camera, float partialTick, float time) {
+        // (3.17) the streaming trail and embers of a burning body (Jim Hammond, Source Code Vision in flight)
+        if (JimFlameLayer.burning(data, player)) {
+            JimFx.trail(mc, player, pose, beams, camera, partialTick, time);
+        }
         if (data.has(HeroAbility.WANDA_CHAOS_BEAM) && data.beamActive()) {
             renderBeam(mc, player, handPosition(mc, player, partialTick), CHAOS.of(player, HeroAbility.WANDA_CHAOS_BEAM),
                     WandaAbilities.beamTargets(player), pose, beams, camera, partialTick, time);

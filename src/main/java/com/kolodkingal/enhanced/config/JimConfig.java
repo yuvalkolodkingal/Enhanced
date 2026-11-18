@@ -16,6 +16,15 @@ public final class JimConfig {
     public static ConfigSpec.DoubleValue FLIGHT_SPEED;
     public static ConfigSpec.BooleanValue FLAMES_WHILE_FLYING;
     public static ConfigSpec.BooleanValue SOURCE_CODE_REPLACES_HERO;
+    public static ConfigSpec.BooleanValue SOLAR_CHARGE;
+    public static ConfigSpec.IntValue SOLAR_CAPACITY;
+    public static ConfigSpec.IntValue SOLAR_FILL_SUN;
+    public static ConfigSpec.IntValue SOLAR_FILL_SHADE;
+    public static ConfigSpec.IntValue BEAM_TAP_COST;
+    public static ConfigSpec.IntValue BEAM_FULL_COST;
+    public static ConfigSpec.IntValue FIREBALL_COST;
+    public static ConfigSpec.IntValue NOVA_COST;
+    public static ConfigSpec.IntValue NOVA_MIN_CHARGE;
 
     public static ConfigSpec.IntValue BEAM_CHARGE_TICKS;
     public static ConfigSpec.IntValue BEAM_TAP_TICKS;
@@ -39,10 +48,13 @@ public final class JimConfig {
     public static ConfigSpec.BooleanValue FIREBALL_FIRE;
 
     public static ConfigSpec.IntValue NOVA_CHARGE_TICKS;
-    public static ConfigSpec.DoubleValue NOVA_RADIUS;
+    public static ConfigSpec.IntValue NOVA_DURATION_TICKS;
+    public static ConfigSpec.IntValue NOVA_RANGE;
+    public static ConfigSpec.DoubleValue NOVA_WIDTH;
+    public static ConfigSpec.BooleanValue NOVA_MAGMA;
+    public static ConfigSpec.IntValue NOVA_MAGMA_RADIUS;
     public static ConfigSpec.DoubleValue NOVA_DAMAGE;
     public static ConfigSpec.IntValue NOVA_BURN_SECONDS;
-    public static ConfigSpec.DoubleValue NOVA_PUSH;
     public static ConfigSpec.IntValue NOVA_COOLDOWN;
     public static ConfigSpec.IntValue NOVA_CANCEL_COOLDOWN;
     public static ConfigSpec.BooleanValue NOVA_FIRE;
@@ -69,6 +81,20 @@ public final class JimConfig {
                 "Off: only a player with no hero. (Vision's own use of it is unchanged.)")
                 .define("sourceCodeReplacesHero", true);
 
+        SOLAR_CHARGE = builder.comment("Jim Hammond charges on the sun, as Source Code Vision's Solar Jewel does: a meter that fills under the open sky by day",
+                "(the Solar Jewel's own rule: none at night, underground or under a roof, a little in shade and rain) and that his attacks spend.",
+                "He starts full. Flight, fire immunity, his body and the burning body cost nothing. Off: his attacks are free.")
+                .define("solarCharge", true);
+        SOLAR_CAPACITY = builder.comment("How much solar charge he holds (his meter's 100%).").defineInRange("solarCapacity", 1000, 100, 100000);
+        SOLAR_FILL_SUN = builder.comment("Charge he gains each tick under the open sky by day (no rain).").defineInRange("solarFillSun", 5, 0, 1000);
+        SOLAR_FILL_SHADE = builder.comment("Charge he gains each tick by day out of the sun (shade, indoors with daylight, rain). None by night.")
+                .defineInRange("solarFillShade", 1, 0, 1000);
+        BEAM_TAP_COST = builder.comment("Charge a tap of the Fire Beam costs.").defineInRange("beamTapCost", 20, 0, 100000);
+        BEAM_FULL_COST = builder.comment("Charge a fully charged Fire Beam costs (between a tap's and this, by how long it was charged).")
+                .defineInRange("beamFullCost", 150, 0, 100000);
+        FIREBALL_COST = builder.comment("Charge a fireball costs.").defineInRange("fireballCost", 30, 0, 100000);
+        NOVA_COST = builder.comment("Charge the Nova Flame costs when its beam goes off.").defineInRange("novaCost", 700, 0, 100000);
+        NOVA_MIN_CHARGE = builder.comment("Charge he must have to begin gathering the Nova Flame.").defineInRange("novaMinCharge", 700, 0, 100000);
         BEAM_CHARGE_TICKS = builder.comment("Ticks of holding R for a full charge of the Fire Beam.")
                 .defineInRange("beamChargeTicks", 40, 5, 400);
         BEAM_TAP_TICKS = builder.comment("A press shorter than this many ticks is a tap: the weakest beam.")
@@ -101,16 +127,24 @@ public final class JimConfig {
 
         NOVA_CHARGE_TICKS = builder.comment("Ticks he must hold B, gathering his energy, before the Nova Flame goes off (let go sooner and it is lost).")
                 .defineInRange("novaChargeTicks", 60, 10, 600);
-        NOVA_RADIUS = builder.comment("Radius (blocks) of the Nova Flame's blast around him.").defineInRange("novaRadius", 12.0, 2.0, 64.0);
-        NOVA_DAMAGE = builder.comment("Damage of the Nova Flame next to him (less at its edge). Never to him.")
-                .defineInRange("novaDamage", 22.0, 0.0, 500.0);
-        NOVA_BURN_SECONDS = builder.comment("Seconds what the Nova Flame strikes burns.").defineInRange("novaBurnSeconds", 8, 0, 60);
-        NOVA_PUSH = builder.comment("How hard the Nova Flame throws creatures back.").defineInRange("novaPush", 1.2, 0.0, 5.0);
+        NOVA_DURATION_TICKS = builder.comment("How long (ticks) the Nova Flame's great beam burns once it is charged, sweeping where he looks.")
+                .defineInRange("novaDurationTicks", 36, 5, 400);
+        NOVA_RANGE = builder.comment("How far (blocks) the Nova Flame's beam reaches (the Fire Beam's is beamMaxRange).")
+                .defineInRange("novaRange", 96, 8, 256);
+        NOVA_WIDTH = builder.comment("Radius (blocks) of the Nova Flame's beam: what it touches is struck (the Fire Beam's is beamMaxWidth).")
+                .defineInRange("novaWidth", 2.2, 0.3, 12.0);
+        NOVA_DAMAGE = builder.comment("Damage of each hit of the Nova Flame's beam on a creature it crosses (every 4 ticks while it burns). Never to him.")
+                .defineInRange("novaDamage", 16.0, 0.0, 500.0);
+        NOVA_BURN_SECONDS = builder.comment("Seconds what the Nova Flame strikes burns.").defineInRange("novaBurnSeconds", 10, 0, 60);
+        NOVA_MAGMA = builder.comment("Whether the Nova Flame's beam turns the ground it sweeps over into magma blocks (only where the mod's block rules",
+                "allow it, never with mobGriefing off).").define("novaMagma", true);
+        NOVA_MAGMA_RADIUS = builder.comment("Radius (blocks) of the patch of ground that turns to magma where the Nova Flame strikes.")
+                .defineInRange("novaMagmaRadius", 2, 0, 8);
         NOVA_COOLDOWN = builder.comment("Ticks after a Nova Flame before the next (1800 = 90 seconds).")
                 .defineInRange("novaCooldown", 1800, 0, 72000);
         NOVA_CANCEL_COOLDOWN = builder.comment("Ticks of cooldown when he lets go before the Nova Flame goes off.")
                 .defineInRange("novaCancelCooldown", 60, 0, 72000);
-        NOVA_FIRE = builder.comment("Whether the Nova Flame sets the ground round him on fire (placed; never with mobGriefing off).")
+        NOVA_FIRE = builder.comment("Whether the Nova Flame's beam sets the ground it strikes on fire (placed; never with mobGriefing off).")
                 .define("novaFire", true);
         builder.pop();
     }

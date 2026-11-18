@@ -253,23 +253,60 @@ public final class JimTests {
     }
 
     @EnhancedTest(template = ARENA)
-    public static void theNovaFlameNeedsItsChargeThenBlastsAndRests(GameTestHelper helper) {
+    public static void theNovaFlameNeedsItsChargeThenBurnsABeamAndRests(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         f.config(JimConfig.NOVA_CHARGE_TICKS, 10);
-        ServerPlayer jim = jim(f, 8.5, 8.5);
-        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 8.5));
+        f.config(JimConfig.NOVA_DURATION_TICKS, 12);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 10.5));
         zombie.setRemainingFireTicks(0);
+        helper.setBlock(new BlockPos(18, (int) FLOOR + 1, 10), Blocks.STONE);
+        look(jim, TestKit.EAST, 0.0F);
         float health = jim.getHealth();
         AbilityHandler.onKey(jim, 4, true);
         check(Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "B held: he gathers his energy");
         PowerTicker.tick(jim);
         check(zombie.getHealth() == zombie.getMaxHealth(), "nothing yet: it takes a while");
-        run(helper, jim, 14, () -> {
-            check(zombie.getHealth() < zombie.getMaxHealth() && zombie.getRemainingFireTicks() > 0, "the blast hurt and burned the zombie");
+        run(helper, jim, 26, () -> {
+            check(zombie.getHealth() < zombie.getMaxHealth() && zombie.getRemainingFireTicks() > 0, "the beam hurt and burned the zombie");
+            check(zombie.getMaxHealth() - zombie.getHealth() > JimConfig.BEAM_MAX_DAMAGE.get() || !zombie.isAlive(), "more than the Fire Beam's best");
             check(jim.getHealth() >= health, "never him");
             long left = Powers.get(jim).cooldownUntil(Powers.get(jim).slot(HeroAbility.JIM_NOVA)) - helper.getLevel().getGameTime();
             check(left > 20 * 60, "then a long cooldown: " + left);
-            check(!Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "no longer gathering");
+            check(!Powers.get(jim).is(Live.JIM_NOVA_CHARGING) && !Powers.get(jim).is(Live.JIM_NOVA_BLAST), "and it is over");
+            check(helper.getLevel().getBlockState(helper.absolutePos(new BlockPos(18, (int) FLOOR + 1, 10))).is(Blocks.MAGMA_BLOCK),
+                    "the ground it struck turned to magma: " + helper.getLevel().getBlockState(helper.absolutePos(new BlockPos(18, (int) FLOOR + 1, 10))));
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void sourceCodeVisionsFlightFireIsOnByDefault(GameTestHelper helper) {
+        check(com.kolodkingal.enhanced.EnhancedConfig.SOURCE_CODE_FLIGHT_FIRE.get(), "vision.source_code_flight_fire is on by default");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void theNovaBeamIsStrongerAndLongerThanTheFireBeam(GameTestHelper helper) {
+        check(JimConfig.NOVA_DAMAGE.get() * (JimConfig.NOVA_DURATION_TICKS.get() / 4) > JimConfig.BEAM_MAX_DAMAGE.get(), "more damage");
+        check(JimConfig.NOVA_RANGE.get() > JimConfig.BEAM_MAX_RANGE.get(), "more reach");
+        check(JimConfig.NOVA_WIDTH.get() >= 2.4 * JimConfig.BEAM_MAX_WIDTH.get(), "much wider");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = "mob_griefing_off_jim_nova")
+    public static void withMobGriefingOffTheNovaMakesNoMagma(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(JimConfig.NOVA_CHARGE_TICKS, 10);
+        f.config(JimConfig.NOVA_DURATION_TICKS, 12);
+        HulkTests.mobGriefing(f, false);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        helper.setBlock(new BlockPos(18, (int) FLOOR + 1, 10), Blocks.STONE);
+        look(jim, TestKit.EAST, 0.0F);
+        AbilityHandler.onKey(jim, 4, true);
+        run(helper, jim, 26, () -> {
+            check(helper.getLevel().getBlockState(helper.absolutePos(new BlockPos(18, (int) FLOOR + 1, 10))).is(Blocks.STONE),
+                    "no magma with mobGriefing off");
             helper.succeed();
         });
     }
@@ -285,6 +322,164 @@ public final class JimTests {
         PowerTicker.tick(jim);
         check(!Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "he let go");
         check(zombie.getHealth() == zombie.getMaxHealth(), "no blast");
+        helper.succeed();
+    }
+
+    // ---- the solar charge ----
+
+    private static int solar(ServerPlayer p) {
+        return Powers.get(p).ironCharge();
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void jimStartsFullOfSolarCharge(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jim = jim(f, 8.5, 8.5);
+        check(solar(jim) == JimConfig.SOLAR_CAPACITY.get(), "full when he becomes Jim: " + solar(jim));
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = "jim_solar_time")
+    public static void solarChargeFillsInTheSunNotAtNightNorUnderARoof(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        net.minecraft.server.level.ServerLevel level = f.level();
+        long before = level.getDayTime();
+        level.setDayTime(6000L);
+        f.onClose(() -> level.setDayTime(before));
+        ServerPlayer jim = jim(f, 8.5, 8.5);
+        BlockPos above = helper.absolutePos(new BlockPos(8, (int) FLOOR + 3, 8));
+        for (int dy = 0; dy < 8; dy++) {
+            helper.getLevel().setBlock(above.above(dy), Blocks.AIR.defaultBlockState(), 3);
+        }
+        Powers.get(jim).setIronCharge(0);
+        run(helper, jim, 10, () -> {
+            check(solar(jim) == 10 * JimConfig.SOLAR_FILL_SUN.get(), "in the open sun it fills at the sun rate: " + solar(jim));
+            // a roof: only the shade rate
+            helper.getLevel().setBlock(above, Blocks.STONE.defaultBlockState(), 3);
+            Powers.get(jim).setIronCharge(0);
+            run(helper, jim, 10, () -> {
+                check(solar(jim) == 10 * JimConfig.SOLAR_FILL_SHADE.get(), "under a roof only the shade rate: " + solar(jim));
+                helper.getLevel().setBlock(above, Blocks.AIR.defaultBlockState(), 3);
+                level.setDayTime(18000L);
+                Powers.get(jim).setIronCharge(0);
+                run(helper, jim, 10, () -> {
+                    check(solar(jim) == 0, "none at night: " + solar(jim));
+                    helper.succeed();
+                });
+            });
+        });
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void solarChargeNeverPassesItsCapacityAndFlightCostsNothing(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(JimConfig.SOLAR_CAPACITY, 300);
+        ServerPlayer jim = jim(f, 8.5, 8.5);
+        Powers.get(jim).setIronCharge(300);
+        AbilityHandler.onKey(jim, 2, true);
+        run(helper, jim, 20, () -> {
+            check(Powers.get(jim).flying(), "he flies");
+            check(solar(jim) <= 300, "never over the capacity: " + solar(jim));
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void eachAttackSpendsSolarCharge(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        look(jim, TestKit.EAST, 0.0F);
+        int full = solar(jim);
+        AbilityHandler.onKey(jim, 3, true);
+        check(JimFireballs.inFlight(jim) == 1, "the fireball flew");
+        check(solar(jim) == full - JimConfig.FIREBALL_COST.get(), "and cost its price: " + solar(jim));
+        int before = solar(jim);
+        AbilityHandler.onKey(jim, 1, true);
+        AbilityHandler.onKey(jim, 1, false);
+        check(before - solar(jim) == JimConfig.BEAM_TAP_COST.get(), "a tap of the beam cost a tap's price: " + (before - solar(jim)));
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void aLongerChargedBeamCostsMore(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(JimConfig.BEAM_CHARGE_TICKS, 5);
+        f.config(JimConfig.BEAM_TAP_TICKS, 2);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        look(jim, TestKit.EAST, 0.0F);
+        int before = solar(jim);
+        AbilityHandler.onKey(jim, 1, true);
+        helper.runAfterDelay(8, () -> {
+            AbilityHandler.onKey(jim, 1, false);
+            check(before - solar(jim) == JimConfig.BEAM_FULL_COST.get(), "a full charge costs the full price: " + (before - solar(jim)));
+            check(JimConfig.BEAM_FULL_COST.get() > JimConfig.BEAM_TAP_COST.get(), "dearer than a tap");
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA, batch = "jim_solar_nova")
+    public static void theNovaFlameSpendsALotAndNeedsAHighMinimum(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(JimConfig.NOVA_CHARGE_TICKS, 5);
+        f.config(JimConfig.NOVA_DURATION_TICKS, 12);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        look(jim, TestKit.EAST, 0.0F);
+        Powers.get(jim).setIronCharge(JimConfig.NOVA_MIN_CHARGE.get() - 1);
+        AbilityHandler.onKey(jim, 4, true);
+        check(!Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "just under the minimum: he cannot even gather it");
+        Powers.get(jim).setIronCharge(JimConfig.SOLAR_CAPACITY.get());
+        AbilityHandler.onKey(jim, 4, true);
+        check(Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "with enough he gathers it");
+        run(helper, jim, 8, () -> {
+            check(solar(jim) <= JimConfig.SOLAR_CAPACITY.get() - JimConfig.NOVA_COST.get() + 8 * JimConfig.SOLAR_FILL_SUN.get(),
+                    "a lot: " + solar(jim));
+            check(JimConfig.NOVA_COST.get() > 4 * JimConfig.BEAM_FULL_COST.get(), "far more than a beam");
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void anAttackIsRefusedWhenTheChargeIsEmpty(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        look(jim, TestKit.EAST, 0.0F);
+        Powers.get(jim).setIronCharge(0);
+        AbilityHandler.onKey(jim, 3, true);
+        check(JimFireballs.inFlight(jim) == 0, "no fireball");
+        AbilityHandler.onKey(jim, 1, true);
+        check(!Powers.get(jim).is(Live.BEAM_CHARGING), "no beam gathers");
+        AbilityHandler.onKey(jim, 4, true);
+        check(!Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "no Nova");
+        check(solar(jim) == 0, "and nothing was spent");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void withTheSolarSwitchOffAttacksAreFree(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(JimConfig.SOLAR_CHARGE, false);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        look(jim, TestKit.EAST, 0.0F);
+        Powers.get(jim).setIronCharge(0);
+        AbilityHandler.onKey(jim, 3, true);
+        check(JimFireballs.inFlight(jim) == 1, "the fireball flies with an empty meter");
+        AbilityHandler.onKey(jim, 4, true);
+        check(Powers.get(jim).is(Live.JIM_NOVA_CHARGING), "and the Nova gathers");
+        check(solar(jim) == 0, "nothing is spent or gained");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA)
+    public static void theNovaStartsAtTheJewelOfTheLook(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jim = jim(f, 8.5, 8.5);
+        PowerData data = Powers.get(jim);
+        Powers.setVariant(jim, Variants.get(Power.JIM_HAMMOND, "android"));
+        check(!com.kolodkingal.enhanced.ability.JimAbilities.novaStartsAtHead(data), "android: from the chest diamond");
+        Powers.setVariant(jim, Variants.get(Power.JIM_HAMMOND, "classic"));
+        check(com.kolodkingal.enhanced.ability.JimAbilities.novaStartsAtHead(data), "classic: from the forehead jewel");
+        data.setDisguise(true);
+        check(!com.kolodkingal.enhanced.ability.JimAbilities.novaStartsAtHead(data), "human disguise: from the chest centre");
         helper.succeed();
     }
 
@@ -306,9 +501,16 @@ public final class JimTests {
         }
         check(Variants.get(Power.JIM_HAMMOND, "android").cape() != null && Variants.get(Power.JIM_HAMMOND, "classic").cape() == null,
                 "the android has the white cape");
-        for (int i = 0; i < 4; i++) {
-            try (InputStream in = JimTests.class.getResourceAsStream("/assets/enhanced/textures/entity/jim/flame_" + i + ".png")) {
-                check(in != null && ImageIO.read(in).getWidth() == 64, "flame picture " + i);
+        // the fire: the glow, twelve frames of sheath (64x64, the skin's layout) and eight of tongue (16x32)
+        String[] sets = {"glow", "shell_", "tongue_"};
+        int[] counts = {1, 12, 8};
+        for (int k = 0; k < sets.length; k++) {
+            for (int i = 0; i < counts[k]; i++) {
+                try (InputStream in = JimTests.class.getResourceAsStream("/assets/enhanced/textures/entity/jim/" + (k == 0 ? sets[k] : sets[k] + i) + ".png")) {
+                    check(in != null, sets[k] + i + " is in the jar");
+                    var image = ImageIO.read(in);
+                    check(image.getWidth() == (k == 2 ? 16 : 64) && image.getHeight() == (k == 2 ? 32 : 64), sets[k] + i + " size");
+                }
             }
         }
         helper.succeed();

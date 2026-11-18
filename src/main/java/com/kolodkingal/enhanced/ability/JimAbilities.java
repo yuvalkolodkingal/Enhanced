@@ -49,8 +49,6 @@ import java.util.UUID;
 public final class JimAbilities {
     private static final ResourceLocation BODY_HEALTH = Enhanced.id("jim_body_health");
     private static final ResourceLocation BODY_ARMOR = Enhanced.id("jim_body_armor");
-    /** The Nova's blast stays on the clients' screens this long. */
-    public static final int NOVA_BLAST_TICKS = 16;
 
     /** When each player began gathering a Nova Flame, and when each blast went off. */
     private static final Map<UUID, Long> NOVA_START = new HashMap<>();
@@ -65,7 +63,18 @@ public final class JimAbilities {
             JimConfig.BEAM_TAP_TICKS::get, JimConfig.BEAM_COOLDOWN::get, JimConfig.BEAM_MIN_DAMAGE::get,
             JimConfig.BEAM_MAX_DAMAGE::get, JimConfig.BEAM_MIN_RANGE::get, JimConfig.BEAM_MAX_RANGE::get,
             JimConfig.BEAM_MAX_WIDTH::get, ModDamageTypes.SOLAR_BEAM,
-            c -> Math.round(JimConfig.BEAM_BURN_SECONDS.get() * (1.0F + (float) c)), JimAbilities::beamImpact);
+            c -> Math.round(JimConfig.BEAM_BURN_SECONDS.get() * (1.0F + (float) c)), JimAbilities::beamImpact,
+            new ChargedBeam.Gate() {
+                @Override
+                public boolean start(ServerPlayer player, PowerData data) {
+                    return JimSolar.has(player, data, JimSolar.beamCost(0.0F));
+                }
+
+                @Override
+                public boolean fire(ServerPlayer player, PowerData data, float charge) {
+                    return JimSolar.spend(player, data, JimSolar.beamCost(charge));
+                }
+            });
 
     // ---- keys ----
 
@@ -113,6 +122,7 @@ public final class JimAbilities {
     // ---- every tick ----
 
     static void tick(ServerPlayer player, PowerData data) {
+        JimSolar.tick(player, data);
         if (data.has(HeroAbility.JIM_BEAM)) {
             ChargedBeam.tick(player, data, BEAM, HeroAbility.JIM_BEAM);
         }
@@ -183,16 +193,15 @@ public final class JimAbilities {
         }
         if (JimConfig.MAGMA.get() && charge >= JimConfig.MAGMA_MIN_CHARGE.get() && hit instanceof BlockHitResult block
                 && hit.getType() == HitResult.Type.BLOCK) {
-            magma(player, level, block.getBlockPos());
+            magma(player, level, block.getBlockPos(), JimConfig.MAGMA_RADIUS.get());
         }
     }
 
     /** A charged beam turns the ground it strikes into magma: the struck block and the ones round it on its layer. */
-    static int magma(ServerPlayer player, ServerLevel level, BlockPos centre) {
+    static int magma(ServerPlayer player, ServerLevel level, BlockPos centre, int r) {
         if (!level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
             return 0;
         }
-        int r = JimConfig.MAGMA_RADIUS.get();
         int made = 0;
         for (int dx = -r; dx <= r; dx++) {
             for (int dz = -r; dz <= r; dz++) {
@@ -208,7 +217,7 @@ public final class JimAbilities {
                 }
                 if (BlockRights.mayBlast(player, level, pos)) {
                     level.setBlockAndUpdate(pos, Blocks.MAGMA_BLOCK.defaultBlockState());
-                    level.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 2, 0.3, 0.1, 0.3, 0.0);
+                    Embers.burst(level, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 2, 0.3, 0.1, 0.3, 0.0);
                     made++;
                 }
             }
@@ -217,6 +226,11 @@ public final class JimAbilities {
     }
 
     // ---- B: the Nova Flame ----
+
+    /** Where the Nova starts by look: the classic suit's jewel is on the forehead (the head part); the android's gold diamond and the human disguise are on the chest. */
+    public static boolean novaStartsAtHead(PowerData data) {
+        return !data.disguise() && "classic".equals(data.variant());
+    }
 
     public static boolean gatheringNova(ServerPlayer player) {
         return NOVA_START.containsKey(player.getUUID());
@@ -230,6 +244,9 @@ public final class JimAbilities {
         long until = data.cooldownUntil(data.slot(HeroAbility.JIM_NOVA));
         if (until > now && !player.getAbilities().instabuild) {
             player.displayClientMessage(Component.translatable("message.enhanced.jim.nova_cooldown", (until - now + 19) / 20), true);
+            return;
+        }
+        if (!JimSolar.has(player, data, JimConfig.NOVA_MIN_CHARGE.get())) {
             return;
         }
         data.setBeamActive(false);
@@ -271,68 +288,83 @@ public final class JimAbilities {
                 // he braces: slowed, the heat gathering round him
                 player.setDeltaMovement(player.getDeltaMovement().multiply(0.5, 0.5, 0.5));
                 player.hurtMarked = true;
-                level.sendParticles(ParticleTypes.FLAME, player.getX(), player.getY() + 1.0, player.getZ(), 2 + (int) (6 * t), 0.5, 0.8, 0.5, 0.02);
+                Embers.burst(level, player.getX(), player.getY() + 1.0, player.getZ(), 2 + (int) (6 * t), 0.5, 0.8, 0.5, 0.02);
             }
         } else if (data.is(Live.JIM_NOVA_CHARGING)) {
             data.set(Live.JIM_NOVA_CHARGING, false);
         }
         Long fired = NOVA_FIRED.get(player.getUUID());
-        if (fired != null && now - fired >= NOVA_BLAST_TICKS) {
+        if (fired != null && (now - fired >= JimConfig.NOVA_DURATION_TICKS.get() || !player.isAlive() || player.isSpectator())) {
             NOVA_FIRED.remove(player.getUUID());
             data.set(Live.JIM_NOVA_BLAST, false);
-        } else if (fired == null && data.is(Live.JIM_NOVA_BLAST)) {
+        } else if (fired != null) {
+            novaBeamTick(player, level, now - fired);
+        } else if (data.is(Live.JIM_NOVA_BLAST)) {
             data.set(Live.JIM_NOVA_BLAST, false);
         }
     }
 
-    /** The blast: a great fiery shell round him that hurts, burns and throws back what it reaches, and fires the ground. */
+    /** The charge is full: the great beam begins (it burns for {@code novaDurationTicks}), and the long cooldown starts. */
     static void novaBlast(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        Vec3 centre = player.position().add(0, player.getBbHeight() * 0.5, 0);
-        double radius = JimConfig.NOVA_RADIUS.get();
-        float damage = JimConfig.NOVA_DAMAGE.get().floatValue();
-        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(centre, centre).inflate(radius),
-                e -> e != player && e.isAlive() && e.getBoundingBox().distanceToSqr(centre) <= radius * radius)) {
-            if (!AreaTargets.mayHurt(player, e, true)) {
-                continue;
-            }
-            double d = Math.sqrt(e.getBoundingBox().distanceToSqr(centre));
-            float scaled = (float) (damage * (1.0 - 0.5 * d / radius));
-            e.hurt(ModDamageTypes.source(level, ModDamageTypes.SOLAR_BEAM, player, player), scaled);
-            BeamFire.ignite(e, JimConfig.NOVA_BURN_SECONDS.get());
-            Vec3 away = e.position().subtract(player.position()).multiply(1, 0, 1);
-            if (away.lengthSqr() > 1.0E-4) {
-                away = away.normalize().scale(JimConfig.NOVA_PUSH.get() * (1.0 - 0.5 * d / radius));
-                e.push(away.x, 0.35, away.z);
-                e.hurtMarked = true;
-            }
+        if (!JimSolar.spend(player, data, JimConfig.NOVA_COST.get())) {
+            data.startCooldown(HeroAbility.JIM_NOVA, now, JimConfig.NOVA_CANCEL_COOLDOWN.get()); // (the charge was drained while it gathered)
+            return;
         }
-        if (JimConfig.NOVA_FIRE.get()) {
-            int placed = 0;
-            for (int i = 0; i < 80 && placed < 30; i++) {
-                double angle = level.random.nextDouble() * Mth.TWO_PI;
-                double dist = 2.0 + Math.sqrt(level.random.nextDouble()) * (radius - 2.0);
-                BlockPos column = BlockPos.containing(centre.x + Math.cos(angle) * dist, centre.y, centre.z + Math.sin(angle) * dist);
-                for (int dy = 3; dy >= -5; dy--) {
-                    BlockPos floor = column.offset(0, dy, 0);
-                    if (!level.getBlockState(floor).isAir() && level.getBlockState(floor).getFluidState().isEmpty()) {
-                        if (BeamFire.place(player, level, floor.above())) {
-                            placed++;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, centre.x, centre.y, centre.z, 1, 0, 0, 0, 0);
-        level.sendParticles(ParticleTypes.FLAME, centre.x, centre.y, centre.z, 160, radius * 0.35, 0.6, radius * 0.35, 0.18);
-        level.sendParticles(ParticleTypes.LAVA, centre.x, centre.y, centre.z, 40, radius * 0.3, 0.5, radius * 0.3, 0.0);
-        level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 2.0F, 0.6F);
-        level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 2.0F, 0.5F);
         data.set(Live.JIM_NOVA_BLAST, true);
         NOVA_FIRED.put(player.getUUID(), now);
-        data.startCooldown(HeroAbility.JIM_NOVA, now, JimConfig.NOVA_COOLDOWN.get());
+        data.startCooldown(HeroAbility.JIM_NOVA, now, JimConfig.NOVA_COOLDOWN.get() + JimConfig.NOVA_DURATION_TICKS.get());
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 2.0F, 0.5F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 1.2F, 0.6F);
+    }
+
+    /**
+     * One tick of the great beam, from his eyes where he looks: everything within its width along it is struck every 4 ticks (never
+     * him), the creatures it crosses burn, and where it strikes the ground it burns it and turns it to magma, so the path it sweeps
+     * is a path of fire and magma. The magma and the fire obey the Fire Beam's rules (mobGriefing, {@link BlockRights}).
+     */
+    private static void novaBeamTick(ServerPlayer player, ServerLevel level, long age) {
+        Vec3 eye = player.getEyePosition();
+        BlockHitResult block = Raycasts.block(player, JimConfig.NOVA_RANGE.get(), 1.0F);
+        Vec3 end = block.getLocation();
+        double width = JimConfig.NOVA_WIDTH.get();
+        if (age % 4 == 0) {
+            AABB box = new AABB(eye, end).inflate(width + 1.0);
+            for (net.minecraft.world.entity.Entity e : level.getEntities(player, box, WandaAbilities.BEAM_TARGET)) {
+                double reach = width + e.getBbWidth() / 2.0;
+                if (distanceToSegment(e.getBoundingBox().getCenter(), eye, end) > reach && e.getBoundingBox().inflate(width).clip(eye, end).isEmpty()) {
+                    continue;
+                }
+                if (e instanceof LivingEntity living && !AreaTargets.mayHurt(player, living, true)) {
+                    continue;
+                }
+                e.hurt(ModDamageTypes.source(level, ModDamageTypes.SOLAR_BEAM, player, player), JimConfig.NOVA_DAMAGE.get().floatValue());
+                BeamFire.ignite(e, JimConfig.NOVA_BURN_SECONDS.get());
+            }
+        }
+        if (block.getType() == HitResult.Type.BLOCK && age % 3 == 0) {
+            if (JimConfig.NOVA_FIRE.get()) {
+                BeamFire.strike(player, level, block, 0, 3);
+            }
+            if (JimConfig.NOVA_MAGMA.get()) {
+                magma(player, level, block.getBlockPos(), JimConfig.NOVA_MAGMA_RADIUS.get());
+            }
+            Embers.burst(level, end.x, end.y, end.z, 6, 0.5, 0.4, 0.5, 0.2);
+        }
+        if (age % 6 == 0) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.5F, 0.5F);
+        }
+        // the recoil: he is held where he stands
+        player.setDeltaMovement(player.getDeltaMovement().multiply(0.6, 0.6, 0.6));
+        player.hurtMarked = true;
+    }
+
+    private static double distanceToSegment(Vec3 p, Vec3 a, Vec3 b) {
+        Vec3 ab = b.subtract(a);
+        double len = ab.lengthSqr();
+        double t = len < 1.0E-9 ? 0 : Math.max(0, Math.min(1, p.subtract(a).dot(ab) / len));
+        return p.distanceTo(a.add(ab.scale(t)));
     }
 
     // ---- ending ----

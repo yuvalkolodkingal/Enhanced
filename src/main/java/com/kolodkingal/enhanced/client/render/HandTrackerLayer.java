@@ -47,7 +47,9 @@ public class HandTrackerLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
         // (3.17) the Solar Jewel of the Source Code skin: its gem is pixels (11-12, 9) of the face and the hat layer's, the
         // middle of the brow, 6.5 down from the top of the head, standing out of the face
         Vec3 jewel = at(ps, model.head, 0.0F, -6.5F, -4.6F);
-        HandTracker.record(player, age, handRight, handLeft, footRight, footLeft, shoulderRight, shoulderLeft, forehead, jewel);
+        // (3.17) Jim Hammond's gold diamond: pixels (23.5-24, 23-23.5) of his suit, the middle of the chest 3.2 down from its top
+        Vec3 chest = at(ps, model.body, 0.0F, 3.2F, -2.3F);
+        HandTracker.record(player, age, handRight, handLeft, footRight, footLeft, shoulderRight, shoulderLeft, forehead, jewel, chest);
     }
 
     /** A point (pixels) of a model part's own frame, in the world. */
