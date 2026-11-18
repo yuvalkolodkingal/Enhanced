@@ -383,16 +383,33 @@ public final class MindTour {
         server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: Sneak + the key: Cosmic Spider-Man still {}, Uni-Power {}",
                 com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(p), com.kolodkingal.enhanced.ultimate.BespokeForms.cosmicEnergy(p)), 10);
         // the Godkiller: 65 blocks tall, with villagers, an iron golem and a marked pillar of 65 blocks beside him for scale
-        client(() -> Minecraft.getInstance().options.renderDistance().set(16), 4);
         become(Power.IRON_MAN, "", false);
         server(p -> {
             p.setGameMode(GameType.SURVIVAL);
             p.getInventory().clearContent();
             p.setXRot(18.0F);
-            net.minecraft.core.BlockPos foot = p.blockPosition().offset(14, 0, 2);
+            // a tower 65 blocks tall beside him, in bands of five blocks, and a house of the size villagers build at its foot
+            net.minecraft.core.BlockPos foot = p.blockPosition().offset(17, 0, 0);
             for (int y = 0; y < 65; y++) {
-                p.level().setBlockAndUpdate(foot.above(y), (y / 5 % 2 == 0 ? net.minecraft.world.level.block.Blocks.RED_CONCRETE
-                        : net.minecraft.world.level.block.Blocks.WHITE_CONCRETE).defaultBlockState());
+                for (int dx = -2; dx <= 2; dx++) {
+                    for (int dz = -2; dz <= 2; dz++) {
+                        p.level().setBlockAndUpdate(foot.offset(dx, y, dz), (y / 5 % 2 == 0 ? net.minecraft.world.level.block.Blocks.RED_CONCRETE
+                                : net.minecraft.world.level.block.Blocks.BLACK_CONCRETE).defaultBlockState());
+                    }
+                }
+            }
+            net.minecraft.core.BlockPos house = p.blockPosition().offset(-20, 0, 0);
+            for (int dx = -4; dx <= 4; dx++) {
+                for (int dz = -4; dz <= 4; dz++) {
+                    for (int y = 0; y < 9; y++) {
+                        boolean roof = y >= 5;
+                        if (roof && (Math.abs(dx) > 9 - y || Math.abs(dz) > 4)) {
+                            continue;
+                        }
+                        p.level().setBlockAndUpdate(house.offset(dx, y, dz), (roof ? net.minecraft.world.level.block.Blocks.BRICKS
+                                : net.minecraft.world.level.block.Blocks.SPRUCE_PLANKS).defaultBlockState());
+                    }
+                }
             }
             for (int i = 0; i < 6; i++) {
                 net.minecraft.world.entity.Mob mob = (i == 0 ? net.minecraft.world.entity.EntityType.IRON_GOLEM
@@ -428,8 +445,14 @@ public final class MindTour {
         server(p -> com.kolodkingal.enhanced.Enhanced.LOGGER.info("Mind tour: after the stamp, the zombies under his feet alive: {}",
                 p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, p.getBoundingBox().inflate(8),
                         e -> e.getTags().contains("enhanced_tour_under") && e.isAlive()).size()), 40);
-        client(() -> Minecraft.getInstance().options.fov().set(70), 200);
+        // (the camera stands 144 blocks off a body this size: the world is drawn far enough to show the ground round him)
+        client(() -> { Minecraft.getInstance().options.renderDistance().set(26); Minecraft.getInstance().options.fov().set(40); }, 400);
         portrait("u70_godkiller_front", CameraType.THIRD_PERSON_FRONT, false);
+        // from his own eyes, looking down at the villagers, the golem and the pillar of 65 blocks at his feet
+        client(() -> { Minecraft.getInstance().player.setYRot(-80.0F); Minecraft.getInstance().player.setXRot(68.0F);
+            Minecraft.getInstance().options.fov().set(70); }, 10);
+        portrait("u74_godkiller_looking_down", CameraType.FIRST_PERSON, false);
+        client(() -> { Minecraft.getInstance().player.setYRot(0.0F); Minecraft.getInstance().player.setXRot(10.0F); }, 10);
         client(() -> Minecraft.getInstance().options.fov().set(30), 4);
         portrait("u73_godkiller_close", CameraType.THIRD_PERSON_FRONT, false);
         client(() -> Minecraft.getInstance().options.fov().set(70), 4);
