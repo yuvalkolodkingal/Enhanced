@@ -40,8 +40,7 @@ public final class AbilityHandler {
     public static void onKey(ServerPlayer player, int ability, boolean down) {
         // Releases always go through, so a hold ability can't get stuck on (e.g. when the player died holding the key).
         // (3.6: key 6 is the Y key of a hero whose Y row is not Build Magic: HeroKeys.pressY.)
-        // (3.17: keys 7 to 9 are the spells, the ultimate form and the Demiurge's Magic types: MagicKeys)
-        if (ability < 1 || ability > com.kolodkingal.enhanced.magic.MagicKeys.MAGIC_TYPE || (down && !player.isAlive())) {
+        if (ability < 1 || ability > com.kolodkingal.enhanced.custom.HeroKeys.Y || (down && !player.isAlive())) {
             return;
         }
         // In a trial of the Witches' Road no power works (and only one without powers is let in).
@@ -68,36 +67,6 @@ public final class AbilityHandler {
         }
         // 3.7: a healer who is DOWN (healing/Downed) does nothing until he rises. (A release still goes through.)
         if (down && com.kolodkingal.enhanced.healing.HealingFactor.isDown(player)) {
-            return;
-        }
-        // 3.17: an enemy's Rune of Protection strips a hero's magic where he stands.
-        if (down && com.kolodkingal.enhanced.magic.MagicZones.powersStripped(player)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.spell.stripped"), true);
-            return;
-        }
-        // 3.17: in a world the Nexus Being holds, her runes strip every hero of his powers.
-        if (down && com.kolodkingal.enhanced.ultimate.NexusBeing.strips(player)) {
-            player.displayClientMessage(Component.translatable("message.enhanced.nexus.stripped"), true);
-            return;
-        }
-        // 3.17: the spell key casts a spell, the ultimate key awakens the ultimate form (or fires its signature), the
-        // Magic types key gives the Demiurge another magic user's abilities.
-        if (ability == com.kolodkingal.enhanced.magic.MagicKeys.SPELL) {
-            com.kolodkingal.enhanced.magic.Casting.key(player, down);
-            Powers.syncIfDirty(player);
-            return;
-        }
-        if (ability == com.kolodkingal.enhanced.magic.MagicKeys.ULTIMATE) {
-            if (down) {
-                com.kolodkingal.enhanced.ultimate.UltimateForms.key(player, player.isShiftKeyDown());
-            }
-            Powers.syncIfDirty(player);
-            return;
-        }
-        if (ability == com.kolodkingal.enhanced.magic.MagicKeys.MAGIC_TYPE) {
-            if (down) {
-                com.kolodkingal.enhanced.ultimate.Demiurge.cycle(player);
-            }
             return;
         }
         // Drained by Agatha (3.3): the power is hers for a while. (A release still goes through.)
@@ -127,14 +96,7 @@ public final class AbilityHandler {
             case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down, alt);
             case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down, alt);
             case VISION -> VisionAbilities.onKey(player, data, ability, down, alt);
-            case BILLY -> {
-                // 3.17: the Demiurge's keys are those of the magic user he took on (Magic types), if any
-                if (data.borrowed() != Power.NONE && data.borrowed() != Power.BILLY) {
-                    heroKey(data.borrowed(), player, data, ability, down, alt);
-                } else {
-                    BillyAbilities.onKey(player, data, ability, down, alt);
-                }
-            }
+            case BILLY -> BillyAbilities.onKey(player, data, ability, down, alt);
             case TOMMY -> TommyAbilities.onKey(player, data, ability, down, alt);
             case LOKI -> LokiAbilities.onKey(player, data, ability, down, alt);
             case THOR -> ThorAbilities.onKey(player, data, ability, down, alt);
@@ -143,10 +105,6 @@ public final class AbilityHandler {
                     HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK, IRON_MAN, FALCON,
                     LOVE -> HeroServers.onKey(hero, player, data, ability, down, alt);
             case NONE -> {
-                // 3.17: a witch's R G V B N (and with Sneak) are her first ten spells
-                if (com.kolodkingal.enhanced.magic.Magic.isWitch(player)) {
-                    com.kolodkingal.enhanced.magic.Casting.quick(player, ability, down, alt);
-                }
             }
         }
     }

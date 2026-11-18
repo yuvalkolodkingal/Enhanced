@@ -256,9 +256,7 @@ public final class SlowMotion {
             for (Player player : level.players()) {
                 PowerData data = Powers.get(player);
                 boolean speedster = holdsZone(data);
-                // (3.17, Ultimate Mode: no power of time slows an Ultimate Tommy)
-                if (!speedster && !com.kolodkingal.enhanced.ultimate.BespokeForms.timeProof(player)
-                        && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius
+                if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius
                         && isInZone(level, player.position())) {
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 3, true, false, false));
                     // Whatever he rides isn't tick-skipped (he steers it), so it is slowed the same way.

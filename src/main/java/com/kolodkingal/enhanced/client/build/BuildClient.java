@@ -217,10 +217,6 @@ public final class BuildClient {
         if (data.power() == Power.CUSTOM && data.has(HeroAbility.WANDA_BUILD_MAGIC)) {
             return Power.SCARLET_WITCH; // (3.5: the Scarlet Witch's Build Magic, her looks and her Instant)
         }
-        if (data.power() == Power.BILLY && data.acting() != Power.BILLY
-                && com.kolodkingal.enhanced.custom.HeroKeys.yRow(data) != null) {
-            return data.acting(); // (3.17: a Demiurge whose magic type has a Y of its own, Doctor Strange's Eye: Y is that)
-        }
         return data.power() == Power.CUSTOM && data.has(HeroAbility.BILLY_BUILD_MAGIC) ? Power.BILLY : data.power();
     }
 

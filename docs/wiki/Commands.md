@@ -66,46 +66,6 @@ One server-wide rule for how strong every power is, so an SMP stays fair (3.16).
 
 The server config file itself is never changed: the balance applies on top of it, and `full` gives you its numbers back.
 
-## Ultimate Mode: /enhanced ultimate
-
-Every hero's ultimate version, for the whole server (3.17; operators). See [Ultimate Mode](Ultimate-Mode).
-
-| Command | What it does |
-|---|---|
-| `/enhanced ultimate on` | Turns Ultimate Mode on for this world: the Ultimate Form key awakens every hero's ultimate form, Source Code Vision runs on the Solar Jewel, Billy is the Demiurge, the Scarlet Witch can become the Nexus Being |
-| `/enhanced ultimate off` | Turns it off for this world (every ultimate form ends) |
-| `/enhanced ultimate info` | Whether it is on, and whether that is the world's own setting or the server config's |
-| `/enhanced ultimate default` | Drops the world's own setting: `[ultimate] enabled` in the server config decides again |
-
-The world's setting is kept in `world/serverconfig/enhanced-ultimate.json` and wins over the config. Every player is told at once.
-
-## The server's settings: /enhanced config
-
-Every setting and limit of the server's config file, read and changed from inside the game (3.17; operators). A setting's **key** is its section and its name joined by a dot, as in the file: `custom_hero.budget`, `scarlet_witch.hexDeathChance`. **Tab completes every key.**
-
-| Command | What it does |
-|---|---|
-| `/enhanced config` (or `/enhanced config menu`) | Opens the mod's settings screen on your own game; on a server, an operator changes the server's settings there |
-| `/enhanced config get <key>` | The setting's value, its default, what it accepts and what it is for |
-| `/enhanced config set <key> <value>` | Changes it. The value is checked by the setting's own rules (its type, its range, its choices): a value that is not accepted is refused with the reason, and nothing changes |
-| `/enhanced config reset <key>` | Puts it back to its default |
-| `/enhanced config list` | The sections, with how many settings each holds |
-| `/enhanced config list <section>` | A section's settings and their values (changed ones in gold) |
-
-A change is used at once, written to the config file the server reads (the world's own `serverconfig/enhanced-server.toml` if there is one, else `config/enhanced-server.toml`) exactly as if you had edited the file, and sent to every player. See [Server Configuration](Server-Configuration).
-
-## Witchcraft: /enhanced witch
-
-The players' witchcraft (3.17; operators). See [Witchcraft](Witchcraft).
-
-| Command | What it does |
-|---|---|
-| `/enhanced witch info [player]` | A player's path, level, mana, corruption and how many spells they know |
-| `/enhanced witch grant <player> <path> [level]` | Makes a player with no hero power a witch: `green`, `potions`, `protection`, `divination`, `spirit` or `sorcerer`, level 1 to 5 |
-| `/enhanced witch revoke <player>` | Takes their witchcraft away |
-| `/enhanced witch grimoire <player> <darkhold\|vishanti\|cagliostro>` | Teaches them a grimoire's spells as if they had read it |
-| `/enhanced witch cleanse <player>` | Clears the Darkhold's corruption from their magic |
-
 ## Asgard: /enhanced asgard
 
 ![The palace of Asgard](images/092-asgard-palace.png)

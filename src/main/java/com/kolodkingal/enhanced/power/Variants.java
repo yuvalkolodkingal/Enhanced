@@ -33,8 +33,6 @@ public final class Variants {
                 new Variant("halloween", Power.TOMMY, Variant.suit("tommy_halloween"), null, false, Power.TOMMY.color, Power.TOMMY.glow),
                 new Variant("tracksuit", Power.TOMMY, Variant.suit("tommy_tracksuit"), null, false, Power.TOMMY.color, Power.TOMMY.glow),
                 new Variant("speed", Power.TOMMY, Variant.suit("tommy_speed"), null, false, Power.TOMMY.color, Power.TOMMY.glow),
-                // (3.17) as the VisionQuest series shows him: one more look to choose, after the others (the first is still his default)
-                new Variant("visionquest", Power.TOMMY, Variant.suit("tommy_visionquest"), null, false, Power.TOMMY.color, Power.TOMMY.glow),
                 own(Power.TOMMY));
 
         add(Power.LOKI,

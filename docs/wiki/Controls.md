@@ -79,18 +79,6 @@ With a crafted **Infinity Gauntlet** in your hand:
 
 The same goes for a bare stone in your hand (no J needed). **J** is also Spider-Man's Web Assist: each answers only for its own player. See [Infinity Stones](Infinity-Stones#the-infinity-gauntlet).
 
-## Spells, the ultimate form and the Demiurge's magic types (3.17)
-
-The three keys of 3.17 are **punctuation keys**, because every letter is already some key's default (the game's own, this mod's, or Enlightened's: the first release of 3.17 put them on **O** and **K**, and O is the game's own Friends key in 26.3 and K is Enlightened's). Change them under Options, Controls, Enhanced.
-
-| Key | Default | What it does |
-|---|---|---|
-| **Spells** | `;` (semicolon) | Casts your chosen spell ([Witchcraft](Witchcraft)); hold it while you chant to chant twice as fast. **Sneak + Spells** opens the Spell Wheel to choose a spell. For witches and sorcerers; for a hero only with [Ultimate Mode](Ultimate-Mode) on. A witch's **R G V B N** (and with Sneak) cast her first ten spells. |
-| **Ultimate Form** | `'` (apostrophe) | With [Ultimate Mode](Ultimate-Mode) on: awakens your hero's ultimate form; again while it lasts, its signature move (with Sneak, the second move of the forms that have one; for the Scarlet Witch, Sneak ends the Nexus Being's form). With Ultimate Mode off it does nothing. |
-| **The Demiurge's Magic Types** | `,` (comma) | Billy as the Demiurge: his keys become the next magic user's (the Scarlet Witch, Doctor Strange, Agatha, Loki), then his own again. |
-
-With Ultimate Mode off, none of the three does anything for a hero, and every hero's own keys are exactly what they were.
-
 ## Build Magic: Y
 
 ![Build Magic: the spell hints on the HUD](images/006-scarlet-witch-build-magic.png)

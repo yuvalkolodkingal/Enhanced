@@ -33,8 +33,7 @@ public final class AgathaEvents {
     /** Her shield, complete, takes the blow (or what it can of it). */
     @Subscribe(priority = Priority.HIGHEST)
     public static void onShieldDamage(LivingIncomingDamageEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player && AgathaAbilities.has(player, HeroAbility.AGATHA_SHIELD)
-                && !com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(event.getSource())) { // (3.17: Ultimate Tommy)
+        if (event.getEntity() instanceof ServerPlayer player && AgathaAbilities.has(player, HeroAbility.AGATHA_SHIELD)) {
             AgathaShield.guard(player, event);
         }
     }

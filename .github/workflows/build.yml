@@ -133,15 +133,10 @@ jobs:
         run: |
           go=true
           cf=false; mr=false
-          # A version that was sent, withdrawn and built again (a line "<version>" in .github/withdrawn.txt) is sent
-          # once more, and marked with the tag published/<site>/<version>-again.
-          again=""
-          if grep -qx "${VERSION}" .github/withdrawn.txt 2>/dev/null; then again="-again"; fi
-          echo "again=$again" >> "$GITHUB_OUTPUT"
           # sent: a published/<site>/<version> tag, or a line "<site> <version>" in .github/published.txt
           sent() {
-            git ls-remote --exit-code --tags origin "refs/tags/published/$1/${VERSION}${again}" >/dev/null \
-              || grep -qx "$1 ${VERSION}${again}" .github/published.txt 2>/dev/null
+            git ls-remote --exit-code --tags origin "refs/tags/published/$1/${VERSION}" >/dev/null \
+              || grep -qx "$1 ${VERSION}" .github/published.txt 2>/dev/null
           }
           if [ -n "$CF_TOKEN" ] && [ -n "$CF_ID" ]; then
             if sent curseforge; then echo "Already on CurseForge"; else cf=true; fi
@@ -193,10 +188,9 @@ jobs:
         if: steps.go.outputs.cf == 'true'
         env:
           VERSION: ${{ needs.build.outputs.version }}
-          AGAIN: ${{ steps.go.outputs.again }}
         run: |
-          git tag "published/curseforge/${VERSION}${AGAIN}" "$GITHUB_SHA"
-          git push origin "published/curseforge/${VERSION}${AGAIN}"
+          git tag "published/curseforge/${VERSION}" "$GITHUB_SHA"
+          git push origin "published/curseforge/${VERSION}"
 
       - name: Upload to Modrinth
         if: steps.go.outputs.mr == 'true'
@@ -224,7 +218,6 @@ jobs:
         if: steps.go.outputs.mr == 'true'
         env:
           VERSION: ${{ needs.build.outputs.version }}
-          AGAIN: ${{ steps.go.outputs.again }}
         run: |
-          git tag "published/modrinth/${VERSION}${AGAIN}" "$GITHUB_SHA"
-          git push origin "published/modrinth/${VERSION}${AGAIN}"
+          git tag "published/modrinth/${VERSION}" "$GITHUB_SHA"
+          git push origin "published/modrinth/${VERSION}"

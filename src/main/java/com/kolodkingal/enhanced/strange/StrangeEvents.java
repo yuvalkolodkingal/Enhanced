@@ -64,9 +64,7 @@ public final class StrangeEvents {
         if (victim.level().isClientSide()) {
             return;
         }
-        // (3.17, Ultimate Mode: Ultimate Tommy's blows go through the Shield of the Seraphim)
-        float amount = com.kolodkingal.enhanced.ultimate.BespokeForms.piercesShields(event.getSource()) ? event.getAmount()
-                : SeraphimShield.harm(victim, event.getSource(), event.getAmount());
+        float amount = SeraphimShield.harm(victim, event.getSource(), event.getAmount());
         amount = MirrorDimension.onHurt(victim, event.getSource(), amount);
         if (amount <= 1.0E-4F) {
             event.setCanceled(true);

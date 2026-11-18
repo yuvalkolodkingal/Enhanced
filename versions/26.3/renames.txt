@@ -403,8 +403,6 @@ public boolean shouldRender\(([^)]*?double \w+)\) => public boolean shouldRender
 \.drop\(([^,()]+(?:\([^()]*\))?), (true|false), (?:true|false)\) => .drop($1, $2, net.minecraft.util.Prediction.SERVER_ONLY)
 \b(\w+)\.invulnerableTime = ([^;]+); => $1.setInvulnerableTime($2);
 \b(\w+)\.invulnerableTime\b => $1.getInvulnerableTime()
-# (3.17.0) an entity's scoreboard tags are entityTags() (a block state's getTags() is renamed above)
-\.getTags\(\)\.contains\( => .entityTags().contains(
 \.mulPose\((new Quaternionf|view\.rotation\(\)|facing\.getRotation\(\)|p\.rotation\)|[\w.()]*\.orientation\)) => .rotate($1
 
 # ---- registries of codecs: structure processors and loot functions have no type objects (the codec is the type) ----

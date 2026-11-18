@@ -32,9 +32,6 @@ import java.util.Map;
 public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     /** Blue chrome, from the tips down to the band. */
     private static final int[] CHROME = {0xDCEFFF, 0x8EBBEE, 0x3D6FC4, 0x1A3473};
-    /** (3.17, Ultimate Mode) The Demiurge's: the same crown, brighter and bluer. */
-    private static final int[] DEMIURGE_CHROME = {0xFFFFFF, 0xA8ECFF, 0x3FB8FF, 0x1670F0};
-    private static final int DEMIURGE_HALO = 0x5FD2FF;
     private static final float FORM_TICKS = 8.0F;
     private static final float FADE_TICKS = 12.0F;
 
@@ -84,14 +81,8 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
             FORMING.remove(player.getId());
             return;
         }
-        // (3.17) The Demiurge (Billy, Ultimate Mode) wears the same crown, brighter and bluer, small stars of energy alive
-        // in it; whatever his look (the Demiurge's suit has no crown painted on it), and in his ultimate form too.
-        boolean demiurge = com.kolodkingal.enhanced.magic.Magic.isDemiurge(player);
-        boolean shown = demiurge
-                ? (data.is(Live.CROWNED) || data.is(Live.ULTIMATE)) && !player.isInvisible()
-                        && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()
-                : data.is(Live.CROWNED) && !player.isInvisible() && !"wiccan".equals(Powers.variant(player).id())
-                        && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
+        boolean shown = data.is(Live.CROWNED) && !player.isInvisible() && !"wiccan".equals(Powers.variant(player).id())
+                && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
         Formation form = FORMING.computeIfAbsent(player.getId(), id -> new Formation());
         float dt = form.last < 0.0F ? 0.0F : Mth.clamp(ageInTicks - form.last, 0.0F, 4.0F);
         form.last = ageInTicks;
@@ -102,7 +93,7 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         // Growing in: each stroke starts after the ones it grows out of. Fading out: it just fades.
         float grown = shown ? form.progress : 1.0F;
         float alpha = shown ? 1.0F : form.progress;
-        drawCrown(poseStack, buffer, getParentModel().head, ageInTicks, grown, alpha, -1, demiurge);
+        drawCrown(poseStack, buffer, getParentModel().head, ageInTicks, grown, alpha, -1);
     }
 
     /**
@@ -111,25 +102,10 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
      */
     public static void drawCrown(PoseStack poseStack, MultiBufferSource buffer, ModelPart head, float ageInTicks, float grown, float alpha,
                                  int tint) {
-        drawCrown(poseStack, buffer, head, ageInTicks, grown, alpha, tint, false);
-    }
-
-    /**
-     * The crown; {@code starry} (3.17): the Demiurge's, the same strokes in a brighter, bluer chrome with a wider halo, and
-     * small four-pointed stars of energy that drift along its strokes and twinkle.
-     */
-    public static void drawCrown(PoseStack poseStack, MultiBufferSource buffer, ModelPart head, float ageInTicks, float grown, float alpha,
-                                 int tint, boolean starry) {
-        float glint = (ageInTicks * (starry ? 0.035F : 0.02F)) % 1.6F - 0.3F;
-        int halo = starry ? DEMIURGE_HALO : tint < 0 ? BillyAbilities.MAIN : tint;
+        float glint = (ageInTicks * 0.02F) % 1.6F - 0.3F;
+        int halo = tint < 0 ? BillyAbilities.MAIN : tint;
         poseStack.pushPose();
         head.translateAndRotate(poseStack);
-        if (starry) {
-            // (it sits outside his hood: a little larger, about the middle of the head)
-            poseStack.translate(0.0F, -4.0F / 16.0F, 0.0F);
-            poseStack.scale(1.24F, 1.24F, 1.24F);
-            poseStack.translate(0.0F, 4.0F / 16.0F, 0.0F);
-        }
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         Matrix4f m = poseStack.last().pose();
         float pulse = 0.85F + 0.15F * Mth.sin(ageInTicks * 0.15F);
@@ -146,11 +122,7 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
                     if (side < 0) {
                         points = points.stream().map(p -> new Vec3(-p.x, p.y, p.z)).toList();
                     }
-                    draw(m, vc, pass == 1, points, length, stroke.widthStart(), stroke.widthEnd(), alpha, pulse, glint, halo, tint,
-                            starry);
-                    if (starry && pass == 1) {
-                        stars(m, vc, points, length, alpha, ageInTicks, side + STROKES.indexOf(stroke) * 3);
-                    }
+                    draw(m, vc, pass == 1, points, length, stroke.widthStart(), stroke.widthEnd(), alpha, pulse, glint, halo, tint);
                 }
             }
         }
@@ -158,30 +130,8 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
     }
 
     /** One stroke: in chrome as two crossed ribbons (so it shows from every side), or the soft glow round it. */
-    /** (3.17) The Demiurge's stars: two to a stroke, drifting slowly along it, each a small cross of light that twinkles. */
-    private static void stars(Matrix4f m, VertexConsumer vc, List<Vec3> points, float length, float alpha, float age, int seed) {
-        int last = Math.max(1, Math.round((points.size() - 1) * length));
-        for (int k = 0; k < 2; k++) {
-            float along = (age * 0.012F + k * 0.5F + seed * 0.173F) % 1.0F;
-            if (along < 0.0F) {
-                along += 1.0F;
-            }
-            float f = along * last;
-            int i = Math.min(last - 1, (int) f);
-            Vec3 p = points.get(i).lerp(points.get(i + 1), f - i);
-            float twinkle = 0.5F + 0.5F * Mth.sin(age * 0.45F + seed * 1.9F + k * 2.3F);
-            float size = 0.35F + 0.55F * twinkle;
-            int c = EnergyGeometry.argb(0xFFFFFF, alpha * (0.45F + 0.55F * twinkle));
-            Vec3 at = new Vec3(p.x, p.y, p.z - 0.25);
-            quad(m, vc, at.add(-size, 0, 0), at.add(size, 0, 0), new Vec3(0, 1, 0), 0.22F, 0.22F, c, c);
-            quad(m, vc, at.add(0, -size, 0), at.add(0, size, 0), new Vec3(1, 0, 0), 0.22F, 0.22F, c, c);
-            quad(m, vc, at.add(0, 0, -size), at.add(0, 0, size), new Vec3(0, 1, 0), 0.22F, 0.22F, c, c);
-        }
-    }
-
     private static void draw(Matrix4f m, VertexConsumer vc, boolean halo, List<Vec3> points, float length,
-                             float widthStart, float widthEnd, float alpha, float pulse, float glint, int haloRgb, int tint,
-                             boolean starry) {
+                             float widthStart, float widthEnd, float alpha, float pulse, float glint, int haloRgb, int tint) {
         int last = Math.max(1, Math.round((points.size() - 1) * length));
         for (int i = 0; i < last; i++) {
             Vec3 a = points.get(i);
@@ -194,25 +144,24 @@ public class BillyCrownLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
             Vec3 across = dir.cross(new Vec3(0, 0, 1));
             across = across.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : across.normalize();
             if (halo) {
-                int glow = EnergyGeometry.argb(haloRgb, (starry ? 0.4F : 0.22F) * alpha * pulse);
-                quad(m, vc, a, b, across, wa * (starry ? 3.6F : 2.6F), wb * (starry ? 3.6F : 2.6F), glow, glow);
+                int glow = EnergyGeometry.argb(haloRgb, 0.22F * alpha * pulse);
+                quad(m, vc, a, b, across, wa * 2.6F, wb * 2.6F, glow, glow);
                 continue;
             }
             Vec3 depth = dir.cross(across).normalize();
-            int ca = chrome(a, glint, alpha, tint, starry);
-            int cb = chrome(b, glint, alpha, tint, starry);
+            int ca = chrome(a, glint, alpha, tint);
+            int cb = chrome(b, glint, alpha, tint);
             quad(m, vc, a, b, across, wa, wb, ca, cb);
             quad(m, vc, a, b, depth, wa * 0.8F, wb * 0.8F, ca, cb);
         }
     }
 
     /** The chrome colour at a point: by height, with a slow glint running up the crown. */
-    private static int chrome(Vec3 p, float glint, float alpha, int tint, boolean starry) {
-        int[] ramp = starry ? DEMIURGE_CHROME : CHROME;
+    private static int chrome(Vec3 p, float glint, float alpha, int tint) {
         float t = Mth.clamp((float) ((-p.y - 4.8) / 7.0), 0.0F, 1.0F);
-        float f = (1.0F - t) * (ramp.length - 1);
-        int i = Math.min(ramp.length - 2, (int) f);
-        int rgb = lerpColor(ramp[i], ramp[i + 1], f - i);
+        float f = (1.0F - t) * (CHROME.length - 1);
+        int i = Math.min(CHROME.length - 2, (int) f);
+        int rgb = lerpColor(CHROME[i], CHROME[i + 1], f - i);
         float shine = Math.max(0.0F, 1.0F - Math.abs(t - glint) * 6.0F);
         if (tint >= 0) {
             // The same light and shade, in the custom hero's colour.

@@ -9,8 +9,6 @@ The file has one section per hero (a boss has a section for his fight and one fo
     hexDeathChance = 0.95
 ```
 
-**Changing the settings in the game (3.17).** An operator does not need the file: `/enhanced config set <section.key> <value>` (also `get`, `reset`, `list`; Tab completes every key, see [Commands](Commands#the-servers-settings-enhanced-config)) changes any option listed here, and `/enhanced config` opens the mod's settings screen, where an operator on a server now edits the **Server Options** too (the same sections, tooltips, Undo and Reset as in a world of your own). Each change is checked by the server (who asks, and whether the value is within the option's range), used at once, written to this file and sent to every player; a value out of range is refused and nothing changes. Players who are not operators see the server's options greyed out, as before.
-
 Every number has an allowed range, and a value outside it is reset to the default when the file is loaded. A *tick* is 1/20 of a second. Food exhaustion of 4.0 costs 1 food point (one drumstick half). Flying speeds are in Minecraft's own units, where Creative flight is 0.05.
 
 The mod has no server option for anything that is not listed here. Everything else (what counts as metal, what can be lifted, which bosses resist) is decided by datapack tags: see [Datapack tags](#datapack-tags) below.
@@ -2296,45 +2294,6 @@ Section `[darkhold]`. The page is [The Sorcerers' Books](Sorcerers-Books#the-dar
 | `darkhold.glimpseMax` | `16` | 1 to 64 | The most creatures one mind glimpse shows (the nearest ones). |
 | `darkhold.glimpseCooldown` | `200` | 0 to 72000 | Cooldown of the mind glimpse, in ticks. |
 | `darkhold.glimpseExhaustion` | `1.0` | 0.0 to 40.0 | Food exhaustion of a mind glimpse (4.0 = 1 food point). Creative players pay nothing. |
-
-## Ultimate Mode
-
-Section `[ultimate]` (3.17): [Ultimate Mode](Ultimate-Mode), every hero's ultimate version. `/enhanced ultimate on|off` saves a world's own setting, which wins over `enabled` here (`/enhanced ultimate default` drops it). It replaced 3.16's `vision.solar_jewel.enabled`; an old file with that on turns `enabled` on.
-
-| Option | Default | Allowed values | Meaning |
-|---|---|---|---|
-| `ultimate.enabled` | `false` | `true` or `false` | Ultimate Mode for every player: the Ultimate Form key awakens the ultimate forms, Source Code Vision runs on the Solar Jewel, Billy is the Demiurge, Wanda can become the Nexus Being. |
-| `ultimate.awakenTicks` | `30` | 5 to 200 | Ticks the awakening takes before the form is the hero's. |
-| `ultimate.durationSeconds` | `45` | 5 to 3600 | Seconds an ultimate form lasts (the Nexus Being's has no limit). |
-| `ultimate.cooldownSeconds` | `180` | 0 to 36000 | Seconds after a form ends before it can be awakened again (none for the Nexus Being). |
-| `ultimate.signatureCooldownSeconds` | `10` | 1 to 600 | Seconds between two signature moves (the Ultimate Form key while the form lasts). |
-| `ultimate.signatureDamage` | `14.0` | 0 to 200 | The damage of a signature move to each creature it strikes. |
-| `ultimate.signatureRadius` | `10` | 2 to 64 | How far a signature move reaches round the hero, in blocks. |
-| `ultimate.damageBonus` | `0.25` | 0 to 5 | How much more damage a hero does in their ultimate form (0.25: a quarter more). |
-| `ultimate.signatureHurtsPlayers` | `true` | `true` or `false` | Whether signature moves strike other players too (PvP must be on). |
-| `ultimate.nexusFlashRange` | `50` | 4 to 128 | How far from the Nexus Being her chaos flashes strike her enemies, in blocks. |
-| `ultimate.nexusFlashDamage` | `15.0` | 0 to 200 | The damage of each chaos flash (they never touch her). |
-
-## Witchcraft
-
-Section `[witchcraft]` (3.17): [Witchcraft](Witchcraft), the spells, the grimoires, the Coven's Road and the Mindscape.
-
-| Option | Default | Allowed values | Meaning |
-|---|---|---|---|
-| `witchcraft.enabled` | `true` | `true` or `false` | Whether witchcraft and the spells are in the game at all. |
-| `witchcraft.manaRegen` | `3.0` | 0 to 100 | Mana a caster gets back each second, before their level (twice as much in a coven). |
-| `witchcraft.covenRadius` | `16` | 1 to 128 | How near another caster must be for the coven's faster mana, in blocks. |
-| `witchcraft.spellDamageFactor` | `1.0` | 0 to 10 | How many times as much the spells hurt. |
-| `witchcraft.interruptDamage` | `4.0` | 0 to 100 | A blow of at least this much breaks an incantation off (0: nothing does). |
-| `witchcraft.chantHeldSpeed` | `2.0` | 1 to 10 | How many times as fast an incantation goes while the Spells key is held. |
-| `witchcraft.corruptionPerSpell` | `6` | 0 to 100 | The corruption each of the Darkhold's spells adds (out of 100). |
-| `witchcraft.spellsHurtPlayers` | `true` | `true` or `false` | Whether harmful spells touch other players (PvP must be on too). |
-| `witchcraft.conjuredBlockSeconds` | `30` | 3 to 600 | Seconds a conjured block (a bridge, a wall, a platform, thorns) lasts. |
-| `witchcraft.hallwayMaxSeconds` | `29` | 3 to 120 | The longest an Infinite Hallway holds anyone (it grows with Billy's rank up to this). |
-| `witchcraft.roadRevives` | `true` | `true` or `false` | Whether the Coven's Road may bring back the dead (a hardcore world's fallen players). |
-| `witchcraft.roadPortalSeconds` | `15` | 3 to 120 | Seconds a portal to the Coven's Road stays open for others to step in. |
-| `witchcraft.mindscapePrivateChat` | `true` | `true` or `false` | Whether chat in the Witches' Mindscape is heard only by those in it. |
-| `witchcraft.roadOffersWitchcraft` | `true` | `true` or `false` | Whether the end of the Coven's Road offers witchcraft to someone with no power. |
 
 ## Structures
 

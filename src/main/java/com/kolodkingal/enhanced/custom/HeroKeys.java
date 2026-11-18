@@ -79,8 +79,7 @@ public final class HeroKeys {
             }
             return found;
         }
-        // (3.17: the Y row of the magic user a Demiurge took on, Doctor Strange's Eye, is his while he has that magic type)
-        HeroAbility own = HeroAbility.at(data.acting(), Y);
+        HeroAbility own = HeroAbility.at(data.power(), Y);
         return own == null || own.resources(HeroAbility.BOTH).contains(Resource.BUILD) ? null : own;
     }
 

@@ -113,7 +113,6 @@ public final class ClientEvents {
         GestureEffects.tick(mc.level);
         MagnetStreams.tick(mc.level);
         handleKeys(mc, player);
-        handleMagicKeys(mc, player);
         QuickHands.tick(mc, player);
         spawnSpeedTrails(mc.level);
         spawnFrostParticles(mc);
@@ -161,11 +160,6 @@ public final class ClientEvents {
         BarrierRenderer.clear();
         MagnetStreams.clear();
         HeroClients.clear();
-        // 3.17: a server's Ultimate Mode stays with it; the spells' light goes
-        if (!Minecraft.getInstance().hasSingleplayerServer()) {
-            com.kolodkingal.enhanced.ultimate.Ultimate.reset();
-        }
-        com.kolodkingal.enhanced.client.magic.MagicFxRenderer.clear();
     }
 
     /**
@@ -237,8 +231,6 @@ public final class ClientEvents {
                     int color = AbilityColors.shade(player, HeroAbility.TOMMY_SPEED, i == 0 ? 0xE6FFF5 : i == 1
                             ? CustomActing.tint(player, Power.TOMMY.glow, true)
                             : CustomActing.tint(player, Power.TOMMY.color, false));
-                    // (3.17: Ultimate Tommy's speed runs green and light pink-purple; anyone else's colour is unchanged)
-                    color = com.kolodkingal.enhanced.ultimate.BespokeForms.speedColor(player, color, i != 2);
                     level.addParticle(new EnergyParticleOptions(color, 1.0F + random.nextFloat() * 0.4F),
                             player.getX() - dx * back + (random.nextDouble() - 0.5) * 0.6, player.getY() - dy * back + random.nextDouble() * random.nextDouble() * 1.6,
                             player.getZ() - dz * back + (random.nextDouble() - 0.5) * 0.6, 0, 0.005, 0);
@@ -272,7 +264,6 @@ public final class ClientEvents {
             int color = AbilityColors.shade(player, HeroAbility.TOMMY_WHIRLWIND, random.nextInt(3) == 0 ? 0xE6FFF5 : random.nextBoolean()
                     ? CustomActing.tint(player, Power.TOMMY.glow, true) : CustomActing.tint(player, Power.TOMMY.color,
                             false));
-            color = com.kolodkingal.enhanced.ultimate.BespokeForms.speedColor(player, color, random.nextBoolean()); // (3.17)
             level.addParticle(new EnergyParticleOptions(color, 1.1F), x, player.getY() + height, z, vx, 0.02, vz);
         }
     }
@@ -350,9 +341,7 @@ public final class ClientEvents {
                 clicked = true;
             }
             // (3.3: the Hex Runes hold a sorcerer's powers: no gesture is predicted for a press the server refuses)
-            // (3.17: a witch's R G V B N are her spells)
-            boolean usable = mine && (power.hasPowers() || com.kolodkingal.enhanced.magic.Magic.isWitch(player)) && mc.screen == null
-                    && !player.isSpectator() && !HexRunes.silences(player);
+            boolean usable = mine && power.hasPowers() && mc.screen == null && !player.isSpectator() && !HexRunes.silences(player);
             boolean down = usable && key.isDown();
             // (3.5: the Sneak the key was pressed with, not the one the tick read; see PRESS_SNEAK)
             boolean sneak = PRESS_SNEAK[i] != 0 ? PRESS_SNEAK[i] == 2 : mc.options.keyShift.isDown();
@@ -371,47 +360,6 @@ public final class ClientEvents {
                 Net.sendToServer(new AbilityKeyPayload(i, false, mc.options.keyShift.isDown()));
                 SENT_DOWN[i] = false;
             }
-        }
-    }
-
-    /** Whether the spell key was sent down (its release is sent once, as for the ability keys). */
-    private static boolean spellSent;
-
-    /**
-     * 3.17: the spell key (with Sneak, the Spell Wheel), the ultimate key and the Magic types key. Nothing is sent for a
-     * player they are not for: the spell key is a caster's, the ultimate key needs Ultimate Mode on, Magic types the Demiurge.
-     */
-    private static void handleMagicKeys(Minecraft mc, LocalPlayer player) {
-        boolean spellClicked = false;
-        while (KeyBindings.SPELLS.consumeClick()) {
-            spellClicked = true;
-        }
-        boolean caster = com.kolodkingal.enhanced.magic.Magic.isCaster(player);
-        if (spellClicked && caster && mc.screen == null && !player.isSpectator()) {
-            if (mc.options.keyShift.isDown()) {
-                com.kolodkingal.enhanced.client.magic.SpellWheelScreen.open(mc);
-            } else if (!spellSent) {
-                Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.SPELL, true, false));
-                spellSent = true;
-            }
-        }
-        if (spellSent && !KeyBindings.SPELLS.isDown()) {
-            Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.SPELL, false, false));
-            spellSent = false;
-        }
-        boolean ultimateClicked = false;
-        while (KeyBindings.ULTIMATE.consumeClick()) {
-            ultimateClicked = true;
-        }
-        if (ultimateClicked && com.kolodkingal.enhanced.ultimate.Ultimate.on() && mc.screen == null && !player.isSpectator()) {
-            Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.ULTIMATE, true, mc.options.keyShift.isDown()));
-        }
-        boolean typesClicked = false;
-        while (KeyBindings.MAGIC_TYPES.consumeClick()) {
-            typesClicked = true;
-        }
-        if (typesClicked && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player) && mc.screen == null && !player.isSpectator()) {
-            Net.sendToServer(new AbilityKeyPayload(com.kolodkingal.enhanced.magic.MagicKeys.MAGIC_TYPE, true, false));
         }
     }
 

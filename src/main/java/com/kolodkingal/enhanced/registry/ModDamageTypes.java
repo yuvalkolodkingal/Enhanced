@@ -70,13 +70,6 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> HERO_MAGIC = key("hero_magic");
     /** 3.4: a custom hero's mind powers: in {@code enhanced:mind_power}. */
     public static final ResourceKey<DamageType> HERO_MIND = key("hero_mind");
-    // ===== magic (3.17) =====
-    /** 3.17: the spells of the witches, the sorcerers and Billy: in {@code enhanced:magic_damage}. */
-    public static final ResourceKey<DamageType> SPELL = key("spell");
-    /** 3.17: the Darkhold's forbidden spells: dark magic, which even a healing factor does not shrug off. */
-    public static final ResourceKey<DamageType> DARK_SPELL = key("dark_spell");
-    /** 3.17: an ultimate form's signature move: in {@code enhanced:energy_damage}. */
-    public static final ResourceKey<DamageType> ULTIMATE = key("ultimate");
     // ===== professor_x (3.3) =====
     /** Professor X's Mental Blast (it ignores armour), and the backlash of a stronger telepath who throws him out. */
     public static final ResourceKey<DamageType> MIND_BLAST = key("mind_blast");

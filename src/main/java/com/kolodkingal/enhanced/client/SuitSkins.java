@@ -37,36 +37,6 @@ public final class SuitSkins {
     private static final PlayerSkin QUICKSILVER = new PlayerSkin(
             Enhanced.id("textures/entity/suit/quicksilver.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
-    /**
-     * 3.17, Ultimate Mode: the Demiurge at rest (the starry suit under his red scarf) and powered (the body of stars). No
-     * cape of the game's: his cloak is a cloth of its own ({@code render.DemiurgeCloakLayer}).
-     */
-    private static final PlayerSkin DEMIURGE = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/billy_demiurge.png"), null, null, null, PlayerSkin.Model.WIDE, true);
-    private static final PlayerSkin DEMIURGE_POWERED = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/billy_demiurge_powered.png"), null, null, null, PlayerSkin.Model.WIDE, true);
-    /** 3.17, Ultimate Mode: the Nexus Being's suit, sleek red and black, with its red cape. */
-    private static final PlayerSkin NEXUS = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/scarlet_witch_nexus.png"), null,
-            Enhanced.id("textures/entity/suit/scarlet_witch_nexus_cape.png"), null, PlayerSkin.Model.SLIM, true);
-    /** The same suit while she does not wear her crown: her own crown is only ever the one she puts on. */
-    private static final PlayerSkin NEXUS_PLAIN = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/scarlet_witch_nexus_plain.png"), null,
-            Enhanced.id("textures/entity/suit/scarlet_witch_nexus_cape.png"), null, PlayerSkin.Model.SLIM, true);
-
-    /** 3.17, Ultimate Mode: Source Code Vision while he burns (flying, or a power in use): a figure of molten red. */
-    private static final PlayerSkin VISION_MOLTEN = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/vision_molten.png"), null, null, null, PlayerSkin.Model.WIDE, true);
-
-    /** 3.17, Ultimate Mode: Cosmic Spider-Man (Captain Universe) and the Godkiller armour. */
-    private static final PlayerSkin COSMIC_SPIDER = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/spider_man_cosmic.png"), null, null, null, PlayerSkin.Model.WIDE, true);
-    /** Ultimate Tommy: the comics' Speed (green suit, white hair, silver goggles). */
-    private static final PlayerSkin ULTIMATE_TOMMY = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/tommy_ultimate.png"), null, null, null, PlayerSkin.Model.WIDE, true);
-    private static final PlayerSkin GODKILLER = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/iron_man_godkiller.png"), null, null, null, PlayerSkin.Model.WIDE, true);
-
     private static final PlayerSkin VISION_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/vision_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -97,26 +67,6 @@ public final class SuitSkins {
     @Nullable
     public static PlayerSkin suitFor(AbstractClientPlayer player) {
         Power power = Powers.power(player);
-        // 3.17: the Demiurge (Billy, Ultimate Mode) and the Nexus Being (Wanda's ultimate form) wear theirs
-        if (power == Power.BILLY && com.kolodkingal.enhanced.magic.Magic.isDemiurge(player)) {
-            return com.kolodkingal.enhanced.client.magic.DemiurgeFx.powered(player) ? DEMIURGE_POWERED : DEMIURGE;
-        }
-        if (com.kolodkingal.enhanced.ultimate.BespokeForms.cosmic(player)) {
-            return COSMIC_SPIDER;
-        }
-        if (com.kolodkingal.enhanced.ultimate.BespokeForms.godkiller(player)) {
-            return GODKILLER;
-        }
-        if (com.kolodkingal.enhanced.ultimate.BespokeForms.tommy(player)) {
-            return ULTIMATE_TOMMY;
-        }
-        if (power == Power.VISION && !Powers.get(player).disguise()
-                && com.kolodkingal.enhanced.client.render.VisionFlameFx.burning(player, Powers.get(player))) {
-            return VISION_MOLTEN;
-        }
-        if (power == Power.SCARLET_WITCH && com.kolodkingal.enhanced.ultimate.NexusBeing.is(player)) {
-            return WandaAbilities.wearsCrown(player) ? NEXUS : NEXUS_PLAIN;
-        }
         if (power == Power.MAGNETO && MagnetoAbilities.wearsHelmet(player)) {
             return MAGNETO;
         }

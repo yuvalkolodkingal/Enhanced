@@ -189,10 +189,6 @@ public final class ClientSetup {
         }
         // 3.6: the Stone Wheel (J).
         registrar.keyMapping(KeyBindings.STONE_WHEEL);
-        // 3.17: the spells, the ultimate form and the Demiurge's Magic types.
-        registrar.keyMapping(KeyBindings.SPELLS);
-        registrar.keyMapping(KeyBindings.ULTIMATE);
-        registrar.keyMapping(KeyBindings.MAGIC_TYPES);
         // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).
         for (KeyMapping key : BuildKeys.ALL) {
             registrar.keyMapping(key);
@@ -472,9 +468,6 @@ public final class ClientSetup {
                 // ===== phoenix =====
                 renderer.addLayer(new PhoenixFlameLayer(renderer,
                         new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
-                // (3.17, Ultimate Mode) Source Code Vision's burning body: the cracks of fire and the sheath of flame
-                renderer.addLayer(new com.kolodkingal.enhanced.client.render.VisionFlameLayer(renderer,
-                        new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
                 // ===== spider =====
                 renderer.addLayer(new SpiderLegsLayer(renderer));
                 renderer.addLayer(new BlackEyesLayer(renderer));
@@ -504,8 +497,6 @@ public final class ClientSetup {
                 // ===== stones (3.6) =====
                 // ===== strange (3.6) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.CloakLayer(renderer));
-                // (3.17, Ultimate Mode) the Demiurge's red cloak, scarf and hood: cloth, drawn for him only
-                renderer.addLayer(new com.kolodkingal.enhanced.client.render.DemiurgeCloakLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.EyeAmuletLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.AstralLayer(renderer));
                 // ===== hulk (3.6) =====
@@ -596,9 +587,6 @@ public final class ClientSetup {
                 new SpeedSurfaceFx.SpeedLines());
         registrar.guiLayer(Enhanced.id("anim_state"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new AnimStateOverlay());
-        // 3.17: the magic's panel (mana, the chosen spell, the chant) and the ultimate form's line.
-        registrar.guiLayer(Enhanced.id("magic"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
-                new com.kolodkingal.enhanced.client.magic.MagicHud());
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
         registrar.guiLayer(Enhanced.id("mind_read"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,

@@ -212,17 +212,14 @@ public final class TommyAbilities {
             data.setSlowMo(slowing);
         }
         if (canRun) {
-            // (3.17: in his ultimate form his running costs no hunger; else as ever, times one)
-            player.causeFoodExhaustion(EnhancedConfig.TOMMY_EXHAUSTION.get().floatValue()
-                    * com.kolodkingal.enhanced.ultimate.BespokeForms.runHunger(player));
+            player.causeFoodExhaustion(EnhancedConfig.TOMMY_EXHAUSTION.get().floatValue());
             player.resetFallDistance();
             if (!was) {
                 player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.QUICKSILVER_WHOOSH.get(),
                         SoundSource.PLAYERS, 0.9F, 1.25F);
             }
         } else if (slowing) {
-            player.causeFoodExhaustion((float) SpeedStrikes.value(SpeedConfig.TOMMY_TIME_EXHAUSTION, 0.01)
-                    * com.kolodkingal.enhanced.ultimate.BespokeForms.runHunger(player));
+            player.causeFoodExhaustion((float) SpeedStrikes.value(SpeedConfig.TOMMY_TIME_EXHAUSTION, 0.01));
         }
         if (!data.acts(Power.QUICKSILVER)) {
             // (3.4: a custom hero with abilities of both speedsters has this upkeep once, from Quicksilver's tick.)

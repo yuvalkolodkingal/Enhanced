@@ -201,10 +201,6 @@ The Scarlet Witch may hold and use **all six** [Infinity Stones](Infinity-Stones
 
 Her **chaos magic** is one of the few things a [healing factor](Healing-Factor) can't stop: her Chaos Beam and her Hex wall defeat Wolverine and Deadpool (with PvP on, for players), where anything else only knocks them down. She is a telepath too, so she may use the [Cerebro console](Mutant-School-Lab#cerebro) of the X-Men's lab.
 
-## The Nexus Being (3.17)
-
-With [Ultimate Mode](Ultimate-Mode) on, the **Ultimate Form key** (`'` unless you change it) makes Wanda **the Nexus Being**: her own face, a sleek red suit with touches of black and a red cape (no new crown: her crown is her own, shown when she wears it). Her hurts heal within two seconds, her abilities have no cooldowns and burn a brighter red, the whole world she stands in becomes hers (a red sky of runes that strip every other hero's powers; she grows stronger for each, and holds several worlds at once), her **Chaos Burst** throws red energy out of all the ground and the sky within 50 blocks at everyone there but her, and nobody can enter her shield. It has no time limit: Sneak + the Ultimate Form key ends it. With Ultimate Mode off nothing of this exists: she is the Scarlet Witch of before.
-
 ## Numbers you can change
 
 Wanda's flight speed, the beam's damage, range and Nausea, whether the shield is unlimited (`shieldUnlimited`, on by default), and, for the old rules, the shield's cost, wind-up, strength, time limit, cooldowns and explosion factor, how far she can lift blocks and how hard they may be (Wanda's and the Phoenix's; Billy and Magneto have their own), and the Hex's default, smallest and largest radius, its death chance and how hard it bites a Vision who pushes against it are the `scarlet_witch.*` options on [Server Configuration](Server-Configuration). The Hex Runes are the `hex_runes.*` options. The Vision of the Hex (his health, punch and beam, how long you need to rebuild him, and turning him off) is the `hex_vision.*` options. The Instant level is `build_magic_wanda.instantMaxBlocks` and `instantMaxMillis`.

@@ -33,7 +33,6 @@ public final class ModCreativeTab {
                         output.accept(ModItems.STORMBREAKER.get());
                         output.accept(ModItems.BOOK_OF_THE_VISHANTI.get());
                         output.accept(ModItems.DARKHOLD.get());
-                        output.accept(ModItems.CAGLIOSTROS_GRIMOIRE.get());
                         output.accept(ModItems.WITCHES_ROAD_DOOR.get());
                         output.accept(ModItems.PHOENIX_EMBER.get());
                         output.accept(ModItems.RADIOACTIVE_SPIDER.get());

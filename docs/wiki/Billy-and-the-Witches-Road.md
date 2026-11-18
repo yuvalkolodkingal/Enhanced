@@ -120,12 +120,6 @@ Billy is a sorcerer: he may hold and use the **Time Stone** (Slow Time; Sneak: R
 
 Billy's **chaos magic** (the Hex Bolt and the Hex Beam) is one of the few things a [healing factor](Healing-Factor) can't stop: it defeats Wolverine and Deadpool, where anything else only knocks them down. He may use the [Cerebro console](Mutant-School-Lab#cerebro) too. At [Agatha's Cottage](Agathas-Cottage), Agatha calls him "Teen", and Nicky wants a spell.
 
-## Spells, and the Demiurge (3.17)
-
-With [Ultimate Mode](Ultimate-Mode) off, Billy is exactly the Billy of before 3.17: his crown, his barrier, his powers and his ranks are unchanged, and he has no spells. With it on he casts every spell of [Witchcraft](Witchcraft) on the Spells key ("I want ..."): the Unbinding, the broomstick, sigils and runes of protection, ghosts, dreams, a pocket dimension, the Infinite Hallway, conjured matter, gravity, portals and the rest.
-
-With [Ultimate Mode](Ultimate-Mode) on, Billy is **the Demiurge**: twenty hearts, Netherite's protection, a barrier round his whole body, a brighter blue with stars in it, every spell, the **Magic types** (the Magic Types key, `,`: he has the Scarlet Witch's, Doctor Strange's, Agatha's or Loki's powers, every key working exactly as on that character) and **Grant Magic** (he gives witchcraft to players with no hero; only they, and he, find the way into the Witches' Mindscape). He wears the Demiurge's starry suit with a red scarf and cape, and while he flies or uses a power the great red hooded cloak, of real cloth; his crown is his own crown, brighter and bluer, with stars alive in it.
-
 ## Numbers you can change
 
 Billy's flight speed, the Hex Beam (whether it is a beam at all, its damage, range, hit rate, hunger and how much it grows with his rank), the Hex Bolt's damage (when the beam is off), the Hex Barrier (its health, how fast it mends, the wait after it shattered, its arc, size, walking speed and rank growth), how long Freeze holds (5 seconds), how far The Noise reaches (32 blocks), whether he tears blocks out at all, how far and how hard a block, and his recharge between blocks are the `billy.*` options on [Server Configuration](Server-Configuration#billy-wiccan). His Build Magic numbers (the meter, the refill, the ten ranks and their practice, his reach and side, Mom's help) are the `build_magic_billy.*` options.

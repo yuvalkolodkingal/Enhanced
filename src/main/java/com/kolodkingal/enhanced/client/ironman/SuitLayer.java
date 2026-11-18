@@ -69,9 +69,6 @@ public class SuitLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Abs
      */
     @Nullable
     public static SuitKind drawn(AbstractClientPlayer player) {
-        if (com.kolodkingal.enhanced.ultimate.BespokeForms.godkiller(player)) {
-            return null; // (3.17, Ultimate Mode: the Godkiller armour is his whole body then, not a suit over it)
-        }
         IronManState state = IronSuits.state(player);
         if (Powers.power(player) != com.kolodkingal.enhanced.power.Power.IRON_MAN) {
             // (Not Iron Man: only a classic suit he has on, unlit; never a state left from before.)

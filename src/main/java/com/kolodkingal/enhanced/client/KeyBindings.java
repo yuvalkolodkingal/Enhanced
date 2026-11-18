@@ -65,26 +65,6 @@ public final class KeyBindings {
     public static final KeyMapping STONE_WHEEL = Keys.newKey("key.enhanced.stone_wheel", KeyBindings.STONES,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
 
-    /**
-     * 3.17: the spells (default the semicolon key): casts the chosen spell (held while chanting: faster); with Sneak, the
-     * Spell Wheel, to choose one. For witches and sorcerers, and with Ultimate Mode on for the Demiurge and the hero
-     * sorcerers. Not a letter: every letter is some key's default already, the game's (26.3 gave O to its Friends screen),
-     * the mod's or Enlightened's (K is its own), so the three keys of 3.17 are punctuation keys nothing else uses.
-     */
-    public static final KeyMapping SPELLS = Keys.newKey("key.enhanced.spells", KeyContext.IN_GAME,
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_SEMICOLON, CATEGORY);
-
-    /** 3.17: Ultimate Mode (default the apostrophe key): awakens the hero's ultimate form; while it lasts, its signature move. */
-    public static final KeyMapping ULTIMATE = Keys.newKey("key.enhanced.ultimate", KeyContext.IN_GAME,
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_APOSTROPHE, CATEGORY);
-
-    /**
-     * 3.17: the Demiurge's Magic types (default the comma key): his keys become another magic user's, one after the other,
-     * and his own again.
-     */
-    public static final KeyMapping MAGIC_TYPES = Keys.newKey("key.enhanced.magic_types", KeyContext.IN_GAME,
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_COMMA, CATEGORY);
-
     private static KeyMapping create(int ability, int key) {
         return Keys.newKey("key.enhanced.ability_" + ability, KeyContext.IN_GAME, InputConstants.Type.KEYSYM, key,
                 CATEGORY);

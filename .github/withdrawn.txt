@@ -1,2 +1,0 @@
-# Versions that were sent to CurseForge or Modrinth, withdrawn, and are released again: "<version>"
-3.17.0

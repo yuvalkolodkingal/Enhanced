@@ -295,31 +295,9 @@ public class ConfigSectionScreen extends OptionsSubScreen {
         if (Objects.equals(before, newValue)) {
             return;
         }
-        put(value, newValue);
+        value.set(newValue);
         undo.push(List.of(new Change(value, before, newValue)));
         changed = true;
-    }
-
-    /**
-     * Puts a value in use here; on another server's settings (3.17, an operator's screen) it is also sent to the server,
-     * which checks it and makes the change for everyone, or refuses it and sends back the value that stands.
-     */
-    private void put(ConfigSpec.ConfigValue<Object> value, Object newValue) {
-        value.set(newValue);
-        if (ConfigClient.remote(file)) {
-            ConfigClient.send(value, newValue);
-        }
-    }
-
-    /** (3.17) The server sent a value while this screen is open: if it is not what the screen shows, the rows are filled again. */
-    void serverChanged(ConfigSpec.ConfigValue<?> value, Object now) {
-        Change last = undo.isEmpty() || undo.peek().isEmpty() ? null : undo.peek().get(undo.peek().size() - 1);
-        if (last != null && last.value() == value && Objects.equals(last.after(), now)) {
-            return; // (the server's answer to this screen's own change)
-        }
-        if (value.getPath().subList(0, value.getPath().size() - 1).equals(path)) {
-            rebuild();
-        }
     }
 
     private void undo() {
@@ -328,7 +306,7 @@ public class ConfigSectionScreen extends OptionsSubScreen {
             return;
         }
         for (int i = step.size() - 1; i >= 0; i--) {
-            put(step.get(i).value(), step.get(i).before());
+            step.get(i).value().set(step.get(i).before());
         }
         changed = true;
     }
@@ -340,7 +318,7 @@ public class ConfigSectionScreen extends OptionsSubScreen {
         for (ConfigSpec.ConfigValue<?> value : sectionValues()) {
             Object before = value.getRaw();
             Object after = value.getSpec().correct(null);
-            put((ConfigSpec.ConfigValue<Object>) value, after);
+            ((ConfigSpec.ConfigValue<Object>) value).set(after);
             step.add(new Change((ConfigSpec.ConfigValue<Object>) value, before, after));
         }
         if (!step.isEmpty()) {

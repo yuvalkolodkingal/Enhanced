@@ -40,8 +40,6 @@ public class Enhanced {
         com.kolodkingal.enhanced.platform.neoforge.bridge.NeoForgeBridge.install();
         // Port P0: the platform layer's NeoForge glue (attachments, messages, entity attributes) comes first.
         NeoSetup.init(modBus);
-        // 3.17: the scale attribute's top, raised for the Godkiller of Ultimate Mode (no body changes for it)
-        com.kolodkingal.enhanced.ultimate.BespokeForms.raiseScaleCap();
         //#if <1.21.4
         NeoRegistrars.register(ModArmorMaterials.ARMOR_MATERIALS, modBus);
         //#endif

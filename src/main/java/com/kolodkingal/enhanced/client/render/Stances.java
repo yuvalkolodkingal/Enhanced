@@ -182,46 +182,6 @@ final class Stances {
             c.occupy(true, w);
             c.occupy(false, w);
         }
-        // (3.17) a chant, a broom, an ultimate form
-        if ((w = st.stance(Stance.MAGIC_CHANT)) > 0.001F) {
-            // the hands raised before the chest, weaving round each other
-            float weave = Mth.sin(c.age * 0.35F) * 14.0F;
-            c.arm(true, -70 + weave, -20, 12, w);
-            c.arm(false, -70 - weave, 20, -12, w);
-            c.tremble(true, 1.2F, 2.4F, w);
-            c.tremble(false, 1.2F, 2.6F, w);
-            c.head(8, 0, 0, w);
-            c.occupy(true, w);
-            c.occupy(false, w);
-        }
-        if ((w = st.stance(Stance.MAGIC_BROOM)) > 0.001F) {
-            // astride the broom: the knees drawn up and out, both hands forward on the stick
-            c.leg(true, -68, 14, w);
-            c.leg(false, -68, -14, w);
-            c.arm(true, -42, -8, 6, w);
-            c.arm(false, -42, 8, -6, w);
-            c.occupy(true, w);
-            c.occupy(false, w);
-        }
-        if ((w = st.stance(Stance.ULTIMATE_AWAKEN)) > 0.001F) {
-            c.arm(true, -165, 10, 30, w);
-            c.arm(false, -165, -10, -30, w);
-            c.tremble(true, 3.0F, 2.8F, w);
-            c.tremble(false, 3.0F, 3.1F, w);
-            c.head(-30, 0, 0, w);
-            float planted = w * (1.0F - st.wAir);
-            c.leg(true, -6, 10, w);
-            c.leg(false, 6, -10, w * Math.max(planted, 0.6F));
-            c.occupy(true, w);
-            c.occupy(false, w);
-        }
-        if ((w = st.stance(Stance.ULTIMATE_POWER)) > 0.001F) {
-            // power held: the arms a little out from the body, the fists low, a slow breath
-            float breath = Mth.sin(c.age * 0.08F) * 3.0F;
-            c.armAdd(true, 6, 0, 14 + breath, w);
-            c.armAdd(false, 6, 0, -14 - breath, w);
-            c.head(-4, 0, 0, w);
-        }
         if ((w = st.stance(Stance.VISION_BEAM)) > 0.001F) {
             // The stone fires from his forehead: chest out, chin up, the arms pulled back.
             if ("white_vision".equals(st.look)) {
@@ -372,8 +332,6 @@ final class Stances {
         lean += ("white_vision".equals(st.look) ? -6.0F : -3.0F) * st.stance(Stance.VISION_BEAM);
         // (3.16) the Overload's recoil leans him back; gathering, he arches
         lean += -9.0F * st.stance(Stance.SOLAR_OVERLOAD) - 5.0F * st.stance(Stance.SOLAR_GATHER);
-        // (3.17) the awakening arches him back; the broom tips him forward
-        lean += -10.0F * st.stance(Stance.ULTIMATE_AWAKEN) + 12.0F * st.stance(Stance.MAGIC_BROOM) - 3.0F * st.stance(Stance.ULTIMATE_POWER);
         lean += (st.weaponKind > 0 ? 6.0F : 4.0F) * st.stance(Stance.THOR_BEAM);
         lean += 10.0F * st.stance(Stance.TOMMY_WHIRL);
         lean += 2.0F * st.stance(Stance.NOISE);
