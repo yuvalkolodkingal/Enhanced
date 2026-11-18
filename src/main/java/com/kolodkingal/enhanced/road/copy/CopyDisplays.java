@@ -38,7 +38,13 @@ final class CopyDisplays {
     /** The saved form of a text that always faces the viewer. */
     static CompoundTag textTag(ServerLevel level, Component text, float scale) {
         CompoundTag tag = new CompoundTag();
+        // From 1.21.5 a text display saves its text as a component, not as a JSON string; a JSON string is shown word for word.
+        //#if >=1.21.5
+        //$$ tag.put("text", net.minecraft.network.chat.ComponentSerialization.CODEC
+        //$$         .encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), text).getOrThrow());
+        //#else
         tag.putString("text", Component.Serializer.toJson(text, level.registryAccess()));
+        //#endif
         tag.putString("billboard", "center");
         tag.putInt("background", 0x80102028);
         tag.putInt("line_width", 260);
