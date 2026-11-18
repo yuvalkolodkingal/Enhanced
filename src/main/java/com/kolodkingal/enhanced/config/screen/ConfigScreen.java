@@ -63,8 +63,16 @@ public class ConfigScreen extends OptionsSubScreen {
             button.active = false;
         } else if (type == ConfigFile.Type.SERVER && minecraft.getCurrentServer() != null
                 && !minecraft.isSingleplayer()) {
-            tooltip.append(Component.translatable(UI + "not_online").withStyle(ChatFormatting.RED)).append(EMPTY_LINE);
-            button.active = false;
+            if (ConfigClient.operator()) {
+                // (3.17) an operator changes another server's settings from here: each change is sent to the server,
+                // which checks who asks and what, and makes it for everyone
+                tooltip.append(Component.translatableWithFallback(UI + "operator",
+                        "You are an operator: your changes are sent to the server and apply to everyone at once.")
+                        .withStyle(ChatFormatting.GREEN)).append(EMPTY_LINE);
+            } else {
+                tooltip.append(Component.translatable(UI + "not_online").withStyle(ChatFormatting.RED)).append(EMPTY_LINE);
+                button.active = false;
+            }
         } else if (type == ConfigFile.Type.SERVER && minecraft.hasSingleplayerServer()
                 && minecraft.getSingleplayerServer().isPublished()) {
             tooltip.append(Component.translatable(UI + "not_lan").withStyle(ChatFormatting.RED)).append(EMPTY_LINE);

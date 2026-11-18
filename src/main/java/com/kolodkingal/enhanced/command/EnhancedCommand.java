@@ -98,6 +98,8 @@ public final class EnhancedCommand {
                                         .executes(EnhancedCommand::look))))
                 // (3.16) SMP Balance Mode: how strong every power is, for everyone on the server
                 .then(com.kolodkingal.enhanced.balance.BalanceCommand.node())
+                // 3.17: every server setting, read and changed from inside the game
+                .then(com.kolodkingal.enhanced.config.ConfigCommand.node())
                 // 3.17: Ultimate Mode, and the players' witchcraft
                 .then(com.kolodkingal.enhanced.ultimate.UltimateCommand.node())
                 .then(com.kolodkingal.enhanced.magic.WitchCommand.node())

@@ -51,6 +51,13 @@ public final class ModNetwork {
         registrar.clientbound(com.kolodkingal.enhanced.balance.BalanceSyncPayload.TYPE,
                 com.kolodkingal.enhanced.balance.BalanceSyncPayload.STREAM_CODEC,
                 com.kolodkingal.enhanced.balance.BalanceSyncPayload::handle);
+        // 3.17: the server's settings changed in game (/enhanced config, an operator's settings screen)
+        registrar.clientbound(com.kolodkingal.enhanced.config.core.ConfigValuePayload.TYPE,
+                com.kolodkingal.enhanced.config.core.ConfigValuePayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.config.core.ConfigValuePayload::handle);
+        registrar.serverbound(com.kolodkingal.enhanced.config.core.ConfigEditPayload.TYPE,
+                com.kolodkingal.enhanced.config.core.ConfigEditPayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.config.core.ConfigEditPayload::handle);
         // 3.17: Ultimate Mode, and the magic of the witches, the sorcerers and Billy
         registrar.clientbound(com.kolodkingal.enhanced.ultimate.UltimateSyncPayload.TYPE,
                 com.kolodkingal.enhanced.ultimate.UltimateSyncPayload.STREAM_CODEC,
