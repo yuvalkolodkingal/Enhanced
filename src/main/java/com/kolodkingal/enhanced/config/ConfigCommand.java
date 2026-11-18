@@ -130,8 +130,19 @@ public final class ConfigCommand {
         text.append("\n").append(Component.translatableWithFallback(KEY + "default", "Default: %s. Accepts: %s.",
                 ConfigEdits.text(value.getDefault()), ConfigEdits.accepts(value)).withStyle(ChatFormatting.GRAY));
         String comment = value.getSpec().getComment();
-        if (comment != null && !comment.isBlank()) {
-            text.append("\n").append(Component.literal(comment.strip()).withStyle(ChatFormatting.DARK_GRAY));
+        if (comment != null) {
+            // (the file's comment ends with the default and the range, which the line above has said)
+            StringBuilder told = new StringBuilder();
+            for (String line : comment.split("\n")) {
+                String stripped = line.strip();
+                if (!stripped.isEmpty() && !stripped.startsWith("Default: ") && !stripped.startsWith("Range: ")
+                        && !stripped.startsWith("Allowed Values: ")) {
+                    told.append(told.length() == 0 ? "" : " ").append(stripped);
+                }
+            }
+            if (told.length() > 0) {
+                text.append("\n").append(Component.literal(told.toString()).withStyle(ChatFormatting.DARK_GRAY));
+            }
         }
         ctx.getSource().sendSuccess(() -> text, false);
         return 1;

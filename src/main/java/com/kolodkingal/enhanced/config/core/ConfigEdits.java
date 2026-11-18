@@ -26,6 +26,10 @@ public final class ConfigEdits {
     /** The permission level that may change the server's settings: an operator's, as for the rest of {@code /enhanced}. */
     public static final int PERMISSION = 2;
 
+    /** The player whose screen asks for the change being made (the server's thread only), or null: the command's. */
+    @Nullable
+    private static ServerPlayer asking;
+
     private ConfigEdits() {
     }
 
@@ -177,7 +181,19 @@ public final class ConfigEdits {
         spec.save();
         // (as when the watcher reads a hand-edited file again: every value that needs no restart is read afresh)
         spec.afterReload();
-        Net.sendToAllPlayers(new ConfigValuePayload(key(value), text(checked)));
+        ConfigValuePayload news = new ConfigValuePayload(key(value), text(checked));
+        ServerPlayer from = asking;
+        if (from == null) {
+            Net.sendToAllPlayers(news);
+        } else {
+            // (whose screen made the change has it already: told again, a value typed a letter at a time would come back
+            // to his screen a step behind his typing)
+            for (ServerPlayer other : from.level().getServer().getPlayerList().getPlayers()) {
+                if (other != from) {
+                    Net.sendToPlayer(other, news);
+                }
+            }
+        }
         Enhanced.LOGGER.info("Config: {} = {}", key(value), text(checked));
     }
 
@@ -215,11 +231,14 @@ public final class ConfigEdits {
             refusal = Component.translatableWithFallback("commands.enhanced.config.not_operator",
                     "Only an operator can change the server's settings.");
         } else {
+            asking = player;
             try {
                 change(key, reset ? null : text);
                 return true;
             } catch (Refused refused) {
                 refusal = refused.reason();
+            } finally {
+                asking = null;
             }
         }
         player.displayClientMessage(refusal.copy().withStyle(ChatFormatting.RED), false);
