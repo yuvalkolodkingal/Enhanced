@@ -325,8 +325,9 @@ public final class UltimateMagicTests {
             // the Godkiller
             double scale = tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE);
             check(Math.abs(scale * 1.8 - 65.0) < 0.01, "the Godkiller stands 65 blocks tall: " + scale * 1.8 + " (scale " + scale + ")");
-            check(tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ENTITY_INTERACTION_RANGE) >= 65.0,
-                    "and reaches what stands under his feet");
+            // (his eyes are 58.5 blocks up; the game stops a reach at 64)
+            double reach = tony.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ENTITY_INTERACTION_RANGE);
+            check(reach >= 1.62 * scale + 3.0, "and reaches what stands under his feet: " + reach);
             check(tony.getArmorValue() >= 24, "more than Netherite: " + tony.getArmorValue());
             check(com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, tony.damageSources().generic()) < 1.0F
                     && com.kolodkingal.enhanced.ultimate.BespokeForms.taken(tony, dark) > 1.0F, "blows glance off; magic bites a little more");

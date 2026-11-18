@@ -1313,7 +1313,10 @@ if __name__ == '__main__':
     cosmic_spider().save(out + 'spider_man_cosmic.png')
     godkiller().save(out + 'iron_man_godkiller.png')
     tommy_ultimate().save(out + 'tommy_ultimate.png')
-    tommy_visionquest().save(out + 'tommy_visionquest.png')
+    # (a look of the ordinary game is an ordinary 64x64 skin: painted fine, then brought down to it)
+    vq = tommy_visionquest().resize((64, 64), Image.BOX)
+    vq.putdata([(r, g, b, 255 if a >= 128 else 0) if a >= 128 else (0, 0, 0, 0) for r, g, b, a in vq.getdata()])
+    vq.save(out + 'tommy_visionquest.png')
     molten().save(out + 'vision_molten.png')
     for i in range(4):
         cracks(i).save(out + 'vision_molten_cracks_%d.png' % i)
