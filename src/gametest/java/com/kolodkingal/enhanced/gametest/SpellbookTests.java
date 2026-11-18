@@ -401,6 +401,27 @@ public final class SpellbookTests {
     }
 
     @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void usingTheLecternHandsTheBookOver(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(8.5, FLOOR, 8.5);
+        ServerLevel level = helper.getLevel();
+        BlockPos pos = player.blockPosition().east(2);
+        level.setBlock(pos, Blocks.LECTERN.defaultBlockState(), Block.UPDATE_ALL);
+        net.minecraft.world.level.block.entity.LecternBlockEntity lectern =
+                (net.minecraft.world.level.block.entity.LecternBlockEntity) level.getBlockEntity(pos);
+        lectern.setBook(new ItemStack(ModItems.BOOK_OF_GREEN_WITCHCRAFT.get()));
+        net.minecraft.world.level.block.LecternBlock.resetBookState(null, level, pos, level.getBlockState(pos), true);
+        check(level.getBlockState(pos).getValue(net.minecraft.world.level.block.LecternBlock.HAS_BOOK), "the book lies on the lectern");
+        check(com.kolodkingal.enhanced.spellbook.SpellbookEvents.take(player, level, pos), "using the lectern takes it");
+        check(player.getInventory().contains(new ItemStack(ModItems.BOOK_OF_GREEN_WITCHCRAFT.get())), "the book is his");
+        check(!level.getBlockState(pos).getValue(net.minecraft.world.level.block.LecternBlock.HAS_BOOK)
+                && lectern.getBook().isEmpty(), "the lectern is empty");
+        check(!com.kolodkingal.enhanced.spellbook.SpellbookEvents.take(player, level, pos), "and there is nothing more to take");
+        check(Powers.power(player) == Power.NONE, "taking the book is not reading it");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void everySpellbookWordIsInBothLanguages(GameTestHelper helper) throws IOException {
         for (String name : List.of("en_us", "he_il")) {
             JsonObject lang = TestKit.lang(name);

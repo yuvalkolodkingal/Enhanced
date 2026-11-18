@@ -173,8 +173,12 @@ public final class SpellShots {
     private static void draw(ServerLevel level, Shot shot) {
         Vec3 p = shot.pos;
         if (shot.kind == Kind.ORB) {
-            level.sendParticles(new EnergyParticleOptions(shot.color, 2.2F), p.x, p.y, p.z, 5, 0.12, 0.12, 0.12, 0.0);
-            level.sendParticles(new EnergyParticleOptions(shot.glow, 1.2F), p.x, p.y, p.z, 2, 0.04, 0.04, 0.04, 0.0);
+            // (a dense ball, drawn at both halves of the tick's flight so it reads as one glowing orb, not a dotted line)
+            Vec3 back = p.subtract(shot.velocity.scale(0.5));
+            for (Vec3 at : new Vec3[]{back, p}) {
+                level.sendParticles(new EnergyParticleOptions(shot.color, 2.8F), at.x, at.y, at.z, 8, 0.14, 0.14, 0.14, 0.0);
+                level.sendParticles(new EnergyParticleOptions(shot.glow, 1.6F), at.x, at.y, at.z, 3, 0.05, 0.05, 0.05, 0.0);
+            }
             level.sendParticles(ParticleTypes.WITCH, p.x, p.y, p.z, 1, 0.15, 0.15, 0.15, 0.0);
         } else {
             level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.ROOTED_DIRT.defaultBlockState()), p.x, p.y, p.z,

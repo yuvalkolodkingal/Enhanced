@@ -119,7 +119,7 @@ public final class SpellMagic {
             }
             for (int h = 0; h < WALL_HEIGHT; h++) {
                 BlockPos pos = base.above(h);
-                if (!level.getBlockState(pos).isAir() || !BlockRights.mayPlace(player, level, pos)
+                if (!free(level, pos) || !BlockRights.mayPlace(player, level, pos)
                         || !level.getEntitiesOfClass(LivingEntity.class, new AABB(pos), LivingEntity::isAlive).isEmpty()) {
                     break;
                 }
@@ -132,19 +132,36 @@ public final class SpellMagic {
         return raised;
     }
 
-    /** The lowest free cell of the column at {@code at} that stands on something (a step up or down at most), or null. */
+    /**
+     * Whether the wall may fill this cell: air, or what any block placed there replaces (grass, a snow layer, a vine), never
+     * water or lava, never a block of anyone's and never a flower or a crop (the column is left out instead).
+     */
+    private static boolean free(ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.isAir() || state.canBeReplaced() && state.getFluidState().isEmpty() && !state.hasBlockEntity();
+    }
+
+    /** Whether something stands solid in this cell (the wall can stand on it). */
+    private static boolean solid(ServerLevel level, BlockPos pos) {
+        return !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
+    }
+
+    /**
+     * The lowest free cell of the column at {@code at} that stands on something solid (a step up or down at most), or null:
+     * the column is left out where the ground there is not free (a flower, a fence, a wall too high) or falls away.
+     */
     private static BlockPos ground(ServerLevel level, BlockPos at) {
         BlockPos pos = at;
-        for (int up = 0; up < 2 && !level.getBlockState(pos).isAir(); up++) {
+        for (int up = 0; up < 2 && solid(level, pos); up++) {
             pos = pos.above();
         }
-        if (!level.getBlockState(pos).isAir()) {
+        if (!free(level, pos)) {
             return null;
         }
-        for (int down = 0; down < 3 && level.getBlockState(pos.below()).isAir(); down++) {
+        for (int down = 0; down < 3 && free(level, pos.below()); down++) {
             pos = pos.below();
         }
-        return level.getBlockState(pos.below()).isAir() ? null : pos;
+        return solid(level, pos.below()) ? pos : null;
     }
 
     // ---- Nature ("bloom") ----

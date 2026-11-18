@@ -367,6 +367,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickB
     NORMAL - com.kolodkingal.enhanced.hydra.HydraEvents#onUseBlock
     NORMAL - com.kolodkingal.enhanced.road.copy.StructureCopyEvents#onRightClickBlock
     NORMAL - com.kolodkingal.enhanced.thanos.ThanosEvents#onRightClickBlock
+    NORMAL - com.kolodkingal.enhanced.spellbook.SpellbookEvents#onUseBlock
 event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickItem -> com.kolodkingal.enhanced.platform.event.PlayerInteractEvent$RightClickItem
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onRightClickItem
     HIGH - com.kolodkingal.enhanced.asgard.AsgardRules#onUseItem
@@ -1112,6 +1113,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickB
     NORMAL - com.kolodkingal.enhanced.hydra.HydraEvents#onUseBlock
     NORMAL - com.kolodkingal.enhanced.road.copy.StructureCopyEvents#onRightClickBlock
     NORMAL - com.kolodkingal.enhanced.thanos.ThanosEvents#onRightClickBlock
+    NORMAL - com.kolodkingal.enhanced.spellbook.SpellbookEvents#onUseBlock
 event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickItem -> com.kolodkingal.enhanced.platform.event.PlayerInteractEvent$RightClickItem
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onRightClickItem
     HIGH - com.kolodkingal.enhanced.asgard.AsgardRules#onUseItem

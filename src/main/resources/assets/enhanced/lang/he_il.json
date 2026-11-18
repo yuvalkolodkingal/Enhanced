@@ -5274,5 +5274,6 @@
   "power_module.enhanced.nature": "טבע",
   "power_module.enhanced.nature.desc": "גרמו לצמחים לצמוח",
   "power_module.enhanced.nature.bloom": "צמיחה",
-  "power_module.enhanced.nature.bloom.desc": "הצמחים סביבכם צומחים ופורחים"
+  "power_module.enhanced.nature.bloom.desc": "הצמחים סביבכם צומחים ופורחים",
+  "message.enhanced.spellbook.taken": "לקחתם את %s"
 }

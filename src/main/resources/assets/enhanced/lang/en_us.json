@@ -5274,5 +5274,6 @@
   "power_module.enhanced.nature": "Nature",
   "power_module.enhanced.nature.desc": "Make plants grow",
   "power_module.enhanced.nature.bloom": "Growth",
-  "power_module.enhanced.nature.bloom.desc": "The plants round you grow and flower"
+  "power_module.enhanced.nature.bloom.desc": "The plants round you grow and flower",
+  "message.enhanced.spellbook.taken": "You took the %s"
 }
