@@ -13,6 +13,7 @@
 * From the X-Men's secret lab: **Wolverine** and **Deadpool**, who get back up from almost anything
 * From the **Avengers Tower**: **Captain America**, **Red Hulk**, **Falcon**, and **Iron Man** with six suits, from the Mark 1 to the nanotech Mark 85 and the Hulkbuster
 * **Love**, Thor's daughter, a wish away from **Eternity** in the End
+* **Jim Hammond**, the android first Human Torch: use the Source Code as a player who is not Vision
 
 ## Bosses
 

@@ -71,7 +71,9 @@ public enum Power implements StringRepresentable {
     RED_HULK(0xC4231B, 0xFF7A3A),
     IRON_MAN(0xB3121B, 0x9FE8FF),
     FALCON(0x8A8F98, 0xE0313A),
-    LOVE(0xB57BFF, 0xFFE59A);
+    LOVE(0xB57BFF, 0xFFE59A),
+    // The hero of 3.17, appended after LOVE: Jim Hammond, the android first Human Torch: the orange of flame, with a pale gold glow.
+    JIM_HAMMOND(0xFF6A1F, 0xFFD27A);
 
     /**
      * By name. A name this version does not know (a hero it no longer has) reads as {@link #NONE} instead of
@@ -165,7 +167,7 @@ public enum Power implements StringRepresentable {
         return switch (this) {
             // (A custom hero flies only if Flight is one of its powers: PowerTicker asks its definition.)
             case MAGNETO, SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, CUSTOM,
-                    DOCTOR_STRANGE, IRON_MAN, FALCON, LOVE -> true;
+                    DOCTOR_STRANGE, IRON_MAN, FALCON, LOVE, JIM_HAMMOND -> true;
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
                     HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK -> false;
         };
@@ -190,6 +192,7 @@ public enum Power implements StringRepresentable {
             case IRON_MAN -> com.kolodkingal.enhanced.config.IronManConfig.MARK3_FLIGHT_SPEED.get().floatValue();
             case FALCON -> com.kolodkingal.enhanced.config.FalconConfig.FLIGHT_SPEED.get().floatValue();
             case LOVE -> com.kolodkingal.enhanced.config.EternityConfig.LOVE_FLIGHT_SPEED.get().floatValue();
+            case JIM_HAMMOND -> com.kolodkingal.enhanced.config.JimConfig.FLIGHT_SPEED.get().floatValue();
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, HEIMDALL, ODIN, HELA,
                     HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK -> 0.05F;
         };
@@ -200,7 +203,7 @@ public enum Power implements StringRepresentable {
         return switch (this) {
             case MAGNETO -> 5;
             case SCARLET_WITCH, VISION, BILLY, THOR, PHOENIX, ULTRON, APOCALYPSE, AGATHA, DOCTOR_STRANGE, IRON_MAN,
-                    FALCON, LOVE -> 2;
+                    FALCON, LOVE, JIM_HAMMOND -> 2;
             // (A custom hero's Flight is on whichever key its player put it; 3.6: all five of the Hulk's keys are
             // rows; 3.7: and Wolverine's and Deadpool's; 3.8: and Captain America's and Red Hulk's.)
             case NONE, QUICKSILVER, TOMMY, LOKI, SPIDER_MAN, THANOS, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN, HELA,

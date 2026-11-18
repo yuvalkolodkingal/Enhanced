@@ -232,6 +232,13 @@ public enum Live {
     BEAM_CHARGING,
     /** A charged beam has just been fired (a few ticks): every client draws it, as wide and as far as its charge made it. */
     BEAM_FIRING,
+    // ===== jim hammond (3.17) =====
+    /** Jim Hammond gathers the Nova Flame (B held): the heat builds round his chest. */
+    JIM_NOVA_CHARGING,
+    /** The Nova Flame has just gone off (a few ticks): the shell of fire races out from him. */
+    JIM_NOVA_BLAST,
+    /** Jim Hammond's whole body burns (he flies in flames). */
+    JIM_FLAMING,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

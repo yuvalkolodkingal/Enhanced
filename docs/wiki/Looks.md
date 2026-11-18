@@ -68,6 +68,9 @@ Frost Giant is ability 5 (**N**) in every look of Loki.
 |---|---|---|
 | **Thor** (default) | `thor` | 2011 and *The Avengers*: black and silver armour with the six chest discs, red cape. |
 | **Ragnarok** | `ragnarok` | The God of Thunder at the end of *Thor: Ragnarok*: short hair, eyepatch. |
+| **Jim Hammond, android suit** | `jim_hammond/android` | (3.17) The white android suit of the comics: a white helmet with a red stripe over the crown, a red face with glowing yellow eyes and a white jaw piece, a gold neck, a white chest plate with red chevrons, a red torso, white arms and legs with a red panel on each thigh, red hands and a long white cape. The face is Vision's own, in red. |
+| **Jim Hammond, classic suit** | `jim_hammond/classic` | (3.17) All red, with a gold collar, belt and gloves, darker boots and a red cowl. |
+| **Jim Hammond, human disguise** | `jim_hammond/human` | (3.17) Short dark hair, pale skin, a dark red ribbed suit with a gold collar and gold boots. The face is Vision's human face with only hair and skin changed. |
 | **Love and Thunder** | `love_and_thunder` | The suit of most of *Thor: Love and Thunder*: navy, gold and black armour with a gold Y on the chest and six black discs, bare arms and a red cape. His long ash-blond hair is swept back from a bare forehead and falls down his back and in locks in front of his shoulders, with a full brown beard. |
 | **Love and Thunder, helmet** | `love_and_thunder_helmet` | The same suit with the winged helmet Thor puts on for the fight at New Asgard: gold with blue stripes, wing panels on the sides, a bird's head over the brow and a face guard with a nose ridge. His eyes still show (and glow as the God of Thunder) and his long hair comes out below it. |
 | **Mighty Thor (Jane Foster)** | `mighty_thor` | Jane Foster as the Mighty Thor. |

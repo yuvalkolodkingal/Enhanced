@@ -366,6 +366,20 @@ New in 3.8. See [Love](Love) for the full story of each ability.
 | **Bifrost** `love.bifrost` | **N** (press) | Bifrost to where you look (press) | 2 a point | Open the Bifrost with your axe in hand. Sneak: straight to where you look. A world power. |
 | **Daughter of Thor** `love.body` | no key (always on) | — | 2 a point | 16 hearts; **worthy of Mjolnir**. |
 
+### Jim Hammond (7)
+
+New in 3.17. See [Jim Hammond](Jim-Hammond) for the full story of each ability.
+
+| Ability | Key | Strength | What it does |
+|---|---|---|---|
+| **Fire Beam** `jim_hammond.fire_beam` | **R** (hold) | 5 | Tap: a weak beam; hold to charge: more damage and reach, it burns the ground, and charged enough it turns the ground to magma. |
+| **Fireball** `jim_hammond.fireball` | **V** | 5 | Throw a ball of fire: it hurts and sets alight what it hits and leaves fire on the ground. |
+| **Nova Flame** `jim_hammond.nova_flame` | **B** (hold) | 5 | Gather your energy; when it is full a great fiery blast goes off round you; then a long cooldown. |
+| **Human Disguise** `jim_hammond.human_disguise` | **N** (on/off) | none | A switch: look human, or as the android. |
+| **Android Body** `jim_hammond.body` | body | 5 | Almost as durable as Vision, and you heal five times as fast. |
+| **Fire Immunity** `jim_hammond.fire_immunity` | body | none | Fire, lava, burning, magma and fire attacks cannot hurt you. |
+| **Burning Body** `jim_hammond.flame_body` | body | none | While you fly your whole body burns; whoever strikes you is set alight. |
+
 ## The Infinity Stones (3.6)
 
 ![The Infinity Stones](images/114-infinity-stones.png)

@@ -211,6 +211,18 @@ public final class Variants {
                 new Variant("love", Power.LOVE, Variant.suit("love"), Variant.suit("love_cape"), true, 0xB57BFF,
                         0xFFE59A),
                 own(Power.LOVE));
+        jim();
+    }
+
+    private static void jim() {
+        // ===== jim_hammond (3.17) =====
+        // The white android suit of the comics (a 128 by 128 skin, with its long white cape), the classic red suit and the human
+        // disguise. Each face is Vision's own face (his shape and shading) in the colours of that suit.
+        add(Power.JIM_HAMMOND,
+                new Variant("android", Power.JIM_HAMMOND, Variant.suit("jim_android"), Variant.suit("jim_android_cape"), false, 0xFF6A1F, 0xFFD27A),
+                new Variant("classic", Power.JIM_HAMMOND, Variant.suit("jim_classic"), null, false, 0xFF5A14, 0xFFC04A),
+                new Variant("human", Power.JIM_HAMMOND, Variant.suit("jim_human"), null, false, 0xC8841E, 0xF2D08A),
+                own(Power.JIM_HAMMOND));
     }
 
     private static void add(Power power, Variant... variants) {

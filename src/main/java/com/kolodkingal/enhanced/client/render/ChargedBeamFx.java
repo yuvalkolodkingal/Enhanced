@@ -42,16 +42,23 @@ public final class ChargedBeamFx {
 
     /** The key whose line of the HUD shows the charge: B for Vision. */
     public static int hudKey(Power power) {
-        return power == Power.VISION ? 4 : -1;
+        return power == Power.VISION ? 4 : power == Power.JIM_HAMMOND ? 1 : -1;
     }
 
     private static int chargeTicks(Power power) {
+        if (power == Power.JIM_HAMMOND) {
+            return EnhancedConfig.SPEC.isLoaded() ? com.kolodkingal.enhanced.config.JimConfig.BEAM_CHARGE_TICKS.get() : 40;
+        }
         return EnhancedConfig.SPEC.isLoaded() ? ChargedBeamConfig.CHARGE_TICKS.get() : 50;
     }
 
     private static double range(Power power, float charge) {
         if (!EnhancedConfig.SPEC.isLoaded()) {
             return 32;
+        }
+        if (power == Power.JIM_HAMMOND) {
+            return Mth.lerp(charge, com.kolodkingal.enhanced.config.JimConfig.BEAM_MIN_RANGE.get(),
+                    Math.max(com.kolodkingal.enhanced.config.JimConfig.BEAM_MIN_RANGE.get(), com.kolodkingal.enhanced.config.JimConfig.BEAM_MAX_RANGE.get()));
         }
         return Mth.lerp(charge, ChargedBeamConfig.MIN_RANGE.get(), Math.max(ChargedBeamConfig.MIN_RANGE.get(), ChargedBeamConfig.MAX_RANGE.get()));
     }
@@ -114,34 +121,13 @@ public final class ChargedBeamFx {
             seen[2] = time;
         }
         float t = Mth.clamp((time - seen[2]) / 8.0F, 0.0F, 1.0F);
-        fired(player, pose, vc, camera, a, origin, look, colors, seen[1], t, time, partialTick);
+        fired(player, data.power(), pose, vc, camera, a, origin, look, colors, seen[1], t, time, partialTick);
     }
 
     private static void gather(Minecraft mc, AbstractClientPlayer player, Matrix4f pose, VertexConsumer vc, Vec3 camera, Vec3 a,
                                Vec3 look, Colors c, float charge, float time, float partialTick) {
-        boolean own = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
-        // rings closing in on the point the beam leaves from, brighter and quicker as the charge grows
-        for (int k = 0; k < 3; k++) {
-            float p = (time * (0.03F + 0.05F * charge) + k / 3.0F) % 1.0F;
-            float radius = Mth.lerp(p, 1.1F, 0.06F) * (0.55F + 0.45F * charge);
-            float alpha = Mth.sin(p * Mth.PI) * (0.35F + 0.65F * charge);
-            EnergyGeometry.ring(pose, vc, a, look, radius, 0.035F + 0.03F * p, 32, EnergyGeometry.argb(c.spark, alpha));
-        }
-        // sparks spiralling in from all round
-        int sparks = 10 + (int) (18 * charge);
-        for (int i = 0; i < sparks; i++) {
-            float phase = (time * 0.05F + i * 0.618F) % 1.0F;
-            float dist = (1.0F - phase) * (0.5F + 1.3F * charge);
-            float yaw = i * 2.399F + phase * 3.0F;
-            float pitch = (i * 0.37F) % 1.0F * Mth.PI - Mth.HALF_PI;
-            Vec3 dir = new Vec3(Mth.cos(yaw) * Mth.cos(pitch), Mth.sin(pitch), Mth.sin(yaw) * Mth.cos(pitch));
-            Vec3 from = a.add(dir.scale(dist));
-            Vec3 to = a.add(dir.scale(Math.max(0.0, dist - 0.2F)));
-            EnergyGeometry.ribbon(pose, vc, from, to, 0.01F, 0.025F, EnergyGeometry.argb(c.glow, 0.0F),
-                    EnergyGeometry.argb(c.core, 0.8F * charge + 0.2F));
-        }
-        flare(pose, vc, a, 0.05F + 0.28F * charge + 0.02F * Mth.sin(time * 1.4F), c);
-        if (own) {
+        gatherAround(pose, vc, a, look, c, charge, time, 1.0F);
+        if (player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson()) {
             // first person: the brow is above the view, so the build-up is also drawn closing in on the aim, a few blocks ahead
             Vec3 ahead = player.getEyePosition(partialTick).add(look.scale(3.0)).subtract(camera);
             for (int k = 0; k < 2; k++) {
@@ -153,9 +139,39 @@ public final class ChargedBeamFx {
         }
     }
 
-    private static void fired(AbstractClientPlayer player, Matrix4f pose, VertexConsumer vc, Vec3 camera, Vec3 a, Vec3 origin,
+    /**
+     * Rings closing in on {@code a} (camera-relative, facing {@code look}), sparks spiralling in and a glow swelling with the
+     * charge; {@code scale} 1 is a beam's brow, more is the Nova Flame's whole body.
+     */
+    static void gatherAround(Matrix4f pose, VertexConsumer vc, Vec3 a, Vec3 look, Colors c, float charge, float time, float scale) {
+        for (int k = 0; k < 3; k++) {
+            float p = (time * (0.03F + 0.05F * charge) + k / 3.0F) % 1.0F;
+            float radius = Mth.lerp(p, 1.1F, 0.06F) * (0.55F + 0.45F * charge) * scale;
+            float alpha = Mth.sin(p * Mth.PI) * (0.35F + 0.65F * charge);
+            EnergyGeometry.ring(pose, vc, a, look, radius, 0.035F + 0.03F * p, 32, EnergyGeometry.argb(c.spark, alpha));
+        }
+        int sparks = 10 + (int) (18 * charge);
+        for (int i = 0; i < sparks; i++) {
+            float phase = (time * 0.05F + i * 0.618F) % 1.0F;
+            float dist = (1.0F - phase) * (0.5F + 1.3F * charge) * scale;
+            float yaw = i * 2.399F + phase * 3.0F;
+            float pitch = (i * 0.37F) % 1.0F * Mth.PI - Mth.HALF_PI;
+            Vec3 dir = new Vec3(Mth.cos(yaw) * Mth.cos(pitch), Mth.sin(pitch), Mth.sin(yaw) * Mth.cos(pitch));
+            Vec3 from = a.add(dir.scale(dist));
+            Vec3 to = a.add(dir.scale(Math.max(0.0, dist - 0.2F * scale)));
+            EnergyGeometry.ribbon(pose, vc, from, to, 0.01F, 0.025F, EnergyGeometry.argb(c.glow, 0.0F),
+                    EnergyGeometry.argb(c.core, 0.8F * charge + 0.2F));
+        }
+        flare(pose, vc, a, (0.05F + 0.28F * charge + 0.02F * Mth.sin(time * 1.4F)) * scale, c);
+    }
+
+    static void flareAt(Matrix4f pose, VertexConsumer vc, Vec3 at, float size, Colors c) {
+        flare(pose, vc, at, size, c);
+    }
+
+    private static void fired(AbstractClientPlayer player, Power power, Matrix4f pose, VertexConsumer vc, Vec3 camera, Vec3 a, Vec3 origin,
                               Vec3 look, Colors c, float charge, float t, float time, float partialTick) {
-        double range = range(Power.VISION, charge);
+        double range = range(power, charge);
         Vec3 end = Raycasts.block(player, range, partialTick).getLocation();
         Vec3 b = end.subtract(camera);
         float strength = 1.0F - t * t;

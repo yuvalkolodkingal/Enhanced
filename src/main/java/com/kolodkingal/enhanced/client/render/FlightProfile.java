@@ -261,6 +261,8 @@ public final class FlightProfile {
             case FALCON -> FALCON;
             // ===== love (3.8) =====
             case LOVE -> LOVE;
+            // ===== jim_hammond (3.17) =====
+            case JIM_HAMMOND -> VISION; // (he flies as Vision does)
             // A custom hero flies with the profile of his flight style (3.4: of(HeroAnimState)); the plain style is the
             // game's own pose.
             case NONE, QUICKSILVER, TOMMY, LOKI, CUSTOM -> null;

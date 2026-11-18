@@ -197,6 +197,7 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     NORMAL - com.kolodkingal.enhanced.hela.HelaEvents#onIncomingDamage
     NORMAL - com.kolodkingal.enhanced.falcon.FalconEvents#onShieldedBlow
     NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onIncomingDamage
+    NORMAL - com.kolodkingal.enhanced.ability.JimEvents#onHurt
     LOW - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onBladeBlow
     LOW - com.kolodkingal.enhanced.event.CommonEvents#onThorMelee
     LOW - com.kolodkingal.enhanced.event.PhoenixEvents#onSlam
@@ -939,6 +940,7 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     NORMAL - com.kolodkingal.enhanced.hela.HelaEvents#onIncomingDamage
     NORMAL - com.kolodkingal.enhanced.falcon.FalconEvents#onShieldedBlow
     NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onIncomingDamage
+    NORMAL - com.kolodkingal.enhanced.ability.JimEvents#onHurt
     LOW - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onBladeBlow
     LOW - com.kolodkingal.enhanced.event.CommonEvents#onThorMelee
     LOW - com.kolodkingal.enhanced.event.PhoenixEvents#onSlam

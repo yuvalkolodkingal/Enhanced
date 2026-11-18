@@ -37,6 +37,9 @@ public final class SuitSkins {
     private static final PlayerSkin QUICKSILVER = new PlayerSkin(
             Enhanced.id("textures/entity/suit/quicksilver.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    private static final PlayerSkin JIM_HUMAN = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/jim_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+
     private static final PlayerSkin VISION_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/vision_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -80,10 +83,15 @@ public final class SuitSkins {
             // In disguise Vision looks human (WandaVision).
             return VISION_HUMAN;
         }
+        if (power == Power.JIM_HAMMOND && Powers.get(player).disguise()) {
+            // (3.17) in the human disguise Jim looks human
+            return JIM_HUMAN;
+        }
         if (power == Power.CUSTOM) {
             // 3.3: a custom hero wears his own PNG, a look of one of the mod's heroes, or his own skin. 3.4: in Vision's
             // disguise (his ability) he looks like himself: the player's own skin.
-            if (Powers.get(player).has(HeroAbility.VISION_DISGUISE) && Powers.get(player).disguise()) {
+            if ((Powers.get(player).has(HeroAbility.VISION_DISGUISE) || Powers.get(player).has(HeroAbility.JIM_DISGUISE))
+                    && Powers.get(player).disguise()) {
                 return null;
             }
             // 3.6: in the Hulk's Human Form he is himself: the player's own skin.

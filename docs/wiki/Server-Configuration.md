@@ -2115,6 +2115,12 @@ Section `[avengers_tower]` (3.8): the Suit Displays and Tech Cases of the tower,
 | `avengers_tower.refitRadius` | `96` | 16 to 512 | Radius (blocks) round a player in which old towers are refitted. |
 | `avengers_tower.refitIntervalTicks` | `100` | 20 to 12000 | Ticks between two looks for old towers near a player (100 = 5 seconds). |
 
+## Jim Hammond
+
+Section `[jim]` (3.17), page [Jim Hammond](Jim-Hammond): `healthBonus` (8) and `armorBonus` (6) of his body, `regenMultiplier` (5), `attackerBurnSeconds` (6), `flightSpeed` (0.08), `flamesWhileFlying`, `sourceCodeReplacesHero`; the Fire Beam: `beamChargeTicks` (40), `beamTapTicks`, `beamCooldown`, `beamMinDamage` / `beamMaxDamage`, `beamMinRange` / `beamMaxRange`, `beamMaxWidth`, `beamBurnSeconds`, `beamFire`, `magma`, `magmaMinCharge` (0.8), `magmaRadius`; the fireballs: `fireballDamage`, `fireballSpeed`, `fireballCooldown`, `fireballBurnSeconds`, `fireballRange`, `fireballFire`; the Nova Flame: `novaChargeTicks` (60), `novaRadius` (12), `novaDamage`, `novaBurnSeconds`, `novaPush`, `novaCooldown` (1800), `novaCancelCooldown`, `novaFire`.
+
+Vision's Charged Beam is `[vision.charged_beam]` (3.17: `chargeTicks`, `tapTicks`, `cooldown`, `minDamage` / `maxDamage`, `minRange` / `maxRange`, `maxWidth`, and for his Source Code look `explosionMinRadius`, `explosionMaxRadius`, `explosionMaxDamage`, `explosionBreaksBlocks`); the Source Code's fire is `vision.solar_jewel.beamFire` and `sourceCodeBurnSeconds`.
+
 ## Eternity and Love
 
 Sections `[eternity]` and `[love]` (3.8). The pages are [Eternity](Eternity) and [Love](Love). The shrines' spacing is data (the structure set `enhanced:eternity_shrines`, 40 / 14 chunks).

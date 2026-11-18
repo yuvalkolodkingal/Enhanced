@@ -468,6 +468,9 @@ public final class ClientSetup {
                 // ===== phoenix =====
                 renderer.addLayer(new PhoenixFlameLayer(renderer,
                         new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
+                // ===== jim hammond (3.17) =====
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.JimFlameLayer(renderer,
+                        new PlayerModel<>(layers.context().bakeLayer(slim ? ENERGY_SLIM : ENERGY_WIDE), slim)));
                 // ===== spider =====
                 renderer.addLayer(new SpiderLegsLayer(renderer));
                 renderer.addLayer(new BlackEyesLayer(renderer));

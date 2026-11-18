@@ -305,7 +305,7 @@ public class PowerHud implements LayeredDraw.Layer {
             case THOR -> thor(player, data, ability);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,
                     HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK, IRON_MAN, FALCON, LOVE,
-                    NONE -> null;
+                    JIM_HAMMOND, NONE -> null;
         };
     }
 

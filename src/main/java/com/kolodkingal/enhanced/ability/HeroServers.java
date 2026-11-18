@@ -45,6 +45,8 @@ public final class HeroServers {
         register(new com.kolodkingal.enhanced.ironman.IronManServer());
         register(new com.kolodkingal.enhanced.falcon.FalconServer());
         register(new com.kolodkingal.enhanced.love.LoveServer());
+        // 3.17: Jim Hammond.
+        register(new JimServer());
     }
 
     /**

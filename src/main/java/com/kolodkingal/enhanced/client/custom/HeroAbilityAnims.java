@@ -84,6 +84,14 @@ public final class HeroAbilityAnims {
         row(HeroAbility.VISION_CHARGED_BEAM).stances(Stance.VISION_BEAM); // (held: the stance is the pose; no gesture of its own)
         row(HeroAbility.VISION_DISGUISE).main(GestureId.VISION_DISGUISE);
         row(HeroAbility.VISION_BODY); // (L2's row, 3.4: a passive body, nothing to act)
+        // ===== jim_hammond (3.17) =====
+        row(HeroAbility.JIM_BEAM).stances(Stance.VISION_BEAM);
+        row(HeroAbility.JIM_FIREBALL);
+        row(HeroAbility.JIM_NOVA).stances(Stance.SOLAR_GATHER, Stance.SOLAR_OVERLOAD);
+        row(HeroAbility.JIM_DISGUISE);
+        row(HeroAbility.JIM_BODY);
+        row(HeroAbility.JIM_FIRE_IMMUNITY);
+        row(HeroAbility.JIM_FLAME_BODY);
         // ===== billy =====
         // (The Hex Beam begins with the bolt's cast, and with billy.beam off R is the single bolt, told by its cooldown.)
         row(HeroAbility.BILLY_HEX_BEAM).mainCd(GestureId.BILLY_BOLT).stances(Stance.BEAM_HAND);

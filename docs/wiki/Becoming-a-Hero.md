@@ -42,6 +42,7 @@ Every hero has one way in. Recipes are on [Items and Crafting](Items-and-Craftin
 | [Red Hulk](Red-Hulk) (3.8) | The same serum: choose **Red Hulk**. |
 | [Falcon](Falcon) (3.8) | Take the **Falcon Exo-Wings** from the tower's observation deck (its highest room), then use the serum with the wings in your bag and choose **Falcon** (locked without them). Wear the wings on your chest. |
 | [Iron Man](Iron-Man) (3.8) | On Tony's desk in the tower's Iron Man workshop, take an **Arc Reactor** and **hold right-click for 2 seconds** (or wear the **Nano Arc Reactor**). Any hero is replaced. Then take the suits from the workshop's displays and put them on with **H**. |
+| [Jim Hammond](Jim-Hammond) (3.17) | Use the **Source Code** (the gem of Vision's brow) as a player who is **not Vision**, with no power or with any other hero (Vision's own use of it is unchanged). The item is used up. No room, recipe or loot. |
 | [Love](Love) (3.8) | In the End, find the **Shrine of the Cosmic Entities**, right-click **Eternity's altar** holding a key of the Bifrost (Stormbreaker, your Mjolnir, Hofund or your Gungnir), and in [Eternity's](Eternity) realm wish to **become Love**. Any hero is replaced; you get a Stormbreaker. |
 | [A custom hero](Hero-Creator) | In **Creative** mode (or as an operator), use the **Hero Creator** from the creative tab: become any hero at once (since 3.4 with that hero's items), or make your own. |
 

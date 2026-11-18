@@ -146,7 +146,8 @@ public final class AvengersSkeletonTests {
     public static void theFiveHeroesComeAfterDeadpool(GameTestHelper helper) {
         Power[] all = Power.values();
         int d = Power.DEADPOOL.ordinal();
-        check(d == 24 && all.length == d + 6, "…DEADPOOL and five more (the stream sends the ordinal)");
+        check(d == 24 && all.length == d + 7, "…DEADPOOL, five more and (3.17) Jim Hammond (the stream sends the ordinal)");
+        check(all[all.length - 1] == Power.JIM_HAMMOND, "Jim Hammond is last");
         for (int i = 0; i < HEROES.size(); i++) {
             check(all[d + 1 + i] == HEROES.get(i), HEROES.get(i) + " in its place");
         }
@@ -204,7 +205,7 @@ public final class AvengersSkeletonTests {
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTwelve(GameTestHelper helper) {
         check(ModNetwork.PROTOCOL_VERSION.equals("17"), "protocol 17 (3.17's settings changed in the game)");
-        check(Live.values().length == 80 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) = 80: "
+        check(Live.values().length == 83 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 3 (3.17 Jim) = 83: "
                 + Live.values().length);
         check(Toggle.values().length == 24 && Toggle.values().length <= 32, "Toggle: 22 + 2 = 24: "
                 + Toggle.values().length);
@@ -338,7 +339,7 @@ public final class AvengersSkeletonTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsAre221(GameTestHelper helper) throws IOException {
-        check(HeroAbility.values().length == 222, "176 + 27 + 18 rows, and 3.12's Mind Palace: " + HeroAbility.values().length);
+        check(HeroAbility.values().length == 229, "176 + 27 + 18 rows, 3.12's Mind Palace and 3.17's Jim Hammond (7): " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.CAPTAIN_SHIELD_THROW.ordinal() - 1] == HeroAbility.DEADPOOL_BODY,
                 "Captain America after Deadpool");
         check(HeroAbility.values()[HeroAbility.CAPTAIN_RICOCHET.ordinal() - 1] == HeroAbility.DEADPOOL_SMOKE,

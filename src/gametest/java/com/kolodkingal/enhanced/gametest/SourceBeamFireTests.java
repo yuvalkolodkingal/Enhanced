@@ -72,7 +72,7 @@ public final class SourceBeamFireTests {
         helper.succeed();
     }
 
-    @EnhancedTest(template = ARENA, batch = "mob_griefing_off")
+    @EnhancedTest(template = ARENA, batch = "mob_griefing_off_source_beam")
     public static void withMobGriefingOffNothingIsLit(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = source(f, true);

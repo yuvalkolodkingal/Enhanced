@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.mind;
 
+import com.kolodkingal.enhanced.config.JimConfig;
 import com.kolodkingal.enhanced.power.EarnedLooks;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
@@ -24,6 +25,9 @@ import java.util.List;
  * The Source Code (3.12): the gem of Vision's brow, which the Human Torch hands over at the bottom of Vision's mind.
  * White Vision who uses it becomes Vision as his Source Code ({@code vision:source_code}, an earned look: stronger,
  * tougher, faster in flight, untouched by fire); from then on the Change Look key reaches that look too.
+ *
+ * <p>(3.17) Anyone else who uses it, a player with another hero or with none, takes the gem into himself and becomes
+ * Jim Hammond, the android first Human Torch ({@link #becomeJim}): in survival that is the only way to become him.
  */
 public class SourceCodeItem extends Item {
     public SourceCodeItem(Properties properties) {
@@ -38,8 +42,7 @@ public class SourceCodeItem extends Item {
         }
         Variant source = Variants.get(Power.VISION, "source_code");
         if (!Powers.is(server, Power.VISION)) {
-            server.displayClientMessage(Component.translatable("message.enhanced.source_code.not_vision"), true);
-            return InteractionResultHolder.fail(stack);
+            return becomeJim(stack, server);
         }
         if ("source_code".equals(Powers.get(server).variant())) {
             server.displayClientMessage(Component.translatable("message.enhanced.source_code.already"), true);
@@ -56,6 +59,30 @@ public class SourceCodeItem extends Item {
         level.playSound(null, server.getX(), server.getY(), server.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.4F);
         server.displayClientMessage(Component.translatable(first ? "message.enhanced.source_code.become"
                 : "message.enhanced.look", source.displayName()).withStyle(s -> s.withColor(source.color())), false);
+        return InteractionResultHolder.success(stack);
+    }
+
+    /**
+     * (3.17) A player who is not Vision becomes Jim Hammond (the usual awakening and announcement; the item is used up in
+     * survival). One who already is Jim is told so; a player with another hero is turned away when
+     * {@code jim.sourceCodeReplacesHero} is off.
+     */
+    private InteractionResultHolder<ItemStack> becomeJim(ItemStack stack, ServerPlayer server) {
+        if (Powers.is(server, Power.JIM_HAMMOND)) {
+            server.displayClientMessage(Component.translatable("message.enhanced.jim.already"), true);
+            return InteractionResultHolder.pass(stack);
+        }
+        if (Powers.power(server).hasPowers() && !JimConfig.SOURCE_CODE_REPLACES_HERO.get()) {
+            server.displayClientMessage(Component.translatable("message.enhanced.jim.refused"), true);
+            return InteractionResultHolder.fail(stack);
+        }
+        Powers.awaken(server, Power.JIM_HAMMOND);
+        Powers.burst(server.serverLevel(), server.getX(), server.getY() + 1.0, server.getZ(), Power.JIM_HAMMOND.color, 80, 0.6);
+        Powers.burst(server.serverLevel(), server.getX(), server.getY() + 1.0, server.getZ(), Power.JIM_HAMMOND.glow, 40, 0.4);
+        server.level().playSound(null, server.getX(), server.getY(), server.getZ(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.0F, 0.8F);
+        if (!server.getAbilities().instabuild) {
+            stack.shrink(1);
+        }
         return InteractionResultHolder.success(stack);
     }
 

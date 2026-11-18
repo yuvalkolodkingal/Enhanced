@@ -321,7 +321,10 @@ public final class DataTests {
                     missing.add(look.translationKey());
                 }
                 if (look.skin() != null) {
-                    checkImage(look.skin(), 64, 64);
+                    // (3.17: Jim Hammond's android suit is a 128 by 128 skin: the same layout at twice the size, which the player
+                    // model draws unchanged; every other look is 64 by 64)
+                    int size = look.skin().getPath().endsWith("/jim_android.png") ? 128 : 64;
+                    checkImage(look.skin(), size, size);
                 }
                 if (look.cape() != null) {
                     checkImage(look.cape(), 64, 32);

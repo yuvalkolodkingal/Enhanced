@@ -572,6 +572,8 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.FalconConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.TowerConfig.define(BUILDER);
         com.kolodkingal.enhanced.config.EternityConfig.define(BUILDER);
+        // 3.17: Jim Hammond ([jim]).
+        com.kolodkingal.enhanced.config.JimConfig.define(BUILDER);
         // 3.5: the world's own music (section [music]).
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }

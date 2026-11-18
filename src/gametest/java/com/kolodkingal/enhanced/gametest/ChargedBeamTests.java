@@ -137,7 +137,7 @@ public final class ChargedBeamTests {
         });
     }
 
-    @EnhancedTest(template = ARENA, batch = "mob_griefing_off")
+    @EnhancedTest(template = ARENA, batch = "mob_griefing_off_charged_beam")
     public static void withMobGriefingOffNoBlockBreaks(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer vision = vision(f, true);

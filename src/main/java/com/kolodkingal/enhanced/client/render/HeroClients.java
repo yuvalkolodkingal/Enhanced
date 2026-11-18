@@ -44,6 +44,8 @@ public final class HeroClients {
         register(new IronManClient());
         register(new FalconClient());
         register(new LoveClient());
+        // 3.17: Jim Hammond.
+        register(new JimClient());
     }
 
     /**

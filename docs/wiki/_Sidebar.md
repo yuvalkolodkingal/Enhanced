@@ -47,6 +47,7 @@
 
 * [Eternity](Eternity)
 * [Love](Love)
+* [Jim Hammond](Jim-Hammond)
 
 **Asgard**
 
@@ -130,6 +131,7 @@
 
 * [הנצח](Eternity-HE)
 * [לאב](Love-HE)
+* [ג'ים המונד](Jim-Hammond-HE)
 
 **אסגרד**
 

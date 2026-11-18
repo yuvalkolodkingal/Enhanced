@@ -1,0 +1,81 @@
+{
+  "format": "enhanced:custom_hero",
+  "version": 2,
+  "name": "",
+  "color": "#FF6A1F",
+  "glow": "#FFD27A",
+  "look": {
+    "base": "jim_hammond/android",
+    "slim": false,
+    "cape": {
+      "style": "vision"
+    }
+  },
+  "powers": [
+    {
+      "id": "jim_hammond.fire_beam",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "flight",
+      "strength": 4,
+      "option": "hover"
+    },
+    {
+      "id": "jim_hammond.fireball",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "jim_hammond.nova_flame",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "jim_hammond.human_disguise",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "jim_hammond.body",
+      "strength": 4,
+      "option": "both"
+    },
+    {
+      "id": "jim_hammond.fire_immunity",
+      "strength": 5,
+      "option": "both"
+    },
+    {
+      "id": "jim_hammond.flame_body",
+      "strength": 4,
+      "option": "both"
+    }
+  ],
+  "keys": [
+    "jim_hammond.fire_beam",
+    "flight",
+    "jim_hammond.fireball",
+    "jim_hammond.nova_flame",
+    "jim_hammond.human_disguise"
+  ],
+  "sneakKeys": [
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "moves": {},
+  "anim": {
+    "flight": "vision",
+    "run": "vision",
+    "speedRun": "auto",
+    "idle": "none"
+  },
+  "preset": {
+    "icon": "minecraft:blaze_rod",
+    "hero": "jim_hammond"
+  }
+}

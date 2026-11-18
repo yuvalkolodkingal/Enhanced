@@ -410,6 +410,25 @@ public enum HeroAbility implements CatalogEntry {
     LOVE_BODY(Power.LOVE, 0, "body", body().cost(2).group(Group.BODY).icon("minecraft:golden_chestplate")
             .traits(Trait.WORTHY).family(Family.BODY)),
 
+    // ===== jim_hammond (3.17) =====
+    // (The designer's six: R the Fire Beam, the fire immunity, the durable body that heals fast, V fireballs, B the Nova
+    // Flame, the burning body in flight. G is flight, N the human disguise.)
+    JIM_BEAM(Power.JIM_HAMMOND, 1, "fire_beam", hold().cost(2).group(Group.ENERGY).icon("minecraft:blaze_rod")
+            .on(d -> d.is(Live.BEAM_CHARGING))),
+    JIM_FIREBALL(Power.JIM_HAMMOND, 3, "fireball", press().cost(2).group(Group.ENERGY).icon("minecraft:fire_charge")),
+    JIM_NOVA(Power.JIM_HAMMOND, 4, "nova_flame", hold().cost(3).group(Group.ENERGY).icon("minecraft:magma_block")
+            .on(d -> d.is(Live.JIM_NOVA_CHARGING))),
+    JIM_DISGUISE(Power.JIM_HAMMOND, 5, "human_disguise", toggle().cost(1).group(Group.BODY).icon("minecraft:leather_chestplate")
+            .fixed().on(PowerData::disguise)),
+    /** A body almost as durable as Vision's (a little less health and armour), healing five times as fast. */
+    JIM_BODY(Power.JIM_HAMMOND, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:iron_chestplate")
+            .family(Family.BODY)),
+    /** Total immunity to fire: burning, lava, magma, fire-type attacks. */
+    JIM_FIRE_IMMUNITY(Power.JIM_HAMMOND, 0, "fire_immunity", body().cost(1).group(Group.BODY).icon("minecraft:magma_cream")
+            .traits(Trait.FIRE_IMMUNE)),
+    /** His whole body burns while he flies; whoever strikes him then is set alight. */
+    JIM_FLAME_BODY(Power.JIM_HAMMOND, 0, "flame_body", body().cost(1).group(Group.BODY).icon("minecraft:blaze_powder")),
+
     // ===== variants (3.5, the creator lane) =====
     // Every Sneak variant of a built-in hero's key as a card of its own (the user: "all abilities listed, like Billy's
     // shield"). A variant row is its parent's Sneak half: picked alone it sits on any key (plain or Sneak) and presses

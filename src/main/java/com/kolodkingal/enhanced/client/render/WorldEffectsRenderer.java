@@ -186,6 +186,15 @@ public final class WorldEffectsRenderer {
             ChargedBeamFx.render(mc, player, data, source ? jewelPosition(mc, player, partialTick) : foreheadPosition(mc, player, partialTick),
                     source ? ChargedBeamFx.FIRE : ChargedBeamFx.MIND, pose, beams, camera, partialTick, time);
         }
+        // (3.17) Jim Hammond: his Fire Beam (charged beam, in fire) and the Nova Flame
+        if (data.power() == com.kolodkingal.enhanced.power.Power.JIM_HAMMOND) {
+            if (data.is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING) || data.is(com.kolodkingal.enhanced.power.Live.BEAM_FIRING)) {
+                ChargedBeamFx.render(mc, player, data, foreheadPosition(mc, player, partialTick), ChargedBeamFx.FIRE, pose, beams, camera,
+                        partialTick, time);
+            }
+            JimFx.nova(mc, player, data, pose, beams, camera, partialTick, time);
+            return;
+        }
         // (3.16) Solar Jewel Vision: his own light (the Solar Beam, the eye beams, the Overload, the sun drunk in)
         if (com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
             SolarJewelFx.render(mc, player, data, pose, beams, camera, partialTick, time);

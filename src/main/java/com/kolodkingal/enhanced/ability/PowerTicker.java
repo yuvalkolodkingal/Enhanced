@@ -112,7 +112,7 @@ public final class PowerTicker {
             case THOR -> ThorAbilities.tick(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,
                     HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK, IRON_MAN, FALCON,
-                    LOVE -> HeroServers.tick(hero, player, data);
+                    LOVE, JIM_HAMMOND -> HeroServers.tick(hero, player, data);
             case NONE -> {
             }
         }
@@ -135,7 +135,7 @@ public final class PowerTicker {
             case QUICKSILVER -> QuicksilverAbilities.endAll(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,
                     HELA, DOCTOR_STRANGE, HULK, WOLVERINE, DEADPOOL, CAPTAIN_AMERICA, RED_HULK, IRON_MAN, FALCON,
-                    LOVE -> HeroServers.endAll(hero, player, data);
+                    LOVE, JIM_HAMMOND -> HeroServers.endAll(hero, player, data);
             default -> {
             }
         }
