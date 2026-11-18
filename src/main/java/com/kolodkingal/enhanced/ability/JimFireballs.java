@@ -5,7 +5,6 @@ import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -203,7 +202,6 @@ public final class JimFireballs {
     }
 
     private static void burst(ServerLevel level, Vec3 at) {
-        level.sendParticles(ParticleTypes.EXPLOSION, at.x, at.y, at.z, 1, 0, 0, 0, 0);
         Embers.burst(level, at.x, at.y, at.z, 24, 0.4, 0.4, 0.4, 0.08);
         Embers.burst(level, at.x, at.y, at.z, 6, 0.3, 0.3, 0.3, 0.0);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0F, 0.8F);

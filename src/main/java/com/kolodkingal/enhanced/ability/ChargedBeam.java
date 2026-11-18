@@ -8,7 +8,6 @@ import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -290,7 +289,8 @@ public final class ChargedBeam {
         if (radius <= 0.0F) {
             return;
         }
-        level.sendParticles(radius >= 2.5F ? ParticleTypes.EXPLOSION_EMITTER : ParticleTypes.EXPLOSION, at.x, at.y, at.z, 1, 0, 0, 0, 0);
+        // (no vanilla explosion puffs: they are grey squares that fill the view near the camera; the ember burst is the blast's look)
+        Embers.burst(level, at.x, at.y, at.z, 10 + (int) (30 * charge), radius * 0.4, radius * 0.4, radius * 0.4, 0.04);
         Embers.burst(level, at.x, at.y, at.z, 12 + (int) (20 * charge), radius * 0.3, radius * 0.3, radius * 0.3, 0.08);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.6F + 0.6F * charge,
                 1.1F - 0.3F * charge);

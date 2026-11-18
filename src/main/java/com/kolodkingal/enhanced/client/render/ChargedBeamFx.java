@@ -72,7 +72,13 @@ public final class ChargedBeamFx {
         Vec3 a = origin.subtract(camera);
         Vec3 b = end.subtract(camera);
         boolean first = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
-        float w = (first ? 0.3F : 0.6F) * strength;
+        if (first) {
+            // seen from his own eyes the beam leaves from his hand (low and to the right), not from between the eyes: the view stays clear
+            Vec3 look = player.getViewVector(partialTick);
+            Vec3 right = look.cross(UP).normalize();
+            a = a.add(right.scale(0.28)).add(0, -0.45, 0).add(look.scale(0.5));
+        }
+        float w = (first ? 0.12F : 0.6F) * strength;
         beam(pose, vc, a, b, FIRE, w, strength, time, player.getId() * 7349L);
         flare(pose, vc, a, 0.25F * strength + 0.03F, FIRE);
         flare(pose, vc, b, (0.45F + 0.1F * Mth.sin(time * 1.9F)) * strength + 0.05F, FIRE);

@@ -391,7 +391,7 @@ public final class JimFx {
             float full = EnhancedConfig.SPEC.isLoaded() ? JimConfig.NOVA_CHARGE_TICKS.get() : 60;
             float t = Mth.clamp((time - seen[0]) / full, 0.0F, 1.0F);
             seen[2] = t; // (how charged it was when it is let go: the beam that follows is that wide and that far)
-            ChargedBeamFx.gatherAround(pose, vc, origin.subtract(camera), look, ChargedBeamFx.FIRE, t, time, 0.9F);
+            ChargedBeamFx.gatherAround(pose, vc, origin.subtract(camera), look, ChargedBeamFx.FIRE, t, time, firstPerson(mc, player) ? 0.3F : 0.9F);
         }
         if (firing) {
             if (seen[1] < 0) {
@@ -415,7 +415,7 @@ public final class JimFx {
             Vec3 e = end.subtract(camera);
             long seed = player.getId() * 7349L;
             // the one great beam from his jewel: wider and hotter the more it was charged, with the flames licking along it
-            float width = Mth.lerp(charge, 0.55F, firstPerson(mc, player) ? 1.0F : 2.8F); // (in first person the view stays clear: slimmer)
+            float width = Mth.lerp(charge, 0.55F, firstPerson(mc, player) ? 0.6F : 2.8F); // (in first person the view stays clear: slimmer)
             ChargedBeamFx.beam(pose, vc, m, e, ChargedBeamFx.FIRE, width * strength, strength, time, seed + 99L);
             ChargedBeamFx.flareAt(pose, vc, m, (0.3F + 0.6F * charge) * strength + 0.1F, ChargedBeamFx.FIRE);
             tongues(pose, vc, m, e, strength * (0.4F + 0.6F * charge), time, seed, 0.35F + 0.65F * charge);

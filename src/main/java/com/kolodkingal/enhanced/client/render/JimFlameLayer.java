@@ -111,9 +111,11 @@ public class JimFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         // 1. his own skin stays as it is (white stays white, red stays red); only a faint warm light lies over it
         pose(glow, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
         float pulse = 0.5F + 0.5F * Mth.sin(t * 0.13F);
-        int glowAlpha = Math.round(255.0F * (0.010F + 0.010F * pulse) * k);
+        // (the swirl type is additive and ignores alpha: the faint light is a dim colour, not a low alpha)
+        float lightF = (0.07F + 0.05F * pulse) * k;
+        int glowColor = 0xFF000000 | Math.round(0xFF * lightF) << 16 | Math.round(0x9A * lightF) << 8 | Math.round(0x30 * lightF);
         glow.renderToBuffer(poseStack, buffer.getBuffer(RenderType.energySwirl(GLOW, (t * 0.003F) % 1.0F, (-t * 0.012F) % 1.0F)),
-                FULL_BRIGHT, OverlayTexture.NO_OVERLAY, glowAlpha << 24 | 0xFF9A30);
+                FULL_BRIGHT, OverlayTexture.NO_OVERLAY, glowColor);
         PlayerModel<AbstractClientPlayer> body = getParentModel();
         // 2. the sheath: the way the flames flow is up and back along his motion, in the world; each part turns it into its own frame
         Vec3 velocity = player.getDeltaMovement();
@@ -132,7 +134,7 @@ public class JimFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
     }
 
     /** Base opacity of the inner and the outer layer of the sheath (their textures' own alpha comes on top). */
-    private static final float[] LAYER_ALPHA = {0.34F, 0.22F};
+    private static final float[] LAYER_ALPHA = {0.2F, 0.12F};
 
     /**
      * One part's sheath (its box in pixels of the part's own frame): four slanted sheets round it, from its foot to a flame's height
