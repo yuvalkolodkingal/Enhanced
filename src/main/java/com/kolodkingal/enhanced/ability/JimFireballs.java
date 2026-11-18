@@ -36,12 +36,29 @@ public final class JimFireballs {
         Vec3 pos;
         final Vec3 velocity;
         double flown;
+        /** 0 for a quick throw, 1 fully charged. */
+        final float charge;
+        /** Its body in the world, so every client draws it where it is (3.17). */
+        final com.kolodkingal.enhanced.entity.JimFireballEntity body;
 
-        Ball(Vec3 pos, Vec3 velocity) {
+        Ball(Vec3 pos, Vec3 velocity, float charge, com.kolodkingal.enhanced.entity.JimFireballEntity body) {
             this.pos = pos;
             this.velocity = velocity;
+            this.charge = charge;
+            this.body = body;
+        }
+
+        void out() {
+            if (body != null) {
+                body.discard();
+            }
         }
     }
+
+    /** When each player began to charge a fireball (V held). */
+    private static final Map<UUID, Long> CHARGING = new HashMap<>();
+    /** The charge (0 to 1) of the ball each player is throwing now. */
+    private static final Map<UUID, Float> THROW_CHARGE = new HashMap<>();
 
     private static final Map<UUID, List<Ball>> BALLS = new HashMap<>();
     /** When each player began a throw (the ball is released {@link #THROW_DELAY} ticks later). */
@@ -55,18 +72,52 @@ public final class JimFireballs {
     private JimFireballs() {
     }
 
-    /** V: a fireball leaves his hand (a cooldown first). */
-    static void launch(ServerPlayer player, PowerData data) {
+    /** V pressed: he starts to charge a fireball in his hand (a cooldown first); let go, and it is thrown. */
+    static void onKey(ServerPlayer player, PowerData data, boolean down) {
         if (player.isSpectator()) {
             return;
         }
         long now = player.level().getGameTime();
-        if (data.cooldownUntil(data.slot(HeroAbility.JIM_FIREBALL)) > now && !player.getAbilities().instabuild) {
+        if (down) {
+            if (!data.is(Live.JIM_FIREBALL_CHARGING)) {
+                CHARGING.remove(player.getUUID()); // (a charge cut short: a screen opened while V was held)
+            }
+            if (CHARGING.containsKey(player.getUUID()) || THROWN_AT.containsKey(player.getUUID())) {
+                return;
+            }
+            if (data.cooldownUntil(data.slot(HeroAbility.JIM_FIREBALL)) > now && !player.getAbilities().instabuild) {
+                return;
+            }
+            CHARGING.put(player.getUUID(), now);
+            data.set(Live.JIM_FIREBALL_CHARGING, true);
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLAZE_AMBIENT, SoundSource.PLAYERS, 0.5F, 1.6F);
             return;
         }
-        if (!JimSolar.spend(player, data, JimConfig.FIREBALL_COST.get())) {
+        Long began = CHARGING.remove(player.getUUID());
+        data.set(Live.JIM_FIREBALL_CHARGING, false);
+        if (began == null) {
             return;
         }
+        launch(player, data, charge(now - began));
+    }
+
+    /** The charge (0 to 1) after holding V for {@code ticks}. */
+    public static float charge(long ticks) {
+        return Math.min(1.0F, Math.max(0.0F, ticks / (float) Math.max(1, JimConfig.FIREBALL_CHARGE_TICKS.get())));
+    }
+
+    /** How big a fireball of this charge is (its body and its flames). */
+    public static float size(float charge) {
+        return 1.0F + 1.2F * charge;
+    }
+
+    /** The throw itself: the ball leaves his hand after the wind-up, as big and strong as it was charged. */
+    static void launch(ServerPlayer player, PowerData data, float charge) {
+        long now = player.level().getGameTime();
+        if (!JimSolar.spend(player, data, Math.round(JimConfig.FIREBALL_COST.get() * (1.0F + charge)))) {
+            return;
+        }
+        THROW_CHARGE.put(player.getUUID(), charge);
         // the throw: every client plays the wind-up now, and the ball leaves his hand at the release, THROW_DELAY ticks on
         data.set(Live.JIM_THROW, true);
         THROWN_AT.put(player.getUUID(), now);
@@ -78,7 +129,16 @@ public final class JimFireballs {
     private static void release(ServerPlayer player) {
         Vec3 look = player.getLookAngle();
         Vec3 from = player.getEyePosition().add(look.scale(0.7)).add(0, -0.25, 0);
-        BALLS.computeIfAbsent(player.getUUID(), u -> new ArrayList<>()).add(new Ball(from, look.scale(JimConfig.FIREBALL_SPEED.get())));
+        float charge = THROW_CHARGE.getOrDefault(player.getUUID(), 0.0F);
+        THROW_CHARGE.remove(player.getUUID());
+        Vec3 velocity = look.scale(JimConfig.FIREBALL_SPEED.get());
+        com.kolodkingal.enhanced.entity.JimFireballEntity body = new com.kolodkingal.enhanced.entity.JimFireballEntity(
+                com.kolodkingal.enhanced.registry.ModEntities.JIM_FIREBALL.get(), player.level());
+        body.setOwner(player);
+        body.setSize(size(charge));
+        body.follow(from, velocity);
+        player.level().addFreshEntity(body);
+        BALLS.computeIfAbsent(player.getUUID(), u -> new ArrayList<>()).add(new Ball(from, velocity, charge, body));
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.0F, 1.2F);
     }
 
@@ -121,7 +181,10 @@ public final class JimFireballs {
         while (it.hasNext()) {
             Ball ball = it.next();
             if (!step(player, level, ball)) {
+                ball.out();
                 it.remove();
+            } else if (ball.body != null) {
+                ball.body.follow(ball.pos, ball.velocity);
             }
         }
         if (list.isEmpty()) {
@@ -144,11 +207,11 @@ public final class JimFireballs {
             }
             EntityHitResult entity = Raycasts.entityBetween(level, player, from, stop, 0.3, WandaAbilities.BEAM_TARGET);
             if (entity != null) {
-                strike(player, level, entity.getLocation(), entity);
+                strike(player, level, entity.getLocation(), entity, ball.charge);
                 return false;
             }
             if (block.getType() == HitResult.Type.BLOCK) {
-                strike(player, level, block.getLocation(), block);
+                strike(player, level, block.getLocation(), block, ball.charge);
                 return false;
             }
             ball.pos = to;
@@ -158,18 +221,12 @@ public final class JimFireballs {
                 return false;
             }
         }
-        // the fireball itself: a core of flame, sparks falling away behind it
-        Vec3 p = ball.pos;
-        Embers.burst(level, p.x, p.y, p.z, 4, 0.12, 0.12, 0.12, 0.01);
-        Embers.burst(level, p.x, p.y, p.z, 3, 0.2, 0.2, 0.2, 0.02);
-        if (level.getGameTime() % 2 == 0) {
-            Embers.burst(level, p.x, p.y, p.z, 1, 0.1, 0.1, 0.1, 0.0);
-        }
         return true;
     }
 
-    private static void strike(ServerPlayer player, ServerLevel level, Vec3 at, HitResult hit) {
-        float damage = JimConfig.FIREBALL_DAMAGE.get().floatValue();
+    private static void strike(ServerPlayer player, ServerLevel level, Vec3 at, HitResult hit, float charge) {
+        // a charged one hits up to two and a half times as hard and splashes twice as wide
+        float damage = JimConfig.FIREBALL_DAMAGE.get().floatValue() * (1.0F + 1.5F * charge);
         int burn = JimConfig.FIREBALL_BURN_SECONDS.get();
         if (hit instanceof EntityHitResult entityHit) {
             Entity target = entityHit.getEntity();
@@ -179,7 +236,7 @@ public final class JimFireballs {
             }
         }
         // the flames splash a little: what stands next to it catches too
-        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(1.5),
+        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(1.5 + 1.5 * charge),
                 e -> e != player && e.isAlive() && !(hit instanceof EntityHitResult h && h.getEntity() == e))) {
             if (AreaTargets.mayHurt(player, e, true)) {
                 e.hurt(ModDamageTypes.source(level, ModDamageTypes.SOLAR_BEAM, player, player), damage * 0.4F);
@@ -188,7 +245,7 @@ public final class JimFireballs {
         }
         if (JimConfig.FIREBALL_FIRE.get()) {
             if (hit instanceof BlockHitResult) {
-                BeamFire.strike(player, level, hit, 0, 2);
+                BeamFire.strike(player, level, hit, 0, 2 + Math.round(3 * charge));
             } else {
                 // a creature standing on the ground: the fire goes under it, where it stands
                 BlockHitResult floor = level.clip(new ClipContext(at.add(0, 0.2, 0), at.add(0, -2.0, 0), ClipContext.Block.COLLIDER,
@@ -208,14 +265,22 @@ public final class JimFireballs {
     }
 
     static void forget(UUID player) {
-        BALLS.remove(player);
+        List<Ball> list = BALLS.remove(player);
+        if (list != null) {
+            list.forEach(Ball::out);
+        }
+        CHARGING.remove(player);
+        THROW_CHARGE.remove(player);
         THROWN_AT.remove(player);
         PULSE_OFF.remove(player);
     }
 
     /** The server stopped: no fireball is left. */
     public static void clear() {
+        BALLS.values().forEach(list -> list.forEach(Ball::out));
         BALLS.clear();
+        CHARGING.clear();
+        THROW_CHARGE.clear();
         THROWN_AT.clear();
         PULSE_OFF.clear();
     }

@@ -38,6 +38,7 @@ public final class JimConfig {
     public static ConfigSpec.IntValue FIREBALL_RANGE;
     public static ConfigSpec.BooleanValue FIREBALL_FIRE;
     public static ConfigSpec.IntValue FIREBALL_COST;
+    public static ConfigSpec.IntValue FIREBALL_CHARGE_TICKS;
 
     public static ConfigSpec.IntValue NOVA_CHARGE_TICKS;
     public static ConfigSpec.IntValue NOVA_TAP_TICKS;
@@ -110,7 +111,9 @@ public final class JimConfig {
         FIREBALL_BURN_SECONDS = builder.comment("Seconds a creature a fireball hits burns.").defineInRange("fireballBurnSeconds", 5, 0, 60);
         FIREBALL_RANGE = builder.comment("How far (blocks) a fireball flies before it goes out.").defineInRange("fireballRange", 48, 4, 256);
         FIREBALL_FIRE = builder.comment("Whether a fireball leaves fire where it strikes the ground.").define("fireballFire", true);
-        FIREBALL_COST = builder.comment("Solar charge a fireball costs.").defineInRange("fireballCost", 30, 0, 100000);
+        FIREBALL_COST = builder.comment("Solar charge a fireball costs (a fully charged one costs twice as much).").defineInRange("fireballCost", 30, 0, 100000);
+        FIREBALL_CHARGE_TICKS = builder.comment("Ticks of holding V to charge a fireball fully: it grows bigger, hits harder and splashes wider",
+                "(a quick tap throws a small one).").defineInRange("fireballChargeTicks", 30, 1, 400);
 
         NOVA_CHARGE_TICKS = builder.comment("Ticks he must hold B for a full charge of the Nova Flame (release sooner: a weaker beam).")
                 .defineInRange("novaChargeTicks", 60, 10, 600);

@@ -258,6 +258,7 @@ public final class JimTests {
         zombie.setRemainingFireTicks(0);
         look(jim, TestKit.EAST, 0.0F);
         AbilityHandler.onKey(jim, 3, true);
+        AbilityHandler.onKey(jim, 3, false);
         check(Powers.get(jim).is(Live.JIM_THROW), "the throw begins: every client sees it and plays the wind-up");
         check(JimFireballs.inFlight(jim) == 0, "the ball is still in his hand");
         run(helper, jim, JimFireballs.THROW_DELAY + 1, () -> {
@@ -486,6 +487,7 @@ public final class JimTests {
         look(full, TestKit.EAST, 0.0F);
         int cap = JimConfig.SOLAR_CAPACITY.get();
         AbilityHandler.onKey(ball, 3, true);
+        AbilityHandler.onKey(ball, 3, false);
         check(solar(ball) == cap - JimConfig.FIREBALL_COST.get(), "a fireball cost its price: " + solar(ball));
         AbilityHandler.onKey(tap, 4, true);
         AbilityHandler.onKey(tap, 4, false);
@@ -515,12 +517,37 @@ public final class JimTests {
     }
 
     @EnhancedTest(template = ARENA)
+    public static void aHeldFireballChargesBiggerAndDearerAndFliesAsABodyInTheWorld(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jim = jim(f, 3.5, 10.5);
+        look(jim, TestKit.EAST, 0.0F);
+        int cap = JimConfig.SOLAR_CAPACITY.get();
+        check(JimFireballs.charge(0) == 0.0F && JimFireballs.charge(JimConfig.FIREBALL_CHARGE_TICKS.get()) == 1.0F, "the charge grows to full");
+        check(JimFireballs.size(1.0F) > JimFireballs.size(0.0F), "a charged ball is bigger");
+        AbilityHandler.onKey(jim, 3, true);
+        check(Powers.get(jim).is(Live.JIM_FIREBALL_CHARGING), "V held: the ball grows in his hand");
+        check(solar(jim) == cap, "charging costs nothing yet");
+        run(helper, jim, JimConfig.FIREBALL_CHARGE_TICKS.get() + 2, () -> {
+            AbilityHandler.onKey(jim, 3, false);
+            check(!Powers.get(jim).is(Live.JIM_FIREBALL_CHARGING) && Powers.get(jim).is(Live.JIM_THROW), "let go: thrown");
+            check(solar(jim) == cap - 2 * JimConfig.FIREBALL_COST.get(), "a full charge costs twice the price: " + solar(jim));
+            run(helper, jim, JimFireballs.THROW_DELAY + 1, () -> {
+                check(JimFireballs.inFlight(jim) == 1, "in the air");
+                check(!helper.getLevel().getEntitiesOfClass(com.kolodkingal.enhanced.entity.JimFireballEntity.class,
+                        jim.getBoundingBox().inflate(40)).isEmpty(), "every client can see it: it has a body in the world");
+                helper.succeed();
+            });
+        });
+    }
+
+    @EnhancedTest(template = ARENA)
     public static void anAttackIsRefusedWhenTheChargeIsEmpty(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jim = jim(f, 3.5, 10.5);
         look(jim, TestKit.EAST, 0.0F);
         Powers.get(jim).setIronCharge(0);
         AbilityHandler.onKey(jim, 3, true);
+        AbilityHandler.onKey(jim, 3, false);
         check(!Powers.get(jim).is(Live.JIM_THROW) && JimFireballs.inFlight(jim) == 0, "no fireball");
         AbilityHandler.onKey(jim, 1, true);
         check(!Powers.get(jim).is(Live.BEAM_FIRING), "no beam");
@@ -538,6 +565,7 @@ public final class JimTests {
         look(jim, TestKit.EAST, 0.0F);
         Powers.get(jim).setIronCharge(0);
         AbilityHandler.onKey(jim, 3, true);
+        AbilityHandler.onKey(jim, 3, false);
         check(Powers.get(jim).is(Live.JIM_THROW), "the fireball is thrown with an empty meter");
         AbilityHandler.onKey(jim, 1, true);
         check(Powers.get(jim).is(Live.BEAM_FIRING), "the beam burns");

@@ -84,11 +84,7 @@ public final class JimAbilities {
                     PowerTicker.toggleFlight(player);
                 }
             }
-            case 3 -> {
-                if (down) {
-                    JimFireballs.launch(player, data);
-                }
-            }
+            case 3 -> JimFireballs.onKey(player, data, down);
             case 4 -> {
                 ChargedBeam.onKey(player, data, down, NOVA, HeroAbility.JIM_NOVA);
             }
@@ -300,6 +296,7 @@ public final class JimAbilities {
         JimBeam.forget(player.getUUID());
         ChargedBeam.forget(player.getUUID());
         data.set(Live.JIM_THROW, false);
+        data.set(Live.JIM_FIREBALL_CHARGING, false);
         data.set(Live.JIM_NOVA_CHARGING, false);
         data.set(Live.JIM_NOVA_BLAST, false);
         data.set(Live.JIM_FLAMING, false);

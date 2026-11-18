@@ -39,6 +39,7 @@ public final class JimServer implements HeroServer {
     @Override
     public void stopHold(PowerData data) {
         data.set(com.kolodkingal.enhanced.power.Live.JIM_NOVA_CHARGING, false);
+        data.set(com.kolodkingal.enhanced.power.Live.JIM_FIREBALL_CHARGING, false);
         data.set(com.kolodkingal.enhanced.power.Live.BEAM_FIRING, false);
     }
 

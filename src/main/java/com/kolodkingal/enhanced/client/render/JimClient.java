@@ -52,6 +52,8 @@ public final class JimClient implements HeroClient {
         on[Stance.VISION_BEAM.ordinal()] = data.is(Live.BEAM_FIRING);
         on[Stance.SOLAR_GATHER.ordinal()] = data.is(Live.JIM_NOVA_CHARGING);
         on[Stance.SOLAR_OVERLOAD.ordinal()] = data.is(Live.JIM_NOVA_BLAST);
+        // the fireball growing in his hand: the arm out, palm up
+        on[Stance.BEAM_HAND.ordinal()] = data.is(Live.JIM_FIREBALL_CHARGING);
     }
 
     @Override

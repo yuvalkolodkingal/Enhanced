@@ -12,8 +12,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -36,10 +34,9 @@ public final class JimFx {
         NOVA.clear();
         TRAIL.clear();
         EMBERS.clear();
-        BALLS.clear();
-        PENDING.clear();
         FLARE.clear();
         THROWING.clear();
+        CHARGING.clear();
         JimFlameLayer.clear();
     }
 
@@ -202,84 +199,35 @@ public final class JimFx {
 
     // ---- the fireballs ----
 
-    /** One fireball in flight, as every client sees it (the server's ball is only a point: this is its picture, flown by the same rule). */
-    private static final class Ball {
-        Vec3 prev;
-        Vec3 pos;
-        final Vec3 velocity;
-        double flown;
-        final java.util.ArrayDeque<Vec3> tail = new java.util.ArrayDeque<>();
-
-        Ball(Vec3 pos, Vec3 velocity) {
-            this.prev = pos;
-            this.pos = pos;
-            this.velocity = velocity;
-        }
-    }
-
-    private static final Map<Integer, java.util.List<Ball>> BALLS = new HashMap<>();
-    /** The game time at which each player's pending ball leaves his hand, and until when the flare at his hand shows. */
-    private static final Map<Integer, Long> PENDING = new HashMap<>();
+    /** Until when the flare at each player's hand shows (the release), and since when each one has charged a ball (V held). */
     private static final Map<Integer, Long> FLARE = new HashMap<>();
+    private static final Map<Integer, Long> CHARGING = new HashMap<>();
     private static final java.util.Set<Integer> THROWING = new java.util.HashSet<>();
     /** The ticks from the begin of a throw to the release (the server's {@code JimFireballs.THROW_DELAY}, less the sync). */
     private static final int RELEASE_AFTER = 3;
 
-    /** Every client tick: a throw that begins (the state turns on) is released a few ticks later; the balls fly. */
+    /**
+     * Every client tick: when a charge begins (its state turns on) the ball starts to grow in his hand; when a throw begins, the flare
+     * at his hand shows at the release. The ball in flight is an entity of its own ({@link JimFireballRenderer}), where the server has it.
+     */
     private static void fireballs(Minecraft mc, ClientLevel level) {
         long now = level.getGameTime();
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
-            boolean throwing = data.power() == com.kolodkingal.enhanced.power.Power.JIM_HAMMOND && data.is(Live.JIM_THROW);
+            boolean jim = data.power() == com.kolodkingal.enhanced.power.Power.JIM_HAMMOND;
+            if (jim && data.is(Live.JIM_FIREBALL_CHARGING)) {
+                CHARGING.putIfAbsent(player.getId(), now);
+            } else {
+                CHARGING.remove(player.getId());
+            }
+            boolean throwing = jim && data.is(Live.JIM_THROW);
             if (throwing && THROWING.add(player.getId())) {
-                PENDING.put(player.getId(), now + RELEASE_AFTER);
+                FLARE.put(player.getId(), now + RELEASE_AFTER + 6);
             } else if (!throwing) {
                 THROWING.remove(player.getId());
             }
-            Long due = PENDING.get(player.getId());
-            if (due != null && now >= due) {
-                PENDING.remove(player.getId());
-                Vec3 look = player.getLookAngle();
-                double speed = EnhancedConfig.SPEC.isLoaded() ? JimConfig.FIREBALL_SPEED.get() : 1.5;
-                BALLS.computeIfAbsent(player.getId(), k -> new java.util.ArrayList<>())
-                        .add(new Ball(player.getEyePosition().add(look.scale(0.7)).add(0, -0.25, 0), look.scale(speed)));
-                FLARE.put(player.getId(), now + 6);
-            }
         }
-        double range = EnhancedConfig.SPEC.isLoaded() ? JimConfig.FIREBALL_RANGE.get() : 48;
-        BALLS.entrySet().removeIf(entry -> {
-            if (!(level.getEntity(entry.getKey()) instanceof AbstractClientPlayer owner)) {
-                return true;
-            }
-            entry.getValue().removeIf(ball -> !step(level, owner, ball, range));
-            return entry.getValue().isEmpty();
-        });
         FLARE.values().removeIf(until -> until < now);
-    }
-
-    /** Flies one ball a tick (in two halves); false when it struck a block or a creature or went out. */
-    private static boolean step(ClientLevel level, AbstractClientPlayer owner, Ball ball, double range) {
-        ball.prev = ball.pos;
-        ball.tail.addFirst(ball.pos);
-        while (ball.tail.size() > 8) {
-            ball.tail.removeLast();
-        }
-        for (int half = 0; half < 2; half++) {
-            Vec3 to = ball.pos.add(ball.velocity.scale(0.5));
-            net.minecraft.world.phys.BlockHitResult block = level.clip(new ClipContext(ball.pos, to, ClipContext.Block.COLLIDER,
-                    ClipContext.Fluid.NONE, owner));
-            if (block.getType() != HitResult.Type.MISS) {
-                ball.pos = block.getLocation();
-                return false;
-            }
-            ball.pos = to;
-            ball.flown += ball.velocity.length() * 0.5;
-            if (ball.flown > range || !level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,
-                    new net.minecraft.world.phys.AABB(to, to).inflate(0.35), e -> e != owner && e.isAlive() && !e.isSpectator()).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -288,62 +236,43 @@ public final class JimFx {
      * mod's own fire, drawn smoothly, never a game particle. Faded out near the camera.
      */
     static void balls(Minecraft mc, AbstractClientPlayer player, Matrix4f pose, VertexConsumer vc, Vec3 camera, float partialTick, float time) {
-        if (!firstPerson(mc, player)) {
-            Long until = FLARE.get(player.getId());
-            Vec3 hand = until == null ? null : HandTracker.hand(player, player.getMainArm(), partialTick);
-            if (hand != null) {
-                float a = Mth.clamp((until - (time)) / 6.0F, 0.0F, 1.0F) * 0.9F + 0.1F;
-                Vec3 at = hand.subtract(camera);
-                ChargedBeamFx.flareAt(pose, vc, at, 0.32F * a, ChargedBeamFx.FIRE);
-                for (int i = 0; i < 5; i++) {
-                    float angle = i * 1.257F + time * 0.4F;
-                    Vec3 tip = at.add(Mth.cos(angle) * 0.28, 0.12 + 0.2 * Mth.sin(angle * 1.3F + i), Mth.sin(angle) * 0.28);
-                    EnergyGeometry.ribbon(pose, vc, at, tip, 0.09F, 0.0F, EnergyGeometry.argb(0xFFD060, 0.7F * a), EnergyGeometry.argb(0xFF4010, 0.0F));
-                }
+        if (firstPerson(mc, player)) {
+            return;
+        }
+        Long began = CHARGING.get(player.getId());
+        Long until = FLARE.get(player.getId());
+        if (began == null && until == null) {
+            return;
+        }
+        Vec3 hand = HandTracker.hand(player, player.getMainArm(), partialTick);
+        if (hand == null) {
+            return;
+        }
+        Vec3 at = hand.subtract(camera);
+        if (began != null) {
+            // the ball grows in his hand while he charges it: a white-hot heart in a swelling orange glow, flames licking up off it
+            int full = EnhancedConfig.SPEC.isLoaded() ? JimConfig.FIREBALL_CHARGE_TICKS.get() : 30;
+            float charge = Mth.clamp((time - began) / full, 0.0F, 1.0F);
+            float r = 0.12F + 0.22F * charge;
+            float pulse = 0.9F + 0.1F * Mth.sin(time * 0.8F);
+            ChargedBeamFx.flareAt(pose, vc, at, r * pulse, ChargedBeamFx.FIRE);
+            ChargedBeamFx.flareAt(pose, vc, at, r * 1.8F * pulse, new ChargedBeamFx.Colors(0xFF5A10, 0xFFB030, 0xFF7A18));
+            for (int i = 0; i < 6; i++) {
+                float angle = i * 1.047F + time * 0.15F;
+                float wave = 0.5F + 0.5F * Mth.sin(time * 0.35F + i * 1.7F);
+                Vec3 base = at.add(Mth.cos(angle) * r * 0.6, 0, Mth.sin(angle) * r * 0.6);
+                Vec3 tip = base.add(Mth.cos(angle) * r * 0.3, r * (1.6 + 1.2 * wave), Mth.sin(angle) * r * 0.3);
+                EnergyGeometry.ribbon(pose, vc, base, tip, r * 0.7F, 0.0F, EnergyGeometry.argb(0xFFC040, 0.6F), EnergyGeometry.argb(0xFF3A08, 0.0F));
             }
         }
-        for (Ball ball : BALLS.getOrDefault(player.getId(), java.util.List.of())) {
-            Vec3 p = ball.prev.lerp(ball.pos, partialTick).subtract(camera);
-            double dist = p.length();
-            float fade = (float) Mth.clamp((dist - 1.2) / 2.5, 0.0, 1.0);
-            if (fade <= 0.0F) {
-                continue;
-            }
-            Vec3 dir = ball.velocity.normalize();
-            Vec3 side = dir.cross(new Vec3(0, 1, 0));
-            side = side.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : side.normalize();
-            Vec3 up = side.cross(dir).normalize();
-            float spin = time * 0.11F + player.getId();
-            // the core: a hot white-yellow heart in a soft orange halo
-            ChargedBeamFx.flareAt(pose, vc, p, 0.30F * fade, ChargedBeamFx.FIRE);
-            ChargedBeamFx.flareAt(pose, vc, p, 0.52F * fade, new ChargedBeamFx.Colors(0xFF5A10, 0xFFB030, 0xFF7A18));
-            // turning: a cross of light that wheels slowly about the line of flight
-            for (int k = 0; k < 3; k++) {
-                float angle = spin + k * 2.094F;
-                Vec3 radial = side.scale(Mth.cos(angle)).add(up.scale(Mth.sin(angle)));
-                EnergyGeometry.ribbon(pose, vc, p.subtract(radial.scale(0.34)), p.add(radial.scale(0.34)), 0.05F, 0.05F,
-                        EnergyGeometry.argb(0xFFE8A0, 0.5F * fade), EnergyGeometry.argb(0xFFC040, 0.5F * fade));
-            }
-            // the flame tongues streaming back, wavering a little
-            for (int k = 0; k < 6; k++) {
-                float angle = spin * 0.6F + k * 1.047F;
-                float wave = 0.5F + 0.5F * Mth.sin(time * 0.3F + k * 1.9F);
-                Vec3 radial = side.scale(Mth.cos(angle)).add(up.scale(Mth.sin(angle)));
-                Vec3 base = p.add(radial.scale(0.16));
-                Vec3 tip = base.subtract(dir.scale(1.5 + 0.7 * wave)).add(radial.scale(0.12 + 0.12 * wave));
-                EnergyGeometry.ribbon(pose, vc, base, tip, 0.2F, 0.0F, EnergyGeometry.argb(0xFFB030, 0.5F * fade), EnergyGeometry.argb(0xFF3A08, 0.0F));
-            }
-            // the path it just flew: a fading ribbon
-            Vec3 last = p;
-            int n = 0;
-            for (Vec3 old : ball.tail) {
-                Vec3 q = old.subtract(camera);
-                float a = 1.0F - n / 8.0F;
-                float b = 1.0F - (n + 1) / 8.0F;
-                EnergyGeometry.ribbon(pose, vc, last, q, 0.2F * a, 0.2F * b, EnergyGeometry.argb(0xFF8A20, 0.4F * a * fade),
-                        EnergyGeometry.argb(0xFF6A14, 0.4F * b * fade));
-                last = q;
-                n++;
+        if (until != null) {
+            // the release: a burst of flame at his hand
+            float a = Mth.clamp((until - time) / 6.0F, 0.0F, 1.0F) * 0.9F + 0.1F;
+            ChargedBeamFx.flareAt(pose, vc, at, 0.32F * a, ChargedBeamFx.FIRE);
+            for (int i = 0; i < 5; i++) {
+                float angle = i * 1.257F + time * 0.4F;
+                Vec3 tip = at.add(Mth.cos(angle) * 0.28, 0.12 + 0.2 * Mth.sin(angle * 1.3F + i), Mth.sin(angle) * 0.28);
+                EnergyGeometry.ribbon(pose, vc, at, tip, 0.09F, 0.0F, EnergyGeometry.argb(0xFFD060, 0.7F * a), EnergyGeometry.argb(0xFF4010, 0.0F));
             }
         }
     }

@@ -241,6 +241,8 @@ public enum Live {
     JIM_FLAMING,
     /** Jim Hammond throws a fireball (a few ticks): every client plays the throw and shows the ball. */
     JIM_THROW,
+    /** Jim Hammond charges a fireball (V held): it grows in his hand until he lets go. */
+    JIM_FIREBALL_CHARGING,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

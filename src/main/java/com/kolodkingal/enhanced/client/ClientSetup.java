@@ -213,6 +213,7 @@ public final class ClientSetup {
         registrar.entityRenderer(ModEntities.THANOS_SWORD, ThanosSwordRenderer::new);
         registrar.entityRenderer(ModEntities.THANOS_METEOR, ThanosMeteorRenderer::new);
         registrar.entityRenderer(ModEntities.THANOS_ORB, ThanosOrbRenderer::new);
+        registrar.entityRenderer(ModEntities.JIM_FIREBALL, com.kolodkingal.enhanced.client.render.JimFireballRenderer::new);
         registrar.entityRenderer(ModEntities.THANOS_PHANTOM, ThanosPhantomRenderer::new);
         // ===== ultron =====
         registrar.entityRenderer(ModEntities.ULTRON, UltronRenderer::new);

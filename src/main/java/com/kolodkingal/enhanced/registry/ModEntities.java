@@ -14,6 +14,7 @@ import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.apocalypse.ApocalypseEntity;
 import com.kolodkingal.enhanced.entity.HexVisionEntity;
 import com.kolodkingal.enhanced.entity.IronShrapnelEntity;
+import com.kolodkingal.enhanced.entity.JimFireballEntity;
 import com.kolodkingal.enhanced.entity.LokiDaggerEntity;
 import com.kolodkingal.enhanced.entity.LokiIllusionEntity;
 import com.kolodkingal.enhanced.entity.MjolnirFragmentEntity;
@@ -169,6 +170,16 @@ public final class ModEntities {
                     .noSave()
                     .noSummon()
                     .build("thanos_orb"));
+    /** 3.17: Jim Hammond's fireball, as every player sees it (the server's JimFireballs fly it). */
+    public static final RegEntry<EntityType<?>, EntityType<JimFireballEntity>> JIM_FIREBALL = ENTITIES.register("jim_fireball",
+            () -> EntityType.Builder.<JimFireballEntity>of(JimFireballEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .fireImmune()
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .noSave()
+                    .noSummon()
+                    .build("jim_fireball"));
     public static final RegEntry<EntityType<?>, EntityType<ThanosPhantomEntity>> THANOS_PHANTOM = ENTITIES.register("thanos_phantom",
             () -> EntityType.Builder.<ThanosPhantomEntity>of(ThanosPhantomEntity::new, MobCategory.MONSTER)
                     .sized(1.2F, 3.3F)

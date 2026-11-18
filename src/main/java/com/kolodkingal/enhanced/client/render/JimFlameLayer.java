@@ -26,11 +26,11 @@ import org.joml.Vector3f;
  * <ol>
  *   <li><b>The glow</b>: his current suit (white android, classic red, any look) stays fully visible, drawn again full-bright
  *   with only a faint warm light over it.</li>
- *   <li><b>The sheath</b>: two larger copies of the posed model (head, torso, both arms, both legs) made of slanted sheets of
- *   flame that start at each part and flow away from it up and back along his motion (straight up when he hovers, swept back in
- *   flight). Each sheet carries one soft flame texture that scrolls smoothly (a fixed texture, never a change of frame), fades to
- *   nothing at its top and is see-through, so the suit shows through; the two layers scroll at their own speeds and overlap into one
- *   connected, softly moving sheath, with no separate tongues to pop in and out. It fades in and out as he starts and stops flying.</li>
+ *   <li><b>The fire</b>: on every part (head, torso, both arms, both legs) three {@link FireSheet}s that always face the camera and
+ *   rise from the part up and back along his motion (straight up when he hovers, swept back in flight): one through the part, a
+ *   wider, taller and slower one behind it, and a fainter one in front of it so flames lick over the body too. Their flame tongues
+ *   scroll up continuously (one texture, never a change of frame), so nothing flickers. It fades in and out as he starts and stops
+ *   flying.</li>
  * </ol>
  * Unlit and alpha-blended ({@link EnhancedRenderTypes#webDecal}): glowing fire from every angle, never a solid or dark shape. The streaming
  * trail and the embers are {@link JimFx}'s (Source Code Vision has those but not the body's flames). In first person his own body is not
@@ -42,8 +42,6 @@ public class JimFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
     private static final java.util.Map<Integer, float[]> LEVEL = new java.util.HashMap<>();
 
     private static final ResourceLocation GLOW = tex("glow");
-    private static final ResourceLocation FLOW_0 = tex("flow_0");
-    private static final ResourceLocation FLOW_1 = tex("flow_1");
 
     static ResourceLocation tex(String name) {
         return Enhanced.id("textures/entity/jim/" + name + ".png");
@@ -117,72 +115,71 @@ public class JimFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         glow.renderToBuffer(poseStack, buffer.getBuffer(RenderType.energySwirl(GLOW, (t * 0.003F) % 1.0F, (-t * 0.012F) % 1.0F)),
                 FULL_BRIGHT, OverlayTexture.NO_OVERLAY, glowColor);
         PlayerModel<AbstractClientPlayer> body = getParentModel();
-        // 2. the sheath: the way the flames flow is up and back along his motion, in the world; each part turns it into its own frame
+        // 2. the fire: sheets of rising flame on every part, always facing the camera, rising up and back along his motion
         Vec3 velocity = player.getDeltaMovement();
-        Vector3f flow = new Vector3f((float) -velocity.x * 2.4F, 1.0F + (float) -velocity.y * 1.2F, (float) -velocity.z * 2.4F);
-        if (flow.y < 0.35F) {
-            flow.y = 0.35F;
+        Vector3f flow = new Vector3f((float) -velocity.x * 2.2F, 1.0F + (float) -velocity.y * 1.1F, (float) -velocity.z * 2.2F);
+        if (flow.y < 0.3F) {
+            flow.y = 0.3F;
         }
         flow.normalize();
-        float slow = 0.88F + 0.12F * Mth.sin(t * 0.06F);
-        sheath(poseStack, buffer, body.head, -4, 4, -8, 0, -4, 4, 7.0F, flow, t, 0, k * slow);
-        sheath(poseStack, buffer, body.body, -4, 4, 0, 12, -2, 2, 4.0F, flow, t, 1, k * slow);
-        sheath(poseStack, buffer, body.rightArm, -3, 1, -2, 10, -2, 2, 5.0F, flow, t, 2, k * slow);
-        sheath(poseStack, buffer, body.leftArm, -1, 3, -2, 10, -2, 2, 5.0F, flow, t, 3, k * slow);
-        sheath(poseStack, buffer, body.rightLeg, -2, 2, 0, 12, -2, 2, 3.0F, flow, t, 4, k * slow);
-        sheath(poseStack, buffer, body.leftLeg, -2, 2, 0, 12, -2, 2, 3.0F, flow, t, 5, k * slow);
-    }
-
-    /** Base opacity of the inner and the outer layer of the sheath (their textures' own alpha comes on top). */
-    private static final float[] LAYER_ALPHA = {0.2F, 0.12F};
-
-    /**
-     * One part's sheath (its box in pixels of the part's own frame): four slanted sheets round it, from its foot to a flame's height
-     * above its top ({@code rise} extra pixels), leaning along {@code flow} (a world direction: up and back), in two layers (the outer one
-     * wider, taller, slower and fainter). Each sheet is two rows of quads; their vertex alpha rises from a little at the foot to full
-     * a third of the way up and to nothing at the top, so the sheet has no edge; the soft flame texture scrolls up it.
-     */
-    private static void sheath(PoseStack poseStack, MultiBufferSource buffer, ModelPart part, float x0, float x1, float y0, float y1,
-                               float z0, float z1, float rise, Vector3f flow, float t, int seed, float level) {
-        poseStack.pushPose();
-        part.translateAndRotate(poseStack);
+        java.util.List<float[]> sheets = new java.util.ArrayList<>();
+        part(poseStack, body.head, 0, -4, 0, 0.36F, 0.95F, flow, sheets);
+        part(poseStack, body.body, 0, 6, 0, 0.40F, 0.85F, flow, sheets);
+        part(poseStack, body.rightArm, -1, 4, 0, 0.22F, 0.7F, flow, sheets);
+        part(poseStack, body.leftArm, 1, 4, 0, 0.22F, 0.7F, flow, sheets);
+        part(poseStack, body.rightLeg, 0, 6, 0, 0.22F, 0.6F, flow, sheets);
+        part(poseStack, body.leftLeg, 0, 6, 0, 0.22F, 0.6F, flow, sheets);
         Matrix4f m = poseStack.last().pose();
-        Vector3f d = new Matrix4f(m).invert().transformDirection(flow, new Vector3f()).normalize();
-        for (int layer = 0; layer < 2; layer++) {
-            float gap = layer == 0 ? 0.6F : 1.3F;
-            float height = ((y1 - y0) + rise) * (layer == 0 ? 1.0F : 1.45F) / 16.0F;
-            float scroll = t * (layer == 0 ? 0.021F : 0.012F) + seed * 0.31F;
-            float shift = 0.06F * Mth.sin(t * 0.04F + seed * 1.7F + layer * 2.0F);
-            VertexConsumer vc = buffer.getBuffer(EnhancedRenderTypes.webDecal(layer == 0 ? FLOW_0 : FLOW_1));
-            int full = Math.round(255.0F * LAYER_ALPHA[layer] * level);
-            int foot = Math.round(full * 0.5F);
-            float[][] sides = {
-                    {x0 - gap, z0 - gap, x1 + gap, z0 - gap}, {x1 + gap, z0 - gap, x1 + gap, z1 + gap},
-                    {x1 + gap, z1 + gap, x0 - gap, z1 + gap}, {x0 - gap, z1 + gap, x0 - gap, z0 - gap}};
-            float span = layer == 0 ? 0.9F : 0.7F;
-            for (int s = 0; s < 4; s++) {
-                float[] e = sides[s];
-                float u0 = s * 0.25F + layer * 0.31F + shift;
-                float u1 = u0 + 0.5F;
-                float ax = e[0] / 16.0F, az = e[1] / 16.0F, bx = e[2] / 16.0F, bz = e[3] / 16.0F;
-                float by = y1 / 16.0F;
-                // rows: the foot (v at the top of the scroll + span), a third up, the top
-                float[] frac = {0.0F, 0.34F, 1.0F};
-                int[] alpha = {foot, full, 0};
-                for (int row = 0; row < 2; row++) {
-                    float f0 = frac[row], f1 = frac[row + 1];
-                    float va = scroll + span * (1.0F - f0), vb = scroll + span * (1.0F - f1);
-                    put(vc, m, ax + d.x * height * f0, by + d.y * height * f0, az + d.z * height * f0, u0, va, alpha[row]);
-                    put(vc, m, bx + d.x * height * f0, by + d.y * height * f0, bz + d.z * height * f0, u1, va, alpha[row]);
-                    put(vc, m, bx + d.x * height * f1, by + d.y * height * f1, bz + d.z * height * f1, u1, vb, alpha[row + 1]);
-                    put(vc, m, ax + d.x * height * f1, by + d.y * height * f1, az + d.z * height * f1, u0, vb, alpha[row + 1]);
+        Matrix4f inverse = new Matrix4f(m).invert();
+        Vector3f base = new Vector3f();
+        Vector3f right = new Vector3f();
+        Vector3f up = new Vector3f();
+        for (int pass = FireSheet.DECAL; pass <= FireSheet.GLOW; pass++) {
+            VertexConsumer vc = buffer.getBuffer(FireSheet.type(pass));
+            if (pass == FireSheet.DECAL) {
+                // a faint wisp of smoke over his head and shoulders, drawn under the flames
+                for (int i = 0; i < Math.min(6, sheets.size()); i += 3) {
+                    float[] sheet = sheets.get(i);
+                    FireSheet.frame(inverse, new Vector3f(sheet[0], sheet[1], sheet[2]), new Vector3f(sheet[3], sheet[4], sheet[5]).mul(1.7F),
+                            sheet[6] * 1.3F, base, right, up);
+                    FireSheet.draw(FireSheet.SMOKE, m, vc, base, right, up, t, sheet[7] + 2.1F, 0.012F, 0.22F * k);
                 }
             }
+            for (float[] sheet : sheets) {
+                FireSheet.frame(inverse, new Vector3f(sheet[0], sheet[1], sheet[2]), new Vector3f(sheet[3], sheet[4], sheet[5]), sheet[6],
+                        base, right, up);
+                FireSheet.draw(pass, m, vc, base, right, up, t, sheet[7], sheet[8], sheet[9] * k);
+            }
         }
-        poseStack.popPose();
     }
 
-    private static void put(VertexConsumer vc, Matrix4f m, float x, float y, float z, float u, float v, int alpha) {
-        vc.addVertex(m, x, y, z).setUv(u, v).setColor(Math.min(255, alpha) << 24 | 0xFFFFFF);
+    /**
+     * The sheets of one part: its middle ({@code cx, cy, cz} pixels in its own frame) found in camera-relative world space, and from it
+     * an inner sheet, a wider and taller outer one that rises slower, and a fainter one in front of the part (so flames lick over the
+     * body too). Each is {foot xyz, rise xyz, half-width, seed, speed, strength}.
+     */
+    private static void part(PoseStack poseStack, ModelPart part, float cx, float cy, float cz, float halfWidth, float height,
+                             Vector3f flow, java.util.List<float[]> out) {
+        poseStack.pushPose();
+        part.translateAndRotate(poseStack);
+        Vector3f middle = poseStack.last().pose().transformPosition(new Vector3f(cx / 16.0F, cy / 16.0F, cz / 16.0F));
+        poseStack.popPose();
+        float seed = out.size() * 0.618F;
+        Vector3f foot = new Vector3f(middle).sub(new Vector3f(flow).mul(0.22F));
+        Vector3f toCamera = new Vector3f(middle).negate();
+        if (toCamera.lengthSquared() > 1.0E-6F) {
+            toCamera.normalize();
+        }
+        Vector3f rise = new Vector3f(flow).mul(height);
+        out.add(sheet(foot, rise, halfWidth, seed, 0.020F, 1.0F));
+        out.add(sheet(new Vector3f(foot).sub(new Vector3f(flow).mul(0.05F)), new Vector3f(flow).mul(height * 1.35F), halfWidth * 1.4F,
+                seed + 0.5F, 0.013F, 0.7F));
+        out.add(sheet(new Vector3f(foot).add(new Vector3f(toCamera).mul(0.28F)), new Vector3f(flow).mul(height * 0.8F), halfWidth * 0.85F,
+                seed + 0.25F, 0.024F, 0.45F));
     }
+
+    private static float[] sheet(Vector3f foot, Vector3f rise, float halfWidth, float seed, float speed, float strength) {
+        return new float[]{foot.x, foot.y, foot.z, rise.x, rise.y, rise.z, halfWidth, seed, speed, strength};
+    }
+
 }
