@@ -95,6 +95,23 @@ public final class ModItems {
     public static final ItemEntry<VishantiBookItem> BOOK_OF_THE_VISHANTI = ITEMS.register("book_of_the_vishanti",
             () -> new VishantiBookItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
+    // ===== spellbooks: whoever has no power becomes their caster (com.kolodkingal.enhanced.spellbook) =====
+    /** The Book of Ethereal Witchcraft, on the lectern in Agatha's room in her cottage. */
+    public static final ItemEntry<com.kolodkingal.enhanced.spellbook.SpellbookItem> BOOK_OF_ETHEREAL_WITCHCRAFT =
+            ITEMS.register("book_of_ethereal_witchcraft", () -> new com.kolodkingal.enhanced.spellbook.SpellbookItem(
+                    com.kolodkingal.enhanced.spellbook.Spellbook.ETHEREAL,
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** The Book of Eldritch Witchcraft, in the library of the Sanctum Sanctorum. */
+    public static final ItemEntry<com.kolodkingal.enhanced.spellbook.SpellbookItem> BOOK_OF_ELDRITCH_WITCHCRAFT =
+            ITEMS.register("book_of_eldritch_witchcraft", () -> new com.kolodkingal.enhanced.spellbook.SpellbookItem(
+                    com.kolodkingal.enhanced.spellbook.Spellbook.ELDRITCH,
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** The Book of Green Witchcraft, on the lectern in Rio Vidal's room (Death's) in Agatha's cottage. */
+    public static final ItemEntry<com.kolodkingal.enhanced.spellbook.SpellbookItem> BOOK_OF_GREEN_WITCHCRAFT =
+            ITEMS.register("book_of_green_witchcraft", () -> new com.kolodkingal.enhanced.spellbook.SpellbookItem(
+                    com.kolodkingal.enhanced.spellbook.Spellbook.GREEN,
+                    new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
     /** Agatha's book (3.2): a purple beam, a retaliation against magic, a hex mark and a mind glimpse for a sorcerer who holds it. Craftable, and costly. */
     public static final ItemEntry<DarkholdItem> DARKHOLD = ITEMS.register("darkhold",
             () -> new DarkholdItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));

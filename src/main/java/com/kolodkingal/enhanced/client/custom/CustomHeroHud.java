@@ -97,7 +97,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
             if (plain == null) {
                 line.append(Component.translatable("hud.enhanced.custom.free").withStyle(ChatFormatting.DARK_GRAY));
             } else {
-                line.append(name(plain).withStyle(s -> s.withColor(colorOf(hero, plain.picked()))));
+                line.append(name(hero, plain).withStyle(s -> s.withColor(colorOf(hero, plain.picked()))));
                 Component status = status(player, data, state, hero, plain, column, now, true);
                 if (status != null) {
                     line.append(Component.literal("  ")).append(status);
@@ -108,7 +108,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
             if (sneak != null) {
                 MutableComponent sub = label(Component.literal(" [").append(Component.translatable("hud.enhanced.custom.sneak", key))
                         .append("] "), hero);
-                sub.append(name(sneak).withStyle(s -> s.withColor(colorOf(hero, sneak.picked()))));
+                sub.append(name(hero, sneak).withStyle(s -> s.withColor(colorOf(hero, sneak.picked()))));
                 Component status = status(player, data, state, hero, sneak, column, now, false);
                 if (status != null) {
                     sub.append(Component.literal("  ")).append(status);
@@ -220,7 +220,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         net.minecraft.network.chat.TextColor color = status == null ? null : status.getStyle().getColor();
         boolean on = color != null && (color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.GREEN))
                 || color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.AQUA)));
-        return new PowerPanels.Slot(name(b).withStyle(s -> s.withColor(colorOf(hero, b.picked()))), status,
+        return new PowerPanels.Slot(name(hero, b).withStyle(s -> s.withColor(colorOf(hero, b.picked()))), status,
                 left > 0 ? left / 20.0F : 0.0F, on, -1, 0, null);
     }
 
@@ -241,6 +241,22 @@ public class CustomHeroHud implements LayeredDraw.Layer {
     }
 
     /** The name of what a binding does: a hero's ability or its Sneak variant, a power or one of its options. */
+    /**
+     * {@link #name(HeroKit.Binding)}, except that a spellbook's caster sees his spells by the names of their options ("Ethereal
+     * Orb", "Throw Earth"), not of the powers they belong to ("Magic", "Earth").
+     */
+    public static MutableComponent name(CustomHero hero, HeroKit.Binding b) {
+        PowerModule m = b.module();
+        if (m != null && m != PowerModule.FLIGHT && HeroKit.MAIN.equals(b.action())
+                && com.kolodkingal.enhanced.spellbook.Spellbook.of(hero) != null) {
+            CustomHero.Pick pick = hero.pick(m);
+            if (pick != null && m.option(pick.option()) != null && m.options().size() > 1) {
+                return Component.translatable(m.optionKey(pick.option()));
+            }
+        }
+        return name(b);
+    }
+
     public static MutableComponent name(HeroKit.Binding b) {
         if (b.picked() instanceof HeroAbility v && v.isVariant()) {
             return CreatorUi.name(v); // (3.5: a variant row, by its own name)

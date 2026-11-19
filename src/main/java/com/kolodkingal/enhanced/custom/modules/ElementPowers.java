@@ -367,12 +367,33 @@ public final class ElementPowers {
         }
     }
 
-    // ---- Earth: no block is changed; the ground shakes and spikes of it throw what stands there ----
+    // ---- Earth: the ground shakes and spikes of it throw what stands there (no block is changed); the spellbooks' green
+    // magic throws a clod, or raises a wall of earth that crumbles by itself ----
 
     static final class Earth implements ModuleLogic {
+        // (Spellbooks: "throw" and "wall" are the green magic's; the wall is the one Earth power that puts blocks in, into
+        // free air only, and they crumble by themselves.)
+        @Override
+        public void tick(Ctx c) {
+            com.kolodkingal.enhanced.spellbook.SpellShots.tick(c.player, com.kolodkingal.enhanced.spellbook.SpellShots.Kind.CLOD);
+        }
+
+        @Override
+        public void end(Ctx c) {
+            com.kolodkingal.enhanced.spellbook.SpellShots.forget(c.player.getUUID(), com.kolodkingal.enhanced.spellbook.SpellShots.Kind.CLOD);
+        }
+
         @Override
         public void key(Ctx c, boolean down) {
             if (!down || !c.ready()) {
+                return;
+            }
+            if (c.option("throw")) {
+                com.kolodkingal.enhanced.spellbook.SpellMagic.throwEarth(c);
+                return;
+            }
+            if (c.option("wall")) {
+                com.kolodkingal.enhanced.spellbook.SpellMagic.wall(c);
                 return;
             }
             ServerPlayer p = c.player;

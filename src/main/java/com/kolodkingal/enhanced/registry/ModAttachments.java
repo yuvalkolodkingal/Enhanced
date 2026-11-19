@@ -135,6 +135,16 @@ public final class ModAttachments {
                     .build();
 
     /**
+     * Spellbooks: the hero of his own a book's caster made with the Hero Creator, kept aside while he is the caster, and the
+     * colour of the Ethereal witch's hat. Saved, kept on death, not synced.
+     */
+    public static final AttachKey<com.kolodkingal.enhanced.spellbook.SpellbookData> SPELLBOOK =
+            Attach.builder("spellbook", () -> com.kolodkingal.enhanced.spellbook.SpellbookData.EMPTY)
+                    .serialize(com.kolodkingal.enhanced.spellbook.SpellbookData.CODEC, data -> !data.isEmpty())
+                    .copyOnDeath()
+                    .build();
+
+    /**
      * 3.3: what a custom hero is doing right now (the powers switched on, stored energy, the Force Field). Not saved; synced
      * to everyone who can see him.
      */

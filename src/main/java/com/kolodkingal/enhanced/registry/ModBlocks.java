@@ -410,6 +410,20 @@ public final class ModBlocks {
                     .strength(2.0F, 6.0F)
                     .sound(SoundType.METAL)
                     .noOcclusion());
+    // ===== spellbooks =====
+    /**
+     * The Earth Wall of the green magic: packed earth raised from the ground that crumbles by itself after a while. It is
+     * only ever put into free air (see {@code EarthWall}), has no item and drops nothing.
+     */
+    public static final BlockEntry<com.kolodkingal.enhanced.spellbook.EarthWallBlock> EARTH_WALL =
+            BLOCKS.registerBlock("earth_wall", com.kolodkingal.enhanced.spellbook.EarthWallBlock::new,
+                    BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.DIRT)
+                    .strength(1.0F, 3.0F)
+                    .sound(SoundType.ROOTED_DIRT)
+                    .pushReaction(PushReaction.BLOCK)
+                    .noLootTable()
+                    .isValidSpawn(Blocks::never));
 
     private ModBlocks() {
     }
