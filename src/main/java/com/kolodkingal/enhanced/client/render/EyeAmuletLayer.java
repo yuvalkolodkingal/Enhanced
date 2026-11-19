@@ -57,7 +57,7 @@ public class EyeAmuletLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             return;
         }
         boolean open = data.toggle(Toggle.TIME_SLOW);
-        boolean high = data.power() == Power.DOCTOR_STRANGE && "multiverse".equals(Variants.current(data).id());
+        boolean high = data.power() == Power.DOCTOR_STRANGE && "multiverse".equals(Variants.drawn(data).id());
         draw(poseStack, buffers, light, LivingEntityRenderer.getOverlayCoords(player, 0.0F), getParentModel().body, open,
                 high, ageInTicks);
     }

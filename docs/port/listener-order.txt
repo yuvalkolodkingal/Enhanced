@@ -754,6 +754,7 @@ event net.neoforged.neoforge.client.event.ViewportEvent$ComputeFogColor -> com.k
 event net.neoforged.neoforge.client.event.ViewportEvent$RenderFog -> com.kolodkingal.enhanced.platform.event.client.ViewportEvent$RenderFog
     NORMAL - com.kolodkingal.enhanced.client.render.ArenaFx#onFog
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFog
+    NORMAL - com.kolodkingal.enhanced.client.custom.LavaSight#onFog
 event net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent -> -
     NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterClientExtensions
 event net.neoforged.neoforge.event.ItemAttributeModifierEvent -> com.kolodkingal.enhanced.platform.event.ItemAttributeModifierEvent

@@ -245,6 +245,12 @@ public final class ClientBindings {
             super.setCanceled(canceled);
             if (canceled) {
                 net.minecraft.client.renderer.fog.FogData data = n.getFogData();
+                if (widens()) {
+                    // (3.17: a fog cleared: the environment's own distances become the listener's; the drawn distance still ends it)
+                    data.environmentalEnd = getFarPlaneDistance();
+                    data.environmentalStart = getNearPlaneDistance();
+                    return;
+                }
                 data.environmentalEnd = Math.min(data.environmentalEnd, getFarPlaneDistance());
                 data.renderDistanceEnd = Math.min(data.renderDistanceEnd, getFarPlaneDistance());
                 data.environmentalStart = Math.min(data.environmentalStart, getNearPlaneDistance());

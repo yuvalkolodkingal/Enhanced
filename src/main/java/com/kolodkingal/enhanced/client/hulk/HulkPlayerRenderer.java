@@ -65,6 +65,11 @@ public class HulkPlayerRenderer extends PlayerRenderer {
             return false;
         }
         PowerData data = Powers.get(player);
+        if (data.ownSkin()) {
+            // (3.17: his own skin does not fit the Hulk's 128 x 128 body: the player model, at the Hulk's size, which the
+            // scale attribute gives it, wears it, as with the client option off)
+            return false;
+        }
         // (3.8: Red Hulk is drawn by this renderer too, lane L2's RedHulkLooks.)
         return data.power() == Power.HULK && HulkAbilities.isHulkLook(HulkAbilities.look(data))
                 || com.kolodkingal.enhanced.client.redhulk.RedHulkLooks.drawsAsHulk(data);

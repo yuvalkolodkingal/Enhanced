@@ -108,6 +108,7 @@ public abstract class ViewportEvent {
         private float nearPlaneDistance;
         private FogShape fogShape;
         private boolean canceled;
+        private boolean widen;
 
         public RenderFog(
                 Camera camera, double partialTick, FogRenderer.FogMode mode, FogType type, float farPlaneDistance,
@@ -150,6 +151,18 @@ public abstract class ViewportEvent {
 
         public void setFogShape(FogShape fogShape) {
             this.fogShape = fogShape;
+        }
+
+        /**
+         * (3.17) Whether the distances set may be farther than the game's own (set before cancelling): a listener that clears a
+         * fog (the lava's, for one who sees clearly in it). From 1.21.6 the game's fog only ever grew nearer by an event.
+         */
+        public boolean widens() {
+            return widen;
+        }
+
+        public void setWidens(boolean widen) {
+            this.widen = widen;
         }
 
         @Override

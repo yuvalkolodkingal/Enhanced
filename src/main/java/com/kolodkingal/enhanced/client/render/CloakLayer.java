@@ -75,7 +75,7 @@ public class CloakLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Ab
             return null;
         }
         if (data.power() == Power.DOCTOR_STRANGE) {
-            return Variants.current(data).id();
+            return Variants.drawn(data).id();
         }
         if (data.power() == Power.CUSTOM) {
             CustomHero.Pick flight = CustomHeroes.pick(player, PowerModule.FLIGHT);

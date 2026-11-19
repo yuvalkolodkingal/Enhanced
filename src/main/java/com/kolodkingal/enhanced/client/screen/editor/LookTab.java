@@ -8,6 +8,10 @@ import com.kolodkingal.enhanced.custom.CustomHero;
 import com.kolodkingal.enhanced.custom.HeroLooks;
 import com.kolodkingal.enhanced.custom.LookCatalog;
 import com.kolodkingal.enhanced.custom.SkinCheck;
+import com.kolodkingal.enhanced.network.OwnSkinPayload;
+import com.kolodkingal.enhanced.platform.net.Net;
+import com.kolodkingal.enhanced.power.Powers;
+import net.minecraft.client.Minecraft;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -34,6 +38,8 @@ public final class LookTab extends EditorTab {
     /** On the skin part: which of the three kinds of look is shown. */
     private String lookKind;
     private int skinPage;
+    /** (3.17) The choice just made, until the server's answer shows it. */
+    private Boolean pendingOwn;
 
     public LookTab(HeroEditorScreen screen) {
         super(screen);
@@ -62,7 +68,27 @@ public final class LookTab extends EditorTab {
 
     // ---- the skin ----
 
+    /** (3.17) Whether the player wears his own Minecraft skin now, on whatever hero he is (his own choice, kept for every hero). */
+    private boolean wearingOwn() {
+        boolean actual = Minecraft.getInstance().player != null && Powers.get(Minecraft.getInstance().player).ownSkin();
+        if (pendingOwn != null && pendingOwn == actual) {
+            pendingOwn = null;
+        }
+        return pendingOwn != null ? pendingOwn : actual;
+    }
+
     private void initSkin(int x, int y, int w, int h) {
+        // The player's own choice, for the hero he is now, built-in or his own: his own Minecraft skin instead of the suit.
+        boolean own = wearingOwn();
+        CreatorUi.BigButton wear = add(new CreatorUi.BigButton(x, y + h - 22, w, 20,
+                Component.translatable(own ? "screen.enhanced.hero_creator.look.wear.own" : "screen.enhanced.hero_creator.look.wear.suit"),
+                null, own ? draft().glow() : draft().color(), () -> {
+            boolean now = !wearingOwn();
+            pendingOwn = now;
+            Net.sendToServer(new OwnSkinPayload(now));
+            screen.rebuild();
+        }).selected(own));
+        wear.setTooltip(Tooltip.create(Component.translatable("screen.enhanced.hero_creator.look.wear.tip")));
         if (!lookKind.equals("hero") && !draft().wearsSkin() && !CustomHero.LOOK_OWN.equals(draft().look())) {
             lookKind = "hero";
         }
@@ -119,7 +145,7 @@ public final class LookTab extends EditorTab {
             for (Path file : skins) {
                 files.add(Card.of(Component.literal(file.getFileName().toString()), 0xB0B0B0, false, () -> loadSkin(file)));
             }
-            cards("skins", files, x, yy + 28, w, y + h - (yy + 28), 120, 18);
+            cards("skins", files, x, yy + 28, w, y + h - 24 - (yy + 28), 120, 18);
         }
     }
 

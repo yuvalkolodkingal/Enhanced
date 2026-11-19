@@ -32,5 +32,13 @@ public enum Trait {
      * only the Infinity Stones, chaos magic, the Allfather's power, the Phoenix or poison defeat him. Wolverine and
      * Deadpool have it; a custom hero by their body rows ({@code healing_factor.customHeroes}).
      */
-    HEALING_FACTOR
+    HEALING_FACTOR,
+    /**
+     * 3.17: he may use the Time Stone as a sorcerer may (bare, in a Gauntlet he wields, on a stone row), without being a
+     * sorcerer (the Hex Runes do not hold him, the books stay closed): the Stone-Bearer body gives it, so the one who
+     * carries the stones uses all six, as the Scarlet Witch does.
+     */
+    TIME_STONE_USER,
+    /** 3.17: the lava's fog is gone for him: he sees clearly while he is in lava (the client's fog; only a look, no safety). */
+    LAVA_SIGHT
 }

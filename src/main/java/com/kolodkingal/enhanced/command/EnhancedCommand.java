@@ -41,6 +41,7 @@ import java.util.List;
  * /enhanced power get [player]
  * /enhanced power set &lt;players&gt; &lt;power&gt; [look]
  * /enhanced look &lt;players&gt; &lt;look&gt;
+ * /enhanced skin &lt;players&gt; &lt;own|suit&gt;
  * /enhanced hex list
  * /enhanced hex clear
  * /enhanced boss start &lt;ultron|thanos|apocalypse&gt; [force]
@@ -98,6 +99,11 @@ public final class EnhancedCommand {
                                         .executes(EnhancedCommand::look))))
                 // Spellbooks: make players a book's caster, or give it up
                 .then(com.kolodkingal.enhanced.spellbook.SpellbookCommand.node())
+                // (3.17) the player's own skin on his hero (any hero, built-in or custom), or the suit again
+                .then(Commands.literal("skin")
+                        .then(Commands.argument("players", EntityArgument.players())
+                                .then(Commands.literal("own").executes(ctx -> skin(ctx, true)))
+                                .then(Commands.literal("suit").executes(ctx -> skin(ctx, false)))))
                 // (3.16) SMP Balance Mode: how strong every power is, for everyone on the server
                 .then(com.kolodkingal.enhanced.balance.BalanceCommand.node())
                 // 3.17: every server setting, read and changed from inside the game
@@ -180,6 +186,20 @@ public final class EnhancedCommand {
         }
         int n = changed;
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.look.set", n, look), true);
+        return changed;
+    }
+
+    /** (3.17) Puts the own skin on, or the suit back on, every given player who has a hero. */
+    private static int skin(CommandContext<CommandSourceStack> ctx, boolean own) throws CommandSyntaxException {
+        int changed = 0;
+        for (ServerPlayer player : EntityArgument.getPlayers(ctx, "players")) {
+            if (Powers.power(player).hasPowers()) {
+                Powers.setOwnSkin(player, own);
+                changed++;
+            }
+        }
+        int n = changed;
+        ctx.getSource().sendSuccess(() -> Component.translatable(own ? "commands.enhanced.skin.own" : "commands.enhanced.skin.suit", n), true);
         return changed;
     }
 

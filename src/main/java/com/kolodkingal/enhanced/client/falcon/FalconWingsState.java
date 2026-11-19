@@ -83,7 +83,7 @@ public final class FalconWingsState {
     /** Whether the player wears the Winter Soldier's look (the darker EXO-7 wings). */
     public static boolean winterSoldier(Player player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.FALCON && FalconAbilities.WINTER_SOLDIER.equals(Variants.current(data).id());
+        return data.power() == Power.FALCON && FalconAbilities.WINTER_SOLDIER.equals(Variants.drawn(data).id());
     }
 
     /** The pose his state asks for now. */

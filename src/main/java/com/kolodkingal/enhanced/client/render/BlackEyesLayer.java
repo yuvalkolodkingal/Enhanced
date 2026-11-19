@@ -61,7 +61,7 @@ public class BlackEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         if (data.power() != Power.SPIDER_MAN || player.isInvisible()) {
             return;
         }
-        String look = Variants.current(data).id();
+        String look = Variants.drawn(data).id();
         boolean kill = data.is(Live.INSTANT_KILL) && "iron_spider".equals(look);
         if (kill) {
             // The lenses close to two slits: black, and over it the red, glowing.

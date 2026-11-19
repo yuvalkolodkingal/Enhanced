@@ -104,7 +104,7 @@ public final class StrangeEvents {
             return;
         }
         PowerData data = Powers.get(player);
-        if (data.has(HeroAbility.STRANGE_BODY)) {
+        if (data.has(HeroAbility.STRANGE_BODY) || data.has(HeroAbility.STRANGE_CLOAK_FALL)) {
             float safe = (float) (StrangeAbilities.safeFall() * data.bodyScale(HeroAbility.STRANGE_BODY));
             if (event.getDistance() <= safe) {
                 event.setCanceled(true);

@@ -7,6 +7,7 @@ All commands start with `/enhanced` and are for **operators** (permission level 
 | `/enhanced power get [player]` | Shows a player's power. Without a player, it shows yours. |
 | `/enhanced power set <players> <power> [look]` | Gives or removes a power, optionally straight into one of its looks. |
 | `/enhanced look <players> <look>` | Changes the look of every given player whose hero has that look. |
+| `/enhanced skin <players> own\|suit` | (3.17) Every given player who has a hero wears his own Minecraft skin (`own`) or his hero's suit (`suit`); any hero, built-in or custom. The same choice is on the Hero Creator's Look tab and as the last look of the Change Look key. |
 | `/enhanced hex list` | Lists all Hexes in the current dimension (the owner, the position, the radius and how many players are allowed in). |
 | `/enhanced hex clear` | Dissolves every Hex in the current dimension. |
 | `/enhanced boss start thanos [force]` | Calls the Mad Titan where you stand, as the Tesseract and Loki's Scepter do: a portal opens and six seconds later he lands 14 to 20 blocks from you. `force` skips the site check, the Overworld rule, the server's `summonEnabled` switch and the rest (Peaceful and one fight at a time still apply; given in the air, the fight is made on the ground under you). See [Thanos](Thanos). |

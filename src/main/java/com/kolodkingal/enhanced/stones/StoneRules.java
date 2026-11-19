@@ -76,7 +76,21 @@ public final class StoneRules {
 
     /** The pure rule of {@link #mayUse(Player, StoneKind)}. */
     public static boolean mayUse(Power power, Predicate<Trait> traits, boolean creative, StoneKind kind) {
-        return mayHold(power, traits, creative, kind) && (kind != StoneKind.TIME || traits.test(Trait.SORCERER));
+        return mayHold(power, traits, creative, kind) && (kind != StoneKind.TIME || timeUser(traits));
+    }
+
+    /**
+     * (3.17) Whether one with these roles uses the Time Stone: a sorcerer, or the Stone-Bearer body's holder
+     * ({@link Trait#TIME_STONE_USER}, who is no sorcerer otherwise).
+     */
+    public static boolean timeUser(Predicate<Trait> traits) {
+        return traits.test(Trait.SORCERER) || traits.test(Trait.TIME_STONE_USER);
+    }
+
+    /** (3.17) {@link #timeUser(Predicate)} for a player. */
+    public static boolean timeUser(Player player) {
+        PowerData data = Powers.get(player);
+        return timeUser(t -> Traits.has(data, t));
     }
 
     /**

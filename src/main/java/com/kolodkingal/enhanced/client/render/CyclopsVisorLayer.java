@@ -71,7 +71,7 @@ public class CyclopsVisorLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         if (data.power() != Power.CYCLOPS) {
             return GLASSES;
         }
-        return switch (Variants.current(data).id()) {
+        return switch (Variants.drawn(data).id()) {
             case "apocalypse" -> VISOR_APOCALYPSE;
             case "classic" -> VISOR_CLASSIC;
             default -> GLASSES;

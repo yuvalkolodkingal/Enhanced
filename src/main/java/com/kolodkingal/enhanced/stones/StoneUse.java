@@ -226,6 +226,8 @@ public final class StoneUse {
     public static Component refusal(Player player, StoneKind kind, Source source) {
         Component name = Component.translatable("item.enhanced." + kind.id() + "_stone");
         boolean sorcerer = Traits.has(player, Trait.SORCERER);
+        // (3.17: the Stone-Bearer body's holder uses the Time Stone as a sorcerer does, without the sorcerer's other ties)
+        boolean timeUser = StoneRules.timeUser(player);
         if (kind == StoneKind.TIME && sorcerer && HexRunes.silences(player)) {
             return Component.translatable("message.enhanced.stones.use.runes");
         }
@@ -244,13 +246,13 @@ public final class StoneUse {
                 if (kind == StoneKind.MIND && isThanos(player) && !StonesConfig.MIND_FOR_THANOS.get()) {
                     yield Component.translatable("message.enhanced.stones.use.mind_for_thanos");
                 }
-                yield kind != StoneKind.TIME || sorcerer ? null
+                yield kind != StoneKind.TIME || timeUser ? null
                         : Component.translatable("message.enhanced.stones.use.no_sorcerer");
             }
             case VESSEL -> kind != StoneKind.TIME || sorcerer ? null
                     : Component.translatable("message.enhanced.stones.use.eye_closed");
             case ROW -> {
-                if (kind == StoneKind.TIME && !sorcerer) {
+                if (kind == StoneKind.TIME && !timeUser) {
                     yield Component.translatable("message.enhanced.stones.use.no_sorcerer");
                 }
                 yield carried(player, kind) ? null

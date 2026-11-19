@@ -73,7 +73,7 @@ public class HeimdallHelmLayer extends RenderLayer<AbstractClientPlayer, PlayerM
 
     /** Whether this player wears the helmet now: Heimdall in the look of the guardian, seen, with nothing on the head. */
     static boolean wears(AbstractClientPlayer player, PowerData data) {
-        return data.power() == Power.HEIMDALL && LOOK.equals(Variants.current(data).id()) && !player.isInvisible()
+        return data.power() == Power.HEIMDALL && LOOK.equals(Variants.drawn(data).id()) && !player.isInvisible()
                 && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
     }
 

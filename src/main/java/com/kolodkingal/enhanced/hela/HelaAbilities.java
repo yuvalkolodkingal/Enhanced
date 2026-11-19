@@ -188,7 +188,8 @@ public final class HelaAbilities {
                 data.set(Live.HELA_SUMMONING, any);
             }
         }
-        if (data.has(HeroAbility.HELA_BODY) && AsgardDimension.in(player) && now % 20 == 0) {
+        if ((data.has(HeroAbility.HELA_BODY) || data.has(HeroAbility.HELA_ASGARD_REGENERATION)) && AsgardDimension.in(player)
+                && now % 20 == 0) {
             // The strength of Asgard: she heals as long as she stands in it.
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, true, false, true));
         }

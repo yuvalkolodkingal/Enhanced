@@ -77,7 +77,7 @@ public class OdinHelmLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
 
     /** Whether this player wears the helmet now: Odin in the Allfather's look, seen, with nothing on the head. */
     static boolean wears(AbstractClientPlayer player, PowerData data) {
-        return data.power() == Power.ODIN && LOOK.equals(Variants.current(data).id()) && !player.isInvisible()
+        return data.power() == Power.ODIN && LOOK.equals(Variants.drawn(data).id()) && !player.isInvisible()
                 && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
     }
 

@@ -26,7 +26,9 @@ public final class HeroPresets {
             // 3.7 (lanes L2, L3)
             "wolverine", "deadpool",
             // 3.8 (lanes L1, L2, L3, L5, L8)
-            "captain_america", "red_hulk", "iron_man", "falcon", "love");
+            "captain_america", "red_hulk", "iron_man", "falcon", "love",
+            // 3.17 (the android Human Torch: his preset was a file and its words, and was left out of this list)
+            "jim_hammond");
     /** The archetypes. */
     public static final List<String> ARCHETYPES = List.of("speedster", "flyer_blaster", "tank", "mage", "mind_master", "elemental");
     /** The most points a preset may cost. */

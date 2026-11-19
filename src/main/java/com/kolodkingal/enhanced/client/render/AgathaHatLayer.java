@@ -66,7 +66,7 @@ public class AgathaHatLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
 
     /** Whether this player wears the hat now: Agatha in the look of the Road, seen, with nothing on the head. */
     static boolean wears(AbstractClientPlayer player, PowerData data) {
-        return data.power() == Power.AGATHA && LOOK.equals(Variants.current(data).id()) && !player.isInvisible()
+        return data.power() == Power.AGATHA && LOOK.equals(Variants.drawn(data).id()) && !player.isInvisible()
                 && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
     }
 

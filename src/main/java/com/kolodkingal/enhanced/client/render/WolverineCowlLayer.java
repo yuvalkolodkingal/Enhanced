@@ -39,7 +39,7 @@ public class WolverineCowlLayer extends RenderLayer<AbstractClientPlayer, Player
     /** Whether the player wears the cowl now: Wolverine in the classic look, no helmet, seen. */
     public static boolean wears(AbstractClientPlayer player) {
         PowerData data = Powers.get(player);
-        return data.power() == Power.WOLVERINE && "classic".equals(Variants.current(data).id())
+        return data.power() == Power.WOLVERINE && "classic".equals(Variants.drawn(data).id())
                 && player.getItemBySlot(EquipmentSlot.HEAD).isEmpty() && !player.isInvisible();
     }
 

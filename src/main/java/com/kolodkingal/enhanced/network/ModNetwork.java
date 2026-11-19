@@ -20,7 +20,8 @@ public final class ModNetwork {
      * (the serum, Captain America, Red Hulk, Iron Man, Falcon, the tower's armoury, Eternity and Love; the momentary
      * states in two words), and once for 3.9 (the mod's own config files: the server's settings travel to a player
      * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once),
-     * ... and once for 3.17 (the server's settings changed in the game: two new messages).
+     * ... and once for 3.17 (the server's settings changed in the game: two new messages, and the player's own skin on his
+     * hero: one more message and a flag of the power data).
      */
     public static final String PROTOCOL_VERSION = "17";
     /**
@@ -39,6 +40,8 @@ public final class ModNetwork {
         registrar.serverbound(AbilityKeyPayload.TYPE, AbilityKeyPayload.STREAM_CODEC, AbilityKeyPayload::handle);
         registrar.serverbound(HexActionPayload.TYPE, HexActionPayload.STREAM_CODEC, HexActionPayload::handle);
         registrar.serverbound(ChangeLookPayload.TYPE, ChangeLookPayload.STREAM_CODEC, ChangeLookPayload::handle);
+        // 3.17: the player's own skin on his hero, from the Hero Creator
+        registrar.serverbound(OwnSkinPayload.TYPE, OwnSkinPayload.STREAM_CODEC, OwnSkinPayload::handle);
         registrar.serverbound(BifrostActionPayload.TYPE, BifrostActionPayload.STREAM_CODEC, BifrostActionPayload::handle);
         registrar.serverbound(RoadChoicePayload.TYPE, RoadChoicePayload.STREAM_CODEC, RoadChoicePayload::handle);
         registrar.clientbound(SlowedProjectilePayload.TYPE, SlowedProjectilePayload.STREAM_CODEC, SlowedProjectilePayload::handle);

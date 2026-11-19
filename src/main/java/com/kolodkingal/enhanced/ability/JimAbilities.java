@@ -125,7 +125,7 @@ public final class JimAbilities {
         if (data.has(HeroAbility.JIM_FIRE_IMMUNITY)) {
             fireImmunity(player);
         }
-        if (data.has(HeroAbility.JIM_BODY)) {
+        if (data.has(HeroAbility.JIM_BODY) || data.has(HeroAbility.JIM_FAST_HEALING)) {
             regenerate(player);
         }
         boolean flames = flaming(player, data);

@@ -142,6 +142,12 @@ public final class Powers {
         return data.power() == Power.CUSTOM ? com.kolodkingal.enhanced.custom.CustomHeroes.variant(player) : Variants.current(data);
     }
 
+    /** (3.17) The look the player is DRAWN in: his own skin's look when he chose it, else {@link #variant}. */
+    public static Variant drawnVariant(Player player) {
+        PowerData data = get(player);
+        return data.power() == Power.CUSTOM ? variant(player) : Variants.drawn(data);
+    }
+
     /** Main energy colour of the player's hero, in their current look. */
     public static int color(Player player) {
         return variant(player).color();
@@ -163,14 +169,32 @@ public final class Powers {
     }
 
     /**
-     * The Change Look key: steps to the next (or previous) look in a shimmer of the new look's colours. Returns false
-     * if the hero has no other looks.
+     * (3.17) Wears the player's own Minecraft skin instead of the hero's suit, or the suit again: his choice for every hero,
+     * built-in or custom, kept when he becomes another; powers, auras and effects are as they were. Synced, so everyone sees it.
+     */
+    public static void setOwnSkin(ServerPlayer player, boolean own) {
+        PowerData data = get(player);
+        if (data.ownSkin() == own) {
+            return;
+        }
+        data.setOwnSkinRaw(own);
+        syncIfDirty(player);
+    }
+
+    /**
+     * The Change Look key: steps to the next (or previous) look in a shimmer of the new look's colours. (3.17: after the last look
+     * of every hero comes "Your own skin", the player's own skin on the hero; heroes with only one suit, and custom heroes, have
+     * that one step.) Returns false if the hero has no other looks.
      */
     public static boolean cycleVariant(ServerPlayer player, int step) {
         PowerData data = get(player);
         // (3.12.2: within the character the hero is: Source Code Vision and Nano Ultron have looks of their own only)
         java.util.List<Variant> looks = Characters.looks(data);
-        if (looks.size() < 2) {
+        // The steps: the looks (a hero without any has his one suit), then "your own skin" (a hero with an "own" look has it).
+        boolean extra = looks.stream().noneMatch(Variant::ownSkin);
+        int count = Math.max(1, looks.size());
+        int total = count + (extra ? 1 : 0);
+        if (total < 2) {
             return false;
         }
         int at = 0;
@@ -179,20 +203,28 @@ public final class Powers {
                 at = i;
             }
         }
-        Variant step1 = looks.get(Math.floorMod(at + step, looks.size()));
+        int pos = extra && data.ownSkin() ? count : at;
+        int next = Math.floorMod(pos + step, total);
         // (3.12: a look that is earned is skipped until it is)
-        for (int i = 0; i < looks.size() && !EarnedLooks.has(player, step1); i++) {
-            at = Math.floorMod(at + step, looks.size());
-            step1 = looks.get(Math.floorMod(at + step, looks.size()));
+        while (next < looks.size() && !EarnedLooks.has(player, looks.get(next))) {
+            next = Math.floorMod(next + step, total);
         }
-        Variant next = step1;
-        setVariant(player, next);
         ServerLevel level = player.serverLevel();
-        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), next.color(), 40, 0.5);
-        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), next.glow(), 20, 0.3);
+        Variant shown;
+        if (extra && next == count) {
+            setOwnSkin(player, true);
+            shown = Variants.ownLook(data.power());
+        } else {
+            setOwnSkin(player, false);
+            shown = looks.isEmpty() ? Variants.get(data.power(), "") : looks.get(next);
+            setVariant(player, shown);
+        }
+        Variant next1 = shown;
+        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), next1.color(), 40, 0.5);
+        burst(level, player.getX(), player.getY() + 1.0, player.getZ(), next1.glow(), 20, 0.3);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.AWAKEN.get(), SoundSource.PLAYERS, 0.35F, 1.6F);
-        player.displayClientMessage(Component.translatable("message.enhanced.look", next.displayName())
-                .withStyle(s -> s.withColor(next.color())), true);
+        player.displayClientMessage(Component.translatable("message.enhanced.look", next1.displayName())
+                .withStyle(s -> s.withColor(next1.color())), true);
         return true;
     }
 
