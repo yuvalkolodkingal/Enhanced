@@ -286,8 +286,11 @@ public final class MindTests {
         // (3.12.2: Nano Ultron is a hero of his own: his looks are the nanotech body and the human form, nothing else)
         Powers.cycleVariant(ultron, 1);
         check("nano_human".equals(Powers.get(ultron).variant()) && NanoUltron.is(ultron), "Change Look: his human form, still Nano Ultron");
+        // (3.17: after a hero's last look comes his own skin)
         Powers.cycleVariant(ultron, 1);
-        check("nano".equals(Powers.get(ultron).variant()), "and back to the nanotech");
+        check(Powers.get(ultron).ownSkin() && NanoUltron.is(ultron), "Change Look: his own skin, still Nano Ultron");
+        Powers.cycleVariant(ultron, 1);
+        check("nano".equals(Powers.get(ultron).variant()) && !Powers.get(ultron).ownSkin(), "and back to the nanotech");
         check(NanoUltron.toggleForm(ultron) && NanoUltron.inForm(ultron), "his nano form");
         NanoUltron.applyBody(ultron);
         check(ultron.isInvisible(), "in pure nanotech his body is not seen");

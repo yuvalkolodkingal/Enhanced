@@ -562,7 +562,14 @@ public enum HeroAbility implements CatalogEntry {
     // ===== passives (3.17): what a hero's body does, one pick each =====
     // (The Hero Creator offers every always-on effect of a built-in hero as a pick of its own, beside his body that gives them
     // all: the hero's own code runs for the row, so nothing is copied. A built-in hero has every row of his: he is unchanged.
-    // A row that is only a switch has no strength: it costs as at strength 5.)
+    // A row that is only a switch has no strength: it costs as at strength 5. The region is appended, in the order of the
+    // heroes, so no row before it moves.)
+    /**
+     * The Stone-Bearer: he carries and uses every Infinity Stone, and wields the Infinity Gauntlet (and the Snap), as the
+     * Scarlet Witch does (the shared {@code StoneRules}).
+     */
+    WANDA_STONE_BEARER(Power.SCARLET_WITCH, 0, "stone_bearer", body().cost(6).group(Group.BODY)
+            .icon("enhanced:infinity_gauntlet").fixed().traits(Trait.STONE_BEARER, Trait.TIME_STONE_USER)),
     /** Vision's digestion, for a body that is not his: never hungry. */
     VISION_NO_HUNGER(Power.VISION, 0, "no_hunger", body().cost(1).group(Group.BODY).icon("minecraft:cooked_beef").fixed()),
     /** Vision's lungs: never out of breath, so he breathes under water. */
@@ -571,27 +578,24 @@ public enum HeroAbility implements CatalogEntry {
     /** Source Code Vision's fire: the Mind Stone beam and the Charged Beam set what they strike alight and burn the ground. */
     VISION_BURNING_BEAMS(Power.VISION, 0, "burning_beams", body().cost(2).group(Group.ENERGY)
             .icon("minecraft:flint_and_steel").fixed()),
+    /** Clear sight in lava: the lava's fog is gone, he sees as in the open (it protects nothing: pair it with fire immunity). */
+    PHOENIX_LAVA_SIGHT(Power.PHOENIX, 0, "lava_sight", body().cost(1).group(Group.BODY).icon("minecraft:lava_bucket")
+            .fixed().traits(Trait.LAVA_SIGHT)),
+    /** The Titan healing factor: when he has not been hurt for a while he heals, slowly, at the cost of a little hunger. */
+    THANOS_REGENERATION(Power.THANOS, 0, "regeneration", body().cost(1).group(Group.BODY).icon("minecraft:golden_apple")
+            .fixed()),
     /** Ultron's machine body: no Poison and no Wither can touch it. */
     ULTRON_NO_POISON(Power.ULTRON, 0, "no_poison", body().cost(1).group(Group.BODY).icon("minecraft:fermented_spider_eye")
             .fixed()),
     /** Ultron's anti-gravity palms: no fall ever hurts. */
     ULTRON_SOFT_LANDING(Power.ULTRON, 0, "soft_landing", body().cost(1).group(Group.BODY).icon("minecraft:slime_ball")
             .fixed()),
-    /** Heimdall's footing: a fall shorter than his safe distance does no harm. */
-    HEIMDALL_SAFE_FALLS(Power.HEIMDALL, 0, "safe_falls", body().cost(1).group(Group.BODY).icon("minecraft:leather_boots")
-            .fixed()),
-    /** The Cloak of Levitation catches the falls. */
-    STRANGE_CLOAK_FALL(Power.DOCTOR_STRANGE, 0, "cloak_fall", body().cost(1).group(Group.BODY).icon("minecraft:feather")
-            .fixed()),
-    /** Jim Hammond's android body heals five times as fast as a player's. */
-    JIM_FAST_HEALING(Power.JIM_HAMMOND, 0, "fast_healing", body().cost(1).group(Group.BODY).icon("minecraft:glistering_melon_slice")
-            .fixed()),
-    /** The Titan healing factor: when he has not been hurt for a while he heals, slowly, at the cost of a little hunger. */
-    THANOS_REGENERATION(Power.THANOS, 0, "regeneration", body().cost(1).group(Group.BODY).icon("minecraft:golden_apple")
-            .fixed()),
     /** The first mutant's healing: after a while without a blow he heals every second. */
     APOCALYPSE_REGENERATION(Power.APOCALYPSE, 0, "regeneration", body().cost(1).group(Group.BODY)
             .icon("minecraft:enchanted_golden_apple").fixed()),
+    /** Heimdall's footing: a fall shorter than his safe distance does no harm. */
+    HEIMDALL_SAFE_FALLS(Power.HEIMDALL, 0, "safe_falls", body().cost(1).group(Group.BODY).icon("minecraft:leather_boots")
+            .fixed()),
     /** The Allfather's recovery: below half his health he regenerates. */
     ODIN_REGENERATION(Power.ODIN, 0, "regeneration", body().cost(1).group(Group.BODY).icon("minecraft:honey_bottle").fixed()),
     /** The strength of Asgard: while she stands in it she regenerates. */
@@ -600,21 +604,18 @@ public enum HeroAbility implements CatalogEntry {
     /** The strength of Asgard: while she stands in it her blows are stronger. */
     HELA_ASGARD_STRENGTH(Power.HELA, 0, "asgard_strength", body().cost(1).group(Group.BODY).icon("minecraft:golden_sword")
             .fixed()),
+    /** The Cloak of Levitation catches the falls. */
+    STRANGE_CLOAK_FALL(Power.DOCTOR_STRANGE, 0, "cloak_fall", body().cost(1).group(Group.BODY).icon("minecraft:feather")
+            .fixed()),
     /**
      * The healing factor of Wolverine and Deadpool, by itself: blows that would kill him leave him DOWN and he rises; only the
      * Infinity Stones, chaos magic, the Allfather's power, the Phoenix or poison defeat him.
      */
     WOLVERINE_HEALING_FACTOR(Power.WOLVERINE, 0, "healing_factor", body().cost(2).group(Group.BODY)
             .icon("minecraft:enchanted_golden_apple").fixed().traits(Trait.HEALING_FACTOR)),
-    /** Clear sight in lava: the lava's fog is gone, he sees as in the open (it protects nothing: pair it with fire immunity). */
-    PHOENIX_LAVA_SIGHT(Power.PHOENIX, 0, "lava_sight", body().cost(1).group(Group.BODY).icon("minecraft:lava_bucket")
-            .fixed().traits(Trait.LAVA_SIGHT)),
-    /**
-     * The Stone-Bearer: he carries and uses every Infinity Stone, and wields the Infinity Gauntlet (and the Snap), as the
-     * Scarlet Witch does (the shared {@code StoneRules}).
-     */
-    WANDA_STONE_BEARER(Power.SCARLET_WITCH, 0, "stone_bearer", body().cost(6).group(Group.BODY)
-            .icon("enhanced:infinity_gauntlet").fixed().traits(Trait.STONE_BEARER, Trait.TIME_STONE_USER));
+    /** Jim Hammond's android body heals five times as fast as a player's. */
+    JIM_FAST_HEALING(Power.JIM_HAMMOND, 0, "fast_healing", body().cost(1).group(Group.BODY).icon("minecraft:glistering_melon_slice")
+            .fixed());
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {

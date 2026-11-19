@@ -339,14 +339,22 @@ public final class AvengersSkeletonTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsAre221(GameTestHelper helper) throws IOException {
-        check(HeroAbility.values().length == 229, "176 + 27 + 18 rows, 3.12's Mind Palace and 3.17's Jim Hammond (7): " + HeroAbility.values().length);
+        check(HeroAbility.values().length == 245, "176 + 27 + 18 rows, 3.12's Mind Palace, 3.17's Jim Hammond (7) and 3.17's 16"
+                + " passives: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.CAPTAIN_SHIELD_THROW.ordinal() - 1] == HeroAbility.DEADPOOL_BODY,
                 "Captain America after Deadpool");
         check(HeroAbility.values()[HeroAbility.CAPTAIN_RICOCHET.ordinal() - 1] == HeroAbility.DEADPOOL_SMOKE,
                 "3.8's variants after 3.7's");
-        check(HeroAbility.values()[HeroAbility.values().length - 2] == HeroAbility.LOVE_BIFROST_LOOK,
-                "and they come last (but for 3.12's row)");
-        check(HeroAbility.values()[HeroAbility.values().length - 1] == HeroAbility.VISION_MIND_PALACE, "3.12 appends");
+        check(HeroAbility.values()[HeroAbility.VISION_MIND_PALACE.ordinal() - 1] == HeroAbility.LOVE_BIFROST_LOOK,
+                "and they come last (but for the regions appended after them)");
+        check(HeroAbility.values()[HeroAbility.WANDA_STONE_BEARER.ordinal() - 1] == HeroAbility.VISION_MIND_PALACE, "3.12 appends");
+        for (int i = HeroAbility.WANDA_STONE_BEARER.ordinal(); i < HeroAbility.values().length; i++) {
+            HeroAbility pick = HeroAbility.values()[i];
+            // (the Scarlet Witch has no body row: her Stone-Bearer pick is the only passive of hers)
+            check(pick.passive() && !pick.isVariant()
+                    && (HeroAbility.at(pick.hero, 0) != pick || pick == HeroAbility.WANDA_STONE_BEARER),
+                    "3.17 appends the passives, each a pick beside its hero's body: " + pick);
+        }
         Map<Power, int[]> counts = Map.of(Power.CAPTAIN_AMERICA, new int[]{6, 5}, Power.RED_HULK, new int[]{6, 4},
                 Power.IRON_MAN, new int[]{5, 3}, Power.FALCON, new int[]{5, 4}, Power.LOVE, new int[]{5, 2});
         for (Power hero : HEROES) {

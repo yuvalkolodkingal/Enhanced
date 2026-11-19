@@ -50,6 +50,17 @@ public final class JimTests {
         helper.runAfterDelay(ticks + 1, after);
     }
 
+    /** Runs {@code after} on the first tick {@code condition} holds, checked each tick for at most {@code ticks} ticks. */
+    private static void whenTrue(GameTestHelper helper, java.util.function.BooleanSupplier condition, int ticks, String what,
+            Runnable after) {
+        if (condition.getAsBoolean()) {
+            after.run();
+        } else {
+            check(ticks > 0, what);
+            helper.runAfterDelay(1, () -> whenTrue(helper, condition, ticks - 1, what, after));
+        }
+    }
+
     private static ServerPlayer jim(TestKit.Fixture f, double x, double z) {
         return f.player(x, FLOOR, z, Power.JIM_HAMMOND);
     }
@@ -430,7 +441,9 @@ public final class JimTests {
             check(solar(jim) == 10 * JimConfig.SOLAR_FILL_SUN.get(), "in the open sun it fills at the sun rate: " + solar(jim));
             // a roof: only the shade rate
             helper.getLevel().setBlock(above, Blocks.STONE.defaultBlockState(), 3);
-            run(helper, jim, 3, () -> { // (the sky is told of the roof within a tick or two)
+            // (the sky is told of the roof by the light engine, a tick or two later, more under a full run's load: wait for it)
+            BlockPos head = BlockPos.containing(jim.getEyePosition());
+            whenTrue(helper, () -> !level.canSeeSky(head), 100, "the roof shades him", () -> {
                 Powers.get(jim).setIronCharge(0);
                 run(helper, jim, 10, () -> {
                     check(solar(jim) == 10 * JimConfig.SOLAR_FILL_SHADE.get(), "under a roof only the shade rate: " + solar(jim));
@@ -685,7 +698,8 @@ public final class JimTests {
     @EnhancedTest(template = ARENA)
     public static void heIsInTheHeroCreatorWithAllHisAbilities(GameTestHelper helper) {
         check(com.kolodkingal.enhanced.custom.HeroLooks.heroes().contains(Power.JIM_HAMMOND), "listed as a hero to become");
-        check(HeroAbility.of(Power.JIM_HAMMOND).size() == 7, "seven rows: " + HeroAbility.of(Power.JIM_HAMMOND).size());
+        check(HeroAbility.of(Power.JIM_HAMMOND).size() == 8, "seven rows and 3.17's fast-healing pick: "
+                + HeroAbility.of(Power.JIM_HAMMOND).size());
         for (HeroAbility a : HeroAbility.of(Power.JIM_HAMMOND)) {
             check(com.kolodkingal.enhanced.custom.Catalog.byId(a.id()) == a, a.id() + " is in the catalogue");
         }

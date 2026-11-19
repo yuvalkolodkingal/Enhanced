@@ -247,7 +247,10 @@ public final class MutantSkeletonTests {
         for (Power hero : List.of(Power.WOLVERINE, Power.DEADPOOL)) {
             List<HeroAbility> rows = HeroAbility.of(hero).stream().filter(a -> !a.isVariant()).toList();
             List<HeroAbility> variants = HeroAbility.of(hero).stream().filter(HeroAbility::isVariant).toList();
-            check(rows.size() == 6 && variants.size() == 5, hero + " has six rows and five variants");
+            // (3.17: Wolverine's healing factor is also a pick of its own, beside his body)
+            int picks = hero == Power.WOLVERINE ? 1 : 0;
+            check(rows.size() == 6 + picks && variants.size() == 5, hero + " has six rows (and " + picks
+                    + " passive picks) and five variants: " + rows.size() + ", " + variants.size());
             for (int key = 0; key <= 5; key++) {
                 check(HeroAbility.at(hero, key) != null, hero + " has a row on key " + key);
             }

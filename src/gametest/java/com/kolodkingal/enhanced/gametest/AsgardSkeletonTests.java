@@ -153,7 +153,10 @@ public final class AsgardSkeletonTests {
         check(HeroAbility.values()[first - 1] == HeroAbility.XAVIER_CEREBRO, "appended after Professor X's rows");
         for (Power god : GODS) {
             List<HeroAbility> rows = HeroAbility.of(god);
-            check(rows.size() == 6, god + " has six rows");
+            // (3.17: what their bodies do is also a pick of its own each: Heimdall's safe falls, Odin's recovery,
+            // Hela's two strengths of Asgard)
+            int picks = god == Power.HELA ? 2 : 1;
+            check(rows.size() == 6 + picks, god + " has six rows (and " + picks + " passive picks): " + rows.size());
             for (int home = 0; home <= 5; home++) {
                 check(HeroAbility.at(god, home) != null, god + " has a row on key " + home);
             }

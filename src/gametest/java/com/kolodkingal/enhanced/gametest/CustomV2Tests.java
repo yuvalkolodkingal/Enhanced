@@ -207,15 +207,18 @@ public final class CustomV2Tests {
         for (HeroAbility a : HeroAbility.values()) {
             check(ids.add(a.id()), "ids are unique: " + a.id());
             check(HeroAbility.byId(a.id()) == a && Catalog.byId(a.id().toUpperCase()) == a, a + " is found by its id");
-            if (a == HeroAbility.MAGNETO_MAGNETIC_PULL || a == HeroAbility.VISION_MIND_PALACE) {
+            if (a == HeroAbility.MAGNETO_MAGNETIC_PULL || a == HeroAbility.VISION_MIND_PALACE
+                    || a == HeroAbility.WANDA_STONE_BEARER) {
                 // (3.5: the creator lane's region of variant rows, appended after the rest, has its own order;
-                // 3.12: so does each region appended after it)
+                // 3.12: so does each region appended after it; 3.17: the passives)
                 lastHero = -1;
             }
             check(a.hero.ordinal() >= lastHero, a + " sits in its hero's region, in the order of the heroes");
             lastHero = a.hero.ordinal();
             check(a.id().equals(a.heroId() + "." + a.name) && a.nameKey().equals("hero_module.enhanced." + a.id()), a + " names");
-            check(a.home >= 0 && a.home <= 6 && a.costPerPoint >= 1 && a.costPerPoint <= 3, a + " home and cost");
+            // (3.17: the Stone-Bearer body alone is dearer, 30 points: every stone and the Gauntlet on one pick)
+            check(a.home >= 0 && a.home <= 6 && a.costPerPoint >= 1 && (a.costPerPoint <= 3
+                    || a == HeroAbility.WANDA_STONE_BEARER && a.cost(HeroAbility.FIXED_STRENGTH) == 30), a + " home and cost");
             check(a.passive() == (a.home == 0), a + ": a body and only a body is passive");
             check(BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(a.icon)), a + "'s icon is an item: " + a.icon);
             for (String needed : a.requires()) {
@@ -232,11 +235,11 @@ public final class CustomV2Tests {
                 check((row != null) != (key == p.flightAbility()), p + " key " + key + " is a row or the flight key, never both");
             }
         }
-        check(HeroAbility.values().length == 229,
+        check(HeroAbility.values().length == 245,
                 "71 keys + 9 bodies (L2: Vision's) + Build Magic, 3.5's 15 keys + 3 bodies, the creator lane's 33 "
                 + "variant rows + the Scarlet Witch's Build Magic, 3.6's 10 keys + 2 bodies + 9 variant rows, and "
                 + "3.7's 10 keys + 2 bodies + 10 variant rows (Wolverine, Deadpool), and 3.8's 22 keys + 5 bodies + 18"
-                + " variant rows (Captain America, Red Hulk, Iron Man, Falcon, Love), 3.12's Mind Palace and 3.17's Jim Hammond (7 rows): " + HeroAbility.values().length);
+                + " variant rows (Captain America, Red Hulk, Iron Man, Falcon, Love), 3.12's Mind Palace, 3.17's Jim Hammond (7 rows) and 3.17's 16 passives: " + HeroAbility.values().length);
         check(Catalog.all().size()
                 == PowerModule.values().length + HeroAbility.values().length + StoneRow.values().length,
                 "the catalogue is the three lists (3.6: the stone rows)");

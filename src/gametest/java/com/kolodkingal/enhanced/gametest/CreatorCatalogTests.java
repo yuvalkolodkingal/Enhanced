@@ -71,13 +71,16 @@ public final class CreatorCatalogTests {
         hero(Power.SCARLET_WITCH, "Chaos Beam", "wanda.chaos_beam",
                 "telekinesis (tear a block, set down)", "wanda.telekinesis", "Chaos Shield", "wanda.chaos_shield",
                 "the Hex and Hex Control", "wanda.hex", "dissolve the Hex", "wanda.hex_dissolve",
-                "Build Magic with Instant", "wanda.build_magic", "flight", "flight");
+                "Build Magic with Instant", "wanda.build_magic", "flight", "flight",
+                "a Bearer of every Infinity Stone and the Gauntlet", "wanda.stone_bearer");
         hero(Power.QUICKSILVER, "Quicksilver Time", "quicksilver.time", "Walkman", "quicksilver.walkman",
                 "Super Speed", "quicksilver.speed", "Dash Strike", "quicksilver.dash",
                 "Speed Blitz", "quicksilver.blitz", "Pickpocket", "quicksilver.pickpocket",
                 "wall and water running", "quicksilver.wall_run", "Pebble Barrage", "quicksilver.barrage");
         hero(Power.VISION, "Mind Stone beam", "vision.mind_beam", "Phase", "vision.phase", "Charged Beam", "vision.charged_beam",
-                "Disguise", "vision.disguise", "Mind Palace", "vision.mind_palace", "synthetic body", "vision.body", "flight", "flight");
+                "Disguise", "vision.disguise", "Mind Palace", "vision.mind_palace", "synthetic body", "vision.body", "flight", "flight",
+                "never hungry (body)", "vision.no_hunger", "water breathing (body)", "vision.water_breathing",
+                "Source Code Vision's burning beams", "vision.burning_beams");
         hero(Power.BILLY, "Hex Beam (or Hex Bolt)", "billy.hex_beam", "telekinesis", "billy.telekinesis",
                 "Freeze", "billy.freeze", "Hex Barrier", "billy.hex_barrier", "The Noise", "billy.noise",
                 "Build Magic (Y)", "billy.build_magic", "flight", "flight");
@@ -94,7 +97,8 @@ public final class CreatorCatalogTests {
         hero(Power.PHOENIX, "mind reading", "phoenix.mind", "Mind Sense", "phoenix.mind_sense",
                 "telekinesis", "phoenix.telekinesis", "mind control", "phoenix.control",
                 "Psionic Field", "phoenix.psionic_field", "Phoenix Burst", "phoenix.burst",
-                "the Phoenix's fire (body)", "phoenix.body", "flight", "flight");
+                "the Phoenix's fire (body)", "phoenix.body", "flight", "flight",
+                "clear sight in lava", "phoenix.lava_sight");
         hero(Power.SPIDER_MAN, "Web Shot", "spider.web", "Web Burst", "spider.web_burst",
                 "web zip and Web Assist (J)", "spider.zip", "web swing", "spider.web_swing",
                 "wall crawling", "spider.crawl", "Spider-Sense", "spider.sense", "Iron Spider legs", "spider.legs",
@@ -103,16 +107,19 @@ public final class CreatorCatalogTests {
                 "Space Stone step", "thanos.space", "Space Pull", "thanos.space_pull",
                 "Reality Stone transmute", "thanos.reality", "Reality Veil", "thanos.reality_veil",
                 "Soul Drain", "thanos.soul", "Soul Sight", "thanos.soul_sight", "Time Stone rewind", "thanos.time",
-                "Time Lock", "thanos.time_lock", "Titan body", "thanos.body");
+                "Time Lock", "thanos.time_lock", "Titan body", "thanos.body",
+                "the Titan's regeneration (body)", "thanos.regeneration");
         hero(Power.ULTRON, "repulsor fire", "ultron.repulsor", "Overcharge", "ultron.overcharge",
                 "gravity pull", "ultron.gravity", "gravity slam", "ultron.slam",
                 "upload into a drone, Second Life", "ultron.upload", "Hack", "ultron.hack",
                 "sentry drones", "ultron.army", "command the drones", "ultron.command", "machine body", "ultron.body",
-                "flight", "flight");
+                "flight", "flight", "no poison, no wither (body)", "ultron.no_poison",
+                "the anti-gravity palms catch his falls", "ultron.soft_landing");
         hero(Power.APOCALYPSE, "sand wave", "apocalypse.sand", "Entomb", "apocalypse.entomb",
                 "portals", "apocalypse.portal", "golden shield", "apocalypse.shield",
                 "power bestowal", "apocalypse.bestow", "Sandstorm", "apocalypse.sandstorm",
-                "Apocalypse's body", "apocalypse.body", "flight", "flight");
+                "Apocalypse's body", "apocalypse.body", "flight", "flight",
+                "the first mutant's healing (body)", "apocalypse.regeneration");
         hero(Power.AGATHA, "Purple Beam", "agatha.purple_beam", "Hex Mark", "agatha.hex_mark",
                 "Power Drain", "agatha.drain", "witch's shield", "agatha.shield", "Rune Trap", "agatha.runes",
                 "poison and dark magic (body)", "agatha.body", "flight", "flight");

@@ -176,7 +176,9 @@ public final class StoneSkeletonTests {
                 "the Hulk after Strange");
         for (Power hero : List.of(Power.DOCTOR_STRANGE, Power.HULK)) {
             List<HeroAbility> rows = HeroAbility.of(hero).stream().filter(a -> !a.isVariant()).toList();
-            check(rows.size() == 6, hero + " has six rows");
+            // (3.17: the Cloak's catch is also a pick of its own, beside Strange's body)
+            int picks = hero == Power.DOCTOR_STRANGE ? 1 : 0;
+            check(rows.size() == 6 + picks, hero + " has six rows (and " + picks + " passive picks): " + rows.size());
             check(HeroAbility.at(hero, 0) != null, hero + " has a body");
         }
         check(HeroAbility.STRANGE_EYE.id().equals("strange.eye") && HeroAbility.at(Power.DOCTOR_STRANGE,
