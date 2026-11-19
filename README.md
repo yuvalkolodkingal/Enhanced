@@ -72,6 +72,10 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Mod loader** NeoForge 21.1.x, 21.4.x, 21.11.x or 26.3.x
 * **Install it on** the client, plus the server for multiplayer
 
+## What's new in 3.17.1
+
+* **Jim Hammond's fireball reads in flight and never fills your screen.** It is drawn half again as big, with a tail that grows with its speed, and it fades away as it nears the camera (just thrown in first person, or flying straight at you) instead of covering the view in orange. How hard it hits is unchanged.
+
 ## What's new in 3.17.0
 
 * **The server's settings, changed in the game.** An operator reads and changes every setting and limit of the server config without leaving the game: `/enhanced config get|set|reset|list` (Tab completes every key, such as `custom_hero.budget`), and `/enhanced config` opens the mod's settings screen, where on a server an operator now edits the Server Options too. The server checks every change (who asks, the option's own range), uses it at once, writes it to the config file and sends it to every player; a bad value is refused and nothing changes. No setting is renamed and no default changes. See [Commands](docs/wiki/Commands.md).
