@@ -406,7 +406,11 @@ public final class WitchLevels {
     public static boolean atHome(ServerLevel level, BlockPos pos, Spellbook book) {
         ResourceKey<Structure> key = home(book);
         Structure structure = key == null ? null : level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(key);
+        //#if >=26.3
+        //$$ return structure != null && level.structureManager().getStructureWithPieceAt(pos.getX(), pos.getY(), pos.getZ(), structure).isValid();
+        //#else
         return structure != null && level.structureManager().getStructureWithPieceAt(pos, structure).isValid();
+        //#endif
     }
 
     /**
@@ -478,9 +482,9 @@ public final class WitchLevels {
         }
         Set<UUID> fought = FOUGHT.remove(dead.getUUID());
         if (isBoss(dead)) {
-            if (fought != null && dead.getServer() != null) {
+            if (fought != null && dead.level() instanceof ServerLevel world) {
                 for (UUID id : fought) {
-                    ServerPlayer p = dead.getServer().getPlayerList().getPlayer(id);
+                    ServerPlayer p = world.getServer().getPlayerList().getPlayer(id);
                     if (p != null) {
                         gain(p, BOSS_XP, false);
                     }

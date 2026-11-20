@@ -254,6 +254,8 @@ public final class CustomHeroServer implements HeroServer {
             CustomHeroes.syncState(player);
             // (3.18.1) a witch: a caster from before the levels is at level 5, her definition is made right for her level
             com.kolodkingal.enhanced.spellbook.WitchLevels.onLogin(player);
+        } else {
+            com.kolodkingal.enhanced.spellbook.WitchLevels.sync(player); // (no witch: the client forgets any level it knew)
         }
     }
 
