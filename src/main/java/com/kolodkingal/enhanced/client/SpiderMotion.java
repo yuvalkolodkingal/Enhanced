@@ -5,6 +5,7 @@ import com.kolodkingal.enhanced.ability.Raycasts;
 import com.kolodkingal.enhanced.ability.SpiderClimb;
 import com.kolodkingal.enhanced.ability.SpiderMath;
 import com.kolodkingal.enhanced.ability.SpiderServer;
+import com.kolodkingal.enhanced.mixin.client.LocalPlayerAccessor;
 import com.kolodkingal.enhanced.ability.SpiderWebs;
 import com.kolodkingal.enhanced.ability.SwingAssist;
 import com.kolodkingal.enhanced.ability.Teleports;
@@ -37,7 +38,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -88,8 +88,8 @@ public final class SpiderMotion {
 
     /** A prediction the server has not confirmed within this many ticks is dropped. */
     private static final int PREDICTION_TICKS = 12;
-    /** Vanilla sends the player's position when it moved further than this (squared) since the last one. */
-    private static final double VANILLA_SENDS = 2.0E-4;
+    /** Vanilla sends the player's position once its reminder counts up to this, moved or not. */
+    private static final int VANILLA_REMINDER = 20;
     /** A zip has arrived this near its stand point (blocks). */
     private static final double ARRIVE = 0.45;
     /** A zip the server has called arrived goes on this many ticks at most to get there. */
@@ -125,9 +125,6 @@ public final class SpiderMotion {
     private static LocalPlayer owner;
     private static Mode mode = Mode.NONE;
     private static boolean jumpWas;
-    /** Where the hero last was when the position was sent to the server (while he clings). */
-    @Nullable
-    private static Vec3 lastSent;
     /** A press of G, seen as it happened, to be acted on by the next tick of the player. */
     private static boolean pressedG;
     private static boolean pressedGSneaking;
@@ -454,33 +451,38 @@ public final class SpiderMotion {
             }
         }
         assistTick(mc, player, data, blocked || spellbound);
+        if (!SpiderMath.finite(player.getDeltaMovement())) {
+            // (Whatever went wrong, a velocity that is not a number never reaches his position, nor the server.)
+            mode = Mode.NONE;
+            surface = SpiderClimb.Surface.NONE;
+            player.setDeltaMovement(Vec3.ZERO);
+        }
+        if (mode == Mode.CLING) {
+            remindTheServer(player);
+        }
     }
 
     /**
      * A hero who hangs still sends no position to the server (vanilla sends one only when the player moves, or every
      * second). The server then lets its copy of him sag with gravity from the wall or the ceiling he hangs on, and does
-     * not see that he clings. So while he hangs, the position goes to the server every tick that vanilla would not send
-     * it.
+     * not see that he clings. So while he hangs, vanilla's own move packet of this tick (sent after the player's tick)
+     * is made to carry his position, by its reminder: never a packet of the mod's beside it. A second position in one
+     * tick is what the server of 26.x kicks for ("Invalid move player packet received"), and what 1.21.x counts as
+     * packets sent too often.
      */
+    private static void remindTheServer(LocalPlayer player) {
+        ((LocalPlayerAccessor) player).enhanced$setPositionReminder(VANILLA_REMINDER);
+    }
+
+    /** What he clings to goes to the server after each tick (his position goes with vanilla's packet: see the cling). */
     @Subscribe
     public static void onClientTickPost(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || player != owner || player.connection == null) {
-            lastSent = null;
             return;
         }
         tellTheServer(player);
-        if (mode != Mode.CLING) {
-            lastSent = null;
-            return;
-        }
-        Vec3 at = player.position();
-        if (lastSent == null || at.distanceToSqr(lastSent) > VANILLA_SENDS) {
-            lastSent = at; // (vanilla sent this one)
-        } else {
-            player.connection.send(new ServerboundMovePlayerPacket.Pos(at.x, at.y, at.z, player.onGround()));
-        }
     }
 
     /**

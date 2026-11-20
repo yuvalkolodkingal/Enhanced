@@ -1539,6 +1539,34 @@ public final class SpiderManTests {
         helper.succeed();
     }
 
+    /**
+     * (3.17.1) A step of the swing is always a number, whatever it is given: a rope of zero, a body on its anchor, an
+     * anchor or a velocity that is not a number. A position that is not a number gets the player kicked from a server
+     * ("Invalid move player packet received").
+     */
+    @EnhancedTest(template = ARENA, batch = QUICK)
+    public static void aSwingStepIsAlwaysANumber(GameTestHelper helper) {
+        Vec3 anchor = new Vec3(0, 20, 0);
+        Vec3 nan = new Vec3(Double.NaN, Double.NaN, Double.NaN);
+        Vec3 huge = new Vec3(Double.POSITIVE_INFINITY, 0, 0);
+        SpiderMath.Swing[] steps = {
+                SpiderMath.swingStep(anchor, Vec3.ZERO, anchor, 0.0, Vec3.ZERO, 0.06, 0.992, 1.8),
+                SpiderMath.swingStep(anchor.add(0, -3, 0), new Vec3(0, 3, 0), anchor, 0.0, Vec3.ZERO, 0.06, 0.992, 1.8),
+                SpiderMath.swingStep(anchor.add(0, -3, 0), Vec3.ZERO, anchor, -1.0, Vec3.ZERO, 0.06, 0.992, 1.8),
+                SpiderMath.swingStep(anchor.add(0, -3, 0), Vec3.ZERO, nan, 4.0, Vec3.ZERO, 0.06, 0.992, 1.8),
+                SpiderMath.swingStep(anchor.add(0, -3, 0), nan, anchor, 4.0, Vec3.ZERO, 0.06, 0.992, 1.8),
+                SpiderMath.swingStep(anchor.add(0, -3, 0), huge, anchor, Double.NaN, Vec3.ZERO, 0.06, 0.992, Double.NaN),
+                SpiderMath.swingStep(anchor.add(0, -3, 0), Vec3.ZERO, anchor, 4.0, nan, 0.06, 0.992, 1.8),
+        };
+        for (int i = 0; i < steps.length; i++) {
+            check(SpiderMath.finite(steps[i].position()) && SpiderMath.finite(steps[i].velocity()), "step " + i + " is a number: " + steps[i]);
+        }
+        check(steps[0].position().equals(anchor), "a body on its anchor stays there");
+        check(steps[1].position().distanceTo(anchor) < 1.0E-9, "a rope of zero holds him at the anchor");
+        check(!SpiderMath.finite(nan) && !SpiderMath.finite(huge) && SpiderMath.finite(anchor), "finite");
+        helper.succeed();
+    }
+
     @EnhancedTest(template = ARENA, batch = QUICK)
     public static void theKickCounterIsResetWhileHanging(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);

@@ -313,6 +313,11 @@ public final class ModItems {
     public static final ItemEntry<com.kolodkingal.enhanced.item.VibraniumShieldItem> VIBRANIUM_SHIELD =
             ITEMS.register("vibranium_shield", () -> new com.kolodkingal.enhanced.item.VibraniumShieldItem(
                     new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)
+                            //#if >=1.21.5
+                            //$$ // (From 1.21.5 a shield is a shield by its blocks_attacks component, not by its class: without
+                            //$$ // it the shield could not be raised, blocked nothing and was not thrown)
+                            //$$ .component(DataComponents.BLOCKS_ATTACKS, com.kolodkingal.enhanced.item.VibraniumShieldItem.blocking())
+                            //#endif
                             .component(DataComponents.UNBREAKABLE, new Unbreakable(false))));
     // ===== iron_man (3.8) =====
     /** The Arc Reactor (lane L3): Tony's desk in the tower; it makes you Iron Man and powers the classic suits. */

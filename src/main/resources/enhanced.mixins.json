@@ -26,6 +26,7 @@
     "client.ItemInHandRendererAccessor",
     "client.LevelRendererMixin",
     "client.LivingEntityRendererMixin",
+    "client.LocalPlayerAccessor",
     "client.MinecraftAccessor",
     "client.MinecraftMixin",
     "client.MultiPlayerGameModeAccessor",

@@ -134,10 +134,21 @@ public final class SpiderMath {
         Vec3 candidate = position.add(next);
         Vec3 away = candidate.subtract(anchor);
         double length = away.length();
-        if (length > rope) {
-            candidate = anchor.add(away.scale(rope / length));
+        if (length > rope && length > 1.0E-9) {
+            candidate = anchor.add(away.scale(Math.max(0.0, rope) / length));
         }
-        return new Swing(candidate, candidate.subtract(position));
+        Vec3 step = candidate.subtract(position);
+        // (A step that is not a number, from a bad anchor, rope or config value, would become his position and the server
+        // kicks a player whose position is not a number: he hangs still instead.)
+        return finite(candidate) && finite(step) ? new Swing(candidate, step) : new Swing(position, Vec3.ZERO);
+    }
+
+    /**
+     * Whether every part of {@code v} is a finite number. A velocity that is not becomes the player's position, and a
+     * position that is not a number gets him kicked from a server ("Invalid move player packet received").
+     */
+    public static boolean finite(Vec3 v) {
+        return Double.isFinite(v.x) && Double.isFinite(v.y) && Double.isFinite(v.z);
     }
 
     /** The speed he keeps when he lets go of a swing: his velocity, a little more if he jumped, never past the cap. */

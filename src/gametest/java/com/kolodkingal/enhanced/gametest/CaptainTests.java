@@ -232,6 +232,28 @@ public final class CaptainTests {
         helper.succeed();
     }
 
+    /**
+     * (3.17.1) The Vibranium Shield is a shield as the game sees it: the use key raises it (a blocking use, as long as it
+     * is held), the throw takes it, and raised it guards him. From 1.21.5 that needs its blocks_attacks component: without
+     * it the shield could not be raised and "You need a shield in your hand" was all R did.
+     */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theUseKeyRaisesTheVibraniumShield(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer cap = cap(f, 6.5, 10.5);
+        ItemStack shield = cap.getItemInHand(InteractionHand.OFF_HAND);
+        check(shield.is(ModItems.VIBRANIUM_SHIELD.get()), "he holds it");
+        check(ShieldRules.isShield(shield), "a shield to the game (what the throw asks)");
+        check(ShieldRules.shieldHand(cap) == InteractionHand.OFF_HAND, "the throw takes it from the off hand");
+        cap.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        shield.use(helper.getLevel(), cap, InteractionHand.OFF_HAND);
+        check(cap.isUsingItem() && cap.getUsedItemHand() == InteractionHand.OFF_HAND, "the use key raises it");
+        check(cap.getUseItem().getUseDuration(cap) >= 72000, "held up as long as the key is");
+        check(ShieldRules.guarding(cap), "raised, it guards him at once");
+        cap.stopUsingItem();
+        helper.succeed();
+    }
+
     /** From behind, the shield takes nothing (only his Resistance cuts the blow). */
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theShieldNeverBlocksFromBehind(GameTestHelper helper) {
