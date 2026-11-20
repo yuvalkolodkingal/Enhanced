@@ -67,6 +67,7 @@ public class Enhanced {
         NeoRegistrars.register(ModCreativeTab.TABS, modBus);
         // 3.8: the beams of Iron Man's suits and Love's eyes (their styles, by id, on both sides).
         com.kolodkingal.enhanced.beam.AvengersBeams.init();
+        com.kolodkingal.enhanced.ability.CosmicSpider.init(); // (3.18: Cosmic Spider-Man's beam styles)
         // Port P0: the messages are declared on the platform's channels; NeoSetup registers them.
         ModNetwork.register();
         com.kolodkingal.enhanced.network.SpeedNetwork.register();

@@ -206,6 +206,25 @@ public final class SpiderServer implements HeroServer {
         return mask;
     }
 
+    /**
+     * (3.18) What stops his cosmic keys: the same holds as {@link #blocked}, but his own cosmic flight is not one (a cosmic
+     * Spider-Man flies; webs, zips and the cling still end in the air).
+     */
+    static boolean cosmicBlocked(ServerPlayer player, PowerData data) {
+        return player.hasEffect(ModEffects.SPELLBOUND) || player.isSpectator() || player.isPassenger() || MjolnirPin.isPinned(player)
+                || Telekinesis.isHeld(player) || player.hasEffect(ModEffects.ENTOMBED) || data.is(Live.LIFTED) || player.isFallFlying();
+    }
+
+    /** (3.18) He has become cosmic: the Black Eyes calm (no crash), Instant Kill ends. */
+    static void cosmicBegins(ServerPlayer player, PowerData data) {
+        SpiderState state = STATES.get(player.getUUID());
+        long now = player.serverLevel().getGameTime();
+        if (state != null && data.is(Live.BLACK_EYES)) {
+            endEyes(player, data, state, now, true, false);
+        }
+        endKill(player, data, now);
+    }
+
     /** Whether the hero cannot act, and every web, zip and swing he had ends. */
     public static boolean blocked(ServerPlayer player, PowerData data) {
         return blockers(player, data) != 0;
@@ -289,6 +308,10 @@ public final class SpiderServer implements HeroServer {
             if (state != null && state.swing != null) {
                 endSwing(player, data, state, 5);
             }
+            return;
+        }
+        // (3.18) Sneak + N becomes Cosmic Spider-Man; while he is, R, B and N are the cosmic keys.
+        if (CosmicSpider.onKey(player, data, ability, down, alt, cosmicBlocked(player, data))) {
             return;
         }
         if (!down) {
@@ -383,6 +406,13 @@ public final class SpiderServer implements HeroServer {
         } else if (spider && !IRON_SPIDER.equals(look)) {
             armor = SpiderConfig.HOMEMADE_ARMOR.get();
         }
+        if (CosmicSpider.isCosmic(data) && CosmicSpider.hasMeter(data)) {
+            // (3.18) the Enigma Force: a full netherite set's protection, in place of his suit's
+            armor = com.kolodkingal.enhanced.config.CosmicSpiderConfig.ARMOR.get();
+            toughness = com.kolodkingal.enhanced.config.CosmicSpiderConfig.TOUGHNESS.get();
+            knockback = com.kolodkingal.enhanced.config.CosmicSpiderConfig.KNOCKBACK_RESISTANCE.get();
+        }
+        CosmicSpider.applyBody(player, data, body, scale);
         PowerTicker.setModifier(player, Attributes.ARMOR, SUIT_ARMOR, armor, armor != 0.0);
         PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, SUIT_TOUGHNESS, toughness, toughness != 0.0);
         PowerTicker.setModifier(player, Attributes.KNOCKBACK_RESISTANCE, SUIT_KNOCKBACK, knockback, knockback != 0.0);
@@ -439,6 +469,9 @@ public final class SpiderServer implements HeroServer {
         if (data.has(HeroAbility.SPIDER_BLACK_EYES)) {
             eyesTick(player, data, state, now);
         }
+
+        // (3.18) the cosmic meter, and the cosmic body's upkeep
+        CosmicSpider.tick(player, data, now);
 
         boolean casting = now < state.castUntil;
         if (data.power() == Power.SPIDER_MAN || casting != state.casting) {
@@ -1554,8 +1587,10 @@ public final class SpiderServer implements HeroServer {
         if (!data.toggle(Toggle.SPIDER_SENSE) || now < state.nextScan) {
             return;
         }
-        boolean surge = data.is(Live.BLACK_EYES);
-        double factor = surge ? SpiderConfig.BLACK_EYES_SENSE_FACTOR.get() : 1.0;
+        // (3.18) cosmic, his sense is wider still, and lists every hostile as the surge's does
+        double cosmic = CosmicSpider.senseFactor(data);
+        boolean surge = data.is(Live.BLACK_EYES) || cosmic > 1.0;
+        double factor = Math.max(data.is(Live.BLACK_EYES) ? SpiderConfig.BLACK_EYES_SENSE_FACTOR.get() : 1.0, cosmic);
         state.nextScan = now + (surge ? Math.max(1, Math.min(2, SpiderConfig.SPIDER_SENSE_INTERVAL.get())) : SpiderConfig.SPIDER_SENSE_INTERVAL.get());
         List<SpiderSense.Threat> fresh = SpiderSense.scan(player, state, SpiderConfig.SPIDER_SENSE_RANGE.get() * factor, factor, surge);
         if (!fresh.isEmpty()) {
@@ -1626,6 +1661,7 @@ public final class SpiderServer implements HeroServer {
         // (His body is taken off by applyBody, which follows with the new power; his webs stand until their own tick.)
         end(player, data, true);
         data.set(Live.CASTING, false);
+        CosmicSpider.endQuietly(player, data);
     }
 
     @Override
@@ -1639,6 +1675,11 @@ public final class SpiderServer implements HeroServer {
         if (isSpiderMan(player)) {
             end(player, Powers.get(player), true);
         }
+        // (3.18) the cosmic state is never saved: he comes back plain, his meter as it was
+        if (CosmicSpider.isCosmic(Powers.get(player))) {
+            CosmicSpider.endQuietly(player, Powers.get(player));
+        }
+        CosmicSpider.forget(player.getUUID());
     }
 
     @Override
@@ -1653,10 +1694,14 @@ public final class SpiderServer implements HeroServer {
         if (isSpiderMan(player)) {
             end(player, Powers.get(player), true);
         }
+        if (CosmicSpider.isCosmic(Powers.get(player))) {
+            CosmicSpider.endQuietly(player, Powers.get(player));
+        }
     }
 
     @Override
     public void onServerStopped() {
         STATES.clear();
+        CosmicSpider.clear();
     }
 }

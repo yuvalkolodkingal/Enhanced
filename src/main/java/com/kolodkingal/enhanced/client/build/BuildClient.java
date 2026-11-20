@@ -214,6 +214,9 @@ public final class BuildClient {
      */
     public static Power hero(Player player) {
         PowerData data = Powers.get(player);
+        if (data.power() == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data)) {
+            return Power.BILLY; // (3.18: Cosmic Spider-Man's Matter Restructuring is Billy's Build Magic, weaker)
+        }
         if (data.power() == Power.CUSTOM && data.has(HeroAbility.WANDA_BUILD_MAGIC)) {
             return Power.SCARLET_WITCH; // (3.5: the Scarlet Witch's Build Magic, her looks and her Instant)
         }

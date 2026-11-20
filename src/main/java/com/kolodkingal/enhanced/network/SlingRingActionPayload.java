@@ -19,6 +19,8 @@ public record SlingRingActionPayload(int action, int index, String name) impleme
     public static final int TRAVEL = 1;
     public static final int SAVE = 2;
     public static final int FORGET = 3;
+    /** (3.18) Cosmic Spider-Man's portal screen: a portal to the world {@code index} of {@code CosmicSpider.WORLDS}. */
+    public static final int WORLD = 4;
 
     public static final Type<SlingRingActionPayload> TYPE = new Type<>(Enhanced.id("sling_ring_action"));
 

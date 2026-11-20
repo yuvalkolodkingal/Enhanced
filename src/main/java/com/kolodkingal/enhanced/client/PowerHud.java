@@ -240,6 +240,10 @@ public class PowerHud implements LayeredDraw.Layer {
         if ((ability == 1 || ability == 5) && com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
             return "ability.enhanced.vision.solar." + ability;
         }
+        // (3.18) Cosmic Spider-Man's own R, B and N
+        if ((ability == 1 || ability == 4 || ability == 5) && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data)) {
+            return "ability.enhanced.spider_man.cosmic." + ability;
+        }
         return power.abilityKey(ability);
     }
 

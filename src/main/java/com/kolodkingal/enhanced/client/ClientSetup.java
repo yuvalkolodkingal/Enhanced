@@ -101,6 +101,9 @@ public final class ClientSetup {
             // ===== cyclops (3.3) =====
             BeamRenderer.registerDrawer(RubyQuartzGlassesItem.OPTIC, CyclopsBeamFx.OPTIC);
             BeamRenderer.registerDrawer(RubyQuartzGlassesItem.UNLEASHED, CyclopsBeamFx.UNLEASHED);
+            // (3.18) Cosmic Spider-Man's eyes: two straight beams, drawn as Love's in his white-blue
+            BeamRenderer.registerDrawer(com.kolodkingal.enhanced.ability.CosmicSpider.EYES,
+                    com.kolodkingal.enhanced.client.love.LoveEyeBeamFx.DRAWER);
             // ===== odin (3.5) =====
             com.kolodkingal.enhanced.client.render.OdinClient.setup();
             // ===== 3.6: each lane registers its effects' drawers here (StoneFx, StrangeFx, HulkFx, HydraFx) =====

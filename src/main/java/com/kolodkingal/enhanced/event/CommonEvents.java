@@ -252,6 +252,10 @@ public final class CommonEvents {
             event.setCanceled(true);
             return;
         }
+        // (3.18) Cosmic Spider-Man is pure life force: dark magic hurts him more.
+        if (com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(player)) {
+            event.setAmount(com.kolodkingal.enhanced.ability.CosmicSpider.onIncomingDamage(player, source, event.getAmount()));
+        }
         if (source.is(DamageTypeTags.IS_FREEZING) && LokiAbilities.isFrostGiant(player)) {
             // A Frost Giant is made of the cold.
             event.setCanceled(true);

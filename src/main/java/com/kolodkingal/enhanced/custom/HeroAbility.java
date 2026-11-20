@@ -140,7 +140,7 @@ public enum HeroAbility implements CatalogEntry {
             .fixed().res(Resource.WALL).family(Family.WALL).on(d -> d.toggle(Toggle.WALL_CRAWL))),
     SPIDER_LEGS(Power.SPIDER_MAN, 4, "legs", toggle().alt(Act.PRESS).cost(2).group(Group.BODY).icon("minecraft:chain")
             .traits(Trait.IRON_LEGS).on(d -> d.toggle(Toggle.SPIDER_LEGS))),
-    SPIDER_BLACK_EYES(Power.SPIDER_MAN, 5, "black_eyes", toggle().cost(2).group(Group.BODY).icon("minecraft:black_dye")
+    SPIDER_BLACK_EYES(Power.SPIDER_MAN, 5, "black_eyes", toggle().alt(Act.TOGGLE).cost(2).group(Group.BODY).icon("minecraft:black_dye")
             .on(d -> d.is(Live.BLACK_EYES))),
     SPIDER_BODY(Power.SPIDER_MAN, 0, "body", body().cost(1).group(Group.BODY).icon("minecraft:rabbit_hide").family(Family.BODY)),
 
@@ -615,7 +615,16 @@ public enum HeroAbility implements CatalogEntry {
             .icon("minecraft:enchanted_golden_apple").fixed().traits(Trait.HEALING_FACTOR)),
     /** Jim Hammond's android body heals five times as fast as a player's. */
     JIM_FAST_HEALING(Power.JIM_HAMMOND, 0, "fast_healing", body().cost(1).group(Group.BODY).icon("minecraft:glistering_melon_slice")
-            .fixed());
+            .fixed()),
+
+    // ===== cosmic spider-man (3.18): appended =====
+    // (After the passives, so no row before it moves: the ids are saved, not the ordinals.)
+    /**
+     * Sneak + the Black Eyes' key: Cosmic Spider-Man, when the cosmic meter is full (CosmicSpider). For a custom hero the
+     * cosmic body: the meter, the strength, the netherite protection, the flight, the healing and the weakness to dark magic.
+     */
+    SPIDER_COSMIC(SPIDER_BLACK_EYES, "cosmic", variant(SPIDER_BLACK_EYES).cost(3).icon("minecraft:nether_star")
+            .on(d -> d.is(Live.SPIDER_COSMIC)));
 
     /** The table's short names of how a Sneak variant acts (the generic modules' kinds). */
     private static final class Act {

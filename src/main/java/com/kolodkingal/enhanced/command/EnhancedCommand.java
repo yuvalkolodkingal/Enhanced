@@ -104,6 +104,11 @@ public final class EnhancedCommand {
                         .then(Commands.argument("players", EntityArgument.players())
                                 .then(Commands.literal("own").executes(ctx -> skin(ctx, true)))
                                 .then(Commands.literal("suit").executes(ctx -> skin(ctx, false)))))
+                // (3.18) Cosmic Spider-Man's meter, set by an operator
+                .then(Commands.literal("cosmic")
+                        .then(Commands.argument("players", EntityArgument.players())
+                                .then(Commands.argument("energy", IntegerArgumentType.integer(0, 10000))
+                                        .executes(EnhancedCommand::cosmic))))
                 // (3.16) SMP Balance Mode: how strong every power is, for everyone on the server
                 .then(com.kolodkingal.enhanced.balance.BalanceCommand.node())
                 // 3.17: every server setting, read and changed from inside the game
@@ -200,6 +205,23 @@ public final class EnhancedCommand {
         }
         int n = changed;
         ctx.getSource().sendSuccess(() -> Component.translatable(own ? "commands.enhanced.skin.own" : "commands.enhanced.skin.suit", n), true);
+        return changed;
+    }
+
+    /** (3.18) Sets the cosmic meter of every Spider-Man among the players (clamped to the meter). */
+    private static int cosmic(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        int energy = IntegerArgumentType.getInteger(ctx, "energy");
+        int changed = 0;
+        for (ServerPlayer player : EntityArgument.getPlayers(ctx, "players")) {
+            com.kolodkingal.enhanced.power.PowerData data = Powers.get(player);
+            if (com.kolodkingal.enhanced.ability.CosmicSpider.hasMeter(data)) {
+                com.kolodkingal.enhanced.ability.CosmicSpider.setEnergy(player, data, energy);
+                Powers.syncIfDirty(player);
+                changed++;
+            }
+        }
+        int n = changed;
+        ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.cosmic.set", n, energy), true);
         return changed;
     }
 

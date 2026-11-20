@@ -266,6 +266,9 @@ public final class SpiderConfig {
         BLACK_EYES_SENSE_FACTOR = builder.comment("How much the Black Eyes widen his spider-sense (and how much faster it scans).")
                 .defineInRange("blackEyesSenseFactor", 2.0, 1.0, 4.0);
 
+        // (3.18) Cosmic Spider-Man: [spider_man.cosmic]
+        CosmicSpiderConfig.define(builder);
+
         builder.pop();
     }
 

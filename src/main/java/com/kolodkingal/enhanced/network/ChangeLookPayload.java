@@ -29,6 +29,11 @@ public record ChangeLookPayload(int step) implements CustomPacketPayload {
 
     static void handle(ChangeLookPayload payload, PacketContext context) {
         if (context.player() instanceof ServerPlayer player && player.isAlive() && !player.isSpectator()) {
+            // (3.18) cosmic, H switches between his two cosmic looks
+            if (com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(Powers.get(player))) {
+                com.kolodkingal.enhanced.ability.CosmicSpider.switchLook(player, Powers.get(player));
+                return;
+            }
             if (Powers.power(player) == com.kolodkingal.enhanced.power.Power.IRON_MAN) {
                 com.kolodkingal.enhanced.ironman.IronSuits.onSuitKey(player, payload.step() < 0 ? -1 : 1);
                 return;

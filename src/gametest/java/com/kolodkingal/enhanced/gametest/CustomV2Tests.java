@@ -208,9 +208,9 @@ public final class CustomV2Tests {
             check(ids.add(a.id()), "ids are unique: " + a.id());
             check(HeroAbility.byId(a.id()) == a && Catalog.byId(a.id().toUpperCase()) == a, a + " is found by its id");
             if (a == HeroAbility.MAGNETO_MAGNETIC_PULL || a == HeroAbility.VISION_MIND_PALACE
-                    || a == HeroAbility.WANDA_STONE_BEARER) {
+                    || a == HeroAbility.WANDA_STONE_BEARER || a == HeroAbility.SPIDER_COSMIC) {
                 // (3.5: the creator lane's region of variant rows, appended after the rest, has its own order;
-                // 3.12: so does each region appended after it; 3.17: the passives)
+                // 3.12: so does each region appended after it; 3.17: the passives; 3.18: Cosmic Spider-Man)
                 lastHero = -1;
             }
             check(a.hero.ordinal() >= lastHero, a + " sits in its hero's region, in the order of the heroes");
@@ -235,11 +235,11 @@ public final class CustomV2Tests {
                 check((row != null) != (key == p.flightAbility()), p + " key " + key + " is a row or the flight key, never both");
             }
         }
-        check(HeroAbility.values().length == 245,
+        check(HeroAbility.values().length == 246,
                 "71 keys + 9 bodies (L2: Vision's) + Build Magic, 3.5's 15 keys + 3 bodies, the creator lane's 33 "
                 + "variant rows + the Scarlet Witch's Build Magic, 3.6's 10 keys + 2 bodies + 9 variant rows, and "
                 + "3.7's 10 keys + 2 bodies + 10 variant rows (Wolverine, Deadpool), and 3.8's 22 keys + 5 bodies + 18"
-                + " variant rows (Captain America, Red Hulk, Iron Man, Falcon, Love), 3.12's Mind Palace, 3.17's Jim Hammond (7 rows) and 3.17's 16 passives: " + HeroAbility.values().length);
+                + " variant rows (Captain America, Red Hulk, Iron Man, Falcon, Love), 3.12's Mind Palace, 3.17's Jim Hammond (7 rows), 3.17's 16 passives and 3.18's Cosmic Spider-Man: " + HeroAbility.values().length);
         check(Catalog.all().size()
                 == PowerModule.values().length + HeroAbility.values().length + StoneRow.values().length,
                 "the catalogue is the three lists (3.6: the stone rows)");

@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.EnhancedConfig;
+import com.kolodkingal.enhanced.ability.CosmicSpider;
 import com.kolodkingal.enhanced.ability.SpiderClimb;
 import com.kolodkingal.enhanced.ability.SpiderServer;
 import com.kolodkingal.enhanced.client.SpiderMotion;
@@ -40,7 +41,8 @@ import java.util.Locale;
  * lines of his own in {@link GestureRoutes} and the methods below; what the client adds (the key press that acts before
  * the server answers, the zip his own movement begins, the landing, the push off a wall and the grab of one, his hands
  * in first person, the flourishes of his gestures) is {@link SpiderActing}, with {@link SpiderEdges} for the rules and
- * {@link SpiderGestureFx} for the flourishes. He does not fly, so he has no flight profile; his walk and sprint have a
+ * {@link SpiderGestureFx} for the flourishes. Plain, he does not fly; as Cosmic Spider-Man (3.18) he does, with the
+ * profile {@code FlightProfile.COSMIC_SPIDER} and {@link CosmicSpiderFx}'s trail and aura; his walk and sprint have a
  * character of their own in {@code RunPoses}.
  */
 public final class SpiderClient implements HeroClient {
@@ -83,6 +85,28 @@ public final class SpiderClient implements HeroClient {
     @Nullable
     @Override
     public Component hudStatus(LocalPlayer player, PowerData data, int ability, long now) {
+        if (CosmicSpider.isCosmic(data)) {
+            // (3.18) the cosmic keys: R and B say what they do while they do it; N says he is cosmic
+            switch (ability) {
+                case 1 -> {
+                    return data.is(Live.BEAMING) ? Component.translatable("hud.enhanced.cosmic_spider.firing").withStyle(ChatFormatting.AQUA) : null;
+                }
+                case 4 -> {
+                    return Component.translatable("hud.enhanced.cosmic_spider.portals").withStyle(ChatFormatting.DARK_AQUA);
+                }
+                case 5 -> {
+                    return Component.translatable("hud.enhanced.cosmic_spider.cosmic", (int) Math.ceil(CosmicSpider.energy(data)),
+                                    Component.translatable(CosmicSpider.universe(data) ? "hud.enhanced.cosmic_spider.look.universe"
+                                            : "hud.enhanced.cosmic_spider.look.starfield"))
+                            .withStyle(s -> s.withColor(CosmicSpider.AURA).withBold(true));
+                }
+                default -> {
+                }
+            }
+        }
+        if (ability == 5 && !data.is(Live.BLACK_EYES) && data.cooldownUntil(5) <= now && CosmicSpider.full(data) && CosmicSpider.enabled()) {
+            return Component.translatable("hud.enhanced.cosmic_spider.ready").withStyle(s -> s.withColor(CosmicSpider.AURA));
+        }
         return switch (ability) {
             case 1 -> {
                 long left = data.cooldownUntil(1) - now;
@@ -151,6 +175,33 @@ public final class SpiderClient implements HeroClient {
      */
     static boolean scattered() {
         return missingArmour >= STRIPPED_TICKS;
+    }
+
+    // ---- (3.18) Cosmic Spider-Man: the eyes, the flight and the aura ----
+
+    /** Cosmic, his lenses blaze white. */
+    @Nullable
+    @Override
+    public net.minecraft.client.renderer.RenderType eyes(AbstractClientPlayer player, PowerData data) {
+        return CosmicSpider.isCosmic(data) ? CosmicSpiderFx.eyes(CosmicSpider.universe(data)) : null;
+    }
+
+    @Nullable
+    @Override
+    public GestureId takeoffGesture() {
+        return GestureId.TAKEOFF_VISION;
+    }
+
+    @Override
+    public void flightParticles(ClientLevel level, AbstractClientPlayer player, HeroAnimState st, FlightEffects.Fx fx, float density,
+                                boolean local) {
+        CosmicSpiderFx.flightParticles(level, player, st, fx, density);
+    }
+
+    @Override
+    public void flightRibbons(org.joml.Matrix4f pose, com.mojang.blaze3d.vertex.VertexConsumer vc, net.minecraft.world.phys.Vec3 camera,
+                              AbstractClientPlayer player, HeroAnimState st, FlightEffects.Fx fx, float time) {
+        CosmicSpiderFx.flightRibbons(pose, vc, camera, player, st, fx, time);
     }
 
     // ---- the animation: which stances are on, and what they add to the body ----
@@ -230,6 +281,8 @@ public final class SpiderClient implements HeroClient {
             case SENSING -> GestureId.SPIDER_ALERT_START;
             case BLACK_EYES -> GestureId.SPIDER_SURGE_ON;
             case INSTANT_KILL -> GestureId.SPIDER_KILL_ON;
+            // (3.18) the Enigma Force surges into him: the surge's hunched gathering, then he straightens in the light
+            case SPIDER_COSMIC -> GestureId.SPIDER_SURGE_ON;
             default -> null;
         };
     }
@@ -263,6 +316,7 @@ public final class SpiderClient implements HeroClient {
         }
         SpiderEffects.tick(level);
         SpiderGestureFx.tick(level);
+        CosmicSpiderFx.tick(level);
         SpiderSenseClient.tick(mc);
         if (level.getGameTime() % 100 == 0) {
             SpiderLegsLayer.prune(level);

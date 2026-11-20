@@ -169,7 +169,7 @@ public final class SlingPortals {
     }
 
     /** Whether a ring has room to stand at {@code feet}: its centre is not inside a block. */
-    static boolean roomFor(ServerLevel level, Vec3 feet) {
+    public static boolean roomFor(ServerLevel level, Vec3 feet) {
         BlockPos c = BlockPos.containing(feet.add(0, SlingPortalEntity.CENTER_UP, 0));
         return level.getBlockState(c).getCollisionShape(level, c).isEmpty();
     }
@@ -180,13 +180,18 @@ public final class SlingPortals {
      */
     public static Pair open(ServerPlayer owner, ServerLevel nearLevel, Vec3 nearFeet, float nearYaw, ServerLevel farLevel,
                             Vec3 farFeet, float farYaw) {
+        // (3.16) a custom hero's colour
+        return open(owner, nearLevel, nearFeet, nearYaw, farLevel, farFeet, farYaw, AbilityColors.chosen(owner, HeroAbility.STRANGE_PORTAL));
+    }
+
+    /** As above, in {@code tint} (an RGB the orange is recoloured to, or -1 for the orange; 3.18: Cosmic Spider-Man's white-blue). */
+    public static Pair open(ServerPlayer owner, ServerLevel nearLevel, Vec3 nearFeet, float nearYaw, ServerLevel farLevel,
+                            Vec3 farFeet, float farYaw, int tint) {
         closeOwnedBy(owner.server, owner.getUUID());
         int life = ticks();
         UUID id = UUID.randomUUID();
         SlingPortalEntity near = ring(nearLevel, nearFeet, nearYaw, life, id);
         SlingPortalEntity far = ring(farLevel, farFeet, farYaw, life, id);
-        // (3.16) a custom hero's colour
-        int tint = AbilityColors.chosen(owner, HeroAbility.STRANGE_PORTAL);
         near.setTint(tint);
         far.setTint(tint);
         ChunkPos chunk = new ChunkPos(BlockPos.containing(farFeet));

@@ -205,9 +205,9 @@ public final class AvengersSkeletonTests {
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTwelve(GameTestHelper helper) {
         check(ModNetwork.PROTOCOL_VERSION.equals("17"), "protocol 17 (3.17's settings changed in the game)");
-        check(Live.values().length == 85 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 5 (3.17 Jim) = 85: "
+        check(Live.values().length == 86 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 5 (3.17 Jim) + 1 (3.18 Cosmic Spider-Man) = 86: "
                 + Live.values().length);
-        check(Toggle.values().length == 24 && Toggle.values().length <= 32, "Toggle: 22 + 2 = 24: "
+        check(Toggle.values().length == 25 && Toggle.values().length <= 32, "Toggle: 22 + 2 + 1 (3.18 Cosmic Spider-Man's look) = 25: "
                 + Toggle.values().length);
         check(Live.CAP_CHARGING.ordinal() == 58 && Live.RED_HULK_TRANSFORMING.ordinal() == 60
                 && Live.IRON_SUITING.ordinal() == 66 && Live.FALCON_GLIDING.ordinal() == 74,
@@ -339,8 +339,8 @@ public final class AvengersSkeletonTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theRowsAre221(GameTestHelper helper) throws IOException {
-        check(HeroAbility.values().length == 245, "176 + 27 + 18 rows, 3.12's Mind Palace, 3.17's Jim Hammond (7) and 3.17's 16"
-                + " passives: " + HeroAbility.values().length);
+        check(HeroAbility.values().length == 246, "176 + 27 + 18 rows, 3.12's Mind Palace, 3.17's Jim Hammond (7), 3.17's 16"
+                + " passives and 3.18's Cosmic Spider-Man: " + HeroAbility.values().length);
         check(HeroAbility.values()[HeroAbility.CAPTAIN_SHIELD_THROW.ordinal() - 1] == HeroAbility.DEADPOOL_BODY,
                 "Captain America after Deadpool");
         check(HeroAbility.values()[HeroAbility.CAPTAIN_RICOCHET.ordinal() - 1] == HeroAbility.DEADPOOL_SMOKE,
@@ -348,7 +348,9 @@ public final class AvengersSkeletonTests {
         check(HeroAbility.values()[HeroAbility.VISION_MIND_PALACE.ordinal() - 1] == HeroAbility.LOVE_BIFROST_LOOK,
                 "and they come last (but for the regions appended after them)");
         check(HeroAbility.values()[HeroAbility.WANDA_STONE_BEARER.ordinal() - 1] == HeroAbility.VISION_MIND_PALACE, "3.12 appends");
-        for (int i = HeroAbility.WANDA_STONE_BEARER.ordinal(); i < HeroAbility.values().length; i++) {
+        check(HeroAbility.values()[HeroAbility.SPIDER_COSMIC.ordinal() - 1] == HeroAbility.JIM_FAST_HEALING
+                && HeroAbility.SPIDER_COSMIC.ordinal() == HeroAbility.values().length - 1, "3.18 appends Cosmic Spider-Man after the passives");
+        for (int i = HeroAbility.WANDA_STONE_BEARER.ordinal(); i < HeroAbility.SPIDER_COSMIC.ordinal(); i++) {
             HeroAbility pick = HeroAbility.values()[i];
             // (the Scarlet Witch has no body row: her Stone-Bearer pick is the only passive of hers)
             check(pick.passive() && !pick.isVariant()

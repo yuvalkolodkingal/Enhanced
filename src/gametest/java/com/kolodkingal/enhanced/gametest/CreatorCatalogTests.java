@@ -102,7 +102,8 @@ public final class CreatorCatalogTests {
         hero(Power.SPIDER_MAN, "Web Shot", "spider.web", "Web Burst", "spider.web_burst",
                 "web zip and Web Assist (J)", "spider.zip", "web swing", "spider.web_swing",
                 "wall crawling", "spider.crawl", "Spider-Sense", "spider.sense", "Iron Spider legs", "spider.legs",
-                "Instant Kill", "spider.instant_kill", "Black Eyes", "spider.black_eyes", "spider body", "spider.body");
+                "Instant Kill", "spider.instant_kill", "Black Eyes", "spider.black_eyes", "spider body", "spider.body",
+                "Cosmic Spider-Man (3.18)", "spider.cosmic");
         hero(Power.THANOS, "Power Stone blast", "thanos.power", "Titan Slam", "thanos.titan_slam",
                 "Space Stone step", "thanos.space", "Space Pull", "thanos.space_pull",
                 "Reality Stone transmute", "thanos.reality", "Reality Veil", "thanos.reality_veil",

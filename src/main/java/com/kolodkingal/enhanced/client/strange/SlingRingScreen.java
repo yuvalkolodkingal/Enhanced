@@ -45,13 +45,34 @@ public class SlingRingScreen extends Screen {
     private boolean shownReady;
     private String typed = "";
     private EditBox nameBox;
+    /** (3.18) Cosmic Spider-Man's portal screen: the same places, no ring, a row of worlds, in white and blue. */
+    private final boolean cosmic;
 
     public SlingRingScreen() {
-        super(Component.translatable("screen.enhanced.sling_ring.title"));
+        this(false);
+    }
+
+    private SlingRingScreen(boolean cosmic) {
+        super(Component.translatable(cosmic ? "screen.enhanced.cosmic_portals.title" : "screen.enhanced.sling_ring.title"));
+        this.cosmic = cosmic;
     }
 
     public static void open() {
         Minecraft.getInstance().setScreen(new SlingRingScreen());
+    }
+
+    /** (3.18) Cosmic Spider-Man's B. */
+    public static void openCosmic() {
+        Minecraft.getInstance().setScreen(new SlingRingScreen(true));
+    }
+
+    /** The space under the list: the cosmic screen has its row of worlds there too. */
+    private int bottom() {
+        return cosmic ? BOTTOM + 24 : BOTTOM;
+    }
+
+    private int accent() {
+        return cosmic ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA : StrangeAbilities.ORANGE;
     }
 
     private static BifrostData data() {
@@ -59,13 +80,13 @@ public class SlingRingScreen extends Screen {
         return player == null ? BifrostData.EMPTY : PlaceBook.Kind.SLING_RING.data(player);
     }
 
-    private static boolean ready() {
+    private boolean ready() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return player != null && PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING) == 0;
+        return player != null && (cosmic || PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING) == 0);
     }
 
     private int perPage() {
-        return Math.max(1, (height - BOTTOM - LIST_TOP) / ROW);
+        return Math.max(1, (height - bottom() - LIST_TOP) / ROW);
     }
 
     @Override
@@ -102,11 +123,31 @@ public class SlingRingScreen extends Screen {
             addRenderableWidget(Button.builder(Component.literal("<"), b -> {
                 page = (page + pages - 1) % pages;
                 rebuildWidgets();
-            }).bounds(left, height - BOTTOM + 2, 20, 20).build());
+            }).bounds(left, height - bottom() + 2, 20, 20).build());
             addRenderableWidget(Button.builder(Component.literal(">"), b -> {
                 page = (page + 1) % pages;
                 rebuildWidgets();
-            }).bounds(left + WIDTH - 20, height - BOTTOM + 2, 20, 20).build());
+            }).bounds(left + WIDTH - 20, height - bottom() + 2, 20, 20).build());
+        }
+        if (cosmic) {
+            // (3.18) the worlds: a portal to each of the others
+            LocalPlayer player = Minecraft.getInstance().player;
+            List<ResourceKey<Level>> worlds = com.kolodkingal.enhanced.ability.CosmicSpider.WORLDS;
+            int w = (WIDTH - 4 * (worlds.size() - 1)) / worlds.size();
+            for (int i = 0; i < worlds.size(); i++) {
+                int index = i;
+                ResourceKey<Level> world = worlds.get(i);
+                Button button = Button.builder(dimensionName(world).copy().withStyle(s -> s.withColor(accent())), b -> {
+                            send(SlingRingActionPayload.WORLD, index, "");
+                            onClose();
+                        })
+                        .bounds(left + i * (w + 4), height - 98, w, 20)
+                        .tooltip(Tooltip.create(Component.translatable("screen.enhanced.cosmic_portals.world",
+                                dimensionName(world))))
+                        .build();
+                button.active = player == null || player.level().dimension() != world;
+                addRenderableWidget(button);
+            }
         }
         nameBox = new EditBox(font, left, height - 74, WIDTH, 20, Component.translatable("screen.enhanced.sling_ring.name"));
         nameBox.setMaxLength(BifrostData.MAX_NAME_LENGTH);
@@ -165,7 +206,8 @@ public class SlingRingScreen extends Screen {
     @Override
     public void tick() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || !player.isAlive() || !SlingRingActions.carries(player)) {
+        if (player == null || !player.isAlive() || (cosmic ? !com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(
+                com.kolodkingal.enhanced.power.Powers.get(player)) : !SlingRingActions.carries(player))) {
             onClose();
             return;
         }
@@ -185,15 +227,16 @@ public class SlingRingScreen extends Screen {
         LocalPlayer player = Minecraft.getInstance().player;
         float time = (player == null ? 0 : player.tickCount) + partialTick;
         int cx = width / 2;
-        int cy = (LIST_TOP + height - BOTTOM) / 2;
-        float r = Math.min(WIDTH * 0.55F, (height - BOTTOM - LIST_TOP) * 0.6F + 30.0F);
+        int cy = (LIST_TOP + height - bottom()) / 2;
+        float r = Math.min(WIDTH * 0.55F, (height - bottom() - LIST_TOP) * 0.6F + 30.0F);
         for (int i = 0; i < SPARKS; i++) {
             float a = (float) (i * Math.PI * 2 / SPARKS + time * 0.02F);
             float wobble = 1.0F + 0.04F * Mth.sin(time * 0.2F + i * 1.7F);
             int x = cx + Math.round(Mth.cos(a) * r * wobble);
             int y = cy + Math.round(Mth.sin(a) * r * wobble);
             int alpha = 0x60 + (int) (0x60 * (0.5F + 0.5F * Mth.sin(time * 0.3F + i)));
-            int color = (alpha << 24) | (i % 4 == 0 ? StrangeAbilities.GOLD : StrangeAbilities.ORANGE);
+            int color = (alpha << 24) | (cosmic ? (i % 4 == 0 ? 0xFFFFFF : com.kolodkingal.enhanced.ability.CosmicSpider.AURA)
+                    : i % 4 == 0 ? StrangeAbilities.GOLD : StrangeAbilities.ORANGE);
             graphics.fill(x - 1, y - 1, x + 1, y + 1, color);
         }
     }
@@ -201,11 +244,14 @@ public class SlingRingScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
-        graphics.drawCenteredString(font, title.copy().withStyle(s -> s.withBold(true).withColor(StrangeAbilities.ORANGE)),
+        graphics.drawCenteredString(font, title.copy().withStyle(s -> s.withBold(true).withColor(accent())),
                 width / 2, 10, 0xFFFFFF);
         LocalPlayer player = Minecraft.getInstance().player;
         long wait = player == null ? 0 : PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING);
-        Component hint = wait > 0
+        Component hint = cosmic ? Component.translatable("screen.enhanced.cosmic_portals.hint",
+                Math.round(com.kolodkingal.enhanced.ability.CosmicSpider.portalCost()),
+                Math.round(com.kolodkingal.enhanced.ability.CosmicSpider.worldPortalCost())).withStyle(ChatFormatting.GRAY)
+                : wait > 0
                 ? Component.translatable("screen.enhanced.sling_ring.cooldown", (wait + 19) / 20).withStyle(ChatFormatting.GOLD)
                 : Component.translatable("screen.enhanced.sling_ring.hint").withStyle(ChatFormatting.GRAY);
         graphics.drawCenteredString(font, hint, width / 2, 24, 0xFFFFFF);

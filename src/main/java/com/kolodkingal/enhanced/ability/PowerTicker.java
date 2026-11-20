@@ -53,8 +53,10 @@ public final class PowerTicker {
         Power power = data.power();
         // Thor needs his weapon to fly.
         // (3.3: a power Agatha has drained does not fly either.)
-        boolean canFly = power.canFly() && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
-                && !(power == Power.CUSTOM && !CustomHeroes.canFly(player))
+        // (3.18: Cosmic Spider-Man flies, and a custom hero with the cosmic row while he is cosmic.)
+        boolean cosmic = CosmicSpider.canFly(player);
+        boolean canFly = (power.canFly() || cosmic) && !(power == Power.THOR && !ThorAbilities.canFly(player, data))
+                && !(power == Power.CUSTOM && !cosmic && !CustomHeroes.canFly(player))
                 // (3.8: Iron Man flies in a powered suit that flies, Falcon with his Exo-Wings on, Love with her axe.)
                 && !(power == Power.IRON_MAN && !com.kolodkingal.enhanced.ironman.IronSuits.canFly(player))
                 && !(power == Power.FALCON && !com.kolodkingal.enhanced.falcon.FalconWings.canFly(player))
@@ -65,7 +67,9 @@ public final class PowerTicker {
         Abilities abilities = player.getAbilities();
         boolean survivalLike = !player.isCreative() && !player.isSpectator();
         // (3.8: Iron Man's speed is his suit's; Falcon's is 0 behind his Wing Shield: he hovers still.)
-        float speed = !survivalLike || !canFly ? 0.05F : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
+        float speed = !survivalLike || !canFly ? 0.05F : cosmic ? Math.max(CosmicSpider.flightSpeed(),
+                power == Power.CUSTOM && CustomHeroes.canFly(player) ? CustomHeroes.flightSpeed(player) : 0.0F)
+                : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
                 : power.flightSpeed() * lookFlight(data);

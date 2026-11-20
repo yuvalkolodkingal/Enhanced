@@ -53,6 +53,8 @@ public final class Limits implements RecipeLimits {
     private final BoundingBox world;
     /** (3.16) A custom hero's own ceiling of blocks per spell (his Build Magic's strength); 0 for none. */
     private final int customCap;
+    /** (3.18) Cosmic Spider-Man's Matter Restructuring: Billy's sizes at this share ({@code spider_man.cosmic.matterFactor}). */
+    private double factor = 1.0;
 
     private Limits(Power hero, int rank, boolean limited, BoundingBox world) {
         this(hero, rank, limited, world, 0);
@@ -94,6 +96,13 @@ public final class Limits implements RecipeLimits {
             }
             return wanda(world);
         }
+        if (power == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(Powers.get(player))) {
+            // (3.18) Cosmic Spider-Man's Matter Restructuring: Billy's Build Magic, weaker (Billy's rules at his own rank)
+            int rank = BillyRanks.rank(ModAttachments.BUILD_DATA.get(player));
+            Limits cosmic = billy(rank, world);
+            cosmic.factor = loaded() ? com.kolodkingal.enhanced.config.CosmicSpiderConfig.MATTER_FACTOR.get() : 0.667;
+            return cosmic;
+        }
         if (power == Power.BILLY || power == Power.CUSTOM && Powers.get(player).has(HeroAbility.BILLY_BUILD_MAGIC)) {
             int rank = BillyRanks.rank(ModAttachments.BUILD_DATA.get(player));
             return player.isCreative() && !limitsInCreative() ? new Limits(Power.BILLY, rank, false, world) : billy(rank, world);
@@ -117,6 +126,16 @@ public final class Limits implements RecipeLimits {
      */
     public static BoundingBox world(Level level) {
         return SpellMath.world(level);
+    }
+
+    /** (3.18) A number of Billy's at this caster's share of it (1 for everyone but Cosmic Spider-Man). */
+    private int scaled(int value) {
+        return factor >= 1.0 ? value : Math.max(1, (int) Math.round(value * factor));
+    }
+
+    /** (3.18) The share of Billy's sizes these numbers have (Cosmic Spider-Man's {@code matterFactor}; 1 for everyone else). */
+    public double factor() {
+        return factor;
     }
 
     /** The hero these numbers belong to: {@link Power#SCARLET_WITCH} or {@link Power#BILLY}. */
@@ -162,7 +181,7 @@ public final class Limits implements RecipeLimits {
     @Override
     public int side() {
         if (limited) {
-            return BillyRanks.side(rank);
+            return scaled(BillyRanks.side(rank));
         }
         return Math.max(world.getXSpan(), Math.max(world.getYSpan(), world.getZSpan()));
     }
@@ -170,7 +189,7 @@ public final class Limits implements RecipeLimits {
     @Override
     public int reach() {
         if (limited) {
-            return BillyRanks.reach(rank);
+            return scaled(BillyRanks.reach(rank));
         }
         return loaded() ? BuildConfig.WANDA_REACH.get() : 256;
     }
@@ -194,7 +213,7 @@ public final class Limits implements RecipeLimits {
     @Override
     public int repeatCopies() {
         if (limited) {
-            return BillyRanks.repeatMax(rank);
+            return scaled(BillyRanks.repeatMax(rank));
         }
         int max = loaded() ? BuildConfig.WANDA_REPEAT_MAX.get() : 0;
         return max <= 0 ? Integer.MAX_VALUE : max;
@@ -204,7 +223,7 @@ public final class Limits implements RecipeLimits {
     @Override
     public int brush() {
         if (limited) {
-            return BillyRanks.brush(rank);
+            return scaled(BillyRanks.brush(rank));
         }
         return loaded() ? BuildConfig.WANDA_BRUSH_MAX.get() : 16;
     }
@@ -251,7 +270,7 @@ public final class Limits implements RecipeLimits {
     /** The most cells a double click selects: Billy's meter, the Scarlet Witch's {@code magicSelectMax}. */
     public int magicSelect() {
         if (limited) {
-            return BillyRanks.magicSelect(rank);
+            return scaled(BillyRanks.magicSelect(rank));
         }
         return loaded() ? BuildConfig.WANDA_MAGIC_SELECT_MAX.get() : 100000;
     }
