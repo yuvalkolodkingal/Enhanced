@@ -664,6 +664,8 @@ public final class GestureRoutes {
             case JIM_FIREBALL_CHARGING -> "a stance (BEAM_HAND, the arm out with the ball growing in the hand); the ball is JimFx's";
             case JIM_FLAMING -> "drawn, not acted: the flames are JimFlameLayer's (the model again, in fire) and JimFx's (the sparks)";
             case SOLAR_EYES, SOLAR_GATHERING, SOLAR_OVERLOAD -> "stances (SOLAR_EYES, SOLAR_GATHER, SOLAR_OVERLOAD); the light is SolarJewelFx's";
+            // (3.18) the transformation plays the surge's gesture, SPIDER_SURGE_ON, from SpiderClient.liveGesture
+            case SPIDER_COSMIC -> null;
         };
     }
 

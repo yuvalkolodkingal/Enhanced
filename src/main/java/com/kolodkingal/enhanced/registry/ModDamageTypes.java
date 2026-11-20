@@ -186,6 +186,9 @@ public final class ModDamageTypes {
     public static final ResourceKey<DamageType> LOVE_EYE_LASER = key("love_eye_laser");
     /** Love's Thunder Strike (is_lightning; lane L8). */
     public static final ResourceKey<DamageType> LOVE_LIGHTNING = key("love_lightning");
+    // ===== cosmic spider-man (3.18) =====
+    /** Cosmic Spider-Man's blasts, from his hand and from his eyes (energy_damage, no damage cooldown). */
+    public static final ResourceKey<DamageType> COSMIC_BLAST = key("cosmic_blast");
 
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));

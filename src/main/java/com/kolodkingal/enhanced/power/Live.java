@@ -243,6 +243,12 @@ public enum Live {
     JIM_THROW,
     /** Jim Hammond charges a fireball (V held): it grows in his hand until he lets go. */
     JIM_FIREBALL_CHARGING,
+    // ===== cosmic spider-man (3.18) =====
+    /**
+     * Spider-Man is Cosmic Spider-Man: the Enigma Force burns in him (his meter drains, his body and his keys are the cosmic
+     * ones, his suit turns black and white with a white-blue glow) until the meter runs out or he lets it go.
+     */
+    SPIDER_COSMIC,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

@@ -67,6 +67,12 @@ public final class IronHud implements LayeredDraw.Layer {
         }
         if (Powers.power(player) != Power.IRON_MAN) {
             PowerData data = Powers.get(player);
+            if (com.kolodkingal.enhanced.ability.CosmicSpider.hasMeter(data) && com.kolodkingal.enhanced.ability.CosmicSpider.enabled()
+                    && !mc.options.hideGui) {
+                // (3.18) Cosmic Spider-Man's meter: Iron Man's energy bar, in the Enigma Force's colours
+                cosmicPanel(g, mc, data, 4, g.guiHeight() / 2 + 16);
+                return;
+            }
             if (data.power() == Power.CUSTOM && data.acts(Power.IRON_MAN) && !mc.options.hideGui) {
                 // (A custom hero with Iron Man's rows: his suit energy meter alone.)
                 bar(g, mc, player, 4, g.guiHeight() / 2 + 16);
@@ -146,6 +152,34 @@ public final class IronHud implements LayeredDraw.Layer {
         }
         g.drawString(mc.font, String.format(Locale.ROOT, "%d", Math.round(SuitEnergy.get(player))),
                 x + BAR_WIDTH + 6, by - 1, 0xFF000000 | color, true);
+    }
+
+    /**
+     * (3.18) Cosmic Spider-Man's meter at ({@code x}, {@code y}): its name, the bar (white-blue while he is cosmic, red and
+     * blinking under a tenth; grey while it fills again, white when it is full), its value and what it means.
+     */
+    static void cosmicPanel(GuiGraphics g, Minecraft mc, PowerData data, int x, int y) {
+        Font font = mc.font;
+        boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data);
+        boolean full = com.kolodkingal.enhanced.ability.CosmicSpider.full(data);
+        float frac = com.kolodkingal.enhanced.ability.CosmicSpider.fraction(data);
+        int aura = com.kolodkingal.enhanced.ability.CosmicSpider.AURA;
+        int color = cosmic ? (frac < 0.10F ? RED : aura) : full ? 0xFFFFFF : 0x8C9AA8;
+        boolean blink = cosmic && frac < 0.10F && (mc.level.getGameTime() / 6) % 2 == 0;
+        g.drawString(font, Component.translatable("hud.enhanced.cosmic_spider.meter").withStyle(ChatFormatting.BOLD), x, y,
+                cosmic ? aura : 0xC8D4E0, true);
+        int by = y + 11;
+        g.fill(x, by, x + BAR_WIDTH + 2, by + 6, 0xA0000000);
+        if (!blink) {
+            g.fill(x + 1, by + 1, x + 1 + Math.round(BAR_WIDTH * frac), by + 5, 0xFF000000 | color);
+        }
+        g.drawString(font, String.format(Locale.ROOT, "%d/%d", (int) Math.ceil(com.kolodkingal.enhanced.ability.CosmicSpider.energy(data)
+                        - 1.0E-6), Math.round(com.kolodkingal.enhanced.ability.CosmicSpider.max())), x + BAR_WIDTH + 6, by - 1,
+                0xFF000000 | color, true);
+        Component line = cosmic ? Component.translatable("hud.enhanced.cosmic_spider.draining")
+                : full ? Component.translatable("hud.enhanced.cosmic_spider.full")
+                : Component.translatable("hud.enhanced.cosmic_spider.filling");
+        g.drawString(font, line, x, by + 9, cosmic ? 0xB8E2FF : full ? 0xFFFFFF : 0x9AA6B2, true);
     }
 
     /** The warning under the panel, or null. */

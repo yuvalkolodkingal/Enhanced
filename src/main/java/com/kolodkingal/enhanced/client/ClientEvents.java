@@ -353,6 +353,11 @@ public final class ClientEvents {
                     continue;
                 }
                 if (BifrostKeys.opensScreen(player, i, sneak)) { mc.setScreen(new BifrostScreen()); continue; }
+                // (3.18) Cosmic Spider-Man's B: the screen of his portals (the places he saved, the worlds)
+                if (i == 4 && !sneak && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(Powers.get(player))) {
+                    com.kolodkingal.enhanced.client.strange.SlingRingScreen.openCosmic();
+                    continue;
+                }
                 Net.sendToServer(new AbilityKeyPayload(i, true, sneak));
                 SENT_DOWN[i] = true;
                 HeroAnimator.predict(player, i);

@@ -81,17 +81,26 @@ public final class SlingRingActions {
 
     /** A button of the ring's screen. */
     public static void handle(ServerPlayer player, int action, int index, String name) {
-        if (!carries(player)) {
+        // (3.18) Cosmic Spider-Man's portal screen keeps the same places, and needs no ring: the Enigma Force opens his portals.
+        com.kolodkingal.enhanced.power.PowerData data = com.kolodkingal.enhanced.power.Powers.get(player);
+        boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data);
+        if (!cosmic && !carries(player)) {
             StrangeAbilities.say(player, "message.enhanced.sling_ring.needs_ring");
             return;
         }
-        if (!wears(player, true)) {
+        if (!cosmic && !wears(player, true)) {
             return;
         }
         switch (action) {
-            case SlingRingActionPayload.TRAVEL -> travel(player, index, name);
+            case SlingRingActionPayload.TRAVEL -> travel(player, index, name, cosmic);
             case SlingRingActionPayload.SAVE -> save(player, name);
             case SlingRingActionPayload.FORGET -> forget(player, index, name);
+            case SlingRingActionPayload.WORLD -> {
+                if (cosmic && index >= 0 && index < com.kolodkingal.enhanced.ability.CosmicSpider.WORLDS.size()) {
+                    com.kolodkingal.enhanced.ability.CosmicSpider.worldPortal(player, data,
+                            com.kolodkingal.enhanced.ability.CosmicSpider.WORLDS.get(index));
+                }
+            }
             default -> {
             }
         }
@@ -149,6 +158,11 @@ public final class SlingRingActions {
 
     /** Opens a pair of portals to the place {@code index} (if it is still called {@code name}). */
     static void travel(ServerPlayer player, int index, String name) {
+        travel(player, index, name, false);
+    }
+
+    /** As above; {@code cosmic}: Cosmic Spider-Man's portal, paid with his cosmic energy, in his white-blue (3.18). */
+    public static void travel(ServerPlayer player, int index, String name, boolean cosmic) {
         BifrostData.Place place = PlaceBook.placeAt(player, PlaceBook.Kind.SLING_RING, index, name);
         if (place == null) {
             return;
@@ -161,7 +175,12 @@ public final class SlingRingActions {
             StrangeAbilities.say(player, refusal);
             return;
         }
-        long wait = PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING);
+        com.kolodkingal.enhanced.power.PowerData data = com.kolodkingal.enhanced.power.Powers.get(player);
+        double cost = com.kolodkingal.enhanced.ability.CosmicSpider.portalCost();
+        if (cosmic && !com.kolodkingal.enhanced.ability.CosmicSpider.mayOpen(player, data, cost)) {
+            return;
+        }
+        long wait = cosmic ? 0 : PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING);
         if (wait > 0) {
             StrangeAbilities.say(player, "message.enhanced.sling_ring.not_ready", (wait + 19) / 20);
             return;
@@ -178,6 +197,13 @@ public final class SlingRingActions {
             return;
         }
         Vec3 far = SlingPortals.fit(there, player, place.pos());
+        if (cosmic) {
+            SlingPortals.open(player, here, near, player.getYRot(), there, far == null ? place.pos() : far, place.yaw(),
+                    com.kolodkingal.enhanced.ability.CosmicSpider.PORTAL_TINT);
+            com.kolodkingal.enhanced.ability.CosmicSpider.paid(player, data, cost);
+            StrangeAbilities.say(player, "message.enhanced.sling_ring.opening", place.name());
+            return;
+        }
         SlingPortals.open(player, here, near, player.getYRot(), there, far == null ? place.pos() : far, place.yaw());
         PlaceBook.readyAt(player, PlaceBook.Kind.SLING_RING, player.level().getGameTime() + cooldown());
         StrangeAbilities.say(player, "message.enhanced.sling_ring.opening", place.name());

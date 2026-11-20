@@ -37,6 +37,10 @@ public final class SuitSkins {
     private static final PlayerSkin QUICKSILVER = new PlayerSkin(
             Enhanced.id("textures/entity/suit/quicksilver.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    /** (3.18) Cosmic Spider-Man: a starry navy suit with blue web lines, big white eyes and a white spider. */
+    private static final PlayerSkin COSMIC_SPIDER = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/spider_cosmic.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+
     private static final PlayerSkin JIM_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/jim_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -70,6 +74,10 @@ public final class SuitSkins {
     @Nullable
     public static PlayerSkin suitFor(AbstractClientPlayer player) {
         Power power = Powers.power(player);
+        if (power == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(Powers.get(player))) {
+            // (3.18) the Enigma Force turns his suit black and white, whatever his look or his own skin
+            return COSMIC_SPIDER;
+        }
         if (power.hasPowers() && Powers.get(player).ownSkin()) {
             // (3.17: he chose his own skin: any hero, built-in or custom, wears it instead of the suit)
             return null;
