@@ -22,7 +22,8 @@ import java.util.stream.Stream;
 /**
  * {@code /enhanced spellbook <players> <ethereal|eldritch|green>}: the players become the book's casters (a hero's power is
  * taken first); {@code /enhanced spellbook <players> none}: casters give their book up; {@code /enhanced spellbook <players>
- * hat <colour 0-11|off|on>}: the Ethereal witch's hat.
+ * hat <colour 0-11|off|on>}: the Ethereal witch's hat. 3.18.1, the witches' levels: {@code /enhanced spellbook xp <players>
+ * add|set <n>} and {@code /enhanced spellbook level <players> <book|gift> <1-5>}.
  */
 public final class SpellbookCommand {
     private static final DynamicCommandExceptionType UNKNOWN =
@@ -33,6 +34,23 @@ public final class SpellbookCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> node() {
         return Commands.literal("spellbook")
+                // 3.18.1, the witches' levels: their experience, and a level of a book (or of the Demiurge's gift) at once
+                .then(Commands.literal("xp")
+                        .then(Commands.argument("players", EntityArgument.players())
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("points", IntegerArgumentType.integer(-100000, 100000))
+                                                .executes(ctx -> xp(ctx, true))))
+                                .then(Commands.literal("set")
+                                        .then(Commands.argument("points", IntegerArgumentType.integer(0, 100000))
+                                                .executes(ctx -> xp(ctx, false))))))
+                .then(Commands.literal("level")
+                        .then(Commands.argument("players", EntityArgument.players())
+                                .then(Commands.argument("book", StringArgumentType.word())
+                                        .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
+                                                Stream.concat(Arrays.stream(Spellbook.values()).map(b -> b.id),
+                                                        Stream.of(WitchLevels.GIFT_KEY)), builder))
+                                        .then(Commands.argument("level", IntegerArgumentType.integer(1, SpellLevels.MAX))
+                                                .executes(SpellbookCommand::level)))))
                 .then(Commands.argument("players", EntityArgument.players())
                         .then(Commands.literal("hat")
                                 .then(Commands.literal("off").executes(ctx -> hat(ctx, -1, false)))
@@ -71,6 +89,61 @@ public final class SpellbookCommand {
         }
         ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.spellbook.set", players.size(), book.title()), true);
         return players.size();
+    }
+
+    /** {@code xp <players> add|set <points>}: the experience of each witch's source now (players who are no witch are passed over). */
+    private static int xp(CommandContext<CommandSourceStack> ctx, boolean add) throws CommandSyntaxException {
+        int points = IntegerArgumentType.getInteger(ctx, "points");
+        int n = 0;
+        for (ServerPlayer player : EntityArgument.getPlayers(ctx, "players")) {
+            if (WitchLevels.setXp(player, points, add)) {
+                n++;
+            }
+        }
+        int count = n;
+        ctx.getSource().sendSuccess(() -> Component.translatable(add ? "commands.enhanced.spellbook.xp_add"
+                : "commands.enhanced.spellbook.xp_set", points, count), true);
+        return n;
+    }
+
+    /**
+     * {@code level <players> <book|gift> <1-5>}: the players are at that level of the book (made its casters first, a
+     * hero's power taken, as {@code /enhanced spellbook <players> <book>} does), or of the Demiurge's gift they have.
+     */
+    private static int level(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        Collection<ServerPlayer> players = EntityArgument.getPlayers(ctx, "players");
+        String name = StringArgumentType.getString(ctx, "book");
+        int level = IntegerArgumentType.getInteger(ctx, "level");
+        Spellbook book = Spellbook.byId(name);
+        if (book == null && !WitchLevels.GIFT_KEY.equals(name)) {
+            throw UNKNOWN.create(name);
+        }
+        int n = 0;
+        for (ServerPlayer player : players) {
+            if (book == null) {
+                WitchLevels.Source s = WitchLevels.source(player);
+                if (s == null || s.kind() != WitchLevels.Kind.GIFT) {
+                    continue;
+                }
+                WitchLevels.setLevel(player, WitchLevels.GIFT_KEY, level);
+            } else {
+                ServerPlayer p = player;
+                com.kolodkingal.enhanced.registry.ModAttachments.SPELLBOOK.set(p,
+                        com.kolodkingal.enhanced.registry.ModAttachments.SPELLBOOK.get(p).withXp(book.id, SpellLevels.threshold(level)));
+                if (Spellbook.of(p) != book) {
+                    if (Spellbook.of(p) == null && Powers.power(p) != Power.NONE) {
+                        Powers.setPower(p, Power.NONE);
+                    }
+                    Spellbooks.become(p, book);
+                } else {
+                    WitchLevels.refresh(p);
+                }
+            }
+            n++;
+        }
+        int count = n;
+        ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.spellbook.level", count, level), true);
+        return n;
     }
 
     private static int hat(CommandContext<CommandSourceStack> ctx, int color, boolean on) throws CommandSyntaxException {

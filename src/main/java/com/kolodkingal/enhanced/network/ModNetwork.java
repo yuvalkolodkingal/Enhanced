@@ -64,6 +64,10 @@ public final class ModNetwork {
         registrar.serverbound(com.kolodkingal.enhanced.spellbook.SpellbookHatPayload.TYPE,
                 com.kolodkingal.enhanced.spellbook.SpellbookHatPayload.STREAM_CODEC,
                 com.kolodkingal.enhanced.spellbook.SpellbookHatPayload::handle);
+        // 3.18.1: a witch's level, for her HUD line and her Book of Spells screen
+        registrar.clientbound(com.kolodkingal.enhanced.spellbook.WitchLevelPayload.TYPE,
+                com.kolodkingal.enhanced.spellbook.WitchLevelPayload.STREAM_CODEC,
+                com.kolodkingal.enhanced.spellbook.WitchLevelPayload::handle);
         registrar.clientbound(ThorFxPayload.TYPE, ThorFxPayload.STREAM_CODEC, ThorFxPayload::handle);
         registrar.clientbound(HexBoltPayload.TYPE, HexBoltPayload.STREAM_CODEC, HexBoltPayload::handle);
         registrar.clientbound(OpenRoadPayload.TYPE, OpenRoadPayload.STREAM_CODEC, OpenRoadPayload::handle);

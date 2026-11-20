@@ -24,6 +24,7 @@ import com.kolodkingal.enhanced.spellbook.Spellbook;
 import com.kolodkingal.enhanced.spellbook.SpellbookData;
 import com.kolodkingal.enhanced.spellbook.SpellbookHatPayload;
 import com.kolodkingal.enhanced.spellbook.Spellbooks;
+import com.kolodkingal.enhanced.spellbook.WitchLevels;
 import com.kolodkingal.enhanced.world.CottagePlan;
 import com.kolodkingal.enhanced.world.StoneSitePlans;
 import net.minecraft.core.BlockPos;
@@ -131,6 +132,7 @@ public final class SpellbookTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(8.5, FLOOR, 8.5);
         use(player, ModItems.BOOK_OF_ETHEREAL_WITCHCRAFT.get(), false);
+        WitchLevels.setLevel(player, Spellbook.ETHEREAL.id, 5); // (3.18.1: all of the book)
         PowerData data = Powers.get(player);
         check(data.power() == Power.CUSTOM && Spellbook.of(player) == Spellbook.ETHEREAL, "she is the Ethereal witch");
         CustomHero hero = ModAttachments.CUSTOM_HERO.get(player);
@@ -186,6 +188,7 @@ public final class SpellbookTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(4.5, FLOOR, 10.5);
         use(player, ModItems.BOOK_OF_ETHEREAL_WITCHCRAFT.get(), false);
+        WitchLevels.setLevel(player, Spellbook.ETHEREAL.id, 5); // (3.18.1: all of the book)
         Zombie zombie = zombie(helper, 12.5, 10.5);
         float before = zombie.getHealth();
         TestKit.lookAt(player, zombie);
@@ -205,6 +208,7 @@ public final class SpellbookTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(8.5, FLOOR, 8.5);
         use(player, ModItems.BOOK_OF_ELDRITCH_WITCHCRAFT.get(), false);
+        WitchLevels.setLevel(player, Spellbook.ELDRITCH.id, 5); // (3.18.1: all of the book)
         PowerData data = Powers.get(player);
         check(Spellbook.of(player) == Spellbook.ELDRITCH, "he is the Eldritch sorcerer");
         HeroKit kit = data.kit();
@@ -233,6 +237,7 @@ public final class SpellbookTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(8.5, FLOOR, 8.5);
         use(player, ModItems.BOOK_OF_GREEN_WITCHCRAFT.get(), false);
+        WitchLevels.setLevel(player, Spellbook.GREEN.id, 5); // (3.18.1: all of the book)
         PowerData data = Powers.get(player);
         CustomHero hero = ModAttachments.CUSTOM_HERO.get(player);
         check(Spellbook.of(player) == Spellbook.GREEN, "she is the Green witch");
@@ -243,7 +248,8 @@ public final class SpellbookTests {
         check(kit.plain(2).module() == PowerModule.NATURE, "G: growth");
         check(kit.plain(3).ability() == HeroAbility.AGATHA_RUNES && hero.pick(HeroAbility.AGATHA_RUNES).strength() < 5,
                 "V: Agatha's runes, weaker");
-        check(hero.pick(PowerModule.HEALING) != null && kit.plain(4) == null, "healing needs no key");
+        check(hero.pick(PowerModule.HEALING) != null && hero.keyOf(PowerModule.HEALING) == 0, "healing needs no key");
+        check(kit.plain(4) != null && "roots".equals(kit.plain(4).action()), "(3.18.1) B: the Root Grasp at level 5");
         check(!data.has(HeroAbility.AGATHA_DRAIN) && !data.has(HeroAbility.AGATHA_PURPLE_BEAM), "nothing else of Agatha's");
         check((Spellbook.GREEN.color >> 8 & 0xFF) > (Spellbook.GREEN.color >> 16 & 0xFF), "her magic is green");
         helper.succeed();
@@ -254,6 +260,7 @@ public final class SpellbookTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 6.5);
         use(player, ModItems.BOOK_OF_GREEN_WITCHCRAFT.get(), false);
+        WitchLevels.setLevel(player, Spellbook.GREEN.id, 5); // (3.18.1: all of the book)
         TestKit.look(player, 0.0F, 0.0F); // (south)
         ServerLevel level = helper.getLevel();
         Direction facing = player.getDirection();
@@ -302,6 +309,7 @@ public final class SpellbookTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = f.player(10.5, FLOOR, 10.5);
         use(player, ModItems.BOOK_OF_GREEN_WITCHCRAFT.get(), false);
+        WitchLevels.setLevel(player, Spellbook.GREEN.id, 5); // (3.18.1: all of the book)
         ServerLevel level = helper.getLevel();
         BlockPos crop = player.blockPosition().east(2);
         level.setBlock(crop.below(), Blocks.FARMLAND.defaultBlockState(), Block.UPDATE_ALL);

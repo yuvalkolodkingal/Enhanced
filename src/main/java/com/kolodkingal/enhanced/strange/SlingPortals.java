@@ -375,6 +375,9 @@ public final class SlingPortals {
         }
         Vec3 velocity = turn(e.getDeltaMovement(), turnBy);
         float yaw = e.getYRot() + turnBy;
+        // (3.18.1) a journey of over 100 blocks, or to another world: the Eldritch sorcerer's practice
+        boolean far = toLevel != e.level() || from.center().distanceTo(to.center())
+                > com.kolodkingal.enhanced.spellbook.WitchLevels.PORTAL_DISTANCE;
         Entity arrived = e;
         if (toLevel == e.level()) {
             if (e instanceof ServerPlayer player) {
@@ -400,6 +403,10 @@ public final class SlingPortals {
         arrived.resetFallDistance();
         toLevel.playSound(null, feet.x, feet.y, feet.z, ModSounds.STRANGE_PORTAL_PASS.get(), SoundSource.PLAYERS, 0.8F,
                 1.0F);
+        if (far && arrived instanceof ServerPlayer traveller) {
+            com.kolodkingal.enhanced.spellbook.WitchLevels.practice(traveller,
+                    com.kolodkingal.enhanced.spellbook.WitchLevels.PORTAL_XP);
+        }
         return arrived;
     }
 

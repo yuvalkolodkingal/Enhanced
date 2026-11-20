@@ -151,7 +151,16 @@ public final class CustomAnimRoutes {
                 default -> GestureId.ULTRON_SLAM;
             };
             // (Spellbooks: the green magic's growth is a blessing given with both hands.)
-            case NATURE -> GestureId.APOC_BESTOW;
+            // (3.18.1: the Root Grasp is the earth called up with a sweep, as the Earth Wall.)
+            case NATURE -> "roots".equals(option) ? GestureId.APOC_SAND_WAVE : GestureId.APOC_BESTOW;
+            // (3.18.1: the witches' cantrips, small spells of the hand.)
+            case CANTRIP -> switch (option) {
+                case "ward" -> GestureId.AGATHA_SHIELD_RAISE;
+                case "blink" -> GestureId.THANOS_STEP;
+                case "mend", "light" -> GestureId.APOC_BESTOW;
+                case "repel" -> GestureId.AGATHA_RUNES;
+                default -> GestureId.BILLY_BOLT;
+            };
             case WIND -> "updraft".equals(option) ? GestureId.APOC_STORM_START : GestureId.WANDA_BEAM_KICK;
             // Passive, or acted elsewhere: Flight by the take-off of its style, Telekinesis by the grab and the throw.
             case DURABILITY, FLIGHT, TELEKINESIS -> null;

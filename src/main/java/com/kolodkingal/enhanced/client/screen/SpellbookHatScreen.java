@@ -63,6 +63,9 @@ public class SpellbookHatScreen extends Screen {
                     onClose();
                 })
                 .bounds(width / 2 - 102, below + 26, 204, 20).build());
+        // (3.18.1) her plain use is the hat, so her Book of Spells opens from here
+        addRenderableWidget(Button.builder(Component.translatable("screen.enhanced.spells.open_button"), b -> SpellsScreen.open())
+                .bounds(width / 2 - 102, below + 52, 204, 20).build());
     }
 
     @Override

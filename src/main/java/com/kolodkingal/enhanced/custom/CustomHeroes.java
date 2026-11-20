@@ -155,7 +155,12 @@ public final class CustomHeroes {
             return false;
         }
         CustomHeroRules.Result result = CustomHeroRules.sanitize(wanted, CustomHeroRules.Limits.current());
-        become(player, result.hero());
+        CustomHero made = result.hero();
+        if (com.kolodkingal.enhanced.spellbook.WitchLevels.cantripsForCustomHeroes()) {
+            // (3.18.1, spellbook_levels.defaults.customHeroes) his empty keys get the witches' cantrips, at no cost
+            made = com.kolodkingal.enhanced.spellbook.SpellLevels.fill(made, 1);
+        }
+        become(player, made);
         com.kolodkingal.enhanced.item.HeroCreatorItem.spendUse(player);
         for (CustomHeroRules.Note note : result.notes()) {
             player.sendSystemMessage(note(note).withStyle(ChatFormatting.GOLD));

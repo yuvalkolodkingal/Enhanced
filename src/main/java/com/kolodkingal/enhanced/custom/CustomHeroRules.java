@@ -126,6 +126,9 @@ public final class CustomHeroRules {
                 notes.add(new Note("message.enhanced.hero_creator.rule.unknown", pick.id()));
                 continue;
             }
+            if (entry instanceof PowerModule m && m.hidden()) {
+                continue; // (3.18.1: the witches' cantrips are put on keys by the levels, never picked)
+            }
             if (!limits.allows(entry)) {
                 notes.add(new Note("message.enhanced.hero_creator.rule.disabled", entry.nameKey()));
                 continue;

@@ -54,6 +54,7 @@ public final class SpellMagic {
     /** Registers the spellbooks' own module with the custom hero's server ({@code CustomHeroServer}). */
     public static void register(Map<PowerModule, ModuleLogic> logic) {
         logic.put(PowerModule.NATURE, new Nature());
+        logic.put(PowerModule.CANTRIP, new Cantrips()); // (3.18.1: the witches' cantrips)
     }
 
     // ---- the Ethereal Orb (Magic, "orb") ----
@@ -173,7 +174,12 @@ public final class SpellMagic {
             if (!down || !c.ready()) {
                 return;
             }
+            if (c.option("roots")) {
+                roots(c);
+                return;
+            }
             int grown = bloom(c.player, c.level(), c.v(ModuleStats.BLOOM_RADIUS));
+            WitchLevels.practice(c.player, grown / 5); // (3.18.1: the Green witch's practice, a point for each 5 plants)
             Vec3 at = c.player.position();
             Shots.ring(c.level(), at, c.v(ModuleStats.BLOOM_RADIUS), c.color());
             c.level().sendParticles(ParticleTypes.HAPPY_VILLAGER, at.x, at.y + 1.0, at.z, 20, 1.2, 0.6, 1.2, 0.0);
@@ -185,6 +191,48 @@ public final class SpellMagic {
             }
             c.cooldown(ModuleStats.BLOOM_COOLDOWN);
         }
+    }
+
+    // ---- 3.18.1: the Root Grasp (Nature, "roots") ----
+
+    /**
+     * The Green witch's Root Grasp: roots burst from the ground where she looks and hold the enemies there for a moment
+     * (2 seconds at her level 5). One step weaker than the growth it springs from (strength 4 beside her growth's 5),
+     * and it holds for less than Agatha's rune trap, so it is never stronger than Agatha.
+     *
+     * @return the creatures it holds
+     */
+    public static List<LivingEntity> roots(ModuleLogic.Ctx c) {
+        int s = Math.max(1, c.strength() - 1);
+        ServerPlayer p = c.player;
+        ServerLevel level = c.level();
+        Shots.Aim aim = Shots.aim(p, ModuleStats.ROOTS_RANGE.value(s));
+        Vec3 at = aim.end();
+        double radius = ModuleStats.ROOTS_RADIUS.value(s);
+        int ticks = Math.max(1, Math.round(ModuleStats.ROOTS_TIME.value(s)));
+        List<LivingEntity> held = new ArrayList<>();
+        for (LivingEntity e : Shots.area(p, at, radius + 0.5)) {
+            if (e instanceof net.minecraft.world.entity.monster.Enemy || e instanceof net.minecraft.world.entity.player.Player) {
+                e.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,
+                        ticks, 9, false, true), p);
+                e.setDeltaMovement(0.0, Math.min(0.0, e.getDeltaMovement().y), 0.0);
+                e.hurtMarked = true;
+                held.add(e);
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.ROOTED_DIRT.defaultBlockState()),
+                        e.getX(), e.getY() + 0.3, e.getZ(), 14, 0.3, 0.3, 0.3, 0.1);
+            }
+        }
+        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.ROOTED_DIRT.defaultBlockState()), at.x, at.y + 0.2,
+                at.z, 30, radius * 0.5, 0.2, radius * 0.5, 0.15);
+        level.sendParticles(new EnergyParticleOptions(c.color(), 1.1F), at.x, at.y + 0.6, at.z, 16, radius * 0.4, 0.4,
+                radius * 0.4, 0.0);
+        Shots.line(level, Shots.hand(p), at, c.color(), c.glow());
+        c.sound(SoundEvents.ROOTED_DIRT_BREAK, 1.4F, 0.6F);
+        c.sound(SoundEvents.HANGING_ROOTS_PLACE, 1.2F, 0.7F);
+        if (c.slot > 0) {
+            c.data.startCooldown(c.slot, c.now(), Math.max(1, Math.round(ModuleStats.ROOTS_COOLDOWN.value(s))));
+        }
+        return held;
     }
 
     /**

@@ -394,6 +394,9 @@ public final class AgathaAbilities {
             data.set(Live.CASTING, true);
             AbilityColors.mark(player,
                     HeroAbility.AGATHA_HEX_MARK); // (3.5: the mark's own colour, when one was chosen)
+            // (3.18.1) the Ethereal witch's practice: a hex mark laid
+            com.kolodkingal.enhanced.spellbook.WitchLevels.practice(player,
+                    com.kolodkingal.enhanced.spellbook.WitchLevels.HEX_MARK_XP);
         }
     }
 
