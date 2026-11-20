@@ -24,6 +24,14 @@ public final class Ultimate {
         return Boolean.TRUE.equals(ModAttachments.ULTIMATE.get(player));
     }
 
+    /**
+     * The same for a holder known only as an object (a client class such as the local player, so that a common class
+     * that asks never has to load it; the dedicated server and the GameTests load the hero plug-ins too).
+     */
+    public static boolean allowedHolder(Object holder) {
+        return on() || Boolean.TRUE.equals(ModAttachments.ULTIMATE.get(holder));
+    }
+
     /** Whether this player may use them now (both sides). */
     public static boolean allowed(Player player) {
         return on() || granted(player);

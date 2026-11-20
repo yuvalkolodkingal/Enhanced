@@ -104,7 +104,8 @@ public final class SpiderClient implements HeroClient {
                 }
             }
         }
-        if (ability == 5 && !data.is(Live.BLACK_EYES) && data.cooldownUntil(5) <= now && CosmicSpider.full(data) && CosmicSpider.allowed(player)) {
+        if (ability == 5 && !data.is(Live.BLACK_EYES) && data.cooldownUntil(5) <= now && CosmicSpider.full(data) && CosmicSpider.enabled()
+                && com.kolodkingal.enhanced.ultimate.Ultimate.allowedHolder(player)) {
             return Component.translatable("hud.enhanced.cosmic_spider.ready").withStyle(s -> s.withColor(CosmicSpider.AURA));
         }
         return switch (ability) {

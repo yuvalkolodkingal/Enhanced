@@ -420,6 +420,7 @@ public final class HeroAbilityAnims {
         toggle(Toggle.WALL_CRAWL, HeroAbility.SPIDER_CRAWL);
         toggle(Toggle.SPIDER_SENSE, HeroAbility.SPIDER_CRAWL);
         toggle(Toggle.SPIDER_LEGS, HeroAbility.SPIDER_LEGS);
+        toggle(Toggle.COSMIC_UNIVERSE, HeroAbility.SPIDER_COSMIC); // (3.18: which cosmic look he wears)
         toggle(Toggle.REALITY_VEIL, HeroAbility.THANOS_REALITY);
         toggle(Toggle.HEAR_THOUGHTS, HeroAbility.XAVIER_THOUGHTS);
         toggle(Toggle.TOMMY_TIME, HeroAbility.TOMMY_TIME);
