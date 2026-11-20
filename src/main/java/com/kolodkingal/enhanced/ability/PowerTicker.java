@@ -72,6 +72,7 @@ public final class PowerTicker {
                 : power == Power.CUSTOM ? CustomHeroes.flightSpeed(player)
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
+                : Demiurge.is(data) ? Math.max(Demiurge.flightSpeed(), power.flightSpeed()) // (3.18.1)
                 : power.flightSpeed() * lookFlight(data);
         if (survivalLike && canFly) {
             // (3.18.1) in another's slowed time a hero flies as slowly as everything round him (Slowness never slows flight)
@@ -102,6 +103,7 @@ public final class PowerTicker {
         LokiAbilities.applyForm(player, data);
         ThorAbilities.applyBody(player, data);
         HeroServers.applyBody(player, data);
+        Demiurge.applyBody(player, data); // (3.18.1: Billy the Demiurge's body, and gone from whoever is not)
     }
 
     /**
@@ -114,7 +116,12 @@ public final class PowerTicker {
             case SCARLET_WITCH -> WandaAbilities.tick(player, data);
             case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
             case VISION -> VisionAbilities.tick(player, data);
-            case BILLY -> BillyAbilities.tick(player, data);
+            case BILLY -> {
+                BillyAbilities.tick(player, data);
+                if (data.power() == Power.BILLY) {
+                    Demiurge.tick(player, data); // (3.18.1: Ultimate checked, the borrowed magic's upkeep)
+                }
+            }
             case TOMMY -> TommyAbilities.tick(player, data);
             case LOKI -> LokiAbilities.tick(player, data);
             case THOR -> ThorAbilities.tick(player, data);
@@ -138,7 +145,13 @@ public final class PowerTicker {
             case SCARLET_WITCH -> WandaAbilities.endAll(player, data);
             case LOKI -> LokiAbilities.endAll(player, data);
             case THOR -> ThorAbilities.endAll(player, data);
-            case BILLY -> BillyAbilities.endAll(player, data);
+            case BILLY -> {
+                Power borrowed = data.power() == Power.BILLY ? data.borrowed() : Power.NONE;
+                if (borrowed != Power.NONE) {
+                    heroEnd(borrowed, player, data); // (3.18.1: and the magic the Demiurge took on)
+                }
+                BillyAbilities.endAll(player, data);
+            }
             case TOMMY -> TommyAbilities.endAll(player, data);
             case QUICKSILVER -> QuicksilverAbilities.endAll(player, data);
             case PHOENIX, SPIDER_MAN, THANOS, ULTRON, APOCALYPSE, AGATHA, CYCLOPS, PROFESSOR_X, CUSTOM, HEIMDALL, ODIN,

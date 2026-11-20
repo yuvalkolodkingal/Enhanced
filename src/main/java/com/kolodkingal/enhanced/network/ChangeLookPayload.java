@@ -34,6 +34,10 @@ public record ChangeLookPayload(int step) implements CustomPacketPayload {
                 com.kolodkingal.enhanced.ability.CosmicSpider.switchLook(player, Powers.get(player));
                 return;
             }
+            // (3.18.1) Billy the Demiurge: H and Sneak + H step through the magic types
+            if (com.kolodkingal.enhanced.ability.Demiurge.cycle(player, Powers.get(player), payload.step() < 0 ? -1 : 1)) {
+                return;
+            }
             if (Powers.power(player) == com.kolodkingal.enhanced.power.Power.IRON_MAN) {
                 com.kolodkingal.enhanced.ironman.IronSuits.onSuitKey(player, payload.step() < 0 ? -1 : 1);
                 return;

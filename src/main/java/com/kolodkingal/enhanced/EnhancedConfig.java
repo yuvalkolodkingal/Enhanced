@@ -427,6 +427,8 @@ public final class EnhancedConfig {
                 .defineInRange("barrierDistance", 1.6, 0.8, 4.0);
         BILLY_BARRIER_SPEED_FACTOR = BUILDER.comment("How fast he walks while the barrier is raised (1.0 = as usual, 0.6 = at three fifths of the speed).")
                 .defineInRange("barrierSpeedFactor", 0.6, 0.1, 1.0);
+        // 3.18.1: Billy the Demiurge, his ultimate version ([billy.demiurge]).
+        com.kolodkingal.enhanced.config.DemiurgeConfig.define(BUILDER);
         BUILDER.pop();
 
         BUILDER.push("tommy");

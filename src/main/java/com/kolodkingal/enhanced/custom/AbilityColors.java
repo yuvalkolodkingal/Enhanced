@@ -40,7 +40,9 @@ public final class AbilityColors {
         }
         PowerData data = Powers.get(player);
         if (data.power() != Power.CUSTOM) {
-            return -1;
+            // (3.18.1) Billy the Demiurge: every effect of his magic, and of the magic type he took on, in his brighter blue
+            // (the client lays small stars in it: DemiurgeStars)
+            return com.kolodkingal.enhanced.ability.Demiurge.is(data) ? com.kolodkingal.enhanced.ability.Demiurge.BLUE : -1;
         }
         return chosen(CustomHeroes.hero(player), row);
     }

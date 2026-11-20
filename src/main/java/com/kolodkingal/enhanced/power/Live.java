@@ -249,6 +249,13 @@ public enum Live {
      * ones, his suit turns black and white with a white-blue glow) until the meter runs out or he lets it go.
      */
     SPIDER_COSMIC,
+    // ===== billy the demiurge (3.18.1) =====
+    /**
+     * Billy is Billy the Demiurge (Sneak + N, only with Ultimate): forty health, a netherite set's protection, faster healing,
+     * his barrier round his whole body, his magic a brighter blue with stars and stronger, and the magic of the other
+     * witches and sorcerers on H ({@code ability.Demiurge}). Never saved: he logs back in as plain Billy.
+     */
+    BILLY_DEMIURGE,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */
