@@ -98,7 +98,7 @@ Every stone has its own cooldown, shared by its two uses, and costs a little hun
 
 ### The Time Stone (green; sorcerers only)
 
-* **Slow Time** (use, on/off): "Time slows around you." Every creature within 12 blocks moves **three times slower** (bosses half as much); green rings turn round your wrist. Up to 10 seconds, then 10 seconds of rest. It stops when the stone leaves you.
+* **Slow Time** (use, on/off): "Time slows around you." Every creature within 12 blocks moves **ten times slower** (three before 3.18.0; bosses half as much); green rings turn round your wrist. Up to 10 seconds, then 10 seconds of rest. It stops when the stone leaves you.
 * **Rewind** (Sneak + use): you go back to where you were **5 seconds** ago, with that health if it was higher, as Thanos's Rewind. Cooldown 30 seconds.
 * **On a crop or a sapling** (use while you look at it): it **grows**; Sneak on a crop: it grows **back**. On a baby animal: it grows up. Every half second.
 * A sorcerer held by a Hex's Runes can't use it: "The Hex Runes hold the Time Stone still."

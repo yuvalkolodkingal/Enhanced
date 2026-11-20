@@ -63,7 +63,7 @@ The Scarlet Witch has one more key. **Z** is her order to the Vision her Hex rai
 
 Doctor Strange's sixth key is **Y**, the same key as Build Magic: **the Eye of Agamotto**. It needs the Eye with him.
 
-* **Y**: **Slow Time** on or off (the Time Stone's: creatures round him move three times slower, up to 10 seconds).
+* **Y**: **Slow Time** on or off (the Time Stone's: creatures round him move ten times slower, up to 10 seconds).
 * **Sneak + Y**: **Rewind**, back to where he was 5 seconds ago.
 
 Its line on the HUD is `[Y]`: `no Eye`, `time slowed 7s`, `recharging 40%` or `ready`. A custom hero with the Eye's ability uses **Y** for it; a hero has at most one **Y** (the Eye or a Build Magic). See [Doctor Strange](Doctor-Strange).

@@ -531,7 +531,9 @@ public final class QuicksilverTests {
             check(farFell > 2.5, "the far block falls normally (fell " + farFell + ")");
             check(nearFell < farFell * 0.4, "the block next to Quicksilver falls in slow motion (fell " + nearFell + " vs " + farFell + ")");
             MobEffectInstance slowness = friend.getEffect(MobEffects.MOVEMENT_SLOWDOWN);
-            check(slowness != null && slowness.getAmplifier() >= 3, "other players nearby are slowed down");
+            int factor = EnhancedConfig.SLOW_MOTION_FACTOR.get();
+            check(slowness != null && slowness.getAmplifier() == SlowMotion.playerSlowness(factor),
+                    "other players nearby are slowed down to about 1/" + factor + " (" + slowness + ")");
             return true;
         });
     }
@@ -647,6 +649,95 @@ public final class QuicksilverTests {
             }
             return false;
         });
+    }
+
+    /** 3.18.0: slowed time is a tenth of the normal speed unless the server says otherwise, for every way of slowing it. */
+    @EnhancedTest(template = ARENA, batch = "quicksilver_tenth")
+    public static void slowTimeIsATenthByDefault(GameTestHelper helper) {
+        check(Integer.valueOf(10).equals(EnhancedConfig.SLOW_MOTION_FACTOR.getDefault()),
+                "Quicksilver's and Tommy's slow time run at 10% (" + EnhancedConfig.SLOW_MOTION_FACTOR.getDefault() + ")");
+        check(Integer.valueOf(10).equals(com.kolodkingal.enhanced.config.StonesConfig.TIME_SLOW_FACTOR.getDefault()),
+                "and so does the Time Stone's (Doctor Strange's Eye too)");
+        check(SlowMotion.playerSlowness(10) == 5, "a player in it keeps 10% of his walking speed (Slowness VI)");
+        check(SlowMotion.playerSlowness(20) == 5, "never so slow that he can't walk out");
+        check(SlowMotion.playerSlowness(2) == 2, "half speed is Slowness III");
+        helper.succeed();
+    }
+
+    /**
+     * 3.18.0: a tick-skipped creature keeps getting its every Nth tick (at a factor of 10, three of thirty ticks), from
+     * the level's clock: on 26.x a skipped tick no longer counts up the creature's own ticks, and a beat on those froze
+     * it for good.
+     */
+    @EnhancedTest(template = ARENA, batch = "quicksilver_tenth_zombie", timeoutTicks = 100)
+    public static void aSlowedZombieGetsEveryTenthTick(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
+        f.config(EnhancedConfig.SLOW_MOTION_FACTOR, 10);
+        ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        Zombie near = timedZombie(helper, 5.5);
+        press(peter, 1);
+        f.everyTick(40, tick -> {
+            run(peter, false);
+            if (tick < 40) {
+                return false;
+            }
+            check(ticked(near) >= 3 && ticked(near) <= 6, "the zombie ticks one tick in ten (" + ticked(near) + " of 40)");
+            return true;
+        });
+    }
+
+    /**
+     * 3.18.0: a vanilla fireball (not an arrow or a thrown thing, so tick-skipped) and one of the mod's own missiles
+     * crawl at a tenth of their speed next to Quicksilver, fly at full speed far from him, and keep their full speed (and
+     * so their hit) all along: only their ticks are spread out.
+     */
+    @EnhancedTest(template = ARENA, batch = "quicksilver_tenth_shots", timeoutTicks = 100)
+    public static void fireballsAndModMissilesCrawl(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
+        f.config(EnhancedConfig.SLOW_MOTION_FACTOR, 10);
+        ServerPlayer peter = f.player(2.5, FLOOR, 10.5, Power.QUICKSILVER);
+        press(peter, 1);
+        run(peter, false);
+        net.minecraft.world.entity.projectile.SmallFireball nearBall = fireball(helper, new Vec3(5.5, FLOOR + 1.5, 10.5));
+        net.minecraft.world.entity.projectile.SmallFireball farBall = fireball(helper, new Vec3(19.5, FLOOR + 1.5, 10.5));
+        com.kolodkingal.enhanced.ironman.IronMissileEntity nearMissile = missile(helper, new Vec3(4.5, FLOOR + 1.5, 8.5));
+        com.kolodkingal.enhanced.ironman.IronMissileEntity farMissile = missile(helper, new Vec3(19.5, FLOOR + 1.5, 8.5));
+        Vec3[] starts = {nearBall.position(), farBall.position(), nearMissile.position(), farMissile.position()};
+        f.everyTick(10, tick -> {
+            run(peter, false);
+            if (tick < 10) {
+                return false;
+            }
+            double nearB = nearBall.position().distanceTo(starts[0]);
+            double farB = farBall.position().distanceTo(starts[1]);
+            double nearM = nearMissile.position().distanceTo(starts[2]);
+            double farM = farMissile.position().distanceTo(starts[3]);
+            check(farB > 2.0 && nearB < farB * 0.3, "the fireball near him crawls (" + nearB + " vs " + farB + ")");
+            check(farM > 2.0 && nearM < farM * 0.3, "so does the mod's missile (" + nearM + " vs " + farM + ")");
+            check(nearMissile.getDeltaMovement().length() > 0.25, "and keeps its full speed for its hit ("
+                    + nearMissile.getDeltaMovement().length() + ")");
+            return true;
+        });
+    }
+
+    private static net.minecraft.world.entity.projectile.SmallFireball fireball(GameTestHelper helper, Vec3 local) {
+        Vec3 at = helper.absoluteVec(local);
+        net.minecraft.world.entity.projectile.SmallFireball ball = new net.minecraft.world.entity.projectile.SmallFireball(
+                EntityType.SMALL_FIREBALL, helper.getLevel());
+        ball.moveTo(at.x, at.y, at.z);
+        ball.setDeltaMovement(0, 0.3, 0);
+        helper.getLevel().addFreshEntity(ball);
+        return ball;
+    }
+
+    private static com.kolodkingal.enhanced.ironman.IronMissileEntity missile(GameTestHelper helper, Vec3 local) {
+        com.kolodkingal.enhanced.ironman.IronMissileEntity missile = com.kolodkingal.enhanced.ironman.IronMissileEntity.create(
+                helper.getLevel(), null, com.kolodkingal.enhanced.ironman.IronMissileEntity.SHOULDER, helper.absoluteVec(local),
+                new Vec3(0, 1, 0), 0.3, 1.0F, 0.0F, 40.0);
+        helper.getLevel().addFreshEntity(missile);
+        return missile;
     }
 
     @EnhancedTest(template = ARENA)

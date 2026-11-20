@@ -130,7 +130,7 @@ Section `[quicksilver]`. The hero's page is [Quicksilver](Quicksilver).
 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
-| `quicksilver.slowMotionFactor` | `5` | 2 to 20 | During Quicksilver Time the world around him runs this many times slower (Tommy's Slow Time too, since 3.3). |
+| `quicksilver.slowMotionFactor` | `10` | 2 to 20 | During Quicksilver Time the world around him runs this many times slower (Tommy's Slow Time too, since 3.3). |
 | `quicksilver.slowMotionRadius` | `32` | 4 to 128 | How far (in blocks) from Quicksilver time slows down (and from Tommy, in his Slow Time). |
 | `quicksilver.speedBonus` | `3.0` | 0.0 to 10.0 | Extra movement speed while he runs in Quicksilver Time or Super Speed (3.0 = four times as fast). |
 | `quicksilver.exhaustion` | `0.03` | 0.0 to 4.0 | Food exhaustion per tick while he runs in Quicksilver Time or Super Speed (4.0 = 1 food point). Quicksilver Time also costs half of this while he is not running. |
@@ -1258,7 +1258,7 @@ These numbers are also those of the **Eye of Agamotto** and of Doctor Strange's 
 | Option | Default | Allowed values | Meaning |
 |---|---|---|---|
 | `time_stone.slowRadius` | `12` | 2 to 64 | Radius (blocks) of the Slow Time zone round the holder. |
-| `time_stone.slowFactor` | `3` | 2 to 20 | How many times slower time runs in the zone. |
+| `time_stone.slowFactor` | `10` | 2 to 20 | How many times slower time runs in the zone. |
 | `time_stone.slowMaxTicks` | `200` | 20 to 2400 | Longest (ticks) Slow Time stays on (200 = 10 seconds). |
 | `time_stone.slowCooldown` | `200` | 0 to 72000 | Cooldown (ticks) of Slow Time (200 = 10 seconds). |
 | `time_stone.bossFactorHalf` | `true` | `true` or `false` | Whether bosses are slowed at half the factor. |

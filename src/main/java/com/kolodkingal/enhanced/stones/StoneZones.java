@@ -30,7 +30,7 @@ public final class StoneZones {
 
     /** How many times slower a Time Stone's zone makes time ({@code [time_stone] slowFactor}). */
     public static int factor() {
-        return EnhancedConfig.SPEC.isLoaded() ? StonesConfig.TIME_SLOW_FACTOR.get() : 3;
+        return EnhancedConfig.SPEC.isLoaded() ? StonesConfig.TIME_SLOW_FACTOR.get() : 10;
     }
 
     /**

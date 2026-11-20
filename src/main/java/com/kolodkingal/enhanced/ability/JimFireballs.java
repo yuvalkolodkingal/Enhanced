@@ -180,6 +180,11 @@ public final class JimFireballs {
         Iterator<Ball> it = list.iterator();
         while (it.hasNext()) {
             Ball ball = it.next();
+            // 3.18.0: in slowed time a fireball moves on every Nth tick only, a whole tick's way (so it hits as hard), on
+            // its body's beat, so the clients' copy of the body (tick-skipped the same way) keeps up with it
+            if (SlowMotion.skipsPoint(level, ball.pos, ball.body != null ? ball.body.getId() : System.identityHashCode(ball))) {
+                continue;
+            }
             if (!step(player, level, ball)) {
                 ball.out();
                 it.remove();

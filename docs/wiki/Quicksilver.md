@@ -36,7 +36,7 @@ In 3.3 Quicksilver's two powers are **separate**: **R** slows time, **G** makes 
 
 **Press R and time slows down around him, whether he runs or not.** He can stand still, walk, mine, build, fight or eat in the middle of it.
 
-* Everything within **32 blocks** runs **5 times slower**: monsters, animals, villagers, falling blocks, TNT fuses, dropped items, smoke, sparks and splashes, and **arrows and thrown things, which hang in the air** and crawl forward. An arrow that finally lands still hits as hard as it would have.
+* Everything within **32 blocks** runs **10 times slower** (since 3.18.0; it was 5): monsters, animals, villagers, falling blocks, TNT fuses, dropped items, boats, smoke, sparks and splashes, fireballs and every other projectile (the heroes' too), and **arrows and thrown things, which hang in the air** and crawl forward. Other players in it keep about a tenth of their walking speed. An arrow that finally lands still hits as hard as it would have.
 * Other players in range are slowed down heavily (a strong Slowness).
 * **The world starts playing his song.** Everyone near him hears his theme, *Silver Hours* (3.5; or your own *Sweet Dreams*, see [below](#the-song-and-your-own-music)), from his Walkman for as long as Quicksilver Time is on (if his Walkman is on: **Sneak + R**). It fades in when he turns Quicksilver Time on, keeps playing from where it was if he turns it off and on again within 10 seconds, and fades out when he turns it off.
 * A cool grey-blue shade at the edges of the screen, and a tint of the world, show that time is slowed; everyone inside his zone sees it. (Inside [Tommy](Tommy)'s slow time it is teal.)

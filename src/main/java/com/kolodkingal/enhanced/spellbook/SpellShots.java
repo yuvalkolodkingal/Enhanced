@@ -116,7 +116,9 @@ public final class SpellShots {
         Iterator<Shot> it = list.iterator();
         while (it.hasNext()) {
             Shot shot = it.next();
-            if (shot.kind == kind && !step(player, level, shot)) {
+            // 3.18.0: in slowed time a shot moves on every Nth tick only, a whole tick's way (so it hits as hard)
+            if (shot.kind == kind && !com.kolodkingal.enhanced.ability.SlowMotion.skipsPoint(level, shot.pos,
+                    System.identityHashCode(shot)) && !step(player, level, shot)) {
                 it.remove();
             }
         }
