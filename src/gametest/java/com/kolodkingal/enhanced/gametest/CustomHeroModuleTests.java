@@ -666,6 +666,7 @@ public final class CustomHeroModuleTests {
         press(player);
         tick(player, 10);
         // 3.18.0: his slowed time is a zone as a speedster's (everything in it runs at a tenth), not Slowness
+        com.kolodkingal.enhanced.ability.SlowMotion.clear(); // (the zones are cached for the tick)
         check(com.kolodkingal.enhanced.ability.SlowMotion.customRadius(player) > 0
                 && com.kolodkingal.enhanced.ability.SlowMotion.isInZone(helper.getLevel(), y.position()), "the world slows round him");
         become(player, PowerModule.TIME, "rewind", 1);

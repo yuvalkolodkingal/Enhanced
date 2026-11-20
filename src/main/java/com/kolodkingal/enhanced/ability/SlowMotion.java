@@ -281,10 +281,15 @@ public final class SlowMotion {
      * a mob walked a step, stood, walked a step); {@link #renderPartialTick} spreads each real tick over the whole beat.
      */
     public static boolean skipTick(Entity entity) {
+        return skipsAt(entity, entity.level().getGameTime());
+    }
+
+    /** {@link #skipTick} at the level's game time {@code time} (the tests walk it through a beat). */
+    public static boolean skipsAt(Entity entity, long time) {
         if (slowedBySpeed(entity) || !affected(entity)) {
             return false;
         }
-        return Math.floorMod(entity.level().getGameTime() + entity.getId(), factorOf(entity)) != 0;
+        return Math.floorMod(time + entity.getId(), factorOf(entity)) != 0;
     }
 
     /**

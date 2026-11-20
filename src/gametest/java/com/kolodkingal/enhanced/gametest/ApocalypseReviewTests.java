@@ -143,6 +143,8 @@ public final class ApocalypseReviewTests {
     @EnhancedTest(template = ARENA, batch = "apocalypse_review_slow", timeoutTicks = 150)
     public static void quicksilverTimeSlowsHisTellsAndTheTricksOfHisHorsemen(GameTestHelper helper) {
         Duel d = duel(helper, 1, Power.QUICKSILVER);
+        // (the timings below are those of a fivefold slowing; 3.18.0 made a tenth the default)
+        d.f().config(com.kolodkingal.enhanced.EnhancedConfig.SLOW_MOTION_FACTOR, 5);
         ServerPlayer speedster = d.hero();
         ApocalypseEntity boss = d.boss();
         ServerLevel level = d.level();
