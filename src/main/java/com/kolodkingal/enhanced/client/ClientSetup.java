@@ -503,6 +503,9 @@ public final class ClientSetup {
                 // ===== stones (3.6) =====
                 // ===== strange (3.6) =====
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.CloakLayer(renderer));
+                // (3.18.1) Billy the Demiurge's red cloak, scarf and hood: cloth, drawn for him only
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.DemiurgeCloakLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.DemiurgeGlowLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.EyeAmuletLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.AstralLayer(renderer));
                 // ===== hulk (3.6) =====

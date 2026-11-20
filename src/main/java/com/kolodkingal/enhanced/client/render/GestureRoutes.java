@@ -669,7 +669,7 @@ public final class GestureRoutes {
             // (3.18) the transformation plays the surge's gesture, SPIDER_SURGE_ON, from SpiderClient.liveGesture
             case SPIDER_COSMIC -> null;
             // (3.18.1) Billy the Demiurge
-            case BILLY_DEMIURGE -> "drawn, not acted: the Demiurge's look (SuitSkins, his glow on GlowingEyesLayer) and his stars (DemiurgeFx)";
+            case BILLY_DEMIURGE -> "drawn, not acted: the Demiurge's two looks (SuitSkins, DemiurgeFx), his cloth cloak (DemiurgeCloakLayer) and crown (BillyCrownLayer)";
         };
     }
 

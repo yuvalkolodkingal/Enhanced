@@ -39,8 +39,6 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
     private static final RenderType WANDA_SUIT = eyeTexture("scarlet_witch_suit_eyes");
     private static final RenderType THOR = eyeTexture("thor_eyes");
     private static final RenderType THOR_RAGNAROK = eyeTexture("thor_ragnarok_eyes");
-    /** (3.18.1) Billy the Demiurge: his eyes and the stars of his suit, alight. */
-    private static final RenderType DEMIURGE = eyeTexture("billy_demiurge_glow");
 
     public GlowingEyesLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
         super(parent);
@@ -60,7 +58,6 @@ public class GlowingEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
             case THOR -> data.has(HeroAbility.THOR_THUNDER) && data.toggle(Toggle.GOD_OF_THUNDER)
                     || data.has(HeroAbility.THOR_LIGHTNING) && data.is(Live.CALLING_LIGHTNING)
                     ? ("ragnarok".equals(Variants.current(data).id()) ? THOR_RAGNAROK : THOR) : null;
-            case BILLY -> com.kolodkingal.enhanced.ability.Demiurge.is(data) ? DEMIURGE : null;
             // The heroes of 3.0 say for themselves, a mask for each look.
             default -> {
                 HeroClient hero = HeroClients.of(data.power());

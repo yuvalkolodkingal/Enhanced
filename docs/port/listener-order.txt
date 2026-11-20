@@ -714,6 +714,7 @@ event net.neoforged.neoforge.client.event.RenderLevelStageEvent -> com.kolodking
     NORMAL - com.kolodkingal.enhanced.client.eternity.MirrorReflection#onRenderLevel
     NORMAL - com.kolodkingal.enhanced.client.CerebroView#onRenderLevel
     NORMAL - com.kolodkingal.enhanced.client.ThoughtBubbles#onRenderLevel
+    NORMAL - com.kolodkingal.enhanced.client.render.DemiurgeFx#onRenderLevel
 event net.neoforged.neoforge.client.event.RenderNameTagEvent -> com.kolodkingal.enhanced.platform.event.client.RenderNameTagEvent
     NORMAL - com.kolodkingal.enhanced.client.Shapeshifts#onRenderNameTag
 event net.neoforged.neoforge.client.event.RenderPlayerEvent$Post -> com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent$Post
