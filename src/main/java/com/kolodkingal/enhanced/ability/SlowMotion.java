@@ -244,6 +244,18 @@ public final class SlowMotion {
         return entity instanceof BossHooks boss ? boss.slowFactor(zone) : zone;
     }
 
+    /**
+     * (3.18.1) How many times slower another player is in slowed time: the zone's factor while he stands in one he does not
+     * hold himself, else 1. Slowness does not touch a hero's flight, so his flying speed is divided by this
+     * ({@code PowerTicker}); his walking gets the matching Slowness ({@link #serverTick}).
+     */
+    public static int playerFactor(Player player) {
+        if (player.isSpectator() || holdsZone(player, Powers.get(player)) || !isInZone(player.level(), player.position())) {
+            return 1;
+        }
+        return Math.max(1, factorOf(player));
+    }
+
     /** Whether this entity is slowed by Quicksilver Time at all (players and things they ride are never tick-skipped). */
     private static boolean affected(Entity entity) {
         if (entity instanceof Player || Platform.get().parts().isPart(entity)

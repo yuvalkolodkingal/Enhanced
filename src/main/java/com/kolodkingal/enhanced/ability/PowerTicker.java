@@ -73,6 +73,10 @@ public final class PowerTicker {
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
                 : power.flightSpeed() * lookFlight(data);
+        if (survivalLike && canFly) {
+            // (3.18.1) in another's slowed time a hero flies as slowly as everything round him (Slowness never slows flight)
+            speed /= SlowMotion.playerFactor(player);
+        }
         boolean changed = false;
         if (Math.abs(abilities.getFlyingSpeed() - speed) > 1.0E-4F) {
             abilities.setFlyingSpeed(speed);
