@@ -177,6 +177,7 @@ public final class HeroAnimator {
         s.prevFlyingEff = s.flyingEff;
         // The local flag flips at once; everyone else's arrives with the synced data.
         s.flyingEff = p instanceof LocalPlayer lp ? lp.getAbilities().flying : data.flying();
+        s.extraFlier = com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data);
         s.sinceFlying = s.flyingEff ? 0 : Math.min(100, s.sinceFlying + 1);
         s.sprinting = p.isSprinting();
         s.crouching = p.isCrouching();
@@ -271,7 +272,7 @@ public final class HeroAnimator {
         FlightProfile profile = FlightProfile.of(s);
         float age = p.tickCount;
         // 2: take-off.
-        if (profile != null && !s.prevFlyingEff && s.flyingEff && power.canFly() && (s.onGround || s.airTicks <= 8)) {
+        if (profile != null && !s.prevFlyingEff && s.flyingEff && (power.canFly() || s.extraFlier) && (s.onGround || s.airTicks <= 8)) {
             GestureId id = switch (flier) {
                 case MAGNETO -> GestureId.TAKEOFF_MAGNETO;
                 case SCARLET_WITCH -> GestureId.TAKEOFF_WANDA;
@@ -515,7 +516,7 @@ public final class HeroAnimator {
         measure(s, player, yBodyRot, dt, profile);
 
         // ---- weights ----
-        boolean air = s.flyingEff && !s.onGround && s.power.canFly() && profile != null;
+        boolean air = s.flyingEff && !s.onGround && (s.power.canFly() || s.extraFlier) && profile != null;
         float tauAirOut = s.onGround ? 1.5F : 3.0F;
         s.wAir = snap ? (air ? 1.0F : 0.0F) : AnimMath.ease(s.wAir, air ? 1.0F : 0.0F, dt, 2.0F, tauAirOut);
         boolean inWater = player.isInWater();

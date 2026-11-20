@@ -79,6 +79,8 @@ public final class HeroAnimState {
     public final EnumSet<Power> kitSources = EnumSet.noneOf(Power.class);
     /** Whose flight profile, take-off and flight effects he flies with ({@code NONE}: the plain flight); the hero for a built-in. */
     public Power flightAs = Power.NONE;
+    /** (3.18) A hero who does not fly but flies now: Cosmic Spider-Man (his take-off, poses and landing are Wiccan's). */
+    public boolean extraFlier;
     /** With {@link #flightAs} VISION: White Vision's. */
     public boolean flightWhite;
     /** Whose run character he walks and sprints with (a {@code AnimCatalog.RUN_CHARACTERS} name; empty: the hero's own). */
