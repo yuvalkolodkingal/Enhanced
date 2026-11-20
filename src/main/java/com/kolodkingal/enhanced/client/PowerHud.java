@@ -91,13 +91,18 @@ public class PowerHud implements LayeredDraw.Layer {
         }
         Variant look = Variants.current(data);
         // Heroes with several looks show the current one, and the key that changes it, after their name.
-        int titleColor = Variants.hasChoice(power) ? look.color() : power.titleColor();
-        MutableComponent title = com.kolodkingal.enhanced.power.Characters.name(data).copy().withStyle(s -> s.withColor(titleColor).withBold(true));
+        // (3.18) Cosmic Spider-Man's panel is in the Enigma Force's colours: a white-blue name, keys and frame
+        boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data);
+        int titleColor = cosmic ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA : Variants.hasChoice(power) ? look.color() : power.titleColor();
+        MutableComponent title = (cosmic ? Component.translatable("hud.enhanced.cosmic_spider.title")
+                : com.kolodkingal.enhanced.power.Characters.name(data).copy()).withStyle(s -> s.withColor(titleColor).withBold(true));
         if (Variants.hasChoice(power)) {
             title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
                     .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
                             .withStyle(s -> s.withBold(false).withColor(ChatFormatting.YELLOW)))
-                    .append(look.displayName().copy().withStyle(s -> s.withBold(false).withColor(ChatFormatting.GRAY)));
+                    .append((cosmic ? Component.translatable(com.kolodkingal.enhanced.ability.CosmicSpider.universe(data)
+                            ? "hud.enhanced.cosmic_spider.look.universe" : "hud.enhanced.cosmic_spider.look.starfield")
+                            : look.displayName().copy()).withStyle(s -> s.withBold(false).withColor(cosmic ? 0xD8EEFF : 0xAAAAAA)));
         }
 
         Power builder = BuildClient.hero(player); // (3.4: whose Build Magic he has, the line's owner)
@@ -107,8 +112,10 @@ public class PowerHud implements LayeredDraw.Layer {
         int width = font.width(title) + 4;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
-                    .withStyle(ChatFormatting.YELLOW)
-                    .append(Component.translatable(abilityKey(data, power, i)).withStyle(ChatFormatting.WHITE));
+                    .withStyle(cosmic ? net.minecraft.network.chat.Style.EMPTY.withColor(com.kolodkingal.enhanced.ability.CosmicSpider.AURA)
+                            : net.minecraft.network.chat.Style.EMPTY.withColor(ChatFormatting.YELLOW))
+                    .append(Component.translatable(abilityKey(data, power, i)).withStyle(cosmic
+                            ? net.minecraft.network.chat.Style.EMPTY.withColor(0xEAF6FF) : net.minecraft.network.chat.Style.EMPTY.withColor(ChatFormatting.WHITE)));
             Component status = status(player, data, i, now);
             if (status != null) {
                 line.append(Component.literal("  ")).append(status);
@@ -146,7 +153,15 @@ public class PowerHud implements LayeredDraw.Layer {
         int y = 4 + BossBarOverride.clearance(x + width + 4);
         int height = 12 + lines.length * 10;
         Coexist.hudBottom(y + height, false);
-        graphics.fill(x - 2, y - 2, x + width + 4, y + height, 0x70000000);
+        graphics.fill(x - 2, y - 2, x + width + 4, y + height, cosmic ? 0x80101A3A : 0x70000000);
+        if (cosmic) {
+            // a thin glowing frame of the Enigma Force round the panel
+            int aura = 0xC0000000 | com.kolodkingal.enhanced.ability.CosmicSpider.AURA;
+            graphics.fill(x - 2, y - 2, x + width + 4, y - 1, aura);
+            graphics.fill(x - 2, y + height - 1, x + width + 4, y + height, aura);
+            graphics.fill(x - 2, y - 2, x - 1, y + height, aura);
+            graphics.fill(x + width + 3, y - 2, x + width + 4, y + height, aura);
+        }
         graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);
         y += 12;
         for (Component line : lines) {
@@ -186,8 +201,9 @@ public class PowerHud implements LayeredDraw.Layer {
         long now = mc.level.getGameTime();
         Variant look = Variants.current(data);
         PowerPanels.Model model = new PowerPanels.Model();
-        model.color = Variants.hasChoice(power) ? look.color() : power.titleColor();
-        model.title = com.kolodkingal.enhanced.power.Characters.name(data);
+        boolean cosmicPanel = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data);
+        model.color = cosmicPanel ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA : Variants.hasChoice(power) ? look.color() : power.titleColor();
+        model.title = cosmicPanel ? Component.translatable("hud.enhanced.cosmic_spider.title") : com.kolodkingal.enhanced.power.Characters.name(data);
         model.identity = power.getSerializedName() + "/" + look.displayName().getString();
         model.sneaking = false;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
@@ -240,8 +256,8 @@ public class PowerHud implements LayeredDraw.Layer {
         if ((ability == 1 || ability == 5) && com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
             return "ability.enhanced.vision.solar." + ability;
         }
-        // (3.18) Cosmic Spider-Man's own R, B and N
-        if ((ability == 1 || ability == 4 || ability == 5) && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data)) {
+        // (3.18) Cosmic Spider-Man's own R, G (webs, not swings: he flies), B and N
+        if ((ability == 1 || ability == 2 || ability == 4 || ability == 5) && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data)) {
             return "ability.enhanced.spider_man.cosmic." + ability;
         }
         return power.abilityKey(ability);

@@ -329,6 +329,10 @@ public final class SpiderServer implements HeroServer {
             // (Web Assist has just leapt him up out of a forest: the key that came with it is not a swing nor a zip.)
             return;
         }
+        if (ability == 2 && CosmicSpider.isCosmic(data)) {
+            // (3.18) Cosmic Spider-Man flies, so G is no swing or zip: it shoots webs (Web Shot; Sneak: Web Burst), as R did
+            ability = 1;
+        }
         switch (ability) {
             case 1 -> {
                 if (sneak) {

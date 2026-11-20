@@ -350,6 +350,9 @@ public final class SpiderMotion {
 
     private static void pressed(LocalPlayer player, PowerData data, int ability, boolean sneaking) {
         long now = player.level().getGameTime();
+        if (ability == 2 && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data)) {
+            return; // (3.18) cosmic, G shoots webs (the server's): no zip, swing or Web Assist
+        }
         if (ability == 2) {
             pressedG = true;
             pressedGSneaking = sneaking;
@@ -405,6 +408,16 @@ public final class SpiderMotion {
             }
             pressedG = false;
             return;
+        }
+        if (com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data)) {
+            // (3.18) Cosmic Spider-Man flies: no swing, no zip and no Web Assist (G shoots webs); one he was on ends here
+            if (mode == Mode.SWING || mode == Mode.ZIP) {
+                mode = Mode.NONE;
+            }
+            pressedG = false;
+            assisted = false;
+            pendingAssist = null;
+            chain = false;
         }
         Keys keys = Keys.read(mc);
         boolean pressedJump = keys.jump() && !jumpWas;
