@@ -50,17 +50,6 @@ public final class JimTests {
         helper.runAfterDelay(ticks + 1, after);
     }
 
-    /** Runs {@code after} on the first tick {@code condition} holds, checked each tick for at most {@code ticks} ticks. */
-    private static void whenTrue(GameTestHelper helper, java.util.function.BooleanSupplier condition, int ticks, String what,
-            Runnable after) {
-        if (condition.getAsBoolean()) {
-            after.run();
-        } else {
-            check(ticks > 0, what);
-            helper.runAfterDelay(1, () -> whenTrue(helper, condition, ticks - 1, what, after));
-        }
-    }
-
     private static ServerPlayer jim(TestKit.Fixture f, double x, double z) {
         return f.player(x, FLOOR, z, Power.JIM_HAMMOND);
     }
@@ -424,7 +413,7 @@ public final class JimTests {
         helper.succeed();
     }
 
-    @EnhancedTest(template = ARENA, batch = "jim_solar_time")
+    @EnhancedTest(template = ARENA, batch = "jim_solar_time", timeoutTicks = 240)
     public static void solarChargeFillsInTheSunNotAtNightNorUnderARoof(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         net.minecraft.server.level.ServerLevel level = f.level();
@@ -436,27 +425,33 @@ public final class JimTests {
         for (int dy = 0; dy < 8; dy++) {
             helper.getLevel().setBlock(above.above(dy), Blocks.AIR.defaultBlockState(), 3);
         }
-        Powers.get(jim).setIronCharge(0);
-        run(helper, jim, 10, () -> {
-            check(solar(jim) == 10 * JimConfig.SOLAR_FILL_SUN.get(), "in the open sun it fills at the sun rate: " + solar(jim));
-            // a roof: only the shade rate
-            helper.getLevel().setBlock(above, Blocks.STONE.defaultBlockState(), 3);
-            // (the sky is told of the roof by the light engine, a tick or two later, more under a full run's load: wait for it)
-            BlockPos head = BlockPos.containing(jim.getEyePosition());
-            whenTrue(helper, () -> !level.canSeeSky(head), 100, "the roof shades him", () -> {
-                Powers.get(jim).setIronCharge(0);
-                run(helper, jim, 10, () -> {
+        // The whole test is scheduled here, up front: a run scheduled from inside a scheduled run can crash the game test
+        // runner (it walks its map of runs as it runs them, and one added on the way may break that walk). The sky learns of
+        // a roof from the light engine some ticks later (more under a full run's load), so each change has 40 ticks to settle.
+        // Ticks 1-40 settle; 41-50 sun; 51 roof; 52-91 settle; 92-101 shade; 102 night; 103-112 night.
+        for (int t = 1; t <= 112; t++) {
+            int tick = t;
+            helper.runAfterDelay(t, () -> {
+                if (tick == 41 || tick == 92 || tick == 103) {
+                    Powers.get(jim).setIronCharge(0);
+                }
+                jim.tickCount++;
+                PowerTicker.tick(jim);
+                if (tick == 50) {
+                    check(solar(jim) == 10 * JimConfig.SOLAR_FILL_SUN.get(), "in the open sun it fills at the sun rate: " + solar(jim));
+                    helper.getLevel().setBlock(above, Blocks.STONE.defaultBlockState(), 3); // a roof: only the shade rate
+                } else if (tick == 91) {
+                    check(!level.canSeeSky(BlockPos.containing(jim.getEyePosition())), "the roof shades him");
+                } else if (tick == 101) {
                     check(solar(jim) == 10 * JimConfig.SOLAR_FILL_SHADE.get(), "under a roof only the shade rate: " + solar(jim));
                     helper.getLevel().setBlock(above, Blocks.AIR.defaultBlockState(), 3);
                     level.setDayTime(18000L);
-                    Powers.get(jim).setIronCharge(0);
-                    run(helper, jim, 10, () -> {
-                        check(solar(jim) == 0, "none at night: " + solar(jim));
-                        helper.succeed();
-                    });
-                });
+                } else if (tick == 112) {
+                    check(solar(jim) == 0, "none at night: " + solar(jim));
+                    helper.succeed();
+                }
             });
-        });
+        }
     }
 
     @EnhancedTest(template = ARENA, batch = "jim_solar_cap")

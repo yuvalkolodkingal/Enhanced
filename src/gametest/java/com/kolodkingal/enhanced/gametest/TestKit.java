@@ -82,6 +82,7 @@ public final class TestKit {
     public static Fixture fixture(GameTestHelper helper) {
         Fixture fixture = new Fixture(helper);
         helper.testInfo.addListener(fixture);
+        roomForRuns(helper);
         // 3.2: the Chaos Shield is unlimited by default; the tests of its limits (strength, hunger, time, recharge) and of
         // everything else that reads them run under the old rules. A test of the unlimited shield sets it back to true.
         fixture.config(EnhancedConfig.WANDA_SHIELD_UNLIMITED, false);
@@ -89,6 +90,66 @@ public final class TestKit {
         // a shot) run with the old bolt. A test of the beam sets it back to true.
         fixture.config(EnhancedConfig.BILLY_BEAM, false);
         return fixture;
+    }
+
+    /**
+     * Vanilla's game test runner walks its map of scheduled runs while it runs them, and a run that schedules more (as so
+     * many tests here do: a check that starts the next stretch of ticks) changes the map mid-walk, which can break the walk
+     * with a NullPointerException that crashes the whole test server. The map is swapped for one that keeps what is
+     * scheduled during a walk aside and adds it when the next walk begins (the next tick).
+     */
+    private static void roomForRuns(GameTestHelper helper) {
+        try {
+            java.lang.reflect.Field field = net.minecraft.gametest.framework.GameTestInfo.class.getDeclaredField("runAtTickTimeMap");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            it.unimi.dsi.fastutil.objects.Object2LongMap<Runnable> old =
+                    (it.unimi.dsi.fastutil.objects.Object2LongMap<Runnable>) field.get(helper.testInfo);
+            if (old instanceof SafeRuns) {
+                return;
+            }
+            SafeRuns safe = new SafeRuns();
+            for (it.unimi.dsi.fastutil.objects.Object2LongMap.Entry<Runnable> entry : old.object2LongEntrySet()) {
+                safe.put(entry.getKey(), entry.getLongValue());
+            }
+            field.set(helper.testInfo, safe);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            // (another runner: nothing to swap)
+        }
+    }
+
+    /** The runner's map of scheduled runs, safe to schedule into during its walk (see {@link #roomForRuns}). */
+    private static final class SafeRuns extends it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<Runnable> {
+        private final it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<Runnable> pending =
+                new it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<>();
+
+        @Override
+        public long put(Runnable key, long value) {
+            pending.put(key, value);
+            return defRetValue;
+        }
+
+        @Override
+        public it.unimi.dsi.fastutil.objects.Object2LongMap.FastEntrySet<Runnable> object2LongEntrySet() {
+            if (!pending.isEmpty()) {
+                for (it.unimi.dsi.fastutil.objects.Object2LongMap.Entry<Runnable> entry : pending.object2LongEntrySet()) {
+                    super.put(entry.getKey(), entry.getLongValue());
+                }
+                pending.clear();
+            }
+            return super.object2LongEntrySet();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return super.isEmpty() && pending.isEmpty();
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            pending.clear();
+        }
     }
 
     /**
