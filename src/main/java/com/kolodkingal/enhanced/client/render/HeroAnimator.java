@@ -698,6 +698,9 @@ public final class HeroAnimator {
         if (!EnhancedConfig.SPEC.isLoaded()) {
             return profile.defaultSpeed;
         }
+        if (s.extraFlier) {
+            return com.kolodkingal.enhanced.ability.CosmicSpider.flightSpeed(); // (3.18: his cosmic speed, so his lean is Wiccan's)
+        }
         return s.power == Power.CUSTOM ? s.customFlightSpeed : s.power.flightSpeed();
     }
 
