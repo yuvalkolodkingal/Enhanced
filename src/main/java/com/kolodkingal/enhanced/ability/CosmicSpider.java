@@ -163,6 +163,10 @@ public final class CosmicSpider {
         return energy(data) + 0.5 / UNITS >= max();
     }
 
+    /** The meter gathered since it was last sent (see the tick), and for how many ticks. */
+    private static final java.util.Map<java.util.UUID, Double> PENDING = new java.util.HashMap<>();
+    private static final java.util.Map<java.util.UUID, Integer> PENDING_TICKS = new java.util.HashMap<>();
+
     private static double exact(Player player, PowerData data) {
         double synced = energy(data);
         Double known = EXACT.get(player.getUUID());
@@ -315,9 +319,21 @@ public final class CosmicSpider {
         }
         double energy = exact(player, data);
         if (!isCosmic(data)) {
+            if (!allowed(player)) {
+                return; // (without Ultimate the meter rests: nothing to fill, nothing to send)
+            }
             double max = max();
             if (energy < max) {
-                setEnergy(player, data, energy + refill() / 20.0);
+                // (gathered every tick but sent once a second, or when it is full: each change of the meter sends his whole
+                // power data to the players who see him, and a send every tick undid the client's own swings and Web
+                // Assist before they began)
+                double pending = PENDING.merge(player.getUUID(), refill() / 20.0, Double::sum);
+                int ticks = PENDING_TICKS.merge(player.getUUID(), 1, Integer::sum);
+                if (energy + pending >= max || ticks >= 20) {
+                    PENDING.remove(player.getUUID());
+                    PENDING_TICKS.remove(player.getUUID());
+                    setEnergy(player, data, energy + pending);
+                }
                 if (full(data) && !READY_SAID.getOrDefault(player.getUUID(), false)) {
                     READY_SAID.put(player.getUUID(), true);
                     player.displayClientMessage(Component.translatable("message.enhanced.cosmic_spider.ready")
@@ -669,6 +685,8 @@ public final class CosmicSpider {
     static void forget(UUID id) {
         BEAM.remove(id);
         EXACT.remove(id);
+        PENDING.remove(id);
+        PENDING_TICKS.remove(id);
         REGEN_AT.remove(id);
         PORTAL_READY.remove(id);
         READY_SAID.remove(id);
@@ -677,6 +695,8 @@ public final class CosmicSpider {
     static void clear() {
         BEAM.clear();
         EXACT.clear();
+        PENDING.clear();
+        PENDING_TICKS.clear();
         REGEN_AT.clear();
         PORTAL_READY.clear();
         READY_SAID.clear();
