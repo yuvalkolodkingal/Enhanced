@@ -23,7 +23,7 @@ import java.util.List;
  * to it. Reads only what the server told the client ({@link WitchLevelView}).
  */
 public class SpellsScreen extends Screen {
-    private static final int W = 300;
+    private static final int W = 380;
     private static final int ROW = 30;
 
     public SpellsScreen() {
@@ -130,7 +130,11 @@ public class SpellsScreen extends Screen {
                     : beyond ? Component.translatable("screen.enhanced.spells.beyond").withStyle(ChatFormatting.DARK_GRAY)
                     : Component.translatable("screen.enhanced.spells.locked", SpellLevels.threshold(l)).withStyle(ChatFormatting.DARK_GRAY);
             graphics.drawString(font, mark, x + W - 6 - font.width(mark), ry + 4, 0xFFFFFFFF, true);
-            graphics.drawString(font, opens(l, textColor), x + 12, ry + 15, 0xFFFFFFFF, false);
+            // (one line: what does not fit the row is cut)
+            List<net.minecraft.util.FormattedCharSequence> parts = font.split(opens(l, textColor), W - 18);
+            if (!parts.isEmpty()) {
+                graphics.drawString(font, parts.get(0), x + 12, ry + 15, 0xFFFFFFFF, false);
+            }
             ry += ROW;
         }
     }
