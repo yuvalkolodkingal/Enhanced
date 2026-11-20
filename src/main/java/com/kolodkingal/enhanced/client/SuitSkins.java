@@ -45,6 +45,11 @@ public final class SuitSkins {
     private static final PlayerSkin COSMIC_UNIVERSE = new PlayerSkin(
             Enhanced.id("textures/entity/suit/spider_cosmic_universe.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    /** (3.18.1) Billy the Demiurge: Wiccan's suit turned a starry bright blue, his eyes alight, the red cape and scarf brighter. */
+    private static final PlayerSkin BILLY_DEMIURGE = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/billy_demiurge.png"), null,
+            Enhanced.id("textures/entity/suit/billy_demiurge_cape.png"), null, PlayerSkin.Model.WIDE, true);
+
     private static final PlayerSkin JIM_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/jim_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -81,6 +86,10 @@ public final class SuitSkins {
         if (power == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(Powers.get(player))) {
             // (3.18) the Enigma Force turns his suit black and white, whatever his look or his own skin
             return com.kolodkingal.enhanced.ability.CosmicSpider.universe(Powers.get(player)) ? COSMIC_UNIVERSE : COSMIC_SPIDER;
+        }
+        if (power == Power.BILLY && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
+            // (3.18.1) the Demiurge looks the Demiurge, whatever his look, his own skin or the magic type on his keys
+            return BILLY_DEMIURGE;
         }
         if (power.hasPowers() && Powers.get(player).ownSkin()) {
             // (3.17: he chose his own skin: any hero, built-in or custom, wears it instead of the suit)

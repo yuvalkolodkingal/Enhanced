@@ -123,6 +123,7 @@ public final class ClientEvents {
         SlowMotionEffect.tick(mc);
         TheNoise.tick(mc);
         HeroClients.tick(mc);
+        com.kolodkingal.enhanced.client.render.DemiurgeFx.tick(mc.level); // (3.18.1: Billy the Demiurge's stars)
     }
 
     /** The game's own music waits while a speedster's Walkman song plays, and for its usual pause after the song ends. */
@@ -353,6 +354,11 @@ public final class ClientEvents {
                     continue;
                 }
                 if (BifrostKeys.opensScreen(player, i, sneak)) { mc.setScreen(new BifrostScreen()); continue; }
+                // (3.18.1) Billy the Demiurge's Sneak + G: the screen of his gift of magic
+                if (i == 2 && sneak && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
+                    com.kolodkingal.enhanced.client.screen.DemiurgeGiftScreen.open();
+                    continue;
+                }
                 // (3.18) Cosmic Spider-Man's B: the screen of his portals (the places he saved, the worlds)
                 if (i == 4 && !sneak && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(Powers.get(player))) {
                     com.kolodkingal.enhanced.client.strange.SlingRingScreen.openCosmic();

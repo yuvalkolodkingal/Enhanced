@@ -34,6 +34,7 @@ public class EnergyParticle extends SingleQuadParticle {
         this.gravity = 0F;
         this.hasPhysics = false;
         this.setSprite(sprites.get(random));
+        DemiurgeStars.spark(level, color, x, y, z, xd, yd, zd); // (3.18.1: the stars in the Demiurge's energy)
     }
 
     @Override
