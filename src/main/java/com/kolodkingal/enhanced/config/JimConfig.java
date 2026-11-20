@@ -125,11 +125,11 @@ public final class JimConfig {
         NOVA_RANGE = builder.comment("Reach (blocks) of a fully charged Nova Flame.").defineInRange("novaRange", 96, 8, 256);
         NOVA_WIDTH = builder.comment("Radius (blocks) of a fully charged Nova Flame's beam: what it touches is struck.")
                 .defineInRange("novaWidth", 2.2, 0.3, 12.0);
-        NOVA_MIN_DAMAGE = builder.comment("Damage of a tap of the Nova Flame.").defineInRange("novaMinDamage", 12.0, 0.0, 500.0);
+        NOVA_MIN_DAMAGE = builder.comment("Damage of a tap of the Nova Flame.").defineInRange("novaMinDamage", 6.0, 0.0, 500.0);
         NOVA_DAMAGE = builder.comment("Damage of a fully charged Nova Flame on every creature it crosses. Never to him.")
-                .defineInRange("novaDamage", 90.0, 0.0, 500.0);
+                .defineInRange("novaDamage", 24.0, 0.0, 500.0);
         NOVA_BURN_SECONDS = builder.comment("Seconds what the Nova Flame strikes burns (a full charge burns twice as long).")
-                .defineInRange("novaBurnSeconds", 10, 0, 60);
+                .defineInRange("novaBurnSeconds", 6, 0, 60);
         NOVA_MAGMA = builder.comment("Whether a charged Nova Flame turns the ground it strikes into magma blocks (only where the mod's block rules",
                 "allow it, never with mobGriefing off, never blocks harder than 8).").define("novaMagma", true);
         NOVA_MAGMA_MIN_CHARGE = builder.comment("How charged (0 to 1) the Nova Flame must be to make magma.")

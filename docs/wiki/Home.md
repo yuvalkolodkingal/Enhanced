@@ -56,6 +56,8 @@ How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero
 
 ## What's new in 3.17.1
 
+* **The Nova Flame no longer kills everything in one hit.** A full charge now does 24 damage (was 90) and a tap 6 (was 12), and what it strikes burns for 6 seconds (was 10); its fire, magma and explosion are unchanged. Server owners can set the old numbers back with `/enhanced config set jim.novaDamage 90`.
+* **Jim Hammond's abilities have their own symbols** in the drawn HUD styles (Comic, Stack, Dial, Scroll, Cluster): a fire beam, flight, a fireball, the Nova sun and the disguise, instead of blank tiles.
 * **Jim Hammond's fireball reads in flight and never fills your screen.** It is drawn half again as big, with a tail that grows with its speed, and it fades away as it nears the camera (just thrown in first person, or flying straight at you) instead of covering the view in orange. How hard it hits is unchanged.
 
 ## What's new in 3.17.0
