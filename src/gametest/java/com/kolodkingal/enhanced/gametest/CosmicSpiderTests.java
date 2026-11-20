@@ -87,6 +87,18 @@ public final class CosmicSpiderTests {
     }
 
     @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void flyingHeShootsWebsWithGEvenAtTheOpenSky(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = cosmic(f);
+        player.getAbilities().flying = true;
+        player.setXRot(-89.0F); // straight up: nothing to hit
+        AbilityHandler.onKey(player, 2, true);
+        AbilityHandler.onKey(player, 2, false);
+        check(data(player).is(Live.CASTING), "flying and aiming at the sky, G still shoots a web");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void heBecomesCosmicOnlyWithAFullMeter(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f);

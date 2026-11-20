@@ -538,7 +538,9 @@ public final class SpiderMotion {
     }
 
     private static boolean blocked(LocalPlayer player, PowerData data) {
-        if (player.isSpectator() || player.isPassenger() || player.getAbilities().flying || player.isFallFlying() || data.is(Live.PINNED)
+        // (3.18) Cosmic Spider-Man's own flight is no hold: his keys work as he flies
+        boolean flying = player.getAbilities().flying && !com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data);
+        if (player.isSpectator() || player.isPassenger() || flying || player.isFallFlying() || data.is(Live.PINNED)
                 || data.is(Live.LIFTED) || player.hasEffect(ModEffects.ENTOMBED)) {
             return true;
         }

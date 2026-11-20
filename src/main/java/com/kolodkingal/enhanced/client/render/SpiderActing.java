@@ -63,9 +63,13 @@ final class SpiderActing {
             // Held (a spell, a pin, telekinesis, a tomb): the server ignores every key, so no hand may thrust a web.
             return null;
         }
+        boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data);
+        if (cosmic && ability == 2) {
+            ability = 1; // (3.18) cosmic, G shoots webs as R did (the server's own remap)
+        }
         boolean creative = me.getAbilities().invulnerable;
         int food = me.getFoodData().getFoodLevel();
-        SpiderGestures.Sight sight = new SpiderGestures.Sight(now >= shotReadyAt, ability == 1 && !sneaking && shotInSight(me),
+        SpiderGestures.Sight sight = new SpiderGestures.Sight(now >= shotReadyAt, ability == 1 && !sneaking && (cosmic || shotInSight(me)),
                 ability == 1 && sneaking && burstInRange(me), SpiderServer.IRON_SPIDER.equals(Variants.current(data).id()),
                 SpiderClient.scattered(), SpiderMotion.confirmPending(now), creative || food > 0, creative || food >= SpiderServer.EYES_MIN_FOOD);
         GestureId id = SpiderGestures.predicted(data, ability, now, sneaking, sight);

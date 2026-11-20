@@ -543,10 +543,15 @@ public final class SpiderServer implements HeroServer {
             return;
         }
         HitResult hit = Raycasts.any(player, SpiderConfig.WEB_SHOT_RANGE.get(), SpiderWebs::webTarget, 1.0F);
+        boolean intoTheSky = false;
         if (hit.getType() == HitResult.Type.MISS) {
-            // A hand must not thrust at nothing: no hunger, no timer, no pose.
-            say(player, "message.enhanced.web.no_target");
-            return;
+            if (!CosmicSpider.isCosmic(data)) {
+                // A hand must not thrust at nothing: no hunger, no timer, no pose.
+                say(player, "message.enhanced.web.no_target");
+                return;
+            }
+            // (3.18) Cosmic Spider-Man shoots as he flies, often at the open sky: the web flies out its full length
+            intoTheSky = true;
         }
         Vec3 from = hand(player);
         Vec3 eye = player.getEyePosition();
@@ -568,7 +573,7 @@ public final class SpiderServer implements HeroServer {
             if (SpiderWebs.web(player, target, ticks) && SpiderWebs.body(target) instanceof LivingEntity living) {
                 SpiderWebs.cocoon(level, player, state.webs, living, organic);
             }
-        } else if (hit instanceof BlockHitResult blockHit) {
+        } else if (hit instanceof BlockHitResult blockHit && !intoTheSky) {
             normal = new Vec3(blockHit.getDirection().getStepX(), blockHit.getDirection().getStepY(), blockHit.getDirection().getStepZ());
             SpiderWebs.patch(level, player, state.webs, blockHit.getBlockPos(), blockHit.getDirection(), SpiderConfig.WEB_PATCH_RADIUS.get(), organic);
         }
@@ -577,7 +582,9 @@ public final class SpiderServer implements HeroServer {
         state.castUntil = now + CAST_TICKS;
         data.set(Live.CASTING, true);
         sound(level, player.position(), ModSounds.WEB_SHOT.get(), 0.9F, 0.92F + player.getRandom().nextFloat() * 0.16F);
-        sound(level, to, ModSounds.WEB_SPLAT.get(), shielded ? 0.5F : 0.7F, 1.0F);
+        if (!intoTheSky) {
+            sound(level, to, ModSounds.WEB_SPLAT.get(), shielded ? 0.5F : 0.7F, 1.0F);
+        }
         send(level, player, new SpiderFxPayload(SpiderFxPayload.Kind.SHOT, player.getId(), from, to, normal, targetId, 0F, organic, 0L, List.of()));
     }
 
