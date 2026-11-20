@@ -1521,6 +1521,44 @@ legs are his hands). Entity tags `web_immune` and `instant_kill_immune`, block t
 suits (`entity/suit/spider_*`), the five eye overlays and the legs (`entity/spider_*`), the web splat (`effect`), the Spider Web
 block, the animated jar of the item (4 frames, a green pulse) and the two effect icons.
 
+
+### 14.14 Cosmic Spider-Man **(added in 3.18)**
+
+> The 1990 "Cosmic Spider-Man": the Enigma Force of Captain Universe fills Peter Parker for a while.
+
+A transformation of Spider-Man, not a hero of his own (`ability/CosmicSpider`, `Live.SPIDER_COSMIC`, options in
+`[spider_man.cosmic]`).
+
+* **The meter.** A cosmic meter of `energyMax` (170), Iron Man's energy bar in white-blue (`IronHud.cosmicPanel`), kept in
+  `PowerData.ironCharge` in hundredths (saved and synced). Plain, it fills by `refillPerSecond` (1); **Sneak + N** makes him
+  cosmic only when it is full. Cosmic, it never recharges: it drains by `drainPerSecond` (0.75) and `flightDrainPerSecond` (0.25)
+  more in flight (170 seconds of flight against the Mark 3's 167), and the blasts by their own cost. At 0 he is plain
+  Spider-Man again (flight ends with Slow Falling) and it fills again; Sneak + N also lets it go at any time. Creative spends nothing.
+  `/enhanced cosmic <players> <energy>` sets it.
+* **The body.** His bare fist hits `strengthFactor` (3) times the Hulk's at 100% rage ((1 + 7) x 1.3 x 3 = 31.2); a full
+  netherite set's protection in place of his suit's (`armor` 20, `toughness` 12, `knockbackResistance` 0.4); he flies at
+  `flightSpeed` (0.16) with a trail of cosmic light and a comic-book flight (a fist ahead at a sprint); he heals `regenAmount` every
+  `regenIntervalTicks` (1 every 80) on top of a player's own healing, twice as fast; his spider-sense is `senseFactor` (2.5)
+  wider and lists every hostile. **Weakness:** pure life force, dark magic (`DarkMagic`: the Darkhold, Agatha, Hela's blades,
+  the Necrosword) hurts him `darkMagicFactor` (1.5) times as much.
+* **His keys while cosmic.** R held: **Cosmic Blast** from his hand (`blastDamage` 6 every `blastInterval` 5 ticks, `blastRange`
+  32, 3 energy a second); Sneak + R held: **Cosmic Eyes**, two white beams from his eyes (8 every 5 ticks, 24 blocks, 4 a second);
+  both on the shared beam system, damage type `enhanced:cosmic_blast`. G and V as ever (webs and the cling end in the air).
+  B: his **portal screen** (the Sling Ring's screen in white and blue, no ring needed): the places he saved (the Sling Ring's
+  list) and a button for each world (Overworld, Nether, End); Sneak + B: a portal to the next world. A place costs `portalEnergy`
+  (15), a world `worldPortalEnergy` (25), then `portalCooldown` (100 ticks). A world portal's twin stands where he would be there
+  (a Nether eighth of the way, the End's island, the Overworld's spawn from the End) on the first safe ground, else on a small
+  obsidian floor. Y: **Matter Restructuring**, Billy's Build Magic with Billy's rules, at `matterFactor` (two thirds) of Billy's
+  reach, side, shapes, brush, Repeat count and magic select at his own rank. N: nothing (the Black Eyes do not come). H: his
+  other cosmic look.
+* **The look.** Two cosmic suits, whatever his own look: *Cosmic (starfield)* (`suit/spider_cosmic`, a starry navy suit with
+  blue web lines and a white spider) and *Cosmic (Captain Universe)* (`suit/spider_cosmic_universe`, with its outer layer),
+  switched by H while cosmic (`Toggle.COSMIC_UNIVERSE`, kept). His lenses glow white (`spider_cosmic_eyes`,
+  `spider_cosmic_universe_eyes`) and a white-blue aura rises off him (`CosmicSpiderFx`). The transformation plays the surge's gesture.
+* **The Hero Creator.** `spider.cosmic`, Sneak + the Black Eyes, appended after the passives: for a custom hero the meter and
+  the cosmic body (strength, protection, flight, healing, the weakness); the blasts, portals and Matter Restructuring are
+  Spider-Man's own keys.
+
 ---
 
 ## 15. Thanos — the Mad Titan **(added in 3.0)**

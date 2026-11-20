@@ -83,6 +83,9 @@ public enum Toggle {
     // ===== falcon (3.8) =====
     /** Falcon's drone Redwing is out (N): it marks monsters and zaps them. */
     REDWING_OUT,
+    // ===== cosmic spider-man (3.18) =====
+    /** Cosmic Spider-Man's look: off the starfield suit, on Captain Universe's (H while cosmic switches it; it is kept). */
+    COSMIC_UNIVERSE,
     ;
 
     final int bit() {

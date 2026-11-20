@@ -32,13 +32,15 @@ final class CosmicSpiderFx {
     private static final int DEEP = 0x4F8FEA;
 
     /** His lenses, blazing white (a mask on the face's eyes of his suit, drawn full-bright). */
-    static net.minecraft.client.renderer.RenderType eyes() {
-        return Eyes.TYPE;
+    static net.minecraft.client.renderer.RenderType eyes(boolean universe) {
+        return universe ? Eyes.UNIVERSE : Eyes.TYPE;
     }
 
     private static final class Eyes {
         static final net.minecraft.client.renderer.RenderType TYPE = net.minecraft.client.renderer.RenderType.eyes(
                 com.kolodkingal.enhanced.Enhanced.id("textures/entity/spider_cosmic_eyes.png"));
+        static final net.minecraft.client.renderer.RenderType UNIVERSE = net.minecraft.client.renderer.RenderType.eyes(
+                com.kolodkingal.enhanced.Enhanced.id("textures/entity/spider_cosmic_universe_eyes.png"));
     }
 
     /** Every client tick: the aura of every cosmic player in view. */

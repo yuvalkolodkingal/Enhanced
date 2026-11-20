@@ -206,6 +206,8 @@ public final class GestureRoutes {
             // ===== falcon (3.8) =====
             // (Redwing out of the pack: the flick of the hand that launches it; home again, nothing.)
             case REDWING_OUT -> power == Power.FALCON && on ? GestureId.FALCON_REDWING_LAUNCH : null;
+            // (3.18) Cosmic Spider-Man switches his cosmic look: the look change's flourish, either way
+            case COSMIC_UNIVERSE -> power == Power.SPIDER_MAN ? GestureId.LOOK_CHANGE : null;
         };
     }
 

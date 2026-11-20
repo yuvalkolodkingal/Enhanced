@@ -41,7 +41,8 @@ import java.util.Locale;
  * lines of his own in {@link GestureRoutes} and the methods below; what the client adds (the key press that acts before
  * the server answers, the zip his own movement begins, the landing, the push off a wall and the grab of one, his hands
  * in first person, the flourishes of his gestures) is {@link SpiderActing}, with {@link SpiderEdges} for the rules and
- * {@link SpiderGestureFx} for the flourishes. He does not fly, so he has no flight profile; his walk and sprint have a
+ * {@link SpiderGestureFx} for the flourishes. Plain, he does not fly; as Cosmic Spider-Man (3.18) he does, with the
+ * profile {@code FlightProfile.COSMIC_SPIDER} and {@link CosmicSpiderFx}'s trail and aura; his walk and sprint have a
  * character of their own in {@code RunPoses}.
  */
 public final class SpiderClient implements HeroClient {
@@ -94,7 +95,9 @@ public final class SpiderClient implements HeroClient {
                     return Component.translatable("hud.enhanced.cosmic_spider.portals").withStyle(ChatFormatting.DARK_AQUA);
                 }
                 case 5 -> {
-                    return Component.translatable("hud.enhanced.cosmic_spider.cosmic", (int) Math.ceil(CosmicSpider.energy(data)))
+                    return Component.translatable("hud.enhanced.cosmic_spider.cosmic", (int) Math.ceil(CosmicSpider.energy(data)),
+                                    Component.translatable(CosmicSpider.universe(data) ? "hud.enhanced.cosmic_spider.look.universe"
+                                            : "hud.enhanced.cosmic_spider.look.starfield"))
                             .withStyle(s -> s.withColor(CosmicSpider.AURA).withBold(true));
                 }
                 default -> {
@@ -180,7 +183,7 @@ public final class SpiderClient implements HeroClient {
     @Nullable
     @Override
     public net.minecraft.client.renderer.RenderType eyes(AbstractClientPlayer player, PowerData data) {
-        return CosmicSpider.isCosmic(data) ? CosmicSpiderFx.eyes() : null;
+        return CosmicSpider.isCosmic(data) ? CosmicSpiderFx.eyes(CosmicSpider.universe(data)) : null;
     }
 
     @Nullable

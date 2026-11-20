@@ -5340,7 +5340,7 @@
   "message.enhanced.cosmic_spider.world_portal": "A portal opens to %s",
   "hud.enhanced.cosmic_spider.firing": "firing",
   "hud.enhanced.cosmic_spider.portals": "B: places · Sneak: world",
-  "hud.enhanced.cosmic_spider.cosmic": "COSMIC %s",
+  "hud.enhanced.cosmic_spider.cosmic": "COSMIC %s · %s",
   "hud.enhanced.cosmic_spider.ready": "Sneak: COSMIC",
   "hud.enhanced.cosmic_spider.meter": "Cosmic Power",
   "hud.enhanced.cosmic_spider.draining": "Cosmic: never recharges while you are",
@@ -5355,5 +5355,9 @@
   "screen.enhanced.cosmic_portals.hint": "A place: %s cosmic power · a world: %s",
   "screen.enhanced.cosmic_portals.world": "Open a portal to %s",
   "hero_module.enhanced.spider.cosmic": "Cosmic Spider-Man (Spider-Man)",
-  "hero_module.enhanced.spider.cosmic.desc": "When the cosmic meter is full: the strength of three Hulks, flight, netherite protection and fast healing until it runs out. Dark magic hurts more."
+  "hero_module.enhanced.spider.cosmic.desc": "When the cosmic meter is full: the strength of three Hulks, flight, netherite protection and fast healing until it runs out. Dark magic hurts more.",
+  "commands.enhanced.cosmic.set": "%s Spider-Man(s) now have %s cosmic power",
+  "hud.enhanced.cosmic_spider.look.starfield": "Cosmic (starfield)",
+  "hud.enhanced.cosmic_spider.look.universe": "Cosmic (Captain Universe)",
+  "message.enhanced.cosmic_spider.look": "Cosmic look: %s"
 }

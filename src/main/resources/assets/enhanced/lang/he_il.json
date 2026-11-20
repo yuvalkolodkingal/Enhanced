@@ -5340,7 +5340,7 @@
   "message.enhanced.cosmic_spider.world_portal": "שער נפתח אל %s",
   "hud.enhanced.cosmic_spider.firing": "יורה",
   "hud.enhanced.cosmic_spider.portals": "B: מקומות · התכופפות: עולם",
-  "hud.enhanced.cosmic_spider.cosmic": "קוסמי %s",
+  "hud.enhanced.cosmic_spider.cosmic": "קוסמי %s · %s",
   "hud.enhanced.cosmic_spider.ready": "התכופפות: קוסמי",
   "hud.enhanced.cosmic_spider.meter": "כוח קוסמי",
   "hud.enhanced.cosmic_spider.draining": "קוסמי: לא מתמלא בזמן שאתם קוסמיים",
@@ -5355,5 +5355,9 @@
   "screen.enhanced.cosmic_portals.hint": "מקום: %s כוח קוסמי · עולם: %s",
   "screen.enhanced.cosmic_portals.world": "לפתוח שער אל %s",
   "hero_module.enhanced.spider.cosmic": "ספיידרמן הקוסמי (ספיידרמן)",
-  "hero_module.enhanced.spider.cosmic.desc": "כשמד הכוח הקוסמי מלא: כוח של שלושה האלקים, תעופה, הגנה של נת'רייט וריפוי מהיר עד שהוא נגמר. קסם אפל פוגע יותר."
+  "hero_module.enhanced.spider.cosmic.desc": "כשמד הכוח הקוסמי מלא: כוח של שלושה האלקים, תעופה, הגנה של נת'רייט וריפוי מהיר עד שהוא נגמר. קסם אפל פוגע יותר.",
+  "commands.enhanced.cosmic.set": "ל-%s ספיידרמנים יש עכשיו %s כוח קוסמי",
+  "hud.enhanced.cosmic_spider.look.starfield": "קוסמי (שמי כוכבים)",
+  "hud.enhanced.cosmic_spider.look.universe": "קוסמי (קפטן יוניברס)",
+  "message.enhanced.cosmic_spider.look": "מראה קוסמי: %s"
 }

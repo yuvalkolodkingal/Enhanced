@@ -207,7 +207,7 @@ public final class AvengersSkeletonTests {
         check(ModNetwork.PROTOCOL_VERSION.equals("17"), "protocol 17 (3.17's settings changed in the game)");
         check(Live.values().length == 86 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 5 (3.17 Jim) + 1 (3.18 Cosmic Spider-Man) = 86: "
                 + Live.values().length);
-        check(Toggle.values().length == 24 && Toggle.values().length <= 32, "Toggle: 22 + 2 = 24: "
+        check(Toggle.values().length == 25 && Toggle.values().length <= 32, "Toggle: 22 + 2 + 1 (3.18 Cosmic Spider-Man's look) = 25: "
                 + Toggle.values().length);
         check(Live.CAP_CHARGING.ordinal() == 58 && Live.RED_HULK_TRANSFORMING.ordinal() == 60
                 && Live.IRON_SUITING.ordinal() == 66 && Live.FALCON_GLIDING.ordinal() == 74,

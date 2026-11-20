@@ -213,6 +213,21 @@ public final class CosmicSpider {
         }
     }
 
+    /** Whether his cosmic look is Captain Universe's (else the starfield suit). */
+    public static boolean universe(PowerData data) {
+        return data.toggle(Toggle.COSMIC_UNIVERSE);
+    }
+
+    /** H while cosmic: the other cosmic look (the starfield suit or Captain Universe's); the choice is kept for next time. */
+    public static void switchLook(ServerPlayer player, PowerData data) {
+        boolean now = !universe(data);
+        data.setToggle(Toggle.COSMIC_UNIVERSE, now);
+        burst(player.serverLevel(), player, 20);
+        player.displayClientMessage(Component.translatable("message.enhanced.cosmic_spider.look",
+                Component.translatable(now ? "hud.enhanced.cosmic_spider.look.universe" : "hud.enhanced.cosmic_spider.look.starfield"))
+                .withStyle(s -> s.withColor(AURA)), true);
+    }
+
     /** Sneak + N: cosmic when the meter is full, or plain Spider-Man again. */
     public static void toggle(ServerPlayer player, PowerData data) {
         if (isCosmic(data)) {
@@ -533,8 +548,9 @@ public final class CosmicSpider {
         Vec3 far = landing(there, arrival(player, here, there));
         open(player, here, near, there, far);
         paid(player, data, cost);
+        ResourceKey<Level> dimension = target;
         player.displayClientMessage(Component.translatable("message.enhanced.cosmic_spider.world_portal",
-                Component.translatable("dimension." + target.location().getNamespace() + "." + target.location().getPath()))
+                Component.translatable("dimension." + dimension.location().getNamespace() + "." + dimension.location().getPath()))
                 .withStyle(s -> s.withColor(AURA)), true);
         return true;
     }

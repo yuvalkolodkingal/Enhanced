@@ -239,6 +239,20 @@ public final class CosmicSpiderTests {
     }
 
     @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theChangeLookKeySwitchesHisTwoCosmicLooks(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = cosmic(f);
+        String suit = Powers.variant(player).id();
+        check(!CosmicSpider.universe(data(player)), "he starts in the starfield suit");
+        CosmicSpider.switchLook(player, data(player));
+        check(CosmicSpider.universe(data(player)), "H while cosmic: Captain Universe's look");
+        check(Powers.variant(player).id().equals(suit), "his own suit is not changed by it");
+        sneakN(player);
+        check(CosmicSpider.universe(data(player)), "the choice is kept when he lets the power go");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void matterRestructuringIsBillysBuildMagicWeaker(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = spider(f);
