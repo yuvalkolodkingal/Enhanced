@@ -375,7 +375,9 @@ public final class SpiderAnimationTests {
     public static void everyGestureOfHisIsStartedBySomething(GameTestHelper helper) {
         HeroClient hero = HeroClients.of(Power.SPIDER_MAN);
         check(hero != null && hero.power() == Power.SPIDER_MAN, "he has a plug-in");
-        check(hero.takeoffGesture() == GestureId.TAKEOFF_VISION, "only Cosmic Spider-Man flies (3.18), and he takes off as Vision does");
+        check(hero.takeoffGesture() == GestureId.TAKEOFF_BILLY, "only Cosmic Spider-Man flies (3.18), and he takes off as Wiccan does");
+        check(com.kolodkingal.enhanced.client.render.FlightProfile.of(Power.SPIDER_MAN, false) == com.kolodkingal.enhanced.client.render.FlightProfile.of(Power.BILLY, false),
+                "and flies as Wiccan does");
         for (GestureId id : new GestureId[]{GestureId.SPIDER_LAND, GestureId.SPIDER_LEAP, GestureId.SPIDER_ARRIVE}) {
             check(hero.startedElsewhere(id) && GestureRoutes.startedElsewhere(id), id + " is the animator's own edge");
         }

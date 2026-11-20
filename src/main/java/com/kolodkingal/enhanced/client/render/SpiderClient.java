@@ -42,7 +42,7 @@ import java.util.Locale;
  * the server answers, the zip his own movement begins, the landing, the push off a wall and the grab of one, his hands
  * in first person, the flourishes of his gestures) is {@link SpiderActing}, with {@link SpiderEdges} for the rules and
  * {@link SpiderGestureFx} for the flourishes. Plain, he does not fly; as Cosmic Spider-Man (3.18) he does, with the
- * profile {@code FlightProfile.COSMIC_SPIDER} and {@link CosmicSpiderFx}'s trail and aura; his walk and sprint have a
+ * flight of Wiccan (his flight profile and take-off) and {@link CosmicSpiderFx}'s trail and aura; his walk and sprint have a
  * character of their own in {@code RunPoses}.
  */
 public final class SpiderClient implements HeroClient {
@@ -104,7 +104,7 @@ public final class SpiderClient implements HeroClient {
                 }
             }
         }
-        if (ability == 5 && !data.is(Live.BLACK_EYES) && data.cooldownUntil(5) <= now && CosmicSpider.full(data) && CosmicSpider.enabled()) {
+        if (ability == 5 && !data.is(Live.BLACK_EYES) && data.cooldownUntil(5) <= now && CosmicSpider.full(data) && CosmicSpider.allowed(player)) {
             return Component.translatable("hud.enhanced.cosmic_spider.ready").withStyle(s -> s.withColor(CosmicSpider.AURA));
         }
         return switch (ability) {
@@ -189,7 +189,7 @@ public final class SpiderClient implements HeroClient {
     @Nullable
     @Override
     public GestureId takeoffGesture() {
-        return GestureId.TAKEOFF_VISION;
+        return GestureId.TAKEOFF_BILLY; // (Wiccan's take-off: Cosmic Spider-Man flies as he does)
     }
 
     @Override

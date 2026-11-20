@@ -138,6 +138,17 @@ public final class ModAttachments {
      * Spellbooks: the hero of his own a book's caster made with the Hero Creator, kept aside while he is the caster, and the
      * colour of the Ethereal witch's hat. Saved, kept on death, not synced.
      */
+    /**
+     * 3.18: whether an operator granted this player the ultimate versions of the heroes (Cosmic Spider-Man) while the
+     * Ultimate switch is off. Saved, kept on death, synced to that player only.
+     */
+    public static final AttachKey<Boolean> ULTIMATE =
+            Attach.builder("ultimate", () -> Boolean.FALSE)
+                    .serialize(com.mojang.serialization.Codec.BOOL, on -> on)
+                    .copyOnDeath()
+                    .sync(SyncTo.SELF, net.minecraft.network.codec.ByteBufCodecs.BOOL)
+                    .build();
+
     public static final AttachKey<com.kolodkingal.enhanced.spellbook.SpellbookData> SPELLBOOK =
             Attach.builder("spellbook", () -> com.kolodkingal.enhanced.spellbook.SpellbookData.EMPTY)
                     .serialize(com.kolodkingal.enhanced.spellbook.SpellbookData.CODEC, data -> !data.isEmpty())

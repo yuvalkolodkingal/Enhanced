@@ -67,7 +67,7 @@ public final class IronHud implements LayeredDraw.Layer {
         }
         if (Powers.power(player) != Power.IRON_MAN) {
             PowerData data = Powers.get(player);
-            if (com.kolodkingal.enhanced.ability.CosmicSpider.hasMeter(data) && com.kolodkingal.enhanced.ability.CosmicSpider.enabled()
+            if (com.kolodkingal.enhanced.ability.CosmicSpider.hasMeter(data) && com.kolodkingal.enhanced.ability.CosmicSpider.allowed(player)
                     && !mc.options.hideGui) {
                 // (3.18) Cosmic Spider-Man's meter: Iron Man's energy bar, in the Enigma Force's colours
                 cosmicPanel(g, mc, data, 4, g.guiHeight() / 2 + 16);

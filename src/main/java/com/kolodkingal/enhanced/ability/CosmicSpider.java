@@ -114,6 +114,14 @@ public final class CosmicSpider {
         return !loaded() || CosmicSpiderConfig.ENABLED.get();
     }
 
+    /**
+     * Whether this player may be Cosmic Spider-Man: the feature is on and he has Ultimate (the switch {@code [ultimate]
+     * enabled}, off by default, or an operator's grant: {@code /enhanced ultimate}).
+     */
+    public static boolean allowed(net.minecraft.world.entity.player.Player player) {
+        return enabled() && com.kolodkingal.enhanced.ultimate.Ultimate.allowed(player);
+    }
+
     /** Whether he has the cosmic meter: Spider-Man, or a custom hero with the cosmic row. */
     public static boolean hasMeter(PowerData data) {
         return data.power() == Power.SPIDER_MAN || data.power() == Power.CUSTOM && data.has(HeroAbility.SPIDER_COSMIC);
@@ -238,6 +246,10 @@ public final class CosmicSpider {
             say(player, "message.enhanced.cosmic_spider.disabled");
             return;
         }
+        if (!allowed(player)) {
+            say(player, "message.enhanced.cosmic_spider.no_ultimate");
+            return;
+        }
         if (!full(data)) {
             player.displayClientMessage(Component.translatable("message.enhanced.cosmic_spider.not_ready",
                     (int) Math.floor(energy(data)), (int) Math.round(max())).withStyle(ChatFormatting.GRAY), true);
@@ -317,7 +329,7 @@ public final class CosmicSpider {
             }
             return;
         }
-        if (!enabled()) {
+        if (!allowed(player)) {
             revert(player, data, false);
             return;
         }

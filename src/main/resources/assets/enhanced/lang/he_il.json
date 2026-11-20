@@ -5359,5 +5359,14 @@
   "commands.enhanced.cosmic.set": "ל-%s ספיידרמנים יש עכשיו %s כוח קוסמי",
   "hud.enhanced.cosmic_spider.look.starfield": "קוסמי (שמי כוכבים)",
   "hud.enhanced.cosmic_spider.look.universe": "קוסמי (קפטן יוניברס)",
-  "message.enhanced.cosmic_spider.look": "מראה קוסמי: %s"
+  "message.enhanced.cosmic_spider.look": "מראה קוסמי: %s",
+  "commands.enhanced.ultimate.is_on": "אולטימייט פועל: כולם יכולים להשתמש בגיבורים האולטימטיביים (ספיידרמן הקוסמי)",
+  "commands.enhanced.ultimate.is_off": "אולטימייט כבוי: רק שחקנים שקיבלו אותו יכולים להשתמש בגיבורים האולטימטיביים (/enhanced ultimate grant <שחקנים>)",
+  "commands.enhanced.ultimate.on": "אולטימייט פועל עכשיו לכולם",
+  "commands.enhanced.ultimate.off": "אולטימייט כבוי עכשיו (מי שקיבל אותו שומר עליו)",
+  "commands.enhanced.ultimate.granted": "אולטימייט ניתן ל-%s שחקנים",
+  "commands.enhanced.ultimate.revoked": "אולטימייט נלקח מ-%s שחקנים",
+  "message.enhanced.ultimate.granted": "קיבלת אולטימייט: ספיידרמן הקוסמי שלך",
+  "message.enhanced.ultimate.revoked": "האולטימייט שלך נלקח",
+  "message.enhanced.cosmic_spider.no_ultimate": "ספיידרמן הקוסמי צריך אולטימייט (מפעיל: /enhanced ultimate true, או /enhanced ultimate grant <אתה>)"
 }

@@ -42,6 +42,7 @@ public final class CosmicSpiderTests {
 
     private static ServerPlayer spider(TestKit.Fixture f) {
         ServerPlayer player = f.player(10.5, FLOOR, 10.5, Power.SPIDER_MAN);
+        com.kolodkingal.enhanced.ultimate.Ultimate.grant(player, true); // (Ultimate is off by default: these tests are granted it)
         PowerTicker.tick(player);
         return player;
     }
@@ -64,6 +65,25 @@ public final class CosmicSpiderTests {
         PowerTicker.tick(player);
         check(CosmicSpider.isCosmic(data(player)), "a full meter and Sneak + N make him cosmic");
         return player;
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void heIsCosmicOnlyWithUltimateWhichIsOffByDefault(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        check(!com.kolodkingal.enhanced.config.UltimateConfig.ENABLED.getDefault(), "the Ultimate switch is off by default");
+        check(!com.kolodkingal.enhanced.ultimate.Ultimate.on(), "and off here");
+        ServerPlayer player = f.player(10.5, FLOOR, 10.5, Power.SPIDER_MAN);
+        PowerTicker.tick(player);
+        CosmicSpider.setEnergy(player, data(player), 170.0);
+        sneakN(player);
+        check(!CosmicSpider.isCosmic(data(player)) && !CosmicSpider.allowed(player), "without Ultimate a full meter does nothing");
+        com.kolodkingal.enhanced.ultimate.Ultimate.grant(player, true);
+        sneakN(player);
+        check(CosmicSpider.isCosmic(data(player)), "granted Ultimate, he becomes Cosmic Spider-Man");
+        com.kolodkingal.enhanced.ultimate.Ultimate.grant(player, false);
+        PowerTicker.tick(player);
+        check(!CosmicSpider.isCosmic(data(player)), "and when it is taken back he is plain Spider-Man again");
+        helper.succeed();
     }
 
     @EnhancedTest(template = ARENA, batch = BATCH)

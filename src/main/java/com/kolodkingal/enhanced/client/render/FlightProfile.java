@@ -169,19 +169,6 @@ public final class FlightProfile {
             pose(-6, 0, 58, -6, 0, -58, 8, 2, 5, -2),      // cruise: arms spread like a bird's
             pose(14, 0, 72, 14, 0, -72, 10, 2, 10, -2)});  // sprint: arms swept back and out, wings
 
-    // ===== cosmic spider-man (3.18) =====
-    /**
-     * Cosmic Spider-Man: a comic-book flier. Hovering he floats upright, the arms a little out and the hands open, a slow
-     * bob; at a cruise he leans well over with the arms back along him; at a sprint he is flat, one fist thrust ahead (the
-     * classic flight of the cosmic heroes) and the other arm back.
-     */
-    private static final FlightProfile COSMIC_SPIDER = new FlightProfile(
-            new float[]{40, 80, -8}, 0.35F, 24, 18, 4.0F, 10, 4, false, new float[]{4.0F, 3.0F}, new float[]{0.04F, 80}, 2.5F, 2.5F, 2.0F, 0.0F,
-            false, 0.16F, false, new float[][]{
-            pose(-12, 0, 20, -12, 0, -20, 4, 1, 2, -1),     // hover: arms low and out, palms open
-            pose(20, 0, 14, 20, 0, -14, 8, 2, 6, -2),       // cruise: arms back along him
-            pose(-168, 0, 6, 26, 0, -10, 10, 1, 10, -1)});  // sprint: a fist ahead, the other arm back
-
     // ===== ultron =====
     /**
      * Ultron: an upright, rigid, silent flier carried by the anti-gravity of his palms, which hang a little out with the
@@ -251,7 +238,7 @@ public final class FlightProfile {
             // The heroes of 3.0, one line each (each lane's own): none has a flight profile until its lane makes one.
             case PHOENIX -> PHOENIX;
             // (3.18: only Cosmic Spider-Man flies; plain Spider-Man never leaves the ground but for Creative flight)
-            case SPIDER_MAN -> COSMIC_SPIDER;
+            case SPIDER_MAN -> BILLY; // (3.18: Cosmic Spider-Man flies as Wiccan does)
             case THANOS -> null; // he does not fly: no take-off, banking or braking (his landings are ThanosActing's)
             case ULTRON -> ULTRON;
             case APOCALYPSE -> APOCALYPSE;

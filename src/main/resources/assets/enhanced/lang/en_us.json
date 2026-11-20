@@ -5359,5 +5359,14 @@
   "commands.enhanced.cosmic.set": "%s Spider-Man(s) now have %s cosmic power",
   "hud.enhanced.cosmic_spider.look.starfield": "Cosmic (starfield)",
   "hud.enhanced.cosmic_spider.look.universe": "Cosmic (Captain Universe)",
-  "message.enhanced.cosmic_spider.look": "Cosmic look: %s"
+  "message.enhanced.cosmic_spider.look": "Cosmic look: %s",
+  "commands.enhanced.ultimate.is_on": "Ultimate is on: everyone can use the ultimate heroes (Cosmic Spider-Man)",
+  "commands.enhanced.ultimate.is_off": "Ultimate is off: only players granted it can use the ultimate heroes (/enhanced ultimate grant <players>)",
+  "commands.enhanced.ultimate.on": "Ultimate is now on for everyone",
+  "commands.enhanced.ultimate.off": "Ultimate is now off (granted players keep it)",
+  "commands.enhanced.ultimate.granted": "Granted Ultimate to %s player(s)",
+  "commands.enhanced.ultimate.revoked": "Took Ultimate back from %s player(s)",
+  "message.enhanced.ultimate.granted": "You were granted Ultimate: Cosmic Spider-Man is yours",
+  "message.enhanced.ultimate.revoked": "Your Ultimate was taken back",
+  "message.enhanced.cosmic_spider.no_ultimate": "Cosmic Spider-Man needs Ultimate (an operator: /enhanced ultimate true, or /enhanced ultimate grant <you>)"
 }

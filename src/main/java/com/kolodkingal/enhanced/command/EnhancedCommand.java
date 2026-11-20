@@ -99,6 +99,8 @@ public final class EnhancedCommand {
                                         .executes(EnhancedCommand::look))))
                 // Spellbooks: make players a book's caster, or give it up
                 .then(com.kolodkingal.enhanced.spellbook.SpellbookCommand.node())
+                // 3.18: the Ultimate switch and its grants (Cosmic Spider-Man)
+                .then(com.kolodkingal.enhanced.ultimate.UltimateCommand.node())
                 // (3.17) the player's own skin on his hero (any hero, built-in or custom), or the suit again
                 .then(Commands.literal("skin")
                         .then(Commands.argument("players", EntityArgument.players())
