@@ -584,3 +584,8 @@ protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float
 # GUI (26.1): the mouse's buttons are SDL's (left 1, middle 2, right 3); the screens read and hand on 1.21.1's (left 0, right 1, middle 2)
 \bint (\w+) = legacyEvent\.button\(\); => int $1 = com.kolodkingal.enhanced.platform.client.MouseButtons.legacy(legacyEvent.button());
 new net\.minecraft\.client\.input\.MouseButtonInfo\(([^,()]+), 0\) => new net.minecraft.client.input.MouseButtonInfo(com.kolodkingal.enhanced.platform.client.MouseButtons.modern($1), 0)
+# (26.3: blocks_attacks names the damage types that pass a shield as a holder set, read from the registries when the item's
+# components are made: the Vibranium Shield's is made then, as vanilla's shield's is)
+@in(/VibraniumShieldItem\.java) \bBlocksAttacks blocking\(\) \{ => BlocksAttacks blocking(net.minecraft.core.HolderLookup.Provider context) {
+@in(/VibraniumShieldItem\.java) \bjava\.util\.Optional\.of\(net\.minecraft\.tags\.DamageTypeTags\.BYPASSES_SHIELD\) => java.util.Optional.of(context.getOrThrow(net.minecraft.tags.DamageTypeTags.BYPASSES_SHIELD))
+@in(/ModItems\.java) \.component\(DataComponents\.BLOCKS_ATTACKS, ([\w.]+VibraniumShieldItem)\.blocking\(\)\) => .delayedComponent(DataComponents.BLOCKS_ATTACKS, $1::blocking)

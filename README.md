@@ -74,6 +74,8 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 
 ## What's new in 3.17.1
 
+* **Captain America's shield works again on 1.21.11 and 26.3.** The Vibranium Shield could not be raised there, blocked nothing, and R only said "You need a shield in your hand": from Minecraft 1.21.5 a shield needs the game's "blocks attacks" part, which the Vibranium Shield did not have. It now raises, blocks, is thrown, hits and comes back as on 1.21.1 and 1.21.4.
+* **Spider-Man is no longer kicked from servers on 26.3** ("Invalid move player packet received") while he clings to a wall or a ceiling. To keep the server up to date while he hangs still, his client sent its position in a packet of its own beside the game's, and from 26.1 a server kicks a player who sends two positions in one tick. The game's own packet now carries it. His swing also never hands the game a position that is not a number.
 * **Jim Hammond's fireball reads in flight and never fills your screen.** It is drawn half again as big, with a tail that grows with its speed, and it fades away as it nears the camera (just thrown in first person, or flying straight at you) instead of covering the view in orange. How hard it hits is unchanged.
 
 ## What's new in 3.17.0
