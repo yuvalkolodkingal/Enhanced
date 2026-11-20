@@ -29,7 +29,7 @@ public class UltronBoltRenderer extends EntityRenderer<UltronBoltEntity> {
     /** How long the trail is, in blocks, at a bolt's usual speed. */
     private static final double TRAIL = 2.4;
     /** The bolt has nothing to texture, but an entity renderer must name a texture. */
-    private static final ResourceLocation NO_TEXTURE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation NO_TEXTURE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
 
     public UltronBoltRenderer(EntityRendererProvider.Context context) {
         super(context);

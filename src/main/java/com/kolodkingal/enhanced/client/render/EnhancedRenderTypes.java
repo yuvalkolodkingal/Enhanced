@@ -124,7 +124,7 @@ public final class EnhancedRenderTypes {
 
     /** The game's plain white texture: a ghost's blocks drawn with it keep their shape and shade, not their look. */
     private static final RenderStateShard.TextureStateShard WHITE = new RenderStateShard.TextureStateShard(
-            ResourceLocation.withDefaultNamespace("textures/misc/white.png"), false, false);
+            com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png"), false, false);
 
     /** As {@link #BUILD_GHOST}, but flat white (the shader colour greys it): the ghost of a spell that is refused. */
     public static final RenderType BUILD_GHOST_FLAT = RenderType.create("enhanced_build_ghost_flat",

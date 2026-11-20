@@ -87,7 +87,7 @@ public final class EnhancedRenderTypes {
             ghost(RenderStateShard.BLOCK_SHEET_MIPPED));
 
     private static final RenderStateShard.TextureStateShard WHITE = new RenderStateShard.TextureStateShard(
-            ResourceLocation.withDefaultNamespace("textures/misc/white.png"), TriState.FALSE, false);
+            Enhanced.id("textures/misc/white.png"), TriState.FALSE, false);
 
     public static final RenderType BUILD_GHOST_FLAT = RenderType.create("enhanced_build_ghost_flat", 4096, false, true,
             GHOST_TRANSLUCENT, ghost(WHITE));

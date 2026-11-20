@@ -23,7 +23,7 @@ public class DeadpoolBulletRenderer extends EntityRenderer<DeadpoolBulletEntity>
     private static final int CORE = 0xFFF8E0;
     private static final int MAIN = 0xFFD24A;
     private static final int HALO = 0xFF8A1E;
-    private static final ResourceLocation NO_TEXTURE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation NO_TEXTURE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
 
     public DeadpoolBulletRenderer(EntityRendererProvider.Context context) {
         super(context);

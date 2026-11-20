@@ -33,7 +33,7 @@ import java.util.function.Function;
  * plinth and the post.
  */
 public class SuitDisplayRenderer implements BlockEntityRenderer<SuitDisplayBlockEntity> {
-    private static final ResourceLocation WHITE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation WHITE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
     /**
      * The suit stands on the plinth (the block's model: 2.5 pixels), a little smaller than life so it fits in the
      * display's two blocks.

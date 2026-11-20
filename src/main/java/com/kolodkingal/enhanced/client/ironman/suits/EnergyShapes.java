@@ -16,7 +16,7 @@ import org.joml.Matrix4f;
  * and the thrusters' flames (a frame falling from the sky). Full-bright, interpolated with the look's time.
  */
 final class EnergyShapes {
-    private static final ResourceLocation WHITE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation WHITE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
     /** The shield: its curve's radius and centre (body pixels), its half width and half height (pixels). */
     private static final float RADIUS = 34.0F;
     private static final float CENTRE_X = 6.0F;

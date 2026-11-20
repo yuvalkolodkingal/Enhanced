@@ -23,7 +23,7 @@ public class HydraBoltRenderer extends EntityRenderer<HydraBoltEntity> {
     private static final int CORE = 0xDDF4FF;
     private static final int MAIN = 0x4FB8FF;
     private static final int HALO = 0x2A7BD6;
-    private static final ResourceLocation NO_TEXTURE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation NO_TEXTURE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
 
     public HydraBoltRenderer(EntityRendererProvider.Context context) {
         super(context);

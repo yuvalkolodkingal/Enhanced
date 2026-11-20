@@ -24,7 +24,7 @@ public class FalconDartRenderer extends EntityRenderer<FalconDartEntity> {
     private static final int CORE = 0xFFF0F0;
     private static final int MAIN = 0xFF3A44;
     private static final int HALO = 0xC0101C;
-    private static final ResourceLocation NO_TEXTURE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation NO_TEXTURE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
 
     public FalconDartRenderer(EntityRendererProvider.Context context) {
         super(context);

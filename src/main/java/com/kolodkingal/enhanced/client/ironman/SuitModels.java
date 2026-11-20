@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public final class SuitModels {
     private static final Map<SuitKind, SuitModel> MODELS = new EnumMap<>(SuitKind.class);
-    private static final ResourceLocation WHITE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation WHITE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
 
     /** The model of a suit (lane L7's when registered, else the skeleton's coloured box). */
     public static SuitModel get(SuitKind kind) {

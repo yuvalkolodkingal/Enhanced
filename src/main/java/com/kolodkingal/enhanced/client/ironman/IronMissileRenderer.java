@@ -21,7 +21,7 @@ import org.joml.Matrix4f;
  * it. Turned by its interpolated rotation (the partial tick), so its turns are smooth; its smoke is the entity's own.
  */
 public class IronMissileRenderer extends EntityRenderer<IronMissileEntity> {
-    private static final ResourceLocation WHITE = ResourceLocation.withDefaultNamespace("textures/misc/white.png");
+    private static final ResourceLocation WHITE = com.kolodkingal.enhanced.Enhanced.id("textures/misc/white.png");
 
     public IronMissileRenderer(EntityRendererProvider.Context context) {
         super(context);

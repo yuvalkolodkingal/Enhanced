@@ -95,7 +95,7 @@ public final class EnhancedRenderTypes {
             ghostPipeline("build_ghost_depth").withoutBlend().withColorWrite(false).withDepthWrite(true).build(),
             TextureAtlas.LOCATION_BLOCKS, false);
 
-    private static final Identifier WHITE = Identifier.withDefaultNamespace("textures/misc/white.png");
+    private static final Identifier WHITE = Enhanced.id("textures/misc/white.png");
 
     public static final RenderType BUILD_GHOST_FLAT = ghost("enhanced_build_ghost_flat", GHOST_TRANSLUCENT, WHITE, true);
 
