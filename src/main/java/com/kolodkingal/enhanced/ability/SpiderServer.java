@@ -317,8 +317,9 @@ public final class SpiderServer implements HeroServer {
         if (!down) {
             return;
         }
-        if (blocked(player, data)) {
-            if (ability == 2) {
+        // (3.18) cosmic, his own flight is no hold: he shoots webs as he flies (G and Sneak + G; swings and zips are not his then)
+        if (CosmicSpider.isCosmic(data) ? cosmicBlocked(player, data) : blocked(player, data)) {
+            if (ability == 2 && !CosmicSpider.isCosmic(data)) {
                 refuse(player, alt);
             }
             return;
