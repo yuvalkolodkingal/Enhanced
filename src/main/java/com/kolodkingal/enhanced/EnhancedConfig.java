@@ -344,7 +344,7 @@ public final class EnhancedConfig {
 
         BUILDER.push("quicksilver");
         SLOW_MOTION_FACTOR = BUILDER.comment("During Quicksilver Time the world around him runs this many times slower.")
-                .defineInRange("slowMotionFactor", 5, 2, 20);
+                .defineInRange("slowMotionFactor", 10, 2, 20);
         SLOW_MOTION_RADIUS = BUILDER.comment("How far (blocks) from Quicksilver time slows down.")
                 .defineInRange("slowMotionRadius", 32, 4, 128);
         QUICKSILVER_SPEED_BONUS = BUILDER.comment("Extra movement speed while he runs in Quicksilver Time or Super Speed",

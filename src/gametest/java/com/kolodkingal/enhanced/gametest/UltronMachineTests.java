@@ -127,8 +127,8 @@ public final class UltronMachineTests {
     private static int skipped(Entity entity, int ticks) {
         int skipped = 0;
         for (int tick = 0; tick < ticks; tick++) {
-            entity.tickCount = tick;
-            skipped += SlowMotion.skipTick(entity) ? 1 : 0;
+            // (3.18.0: the beat is the level's clock, not the entity's tickCount)
+            skipped += SlowMotion.skipsAt(entity, tick) ? 1 : 0;
         }
         return skipped;
     }

@@ -665,7 +665,10 @@ public final class CustomHeroModuleTests {
         Zombie y = zombie(helper, 7.5, 12.5);
         press(player);
         tick(player, 10);
-        check(y.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the world slows round him");
+        // 3.18.0: his slowed time is a zone as a speedster's (everything in it runs at a tenth), not Slowness
+        com.kolodkingal.enhanced.ability.SlowMotion.clear(); // (the zones are cached for the tick)
+        check(com.kolodkingal.enhanced.ability.SlowMotion.customRadius(player) > 0
+                && com.kolodkingal.enhanced.ability.SlowMotion.isInZone(helper.getLevel(), y.position()), "the world slows round him");
         become(player, PowerModule.TIME, "rewind", 1);
         Vec3 start = player.position();
         tick(player, 70);

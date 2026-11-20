@@ -718,12 +718,10 @@ public final class MindPowers {
             if (!c.option("slow") || !c.state.isOn(PowerModule.TIME)) {
                 return;
             }
+            // 3.18.0: the slowing itself is the slowed time's (SlowMotion.customRadius makes it a zone, as a speedster's):
+            // everything round him runs at a tenth, creatures, projectiles and all, and other players crawl
             double radius = c.v(ModuleStats.SLOW_RADIUS);
             if (p.tickCount % 10 == 0) {
-                for (LivingEntity e : Shots.area(p, p.position(), radius)) {
-                    e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, false));
-                    e.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 20, 2, true, false));
-                }
                 Shots.ring(c.level(), p.position().add(0, 0.2, 0), radius, c.color());
             }
             if (p.tickCount % 20 == 0) {
@@ -732,11 +730,6 @@ public final class MindPowers {
                     c.state.set(PowerModule.TIME, false);
                     return;
                 }
-            }
-            for (Projectile shot : c.level().getEntitiesOfClass(Projectile.class, p.getBoundingBox().inflate(radius),
-                    e -> e.getOwner() != p && e.getDeltaMovement().lengthSqr() > 0.04)) {
-                shot.setDeltaMovement(shot.getDeltaMovement().scale(0.7));
-                shot.hurtMarked = true;
             }
         }
 

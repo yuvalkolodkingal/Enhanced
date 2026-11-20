@@ -23,7 +23,7 @@ public final class SlowParticles {
             slowed.enhanced$setSlowPhase(-1);
             return false;
         }
-        int phase = (slowed.enhanced$slowPhase() + 1) % SlowMotion.factor();
+        int phase = (slowed.enhanced$slowPhase() + 1) % factor(particle);
         slowed.enhanced$setSlowPhase(phase);
         return phase != 0;
     }
@@ -31,7 +31,17 @@ public final class SlowParticles {
     /** Spreads the movement of the last real tick over the whole slowed cycle. */
     public static float partialTick(Particle particle, float partialTick) {
         int phase = ((SlowedParticle) particle).enhanced$slowPhase();
-        return phase < 0 ? partialTick : (phase + partialTick) / SlowMotion.factor();
+        return phase < 0 ? partialTick : (phase + partialTick) / factor(particle);
+    }
+
+    /**
+     * 3.18.0: the beat of a slowed particle: a speedster's zone's, or the Time Stone's when no speedster slows time here
+     * (asked every frame for every particle, so it looks at the zones' owners, not at each particle's place).
+     */
+    private static int factor(Particle particle) {
+        Minecraft mc = Minecraft.getInstance();
+        return Math.max(1, mc.level != null && SlowMotion.speedsterZoneIn(mc.level) ? SlowMotion.factor()
+                : com.kolodkingal.enhanced.stones.StoneZones.factor());
     }
 
     private static boolean slowed(Particle particle) {

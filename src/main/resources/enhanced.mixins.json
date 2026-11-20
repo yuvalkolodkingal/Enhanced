@@ -34,7 +34,8 @@
     "client.ParticleEngineMixin",
     "client.ParticleMixin",
     "client.PlayerModelMixin",
-    "client.PlayerRendererMixin"
+    "client.PlayerRendererMixin",
+    "client.SlowRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

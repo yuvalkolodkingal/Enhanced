@@ -188,7 +188,7 @@ public final class StonesConfig {
         TIME_SLOW_RADIUS = builder.comment("Radius (blocks) of the Slow Time zone round the holder.")
                 .defineInRange("slowRadius", 12, 2, 64);
         TIME_SLOW_FACTOR = builder.comment("How many times slower time runs in the zone.")
-                .defineInRange("slowFactor", 3, 2, 20);
+                .defineInRange("slowFactor", 10, 2, 20);
         TIME_SLOW_MAX_TICKS = builder.comment("Longest (ticks) Slow Time stays on.")
                 .defineInRange("slowMaxTicks", 200, 20, 2400);
         TIME_SLOW_COOLDOWN = builder.comment("Cooldown (ticks) of Slow Time.")

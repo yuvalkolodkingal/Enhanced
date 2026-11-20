@@ -131,7 +131,7 @@ public final class CommonEvents {
     @Subscribe
     public static void onEntityTick(EntityTickEvent.Pre event) {
         MjolnirPin.beforeTick(event.getEntity());
-        if (SlowMotion.skipTick(event.getEntity())) {
+        if (SlowMotion.beforeTick(event.getEntity())) {
             event.setCanceled(true);
         }
     }
