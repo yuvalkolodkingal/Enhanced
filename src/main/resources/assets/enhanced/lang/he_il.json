@@ -5371,5 +5371,7 @@
   "commands.enhanced.ultimate.revoked": "אולטימייט נלקח מ-%s שחקנים",
   "message.enhanced.ultimate.granted": "קיבלת אולטימייט: ספיידרמן הקוסמי שלך",
   "message.enhanced.ultimate.revoked": "האולטימייט שלך נלקח",
-  "message.enhanced.cosmic_spider.no_ultimate": "ספיידרמן הקוסמי צריך אולטימייט (מפעיל: /enhanced ultimate true, או /enhanced ultimate grant <אתה>)"
+  "message.enhanced.cosmic_spider.no_ultimate": "ספיידרמן הקוסמי צריך אולטימייט (מפעיל: /enhanced ultimate true, או /enhanced ultimate grant <אתה>)",
+  "message.enhanced.agatha.drained_cosmic": "שתית %2$s מהכוח הקוסמי של %1$s",
+  "message.enhanced.cosmic_spider.drained": "%1$s שאבה %2$s מהכוח הקוסמי שלך"
 }

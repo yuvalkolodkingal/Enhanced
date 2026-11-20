@@ -5371,5 +5371,7 @@
   "commands.enhanced.ultimate.revoked": "Took Ultimate back from %s player(s)",
   "message.enhanced.ultimate.granted": "You were granted Ultimate: Cosmic Spider-Man is yours",
   "message.enhanced.ultimate.revoked": "Your Ultimate was taken back",
-  "message.enhanced.cosmic_spider.no_ultimate": "Cosmic Spider-Man needs Ultimate (an operator: /enhanced ultimate true, or /enhanced ultimate grant <you>)"
+  "message.enhanced.cosmic_spider.no_ultimate": "Cosmic Spider-Man needs Ultimate (an operator: /enhanced ultimate true, or /enhanced ultimate grant <you>)",
+  "message.enhanced.agatha.drained_cosmic": "You drank %2$s of %1$s's cosmic power",
+  "message.enhanced.cosmic_spider.drained": "%1$s drained %2$s of your cosmic power"
 }

@@ -25,6 +25,7 @@ public final class CosmicSpiderConfig {
     public static ConfigSpec.DoubleValue REGEN_AMOUNT;
     public static ConfigSpec.DoubleValue FLIGHT_SPEED;
     public static ConfigSpec.DoubleValue DARK_MAGIC_FACTOR;
+    public static ConfigSpec.DoubleValue AGATHA_DRAIN;
     public static ConfigSpec.DoubleValue SENSE_FACTOR;
     // ---- the blasts ----
     public static ConfigSpec.IntValue BLAST_RANGE;
@@ -75,6 +76,8 @@ public final class CosmicSpiderConfig {
                 .defineInRange("flightSpeed", 0.16, 0.01, 1.0);
         DARK_MAGIC_FACTOR = builder.comment("Pure life force: dark magic (the Darkhold, Agatha, Hela's blades...) hurts him this many times as much while cosmic.")
                 .defineInRange("darkMagicFactor", 1.5, 1.0, 10.0);
+        AGATHA_DRAIN = builder.comment("Cosmic energy Agatha's Power Drain takes from him while he is cosmic (she gains as from any drain).")
+                .defineInRange("agathaDrain", 25.0, 0.0, 10000.0);
         SENSE_FACTOR = builder.comment("How much wider (and faster) his spider-sense is while cosmic.")
                 .defineInRange("senseFactor", 2.5, 1.0, 5.0);
 

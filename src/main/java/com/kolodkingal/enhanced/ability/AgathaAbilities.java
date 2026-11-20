@@ -430,6 +430,9 @@ public final class AgathaAbilities {
             if (!Powers.power(other).hasPowers()) {
                 return "message.enhanced.agatha.no_power";
             }
+            if (CosmicSpider.isCosmic(Powers.get(other))) {
+                return null; // (3.18.1) the Enigma Force is power she can drink, sorcerer or not
+            }
             return !AgathaConfig.DRAIN_ONLY_SORCERERS.get() || drainable(Powers.get(other)) ? null
                     : "message.enhanced.agatha.drain_not_sorcerer";
         }
@@ -489,7 +492,12 @@ public final class AgathaAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         boolean power = target instanceof ServerPlayer;
-        if (target instanceof ServerPlayer victim) {
+        if (target instanceof ServerPlayer victim && CosmicSpider.isCosmic(Powers.get(victim))) {
+            // (3.18.1) Cosmic Spider-Man is not cut off from his power: she drinks some of his cosmic meter, which he must
+            // gather again (and at 0 he is plain Spider-Man again)
+            int taken = CosmicSpider.drainedBy(victim, player);
+            player.displayClientMessage(Component.translatable("message.enhanced.agatha.drained_cosmic", victim.getDisplayName(), taken), true);
+        } else if (target instanceof ServerPlayer victim) {
             victim.addEffect(new MobEffectInstance(ModEffects.DRAINED, AgathaConfig.DRAIN_TICKS.get(), 0, false, true, true), player);
             victim.displayClientMessage(Component.translatable("message.enhanced.agatha.drained_you", player.getDisplayName())
                     .withStyle(s -> s.withColor(VIOLET)), true);

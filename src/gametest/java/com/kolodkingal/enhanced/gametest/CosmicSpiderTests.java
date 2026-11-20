@@ -98,6 +98,24 @@ public final class CosmicSpiderTests {
         helper.succeed();
     }
 
+    @EnhancedTest(template = ARENA, batch = "agatha_pvp")
+    public static void agathasDrainTakesTwentyFiveOfHisCosmicPower(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer spider = cosmic(f);
+        ServerPlayer agatha = f.player(12.5, FLOOR, 10.5, Power.AGATHA);
+        check(com.kolodkingal.enhanced.ability.AgathaAbilities.drainRefusal(agatha, spider) == null,
+                "she may drain Cosmic Spider-Man, though he is no sorcerer");
+        double before = CosmicSpider.energy(data(spider));
+        int taken = CosmicSpider.drainedBy(spider, agatha);
+        assertNear(before - CosmicSpider.energy(data(spider)), 25.0, 0.02, "25 of his cosmic power gone");
+        check(taken == 25 && CosmicSpider.isCosmic(data(spider)), "and he is still cosmic with the rest");
+        CosmicSpider.setEnergy(spider, data(spider), 10.0);
+        CosmicSpider.drainedBy(spider, agatha);
+        check(!CosmicSpider.isCosmic(data(spider)), "drained to nothing, he is plain Spider-Man again");
+        helper.succeed();
+    }
+
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void heBecomesCosmicOnlyWithAFullMeter(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);

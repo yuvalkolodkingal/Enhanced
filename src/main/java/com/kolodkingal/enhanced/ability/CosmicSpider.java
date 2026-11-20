@@ -414,6 +414,25 @@ public final class CosmicSpider {
         return isCosmic(data) && hasMeter(data);
     }
 
+    /**
+     * (3.18.1) Agatha's Power Drain on Cosmic Spider-Man: it takes {@code agathaDrain} (25) of his cosmic meter, which he must
+     * gather again; at 0 he is plain Spider-Man again (the tick sees to it). Returns how much it took.
+     */
+    public static int drainedBy(ServerPlayer victim, ServerPlayer agatha) {
+        PowerData data = Powers.get(victim);
+        double before = exact(victim, data);
+        double take = cfg(CosmicSpiderConfig.AGATHA_DRAIN, 25.0);
+        setEnergy(victim, data, before - take);
+        int taken = (int) Math.round(before - energy(data));
+        victim.displayClientMessage(Component.translatable("message.enhanced.cosmic_spider.drained", agatha.getDisplayName(), taken)
+                .withStyle(ChatFormatting.DARK_PURPLE), true);
+        if (energy(data) <= 0.0) {
+            revert(victim, data, true);
+        }
+        Powers.syncIfDirty(victim);
+        return taken;
+    }
+
     /** Pure life force: dark magic hurts him {@code darkMagicFactor} times as much while cosmic. */
     public static float onIncomingDamage(Player player, DamageSource source, float amount) {
         if (!isCosmic(Powers.get(player)) || !isDark(source)) {
