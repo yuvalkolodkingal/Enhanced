@@ -213,13 +213,21 @@ public class DemiurgeCloakLayer extends RenderLayer<AbstractClientPlayer, Player
     private static Vec3 hoodPoint(float phi, float h, float flutter) {
         float elevation = Mth.lerp(h, -42.0F, 90.0F);
         float e = elevation * Mth.DEG_TO_RAD;
-        float r = 5.3F + flutter * h;
-        // (a boxy dome: the head it covers is a box)
-        float ring = r * (float) Math.pow(Math.max(0.0F, Mth.cos(e)), 0.45);
+        float r = 5.5F + flutter * h;
         float closing = Mth.clamp((elevation - 15.0F) / 40.0F, 0.0F, 1.0F);
         float angle = phi / HOOD_ARC * Mth.lerp(closing, HOOD_ARC, Mth.PI);
-        float forward = Math.max(0.0F, Mth.sin(e)) * 1.3F + Math.max(0.0F, Math.abs(phi) / HOOD_ARC - 0.7F) * 3.0F;
-        return new Vec3(ring * Mth.sin(angle), -4.3F - r * Mth.sin(e), ring * Mth.cos(angle) + 0.4F - forward);
+        // (3.18.1) a rounded box round the head, not a ball: the head and its hat layer are a box 9 pixels wide, whose
+        // corners (6.4 from its middle) came through a round hood. Every direction reaches out to a superellipsoid of
+        // exponent 8, whose corners reach past the hat layer's while its flat sides stay 5.5, a pixel over it.
+        double dx = Mth.cos(e) * Mth.sin(angle);
+        double dy = Mth.sin(e);
+        double dz = Mth.cos(e) * Mth.cos(angle);
+        double n = Math.pow(Math.pow(Math.abs(dx), 8) + Math.pow(Math.abs(dy), 8) + Math.pow(Math.abs(dz), 8), 1.0 / 8.0);
+        double reach = r / Math.max(1.0E-4, n);
+        // (only its front comes forward over the brow: the back stays over the back of the head)
+        float front = Math.max(0.0F, (float) -dz);
+        float forward = Math.max(0.0F, Mth.sin(e)) * 1.3F * front + Math.max(0.0F, Math.abs(phi) / HOOD_ARC - 0.7F) * 3.0F;
+        return new Vec3(reach * dx, -4.3F - reach * dy, reach * dz + 0.4F - forward);
     }
 
     private static Vector3f normal(Vec3 a, Vec3 b, Vec3 d) {

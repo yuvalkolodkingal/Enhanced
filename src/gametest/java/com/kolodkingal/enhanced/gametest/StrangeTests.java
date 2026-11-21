@@ -659,6 +659,20 @@ public final class StrangeTests {
         helper.succeed();
     }
 
+    /** (3.18.1) The Y row (6, his Eye) has no cooldown slot: reading it never runs off the end (his HUD crashed the game). */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void hisEyeKeyReadsNoCooldownAndNeverCrashes(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = f.player(10.5, FLOOR, 10.5, Power.DOCTOR_STRANGE);
+        PowerData data = Powers.get(player);
+        long now = player.level().getGameTime();
+        check(data.cooldownUntil(HeroKeys.Y) == 0L && data.isReady(HeroKeys.Y, now), "the Eye's key reads ready");
+        data.startCooldown(HeroKeys.Y, now, 100);
+        check(data.isReady(HeroKeys.Y, now), "and a cooldown on it is ignored, not written past the end");
+        check(data.cooldownUntil(0) == 0L && data.cooldownUntil(-1) == 0L && data.cooldownUntil(99) == 0L, "nor any key out of range");
+        helper.succeed();
+    }
+
     private StrangeTests() {
     }
 }

@@ -172,7 +172,12 @@ public final class Metal {
      * 2.3); 3.8: Iron Man in a powered classic suit ({@code IronSuits.isMetal}: lane L3's rule).
      */
     private static boolean isMetalHero(Player player) {
-        // (3.4: Vision and Ultron, and a custom hero with a metal body: Traits.)
+        // (3.4: Vision and Ultron, and a custom hero with a metal body: Traits. 3.18.1: Wolverine's adamantium skeleton,
+        // and Deadpool's, Magneto's telekinesis takes both)
+        com.kolodkingal.enhanced.power.Power hero = com.kolodkingal.enhanced.power.Powers.get(player).power();
+        if (hero == com.kolodkingal.enhanced.power.Power.WOLVERINE || hero == com.kolodkingal.enhanced.power.Power.DEADPOOL) {
+            return true;
+        }
         return Traits.has(player, Trait.METAL_BODY) || SpiderServer.isIronSpider(player)
                 || com.kolodkingal.enhanced.ironman.IronSuits.isMetal(player);
     }

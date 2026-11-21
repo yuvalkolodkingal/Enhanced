@@ -318,4 +318,22 @@ public final class CosmicSpiderTests {
                 && "spider.cosmic".equals(HeroAbility.SPIDER_COSMIC.id()), "the Hero Creator's row: Sneak + the Black Eyes");
         helper.succeed();
     }
+
+    /** (3.18.1) He commands matter, down to every cell: his hand defeats Wolverine and Deadpool, whose healing stops no one else's. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void heDefeatsWolverineAndDeadpoolThroughTheirHealing(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer spider = cosmic(f);
+        ServerPlayer plainSpider = f.player(7.5, FLOOR, 7.5, Power.SPIDER_MAN);
+        for (Power healer : new Power[]{Power.WOLVERINE, Power.DEADPOOL}) {
+            ServerPlayer victim = f.player(12.5, FLOOR, 10.5, healer);
+            check(com.kolodkingal.enhanced.healing.HealingFactor.has(victim), healer + " has a healing factor");
+            DamageSource cosmicHit = victim.damageSources().playerAttack(spider);
+            check(com.kolodkingal.enhanced.healing.HealingFactor.defeat(cosmicHit, victim)
+                    == com.kolodkingal.enhanced.healing.HealingFactor.Defeat.COSMIC, "Cosmic Spider-Man defeats " + healer);
+            check(com.kolodkingal.enhanced.healing.HealingFactor.defeat(victim.damageSources().playerAttack(plainSpider), victim) == null,
+                    "plain Spider-Man does not defeat " + healer);
+        }
+        helper.succeed();
+    }
 }

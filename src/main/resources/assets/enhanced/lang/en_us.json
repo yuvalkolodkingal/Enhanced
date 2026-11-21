@@ -3943,6 +3943,7 @@
   "message.enhanced.healing.defeated.phoenix": "%s's healing factor could not stop the Phoenix.",
   "message.enhanced.healing.defeated.darkhold": "%s's healing factor could not stop the Darkhold.",
   "message.enhanced.healing.defeated.vormir": "%s's healing factor could not stop the Soul Stone's price.",
+  "message.enhanced.healing.defeated.cosmic": "%s's healing factor could not stop Cosmic Spider-Man unmaking his cells.",
   "hud.enhanced.healing.on": "Healing factor: ON (+%s/s)",
   "hud.enhanced.healing.off": "Healing factor OFF — poisoned!",
   "hud.enhanced.healing.down": "Healing… %s",

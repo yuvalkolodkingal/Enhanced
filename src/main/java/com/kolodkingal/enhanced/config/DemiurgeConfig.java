@@ -54,9 +54,9 @@ public final class DemiurgeConfig {
 
         DAMAGE_FACTOR = builder.comment("Every power of his, his own and the magic types', hurts this many times as much as the Demiurge",
                         "(his bare fist is not changed).")
-                .defineInRange("damageFactor", 2.0, 1.0, 20.0);
+                .defineInRange("damageFactor", 8.0, 1.0, 40.0);
         BARRIER_HEALTH_FACTOR = builder.comment("His Hex Barrier, which wraps his whole body as the Demiurge, has this many times its health.")
-                .defineInRange("barrierHealthFactor", 2.0, 1.0, 20.0);
+                .defineInRange("barrierHealthFactor", 8.0, 1.0, 40.0);
         MAGIC_TYPES = builder.comment("Whether H, as the Demiurge, gives his keys the magic of another witch or sorcerer (Magic Types).")
                 .define("magicTypes", true);
 

@@ -3943,6 +3943,7 @@
   "message.enhanced.healing.defeated.phoenix": "גורם הריפוי של %s לא הצליח לעצור את עוף החול.",
   "message.enhanced.healing.defeated.darkhold": "גורם הריפוי של %s לא הצליח לעצור את הדארקהולד.",
   "message.enhanced.healing.defeated.vormir": "גורם הריפוי של %s לא הצליח לעצור את המחיר של אבן הנשמה.",
+  "message.enhanced.healing.defeated.cosmic": "גורם הריפוי של %s לא הצליח לעצור את ספיידרמן הקוסמי שפירק את התאים שלו.",
   "hud.enhanced.healing.on": "גורם הריפוי: פועל (+%s/ש')",
   "hud.enhanced.healing.off": "גורם הריפוי: כבוי — מורעל!",
   "hud.enhanced.healing.down": "מתרפא… %s",

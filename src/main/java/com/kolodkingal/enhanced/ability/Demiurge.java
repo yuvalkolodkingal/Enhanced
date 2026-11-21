@@ -307,12 +307,12 @@ public final class Demiurge {
 
     /** How many times as hard his powers hit. */
     public static double damageFactor() {
-        return cfg(DemiurgeConfig.DAMAGE_FACTOR, 2.0);
+        return cfg(DemiurgeConfig.DAMAGE_FACTOR, 8.0);
     }
 
     /** How many times its health his barrier has. */
     public static double barrierFactor() {
-        return cfg(DemiurgeConfig.BARRIER_HEALTH_FACTOR, 2.0);
+        return cfg(DemiurgeConfig.BARRIER_HEALTH_FACTOR, 8.0);
     }
 
     /**

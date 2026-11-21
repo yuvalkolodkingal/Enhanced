@@ -270,4 +270,21 @@ public final class DemiurgeTests {
         check(DemiurgeGifts.give(null, other, picks) == null && DemiurgeGifts.gifted(other), "with it on, an operator may give it");
         helper.succeed();
     }
+
+    /** (3.18.1) As the Demiurge his Build Magic has no limit (plain Billy keeps his rank's), and his powers hit 8 times as hard. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void hisBuildMagicHasNoLimitAndHisPowersHitFourTimesHarder(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer plain = billy(f, false);
+        com.kolodkingal.enhanced.build.Limits limits = com.kolodkingal.enhanced.build.Limits.of(plain);
+        check(limits != null && limits.limited(), "plain Billy's Build Magic has his rank's limits");
+        ServerPlayer player = demiurge(f);
+        limits = com.kolodkingal.enhanced.build.Limits.of(player);
+        check(limits != null && limits.billy() && !limits.limited(), "the Demiurge's has none");
+        assertNear(com.kolodkingal.enhanced.config.DemiurgeConfig.DAMAGE_FACTOR.getDefault(), 8.0, 1.0E-9,
+                "his powers hit 8 times as hard by default (four times the 2 of before)");
+        assertNear(com.kolodkingal.enhanced.config.DemiurgeConfig.BARRIER_HEALTH_FACTOR.getDefault(), 8.0, 1.0E-9,
+                "his barrier has 8 times its health by default");
+        helper.succeed();
+    }
 }

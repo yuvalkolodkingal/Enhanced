@@ -674,6 +674,22 @@ public final class MagnetoMetalTests {
         return n;
     }
 
+    /** (3.18.1) Wolverine's adamantium, and Deadpool: Magneto's telekinesis takes hold of both. */
+    @EnhancedTest(template = ARENA, batch = METAL)
+    public static void magnetoLiftsWolverineAndDeadpool(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer magneto = f.player(10.5, FLOOR, 10.5, Power.MAGNETO);
+        ServerPlayer wolverine = f.player(13.5, FLOOR, 10.5, Power.WOLVERINE);
+        ServerPlayer deadpool = f.player(10.5, FLOOR, 13.5, Power.DEADPOOL);
+        ServerPlayer plain = f.player(7.5, FLOOR, 10.5, Power.NONE);
+        check(Metal.isMagnetic(wolverine) && Metal.isMagnetic(deadpool), "Wolverine and Deadpool are magnetic");
+        check(!Metal.isMagnetic(plain), "a player with no metal is not");
+        check(Telekinesis.canLift(magneto, wolverine, Telekinesis.Mode.MAGNETO), "Magneto's telekinesis takes Wolverine");
+        check(Telekinesis.canLift(magneto, deadpool, Telekinesis.Mode.MAGNETO), "and Deadpool");
+        helper.succeed();
+    }
+
     private MagnetoMetalTests() {
     }
 }

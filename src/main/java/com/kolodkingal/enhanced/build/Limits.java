@@ -105,7 +105,10 @@ public final class Limits implements RecipeLimits {
         }
         if (power == Power.BILLY || power == Power.CUSTOM && Powers.get(player).has(HeroAbility.BILLY_BUILD_MAGIC)) {
             int rank = BillyRanks.rank(ModAttachments.BUILD_DATA.get(player));
-            return player.isCreative() && !limitsInCreative() ? new Limits(Power.BILLY, rank, false, world) : billy(rank, world);
+            // (3.18.1) Billy the Demiurge: his Build Magic has no limit, as in Creative (no meter, no caps)
+            boolean free = player.isCreative() && !limitsInCreative() || power == Power.BILLY
+                    && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player));
+            return free ? new Limits(Power.BILLY, rank, false, world) : billy(rank, world);
         }
         return null;
     }

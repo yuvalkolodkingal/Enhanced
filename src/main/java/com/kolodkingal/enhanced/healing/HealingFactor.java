@@ -64,7 +64,9 @@ public final class HealingFactor {
         PHOENIX,
         DARKHOLD,
         /** Pushed off the Vormir Cliff and given to the chasm. */
-        VORMIR;
+        VORMIR,
+        /** (3.18.1) Cosmic Spider-Man's hand: he commands matter, down to every cell the healing would mend. */
+        COSMIC;
 
         /** {@code stones}, {@code chaos}...: the lang keys' last part. */
         public String id() {
@@ -141,6 +143,9 @@ public final class HealingFactor {
     public static Defeat defeat(DamageSource source, Player victim) {
         if (!has(victim)) {
             return Defeat.ALWAYS;
+        }
+        if (source.getEntity() != victim && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(source.getEntity())) {
+            return Defeat.COSMIC;
         }
         return defeat(source::is, isVoidOrKill(source.typeHolder()), active(victim), config(),
                 isSacrificeFall(victim, source));
