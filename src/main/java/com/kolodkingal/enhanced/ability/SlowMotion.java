@@ -250,7 +250,8 @@ public final class SlowMotion {
      * ({@code PowerTicker}); his walking gets the matching Slowness ({@link #serverTick}).
      */
     public static int playerFactor(Player player) {
-        if (player.isSpectator() || holdsZone(player, Powers.get(player)) || !isInZone(player.level(), player.position())) {
+        if (player.isSpectator() || holdsZone(player, Powers.get(player)) || Demiurge.is(Powers.get(player))
+                || !isInZone(player.level(), player.position())) {
             return 1;
         }
         return Math.max(1, factorOf(player));
@@ -422,7 +423,8 @@ public final class SlowMotion {
             }
             for (Player player : level.players()) {
                 PowerData data = Powers.get(player);
-                boolean speedster = holdsZone(player, data);
+                // (3.18.1) Billy the Demiurge stands outside every slowed time
+                boolean speedster = holdsZone(player, data) || Demiurge.is(data);
                 if (!speedster && !player.isSpectator() && !player.isCreative() && player.position().distanceToSqr(center) < radius * radius
                         && isInZone(level, player.position())) {
                     int amplifier = playerSlowness(factorOf(player));

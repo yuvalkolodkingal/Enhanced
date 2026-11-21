@@ -92,7 +92,9 @@ public class DemiurgeCloakLayer extends RenderLayer<AbstractClientPlayer, Player
                         new Vector3f(n).negate(), light, overlay);
             }
         }
-        scarf(vc, pose, sway, light, overlay);
+        if (out > 0.03F) {
+            scarf(vc, pose, sway, light, overlay); // (3.18.1: at rest a plain cape, no scarf; it comes up with the hood)
+        }
         poseStack.popPose();
         if (out > 0.03F) {
             poseStack.pushPose();
@@ -111,10 +113,11 @@ public class DemiurgeCloakLayer extends RenderLayer<AbstractClientPlayer, Player
     static Vec3[][] cloth(CloakLayer.Sway sway, float out) {
         Vec3[][] grid = new Vec3[NY + 1][NX + 1];
         float wave = sway.calm() ? 0.0F : 1.0F;
-        float length = Mth.lerp(out, 19.0F, 38.0F);
-        float topHalf = Mth.lerp(out, 5.2F, 6.6F);
-        float hemHalf = Mth.lerp(out, 6.8F, 25.0F);
-        float billow = Math.max(sway.billow(), Mth.lerp(out, 6.0F, 34.0F));
+        // (3.18.1: at rest a plain cape, the size of the game's own: ten pixels wide and sixteen long)
+        float length = Mth.lerp(out, 16.0F, 38.0F);
+        float topHalf = Mth.lerp(out, 5.0F, 6.6F);
+        float hemHalf = Mth.lerp(out, 5.0F, 25.0F);
+        float billow = Math.max(sway.billow(), Mth.lerp(out, 4.0F, 34.0F));
         for (int i = 0; i <= NX; i++) {
             float fx = (float) i / NX * 2.0F - 1.0F;
             float y = 0.4F;
@@ -124,7 +127,7 @@ public class DemiurgeCloakLayer extends RenderLayer<AbstractClientPlayer, Player
                 // (it widens slowly at first, then flares)
                 float half = Mth.lerp(v * v * (3.0F - 2.0F * v), topHalf, hemHalf + billow * 0.02F);
                 float x = fx * half + sway.side() * 0.03F * v * 16.0F;
-                float wrap = Math.max(0.0F, 1.0F - v * 4.0F) * 3.0F * fx * fx;
+                float wrap = out * Math.max(0.0F, 1.0F - v * 4.0F) * 3.0F * fx * fx;
                 grid[j][i] = new Vec3(x, y, z - wrap);
                 if (j == NY) {
                     break;

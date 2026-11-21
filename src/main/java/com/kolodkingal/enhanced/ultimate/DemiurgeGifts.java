@@ -50,13 +50,31 @@ public final class DemiurgeGifts {
     /** The name of a gifted player's definition (what tells a gift from any other custom hero). */
     public static final String NAME = "Gift of the Demiurge";
     /** The witches and sorcerers whose abilities may be given, in the screen's order. */
-    public static final List<Power> SORCERERS = List.of(Power.SCARLET_WITCH, Power.BILLY, Power.AGATHA, Power.DOCTOR_STRANGE, Power.LOKI);
+    public static final List<Power> SORCERERS = List.of(Power.SCARLET_WITCH, Power.BILLY, Power.AGATHA, Power.DOCTOR_STRANGE, Power.LOKI,
+            Power.ODIN, Power.HELA);
+    /** (3.18.1) The id of a gift that is a whole witch of a spellbook: {@code witch:<book id>}. */
+    public static final String WITCH = "witch:";
 
     /** One power that may be given: a catalogue entry and the option it is given in. */
     public record Gift(String id, String option) {
         @Nullable
         public CatalogEntry entry() {
-            return Catalog.byId(id);
+            return witch() != null ? null : Catalog.byId(id);
+        }
+
+        /** (3.18.1) The spellbook whose witch this gift is, or null for a power. */
+        @Nullable
+        public com.kolodkingal.enhanced.spellbook.Spellbook witch() {
+            if (!id.startsWith(WITCH)) {
+                return null;
+            }
+            String book = id.substring(WITCH.length());
+            for (com.kolodkingal.enhanced.spellbook.Spellbook b : com.kolodkingal.enhanced.spellbook.Spellbook.values()) {
+                if (b.id.equals(book)) {
+                    return b;
+                }
+            }
+            return null;
         }
 
         /** Whether it goes on a key (a body takes none). */
@@ -74,6 +92,10 @@ public final class DemiurgeGifts {
 
         /** Its name in the player's language ("Mystic Bolts", "Chaos Beam"). */
         public Component name() {
+            com.kolodkingal.enhanced.spellbook.Spellbook book = witch();
+            if (book != null) {
+                return Component.translatable("screen.enhanced.demiurge_gift.witch", book.title());
+            }
             CatalogEntry e = entry();
             if (e instanceof PowerModule module) {
                 return Component.translatable(module.optionKey(option));
@@ -87,13 +109,17 @@ public final class DemiurgeGifts {
 
     private static List<Gift> build() {
         List<Gift> list = new ArrayList<>();
-        for (String option : List.of("bolts", "orb", "ward", "curse")) {
-            list.add(new Gift(PowerModule.MAGIC.id(), option));
+        // (3.18.1) first a whole witch of one of the three books (she grows by the witch levels), then every magic power
+        for (com.kolodkingal.enhanced.spellbook.Spellbook book : com.kolodkingal.enhanced.spellbook.Spellbook.values()) {
+            list.add(new Gift(WITCH + book.id, ""));
         }
-        list.add(new Gift(PowerModule.EARTH.id(), "throw"));
-        list.add(new Gift(PowerModule.EARTH.id(), "wall"));
-        list.add(new Gift(PowerModule.NATURE.id(), "bloom"));
+        for (PowerModule module : List.of(PowerModule.MAGIC, PowerModule.EARTH, PowerModule.NATURE)) {
+            for (PowerModule.Option option : module.options()) {
+                list.add(new Gift(module.id(), option.id()));
+            }
+        }
         list.add(new Gift(PowerModule.FLIGHT.id(), "hover"));
+        list.add(new Gift(PowerModule.FLIGHT.id(), "cloak"));
         for (Power hero : SORCERERS) {
             for (HeroAbility a : HeroAbility.values()) {
                 if (a.hero == hero && magic(a)) {
@@ -265,6 +291,19 @@ public final class DemiurgeGifts {
         if (refused == null && picks.isEmpty()) {
             refused = "message.enhanced.demiurge.gift.empty";
         }
+        // (3.18.1) a whole witch: she becomes the book's witch, at her level in it (level 1 if she never began it)
+        com.kolodkingal.enhanced.spellbook.Spellbook witch = null;
+        for (int i : picks) {
+            if (i >= 0 && i < CATALOG.size() && CATALOG.get(i).witch() != null) {
+                witch = CATALOG.get(i).witch();
+                break;
+            }
+        }
+        if (refused == null && witch != null) {
+            com.kolodkingal.enhanced.spellbook.Spellbooks.become(target, witch);
+            announce(giver, target, null);
+            return null;
+        }
         CustomHero hero = refused == null ? definition(picks) : null;
         if (refused == null && hero.powers().isEmpty()) {
             refused = "message.enhanced.demiurge.gift.empty";
@@ -290,6 +329,15 @@ public final class DemiurgeGifts {
                     : "message.enhanced.demiurge.gift.no_ultimate").withStyle(s -> s.withColor(0xFF8080)), true);
             return false;
         }
+        if (!gifted(target) && com.kolodkingal.enhanced.spellbook.Spellbook.of(target) != null) {
+            // (3.18.1) a witch of a book (his gift, or the book's own): her magic goes back as when she renounces it
+            com.kolodkingal.enhanced.spellbook.Spellbooks.renounce(target);
+            if (giver != null) {
+                giver.displayClientMessage(Component.translatable("message.enhanced.demiurge.gift.took", target.getDisplayName())
+                        .withStyle(s -> s.withColor(Demiurge.AURA)), true);
+            }
+            return true;
+        }
         if (!gifted(target)) {
             if (giver != null) {
                 giver.displayClientMessage(Component.translatable("message.enhanced.demiurge.gift.not_gifted", target.getDisplayName())
@@ -311,7 +359,7 @@ public final class DemiurgeGifts {
         return true;
     }
 
-    private static void announce(@Nullable ServerPlayer giver, ServerPlayer target, CustomHero hero) {
+    private static void announce(@Nullable ServerPlayer giver, ServerPlayer target, @Nullable CustomHero hero) {
         ServerLevel level = target.serverLevel();
         target.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 20));
         target.connection.send(new ClientboundSetTitleTextPacket(Component.translatable("message.enhanced.demiurge.gift.title")
@@ -325,7 +373,7 @@ public final class DemiurgeGifts {
         Demiurge.burst(level, target, 90);
         if (giver != null) {
             giver.displayClientMessage(Component.translatable("message.enhanced.demiurge.gift.given", target.getDisplayName(),
-                    hero.powers().size()).withStyle(s -> s.withColor(Demiurge.AURA)), true);
+                    hero == null ? 1 : hero.powers().size()).withStyle(s -> s.withColor(Demiurge.AURA)), true);
         }
     }
 }

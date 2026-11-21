@@ -31,6 +31,11 @@ public final class ShieldStyles {
      */
     @Nullable
     public static ShieldStyle of(PowerData data) {
+        if (data.borrowed() != Power.NONE) {
+            // (3.18.1) Billy the Demiurge with another's magic on his keys: that hero's shield (the Chaos Shield was never
+            // drawn for him, though it stopped blows)
+            return of(data.borrowed());
+        }
         if (data.power() != Power.CUSTOM) {
             return of(data.power());
         }
@@ -49,6 +54,12 @@ public final class ShieldStyles {
     @Nullable
     public static ShieldStyle of(Player player, PowerData data) {
         ShieldStyle style = of(data);
+        if (style != null && data.borrowed() != Power.NONE) {
+            // (3.18.1) in the Demiurge's blue
+            int chosen = AbilityColors.chosen(player, data.borrowed() == Power.SCARLET_WITCH ? HeroAbility.WANDA_CHAOS_SHIELD
+                    : data.borrowed() == Power.AGATHA ? HeroAbility.AGATHA_SHIELD : HeroAbility.ODIN_ODINFORCE);
+            return chosen < 0 ? style : style.tinted(chosen);
+        }
         if (style == null || data.power() != Power.CUSTOM) {
             return style;
         }

@@ -51,7 +51,7 @@ public final class SuitSkins {
      * of its own ({@code render.DemiurgeCloakLayer}).
      */
     private static final PlayerSkin BILLY_DEMIURGE = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/billy_demiurge.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+            Enhanced.id("textures/entity/suit/billy_demiurge.png"), null, null, null, PlayerSkin.Model.SLIM, true);
     private static final PlayerSkin BILLY_DEMIURGE_POWERED = new PlayerSkin(
             Enhanced.id("textures/entity/suit/billy_demiurge_powered.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -94,7 +94,7 @@ public final class SuitSkins {
         }
         if (power == Power.BILLY && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
             // (3.18.1) the Demiurge looks the Demiurge, whatever his look, his own skin or the magic type on his keys
-            return com.kolodkingal.enhanced.client.render.DemiurgeFx.powered(player) ? BILLY_DEMIURGE_POWERED : BILLY_DEMIURGE;
+            return com.kolodkingal.enhanced.client.render.DemiurgeFx.poweredSkin(player) ? BILLY_DEMIURGE_POWERED : BILLY_DEMIURGE;
         }
         if (power.hasPowers() && Powers.get(player).ownSkin()) {
             // (3.17: he chose his own skin: any hero, built-in or custom, wears it instead of the suit)

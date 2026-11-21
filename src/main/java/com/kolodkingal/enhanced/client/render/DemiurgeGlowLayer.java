@@ -23,6 +23,7 @@ import net.minecraft.util.Mth;
 public class DemiurgeGlowLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     private static final ResourceLocation STARS_A = Enhanced.id("textures/entity/suit/billy_demiurge_aura_0.png");
     private static final ResourceLocation STARS_B = Enhanced.id("textures/entity/suit/billy_demiurge_aura_1.png");
+    private static final ResourceLocation WHITE = Enhanced.id("textures/misc/white.png");
     /** How much larger than the body the glow is drawn (round the middle of the body). */
     private static final float GROW = 1.07F;
 
@@ -36,6 +37,16 @@ public class DemiurgeGlowLayer extends RenderLayer<AbstractClientPlayer, PlayerM
                        float headPitch) {
         if (!Demiurge.is(player) || player.isInvisible()) {
             return;
+        }
+        float flash = DemiurgeFx.flash(player);
+        if (flash > 0.02F) {
+            // (3.18.1) the transformation: his whole body floods with white light, a little larger than him
+            poseStack.pushPose();
+            poseStack.translate(0.0F, 0.75F, 0.0F);
+            poseStack.scale(1.02F, 1.02F, 1.02F);
+            poseStack.translate(0.0F, -0.75F, 0.0F);
+            draw(poseStack, buffers, WHITE, flash * 0.9F);
+            poseStack.popPose();
         }
         float out = DemiurgeFx.out(player);
         if (out <= 0.02F) {

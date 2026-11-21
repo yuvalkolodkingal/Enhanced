@@ -36,6 +36,9 @@ public final class StoneRules {
     /** Whether the player is a Bearer: he may hold every bare stone. */
     public static boolean isBearer(Player player) {
         PowerData data = Powers.get(player);
+        if (com.kolodkingal.enhanced.ability.Demiurge.is(data)) {
+            return true; // (3.18.1) Billy the Demiurge bears every stone
+        }
         return isBearer(data.power(), t -> Traits.has(data, t));
     }
 
@@ -51,6 +54,9 @@ public final class StoneRules {
     /** Whether the player may hold the bare stone (carry it, pick it up, take it from a pedestal). */
     public static boolean mayHold(Player player, StoneKind kind) {
         PowerData data = Powers.get(player);
+        if (com.kolodkingal.enhanced.ability.Demiurge.is(data)) {
+            return true;
+        }
         return mayHold(data.power(), t -> Traits.has(data, t), player.isCreative(), kind);
     }
 
@@ -71,6 +77,9 @@ public final class StoneRules {
      */
     public static boolean mayUse(Player player, StoneKind kind) {
         PowerData data = Powers.get(player);
+        if (com.kolodkingal.enhanced.ability.Demiurge.is(data)) {
+            return true; // (3.18.1) the Demiurge uses all six, the Time Stone too
+        }
         return mayUse(data.power(), t -> Traits.has(data, t), player.isCreative(), kind);
     }
 
@@ -90,6 +99,9 @@ public final class StoneRules {
     /** (3.17) {@link #timeUser(Predicate)} for a player. */
     public static boolean timeUser(Player player) {
         PowerData data = Powers.get(player);
+        if (com.kolodkingal.enhanced.ability.Demiurge.is(data)) {
+            return true;
+        }
         return timeUser(t -> Traits.has(data, t));
     }
 

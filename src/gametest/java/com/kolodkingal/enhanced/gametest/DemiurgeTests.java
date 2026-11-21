@@ -223,9 +223,10 @@ public final class DemiurgeTests {
         check(Powers.power(target) == Power.NONE, "the target has no hero");
         // the catalogue is magic only
         for (DemiurgeGifts.Gift g : DemiurgeGifts.CATALOG) {
-            check(g.entry() != null, g.id() + " is in the Hero Creator's catalogue");
+            check(g.witch() != null || g.entry() != null, g.id() + " is a witch of a book or in the Hero Creator's catalogue");
             Power hero = g.hero();
-            check(hero == null ? List.of("magic", "earth", "nature", "flight").contains(g.id()) : DemiurgeGifts.SORCERERS.contains(hero),
+            check(g.witch() != null || (hero == null ? List.of("magic", "earth", "nature", "flight").contains(g.id())
+                    : DemiurgeGifts.SORCERERS.contains(hero)),
                     g.id() + " is magic");
         }
         check(DemiurgeGifts.CATALOG.size() >= 30, "every witch's and sorcerer's ability: " + DemiurgeGifts.CATALOG.size());
@@ -286,5 +287,58 @@ public final class DemiurgeTests {
         assertNear(com.kolodkingal.enhanced.config.DemiurgeConfig.BARRIER_HEALTH_FACTOR.getDefault(), 8.0, 1.0E-9,
                 "his barrier has 8 times its health by default");
         helper.succeed();
+    }
+
+    /** (3.18.1) He may give a whole witch of a book (at level 1), Odin's and Hela's magic too; and he bears all six stones. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void heGivesAWitchOrAnyMagicAndBearsEveryStone(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = demiurge(f);
+        int witch = index(DemiurgeGifts.WITCH + "green", null);
+        check(DemiurgeGifts.CATALOG.stream().anyMatch(g -> g.hero() == Power.ODIN)
+                && DemiurgeGifts.CATALOG.stream().anyMatch(g -> g.hero() == Power.HELA), "Odin's and Hela's magic may be given");
+        check(DemiurgeGifts.CATALOG.stream().anyMatch(g -> "nature".equals(g.id()) && "roots".equals(g.option())), "and Root Grasp");
+        ServerPlayer other = f.player(12.5, FLOOR, 10.5, Power.NONE);
+        check(DemiurgeGifts.give(player, other, List.of(witch)) == null, "he gives the Green Witch");
+        check(com.kolodkingal.enhanced.spellbook.Spellbook.of(other) == com.kolodkingal.enhanced.spellbook.Spellbook.GREEN,
+                "the player is the Green Witch");
+        check(DemiurgeGifts.takeBack(player, other) && Powers.power(other) == Power.NONE, "and he takes her magic back");
+        for (com.kolodkingal.enhanced.thanos.StoneKind kind : com.kolodkingal.enhanced.thanos.StoneKind.values()) {
+            check(com.kolodkingal.enhanced.stones.StoneRules.mayUse(player, kind), "the Demiurge uses the " + kind + " stone");
+        }
+        check(com.kolodkingal.enhanced.stones.StoneRules.mayWield(player), "and wields the Gauntlet");
+        ServerPlayer plain = billy(f, false);
+        check(!com.kolodkingal.enhanced.stones.StoneRules.mayUse(plain, com.kolodkingal.enhanced.thanos.StoneKind.POWER),
+                "plain Billy does not use the Power Stone");
+        helper.succeed();
+    }
+
+    /** (3.18.1) With the Scarlet Witch's magic, the Demiurge's Chaos Shield forms and stops a blow; and slowed time never slows him. */
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 200)
+    public static void hisChaosShieldWorksWithHerMagic(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = demiurge(f);
+        Demiurge.setType(player, data(player), 1);
+        AbilityHandler.onKey(player, 4, true, false);
+        check(data(player).chaosShieldActive(), "B raises her Chaos Shield");
+        int wait = com.kolodkingal.enhanced.EnhancedConfig.CHAOS_SHIELD_WIND_UP_TICKS.get() + 4;
+        for (int t = 1; t <= wait; t++) {
+            int at = t;
+            helper.runAfterDelay(t, () -> {
+                PowerTicker.tick(player);
+                check(data(player).chaosShieldActive(), "the shield is still held at tick " + at);
+            });
+        }
+        helper.runAfterDelay(wait + 1, () -> {
+            check(com.kolodkingal.enhanced.ability.WandaAbilities.hasShieldUp(player), "the Chaos Shield is complete");
+            net.minecraft.world.entity.monster.Zombie zombie = TestKit.spawnWithNoFreeWill(helper,
+                    net.minecraft.world.entity.EntityType.ZOMBIE, new net.minecraft.world.phys.Vec3(11.5, FLOOR, 10.5));
+            float before = player.getHealth();
+            player.invulnerableTime = 0;
+            player.hurt(player.damageSources().mobAttack(zombie), 6.0F);
+            check(player.getHealth() >= before - 1.0E-4F, "the shield stops a zombie's blow: " + before + " -> " + player.getHealth());
+            check(com.kolodkingal.enhanced.ability.SlowMotion.playerFactor(player) == 1, "slowed time never slows the Demiurge");
+            helper.succeed();
+        });
     }
 }

@@ -144,6 +144,9 @@ public class DemiurgeGiftScreen extends Screen {
         }
         String id = DemiurgeGifts.CATALOG.get(index).id();
         picks.removeIf(i -> DemiurgeGifts.CATALOG.get(i).id().equals(id));
+        // (3.18.1) a whole witch is given alone: picking her clears the powers, picking a power clears her
+        boolean witch = DemiurgeGifts.CATALOG.get(index).witch() != null;
+        picks.removeIf(i -> witch || DemiurgeGifts.CATALOG.get(i).witch() != null);
         picks.add(index);
     }
 
@@ -166,7 +169,7 @@ public class DemiurgeGiftScreen extends Screen {
             return Component.translatable("screen.enhanced.demiurge_gift.unseen").withStyle(ChatFormatting.GRAY);
         }
         Power power = Powers.power(seen);
-        if (DemiurgeGifts.gifted(seen)) {
+        if (DemiurgeGifts.gifted(seen) || com.kolodkingal.enhanced.spellbook.Spellbook.of(seen) != null) {
             return Component.translatable("screen.enhanced.demiurge_gift.gifted").withStyle(s -> s.withColor(Demiurge.AURA));
         }
         return power == Power.NONE ? Component.translatable("screen.enhanced.demiurge_gift.ready").withStyle(ChatFormatting.GREEN)
@@ -213,7 +216,7 @@ public class DemiurgeGiftScreen extends Screen {
             boolean on = picks.contains(index);
             DemiurgeGifts.Gift gift = DemiurgeGifts.CATALOG.get(index);
             Power hero = gift.hero();
-            int color = hero == null ? 0xE6E6FF : hero.titleColor();
+            int color = gift.witch() != null ? gift.witch().color : hero == null ? 0xE6E6FF : hero.titleColor();
             graphics.fill(x, y, x + width, y + height, on ? 0xC0103A78 : 0x90000000);
             if (on) {
                 graphics.renderOutline(x, y, width, height, 0xFF000000 | Demiurge.AURA);

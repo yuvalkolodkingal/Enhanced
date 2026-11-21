@@ -79,6 +79,27 @@ public final class DemiurgeFx {
         return look != null && look.powered;
     }
 
+    /**
+     * (3.18.1) Which skin he wears: the powered one from the middle of the transformation on, hidden by its flash (and the
+     * rest one again from the middle of the change back).
+     */
+    public static boolean poweredSkin(Player player) {
+        Look look = LOOKS.get(player.getId());
+        return look != null && look.amount >= 0.5F;
+    }
+
+    /**
+     * (3.18.1) The transformation's flash (0 to 1): as he powers up, white star light floods his body and is brightest at
+     * the middle, where the suit changes under it; coming back to rest, a softer one.
+     */
+    public static float flash(Player player) {
+        Look look = LOOKS.get(player.getId());
+        if (look == null || look.amount <= 0.0F || look.amount >= 1.0F) {
+            return 0.0F;
+        }
+        return Mth.sin(look.amount * Mth.PI) * (look.powered ? 1.0F : 0.45F);
+    }
+
     /** How far the powered look is out for him now (0 at rest to 1, eased): the cloak's layer grows the cloth by it. */
     public static float out(Player player) {
         Look look = LOOKS.get(player.getId());
@@ -114,7 +135,23 @@ public final class DemiurgeFx {
             }
             look.powered = now;
             look.amountO = look.amount;
-            look.amount = Mth.clamp(look.amount + (now ? 0.12F : -0.08F), 0.0F, 1.0F);
+            // (3.18.1: the transformation takes about three quarters of a second, a ring of stars rising up his body)
+            look.amount = Mth.clamp(look.amount + (now ? 0.07F : -0.08F), 0.0F, 1.0F);
+            if (now && look.amount > 0.0F && look.amount < 1.0F && !player.isInvisible()) {
+                ring(level, player, look.amount);
+            }
+        }
+    }
+
+    /** (3.18.1) The transformation's ring: stars round his body at the height it has risen to, from his feet to his crown. */
+    private static void ring(ClientLevel level, Player player, float amount) {
+        RandomSource random = level.random;
+        double y = player.getY() + player.getBbHeight() * amount;
+        for (int i = 0; i < 10; i++) {
+            double a = random.nextDouble() * Math.PI * 2.0;
+            double r = 0.55 + random.nextDouble() * 0.1;
+            level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? STAR : BLUE, 0.5F + random.nextFloat() * 0.3F),
+                    player.getX() + Math.cos(a) * r, y, player.getZ() + Math.sin(a) * r, 0.0, 0.02, 0.0);
         }
     }
 
