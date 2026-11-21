@@ -376,4 +376,19 @@ public final class DemiurgeTests {
                 com.kolodkingal.enhanced.spellbook.WitchLevels.GIFT_KEY) == 5, "at level 5");
         helper.succeed();
     }
+
+    /** (3.18.1) The Demiurge's Vishanti ward is one and a half times the Scarlet Witch's, the biggest of all. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void hisWardIsBiggerThanTheScarletWitchs(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer wanda = f.player(4.5, FLOOR, 4.5, Power.SCARLET_WITCH);
+        ServerPlayer plain = billy(f, false);
+        int hers = com.kolodkingal.enhanced.vishanti.WardStrength.radiusOf(wanda);
+        check(com.kolodkingal.enhanced.vishanti.WardStrength.radiusOf(plain) <= hers, "plain Billy's ward is no bigger than hers");
+        ServerPlayer player = demiurge(f);
+        int his = com.kolodkingal.enhanced.vishanti.WardStrength.radiusOf(player);
+        check(his > hers && his == Math.min(com.kolodkingal.enhanced.config.VishantiConfig.MAX_RADIUS, (int) Math.round(hers * 1.5)),
+                "the Demiurge's is one and a half times hers: " + his + " vs " + hers);
+        helper.succeed();
+    }
 }

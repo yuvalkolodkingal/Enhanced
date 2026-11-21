@@ -70,6 +70,11 @@ public final class WardStrength {
     /** The radius of this player's ward now. */
     public static int radiusOf(Player player) {
         Power power = Powers.power(player);
+        // (3.18.1) Billy the Demiurge's ward is one and a half times the Scarlet Witch's (hers is the most any other ward can be)
+        if (power == Power.BILLY && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
+            int wanda = radius(Power.SCARLET_WITCH, 0.0);
+            return wanda <= 0 ? 0 : Math.min(VishantiConfig.MAX_RADIUS, (int) Math.round(wanda * 1.5));
+        }
         return radius(power, power == Power.BILLY ? billyFraction(player) : 0.0);
     }
 
