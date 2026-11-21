@@ -72,6 +72,14 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Mod loader** NeoForge 21.1.x, 21.4.x, 21.11.x or 26.3.x
 * **Install it on** the client, plus the server for multiplayer
 
+## What's new in 3.18.2
+
+* **Helmets and goggles stay on the head.** On Minecraft 1.21.9 and newer (26.3 included), Magneto's helmet, Quicksilver's goggles and any other helmet slid off the head while a hero flew, ran or wall-ran: the armour worked the hero's pose out twice. It is worked out once now.
+* **The Demiurge gives more magic.** His gift screen has a **Level** button: the gifted witch starts at that witch level (5 by default: every power he picked at once; lower, and she grows by the levels). Up to 20 powers in one gift (`billy.demiurge.giftMaxPowers`).
+* **The Demiurge's Vishanti ward** is one and a half times the Scarlet Witch's (72 blocks by default).
+* **The Shields of the Seraphim protect.** Doctor Strange's (and the Eldritch witch's) Shield now stops everything that comes at its front, and the Dome stops everything from outside it; harm from inside the Dome is halved, as before.
+* **The Cloak of Levitation's collar** turns with the head, so the head no longer comes through it when he turns or looks up.
+
 ## What's new in 3.18.1
 
 * **A level system for witches.** Each of the three spellbooks now starts its caster at level 1 and grows to level 5 by experience: each level opens one more spell on a fixed key and makes the spells stronger, and level 5 is exactly the whole book of before (never stronger than the real hero: every ability of Agatha's or Strange's at most at its strength 5). Experience comes from spells that hit hostile creatures, kills, bosses (400), the book's practice and a daily study at the book's home lectern (60), with a coven bonus near another witch and a cap of 600 an hour; death costs none. Empty keys get small cantrips in the book's colour by role (Mini Shield, Blink Step, Mend, Repel, Spark, Witch Light). The Green witch gains a new spell at level 5, **Root Grasp** (B). A level line and experience bar on the HUD, a title with particles on each level-up (and a word to the whole server at level 5), and the **Book of Spells** screen when you use your book (the Ethereal witch: a button on her hat's screen). Existing casters start at level 5 and nothing changes for them. Settings in `[spellbook_levels]`; commands `/enhanced spellbook xp <players> add|set <n>` and `/enhanced spellbook level <players> <book> <1-5>`.
