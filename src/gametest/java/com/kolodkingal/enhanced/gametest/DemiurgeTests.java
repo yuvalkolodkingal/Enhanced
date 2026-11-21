@@ -226,7 +226,7 @@ public final class DemiurgeTests {
             check(g.witch() != null || g.entry() != null, g.id() + " is a witch of a book or in the Hero Creator's catalogue");
             Power hero = g.hero();
             check(g.witch() != null || (hero == null ? List.of("magic", "earth", "nature", "flight").contains(g.id())
-                    : DemiurgeGifts.SORCERERS.contains(hero)),
+                    : DemiurgeGifts.SORCERERS.contains(hero) || DemiurgeGifts.BIFROST.stream().anyMatch(b -> b.id().equals(g.id()))),
                     g.id() + " is magic");
         }
         check(DemiurgeGifts.CATALOG.size() >= 30, "every witch's and sorcerer's ability: " + DemiurgeGifts.CATALOG.size());
@@ -281,7 +281,17 @@ public final class DemiurgeTests {
         check(limits != null && limits.limited(), "plain Billy's Build Magic has his rank's limits");
         ServerPlayer player = demiurge(f);
         limits = com.kolodkingal.enhanced.build.Limits.of(player);
-        check(limits != null && limits.billy() && !limits.limited(), "the Demiurge's has none");
+        check(limits != null && limits.billy() && !limits.limited() && limits.anyBlock(), "the Demiurge's has none");
+        net.minecraft.world.level.block.state.BlockState bedrock = net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState();
+        check(com.kolodkingal.enhanced.build.BuildRules.material(bedrock, limits) != com.kolodkingal.enhanced.network.BuildVerdictPayload.BAD_BLOCK,
+                "he may make bedrock");
+        check(com.kolodkingal.enhanced.build.BuildRules.material(net.minecraft.world.level.block.Blocks.BARRIER.defaultBlockState(), limits)
+                == com.kolodkingal.enhanced.network.BuildVerdictPayload.BAD_BLOCK
+                && com.kolodkingal.enhanced.build.BuildRules.material(net.minecraft.world.level.block.Blocks.LIGHT.defaultBlockState(), limits)
+                == com.kolodkingal.enhanced.network.BuildVerdictPayload.BAD_BLOCK, "but never a barrier nor a light block");
+        check(!com.kolodkingal.enhanced.build.BuildRules.paysMaterials(player), "and pays no materials");
+        check(com.kolodkingal.enhanced.build.BuildRules.material(bedrock, com.kolodkingal.enhanced.build.Limits.of(plain))
+                == com.kolodkingal.enhanced.network.BuildVerdictPayload.BAD_BLOCK, "plain Billy may not make bedrock");
         assertNear(com.kolodkingal.enhanced.config.DemiurgeConfig.DAMAGE_FACTOR.getDefault(), 8.0, 1.0E-9,
                 "his powers hit 8 times as hard by default (four times the 2 of before)");
         assertNear(com.kolodkingal.enhanced.config.DemiurgeConfig.BARRIER_HEALTH_FACTOR.getDefault(), 8.0, 1.0E-9,
@@ -295,8 +305,11 @@ public final class DemiurgeTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = demiurge(f);
         int witch = index(DemiurgeGifts.WITCH + "green", null);
-        check(DemiurgeGifts.CATALOG.stream().anyMatch(g -> g.hero() == Power.ODIN)
-                && DemiurgeGifts.CATALOG.stream().anyMatch(g -> g.hero() == Power.HELA), "Odin's and Hela's magic may be given");
+        check(DemiurgeGifts.CATALOG.stream().noneMatch(g -> g.hero() == Power.ODIN)
+                && DemiurgeGifts.CATALOG.stream().anyMatch(g -> g.hero() == Power.HELA), "Hela's magic may be given, Odin's not");
+        check(DemiurgeGifts.CATALOG.stream().anyMatch(g -> g.id().equals(HeroAbility.HEIMDALL_BIFROST.id()))
+                && DemiurgeGifts.CATALOG.stream().anyMatch(g -> g.id().equals(HeroAbility.HEIMDALL_STRIKE.id())),
+                "the Bifrost and the Bifrost Strike may be given");
         check(DemiurgeGifts.CATALOG.stream().anyMatch(g -> "nature".equals(g.id()) && "roots".equals(g.option())), "and Root Grasp");
         ServerPlayer other = f.player(12.5, FLOOR, 10.5, Power.NONE);
         check(DemiurgeGifts.give(player, other, List.of(witch)) == null, "he gives the Green Witch");

@@ -2754,7 +2754,7 @@ public final class BuildJob {
     /** P4, P5, P8 and (when the block itself changes) the break event, for a neighbour the settle pass changes. */
     private boolean mayChangeNeighbour(BlockPos pos, BlockState before, BlockState after) {
         ServerPlayer actor = rules.player();
-        if (SpellMath.untouchable(before, level, pos) || BlockRights.massEditRefuses(actor, level, pos) || !BlockRights.vanillaRights(actor, level, pos)) {
+        if (SpellMath.untouchable(before, level, pos, Limits.anyBlock(actor)) || BlockRights.massEditRefuses(actor, level, pos) || !BlockRights.vanillaRights(actor, level, pos)) {
             return false;
         }
         if (before.hasBlockEntity() && before.getBlock() != after.getBlock()) {

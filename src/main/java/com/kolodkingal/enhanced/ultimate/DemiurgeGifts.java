@@ -51,7 +51,9 @@ public final class DemiurgeGifts {
     public static final String NAME = "Gift of the Demiurge";
     /** The witches and sorcerers whose abilities may be given, in the screen's order. */
     public static final List<Power> SORCERERS = List.of(Power.SCARLET_WITCH, Power.BILLY, Power.AGATHA, Power.DOCTOR_STRANGE, Power.LOKI,
-            Power.ODIN, Power.HELA);
+            Power.HELA);
+    /** (3.18.1) And the Bifrost's magic: the rainbow bridge itself and the attack of its light. */
+    public static final List<HeroAbility> BIFROST = List.of(HeroAbility.HEIMDALL_BIFROST, HeroAbility.HEIMDALL_STRIKE);
     /** (3.18.1) The id of a gift that is a whole witch of a spellbook: {@code witch:<book id>}. */
     public static final String WITCH = "witch:";
 
@@ -126,6 +128,9 @@ public final class DemiurgeGifts {
                     list.add(new Gift(a.id(), HeroAbility.BOTH));
                 }
             }
+        }
+        for (HeroAbility a : BIFROST) {
+            list.add(new Gift(a.id(), HeroAbility.BOTH));
         }
         return Collections.unmodifiableList(list);
     }

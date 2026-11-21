@@ -1466,6 +1466,23 @@ public final class SpellMath {
         return state.is(ModTags.BUILD_UNTOUCHABLE) || state.getDestroySpeed(level, pos) < 0.0F;
     }
 
+    /**
+     * (3.18.1) {@link #untouchable} for a caster: Billy the Demiurge's magic touches every block, bedrock, the End
+     * portal's frame and the other unbreakable ones too, but never a barrier, a light block or Mjolnir.
+     */
+    public static boolean untouchable(BlockState state, BlockGetter level, BlockPos pos, boolean anyBlock) {
+        if (anyBlock) {
+            return anyBlockRefuses(state);
+        }
+        return untouchable(state, level, pos);
+    }
+
+    /** (3.18.1) What even the Demiurge's Build Magic never touches nor makes: a barrier, a light block, Mjolnir. */
+    public static boolean anyBlockRefuses(BlockState state) {
+        return state.is(net.minecraft.world.level.block.Blocks.BARRIER) || state.is(net.minecraft.world.level.block.Blocks.LIGHT)
+                || net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString().equals("enhanced:mjolnir");
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // The Pull surface
 

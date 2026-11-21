@@ -221,7 +221,8 @@ public final class BuildRules {
         if (state == null || state.isAir()) {
             return BuildVerdictPayload.NO_BLOCK;
         }
-        if (state.is(ModTags.BUILD_UNCONJURABLE) || SpellMath.untouchable(state, EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
+        if (limits.anyBlock() ? SpellMath.anyBlockRefuses(state)
+                : state.is(ModTags.BUILD_UNCONJURABLE) || SpellMath.untouchable(state, EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
             return BuildVerdictPayload.BAD_BLOCK;
         }
         if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) || state.hasProperty(BlockStateProperties.BED_PART)) {
@@ -357,7 +358,9 @@ public final class BuildRules {
      * ({@code build_magic.requireMaterials}): in Survival, while he is here (null: away); Creative never pays.
      */
     public static boolean paysMaterials(@Nullable ServerPlayer player) {
-        return player != null && BuildConfig.REQUIRE_MATERIALS.get() && !player.isCreative() && !player.isSpectator();
+        // (3.18.1: nor does Billy the Demiurge, whose magic has no limit)
+        return player != null && BuildConfig.REQUIRE_MATERIALS.get() && !player.isCreative() && !player.isSpectator()
+                && !Limits.anyBlock(player);
     }
 
     /**
@@ -522,7 +525,9 @@ public final class BuildRules {
          */
         public @Nullable Left check(BlockPos pos, BlockState old, BlockState now, boolean conjured, boolean carried) {
             spills = false;
-            if (SpellMath.untouchable(old, level, pos) || conjured && now.is(ModTags.BUILD_UNCONJURABLE)) {
+            boolean anyBlock = Limits.anyBlock(player); // (3.18.1: the Demiurge's magic touches bedrock too)
+            if (SpellMath.untouchable(old, level, pos, anyBlock) || conjured && (anyBlock ? SpellMath.anyBlockRefuses(now)
+                    : now.is(ModTags.BUILD_UNCONJURABLE))) {
                 return Left.BEYOND;
             }
             if (BlockRights.massEditRefuses(player, level, pos)) {

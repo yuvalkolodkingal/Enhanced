@@ -108,7 +108,9 @@ public final class Limits implements RecipeLimits {
             // (3.18.1) Billy the Demiurge: his Build Magic has no limit, as in Creative (no meter, no caps)
             boolean free = player.isCreative() && !limitsInCreative() || power == Power.BILLY
                     && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player));
-            return free ? new Limits(Power.BILLY, rank, false, world) : billy(rank, world);
+            Limits limits = free ? new Limits(Power.BILLY, rank, false, world) : billy(rank, world);
+            limits.anyBlock = anyBlock(player);
+            return limits;
         }
         return null;
     }
@@ -129,6 +131,19 @@ public final class Limits implements RecipeLimits {
      */
     public static BoundingBox world(Level level) {
         return SpellMath.world(level);
+    }
+
+    /** (3.18.1) Whether this player's Build Magic touches any block (bedrock too): Billy the Demiurge's. */
+    public static boolean anyBlock(@Nullable Player player) {
+        return player != null && Powers.power(player) == Power.BILLY
+                && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player));
+    }
+
+    /** (3.18.1) These numbers' {@link #anyBlock(Player)}, kept from when they were read. */
+    private boolean anyBlock;
+
+    public boolean anyBlock() {
+        return anyBlock;
     }
 
     /** (3.18) A number of Billy's at this caster's share of it (1 for everyone but Cosmic Spider-Man). */
