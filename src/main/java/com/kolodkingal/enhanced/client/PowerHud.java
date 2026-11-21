@@ -258,9 +258,10 @@ public class PowerHud implements LayeredDraw.Layer {
      * The symbol of an ability (3.10): textures/gui/ability/&lt;hero&gt;_&lt;n&gt;.png, drawn by tools/symbols.py from the motif
      * tools/symbols.json gives its translation key ("ability.enhanced.thor.3" is thor_3).
      */
-    private static PowerPanels.Icon symbol(String abilityKey) {
+    public static PowerPanels.Icon symbol(String abilityKey) {
+        // (3.18.1: the path is the witches' icons' too: WitchIcons.texture)
         net.minecraft.resources.ResourceLocation texture = com.kolodkingal.enhanced.Enhanced.id(
-                "textures/gui/ability/" + abilityKey.substring("ability.enhanced.".length()).replace('.', '_') + ".png");
+                com.kolodkingal.enhanced.spellbook.WitchIcons.texture(abilityKey));
         return (g, x, y, size) -> {
             com.mojang.blaze3d.systems.RenderSystem.enableBlend();
             g.blit(texture, x, y, size, size, 0, 0, 32, 32, 32, 32);

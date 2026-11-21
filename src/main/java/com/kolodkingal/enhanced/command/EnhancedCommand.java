@@ -84,8 +84,9 @@ public final class EnhancedCommand {
                         .then(Commands.literal("set")
                                 .then(Commands.argument("players", EntityArgument.players())
                                         .then(Commands.argument("power", StringArgumentType.word())
-                                                .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
-                                                        Arrays.stream(Power.values()).map(Power::getSerializedName), builder))
+                                                .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(java.util.stream.Stream.concat(
+                                                        Arrays.stream(Power.values()).map(Power::getSerializedName),
+                                                        com.kolodkingal.enhanced.spellbook.Spellbook.heroIds().stream()), builder))
                                                 .executes(ctx -> set(ctx, ""))
                                                 .then(Commands.argument("look", StringArgumentType.word())
                                                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(lookIds(
@@ -150,7 +151,10 @@ public final class EnhancedCommand {
 
     private static int get(CommandSourceStack source, ServerPlayer player) {
         Power power = Powers.power(player);
-        source.sendSuccess(() -> Component.translatable("commands.enhanced.power.get", player.getDisplayName(), power.displayName()), false);
+        // (3.18.1: a spellbook's witch by her own name)
+        com.kolodkingal.enhanced.spellbook.Spellbook witch = com.kolodkingal.enhanced.spellbook.Spellbook.of(player);
+        Component name = witch != null ? witch.title() : power.displayName();
+        source.sendSuccess(() -> Component.translatable("commands.enhanced.power.get", player.getDisplayName(), name), false);
         return power.ordinal();
     }
 
@@ -160,6 +164,21 @@ public final class EnhancedCommand {
 
     private static int set(CommandContext<CommandSourceStack> ctx, String look) throws CommandSyntaxException {
         String name = StringArgumentType.getString(ctx, "power");
+        com.kolodkingal.enhanced.spellbook.Spellbook witch = com.kolodkingal.enhanced.spellbook.Spellbook.byHeroId(name);
+        if (witch != null) {
+            // (3.18.1) a spellbook's witch, as a hero of her own: at her level in the book (she has no looks)
+            if (!look.isEmpty()) {
+                throw UNKNOWN_LOOK.create(look);
+            }
+            Collection<ServerPlayer> players = EntityArgument.getPlayers(ctx, "players");
+            for (ServerPlayer player : players) {
+                if (com.kolodkingal.enhanced.spellbook.Spellbook.of(player) != witch) {
+                    com.kolodkingal.enhanced.spellbook.Spellbooks.become(player, witch);
+                }
+            }
+            ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.power.set", players.size(), witch.title()), true);
+            return players.size();
+        }
         Power power = Power.byName(name);
         if (power == null) {
             throw UNKNOWN_POWER.create(name);

@@ -265,6 +265,33 @@ public final class CustomHeroes {
         return true;
     }
 
+    /**
+     * 3.18.1, the creator's "Choose a Hero" for one of the spellbooks' witches (a hero of her own there, as on her book):
+     * the player becomes that book's witch ({@code Spellbooks.become}: at her level in the book, level 1 if she never
+     * began it; his own custom hero kept aside), with the same checks as {@link #choose}. A witch she already is stays as
+     * she is.
+     */
+    public static boolean chooseWitch(ServerPlayer player, com.kolodkingal.enhanced.spellbook.Spellbook book) {
+        String refused = refusal(player);
+        if (refused != null) {
+            player.displayClientMessage(Component.translatable(refused).withStyle(ChatFormatting.RED), true);
+            return false;
+        }
+        if (EnhancedConfig.SPEC.isLoaded() && !CustomHeroConfig.ALLOW_CHOOSE_EXISTING.get()) {
+            player.displayClientMessage(Component.translatable("message.enhanced.hero_creator.choose_disabled").withStyle(ChatFormatting.RED), true);
+            return false;
+        }
+        if (com.kolodkingal.enhanced.spellbook.Spellbook.of(player) == book) {
+            return true;
+        }
+        if (tooSoon(player)) {
+            return false;
+        }
+        com.kolodkingal.enhanced.spellbook.Spellbooks.become(player, book);
+        com.kolodkingal.enhanced.item.HeroCreatorItem.spendUse(player);
+        return true;
+    }
+
     /** A note of the rules as a message: arguments that are lang keys of powers are translated. */
     public static MutableComponent note(CustomHeroRules.Note note) {
         Object[] args = note.args().clone();

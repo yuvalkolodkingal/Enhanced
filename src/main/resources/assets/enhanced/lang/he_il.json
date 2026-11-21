@@ -1887,6 +1887,7 @@
   "screen.enhanced.hero_creator.become": "הפכו!",
   "screen.enhanced.hero_creator.become.desc": "הפכו לגיבור הזה עכשיו",
   "screen.enhanced.hero_creator.pick_hero": "לחצו על גיבור כדי לראות את המראות שלו",
+  "screen.enhanced.hero_creator.witch.desc": "מכשפה מספרי הלחשים, עם הקסם של %s. היא שומרת על הסקין שלה, והלחשים שלה נפתחים ככל שהיא עולה מרמה 1 לרמה 5.",
   "screen.enhanced.hero_creator.scroll": "גללו לעוד גיבורים",
   "screen.enhanced.hero_creator.editor": "צרו את הגיבור שלכם",
   "screen.enhanced.hero_creator.tab.name": "שם",

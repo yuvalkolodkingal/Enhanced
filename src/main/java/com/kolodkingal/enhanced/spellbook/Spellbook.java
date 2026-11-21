@@ -33,9 +33,9 @@ import java.util.Set;
  * ({@link #of(CustomHero)}). {@link Spellbooks} makes and unmakes him.
  */
 public enum Spellbook {
-    ETHEREAL("ethereal", "Ethereal Witch", 0xA64DFF, 0xE6C8FF),
-    ELDRITCH("eldritch", "Eldritch Sorcerer", 0xF29A2E, 0xFFE0A8),
-    GREEN("green", "Green Witch", 0x3FBF4A, 0xC8F5A0);
+    ETHEREAL("ethereal", "Ethereal Witch", 0xA64DFF, 0xE6C8FF, "ethereal_witch"),
+    ELDRITCH("eldritch", "Eldritch Sorcerer", 0xF29A2E, 0xFFE0A8, "eldritch_sorcerer"),
+    GREEN("green", "Green Witch", 0x3FBF4A, 0xC8F5A0, "green_witch");
 
     /** The limits the books' own definitions are judged by: every power allowed (the server's creator limits are for heroes made in the creator). */
     private static final CustomHeroRules.Limits LIMITS = new CustomHeroRules.Limits(10_000, 20, PowerModule.MAX_STRENGTH, 16384,
@@ -46,6 +46,11 @@ public enum Spellbook {
     public final String casterName;
     public final int color;
     public final int glow;
+    /**
+     * 3.18.1: her id as a hero of her own ({@code ethereal_witch}): what the Hero Creator's "Choose a Hero" and
+     * {@code /enhanced power set} name her by, and the prefix of her ability icons ({@link WitchIcons}).
+     */
+    public final String heroId;
 
     /** 3.18.1: the definition of each level (index 1-5), without the cantrips [0] and with them [1], judged once. */
     private final CustomHero[][] levels = new CustomHero[2][SpellLevels.MAX + 1];
@@ -53,11 +58,12 @@ public enum Spellbook {
     @Nullable
     private CustomHero legacy;
 
-    Spellbook(String id, String casterName, int color, int glow) {
+    Spellbook(String id, String casterName, int color, int glow, String heroId) {
         this.id = id;
         this.casterName = casterName;
         this.color = color;
         this.glow = glow;
+        this.heroId = heroId;
     }
 
     /** The caster's name, in the player's language ("Ethereal Witch"). */
@@ -179,6 +185,26 @@ public enum Spellbook {
             }
         }
         return null;
+    }
+
+    /** 3.18.1: the witch of this hero id ({@code green_witch}), or null. */
+    @Nullable
+    public static Spellbook byHeroId(@Nullable String heroId) {
+        if (heroId == null) {
+            return null;
+        }
+        String wanted = heroId.trim().toLowerCase(Locale.ROOT);
+        for (Spellbook book : values()) {
+            if (book.heroId.equals(wanted)) {
+                return book;
+            }
+        }
+        return null;
+    }
+
+    /** 3.18.1: the witches' hero ids, in the books' order. */
+    public static List<String> heroIds() {
+        return java.util.Arrays.stream(values()).map(b -> b.heroId).toList();
     }
 
     /** 3.18.1: a book and the level a caster's definition is of. */

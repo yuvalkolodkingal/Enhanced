@@ -619,11 +619,21 @@ def rgb(value):
     return ((value >> 16) & 255, (value >> 8) & 255, value & 255)
 
 
+# 3.18.1: the cantrips of anyone who is no book's witch (a witch of the Demiurge's gift): a pale lilac
+CANTRIP = ((0x8C, 0x7B, 0xD9), (0xEC, 0xE6, 0xFF))
+
+
 def heroes():
-    """Each hero's two colours, from Power.java: NAME(0xMAIN, 0xLIGHT)."""
+    """Each hero's two colours, from Power.java: NAME(0xMAIN, 0xLIGHT); 3.18.1: and the spellbooks' witches', from
+    Spellbook.java: NAME("id", "Caster Name", 0xMAIN, 0xLIGHT, "hero_id"), by their hero ids; and the cantrips'."""
     src = open(os.path.join(ROOT, "src/main/java/com/kolodkingal/enhanced/power/Power.java")).read()
-    return {name.lower(): (rgb(int(main, 16)), rgb(int(light, 16)))
-            for name, main, light in re.findall(r"^    ([A-Z_]+)\(0x([0-9A-Fa-f]{6}), 0x([0-9A-Fa-f]{6})\)", src, re.M)}
+    out = {name.lower(): (rgb(int(main, 16)), rgb(int(light, 16)))
+           for name, main, light in re.findall(r"^    ([A-Z_]+)\(0x([0-9A-Fa-f]{6}), 0x([0-9A-Fa-f]{6})\)", src, re.M)}
+    books = open(os.path.join(ROOT, "src/main/java/com/kolodkingal/enhanced/spellbook/Spellbook.java")).read()
+    for main, light, hero in re.findall(r'^    [A-Z_]+\("\w+", "[^"]+", 0x([0-9A-Fa-f]{6}), 0x([0-9A-Fa-f]{6}), "(\w+)"\)', books, re.M):
+        out[hero] = (rgb(int(main, 16)), rgb(int(light, 16)))
+    out["cantrip"] = CANTRIP
+    return out
 
 
 def main():
@@ -649,6 +659,10 @@ def main():
         pen.d_base = tuple(int(c * 0.82) for c in base)
         MOTIFS[motif_name](pen)
         name = "_".join(parts)
+        if hero == "cantrip" or name.split("_", 2)[-1].startswith("cantrip_") or "_cantrip_" in name:
+            # (3.18.1) a cantrip, a small spell: a sparkle in the corner of its badge
+            pen.star(77, 23, 11, 4, 0.32, light)
+            pen.star(77, 23, 5, 4, 0.4, accent)
         img.resize((32, 32), Image.LANCZOS).save(os.path.join(OUT, name + ".png"))
         names.append(name)
     os.makedirs(os.path.join(ROOT, "build"), exist_ok=True)

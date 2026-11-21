@@ -13,7 +13,8 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Client → server (3.3): a button of the Hero Creator. {@link #CHOOSE}: become one of the mod's heroes in a look ({@code
- * power} and {@code look}; {@code none} takes the powers away); {@link #APPLY}: become the custom hero {@code hero}. The
+ * power} and {@code look}; {@code none} takes the powers away; 3.18.1: or a spellbook's witch by her hero id,
+ * {@code ethereal_witch}); {@link #APPLY}: become the custom hero {@code hero}. The
  * server checks everything again (Creative or operator, the config) and judges the hero by its own rules
  * ({@code CustomHeroRules}) before anyone becomes it. The hero travels in its binary form, the skin raw (at most 24 KiB),
  * well under the 32 KiB of a packet to the server.
@@ -40,6 +41,11 @@ public record HeroCreatorPayload(int action, String power, String look, CustomHe
         return new HeroCreatorPayload(CHOOSE, power.getSerializedName(), look, CustomHero.EMPTY);
     }
 
+    /** 3.18.1: become one of the spellbooks' witches (her hero id travels where a hero's name does). */
+    public static HeroCreatorPayload chooseWitch(com.kolodkingal.enhanced.spellbook.Spellbook book) {
+        return new HeroCreatorPayload(CHOOSE, book.heroId, "", CustomHero.EMPTY);
+    }
+
     public static HeroCreatorPayload apply(CustomHero hero) {
         return new HeroCreatorPayload(APPLY, "", "", hero);
     }
@@ -49,13 +55,19 @@ public record HeroCreatorPayload(int action, String power, String look, CustomHe
         return TYPE;
     }
 
-    static void handle(HeroCreatorPayload payload, PacketContext context) {
+    public static void handle(HeroCreatorPayload payload, PacketContext context) {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }
         if (payload.action() == APPLY) {
             CustomHeroes.apply(player, payload.hero());
         } else if (payload.action() == CHOOSE) {
+            // (3.18.1) a witch of the spellbooks, chosen as a hero of her own (ethereal_witch)
+            com.kolodkingal.enhanced.spellbook.Spellbook witch = com.kolodkingal.enhanced.spellbook.Spellbook.byHeroId(payload.power());
+            if (witch != null) {
+                CustomHeroes.chooseWitch(player, witch);
+                return;
+            }
             Power power = Power.byName(payload.power());
             if (power != null) {
                 CustomHeroes.choose(player, power, payload.look());

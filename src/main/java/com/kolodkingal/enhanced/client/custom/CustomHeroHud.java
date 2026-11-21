@@ -283,8 +283,10 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         net.minecraft.network.chat.TextColor color = status == null ? null : status.getStyle().getColor();
         boolean on = color != null && (color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.GREEN))
                 || color.equals(net.minecraft.network.chat.TextColor.fromLegacyFormat(ChatFormatting.AQUA)));
+        // (3.18.1) a witch's spells and anyone's cantrips have their icons (WitchIcons), as the heroes' abilities do
+        String icon = com.kolodkingal.enhanced.spellbook.WitchIcons.key(hero, b);
         return new PowerPanels.Slot(name(hero, b).withStyle(s -> s.withColor(colorOf(hero, b.picked()))), status,
-                left > 0 ? left / 20.0F : 0.0F, on, -1, 0, null);
+                left > 0 ? left / 20.0F : 0.0F, on, -1, 0, icon == null ? null : PowerHud.symbol(icon));
     }
 
     private static MutableComponent label(MutableComponent text, CustomHero hero) {

@@ -1887,6 +1887,7 @@
   "screen.enhanced.hero_creator.become": "Become!",
   "screen.enhanced.hero_creator.become.desc": "Become this hero now",
   "screen.enhanced.hero_creator.pick_hero": "Click a hero to see its looks",
+  "screen.enhanced.hero_creator.witch.desc": "A witch of the spellbooks, with the magic of the %s. She keeps her own skin, and her spells open as she grows from level 1 to level 5.",
   "screen.enhanced.hero_creator.scroll": "Scroll for more heroes",
   "screen.enhanced.hero_creator.editor": "Create Your Hero",
   "screen.enhanced.hero_creator.tab.name": "Name",
