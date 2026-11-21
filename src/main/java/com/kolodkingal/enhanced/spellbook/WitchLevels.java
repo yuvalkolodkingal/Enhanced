@@ -374,8 +374,12 @@ public final class WitchLevels {
         return false;
     }
 
+    /**
+     * (3.18.1) The real-world day (UTC), not the game's: daily study and the book practice come back once a day of real
+     * time, however fast the game's days run.
+     */
     private static long day(ServerPlayer player) {
-        return player.server.overworld().getDayTime() / DAY;
+        return java.time.LocalDate.now(java.time.ZoneOffset.UTC).toEpochDay();
     }
 
     /** The book's practice: up to {@link #PRACTICE_PER_DAY} points a day. @return the points given */

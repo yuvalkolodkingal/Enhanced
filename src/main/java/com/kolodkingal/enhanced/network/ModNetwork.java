@@ -23,7 +23,7 @@ public final class ModNetwork {
      * ... and once for 3.17 (the server's settings changed in the game: two new messages, and the player's own skin on his
      * hero: one more message and a flag of the power data).
      */
-    public static final String PROTOCOL_VERSION = "17";
+    public static final String PROTOCOL_VERSION = "18";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only

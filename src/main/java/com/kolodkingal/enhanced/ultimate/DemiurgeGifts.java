@@ -276,13 +276,9 @@ public final class DemiurgeGifts {
             }
             return refused;
         }
-        // (as a spellbook does: a hero of his own making is kept aside)
-        SpellbookData book = ModAttachments.SPELLBOOK.get(target);
-        CustomHero own = ModAttachments.CUSTOM_HERO.get(target);
-        if (Spellbook.of(own) == null && !isGift(own)) {
-            ModAttachments.SPELLBOOK.set(target, book.withStash(own));
-        }
-        CustomHeroes.become(target, hero, false);
+        // (3.18.1) a witch of his gift grows by the witch levels: she starts at level 1 and her gifted powers open level by
+        // level (level 5 is the whole gift); a hero of her own making is kept aside, as a spellbook does
+        com.kolodkingal.enhanced.spellbook.WitchLevels.startGift(target, hero);
         announce(giver, target, hero);
         return null;
     }
@@ -305,7 +301,7 @@ public final class DemiurgeGifts {
         SpellbookData book = ModAttachments.SPELLBOOK.get(target);
         ModAttachments.CUSTOM_HERO.set(target, book.stash());
         ModAttachments.CUSTOM_HERO.sync(target);
-        ModAttachments.SPELLBOOK.set(target, book.withStash(CustomHero.EMPTY));
+        ModAttachments.SPELLBOOK.set(target, book.withStash(CustomHero.EMPTY).withGift(CustomHero.EMPTY));
         target.displayClientMessage(Component.translatable("message.enhanced.demiurge.gift.taken")
                 .withStyle(s -> s.withColor(Demiurge.AURA)), true);
         if (giver != null) {
