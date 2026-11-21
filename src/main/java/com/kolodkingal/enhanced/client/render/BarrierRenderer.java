@@ -151,6 +151,12 @@ public final class BarrierRenderer {
         float see = mine ? 0.4F : 1.0F; // the plate is right in front of his own eyes: fainter there
         float alpha = (0.35F + 0.65F * grow) * (0.55F + 0.45F * fraction) * flicker * see * out;
 
+        if (com.kolodkingal.enhanced.ability.Demiurge.is(player)) {
+            // 3.18.1: the Demiurge's barrier wraps his whole body: a shell of bright blue with small stars turning in it
+            demiurgeShell(player, body.subtract(camera), grow, alpha / see * (mine ? 0.45F : 1.0F), hit, buffers, pose,
+                    reduced ? 0.0F : time);
+            return;
+        }
         tint = AbilityColors.chosen(player, HeroAbility.BILLY_HEX_BARRIER);
         BillyBarrier.Frame plate = BillyBarrier.frame(body, player.getViewVector(partialTick));
         double width = BillyBarrier.width() * (0.4 + 0.6 * grow);
@@ -178,6 +184,41 @@ public final class BarrierRenderer {
         VertexConsumer vc = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
         // (the cracks stay plain even on his own plate, which is drawn faint: he must see it wearing)
         crackle(vc, pose, c, plate, width, height, mark, fraction, hit, player.getId(), time, alpha, alpha / see, reduced);
+        buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
+    }
+
+    /**
+     * (3.18.1) Billy the Demiurge's barrier: a shell of the Demiurge's blue round his whole body, its engraved lines turning,
+     * a bright rim, rings of light round his middle, and small white stars drifting and twinkling inside it.
+     */
+    private static void demiurgeShell(AbstractClientPlayer player, Vec3 c, float grow, float alpha, float hit,
+                                      MultiBufferSource.BufferSource buffers, Matrix4f pose, float time) {
+        float radius = (float) (player.getBbHeight() * 0.64 * (0.5 + 0.5 * grow));
+        int blue = com.kolodkingal.enhanced.ability.Demiurge.BLUE;
+        int pale = com.kolodkingal.enhanced.ability.Demiurge.AURA;
+        VertexConsumer veil = buffers.getBuffer(EnhancedRenderTypes.ENERGY_VEIL);
+        EnergyGeometry.veil(pose, veil, c, radius, 28, 14, blue, alpha * (0.12F + 0.22F * hit), alpha * 0.5F);
+        buffers.endBatch(EnhancedRenderTypes.ENERGY_VEIL);
+        RenderType lines = EnhancedRenderTypes.energyField(PLATE_GREY);
+        EnergyGeometry.sphere(pose, buffers.getBuffer(lines), c, radius * 1.01F, 28, 14, 6, 3, time * 0.006F, pale,
+                alpha * 0.4F, alpha * (0.75F + 0.4F * hit));
+        buffers.endBatch(lines);
+        VertexConsumer vc = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
+        for (int i = 0; i < 26; i++) {
+            float a = time * 0.02F * (i % 2 == 0 ? 1 : -1) + i * 2.399F;
+            float y = ((i * 0.37F + time * 0.004F) % 1.0F) * 2.0F - 1.0F;
+            float rr = Mth.sqrt(Math.max(0.0F, 1.0F - y * y)) * radius * 0.82F;
+            Vec3 star = c.add(Mth.cos(a) * rr, y * radius * 0.82F, Mth.sin(a) * rr);
+            float tw = 0.5F + 0.5F * Mth.sin(time * 0.4F + i * 1.7F);
+            float size = 0.045F + 0.05F * tw;
+            int col = EnergyGeometry.argb(i % 3 == 0 ? 0xFFFFFF : 0xCFF4FF, alpha * (0.55F + 0.45F * tw));
+            EnergyGeometry.ribbon(pose, vc, star.add(-size, 0, 0), star.add(size, 0, 0), size * 0.45F, col, col);
+            EnergyGeometry.ribbon(pose, vc, star.add(0, -size, 0), star.add(0, size, 0), size * 0.45F, col, col);
+        }
+        float spin = time * 0.03F;
+        EnergyGeometry.ring(pose, vc, c, new Vec3(0, 1, 0), radius, 0.045F, 40, EnergyGeometry.argb(0xDFF8FF, alpha * 0.85F));
+        EnergyGeometry.ring(pose, vc, c, new Vec3(Mth.sin(spin), 0.35F, Mth.cos(spin)).normalize(), radius * 0.98F, 0.03F, 40,
+                EnergyGeometry.argb(pale, alpha * 0.6F));
         buffers.endBatch(EnhancedRenderTypes.ENERGY_BEAM);
     }
 

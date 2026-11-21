@@ -92,11 +92,21 @@ public class PowerHud implements LayeredDraw.Layer {
         Variant look = Variants.current(data);
         // Heroes with several looks show the current one, and the key that changes it, after their name.
         // (3.18) Cosmic Spider-Man's panel is in the Enigma Force's colours: a white-blue name, keys and frame
-        boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data);
-        int titleColor = cosmic ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA : Variants.hasChoice(power) ? look.color() : power.titleColor();
-        MutableComponent title = (cosmic ? Component.translatable("hud.enhanced.cosmic_spider.title")
+        // (3.18.1) Billy the Demiurge's panel too: his name in the Demiurge's blue, the magic type on H, a starry frame
+        boolean demiurge = com.kolodkingal.enhanced.ability.Demiurge.is(data);
+        boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data) || demiurge;
+        int aura = demiurge ? com.kolodkingal.enhanced.ability.Demiurge.AURA : com.kolodkingal.enhanced.ability.CosmicSpider.AURA;
+        int titleColor = cosmic ? aura : Variants.hasChoice(power) ? look.color() : power.titleColor();
+        MutableComponent title = (demiurge ? Component.translatable("hud.enhanced.demiurge.title")
+                : cosmic ? Component.translatable("hud.enhanced.cosmic_spider.title")
                 : com.kolodkingal.enhanced.power.Characters.name(data).copy()).withStyle(s -> s.withColor(titleColor).withBold(true));
-        if (Variants.hasChoice(power)) {
+        if (demiurge) {
+            title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
+                    .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
+                            .withStyle(s -> s.withBold(false).withColor(aura)))
+                    .append(Component.translatable("hud.enhanced.demiurge.magic", com.kolodkingal.enhanced.ability.Demiurge.typeName(
+                            com.kolodkingal.enhanced.ability.Demiurge.type(data))).withStyle(s -> s.withBold(false).withColor(0xE6F8FF)));
+        } else if (Variants.hasChoice(power)) {
             title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
                     .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
                             .withStyle(s -> s.withBold(false).withColor(ChatFormatting.YELLOW)))
@@ -112,9 +122,9 @@ public class PowerHud implements LayeredDraw.Layer {
         int width = font.width(title) + 4;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             MutableComponent line = Component.literal("[").append(KeyBindings.ability(i).getTranslatedKeyMessage()).append("] ")
-                    .withStyle(cosmic ? net.minecraft.network.chat.Style.EMPTY.withColor(com.kolodkingal.enhanced.ability.CosmicSpider.AURA)
+                    .withStyle(cosmic ? net.minecraft.network.chat.Style.EMPTY.withColor(aura)
                             : net.minecraft.network.chat.Style.EMPTY.withColor(ChatFormatting.YELLOW))
-                    .append(Component.translatable(abilityKey(data, power, i)).withStyle(cosmic
+                    .append(Component.translatable(abilityKey(player, data, power, i)).withStyle(cosmic
                             ? net.minecraft.network.chat.Style.EMPTY.withColor(0xEAF6FF) : net.minecraft.network.chat.Style.EMPTY.withColor(ChatFormatting.WHITE)));
             Component status = status(player, data, i, now);
             if (status != null) {
@@ -156,11 +166,20 @@ public class PowerHud implements LayeredDraw.Layer {
         graphics.fill(x - 2, y - 2, x + width + 4, y + height, cosmic ? 0x80101A3A : 0x70000000);
         if (cosmic) {
             // a thin glowing frame of the Enigma Force round the panel
-            int aura = 0xC0000000 | com.kolodkingal.enhanced.ability.CosmicSpider.AURA;
-            graphics.fill(x - 2, y - 2, x + width + 4, y - 1, aura);
-            graphics.fill(x - 2, y + height - 1, x + width + 4, y + height, aura);
-            graphics.fill(x - 2, y - 2, x - 1, y + height, aura);
-            graphics.fill(x + width + 3, y - 2, x + width + 4, y + height, aura);
+            int frame = 0xC0000000 | aura;
+            graphics.fill(x - 2, y - 2, x + width + 4, y - 1, frame);
+            graphics.fill(x - 2, y + height - 1, x + width + 4, y + height, frame);
+            graphics.fill(x - 2, y - 2, x - 1, y + height, frame);
+            graphics.fill(x + width + 3, y - 2, x + width + 4, y + height, frame);
+            if (demiurge) {
+                // (small stars twinkling on the Demiurge's frame)
+                long t = now;
+                for (int k = 0; k < 6; k++) {
+                    int sx = x + (int) ((k * 37L + t / 3) % (width + 4)) - 1;
+                    int sy = k % 2 == 0 ? y - 2 : y + height - 1;
+                    graphics.fill(sx, sy, sx + 1, sy + 1, 0xFFFFFFFF);
+                }
+            }
         }
         graphics.drawString(font, title, x, y, 0xFFFFFFFF, true);
         y += 12;
@@ -202,14 +221,17 @@ public class PowerHud implements LayeredDraw.Layer {
         Variant look = Variants.current(data);
         PowerPanels.Model model = new PowerPanels.Model();
         boolean cosmicPanel = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data);
-        model.color = cosmicPanel ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA : Variants.hasChoice(power) ? look.color() : power.titleColor();
-        model.title = cosmicPanel ? Component.translatable("hud.enhanced.cosmic_spider.title") : com.kolodkingal.enhanced.power.Characters.name(data);
+        boolean demiurgePanel = com.kolodkingal.enhanced.ability.Demiurge.is(data); // (3.18.1)
+        model.color = demiurgePanel ? com.kolodkingal.enhanced.ability.Demiurge.AURA : cosmicPanel ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA
+                : Variants.hasChoice(power) ? look.color() : power.titleColor();
+        model.title = demiurgePanel ? Component.translatable("hud.enhanced.demiurge.title")
+                : cosmicPanel ? Component.translatable("hud.enhanced.cosmic_spider.title") : com.kolodkingal.enhanced.power.Characters.name(data);
         model.identity = power.getSerializedName() + "/" + look.displayName().getString();
         model.sneaking = false;
         for (int i = 1; i <= PowerData.ABILITIES; i++) {
             model.rows.add(new PowerPanels.Row(KeyBindings.ability(i).getTranslatedKeyMessage(),
-                    panelSlot(Component.translatable(abilityKey(data, power, i)), status(player, data, i, now), data, i, now)
-                            .withIcon(symbol(power.abilityKey(i))), null));
+                    panelSlot(Component.translatable(abilityKey(player, data, power, i)), status(player, data, i, now), data, i, now)
+                            .withIcon(symbol(com.kolodkingal.enhanced.ability.Demiurge.keysOf(data).abilityKey(i))), null));
         }
         Power builder = BuildClient.hero(player);
         if (extraLines(builder) > 0) {
@@ -219,7 +241,12 @@ public class PowerHud implements LayeredDraw.Layer {
             model.rows.add(new PowerPanels.Row(BuildKeys.MAGIC.getTranslatedKeyMessage(),
                     panelSlot(Component.translatable(power.abilityKey(y)), status(player, data, y, now), data, y, now), null));
         }
-        if (Variants.hasChoice(power)) {
+        if (demiurgePanel) {
+            model.notes.add(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
+                    .withStyle(s -> s.withColor(com.kolodkingal.enhanced.ability.Demiurge.AURA))
+                    .append(Component.translatable("hud.enhanced.demiurge.magic", com.kolodkingal.enhanced.ability.Demiurge.typeName(
+                            com.kolodkingal.enhanced.ability.Demiurge.type(data))).withStyle(ChatFormatting.WHITE)));
+        } else if (Variants.hasChoice(power)) {
             model.notes.add(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
                     .withStyle(ChatFormatting.YELLOW)
                     .append(look.displayName().copy().withStyle(ChatFormatting.GRAY)));
@@ -252,7 +279,20 @@ public class PowerHud implements LayeredDraw.Layer {
     }
 
     /** The name of a key's ability: the hero's, or (3.16) Solar Jewel Vision's own on R and N. */
-    private static String abilityKey(PowerData data, Power power, int ability) {
+    private static String abilityKey(LocalPlayer player, PowerData data, Power power, int ability) {
+        // (3.18.1) Billy the Demiurge: the magic type's names on its keys; his own N says how to leave, a plain Billy with
+        // Ultimate how to become him (without Ultimate nothing of the Demiurge is shown)
+        if (com.kolodkingal.enhanced.ability.Demiurge.is(data)) {
+            Power kit = com.kolodkingal.enhanced.ability.Demiurge.keysOf(data);
+            if (kit != Power.BILLY) {
+                return kit.abilityKey(ability);
+            }
+            if (ability == 5) {
+                return "ability.enhanced.billy.demiurge.5";
+            }
+        } else if (power == Power.BILLY && ability == 5 && com.kolodkingal.enhanced.ability.Demiurge.allowedHolder(player)) {
+            return "ability.enhanced.billy.demiurge_ready.5";
+        }
         if ((ability == 1 || ability == 5) && com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
             return "ability.enhanced.vision.solar." + ability;
         }
@@ -276,17 +316,19 @@ public class PowerHud implements LayeredDraw.Layer {
                     .withStyle(percent >= 40 ? ChatFormatting.GOLD : ChatFormatting.RED);
         }
         // The heroes of 3.0 say for themselves (by default: the cooldown, as below).
-        HeroClient hero = HeroClients.of(data.power());
+        // (3.18.1: the Demiurge's keys say what the magic type's would)
+        Power shown = com.kolodkingal.enhanced.ability.Demiurge.keysOf(data);
+        HeroClient hero = HeroClients.of(shown);
         if (hero != null) {
             return hero.hudStatus(player, data, ability, now);
         }
         // (Magneto's R says which of its recharges runs: the Magnetic Pull's, never a bare cooldown.)
-        Component cooldown = data.power() == Power.MAGNETO && ability == 1 ? null : cooldown(data, ability, now);
+        Component cooldown = shown == Power.MAGNETO && ability == 1 ? null : cooldown(data, ability, now);
         if (cooldown != null) {
             return cooldown;
         }
         boolean holding = data.heldEntityId() != -1;
-        return switch (data.power()) {
+        return switch (shown) {
             case MAGNETO -> switch (ability) {
                 case 1 -> holding ? active("hud.enhanced.holding") : pullCooldown(data, now);
                 case 2 -> Component.translatable("hud.enhanced.shards", MagnetoAbilities.countAmmo(player, data))

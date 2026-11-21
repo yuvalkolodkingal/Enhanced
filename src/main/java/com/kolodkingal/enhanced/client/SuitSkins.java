@@ -45,6 +45,16 @@ public final class SuitSkins {
     private static final PlayerSkin COSMIC_UNIVERSE = new PlayerSkin(
             Enhanced.id("textures/entity/suit/spider_cosmic_universe.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    /**
+     * (3.18.1) Billy the Demiurge, as in the Demiurge's first design: at rest the starry suit under his red scarf, powered
+     * (flying or using a power: {@code DemiurgeFx.powered}) the body of stars. No cape of the game's: his cloak is a cloth
+     * of its own ({@code render.DemiurgeCloakLayer}).
+     */
+    private static final PlayerSkin BILLY_DEMIURGE = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/billy_demiurge.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+    private static final PlayerSkin BILLY_DEMIURGE_POWERED = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/billy_demiurge_powered.png"), null, null, null, PlayerSkin.Model.WIDE, true);
+
     private static final PlayerSkin JIM_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/jim_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -81,6 +91,10 @@ public final class SuitSkins {
         if (power == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(Powers.get(player))) {
             // (3.18) the Enigma Force turns his suit black and white, whatever his look or his own skin
             return com.kolodkingal.enhanced.ability.CosmicSpider.universe(Powers.get(player)) ? COSMIC_UNIVERSE : COSMIC_SPIDER;
+        }
+        if (power == Power.BILLY && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
+            // (3.18.1) the Demiurge looks the Demiurge, whatever his look, his own skin or the magic type on his keys
+            return com.kolodkingal.enhanced.client.render.DemiurgeFx.powered(player) ? BILLY_DEMIURGE_POWERED : BILLY_DEMIURGE;
         }
         if (power.hasPowers() && Powers.get(player).ownSkin()) {
             // (3.17: he chose his own skin: any hero, built-in or custom, wears it instead of the suit)

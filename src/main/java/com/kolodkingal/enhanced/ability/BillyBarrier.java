@@ -92,7 +92,9 @@ public final class BillyBarrier {
 
     /** The health of a whole barrier of this Billy (his rank's). */
     public static float maxHealth(Player billy) {
-        return maxStrength(ModAttachments.BUILD_DATA.getExisting(billy).orElse(BuildData.EMPTY));
+        float max = maxStrength(ModAttachments.BUILD_DATA.getExisting(billy).orElse(BuildData.EMPTY));
+        // (3.18.1: the Demiurge's barrier, round his whole body, is stronger)
+        return Demiurge.is(billy) ? (float) (max * Demiurge.barrierFactor()) : max;
     }
 
     /**
@@ -171,7 +173,8 @@ public final class BillyBarrier {
      */
     public static boolean owns(PowerData data) {
         if (data.power() == Power.BILLY) {
-            return true;
+            // (3.18.1: not while the Demiurge has another's magic on his keys: the shield is then that hero's)
+            return data.borrowed() == Power.NONE;
         }
         HeroKit kit = data.power() == Power.CUSTOM ? data.kit() : null;
         // (3.5: or the Hex Barrier picked as a card of its own.)
@@ -185,6 +188,9 @@ public final class BillyBarrier {
 
     /** Whether a point is in the arc the barrier covers: within the half-angle of the way he looks, seen from his body. */
     public static boolean covers(Player billy, Vec3 point) {
+        if (Demiurge.is(billy)) {
+            return true; // (3.18.1: the Demiurge's barrier wraps his whole body)
+        }
         Vec3 to = point.subtract(body(billy));
         double length = to.length();
         if (length < 1.0E-4) {

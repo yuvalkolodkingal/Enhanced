@@ -236,14 +236,30 @@ public final class PowerData {
     public boolean has(HeroAbility a) {
         // (3.6: a custom hero in the Hulk's Human Form has none of his rows but the Transform that ends it; 3.8: Red
         // Hulk's Transform ends it too.)
+        // (3.18.1: Billy the Demiurge, with another witch's or sorcerer's magic on his keys (Magic Types), has that hero's
+        // abilities in place of his own: com.kolodkingal.enhanced.ability.Demiurge.borrowed)
+        Power borrowed = borrowed();
+        if (borrowed != Power.NONE) {
+            return a.hero == borrowed;
+        }
         return power == a.hero || power == Power.CUSTOM && kit != null && kit.has(a)
                 && (a == HeroAbility.HULK_TRANSFORM || a == HeroAbility.RED_HULK_TRANSFORM
                 || !toggle(Toggle.HUMAN_FORM));
     }
 
+    /**
+     * (3.18.1) The witch or sorcerer whose magic Billy the Demiurge has taken on (Magic Types), or {@link Power#NONE}: read
+     * from the synced state alone (his power, {@link Live#BILLY_DEMIURGE} and the magic type in {@link #ironCharge}), so both
+     * sides agree.
+     */
+    public Power borrowed() {
+        return com.kolodkingal.enhanced.ability.Demiurge.borrowed(this);
+    }
+
     /** Whether any of this built-in hero's upkeep runs for the player: he is the hero, or a custom hero with one of his abilities. */
     public boolean acts(Power hero) {
-        return power == hero || power == Power.CUSTOM && kit != null && kit.acts(hero);
+        return power == hero || power == Power.CUSTOM && kit != null && kit.acts(hero)
+                || power == Power.BILLY && hero != Power.NONE && borrowed() == hero;
     }
 
     /**
@@ -252,7 +268,7 @@ public final class PowerData {
      * ability on two keys (its main on one, its variant row on another) waits on the key that was used.
      */
     public int slot(HeroAbility a) {
-        if (power == a.hero) {
+        if (power == a.hero || a.hero != Power.NONE && borrowed() == a.hero) {
             return a.home >= 1 && a.home <= ABILITIES ? a.home : 0;
         }
         if (power != Power.CUSTOM || kit == null) {

@@ -30,6 +30,7 @@ public class EnergyParticle extends TextureSheetParticle {
         this.gravity = 0F;
         this.hasPhysics = false;
         this.pickSprite(sprites);
+        DemiurgeStars.spark(level, color, x, y, z, xd, yd, zd); // (3.18.1: the stars in the Demiurge's energy)
     }
 
     @Override

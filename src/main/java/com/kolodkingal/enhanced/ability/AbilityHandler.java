@@ -96,7 +96,18 @@ public final class AbilityHandler {
             case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down, alt);
             case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down, alt);
             case VISION -> VisionAbilities.onKey(player, data, ability, down, alt);
-            case BILLY -> BillyAbilities.onKey(player, data, ability, down, alt);
+            case BILLY -> {
+                // (3.18.1) Billy's Sneak + N is the Demiurge's; the Demiurge's keys are the magic type's he has chosen
+                if (Demiurge.onKey(player, data, ability, down, alt)) {
+                    return;
+                }
+                Power borrowed = data.power() == Power.BILLY ? data.borrowed() : Power.NONE;
+                if (borrowed != Power.NONE) {
+                    heroKey(borrowed, player, data, ability, down, alt);
+                } else {
+                    BillyAbilities.onKey(player, data, ability, down, alt);
+                }
+            }
             case TOMMY -> TommyAbilities.onKey(player, data, ability, down, alt);
             case LOKI -> LokiAbilities.onKey(player, data, ability, down, alt);
             case THOR -> ThorAbilities.onKey(player, data, ability, down, alt);

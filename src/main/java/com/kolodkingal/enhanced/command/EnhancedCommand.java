@@ -101,6 +101,8 @@ public final class EnhancedCommand {
                 .then(com.kolodkingal.enhanced.spellbook.SpellbookCommand.node())
                 // 3.18: the Ultimate switch and its grants (Cosmic Spider-Man)
                 .then(com.kolodkingal.enhanced.ultimate.UltimateCommand.node())
+                // 3.18.1: Billy the Demiurge, and his gift of magic, by an operator
+                .then(com.kolodkingal.enhanced.ultimate.DemiurgeCommand.node())
                 // (3.17) the player's own skin on his hero (any hero, built-in or custom), or the suit again
                 .then(Commands.literal("skin")
                         .then(Commands.argument("players", EntityArgument.players())
@@ -142,6 +144,8 @@ public final class EnhancedCommand {
                 .then(com.kolodkingal.enhanced.serum.SerumCommand.node())
                 .then(com.kolodkingal.enhanced.eternity.EternityCommand.node()));
         RoadCommands.registerPlayerCommands(dispatcher);
+        // 3.18.1: what the Demiurge's gift screen sends (anyone may run it; only the Demiurge is let through)
+        dispatcher.register(com.kolodkingal.enhanced.ultimate.DemiurgeCommand.root());
     }
 
     private static int get(CommandSourceStack source, ServerPlayer player) {

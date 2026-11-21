@@ -458,6 +458,20 @@ public final class BillyAbilities {
         data.set(Live.FREEZING, false);
     }
 
+    /**
+     * (3.18.1) What his own magic holds lets go (Billy the Demiurge takes on another's magic): the Hex Beam stops and the
+     * barrier comes down; the rest of him stays.
+     */
+    static void letGo(ServerPlayer player, PowerData data) {
+        if (ContinuousBeam.isFiring(player)) {
+            ContinuousBeam.stop(player);
+        }
+        data.set(Live.BEAMING, false);
+        if (BillyBarrier.owns(data) && data.chaosShieldActive()) {
+            BillyBarrier.lower(player, data);
+        }
+    }
+
     public static void clear() {
         SPELLS.clear();
         ContinuousBeam.clear();
