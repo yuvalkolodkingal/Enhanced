@@ -131,12 +131,21 @@ public class CloakLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Ab
             return;
         }
         draw(poseStack, buffers, light, LivingEntityRenderer.getOverlayCoords(player, 0.0F), texture(look),
-                getParentModel().body, sway(player, data, partialTicks, ageInTicks));
+                getParentModel().body, getParentModel().head, sway(player, data, partialTicks, ageInTicks));
     }
 
     /** Draws the cloak and its collar on {@code body} (the pose stack at the model's root). */
     public static void draw(PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
                             ResourceLocation texture, ModelPart body, Sway sway) {
+        draw(poseStack, buffers, light, overlay, texture, body, null, sway);
+    }
+
+    /**
+     * (3.18.1) With the {@code head}: the collar turns with the head (its turn, and its tilt back when he looks up), so the
+     * head, which turns about the neck, never comes through it; fixed to the body it did whenever he turned or looked up.
+     */
+    public static void draw(PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
+                            ResourceLocation texture, ModelPart body, @org.jetbrains.annotations.Nullable ModelPart head, Sway sway) {
         poseStack.pushPose();
         body.translateAndRotate(poseStack);
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
@@ -161,8 +170,19 @@ public class CloakLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Ab
                         new Vector3f(n).negate(), light, overlay);
             }
         }
-        collar(vc, pose, sway, light, overlay);
+        if (head == null) {
+            collar(vc, pose, sway, light, overlay);
+        }
         poseStack.popPose();
+        if (head != null) {
+            poseStack.pushPose();
+            poseStack.translate(head.x / 16.0F, head.y / 16.0F, head.z / 16.0F);
+            poseStack.mulPose(com.mojang.math.Axis.YP.rotation(head.yRot));
+            poseStack.mulPose(com.mojang.math.Axis.XP.rotation(Math.min(0.0F, head.xRot)));
+            poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
+            collar(vc, poseStack.last(), sway, light, overlay);
+            poseStack.popPose();
+        }
     }
 
     /**
