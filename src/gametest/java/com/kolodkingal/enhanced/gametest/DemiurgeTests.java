@@ -144,6 +144,8 @@ public final class DemiurgeTests {
         Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(12.5, FLOOR, 12.5));
         DamageSource magic = player.damageSources().indirectMagic(player, player);
         DamageSource fist = player.damageSources().playerAttack(player);
+        // (the default, whatever a test world's file kept: 8 since 3.18.1)
+        f.config(DemiurgeConfig.DAMAGE_FACTOR, DemiurgeConfig.DAMAGE_FACTOR.getDefault());
         double factor = DemiurgeConfig.DAMAGE_FACTOR.get();
         check(factor > 1.0, "his powers are stronger by default");
         assertNear(Demiurge.outgoing(zombie, magic, 6.0F), 6.0 * factor, 1.0E-4, "his magic hits " + factor + " times as hard");
@@ -151,8 +153,8 @@ public final class DemiurgeTests {
         assertNear(Demiurge.outgoing(zombie, plain.damageSources().indirectMagic(plain, plain), 6.0F), 6.0, 1.0E-4,
                 "plain Billy's as it was");
         float before = zombie.getHealth();
-        zombie.hurt(magic, 4.0F);
-        check(before - zombie.getHealth() >= 4.0F * factor - 0.5F, "a real hurt of his comes to more: " + (before - zombie.getHealth()));
+        zombie.hurt(magic, 1.0F); // (one point: eight of his would kill the zombie outright and the hurt would read less)
+        check(before - zombie.getHealth() >= 1.0F * factor - 0.5F, "a real hurt of his comes to more: " + (before - zombie.getHealth()));
         check(AbilityColors.chosen(player, HeroAbility.BILLY_HEX_BEAM) == Demiurge.BLUE, "his beam in the Demiurge's blue");
         check(AbilityColors.chosen(plain, HeroAbility.BILLY_HEX_BEAM) == -1, "plain Billy's in his own");
         helper.succeed();
