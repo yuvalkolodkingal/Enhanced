@@ -53,6 +53,23 @@ public final class HeroPoses {
      * The fields vanilla never resets for the player model, which this layer writes: the head's and the body's roll. The
      * model is shared by every player with the same arm width (and by Loki's illusions), so they are cleared on every call.
      */
+    /**
+     * (3.18.1) The armour layer's models (1.21.9+: a player's armour is drawn with player models of its own). They wear the
+     * body's pose ({@link #dress}); the poses are never worked out on them again: on top of the pose put on them that
+     * doubled every turn of the head, and a flying or running hero's helmet or goggles left his head.
+     */
+    private static final java.util.Set<Object> ARMOUR = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    public static void markArmour(Object model) {
+        if (model != null) {
+            ARMOUR.add(model);
+        }
+    }
+
+    public static boolean isArmour(Object model) {
+        return ARMOUR.contains(model);
+    }
+
     public static void reset(PlayerModel<?> model) {
         model.head.zRot = 0.0F;
         model.body.zRot = 0.0F;

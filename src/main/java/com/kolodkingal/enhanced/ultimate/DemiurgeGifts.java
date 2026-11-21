@@ -155,7 +155,7 @@ public final class DemiurgeGifts {
     }
 
     private static int maxPowers() {
-        return EnhancedConfig.SPEC.isLoaded() ? DemiurgeConfig.GIFT_MAX_POWERS.get() : 10;
+        return EnhancedConfig.SPEC.isLoaded() ? DemiurgeConfig.GIFT_MAX_POWERS.get() : 20;
     }
 
     /** The limits a gift is judged by: every power allowed, no point budget. */
@@ -187,6 +187,20 @@ public final class DemiurgeGifts {
             }
         }
         return new ArrayList<>(picks);
+    }
+
+    /**
+     * (3.18.1) The witch level a gift starts at: {@code L1} to {@code L5} among the picks' text (the screen's choice, 5 by
+     * default there: all of the gift at once); 1 when the text has none (as before).
+     */
+    public static int parseLevel(String text) {
+        for (String part : text.split("[,;]")) {
+            String t = part.trim();
+            if (t.length() == 2 && (t.charAt(0) == 'L' || t.charAt(0) == 'l') && Character.isDigit(t.charAt(1))) {
+                return Math.max(1, Math.min(com.kolodkingal.enhanced.spellbook.SpellLevels.MAX, t.charAt(1) - '0'));
+            }
+        }
+        return 1;
     }
 
     /** {@code picks} as the text the screen sends. */
@@ -292,6 +306,12 @@ public final class DemiurgeGifts {
      */
     @Nullable
     public static String give(@Nullable ServerPlayer giver, ServerPlayer target, List<Integer> picks) {
+        return give(giver, target, picks, 1);
+    }
+
+    /** (3.18.1) {@link #give} starting at witch level {@code level} (1 to 5; 5: all of the gift at once). */
+    @Nullable
+    public static String give(@Nullable ServerPlayer giver, ServerPlayer target, List<Integer> picks, int level) {
         String refused = refusal(giver, target);
         if (refused == null && picks.isEmpty()) {
             refused = "message.enhanced.demiurge.gift.empty";
@@ -306,6 +326,9 @@ public final class DemiurgeGifts {
         }
         if (refused == null && witch != null) {
             com.kolodkingal.enhanced.spellbook.Spellbooks.become(target, witch);
+            if (level > 1) {
+                com.kolodkingal.enhanced.spellbook.WitchLevels.setLevel(target, witch.id, level);
+            }
             announce(giver, target, null);
             return null;
         }
@@ -323,6 +346,9 @@ public final class DemiurgeGifts {
         // (3.18.1) a witch of his gift grows by the witch levels: she starts at level 1 and her gifted powers open level by
         // level (level 5 is the whole gift); a hero of her own making is kept aside, as a spellbook does
         com.kolodkingal.enhanced.spellbook.WitchLevels.startGift(target, hero);
+        if (level > 1) {
+            com.kolodkingal.enhanced.spellbook.WitchLevels.setLevel(target, com.kolodkingal.enhanced.spellbook.WitchLevels.GIFT_KEY, level);
+        }
         announce(giver, target, hero);
         return null;
     }

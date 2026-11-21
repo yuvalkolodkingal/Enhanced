@@ -40,6 +40,8 @@ public class DemiurgeGiftScreen extends Screen {
     private final List<String> names = new ArrayList<>();
     private int target;
     private int page;
+    /** (3.18.1) The witch level the gift starts at: 5, all of it at once, unless he chooses less. */
+    private int level = 5;
 
     public DemiurgeGiftScreen() {
         super(Component.translatable("screen.enhanced.demiurge_gift.title"));
@@ -95,6 +97,10 @@ public class DemiurgeGiftScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("<"), b -> turn(-1)).bounds(mid - 60, below, 20, 16).build());
         addRenderableWidget(Button.builder(Component.literal(">"), b -> turn(1)).bounds(mid + 40, below, 20, 16).build());
         int buttons = below + 22;
+        addRenderableWidget(Button.builder(levelLabel(), b -> {
+            level = level % com.kolodkingal.enhanced.spellbook.SpellLevels.MAX + 1;
+            b.setMessage(levelLabel());
+        }).bounds(mid + 70, below, 84, 16).build());
         addRenderableWidget(Button.builder(Component.translatable("screen.enhanced.demiurge_gift.give")
                         .withStyle(s -> s.withColor(Demiurge.AURA)), b -> give())
                 .bounds(mid - 154, buttons, 100, 20).build());
@@ -102,6 +108,10 @@ public class DemiurgeGiftScreen extends Screen {
                 .bounds(mid - 50, buttons, 100, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("screen.enhanced.demiurge_gift.done"), b -> onClose())
                 .bounds(mid + 54, buttons, 100, 20).build());
+    }
+
+    private Component levelLabel() {
+        return Component.translatable("screen.enhanced.demiurge_gift.level", level);
     }
 
     private void step(int by) {
@@ -124,7 +134,7 @@ public class DemiurgeGiftScreen extends Screen {
         if (players.isEmpty() || picks.isEmpty() || mc.getConnection() == null) {
             return;
         }
-        mc.getConnection().sendCommand("demiurge give " + targetName() + " " + DemiurgeGifts.format(new ArrayList<>(picks)));
+        mc.getConnection().sendCommand("demiurge give " + targetName() + " " + DemiurgeGifts.format(new ArrayList<>(picks)) + ",L" + level);
         onClose();
     }
 

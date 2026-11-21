@@ -356,4 +356,24 @@ public final class DemiurgeTests {
             helper.succeed();
         });
     }
+
+    /** (3.18.1) The screen's level: a gift may start at level 5, every power open at once; up to 20 powers in one gift. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aGiftMayStartAtLevelFiveWithAllItsPowers(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer giver = demiurge(f);
+        check(DemiurgeGifts.parseLevel("3,7,L5") == 5 && DemiurgeGifts.parseLevel("3,7") == 1, "the level travels with the picks");
+        check(DemiurgeGifts.parse("3,7,L5").equals(List.of(3, 7)), "and is no pick");
+        check(com.kolodkingal.enhanced.config.DemiurgeConfig.GIFT_MAX_POWERS.getDefault() == 20, "up to 20 powers in a gift");
+        List<Integer> picks = List.of(index(PowerModule.MAGIC.id(), "bolts"), index("wanda.chaos_beam", null),
+                index("strange.whip", null), index("agatha.shield", null), index("loki.daggers", null), index("billy.noise", null),
+                index("hela.necroswords", null), index(HeroAbility.HEIMDALL_STRIKE.id(), null));
+        ServerPlayer target = f.player(12.5, FLOOR, 10.5, Power.NONE);
+        check(DemiurgeGifts.give(giver, target, picks, 5) == null, "given at level 5");
+        CustomHero hero = CustomHeroes.hero(target);
+        check(hero.powers().size() >= picks.size(), "every power is there at once: " + hero.powers().size());
+        check(com.kolodkingal.enhanced.spellbook.WitchLevels.level(ModAttachments.SPELLBOOK.get(target),
+                com.kolodkingal.enhanced.spellbook.WitchLevels.GIFT_KEY) == 5, "at level 5");
+        helper.succeed();
+    }
 }

@@ -49,8 +49,9 @@ public class CloakLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Ab
     private static final float BACK = 2.3F;
     /** The collar: its height and its radius round the neck, at the bottom and at the flared top. */
     private static final float COLLAR_H = 7.0F;
-    private static final float COLLAR_R0 = 5.0F;
-    private static final float COLLAR_R1 = 6.3F;
+    // (3.18.1: wider, so the head and its hat layer, 4.5 out and 6.4 at a corner as it turns, never come through it)
+    private static final float COLLAR_R0 = 5.4F;
+    private static final float COLLAR_R1 = 7.0F;
     private static final int COLLAR_SEGS = 10;
     private static final float COLLAR_ARC = (float) Math.toRadians(112);
 
@@ -230,7 +231,7 @@ public class CloakLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<Ab
         float r = Mth.lerp(h * h, COLLAR_R0, COLLAR_R1 + flutter);
         // The sides stand a little lower than the back, as the film's collar dips toward the chest.
         float height = COLLAR_H * h * (1.0F - 0.35F * Math.abs(phi) / COLLAR_ARC);
-        return new Vec3(r * Mth.sin(phi), -height, r * Mth.cos(phi) * 0.9F - 0.6F);
+        return new Vec3(r * Mth.sin(phi), -height, r * Mth.cos(phi) - 0.2F);
     }
 
     private static Vector3f normal(Vec3 a, Vec3 b, Vec3 d) {

@@ -5412,6 +5412,7 @@
   "commands.enhanced.demiurge.not_demiurge": "%s אינו הדמיורג",
   "screen.enhanced.demiurge_gift.title": "מתנת הקסם",
   "screen.enhanced.demiurge_gift.witch": "מכשפה: %s",
+  "screen.enhanced.demiurge_gift.level": "רמה %s",
   "screen.enhanced.demiurge_gift.give": "תן קסם",
   "screen.enhanced.demiurge_gift.take": "קח בחזרה",
   "screen.enhanced.demiurge_gift.done": "סיום",

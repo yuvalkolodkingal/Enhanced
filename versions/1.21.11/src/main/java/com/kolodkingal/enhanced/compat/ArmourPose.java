@@ -12,18 +12,15 @@ import java.util.WeakHashMap;
  * marked model after vanilla posed it.
  */
 public final class ArmourPose {
-    private static final Set<Object> MODELS = Collections.newSetFromMap(new WeakHashMap<>());
 
     private ArmourPose() {
     }
 
     public static void mark(Object model) {
-        if (model != null) {
-            MODELS.add(model);
-        }
+        com.kolodkingal.enhanced.client.render.HeroPoses.markArmour(model);
     }
 
     public static boolean marked(Object model) {
-        return MODELS.contains(model);
+        return com.kolodkingal.enhanced.client.render.HeroPoses.isArmour(model);
     }
 }

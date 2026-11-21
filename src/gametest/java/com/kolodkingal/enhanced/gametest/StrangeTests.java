@@ -273,7 +273,7 @@ public final class StrangeTests {
         PowerTicker.tick(strange);
         check(arrow.isRemoved(), "the arrow turns to sparks at the disc");
         float hit = SeraphimShield.harm(strange, level.damageSources().mobAttack(husk(helper, 10.5, 6.5)), 10.0F);
-        assertNear(hit, 10.0F * SeraphimShield.FRONT_REDUCTION, 0.01, "a blow from the front loses most of its harm");
+        assertNear(hit, 10.0F * SeraphimShield.FRONT_REDUCTION, 0.01, "a blow from the front is stopped");
         CustomKitSupport.press(strange, 3, false, false);
         check(!Powers.get(strange).is(Live.STRANGE_SHIELD), "V let go: it comes down");
         check(!Powers.get(strange).isReady(3, level.getGameTime() + 5), "and recharges");
@@ -291,6 +291,10 @@ public final class StrangeTests {
         float before = friend.getHealth();
         friend.hurt(helper.getLevel().damageSources().generic(), 8.0F);
         assertNear(before - friend.getHealth(), 4.0, 0.01, "he takes half the harm");
+        // (3.18.1) a blow from outside the Dome never reaches in
+        Zombie outside = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(18.5, FLOOR, 10.5));
+        check(SeraphimShield.harm(friend, helper.getLevel().damageSources().mobAttack(outside), 8.0F) == 0.0F,
+                "harm from outside the Dome is stopped");
         Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(11.5, FLOOR, 11.5));
         check(!SeraphimShield.shelters(zombie), "a monster inside is not sheltered");
         check(!Powers.get(strange).isReady(3, helper.getLevel().getGameTime() + SeraphimShield.domeCooldown() - 5),
@@ -654,7 +658,7 @@ public final class StrangeTests {
         strange.setHealth(20.0F);
         strange.hurt(helper.getLevel().damageSources().playerAttack(foe), 10.0F);
         assertNear(20.0F - strange.getHealth(), 10.0F * SeraphimShield.FRONT_REDUCTION, 0.6,
-                "a blow from the front: 40% of it");
+                "a blow from the front: stopped");
         CustomKitSupport.press(strange, 3, false, false);
         helper.succeed();
     }

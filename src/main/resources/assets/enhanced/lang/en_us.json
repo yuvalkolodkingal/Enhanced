@@ -5412,6 +5412,7 @@
   "commands.enhanced.demiurge.not_demiurge": "%s is not the Demiurge",
   "screen.enhanced.demiurge_gift.title": "The Gift of Magic",
   "screen.enhanced.demiurge_gift.witch": "Witch: %s",
+  "screen.enhanced.demiurge_gift.level": "Level %s",
   "screen.enhanced.demiurge_gift.give": "Give magic",
   "screen.enhanced.demiurge_gift.take": "Take it back",
   "screen.enhanced.demiurge_gift.done": "Done",

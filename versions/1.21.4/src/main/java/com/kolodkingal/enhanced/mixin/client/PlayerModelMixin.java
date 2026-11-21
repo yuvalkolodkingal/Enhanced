@@ -21,6 +21,9 @@ public abstract class PlayerModelMixin {
 
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;)V", at = @At("TAIL"))
     private void enhanced$heroPoses(PlayerRenderState state, CallbackInfo ci) {
+        if (HeroPoses.isArmour(this)) {
+            return; // (3.18.1: an armour model wears the body's pose already, HumanoidModelMixin; worked out again it doubled)
+        }
         RenderBridge.pose = state;
         if (RenderBridge.entity(state) instanceof LivingEntity entity) {
             HeroPoses.apply((PlayerModel) (Object) this, entity, state.walkAnimationPos, state.walkAnimationSpeed,

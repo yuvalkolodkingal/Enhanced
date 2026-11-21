@@ -50,7 +50,7 @@ public final class SeraphimShield {
     public static final double DISC_RADIUS = 1.3;
     public static final double DISC_AHEAD = 1.1;
     /** What a blow from the front still does through the Shield. */
-    public static final float FRONT_REDUCTION = 0.4F;
+    public static final float FRONT_REDUCTION = 0.0F; // (3.18.1: was 0.4; the Shield stops what comes at its front, as a shield should)
     /** What a harm to someone inside the Dome still does. */
     public static final float DOME_REDUCTION = 0.5F;
     /** The Shield's hunger each tick it stands. */
@@ -353,6 +353,13 @@ public final class SeraphimShield {
             amount *= FRONT_REDUCTION;
         }
         if (shelters(victim)) {
+            // (3.18.1) what comes from outside the Dome never reaches in (it protected from nothing: the harm was only halved);
+            // harm from inside it, or with no place, is halved
+            Player holder = domeHolding(victim);
+            Vec3 at = source.getSourcePosition();
+            if (holder != null && at != null && at.distanceToSqr(domeCenter(holder)) > domeRadius() * domeRadius()) {
+                return 0.0F;
+            }
             amount *= DOME_REDUCTION;
         }
         return amount;

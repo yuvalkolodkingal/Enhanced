@@ -64,8 +64,8 @@ public final class DemiurgeConfig {
                 .define("gifts", true);
         GIFT_STRENGTH = builder.comment("The strength (1-10, as in the Hero Creator) of every power he gives.")
                 .defineInRange("giftStrength", 8, 1, 10);
-        GIFT_MAX_POWERS = builder.comment("At most this many powers in one gift.")
-                .defineInRange("giftMaxPowers", 10, 1, 20);
+        GIFT_MAX_POWERS = builder.comment("At most this many powers in one gift (ten of them on keys: R G V B N and with Sneak).")
+                .defineInRange("giftMaxPowers", 20, 1, 40);
         GIFT_RANGE = builder.comment("How near (blocks) the player he gives magic to must be (0: anywhere in the same world).")
                 .defineInRange("giftRange", 0.0, 0.0, 10000.0);
         builder.pop();

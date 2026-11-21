@@ -68,10 +68,12 @@ public final class DemiurgeCommand {
 
     private static int give(CommandContext<CommandSourceStack> ctx, boolean operator) throws CommandSyntaxException {
         ServerPlayer giver = operator ? null : ctx.getSource().getPlayerOrException();
-        List<Integer> picks = DemiurgeGifts.parse(StringArgumentType.getString(ctx, "picks"));
+        String text = StringArgumentType.getString(ctx, "picks");
+        List<Integer> picks = DemiurgeGifts.parse(text);
+        int level = DemiurgeGifts.parseLevel(text); // (3.18.1: "L5" among the picks: the witch level the gift starts at)
         int given = 0;
         for (ServerPlayer target : targets(ctx, operator)) {
-            String refused = DemiurgeGifts.give(giver, target, picks);
+            String refused = DemiurgeGifts.give(giver, target, picks, level);
             if (refused == null) {
                 given++;
             } else if (operator) {
