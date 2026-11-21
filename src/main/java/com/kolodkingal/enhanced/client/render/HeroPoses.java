@@ -163,7 +163,10 @@ public final class HeroPoses {
      */
     public static boolean dress(net.minecraft.client.model.HumanoidModel<?> model, Player player, float ageInTicks) {
         HeroAnimState st = HeroAnimator.peek(player);
-        if (st == null || st.drawnAge != ageInTicks) {
+        // (3.18.1) the pose of this frame, or of the frame just before: from 1.21.9 the models are posed when the frame is
+        // drawn, and the armour may be drawn before the body, so it found only the last frame's pose and stood upright on
+        // a flying or wall-running hero. A pose at most a tick old is as good as this frame's.
+        if (st == null || Float.isNaN(st.drawnAge) || Math.abs(st.drawnAge - ageInTicks) > 1.0F) {
             return false;
         }
         float[] p = st.drawnPose;
