@@ -642,15 +642,19 @@ public final class PowerData {
         }
     }
 
+    /** (3.18.1) A key with no cooldown slot (the Y row, 6, which Doctor Strange's Eye is on) reads as never cooling down. */
     public long cooldownUntil(int ability) {
-        return cooldownUntil[ability];
+        return ability >= 1 && ability <= ABILITIES ? cooldownUntil[ability] : 0L;
     }
 
     public boolean isReady(int ability, long gameTime) {
-        return gameTime >= cooldownUntil[ability];
+        return gameTime >= cooldownUntil(ability);
     }
 
     public void startCooldown(int ability, long gameTime, int ticks) {
+        if (ability < 1 || ability > ABILITIES) {
+            return;
+        }
         cooldownUntil[ability] = gameTime + ticks;
         dirty = true;
     }
