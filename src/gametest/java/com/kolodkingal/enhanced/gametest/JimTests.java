@@ -296,7 +296,9 @@ public final class JimTests {
         run(helper, full, 12, () -> {
             check(zf.isAlive(), "nothing yet while it charges");
             AbilityHandler.onKey(full, 4, false);
-            check(!zf.isAlive(), "released at full charge, the beam kills the zombie that a tap only hurt");
+            // (3.18.3: a full blast no longer kills outright: it hurts far more than a tap, and a zombie of 20 health lives)
+            check(!zf.isAlive() || zf.getMaxHealth() - zf.getHealth() >= JimConfig.NOVA_DAMAGE.get() - 3,
+                    "released at full charge, the beam hits far harder than a tap: " + zf.getHealth());
             check(full.getHealth() >= health, "never him");
             long left = Powers.get(full).cooldownUntil(Powers.get(full).slot(HeroAbility.JIM_NOVA)) - helper.getLevel().getGameTime();
             check(left > 20 * 60, "then a long cooldown: " + left);
@@ -309,8 +311,10 @@ public final class JimTests {
 
     @EnhancedTest(template = ARENA)
     public static void theNovaBeamIsStrongerAndWiderThanTheFireBeamAndGrowsWithTheCharge(GameTestHelper helper) {
-        check(JimConfig.NOVA_DAMAGE.get() > 5 * JimConfig.BEAM_DAMAGE.get(), "a full Nova hit beats a second of the Fire Beam");
+        check(JimConfig.NOVA_DAMAGE.get() > 3 * JimConfig.BEAM_DAMAGE.get(), "a full Nova hit beats three hits of the Fire Beam");
         check(JimConfig.NOVA_DAMAGE.get() > JimConfig.NOVA_MIN_DAMAGE.get(), "and a full charge beats a tap");
+        check(JimConfig.NOVA_DAMAGE.getDefault() < 20.0, "(3.18.3) a player at full health lives through a full Nova Flame");
+        check(com.kolodkingal.enhanced.config.HulkConfig.REGEN_PER_SECOND.getDefault() >= 1.5, "(3.18.3) and the Hulk heals fast");
         check(JimConfig.NOVA_RANGE.get() > JimConfig.BEAM_RANGE.get() && JimConfig.NOVA_RANGE.get() > JimConfig.NOVA_MIN_RANGE.get(), "more reach, growing with the charge");
         check(JimConfig.NOVA_WIDTH.get() >= 2.4 * JimConfig.BEAM_WIDTH.get(), "much wider");
         check(JimConfig.NOVA_BURN_RADIUS_MAX.get() > JimConfig.NOVA_BURN_RADIUS_MIN.get(), "its burning band grows with the charge");

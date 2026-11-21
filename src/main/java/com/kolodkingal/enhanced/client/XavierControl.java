@@ -186,7 +186,9 @@ public final class XavierControl {
             mc.setCameraEntity(player);
             cameraTaken = false;
         }
-        Net.sendToServer(new XavierInputPayload(forward, strafe, jump, sneak, player.getYRot(), player.getXRot(), attack));
+        // (3.18.3) the use button: a player's body uses what it holds
+        boolean use = mc.screen == null && mc.options.keyUse.isDown();
+        Net.sendToServer(new XavierInputPayload(forward, strafe, jump, sneak, player.getYRot(), player.getXRot(), attack, use));
         attack = false;
     }
 

@@ -222,6 +222,26 @@ public final class SpeedStrikeTests {
         });
     }
 
+    /** (3.18.3) A player in another's slowed time is slow in the air too: a jump no longer moves him at full speed. */
+    @EnhancedTest(template = ARENA, batch = "speed_tommy_time", timeoutTicks = 100)
+    public static void aJumpInSlowedTimeIsSlowToo(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.config(EnhancedConfig.SLOW_MOTION_RADIUS, 6);
+        ServerPlayer tommy = f.player(10.5, FLOOR, 10.5, Power.TOMMY);
+        press(tommy, 1);
+        PowerTicker.tick(tommy);
+        SlowMotion.clear();
+        ServerPlayer other = f.player(12.5, FLOOR + 1.0, 10.5, Power.NONE);
+        other.setOnGround(false);
+        check(SlowMotion.playerFactor(other) > 1, "he stands in Tommy's slowed time");
+        other.setDeltaMovement(0.3, 0.42, 0.0);
+        SlowMotion.slowAir(other);
+        Vec3 v = other.getDeltaMovement();
+        check(v.x <= 0.3 / SlowMotion.playerFactor(other) + 1.0E-6 && v.y == 0.42, "in the air he moves at the slowed pace: " + v);
+        check(SlowMotion.playerFactor(tommy) == 1, "and Tommy, in his own, does not");
+        helper.succeed();
+    }
+
     private SpeedStrikeTests() {
     }
 }

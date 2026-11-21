@@ -130,6 +130,8 @@ public final class SpeedsterMotion {
         if (event.getEntity() != owner || !(event.getEntity() instanceof LocalPlayer player)) {
             return;
         }
+        // (3.18.3) in another's slowed time he is slow in the air too, not only on the ground
+        com.kolodkingal.enhanced.ability.SlowMotion.slowAir(player);
         if (RUNNER.turn > 0.0F) {
             float step = Math.min(TURN_RATE, RUNNER.turn);
             RUNNER.turn -= step;

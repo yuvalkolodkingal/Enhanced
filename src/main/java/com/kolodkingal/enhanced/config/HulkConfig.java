@@ -133,8 +133,9 @@ public final class HulkConfig {
                 .defineInRange("speedBonus", 0.15, 0.0, 1.0);
         BREAK_SPEED_FACTOR = builder.comment("How many times faster the Hulk breaks blocks by hand.")
                 .defineInRange("breakSpeedFactor", 4.0, 1.0, 20.0);
-        REGEN_PER_SECOND = builder.comment("Health the Hulk heals per second when not hurt for 5 seconds.")
-                .defineInRange("regenPerSecond", 0.35, 0.0, 10.0);
+        // (3.18.3: was "regenPerSecond", 0.35 after 5 seconds; a new name, so that every server takes the faster healing)
+        REGEN_PER_SECOND = builder.comment("Health the Hulk heals per second when not hurt for 3 seconds (1.5: three quarters of a heart).")
+                .defineInRange("regenerationPerSecond", 1.5, 0.0, 10.0);
         EXHAUSTION_FACTOR = builder.comment("How many times hungrier the Hulk gets.")
                 .defineInRange("exhaustionFactor", 1.5, 1.0, 5.0);
         SMASH_DAMAGE = builder.comment("Damage of Hulk Smash to everyone on the ground near.")

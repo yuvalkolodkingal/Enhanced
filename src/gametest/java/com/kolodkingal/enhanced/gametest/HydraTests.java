@@ -994,7 +994,7 @@ public final class HydraTests {
         TestKit.lookAt(charles, soldier);
         press(charles, 3);
         check(MindLink.isHost(soldier) && HydraLoyalty.isTraitor(soldier), "he is in the soldier");
-        MindLink.input(charles, new XavierInputPayload(0.0F, 0.0F, false, false, 0.0F, 0.0F, true));
+        MindLink.input(charles, new XavierInputPayload(0.0F, 0.0F, false, false, 0.0F, 0.0F, true, false));
         PowerTicker.tick(charles);
         f.everyTick(50, tick -> {
             PowerTicker.tick(charles);

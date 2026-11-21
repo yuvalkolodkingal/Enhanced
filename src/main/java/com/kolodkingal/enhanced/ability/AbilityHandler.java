@@ -74,6 +74,10 @@ public final class AbilityHandler {
             player.displayClientMessage(Component.translatable("message.enhanced.agatha.you_are_drained"), true);
             return;
         }
+        // (3.18.3) Professor X in another player's body: his keys are that body's powers (but the one that brings him back)
+        if (MindLink.isLinked(player) && MindLink.bodyKey(player, ability, down, player.isShiftKeyDown())) {
+            return;
+        }
         PowerData data = Powers.get(player);
         if (ability == com.kolodkingal.enhanced.custom.HeroKeys.Y) {
             com.kolodkingal.enhanced.custom.HeroKeys.pressY(player, data, down, player.isShiftKeyDown());

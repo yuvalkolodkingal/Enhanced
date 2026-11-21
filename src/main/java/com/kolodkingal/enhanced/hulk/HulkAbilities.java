@@ -459,8 +459,9 @@ public final class HulkAbilities {
     /** The healing factor and the hunger of his body. */
     private static void bodyTick(ServerPlayer player, PowerData data, State state, long now) {
         float k = data.bodyScale(HeroAbility.HULK_BODY);
-        if (now % 20 == 0 && now - state.lastHurt >= 100 && player.getHealth() < player.getMaxHealth()) {
-            player.heal((float) (cfg(HulkConfig.REGEN_PER_SECOND, 0.35) * k));
+        // (3.18.3: faster, three seconds after a hurt; it was five, and a third of this)
+        if (now % 20 == 0 && now - state.lastHurt >= 60 && player.getHealth() < player.getMaxHealth()) {
+            player.heal((float) (cfg(HulkConfig.REGEN_PER_SECOND, 1.5) * k));
         }
         float exhaustion = player.getFoodData().getExhaustionLevel();
         if (state.lastExhaustion >= 0.0F && exhaustion > state.lastExhaustion) {

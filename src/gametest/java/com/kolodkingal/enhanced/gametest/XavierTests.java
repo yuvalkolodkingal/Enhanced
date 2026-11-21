@@ -354,7 +354,7 @@ public final class XavierTests {
         double startX = husk.getX();
         // He walks it east (+x): yaw -90 looks along +x.
         f.everyTick(60, tick -> {
-            MindLink.input(charles, new XavierInputPayload(1.0F, 0.0F, false, false, TestKit.EAST, 0.0F, false));
+            MindLink.input(charles, new XavierInputPayload(1.0F, 0.0F, false, false, TestKit.EAST, 0.0F, false, false));
             PowerTicker.tick(charles);
             if (tick < 40) {
                 return false;
@@ -381,11 +381,11 @@ public final class XavierTests {
         press(charles, 3);
         check(MindLink.isHost(husk), "in the husk");
         float before = villager.getHealth();
-        MindLink.input(charles, new XavierInputPayload(0.0F, 0.0F, false, false, TestKit.EAST, 10.0F, true));
+        MindLink.input(charles, new XavierInputPayload(0.0F, 0.0F, false, false, TestKit.EAST, 10.0F, true, false));
         PowerTicker.tick(charles);
         check(villager.getHealth() < before, "a click: the husk strikes the villager in front of it");
         float after = villager.getHealth();
-        MindLink.input(charles, new XavierInputPayload(0.0F, 0.0F, false, false, TestKit.EAST, 10.0F, true));
+        MindLink.input(charles, new XavierInputPayload(0.0F, 0.0F, false, false, TestKit.EAST, 10.0F, true, false));
         PowerTicker.tick(charles);
         check(villager.getHealth() == after, "and not again before half a second");
         helper.succeed();
@@ -521,6 +521,31 @@ public final class XavierTests {
     // ------------------------------------------------------------------------------------------------------------
     // V: Take Over a Body (players), and the stronger telepaths
 
+    /** (3.18.3) In a player's body his keys are that body's powers, his take-over key brings him back, and he uses what it holds. */
+    @EnhancedTest(template = ARENA, batch = PVP)
+    public static void inAPlayersBodyHeUsesTheirPowersAndItems(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer charles = xavier(f, 3.5, 10.5);
+        releaseOnClose(f, charles);
+        ServerPlayer wanda = f.player(6.5, FLOOR, 10.5, Power.MAGNETO);
+        lookAt(charles, wanda);
+        press(charles, 3);
+        check(MindLink.isHost(wanda), "he steers Magneto (no helmet)");
+        boolean before = Powers.get(wanda).magneticShield();
+        AbilityHandler.onKey(charles, 4, true);
+        AbilityHandler.onKey(charles, 4, false);
+        check(Powers.get(wanda).magneticShield() != before, "his B is Magneto's own B: the magnetic shield");
+        wanda.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.BOW));
+        wanda.getInventory().add(new ItemStack(Items.ARROW, 4));
+        MindLink.input(charles, new XavierInputPayload(0.0F, 0.0F, false, false, TestKit.EAST, 0.0F, false, true));
+        PowerTicker.tick(charles);
+        check(wanda.isUsingItem() && wanda.getUseItem().is(Items.BOW), "his use button draws the bow the body holds");
+        press(charles, 3);
+        check(!MindLink.isLinked(charles) && !MindLink.isHost(wanda), "V, his own take-over key, still brings him back");
+        helper.succeed();
+    }
+
     @EnhancedTest(template = ARENA, batch = PVP)
     public static void heSteersAPlayerWhoNeverStaysStuck(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
@@ -537,10 +562,10 @@ public final class XavierTests {
         AbilityHandler.onKey(victim, 5, false);
         check(!Powers.get(victim).toggle(Toggle.FROST_GIANT), "the body's own keys do nothing (no Frost Giant for Loki)");
         // His keys move them: a velocity the server gives, never a position from his client.
-        MindLink.input(charles, new XavierInputPayload(1.0F, 0.0F, false, false, TestKit.EAST, 0.0F, false));
+        MindLink.input(charles, new XavierInputPayload(1.0F, 0.0F, false, false, TestKit.EAST, 0.0F, false, false));
         PowerTicker.tick(charles);
         check(victim.getDeltaMovement().x > 0.15 && Math.abs(victim.getDeltaMovement().z) < 1.0E-6, "they are pushed east: " + victim.getDeltaMovement());
-        MindLink.input(charles, new XavierInputPayload(Float.NaN, 99.0F, false, false, Float.POSITIVE_INFINITY, 0.0F, false));
+        MindLink.input(charles, new XavierInputPayload(Float.NaN, 99.0F, false, false, Float.POSITIVE_INFINITY, 0.0F, false, false));
         PowerTicker.tick(charles);
         check(Double.isFinite(victim.getDeltaMovement().x) && victim.getDeltaMovement().length() < 0.5, "nonsense is clamped: " + victim.getDeltaMovement());
         // PvP off: let go.
@@ -657,7 +682,7 @@ public final class XavierTests {
         check(Integer.parseInt(ModNetwork.PROTOCOL_VERSION) >= 10,
                 "3.6 bumps the protocol to 10 (3.3 had 7, 3.4 8, 3.5 9; 3.7 11, pinned by MutantSkeletonTests)");
         RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());
-        XavierInputPayload input = new XavierInputPayload(0.5F, -1.0F, true, false, 12.5F, -30.0F, true);
+        XavierInputPayload input = new XavierInputPayload(0.5F, -1.0F, true, false, 12.5F, -30.0F, true, false);
         XavierInputPayload.STREAM_CODEC.encode(buf, input);
         check(XavierInputPayload.STREAM_CODEC.decode(buf).equals(input), "the input");
         XavierPayload link = new XavierPayload(XavierPayload.LINK_START, 42, 160);

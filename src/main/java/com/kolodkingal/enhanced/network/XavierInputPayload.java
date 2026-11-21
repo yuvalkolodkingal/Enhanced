@@ -21,8 +21,10 @@ import net.minecraft.server.level.ServerPlayer;
  * @param yaw     where he looks (degrees), which is where the body looks
  * @param pitch   the same, up and down
  * @param attack  the attack button was pressed since the last message
+ * @param use     (3.18.3) the use button is down: a player's body uses what it holds
  */
-public record XavierInputPayload(float forward, float strafe, boolean jump, boolean sneak, float yaw, float pitch, boolean attack)
+public record XavierInputPayload(float forward, float strafe, boolean jump, boolean sneak, float yaw, float pitch, boolean attack,
+                                 boolean use)
         implements CustomPacketPayload {
     public static final Type<XavierInputPayload> TYPE = new Type<>(Enhanced.id("xavier_input"));
 
@@ -34,8 +36,10 @@ public record XavierInputPayload(float forward, float strafe, boolean jump, bool
         ByteBufCodecs.FLOAT.encode(buf, p.yaw);
         ByteBufCodecs.FLOAT.encode(buf, p.pitch);
         ByteBufCodecs.BOOL.encode(buf, p.attack);
+        ByteBufCodecs.BOOL.encode(buf, p.use);
     }, buf -> new XavierInputPayload(ByteBufCodecs.FLOAT.decode(buf), ByteBufCodecs.FLOAT.decode(buf), ByteBufCodecs.BOOL.decode(buf),
-            ByteBufCodecs.BOOL.decode(buf), ByteBufCodecs.FLOAT.decode(buf), ByteBufCodecs.FLOAT.decode(buf), ByteBufCodecs.BOOL.decode(buf)));
+            ByteBufCodecs.BOOL.decode(buf), ByteBufCodecs.FLOAT.decode(buf), ByteBufCodecs.FLOAT.decode(buf), ByteBufCodecs.BOOL.decode(buf),
+            ByteBufCodecs.BOOL.decode(buf)));
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

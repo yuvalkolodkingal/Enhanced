@@ -104,6 +104,9 @@ public final class MindLink {
         float yaw;
         float pitch;
         boolean attack;
+        /** (3.18.3) The use button is down now, and was at the last tick. */
+        boolean use;
+        boolean usedBefore;
         long lastAttack = Long.MIN_VALUE / 2;
         /** A steered player's vertical speed, as the server reckons it (see {@link #steerPlayer}). */
         double vy;
@@ -407,6 +410,7 @@ public final class MindLink {
             link.pitch = Mth.clamp(p.pitch(), -90.0F, 90.0F);
         }
         link.attack |= p.attack();
+        link.use = p.use();
     }
 
     private static float clampUnit(float v) {
@@ -430,6 +434,7 @@ public final class MindLink {
         Entity host = find(xavier.server, link.host);
         if (host instanceof ServerPlayer player) {
             steerPlayer(player, link);
+            useItem(player, link);
         }
         if (link.attack) {
             link.attack = false;
@@ -555,6 +560,85 @@ public final class MindLink {
      * position reports would lag a tick behind), sent as a motion packet that their own client carries out. A body in
      * the air in Creative-like flight follows his look up and down.
      */
+    /**
+     * (3.18.3) The use button: a player's body uses what it holds in its main hand, as its own right click would: on the
+     * block it looks at (placing, opening), else in the air (eating, drinking, drawing a bow, throwing); let go, what it
+     * was using is let go (the bow shoots).
+     */
+    /** (3.18.3) The body he is using an item with right now: its own clicks are refused, this one is his. */
+    @Nullable
+    private static UUID acting;
+
+    /** Whether this body is doing what he makes it do this moment (its use of an item), not acting by itself. */
+    public static boolean actsForHim(Entity body) {
+        return acting != null && acting.equals(body.getUUID());
+    }
+
+    private static void useItem(ServerPlayer host, Link link) {
+        acting = host.getUUID();
+        try {
+            useItemNow(host, link);
+        } finally {
+            acting = null;
+        }
+    }
+
+    private static void useItemNow(ServerPlayer host, Link link) {
+        boolean pressed = link.use && !link.usedBefore;
+        boolean released = !link.use && link.usedBefore;
+        link.usedBefore = link.use;
+        if (released && host.isUsingItem()) {
+            host.releaseUsingItem();
+            return;
+        }
+        if (!pressed || host.isUsingItem()) {
+            return;
+        }
+        net.minecraft.world.InteractionHand hand = net.minecraft.world.InteractionHand.MAIN_HAND;
+        net.minecraft.world.item.ItemStack stack = host.getItemInHand(hand);
+        net.minecraft.world.phys.HitResult hit = host.pick(host.blockInteractionRange(), 1.0F, false);
+        if (hit instanceof net.minecraft.world.phys.BlockHitResult block && hit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
+            net.minecraft.world.InteractionResult result = host.gameMode.useItemOn(host, host.serverLevel(), stack, hand, block);
+            if (result.consumesAction()) {
+                host.swing(hand, true);
+                return;
+            }
+        }
+        if (!stack.isEmpty()) {
+            net.minecraft.world.InteractionResult result = host.gameMode.useItem(host, host.serverLevel(), stack, hand);
+            if (result.consumesAction()) {
+                host.swing(hand, true);
+            }
+        }
+    }
+
+    /**
+     * (3.18.3) A key of his while he steers a player's body: that body's own powers answer it (its hero's, with Sneak as
+     * he holds it), aimed where he makes it look. Every key but the one that takes the body over (it brings him back).
+     * Returns whether the key went to the body.
+     */
+    public static boolean bodyKey(ServerPlayer xavier, int ability, boolean down, boolean alt) {
+        Link link = BY_XAVIER.get(xavier.getUUID());
+        if (link == null || !link.player) {
+            return false;
+        }
+        PowerData own = Powers.get(xavier);
+        if (ability == own.slot(HeroAbility.XAVIER_TAKE_OVER)) {
+            return false;
+        }
+        if (!(find(xavier.server, link.host) instanceof ServerPlayer host) || !host.isAlive()) {
+            return false;
+        }
+        PowerData data = Powers.get(host);
+        if (ability == com.kolodkingal.enhanced.custom.HeroKeys.Y) {
+            com.kolodkingal.enhanced.custom.HeroKeys.pressY(host, data, down, alt);
+        } else {
+            AbilityHandler.heroKey(data.power(), host, data, ability, down, alt);
+        }
+        Powers.syncIfDirty(host);
+        return true;
+    }
+
     static void steerPlayer(ServerPlayer host, Link link) {
         double scale = host.getAttributeValue(Attributes.MOVEMENT_SPEED) / 0.1;
         double speed = (link.sneak ? PLAYER_SNEAK : PLAYER_WALK) * Mth.clamp(scale, 0.0, 3.0);

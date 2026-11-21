@@ -46,7 +46,8 @@ public final class XavierEvents {
 
     /** Neither a body he steers nor his own body, while he is away, acts by itself. */
     private static boolean entranced(Entity entity) {
-        return entity instanceof ServerPlayer player && (MindLink.isHost(player) || MindLink.isLinked(player));
+        return entity instanceof ServerPlayer player && (MindLink.isHost(player) || MindLink.isLinked(player))
+                && !MindLink.actsForHim(player); // (3.18.3: what he makes the body use goes through)
     }
 
     private static void refuse(Entity entity, Cancellable event) {

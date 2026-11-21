@@ -257,6 +257,28 @@ public final class SlowMotion {
         return Math.max(1, factorOf(player));
     }
 
+    /**
+     * (3.18.3) A player in another's slowed time is slow in the air too: Slowness never touches a jump (the game moves a
+     * player in the air at its own pace), so he moved at full speed as soon as he jumped. Called on his own client after
+     * each of his ticks (his client moves him): his speed across the ground is held to a jump's at the zone's factor.
+     */
+    public static void slowAir(Player player) {
+        if (player.onGround() || player.getAbilities().flying || player.isInWater() || player.isInLava() || player.isPassenger()) {
+            return;
+        }
+        int factor = playerFactor(player);
+        if (factor <= 1) {
+            return;
+        }
+        Vec3 v = player.getDeltaMovement();
+        double across = Math.sqrt(v.x * v.x + v.z * v.z);
+        double cap = 0.3 / factor;
+        if (across > cap) {
+            double k = cap / across;
+            player.setDeltaMovement(v.x * k, v.y, v.z * k);
+        }
+    }
+
     /** Whether this entity is slowed by Quicksilver Time at all (players and things they ride are never tick-skipped). */
     private static boolean affected(Entity entity) {
         if (entity instanceof Player || Platform.get().parts().isPart(entity)
