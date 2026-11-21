@@ -237,7 +237,13 @@ public final class DemiurgeTests {
         CustomHero hero = CustomHeroes.hero(target);
         check(Powers.power(target) == Power.CUSTOM && DemiurgeGifts.gifted(target), "the target is a custom hero of the gift");
         check(CustomHero.LOOK_OWN.equals(hero.look()), "in his own skin");
-        check(hero.powers().size() == picks.size(), "with every power given: " + hero.powers().size());
+        // (3.18.1) a witch of the gift starts at level 1 of the witch levels: some of the gift now, all of it at level 5
+        check(com.kolodkingal.enhanced.spellbook.WitchLevels.level(target) == 1 && hero.powers().size() < picks.size(),
+                "she starts at level 1 with part of the gift: " + hero.powers().size());
+        com.kolodkingal.enhanced.spellbook.WitchLevels.setLevel(target, "gift", 5);
+        hero = CustomHeroes.hero(target);
+        check(DemiurgeGifts.gifted(target), "still a witch of the gift at level 5");
+        check(hero.powers().size() == picks.size(), "at level 5, every power given: " + hero.powers().size());
         PowerTicker.tick(target);
         check(data(target).has(HeroAbility.WANDA_CHAOS_BEAM) && data(target).has(HeroAbility.STRANGE_WHIP), "the powers work for him");
         // a player who has a hero is refused
