@@ -54,6 +54,14 @@ Hebrew: [עברית, דף הבית](Home-HE)
 
 How each hero is unlocked, step by step, is on [Becoming a Hero](Becoming-a-Hero). Every key is on [Controls](Controls), and the heroes with several looks (Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, Heimdall, Odin, Hela, Doctor Strange, the Hulk, Wolverine, Deadpool, Captain America, Falcon, Red Hulk and Love) are on [Looks](Looks).
 
+## What's new in 3.18.3
+
+* **The Nova Flame can be survived.** A full blast of the Human Torch's Nova Flame does 14 damage (it was 24) and burns 4 seconds, 8 at full charge (it was 6 and 12): a player at full health lives through it, and armour and tougher heroes take much less. (New setting names `jim.novaFlameDamage` and `jim.novaFlameBurnSeconds`, so every server takes the new numbers.)
+* **Professor X uses the body he takes over.** In a player's body, his ability keys are that body's own powers (its hero's, with Sneak), aimed where he makes it look; his take-over key still brings him back. His right click uses what the body holds: places a block, opens a door, eats, drinks, draws and shoots a bow.
+* **The Hulk heals faster:** 1.5 health a second (it was 0.35), from 3 seconds after a hurt (it was 5). Setting `hulk.regenerationPerSecond`.
+* **Jumping in slowed time is slow too.** A player inside another's slowed time moved at full speed as soon as he jumped; he is slow in the air now as on the ground.
+* The network protocol is 19: players need 3.18.3 on both sides.
+
 ## What's new in 3.18.2
 
 * **Helmets and goggles stay on the head.** On Minecraft 1.21.9 and newer (26.3 included), Magneto's helmet, Quicksilver's goggles and any other helmet slid off the head while a hero flew, ran or wall-ran: the armour worked the hero's pose out twice. It is worked out once now.
