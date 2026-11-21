@@ -312,6 +312,30 @@ public final class ModuleStats {
     public static final Stat WALL_COOLDOWN = s("cooldown", 200, 80, Kind.COOLDOWN);
     public static final Stat BLOOM_RADIUS = s("radius", 3, 8, Kind.BLOCKS);
     public static final Stat BLOOM_COOLDOWN = s("cooldown", 160, 50, Kind.COOLDOWN);
+    // 3.18.1: the Green witch's Root Grasp (Nature "roots"): at strength 4, beside her growth's 5, it holds for 2 seconds
+    public static final Stat ROOTS_RANGE = s("range", 12, 24, Kind.BLOCKS);
+    public static final Stat ROOTS_RADIUS = s("radius", 2, 3.5F, Kind.BLOCKS);
+    public static final Stat ROOTS_TIME = s("duration", 31, 58, Kind.TICKS, Scale.CONTROL);
+    public static final Stat ROOTS_COOLDOWN = s("cooldown", 300, 160, Kind.COOLDOWN);
+
+    // ---- 3.18.1: the witches' cantrips (CANTRIP), strength = the witch's level: 5% more each level, a fifth at level 5 ----
+    public static final Stat CANTRIP_WARD_SHIELD = s("shield", 6, 8.7F, Kind.HEALTH);
+    public static final Stat CANTRIP_WARD_TIME = s("duration", 80, 80, Kind.TICKS);
+    public static final Stat CANTRIP_WARD_COOLDOWN = s("cooldown", 400, 400, Kind.COOLDOWN);
+    public static final Stat CANTRIP_BLINK_DISTANCE = s("distance", 5, 7.25F, Kind.BLOCKS);
+    public static final Stat CANTRIP_BLINK_COOLDOWN = s("cooldown", 160, 160, Kind.COOLDOWN);
+    public static final Stat CANTRIP_MEND_HEAL = s("heal", 4, 5.8F, Kind.HEALTH);
+    public static final Stat CANTRIP_MEND_TIME = s("duration", 80, 80, Kind.TICKS);
+    public static final Stat CANTRIP_MEND_COOLDOWN = s("cooldown", 600, 600, Kind.COOLDOWN);
+    public static final Stat CANTRIP_REPEL_RADIUS = s("radius", 4, 5.8F, Kind.BLOCKS);
+    public static final Stat CANTRIP_REPEL_DAMAGE = s("damage", 1, 1.45F, Kind.DAMAGE);
+    public static final Stat CANTRIP_REPEL_COOLDOWN = s("cooldown", 240, 240, Kind.COOLDOWN);
+    public static final Stat CANTRIP_SPARK_DAMAGE = s("damage", 3, 4.35F, Kind.DAMAGE);
+    public static final Stat CANTRIP_SPARK_RANGE = s("range", 20, 29, Kind.BLOCKS);
+    public static final Stat CANTRIP_SPARK_COOLDOWN = s("cooldown", 30, 30, Kind.COOLDOWN);
+    public static final Stat CANTRIP_LIGHT_TIME = s("duration", 1200, 1200, Kind.TICKS);
+    public static final Stat CANTRIP_LIGHT_RADIUS = s("radius", 16, 23.2F, Kind.BLOCKS);
+    public static final Stat CANTRIP_LIGHT_COOLDOWN = s("cooldown", 400, 400, Kind.COOLDOWN);
 
     /** The numbers of a module in one of its options, in the order the editor's preview lists them. */
     public static List<Stat> of(PowerModule module, String option) {
@@ -392,7 +416,16 @@ public final class ModuleStats {
                 case "wall" -> List.of(WALL_LENGTH, WALL_TIME, WALL_COOLDOWN);
                 default -> List.of(TREMOR_DAMAGE, TREMOR_RADIUS, TREMOR_COOLDOWN);
             });
-            case NATURE -> list.addAll(List.of(BLOOM_RADIUS, BLOOM_COOLDOWN));
+            case NATURE -> list.addAll(option.equals("roots") ? List.of(ROOTS_RANGE, ROOTS_RADIUS, ROOTS_TIME, ROOTS_COOLDOWN)
+                    : List.of(BLOOM_RADIUS, BLOOM_COOLDOWN));
+            case CANTRIP -> list.addAll(switch (option) {
+                case "blink" -> List.of(CANTRIP_BLINK_DISTANCE, CANTRIP_BLINK_COOLDOWN);
+                case "mend" -> List.of(CANTRIP_MEND_HEAL, CANTRIP_MEND_TIME, CANTRIP_MEND_COOLDOWN);
+                case "repel" -> List.of(CANTRIP_REPEL_RADIUS, CANTRIP_REPEL_DAMAGE, CANTRIP_REPEL_COOLDOWN);
+                case "spark" -> List.of(CANTRIP_SPARK_DAMAGE, CANTRIP_SPARK_RANGE, CANTRIP_SPARK_COOLDOWN);
+                case "light" -> List.of(CANTRIP_LIGHT_TIME, CANTRIP_LIGHT_RADIUS, CANTRIP_LIGHT_COOLDOWN);
+                default -> List.of(CANTRIP_WARD_SHIELD, CANTRIP_WARD_TIME, CANTRIP_WARD_COOLDOWN);
+            });
             case WIND -> {
                 list.addAll(option.equals("updraft") ? List.of(UPDRAFT_LIFT, UPDRAFT_COOLDOWN) : List.of(GUST_PUSH, GUST_RANGE, GUST_DAMAGE, GUST_COOLDOWN));
                 list.add(FALL_GUARD);

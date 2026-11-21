@@ -57,7 +57,13 @@ public enum PowerModule implements CatalogEntry {
             opt("throw", Act.PRESS), opt("wall", Act.PRESS)),
     WIND("wind", 1, Group.ELEMENT, "minecraft:wind_charge", opt("gust", Act.PRESS), opt("updraft", Act.PRESS)),
     // (Spellbooks: the green magic's growth: the plants round the caster grow and flower, as bone meal makes them.)
-    NATURE("nature", 1, Group.ELEMENT, "minecraft:bone_meal", opt("bloom", Act.PRESS));
+    // (3.18.1, the witches' levels: "roots" is the Green witch's Root Grasp, roots that burst from the ground where she
+    // looks and hold enemies for a moment.)
+    NATURE("nature", 1, Group.ELEMENT, "minecraft:bone_meal", opt("bloom", Act.PRESS), opt("roots", Act.PRESS)),
+    // (3.18.1, the witches' levels: the six cantrips that fill a witch's empty keys, one per role, in her magic's colour.
+    // Never in the Hero Creator's catalogue ({@link #hidden}): the levels put them on the keys themselves.)
+    CANTRIP("cantrip", 1, Group.ENERGY, "minecraft:glowstone_dust", opt("ward", Act.PRESS), opt("blink", Act.PRESS),
+            opt("mend", Act.PRESS), opt("repel", Act.PRESS), opt("spark", Act.PRESS), opt("light", Act.PRESS));
 
     /** The strongest any power can be (a server may allow less: {@code custom_hero.maxStrength}). */
     public static final int MAX_STRENGTH = 10;
@@ -246,6 +252,14 @@ public enum PowerModule implements CatalogEntry {
             case FIRE -> EnumSet.of(Trait.FIRE_IMMUNE);
             default -> Set.of();
         };
+    }
+
+    /**
+     * 3.18.1: whether the module stays out of the Hero Creator: the witches' cantrips, which only the levels put on a
+     * witch's empty keys (the rules drop it from any definition a player sends).
+     */
+    public boolean hidden() {
+        return this == CANTRIP;
     }
 
     /** The module of this id, or null for a power this version does not know. */

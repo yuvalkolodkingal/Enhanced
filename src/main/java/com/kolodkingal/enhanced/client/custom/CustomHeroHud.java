@@ -90,12 +90,23 @@ public class CustomHeroHud implements LayeredDraw.Layer {
 
         Component title = CustomHeroes.name(player).copy().withStyle(s -> s.withColor(hero.color()).withBold(true));
         List<Component> lines = new ArrayList<>();
+        boolean witch = witch(hero);
         for (int column = 1; column <= CustomHero.KEYS; column++) {
             Component key = KeyBindings.ability(column).getTranslatedKeyMessage();
             HeroKit.Binding plain = kit.plain(column);
             MutableComponent line = label(Component.literal("[").append(key).append("] "), hero);
-            if (plain == null) {
+            int opensAt = witch ? com.kolodkingal.enhanced.spellbook.WitchLevelView.keyLevel(column) : 0;
+            if (plain == null && opensAt > com.kolodkingal.enhanced.spellbook.WitchLevelView.level()) {
+                // (3.18.1: a key her level has not opened yet, and no cantrip on it: locked, with the level that opens it)
+                line.append(Component.translatable("hud.enhanced.witch_levels.locked", opensAt).withStyle(ChatFormatting.DARK_GRAY));
+            } else if (plain == null) {
                 line.append(Component.translatable("hud.enhanced.custom.free").withStyle(ChatFormatting.DARK_GRAY));
+            } else if (plain.module() == PowerModule.CANTRIP) {
+                line.append(name(hero, plain).withStyle(s -> s.withColor(soft(hero.color()))));
+                Component status = status(player, data, state, hero, plain, column, now, true);
+                if (status != null) {
+                    line.append(Component.literal("  ")).append(status);
+                }
             } else {
                 line.append(name(hero, plain).withStyle(s -> s.withColor(colorOf(hero, plain.picked()))));
                 Component status = status(player, data, state, hero, plain, column, now, true);
@@ -115,6 +126,12 @@ public class CustomHeroHud implements LayeredDraw.Layer {
                 }
                 lines.add(sub);
             }
+        }
+        // (3.18.1) a witch's level: its line under her name, and the bar of her way to the next level under it
+        int levelLine = -1;
+        if (witch) {
+            lines.add(0, levelLine(hero));
+            levelLine = 0;
         }
         // (3.17) the setting "Show always-on powers": the list shows for a few seconds, always, or never; the key rows always show
         float shown = PassiveHud.visibility(mc, identity(hero, data, player));
@@ -147,7 +164,7 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         }
         int x = 6;
         int y = 4 + BossBarOverride.clearance(x + width + 4);
-        int height = 12 + lines.size() * 10;
+        int height = 12 + lines.size() * 10 + (levelLine >= 0 ? 4 : 0);
         graphics.fill(x - 4, y - 2, x + width + 4, y + height, 0x70000000);
         // A stripe of his two colours down the side of the panel, and a thin line of his colour under the name.
         graphics.fill(x - 4, y - 2, x - 2, y + height / 2, 0xFF000000 | hero.color());
@@ -158,7 +175,50 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         for (int i = 0; i < lines.size(); i++) {
             graphics.drawString(font, lines.get(i), x, y, i == passiveLine ? (passiveAlpha << 24) | 0xFFFFFF : 0xFFFFFFFF, true);
             y += 10;
+            if (i == levelLine) {
+                // the thin bar of her experience, in her magic's colour (full at level 5)
+                float progress = com.kolodkingal.enhanced.spellbook.WitchLevelView.progress();
+                graphics.fill(x, y - 1, x + width, y + 2, 0xA0000000);
+                graphics.fill(x, y - 1, x + Math.round(width * progress), y + 2, 0xFF000000 | hero.color());
+                y += 4;
+            }
         }
+    }
+
+    /**
+     * 3.18.1: whether this player's panel is a witch's (the server told the client her level, and her definition is still
+     * her source's: her book's, or no book's for the Demiurge's gift).
+     */
+    private static boolean witch(CustomHero hero) {
+        int source = com.kolodkingal.enhanced.spellbook.WitchLevelView.source();
+        if (source == 0) {
+            return false;
+        }
+        com.kolodkingal.enhanced.spellbook.Spellbook book = com.kolodkingal.enhanced.spellbook.Spellbook.of(hero);
+        return source <= 3 ? book != null && book.ordinal() == source - 1 : book == null;
+    }
+
+    /** 3.18.1: a witch's level line: "Level 2 · Hex Caster  140/250" (at level 5, its name only). */
+    private static MutableComponent levelLine(CustomHero hero) {
+        int level = com.kolodkingal.enhanced.spellbook.WitchLevelView.level();
+        int source = com.kolodkingal.enhanced.spellbook.WitchLevelView.source();
+        MutableComponent line = Component.translatable("hud.enhanced.witch_levels.level", level,
+                Component.translatable(com.kolodkingal.enhanced.spellbook.WitchLevels.levelTitleKey(source, level)))
+                .withStyle(s -> s.withColor(hero.glow()));
+        int missing = com.kolodkingal.enhanced.spellbook.WitchLevelView.missing();
+        if (missing > 0) {
+            line.append(Component.literal("  " + com.kolodkingal.enhanced.spellbook.WitchLevelView.xp() + "/"
+                    + com.kolodkingal.enhanced.spellbook.SpellLevels.threshold(level + 1)).withStyle(ChatFormatting.GRAY));
+        }
+        return line;
+    }
+
+    /** A softer shade of a colour (the cantrips': her magic's colour, paler). */
+    private static int soft(int rgb) {
+        int r = (rgb >> 16 & 0xFF) + 0xFF >> 1;
+        int g = (rgb >> 8 & 0xFF) + 0xFF >> 1;
+        int b = (rgb & 0xFF) + 0xFF >> 1;
+        return r << 16 | g << 8 | b;
     }
 
     /** Which hero, loadout and look this is: when it changes, the passive lines show again for a few seconds. */
@@ -209,6 +269,9 @@ public class CustomHeroHud implements LayeredDraw.Layer {
         if (always != null && PassiveHud.visibility(mc, identity(hero, data, player)) > 0.0F) {
             model.notes.add(always);
         }
+        if (witch(hero)) {
+            model.notes.add(0, levelLine(hero)); // (3.18.1: a witch's level)
+        }
         return model;
     }
 
@@ -247,6 +310,10 @@ public class CustomHeroHud implements LayeredDraw.Layer {
      */
     public static MutableComponent name(CustomHero hero, HeroKit.Binding b) {
         PowerModule m = b.module();
+        if (m == PowerModule.CANTRIP) {
+            // (3.18.1: a witch's cantrip, marked as one: a small spell until her level opens one of her own there)
+            return Component.literal("✧ ").append(Component.translatable(m.optionKey(b.action()))).withStyle(s -> s.withItalic(true));
+        }
         if (m != null && m != PowerModule.FLIGHT && HeroKit.MAIN.equals(b.action())
                 && com.kolodkingal.enhanced.spellbook.Spellbook.of(hero) != null) {
             CustomHero.Pick pick = hero.pick(m);

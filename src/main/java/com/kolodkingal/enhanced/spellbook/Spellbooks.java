@@ -51,8 +51,24 @@ public final class Spellbooks {
         } else if (level.isClientSide() && player.isShiftKeyDown() && book == Spellbook.ETHEREAL && Spellbook.of(player) == book) {
             // Client only: this branch never runs on a dedicated server, so the screen class is never loaded there.
             com.kolodkingal.enhanced.client.screen.SpellbookHatScreen.open();
+        } else if (level.isClientSide() && opensSpells(player, book, player.isShiftKeyDown())) {
+            // (3.18.1) the Book of Spells: the caster's plain use (the Ethereal witch's is her hat: her hat's screen has
+            // the button), or a witch of the Demiurge's gift using any book. Client only, as above.
+            com.kolodkingal.enhanced.client.screen.SpellsScreen.open();
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+    }
+
+    /**
+     * 3.18.1: whether this use opens the Book of Spells on the client: the book's own caster's plain use (not the Ethereal
+     * witch's: hers is the hat), or any use of a book by a witch of the Demiurge's gift.
+     */
+    public static boolean opensSpells(Player player, Spellbook book, boolean sneak) {
+        Spellbook current = Spellbook.of(player);
+        if (current == null) {
+            return Powers.power(player) == Power.CUSTOM && WitchLevelView.gift();
+        }
+        return current == book && book != Spellbook.ETHEREAL && !sneak;
     }
 
     /** What using the book does on the server (with Sneak or not). */
@@ -67,8 +83,14 @@ public final class Spellbooks {
             } else if (sneak) {
                 renounce(player);
             } else {
-                say(player, "message.enhanced.spellbook.already", book.title());
+                // (3.18.1: the client has opened the Book of Spells; it is told her level afresh)
+                WitchLevels.sync(player);
             }
+            return;
+        }
+        WitchLevels.Source source = current == null ? WitchLevels.source(player) : null;
+        if (source != null && source.kind() == WitchLevels.Kind.GIFT) {
+            WitchLevels.sync(player); // (a witch of the Demiurge's gift: the client has opened her Book of Spells)
             return;
         }
         if (current == null && Powers.power(player) != Power.NONE) {
@@ -90,9 +112,12 @@ public final class Spellbooks {
         if (Spellbook.of(own) == null) {
             data = data.withStash(own); // (a book's definition left from before is never kept aside: his own already is)
         }
+        // (3.18.1) a book begun now starts at level 1; a book she comes back to, at her level in it
+        data = WitchLevels.begin(data, book.id);
         ModAttachments.SPELLBOOK.set(player, data);
-        CustomHeroes.become(player, book.definition(data.hatColor(), true), false);
+        CustomHeroes.become(player, book.definition(WitchLevels.level(data, book.id), data.hatColor(), true), false);
         announce(player, book);
+        WitchLevels.sync(player);
     }
 
     /** The caster gives the book's magic up: no power, and his own custom hero back. False if he is no caster. */
@@ -109,6 +134,7 @@ public final class Spellbooks {
         player.serverLevel().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BOOK_PUT, SoundSource.PLAYERS,
                 1.0F, 0.7F);
         say(player, "message.enhanced.spellbook.renounced", book.bookName());
+        WitchLevels.sync(player);
         return true;
     }
 
@@ -144,7 +170,9 @@ public final class Spellbooks {
     }
 
     private static void setHat(ServerPlayer player, boolean on, int color) {
-        CustomHero hero = Spellbook.ETHEREAL.definition(color, on);
+        // (3.18.1: at her level; the hat changes nothing else)
+        CustomHero hero = Spellbook.ETHEREAL.definition(WitchLevels.level(ModAttachments.SPELLBOOK.get(player), Spellbook.ETHEREAL.id),
+                color, on);
         ModAttachments.CUSTOM_HERO.set(player, hero);
         ModAttachments.CUSTOM_HERO.sync(player);
         Powers.syncIfDirty(player);

@@ -32,11 +32,27 @@ public final class SpellbookEvents {
                 || event.getHand() != InteractionHand.MAIN_HAND) {
             return;
         }
-        if (!take(player, level, event.getPos())) {
+        if (!take(player, level, event.getPos()) && !study(player, level, event.getPos())) {
             return;
         }
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
+    }
+
+    /**
+     * 3.18.1: a book's caster studies at its home lectern (an empty lectern in Agatha's cottage for the Ethereal and the
+     * Green witch, in the Sanctum Sanctorum for the Eldritch sorcerer): once a day, {@link WitchLevels#STUDY_XP}. False
+     * (nothing done) if this is no such lectern, or she is no caster of a book at home here.
+     */
+    public static boolean study(ServerPlayer player, ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        Spellbook book = Spellbook.of(player);
+        if (book == null || !(state.getBlock() instanceof LecternBlock) || state.getValue(LecternBlock.HAS_BOOK)
+                || !WitchLevels.atHome(level, pos, book)) {
+            return false;
+        }
+        WitchLevels.study(player);
+        return true;
     }
 
     /** The player takes the spellbook from the lectern at {@code pos}; false (nothing done) if it holds none or he may not. */

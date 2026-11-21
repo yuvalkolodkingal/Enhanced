@@ -252,11 +252,16 @@ public final class CustomHeroServer implements HeroServer {
         if (Powers.is(player, Power.CUSTOM)) {
             onBecome(player, CustomHeroes.hero(player), CustomHeroes.state(player));
             CustomHeroes.syncState(player);
+            // (3.18.1) a witch: a caster from before the levels is at level 5, her definition is made right for her level
+            com.kolodkingal.enhanced.spellbook.WitchLevels.onLogin(player);
+        } else {
+            com.kolodkingal.enhanced.spellbook.WitchLevels.sync(player); // (no witch: the client forgets any level it knew)
         }
     }
 
     @Override
     public void onLogout(ServerPlayer player) {
+        com.kolodkingal.enhanced.spellbook.WitchLevels.forget(player);
         if (Powers.is(player, Power.CUSTOM)) {
             endPowers(player, Powers.get(player));
         }
@@ -306,5 +311,6 @@ public final class CustomHeroServer implements HeroServer {
         }
         HELD.clear();
         CustomHeroes.clear();
+        com.kolodkingal.enhanced.spellbook.WitchLevels.clear();
     }
 }

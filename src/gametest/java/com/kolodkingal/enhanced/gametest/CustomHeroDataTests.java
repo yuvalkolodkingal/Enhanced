@@ -297,7 +297,8 @@ public final class CustomHeroDataTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void thirtyPowersEachWithLogicOptionsAndNumbers(GameTestHelper helper) {
-        check(PowerModule.values().length == 31, "thirty powers and the spellbooks' Nature: " + PowerModule.values().length);
+        check(PowerModule.values().length == 32, "thirty powers, the spellbooks' Nature and (3.18.1) the witches' cantrips: "
+                + PowerModule.values().length);
         for (PowerModule m : PowerModule.values()) {
             check(PowerModule.byId(m.id) == m && PowerModule.byId(m.id.toUpperCase()) == m, m + " is found by its id");
             check(CustomHeroServer.logic(m) != null, m + " has its server logic");

@@ -47,8 +47,11 @@ public enum Spellbook {
     public final int color;
     public final int glow;
 
+    /** 3.18.1: the definition of each level (index 1-5), without the cantrips [0] and with them [1], judged once. */
+    private final CustomHero[][] levels = new CustomHero[2][SpellLevels.MAX + 1];
+    /** The definition of before the levels (all of the book, no cantrips): an older save's caster is known by it. */
     @Nullable
-    private CustomHero definition;
+    private CustomHero legacy;
 
     Spellbook(String id, String casterName, int color, int glow) {
         this.id = id;
@@ -73,26 +76,58 @@ public enum Spellbook {
     }
 
     /**
-     * The caster's definition: the book's powers on their keys, his own skin, and (the Ethereal witch) Agatha's hat in
-     * {@code hatColor}, or no hat when {@code hat} is false.
+     * The caster's definition at level 5 (all of the book), with the cantrips if the server gives them: see
+     * {@link #definition(int, int, boolean)}.
      */
     public CustomHero definition(int hatColor, boolean hat) {
-        CustomHero base = base();
+        return definition(SpellLevels.MAX, hatColor, hat);
+    }
+
+    /**
+     * 3.18.1: the caster's definition at {@code level} (1-5): the book's powers that level opens, on their keys, at its
+     * strengths ({@link SpellLevels}), a cantrip on each key still empty when the server gives them
+     * ({@code spellbook_levels.defaults.enabled}), his own skin, and (the Ethereal witch) Agatha's hat in
+     * {@code hatColor}, or no hat when {@code hat} is false.
+     */
+    public CustomHero definition(int level, int hatColor, boolean hat) {
+        return withHat(base(level, WitchLevels.cantripsOn()), hatColor, hat);
+    }
+
+    /** {@code base} with (the Ethereal witch) Agatha's hat in {@code hatColor}, or as it is. */
+    public CustomHero withHat(CustomHero base, int hatColor, boolean hat) {
         if (this != ETHEREAL || !hat) {
             return base;
         }
         return base.withLayers(base.layers().with(1, new CustomHero.Layer("witch_hat", hatColor & 0xFFFFFF, 0, CustomHero.Layer.ALWAYS)));
     }
 
-    /** The definition without a hat, judged once by the rules. */
-    private synchronized CustomHero base() {
-        if (definition == null) {
-            definition = CustomHeroRules.sanitize(raw(), LIMITS).hero();
+    /**
+     * 3.18.1: the definition of a level without a hat, judged once by the rules: the level's picks and keys
+     * ({@link SpellLevels#bookLevel}), the bindings the level adds after the rules (the Green witch's Root Grasp), every
+     * ability of a real hero at most at its strength 5 ({@link SpellLevels#capToHero}), and the cantrips if {@code cantrips}.
+     * Level 5 without cantrips is the book's definition of before (and the Green witch's Root Grasp).
+     */
+    public synchronized CustomHero base(int level, boolean cantrips) {
+        int l = Math.max(1, Math.min(SpellLevels.MAX, level));
+        int f = cantrips ? 1 : 0;
+        if (levels[f][l] == null) {
+            CustomHero ruled = CustomHeroRules.sanitize(SpellLevels.bookLevel(this, raw(), l), LIMITS).hero();
+            ruled = SpellLevels.capToHero(SpellLevels.extras(this, ruled, l));
+            levels[f][l] = cantrips ? SpellLevels.fill(ruled, l) : ruled;
         }
-        return definition;
+        return levels[f][l];
     }
 
-    private CustomHero raw() {
+    /** The book's definition of before the levels (all of it, judged by the rules): how an older save's caster is known. */
+    public synchronized CustomHero legacy() {
+        if (legacy == null) {
+            legacy = CustomHeroRules.sanitize(raw(), LIMITS).hero();
+        }
+        return legacy;
+    }
+
+    /** The book's whole definition, before the rules (level 5 is made from it). */
+    public CustomHero raw() {
         CustomHero hero = CustomHero.EMPTY.withName(casterName).withColors(color, glow).withLook(CustomHero.LOOK_OWN, false);
         return switch (this) {
             // Agatha's keys, the Ethereal Orb on V where her drain was.
@@ -146,17 +181,42 @@ public enum Spellbook {
         return null;
     }
 
-    /** The book whose definition this is (whatever its hat), or null for any other hero. */
+    /** 3.18.1: a book and the level a caster's definition is of. */
+    public record Level(Spellbook book, int level) {
+    }
+
+    /** The book whose definition this is (whatever its hat and its level), or null for any other hero. */
     @Nullable
     public static Spellbook of(CustomHero hero) {
+        Level match = match(hero);
+        return match == null ? null : match.book();
+    }
+
+    /**
+     * 3.18.1: the book and level of a caster's definition (at any of its five levels, with or without the cantrips,
+     * whatever its hat; the definition of before the levels is level 5), or null for any other hero.
+     */
+    @Nullable
+    public static Level match(CustomHero hero) {
         for (Spellbook book : values()) {
-            CustomHero def = book.base();
-            if (hero.name().equals(def.name()) && hero.powers().equals(def.powers()) && hero.keys().equals(def.keys())
-                    && hero.sneakKeys().equals(def.sneakKeys())) {
-                return book;
+            if (!hero.name().equals(book.casterName)) {
+                continue;
+            }
+            for (int level = SpellLevels.MAX; level >= 1; level--) {
+                if (same(hero, book.base(level, true)) || same(hero, book.base(level, false))) {
+                    return new Level(book, level);
+                }
+            }
+            if (same(hero, book.legacy())) {
+                return new Level(book, SpellLevels.MAX);
             }
         }
         return null;
+    }
+
+    private static boolean same(CustomHero hero, CustomHero def) {
+        return hero.name().equals(def.name()) && hero.powers().equals(def.powers()) && hero.keys().equals(def.keys())
+                && hero.sneakKeys().equals(def.sneakKeys());
     }
 
     /** The book this player is the caster of (on either side), or null. */

@@ -112,7 +112,7 @@ public final class PowersTab extends EditorTab {
         List<Card> cards = new ArrayList<>();
         if (!query.isBlank()) {
             for (CatalogEntry e : Catalog.all()) {
-                if (CatalogSearch.matches(e, query, I18n::get)) {
+                if (!(e instanceof PowerModule m && m.hidden()) && CatalogSearch.matches(e, query, I18n::get)) {
                     cards.add(card(e, CreatorUi.name(e)));
                 }
             }
@@ -144,6 +144,9 @@ public final class PowersTab extends EditorTab {
         PowerModule.Group group = PowerModule.Group.values()[List.of(CATEGORIES).indexOf(category)];
         Set<CatalogEntry.Family> shown = new HashSet<>();
         for (CatalogEntry e : Catalog.all()) {
+            if (e instanceof PowerModule m && m.hidden()) {
+                continue; // (3.18.1: the witches' cantrips are no power to pick)
+            }
             CatalogEntry.Family f = e.family();
             if (f != null) {
                 List<CatalogEntry> members = Catalog.family(f);

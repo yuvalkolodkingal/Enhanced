@@ -216,6 +216,8 @@ public final class CommonEvents {
             MjolnirPin.onOwnerGone(player);
             HeroLifecycle.onDeath(player);
         }
+        // (3.18.1) a witch's kill by a spell, or a boss's fall, earns the witches experience
+        com.kolodkingal.enhanced.spellbook.WitchLevels.onDeath(event.getEntity(), event.getSource());
     }
 
     @Subscribe
@@ -473,6 +475,8 @@ public final class CommonEvents {
         if (source.is(DamageTypes.PLAYER_ATTACK) && source.getEntity() instanceof ServerPlayer player && source.getDirectEntity() == player) {
             LokiAbilities.onMeleeHit(player, event.getEntity());
         }
+        // (3.18.1) a witch's spell that hits earns her experience; a boss remembers the witches who fought it
+        com.kolodkingal.enhanced.spellbook.WitchLevels.onDamage(event.getEntity(), source);
     }
 
     // ---- who creatures go after ----

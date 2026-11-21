@@ -582,6 +582,8 @@ public final class EnhancedConfig {
         com.kolodkingal.enhanced.config.JimConfig.define(BUILDER);
         // 3.18: the Ultimate switch ([ultimate]): Cosmic Spider-Man works only while it is on, or for granted players.
         com.kolodkingal.enhanced.config.UltimateConfig.define(BUILDER);
+        // 3.18.1: the witches' levels ([spellbook_levels]).
+        com.kolodkingal.enhanced.config.WitchLevelsConfig.define(BUILDER);
         // 3.5: the world's own music (section [music]).
         com.kolodkingal.enhanced.config.MusicConfig.define(BUILDER);
     }
