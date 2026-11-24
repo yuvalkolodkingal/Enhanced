@@ -33,9 +33,9 @@ public final class MultiverseTests {
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theUniversesAreThereWithTheirOwnLand(GameTestHelper helper) {
         ServerLevel any = helper.getLevel();
-        // The GameTest server's world is built from the flat preset, with the game's three dimensions alone (no Asgard
-        // either): the universes' worlds are checked where the mod's dimensions are loaded, as on a real server.
-        if (any.getServer().getLevel(com.kolodkingal.enhanced.asgard.AsgardDimension.KEY) != null) {
+        // The GameTest server's world is built from the flat preset, with the game's three dimensions alone: the
+        // universes' worlds are checked where they are loaded, as on a real server, and their files are read below.
+        if (any.getServer().getLevel(Multiverse.XMEN_KEY) != null) {
             for (int universe : new int[]{Multiverse.MAIN, Multiverse.XMEN, Multiverse.ZOMBIES, 12345}) {
                 check(Multiverse.levelOf(any.getServer(), universe) != null, "universe " + universe + " has a world");
             }
