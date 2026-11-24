@@ -292,9 +292,11 @@ public final class MultiverseTests {
         net.minecraft.world.level.chunk.LevelChunk citadel = city.getChunk(1, 1);
         check(city.getBlockState(new BlockPos(3, ground, 100)).is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE)
                 || city.getBlockState(new BlockPos(3, ground, 100)).is(net.minecraft.world.level.block.Blocks.YELLOW_CONCRETE), "a street");
-        check(city.getBlockState(new BlockPos(27, ground + com.kolodkingal.enhanced.multiverse.CityChunkGenerator.CITADEL_HEIGHT, 27))
-                .is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE), "the Citadel's black roof, high over the city");
-        boolean red = false;
+        // The test world is kept between runs: a Citadel an earlier run already freed is grey, and then only the fall is tested.
+        net.minecraft.world.level.block.state.BlockState roof = city.getBlockState(new BlockPos(27, ground + com.kolodkingal.enhanced.multiverse.CityChunkGenerator.CITADEL_HEIGHT, 27));
+        boolean turnedBefore = roof.is(net.minecraft.world.level.block.Blocks.GRAY_CONCRETE);
+        check(turnedBefore || roof.is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE), "the Citadel's black roof, high over the city");
+        boolean red = turnedBefore;
         for (int y = ground + 1; y < ground + 40 && !red; y++) {
             for (int x = 16; x < 32 && !red; x++) {
                 red = city.getBlockState(new BlockPos(x, y, 11)).is(net.minecraft.world.level.block.Blocks.RED_CONCRETE);
