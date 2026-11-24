@@ -56,15 +56,13 @@ public final class SuitSkins {
             Enhanced.id("textures/entity/suit/billy_demiurge_powered.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
     /**
-     * (3.19) Ultimate Wanda, the Sorceress Supreme of the comics' design: the crimson and black suit, the tall crown, the red
-     * cloak lined in flame, with the films' red hair, or (Sneak + H) the comics' black.
+     * (3.19) Ultimate Wanda wears the Sorceress Supreme look (her looks {@code sorcerer_supreme} and its dark-haired twin):
+     * the films' ginger hair, or (Sneak + H) the dark. Her waist cloak, tiara and runes are drawn by the Sorcerer layers.
      */
     private static final PlayerSkin WANDA_ULTIMATE = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate.png"), null,
-            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate_cape.png"), null, PlayerSkin.Model.SLIM, true);
+            Enhanced.id("textures/entity/suit/scarlet_witch_sorcerer_supreme.png"), null, null, null, PlayerSkin.Model.SLIM, true);
     private static final PlayerSkin WANDA_ULTIMATE_COMICS = new PlayerSkin(
-            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate_comics.png"), null,
-            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate_cape.png"), null, PlayerSkin.Model.SLIM, true);
+            Enhanced.id("textures/entity/suit/scarlet_witch_sorcerer_supreme_dark.png"), null, null, null, PlayerSkin.Model.SLIM, true);
 
     private static final PlayerSkin JIM_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/jim_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
@@ -118,8 +116,14 @@ public final class SuitSkins {
         if (power == Power.MAGNETO && MagnetoAbilities.wearsHelmet(player)) {
             return MAGNETO;
         }
-        if (power == Power.SCARLET_WITCH && WandaAbilities.wearsCrown(player)) {
-            return SCARLET_WITCH;
+        if (power == Power.SCARLET_WITCH) {
+            // Her crown puts the suit on: the look she chose (her own suit, or the Sorceress Supreme's). Without it she is
+            // herself, in her own skin.
+            if (!WandaAbilities.wearsCrown(player)) {
+                return null;
+            }
+            Variant chosen = Powers.variant(player);
+            return chosen.skin() == null || "suit".equals(chosen.id()) ? SCARLET_WITCH : skinOf(chosen);
         }
         if (power == Power.QUICKSILVER && QuicksilverAbilities.wearsGoggles(player)) {
             return QUICKSILVER;
