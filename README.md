@@ -72,6 +72,13 @@ on the [Releases](../../releases) page. The newest build is always marked *Lates
 * **Mod loader** NeoForge 21.1.x, 21.4.x, 21.11.x or 26.3.x
 * **Install it on** the client, plus the server for multiplayer
 
+## What's new in 3.19.0
+
+* **The Multiverse.** Every place belongs to a universe: **Earth-616**, the main one, where a new world starts (every structure but the Mutant School); **Earth-10005**, the X-Men's, the only universe with the **Mutant School** now; **Earth-2149**, the zombies', where helmeted zombies walk by day and night, four times as many as a normal night, and every village is abandoned; and **endless What If universes**, as in the April Fools infinite dimensions: a renamed item names one by a number or by any words, and each asks its own question (What If... Gravity Failed? the Dead Rose? Everyone Was Quicksilver?...). See [The Multiverse](docs/wiki/Multiverse.md).
+* **Three ways between them**, each with a Multiverse screen: the **Darkhold's Dream Walking** (Sneak + use, looking straight down), the **Sling Ring of a cosmic hero** (Billy the Demiurge, Cosmic Spider-Man: portals to the other universe), and **Reed Richards' Multiverse Bridge** (8 netherite blocks round an empty middle): a great ring that, powered by redstone, sends whoever stands in its middle.
+* **The other universes' Infinity Stones** lie in chests, one of each per universe (the first copy taken is the stone, the others fade away), and a stone works only in its own universe.
+* The server and every player need 3.19 (network protocol 20).
+
 ## What's new in 3.18.3
 
 * **The Nova Flame can be survived.** A full blast of the Human Torch's Nova Flame does 14 damage (it was 24) and burns 4 seconds, 8 at full charge (it was 6 and 12): a player at full health lives through it, and armour and tougher heroes take much less. (New setting names `jim.novaFlameDamage` and `jim.novaFlameBurnSeconds`, so every server takes the new numbers.)

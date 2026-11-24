@@ -30,6 +30,13 @@ public class SlingRingItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player instanceof ServerPlayer server) {
+            // 3.19: a cosmic hero of the Ultimate versions opens portals to other universes (Sneak + use, looking straight down).
+            if (server.isShiftKeyDown() && com.kolodkingal.enhanced.multiverse.UniverseTravel.looksDown(server)
+                    && com.kolodkingal.enhanced.multiverse.UniverseTravel.cosmic(server)) {
+                com.kolodkingal.enhanced.multiverse.UniverseTravel.open(server,
+                        com.kolodkingal.enhanced.multiverse.UniverseTravel.RING, null);
+                return InteractionResultHolder.success(stack);
+            }
             if (!SlingRingActions.wears(server, true)) {
                 return InteractionResultHolder.fail(stack);
             }
@@ -49,5 +56,6 @@ public class SlingRingItem extends Item {
                 ChatFormatting.ITALIC));
         tooltip.add(Component.translatable("item.enhanced.sling_ring.sorcerers").withStyle(ChatFormatting.LIGHT_PURPLE));
         tooltip.add(Component.translatable("item.enhanced.sling_ring.use").withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.enhanced.sling_ring.multiverse").withStyle(ChatFormatting.DARK_AQUA));
     }
 }

@@ -65,6 +65,7 @@
 
 **Places**
 
+* [The Multiverse](Multiverse)
 * [The X-Men lower lab](Mutant-School-Lab)
 * [Agatha's Cottage](Agathas-Cottage)
 
@@ -149,6 +150,7 @@
 
 **מקומות**
 
+* [המולטיברס](Multiverse-HE)
 * [המעבדה התחתונה של האקס-מן](Mutant-School-Lab-HE)
 * [הבקתה של אגתה](Agathas-Cottage-HE)
 

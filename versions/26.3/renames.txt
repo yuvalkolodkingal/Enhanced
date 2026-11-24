@@ -589,3 +589,4 @@ new net\.minecraft\.client\.input\.MouseButtonInfo\(([^,()]+), 0\) => new net.mi
 @in(/VibraniumShieldItem\.java) \bBlocksAttacks blocking\(\) \{ => BlocksAttacks blocking(net.minecraft.core.HolderLookup.Provider context) {
 @in(/VibraniumShieldItem\.java) \bjava\.util\.Optional\.of\(net\.minecraft\.tags\.DamageTypeTags\.BYPASSES_SHIELD\) => java.util.Optional.of(context.getOrThrow(net.minecraft.tags.DamageTypeTags.BYPASSES_SHIELD))
 @in(/ModItems\.java) \.component\(DataComponents\.BLOCKS_ATTACKS, ([\w.]+VibraniumShieldItem)\.blocking\(\)\) => .delayedComponent(DataComponents.BLOCKS_ATTACKS, $1::blocking)
+@in(/UniverseChunkGenerator\.java) createForFlat\(randomState, seed, getBiomeSource\(\), => createForFlat(randomState, seed, this.getOrigin(randomState), getBiomeSource(),

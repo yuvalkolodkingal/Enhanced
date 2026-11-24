@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NNN",
+    "N N",
+    "NNN"
+  ],
+  "key": {
+    "N": "minecraft:netherite_block"
+  },
+  "result": {
+    "id": "enhanced:multiverse_bridge",
+    "count": 1
+  }
+}

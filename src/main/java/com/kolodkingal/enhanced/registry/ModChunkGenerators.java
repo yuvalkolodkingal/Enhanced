@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.registry;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.asgard.AsgardChunkGenerator;
+import com.kolodkingal.enhanced.multiverse.UniverseChunkGenerator;
 import com.kolodkingal.enhanced.platform.reg.RegEntry;
 import com.kolodkingal.enhanced.platform.reg.Registrar;
 import com.kolodkingal.enhanced.platform.reg.Registrars;
@@ -16,6 +17,10 @@ public final class ModChunkGenerators {
 
     public static final RegEntry<MapCodec<? extends ChunkGenerator>, MapCodec<AsgardChunkGenerator>> ASGARD =
             CHUNK_GENERATORS.register("asgard", () -> AsgardChunkGenerator.CODEC);
+
+    /** 3.19: the other universes' land ({@code data/enhanced/dimension/universe_10005.json} and the others). */
+    public static final RegEntry<MapCodec<? extends ChunkGenerator>, MapCodec<UniverseChunkGenerator>> UNIVERSE =
+            CHUNK_GENERATORS.register("universe", () -> UniverseChunkGenerator.CODEC);
 
     private ModChunkGenerators() {
     }

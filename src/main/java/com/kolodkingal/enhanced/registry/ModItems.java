@@ -251,6 +251,8 @@ public final class ModItems {
     // ===== hulk (3.6) =====
     /** The Gamma Emitter (lane L7). */
     public static final ItemEntry<BlockItem> GAMMA_EMITTER = ITEMS.registerSimpleBlockItem(ModBlocks.GAMMA_EMITTER);
+    /** 3.19: Reed Richards' Multiverse Bridge (eight netherite blocks round an empty middle). */
+    public static final ItemEntry<BlockItem> MULTIVERSE_BRIDGE = ITEMS.registerSimpleBlockItem(ModBlocks.MULTIVERSE_BRIDGE);
     /** Bruce Banner's Gamma Inhibitor (lane L7, P2). */
     public static final ItemEntry<GammaInhibitorItem> GAMMA_INHIBITOR = ITEMS.register("gamma_inhibitor",
             () -> new GammaInhibitorItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));

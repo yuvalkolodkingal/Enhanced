@@ -319,6 +319,7 @@ public class InfinityGauntletItem extends AwakeningItem implements ItemExt.StopU
         }
         gauntlet.set(ModDataComponents.GAUNTLET.get(), next);
         StoneLedger.putInGauntletOf(gauntlet, item.kind, StoneLedger.taker(stone));
+        com.kolodkingal.enhanced.multiverse.UniverseStones.intoGauntlet(gauntlet, item.kind, stone);
         player.playSound(ModSounds.GAUNTLET_INSERT.get(), 0.8F, 1.0F);
         return ItemStack.EMPTY;
     }
@@ -343,6 +344,7 @@ public class InfinityGauntletItem extends AwakeningItem implements ItemExt.StopU
         if (taker != null) {
             StoneLedger.stamp(stone, taker);
         }
+        com.kolodkingal.enhanced.multiverse.UniverseStones.outOfGauntlet(gauntlet, kind, stone);
         StoneLedger.putInGauntletOf(gauntlet, kind, null);
         GauntletContents left = contents.without(kind);
         StoneKind next = selectedOrFirst(left);

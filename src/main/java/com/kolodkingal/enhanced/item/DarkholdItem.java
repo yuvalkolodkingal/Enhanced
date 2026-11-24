@@ -51,6 +51,12 @@ public class DarkholdItem extends Item implements ItemExt.StopUsing {
             if (DarkholdBook.refuse(server)) {
                 return InteractionResultHolder.fail(stack);
             }
+            if (server.isShiftKeyDown() && com.kolodkingal.enhanced.multiverse.UniverseTravel.looksDown(server)) {
+                // 3.19: Dream Walking, to another universe.
+                com.kolodkingal.enhanced.multiverse.UniverseTravel.open(server,
+                        com.kolodkingal.enhanced.multiverse.UniverseTravel.DREAM, null);
+                return InteractionResultHolder.success(stack);
+            }
             if (server.isShiftKeyDown()) {
                 DarkholdBook.markOrGlimpse(server);
                 return InteractionResultHolder.success(stack);
@@ -111,6 +117,7 @@ public class DarkholdItem extends Item implements ItemExt.StopUsing {
         tooltip.add(Component.translatable("item.enhanced.darkhold.desc").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
         tooltip.add(Component.translatable("item.enhanced.darkhold.agatha").withStyle(ChatFormatting.LIGHT_PURPLE));
         tooltip.add(Component.translatable("item.enhanced.darkhold.sorcerers").withStyle(ChatFormatting.LIGHT_PURPLE));
+        tooltip.add(Component.translatable("item.enhanced.darkhold.dream_walk").withStyle(ChatFormatting.DARK_AQUA));
         tooltip.add(Component.translatable("item.enhanced.darkhold.beam").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.enhanced.darkhold.retaliation").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.enhanced.darkhold.marks").withStyle(ChatFormatting.GRAY));

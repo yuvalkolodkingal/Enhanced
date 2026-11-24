@@ -104,6 +104,8 @@ public final class EnhancedCommand {
                 .then(com.kolodkingal.enhanced.ultimate.UltimateCommand.node())
                 // 3.18.1: Billy the Demiurge, and his gift of magic, by an operator
                 .then(com.kolodkingal.enhanced.ultimate.DemiurgeCommand.node())
+                // 3.19: the multiverse (where am I; an operator's journey; the other universes' stones)
+                .then(com.kolodkingal.enhanced.multiverse.MultiverseCommand.node())
                 // (3.17) the player's own skin on his hero (any hero, built-in or custom), or the suit again
                 .then(Commands.literal("skin")
                         .then(Commands.argument("players", EntityArgument.players())

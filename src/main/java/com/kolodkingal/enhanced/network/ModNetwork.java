@@ -21,9 +21,10 @@ public final class ModNetwork {
      * states in two words), and once for 3.9 (the mod's own config files: the server's settings travel to a player
      * as a required message, so a 3.8 player and a 3.9 server, or the other way round, refuse each other at once),
      * ... and once for 3.17 (the server's settings changed in the game: two new messages, and the player's own skin on his
-     * hero: one more message and a flag of the power data).
+     * hero: one more message and a flag of the power data), and once for 3.19 (the multiverse: the Multiverse screen and
+     * its choice).
      */
-    public static final String PROTOCOL_VERSION = "19";
+    public static final String PROTOCOL_VERSION = "20";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -119,6 +120,9 @@ public final class ModNetwork {
         // hooks.
         registrar.serverbound(StoneActionPayload.TYPE, StoneActionPayload.STREAM_CODEC, StoneActionPayload::handle);
         registrar.clientbound(RealmScreenPayload.TYPE, RealmScreenPayload.STREAM_CODEC, RealmScreenPayload::handle);
+        // 3.19 (the multiverse): protocol 20. The Multiverse screen and its choice.
+        registrar.clientbound(UniverseScreenPayload.TYPE, UniverseScreenPayload.STREAM_CODEC, UniverseScreenPayload::handle);
+        registrar.serverbound(UniverseChoicePayload.TYPE, UniverseChoicePayload.STREAM_CODEC, UniverseChoicePayload::handle);
         registrar.clientbound(StoneFxPayload.TYPE, StoneFxPayload.STREAM_CODEC, StoneFxPayload::handle);
         registrar.clientbound(StrangeFxPayload.TYPE, StrangeFxPayload.STREAM_CODEC, StrangeFxPayload::handle);
         registrar.serverbound(SlingRingActionPayload.TYPE, SlingRingActionPayload.STREAM_CODEC,
