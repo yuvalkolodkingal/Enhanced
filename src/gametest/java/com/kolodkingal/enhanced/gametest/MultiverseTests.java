@@ -147,4 +147,41 @@ public final class MultiverseTests {
         }
         helper.succeed();
     }
+
+    /** The universes' land is made as a real world makes it: chunks round the middle generate in each, in good time. */
+    @EnhancedTest(template = ARENA, batch = "multiverse_land", timeoutTicks = 2400)
+    public static void theUniversesLandGeneratesInGoodTime(GameTestHelper helper) {
+        net.minecraft.server.MinecraftServer server = helper.getLevel().getServer();
+        Object[][] universes = {{Multiverse.XMEN_KEY, "universe_10005"}, {Multiverse.ZOMBIES_KEY, "universe_2149"},
+                {Multiverse.WHAT_IF_KEY, "what_if"}};
+        for (Object[] u : universes) {
+            @SuppressWarnings("unchecked")
+            net.minecraft.resources.ResourceKey<Level> key = (net.minecraft.resources.ResourceKey<Level>) u[0];
+            ServerLevel level = server.getLevel(key);
+            if (level == null) {
+                level = AsgardTestSupport.makeLevel(server, key, "/data/enhanced/dimension/" + u[1] + ".json");
+            }
+            long start = System.nanoTime();
+            for (int dx = -4; dx <= 4; dx++) {
+                for (int dz = -4; dz <= 4; dz++) {
+                    level.getChunk(dx, dz);
+                }
+            }
+            long ms = (System.nanoTime() - start) / 1_000_000L;
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Multiverse land: 81 chunks of {} in {} ms", u[1], ms);
+            check(ms < 60_000, "81 chunks of " + u[1] + " generate within a minute: " + ms + " ms");
+        }
+        // Arriving finds ground without making a great many chunks (the noise says where the land is).
+        TestKit.Fixture f = TestKit.fixture(helper);
+        net.minecraft.server.level.ServerPlayer player = f.player(5.5, TestKit.FLOOR, 5.5, com.kolodkingal.enhanced.power.Power.NONE);
+        for (int universe : new int[]{Multiverse.XMEN, Multiverse.ZOMBIES, 48213, Multiverse.named("Captain Carter"), 777}) {
+            long start = System.nanoTime();
+            com.kolodkingal.enhanced.stones.SpaceRealms.Arrival arrival = com.kolodkingal.enhanced.multiverse.UniverseTravel.arrival(player, universe);
+            long ms = (System.nanoTime() - start) / 1_000_000L;
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Multiverse arrival in {}: {} ms at {}", universe, ms, arrival == null ? null : arrival.spot());
+            check(arrival != null, "there is ground to arrive on in " + universe);
+            check(Multiverse.universeAt(arrival.level(), BlockPos.containing(arrival.spot())) == universe, "and it is in " + universe);
+        }
+        helper.succeed();
+    }
 }

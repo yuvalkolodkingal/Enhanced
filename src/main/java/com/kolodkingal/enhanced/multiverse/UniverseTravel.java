@@ -21,6 +21,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -180,17 +181,41 @@ public final class UniverseTravel {
                 around = overworld.getSharedSpawnPos();
             }
         }
-        // Over an ocean there is no ground: look further out, a few times.
-        for (int attempt = 0; attempt < 8; attempt++) {
-            double angle = attempt * Mth.TWO_PI / 7;
-            int far = attempt == 0 ? 0 : 96 * attempt;
-            BlockPos at = around.offset(Mth.floor(Math.cos(angle) * far), 0, Mth.floor(Math.sin(angle) * far));
-            Vec3 spot = SpaceRealms.surfaceNear(level, player, at, 24);
-            if (spot != null) {
-                return new SpaceRealms.Arrival(level, spot, player.getYRot());
+        // Over an ocean there is no ground: find land first from the generator's noise alone (no chunk is made for
+        // it), then make only the chunks round that one spot.
+        BlockPos land = land(level, around);
+        Vec3 spot = SpaceRealms.surfaceNear(level, player, land, land.equals(around) ? 24 : 8);
+        if (spot == null && !land.equals(around)) {
+            spot = SpaceRealms.surfaceNear(level, player, around, 8);
+        }
+        return spot == null ? null : new SpaceRealms.Arrival(level, spot, player.getYRot());
+    }
+
+    /** How far (blocks) the search for land goes out, and how far apart the columns it looks at are. */
+    static final int LAND_SEARCH = 768;
+    static final int LAND_STEP = 32;
+
+    /**
+     * The nearest column round {@code around} whose land, as the generator would make it, stands above the sea: read
+     * from the noise, without making a chunk. {@code around} itself if it is land, or if no land is near.
+     */
+    static BlockPos land(ServerLevel level, BlockPos around) {
+        net.minecraft.world.level.chunk.ChunkGenerator generator = level.getChunkSource().getGenerator();
+        net.minecraft.world.level.levelgen.RandomState random = level.getChunkSource().randomState();
+        int sea = generator.getSeaLevel();
+        for (int r = 0; r <= LAND_SEARCH; r += LAND_STEP) {
+            int steps = r == 0 ? 1 : Math.max(8, (int) (Mth.TWO_PI * r / LAND_STEP));
+            for (int i = 0; i < steps; i++) {
+                double angle = i * Mth.TWO_PI / steps;
+                int x = around.getX() + Mth.floor(Math.cos(angle) * r);
+                int z = around.getZ() + Mth.floor(Math.sin(angle) * r);
+                int top = generator.getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, level, random);
+                if (top > sea) {
+                    return new BlockPos(x, around.getY(), z);
+                }
             }
         }
-        return null;
+        return around;
     }
 
     /** Takes the player (alone) to the universe, with a swirl at both ends. Returns whether he went. */
