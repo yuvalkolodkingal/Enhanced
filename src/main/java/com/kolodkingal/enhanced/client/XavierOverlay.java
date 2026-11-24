@@ -65,7 +65,9 @@ public class XavierOverlay implements LayeredDraw.Layer {
             Entity host = XavierControl.host();
             if (host != null && XavierControl.inBody()) {
                 Component line = Component.translatable("hud.enhanced.xavier.in_body", host.getDisplayName(),
-                        String.format(Locale.ROOT, "%.0f", XavierControl.ticksLeft() / 20.0), KeyBindings.ability(3).getTranslatedKeyMessage());
+                        // (3.19: Ultimate Wanda's link never runs out)
+                        XavierControl.ticksLeft() > 1_000_000L ? "\u221E" : String.format(Locale.ROOT, "%.0f", XavierControl.ticksLeft() / 20.0),
+                        KeyBindings.ability(3).getTranslatedKeyMessage());
                 graphics.drawCenteredString(font, line.copy().withStyle(s -> s.withColor(Power.PROFESSOR_X.glow)), w / 2, h - 96, 0xFFFFFF);
                 if (host instanceof LivingEntity living) {
                     Component hp = Component.translatable("hud.enhanced.xavier.body_health",

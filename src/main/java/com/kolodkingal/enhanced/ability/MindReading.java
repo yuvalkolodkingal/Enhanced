@@ -184,12 +184,15 @@ public final class MindReading {
     private static void motes(ServerLevel level, ServerPlayer reader, LivingEntity target) {
         Vec3 from = reader.getEyePosition();
         Vec3 to = target.getEyePosition();
-        EnergyParticleOptions mote = new EnergyParticleOptions(PhoenixAbilities.PSY_MAIN, 0.7F);
+        // (3.19: Ultimate Wanda's motes are her red: AbilityColors gives it to her reading)
+        EnergyParticleOptions mote = new EnergyParticleOptions(com.kolodkingal.enhanced.custom.AbilityColors.shade(reader,
+                com.kolodkingal.enhanced.custom.HeroAbility.PHOENIX_MIND, PhoenixAbilities.PSY_MAIN), 0.7F);
         for (int i = 1; i <= 6; i++) {
             Vec3 at = from.lerp(to, i / 7.0);
             level.sendParticles(mote, at.x, at.y, at.z, 1, 0.03, 0.03, 0.03, 0.0);
         }
-        level.sendParticles(new EnergyParticleOptions(PhoenixAbilities.PSY_CORE, 0.8F), to.x, to.y + 0.3, to.z, 3, 0.2, 0.1, 0.2, 0.01);
+        level.sendParticles(new EnergyParticleOptions(com.kolodkingal.enhanced.custom.AbilityColors.shade(reader,
+                com.kolodkingal.enhanced.custom.HeroAbility.PHOENIX_MIND, PhoenixAbilities.PSY_CORE), 0.8F), to.x, to.y + 0.3, to.z, 3, 0.2, 0.1, 0.2, 0.01);
     }
 
     // ------------------------------------------------------------------------------------------------------------

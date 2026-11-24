@@ -110,6 +110,7 @@ event net.neoforged.neoforge.event.entity.living.LivingDamageEvent$Pre -> com.ko
 event net.neoforged.neoforge.event.entity.living.LivingDeathEvent -> com.kolodkingal.enhanced.platform.event.LivingDeathEvent
     HIGHEST - com.kolodkingal.enhanced.healing.HealingEvents#onDeath
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onDeath
+    HIGHEST - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onDeath
     HIGH - com.kolodkingal.enhanced.ultron.UltronEvents#onSecondLife
     NORMAL - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onDeath
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onDeath
@@ -171,6 +172,7 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     HIGHEST - com.kolodkingal.enhanced.heimdall.HeimdallEvents#onShadowHurt
     HIGHEST - com.kolodkingal.enhanced.ultron.SokoviaEvents#onIncomingDamage
     HIGHEST - com.kolodkingal.enhanced.eternity.EternityEvents#onDamage
+    HIGHEST - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onIncomingDamage
     HIGH - com.kolodkingal.enhanced.asgard.AsgardRules#onVoidDamage
     HIGH - com.kolodkingal.enhanced.strange.StrangeEvents#onIncomingDamage
     HIGH - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onIncoming
@@ -222,6 +224,7 @@ event net.neoforged.neoforge.event.entity.living.MobEffectEvent$Applicable -> co
     HIGH - com.kolodkingal.enhanced.event.SpiderEvents#onEffectApplicable
     HIGH - com.kolodkingal.enhanced.thanos.ThanosEvents#onEffectApplicable
     HIGH - com.kolodkingal.enhanced.ultron.UltronEvents#onEffectApplicable
+    HIGH - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onEffectApplicable
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onEffectApplicable
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onEffectApplicable
     NORMAL - com.kolodkingal.enhanced.event.PhoenixEvents#onEffectApplicable
@@ -321,6 +324,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEven
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.ability.SolarJewel#onLogout
+    NORMAL - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onLogout
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerRespawnEvent
     HIGH - com.kolodkingal.enhanced.death.DeathMeeting#onRespawn
     NORMAL - com.kolodkingal.enhanced.vormir.VormirEvents#onRespawn
@@ -472,6 +476,7 @@ event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onStopped
     NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onServerStopped
+    NORMAL - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onServerStopped
     LOWEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStoppingEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppingEvent
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onServerStopping
@@ -567,6 +572,7 @@ event net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent$LoggingOut ->
     NORMAL - com.kolodkingal.enhanced.client.world.SiteAmbienceClient$Events#onLogout
     NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView#onLoggingOut
     NORMAL - com.kolodkingal.enhanced.client.WardFx#onLogout
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onLoggingOut
     NORMAL - com.kolodkingal.enhanced.client.custom.CustomFx#onLogout
     NORMAL - com.kolodkingal.enhanced.client.deadpool.LineBubbles#onLoggingOut
     NORMAL - com.kolodkingal.enhanced.client.music.ServerMusicClient#onLogout
@@ -758,10 +764,12 @@ event net.neoforged.neoforge.client.event.ViewportEvent$ComputeFogColor -> com.k
     NORMAL - com.kolodkingal.enhanced.client.render.ArenaFx#onFogColor
     NORMAL - com.kolodkingal.enhanced.client.ThanosAtmosphere#onFogColor
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFogColour
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onFogColour
 event net.neoforged.neoforge.client.event.ViewportEvent$RenderFog -> com.kolodkingal.enhanced.platform.event.client.ViewportEvent$RenderFog
     NORMAL - com.kolodkingal.enhanced.client.render.ArenaFx#onFog
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFog
     NORMAL - com.kolodkingal.enhanced.client.custom.LavaSight#onFog
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onFog
 event net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent -> -
     NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterClientExtensions
 event net.neoforged.neoforge.event.ItemAttributeModifierEvent -> com.kolodkingal.enhanced.platform.event.ItemAttributeModifierEvent

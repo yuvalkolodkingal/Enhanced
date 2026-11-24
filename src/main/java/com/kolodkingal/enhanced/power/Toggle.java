@@ -86,6 +86,9 @@ public enum Toggle {
     // ===== cosmic spider-man (3.18) =====
     /** Cosmic Spider-Man's look: off the starfield suit, on Captain Universe's (H while cosmic switches it; it is kept). */
     COSMIC_UNIVERSE,
+    // ===== ultimate wanda (3.19) =====
+    /** Ultimate Wanda's hair: off the films' red, on the comics' black (Sneak + H while she is the Ultimate; it is kept). */
+    WANDA_COMICS_HAIR,
     ;
 
     final int bit() {

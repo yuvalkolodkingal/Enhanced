@@ -97,7 +97,12 @@ public final class AbilityHandler {
     public static void heroKey(Power hero, ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
         switch (hero) {
             case MAGNETO -> MagnetoAbilities.onKey(player, data, ability, down, alt);
-            case SCARLET_WITCH -> WandaAbilities.onKey(player, data, ability, down, alt);
+            case SCARLET_WITCH -> {
+                // (3.19) Sneak + G is Ultimate Wanda's; in her Ultimate menu R, V and B are hers
+                if (!UltimateWanda.onKey(player, data, ability, down, alt)) {
+                    WandaAbilities.onKey(player, data, ability, down, alt);
+                }
+            }
             case QUICKSILVER -> QuicksilverAbilities.onKey(player, data, ability, down, alt);
             case VISION -> VisionAbilities.onKey(player, data, ability, down, alt);
             case BILLY -> {

@@ -175,7 +175,8 @@ public final class WandaAbilities {
 
     /** While the Scarlet Witch wears her crown: 40 max health and the protection of a full Diamond set. */
     static void applyCrown(ServerPlayer player, PowerData data) {
-        boolean transformed = data.power() == Power.SCARLET_WITCH && wearsCrown(player);
+        // (3.19: Ultimate Wanda's body is her own twenty hearts and netherite: the crown's bonus steps aside)
+        boolean transformed = data.power() == Power.SCARLET_WITCH && wearsCrown(player) && !UltimateWanda.is(data);
         PowerTicker.setModifier(player, Attributes.MAX_HEALTH, CROWN_HEALTH, 20.0, transformed);
         PowerTicker.setModifier(player, Attributes.ARMOR, CROWN_ARMOR, 20.0, transformed);
         PowerTicker.setModifier(player, Attributes.ARMOR_TOUGHNESS, CROWN_TOUGHNESS, 8.0, transformed);

@@ -55,6 +55,17 @@ public final class SuitSkins {
     private static final PlayerSkin BILLY_DEMIURGE_POWERED = new PlayerSkin(
             Enhanced.id("textures/entity/suit/billy_demiurge_powered.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    /**
+     * (3.19) Ultimate Wanda, the Sorceress Supreme of the comics' design: the crimson and black suit, the tall crown, the red
+     * cloak lined in flame, with the films' red hair, or (Sneak + H) the comics' black.
+     */
+    private static final PlayerSkin WANDA_ULTIMATE = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate.png"), null,
+            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate_cape.png"), null, PlayerSkin.Model.SLIM, true);
+    private static final PlayerSkin WANDA_ULTIMATE_COMICS = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate_comics.png"), null,
+            Enhanced.id("textures/entity/suit/scarlet_witch_ultimate_cape.png"), null, PlayerSkin.Model.SLIM, true);
+
     private static final PlayerSkin JIM_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/jim_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -91,6 +102,10 @@ public final class SuitSkins {
         if (power == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(Powers.get(player))) {
             // (3.18) the Enigma Force turns his suit black and white, whatever his look or his own skin
             return com.kolodkingal.enhanced.ability.CosmicSpider.universe(Powers.get(player)) ? COSMIC_UNIVERSE : COSMIC_SPIDER;
+        }
+        if (power == Power.SCARLET_WITCH && com.kolodkingal.enhanced.ability.UltimateWanda.is(Powers.get(player))) {
+            // (3.19) Ultimate Wanda looks the Sorceress Supreme, whatever her look or her own skin
+            return com.kolodkingal.enhanced.ability.UltimateWanda.comicsHair(Powers.get(player)) ? WANDA_ULTIMATE_COMICS : WANDA_ULTIMATE;
         }
         if (power == Power.BILLY && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
             // (3.18.1) the Demiurge looks the Demiurge, whatever his look, his own skin or the magic type on his keys

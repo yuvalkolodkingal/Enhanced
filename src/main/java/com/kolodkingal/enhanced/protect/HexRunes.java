@@ -65,8 +65,8 @@ public final class HexRunes {
     /** The Hex whose runes hold this player now, or null: a sorcerer inside a Hex with its runes up that is not their own. */
     @Nullable
     public static Hex silencing(Player player) {
-        if (player.isSpectator() || !enabled()) {
-            return null;
+        if (player.isSpectator() || !enabled() || com.kolodkingal.enhanced.ability.UltimateWanda.is(player)) {
+            return null; // (3.19: the runes do not hold Ultimate Wanda)
         }
         Vec3 at = Shelters.middle(player);
         for (Hex hex : HexManager.data(player.level()).hexes()) {
@@ -106,13 +106,14 @@ public final class HexRunes {
                 wanda.displayClientMessage(Component.translatable("message.enhanced.hex_runes.disabled"), true);
                 return false;
             }
-            long left = cooldown(wanda);
+            boolean endless = com.kolodkingal.enhanced.ability.UltimateWanda.is(wanda); // (3.19: no recharge, no hunger)
+            long left = endless ? 0L : cooldown(wanda);
             if (left > 0) {
                 wanda.displayClientMessage(Component.translatable("message.enhanced.hex_runes.recharging",
                         String.format(Locale.ROOT, "%.1f", left / 20.0)), true);
                 return false;
             }
-            if (!wanda.getAbilities().invulnerable) {
+            if (!wanda.getAbilities().invulnerable && !endless) {
                 if (wanda.getFoodData().getFoodLevel() <= 0) {
                     wanda.displayClientMessage(Component.translatable("message.enhanced.hex_runes.hungry"), true);
                     return false;

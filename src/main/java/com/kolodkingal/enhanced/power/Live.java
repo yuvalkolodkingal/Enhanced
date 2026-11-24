@@ -256,6 +256,12 @@ public enum Live {
      * witches and sorcerers on H ({@code ability.Demiurge}). Never saved: he logs back in as plain Billy.
      */
     BILLY_DEMIURGE,
+    // ===== ultimate wanda (3.19) =====
+    /**
+     * The Scarlet Witch is Ultimate Wanda (Sneak + G, only with Ultimate): twenty hearts, a netherite set's protection, twice
+     * the healing, her powers eight times as strong, her own menu on H ({@code ability.UltimateWanda}). Never saved.
+     */
+    WANDA_ULTIMATE,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

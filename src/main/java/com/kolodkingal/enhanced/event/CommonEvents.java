@@ -247,6 +247,8 @@ public final class CommonEvents {
         if (!event.getEntity().level().isClientSide()) {
             // (3.18.1) Billy the Demiurge's powers hit much harder, whoever they hit
             event.setAmount(com.kolodkingal.enhanced.ability.Demiurge.outgoing(event.getEntity(), event.getSource(), event.getAmount()));
+            // (3.19) and Ultimate Wanda's (and a body she steers)
+            event.setAmount(com.kolodkingal.enhanced.ability.UltimateWanda.outgoing(event.getEntity(), event.getSource(), event.getAmount()));
         }
         if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
             return;

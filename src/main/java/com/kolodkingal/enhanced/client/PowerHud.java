@@ -96,11 +96,20 @@ public class PowerHud implements LayeredDraw.Layer {
         boolean demiurge = com.kolodkingal.enhanced.ability.Demiurge.is(data);
         boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data) || demiurge;
         int aura = demiurge ? com.kolodkingal.enhanced.ability.Demiurge.AURA : com.kolodkingal.enhanced.ability.CosmicSpider.AURA;
-        int titleColor = cosmic ? aura : Variants.hasChoice(power) ? look.color() : power.titleColor();
-        MutableComponent title = (demiurge ? Component.translatable("hud.enhanced.demiurge.title")
+        boolean ultimateWanda = com.kolodkingal.enhanced.ability.UltimateWanda.is(data); // (3.19: her name in her red, her menu on H)
+        int titleColor = ultimateWanda ? com.kolodkingal.enhanced.ability.UltimateWanda.RED
+                : cosmic ? aura : Variants.hasChoice(power) ? look.color() : power.titleColor();
+        MutableComponent title = (ultimateWanda ? Component.translatable("hud.enhanced.ultimate_wanda.title")
+                : demiurge ? Component.translatable("hud.enhanced.demiurge.title")
                 : cosmic ? Component.translatable("hud.enhanced.cosmic_spider.title")
                 : com.kolodkingal.enhanced.power.Characters.name(data).copy()).withStyle(s -> s.withColor(titleColor).withBold(true));
-        if (demiurge) {
+        if (ultimateWanda) {
+            title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
+                    .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
+                            .withStyle(s -> s.withBold(false).withColor(com.kolodkingal.enhanced.ability.UltimateWanda.GLOW)))
+                    .append(Component.translatable("hud.enhanced.ultimate_wanda.menu", com.kolodkingal.enhanced.ability.UltimateWanda.menuName(data.ironCharge()))
+                            .withStyle(s -> s.withBold(false).withColor(0xFFE0E6)));
+        } else if (demiurge) {
             title.append(Component.literal(" ").withStyle(s -> s.withBold(false)))
                     .append(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
                             .withStyle(s -> s.withBold(false).withColor(aura)))
@@ -224,7 +233,12 @@ public class PowerHud implements LayeredDraw.Layer {
         boolean demiurgePanel = com.kolodkingal.enhanced.ability.Demiurge.is(data); // (3.18.1)
         model.color = demiurgePanel ? com.kolodkingal.enhanced.ability.Demiurge.AURA : cosmicPanel ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA
                 : Variants.hasChoice(power) ? look.color() : power.titleColor();
-        model.title = demiurgePanel ? Component.translatable("hud.enhanced.demiurge.title")
+        boolean ultimatePanel = com.kolodkingal.enhanced.ability.UltimateWanda.is(data); // (3.19)
+        if (ultimatePanel) {
+            model.color = com.kolodkingal.enhanced.ability.UltimateWanda.RED;
+        }
+        model.title = ultimatePanel ? Component.translatable("hud.enhanced.ultimate_wanda.title")
+                : demiurgePanel ? Component.translatable("hud.enhanced.demiurge.title")
                 : cosmicPanel ? Component.translatable("hud.enhanced.cosmic_spider.title") : com.kolodkingal.enhanced.power.Characters.name(data);
         model.identity = power.getSerializedName() + "/" + look.displayName().getString();
         model.sneaking = false;
@@ -241,7 +255,12 @@ public class PowerHud implements LayeredDraw.Layer {
             model.rows.add(new PowerPanels.Row(BuildKeys.MAGIC.getTranslatedKeyMessage(),
                     panelSlot(Component.translatable(power.abilityKey(y)), status(player, data, y, now), data, y, now), null));
         }
-        if (demiurgePanel) {
+        if (ultimatePanel) {
+            model.notes.add(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
+                    .withStyle(s -> s.withColor(com.kolodkingal.enhanced.ability.UltimateWanda.GLOW))
+                    .append(Component.translatable("hud.enhanced.ultimate_wanda.menu", com.kolodkingal.enhanced.ability.UltimateWanda.menuName(data.ironCharge()))
+                            .withStyle(ChatFormatting.WHITE)));
+        } else if (demiurgePanel) {
             model.notes.add(Component.literal("[").append(KeyBindings.CHANGE_LOOK.getTranslatedKeyMessage()).append("] ")
                     .withStyle(s -> s.withColor(com.kolodkingal.enhanced.ability.Demiurge.AURA))
                     .append(Component.translatable("hud.enhanced.demiurge.magic", com.kolodkingal.enhanced.ability.Demiurge.typeName(
@@ -293,6 +312,18 @@ public class PowerHud implements LayeredDraw.Layer {
             }
         } else if (power == Power.BILLY && ability == 5 && com.kolodkingal.enhanced.ability.Demiurge.allowedHolder(player)) {
             return "ability.enhanced.billy.demiurge_ready.5";
+        }
+        // (3.19) Ultimate Wanda: her own R, V and B in her Ultimate menu; G says how to leave the Ultimate, a plain Scarlet Witch
+        // with Ultimate how to become her
+        if (com.kolodkingal.enhanced.ability.UltimateWanda.is(data)) {
+            if (com.kolodkingal.enhanced.ability.UltimateWanda.ultimateMenu(data) && (ability == 1 || ability == 3 || ability == 4)) {
+                return "ability.enhanced.scarlet_witch.ultimate." + ability;
+            }
+            if (ability == 2) {
+                return "ability.enhanced.scarlet_witch.ultimate.2";
+            }
+        } else if (power == Power.SCARLET_WITCH && ability == 2 && com.kolodkingal.enhanced.ability.UltimateWanda.allowedHolder(player)) {
+            return "ability.enhanced.scarlet_witch.ultimate_ready.2";
         }
         if ((ability == 1 || ability == 5) && com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
             return "ability.enhanced.vision.solar." + ability;

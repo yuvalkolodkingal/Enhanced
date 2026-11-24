@@ -208,6 +208,8 @@ public final class GestureRoutes {
             case REDWING_OUT -> power == Power.FALCON && on ? GestureId.FALCON_REDWING_LAUNCH : null;
             // (3.18) Cosmic Spider-Man switches his cosmic look: the look change's flourish, either way
             case COSMIC_UNIVERSE -> power == Power.SPIDER_MAN ? GestureId.LOOK_CHANGE : null;
+            // (3.19) Ultimate Wanda switches her hair: the look change's flourish, either way
+            case WANDA_COMICS_HAIR -> power == Power.SCARLET_WITCH ? GestureId.LOOK_CHANGE : null;
         };
     }
 
@@ -670,6 +672,8 @@ public final class GestureRoutes {
             case SPIDER_COSMIC -> null;
             // (3.18.1) Billy the Demiurge
             case BILLY_DEMIURGE -> "drawn, not acted: the Demiurge's two looks (SuitSkins, DemiurgeFx), his cloth cloak (DemiurgeCloakLayer) and crown (BillyCrownLayer)";
+            // (3.19) Ultimate Wanda
+            case WANDA_ULTIMATE -> "drawn, not acted: the Sorceress Supreme's look (SuitSkins), her red sky (UniverseTakeoverClient)";
         };
     }
 

@@ -484,7 +484,8 @@ public final class HexManager {
      */
     public static Verdict judge(Hex hex, LivingEntity entity, boolean leaving) {
         if (entity instanceof Player player) {
-            if (player.isCreative() || player.isSpectator() || player.getUUID().equals(hex.owner())) {
+            if (player.isCreative() || player.isSpectator() || player.getUUID().equals(hex.owner())
+                    || com.kolodkingal.enhanced.ability.UltimateWanda.is(player)) { // (3.19: every Hex lets Ultimate Wanda through)
                 return Verdict.PASS;
             }
             if (leaving && Powers.is(player, Power.VISION)) {
