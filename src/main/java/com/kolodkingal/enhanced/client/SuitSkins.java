@@ -103,8 +103,14 @@ public final class SuitSkins {
         if (power == Power.MAGNETO && MagnetoAbilities.wearsHelmet(player)) {
             return MAGNETO;
         }
-        if (power == Power.SCARLET_WITCH && WandaAbilities.wearsCrown(player)) {
-            return SCARLET_WITCH;
+        if (power == Power.SCARLET_WITCH) {
+            // Her crown puts the suit on: the look she chose (her own suit, or the Sorceress Supreme's). Without it she is
+            // herself, in her own skin.
+            if (!WandaAbilities.wearsCrown(player)) {
+                return null;
+            }
+            Variant chosen = Powers.variant(player);
+            return chosen.skin() == null || "suit".equals(chosen.id()) ? SCARLET_WITCH : skinOf(chosen);
         }
         if (power == Power.QUICKSILVER && QuicksilverAbilities.wearsGoggles(player)) {
             return QUICKSILVER;

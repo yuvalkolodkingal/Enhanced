@@ -506,6 +506,9 @@ public final class ClientSetup {
                 // (3.18.1) Billy the Demiurge's red cloak, scarf and hood: cloth, drawn for him only
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.DemiurgeCloakLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.DemiurgeGlowLayer(renderer));
+                // The Scarlet Witch as the Sorceress Supreme: the Cloak of Levitation at her waist, her tiara and sigils of light
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.SorcererCloakLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.SorcererGlowLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.EyeAmuletLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.AstralLayer(renderer));
                 // ===== hulk (3.6) =====

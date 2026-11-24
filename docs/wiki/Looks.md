@@ -2,7 +2,7 @@
 
 A **look** is one of a hero's outfits. Each look has its own skin, its own cape (a few have none) and its own colour for the hero's energy and magic. The abilities are the same in every look: a look changes how a hero appears, not what the hero can do. (The exceptions are Spider-Man, whose suits also differ in protection, and only the Iron Spider has his legs; and since 3.6 the Hulk, whose Bruce Banner has no powers and whose Brand New Day Hulk is bigger and hits harder.)
 
-Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, since 3.6 Doctor Strange and the Hulk, since 3.7 Wolverine and Deadpool, and since 3.8 Captain America, Red Hulk, Falcon and Love have several looks (Iron Man's look is his suit: for him **H** is the suit key, see [Iron Man](Iron-Man#h-suiting-up)). A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto, the Scarlet Witch and Quicksilver have one suit each, which they put on with their helmet, crown or goggles.
+Vision, Tommy, Billy, Loki, Thor, the Phoenix, Spider-Man, Thanos, Ultron, Apocalypse, Agatha, Cyclops, Professor X, since 3.5 Heimdall, Odin and Hela, since 3.6 Doctor Strange and the Hulk, since 3.7 Wolverine and Deadpool, and since 3.8 Captain America, Red Hulk, Falcon and Love have several looks (Iron Man's look is his suit: for him **H** is the suit key, see [Iron Man](Iron-Man#h-suiting-up)). A custom hero wears the look you give it in the [Hero Creator](Hero-Creator#8-looks): your own skin, any look of any hero, or a skin file of your own, and since 3.4 a cape, a hat, a mask, glowing eyes and an aura on top (a plain cape in any colour or a hero's cape, a witch's hat or a hero's helmet or crown, Cyclops's visor or a mask, eyes that glow, crackle or burn, an aura of energy, flames, sand, sparks or mist). Magneto and Quicksilver have one suit each, which they put on with their helmet or goggles. The Scarlet Witch puts hers on with her crown too, and chooses which with **H**: her own suit or the Sorceress Supreme's.
 
 ![All the heroes in one roster](images/000-enhanced-heroes-roster.png)
 
@@ -24,6 +24,16 @@ Every look list of the newer heroes ends with **Your own skin**: the hero's powe
 ![Billy, second look](images/021-billy-look-2.png)
 
 ![Billy, third look](images/022-billy-look-3.png)
+
+### Scarlet Witch ([page](Scarlet-Witch))
+
+| Look | Id | What it is |
+|---|---|---|
+| **Scarlet Witch** (default) | `suit` | Her own suit, with its crown and red cape. |
+| **Sorceress Supreme** | `sorcerer_supreme` | The costume of *Sorcerer Supreme* (2025): a periwinkle top over the shoulders with red at the throat, a black and plum bodysuit, the Eye of Agamotto on her chest between two moons of light, dark sleeves that turn red at the hands, red blades on the hips and plum boots with gold heels. Her tiara is red chaos energy, not metal, and glows in the dark; a rune of the same energy lights on the back of each hand while she uses her magic. The Cloak of Levitation is folded at her waist: a scarlet train with a wide gold border that floats behind her, and the collar's two points at her hips. Her face and ginger hair are those of her own suit, with green eyes. |
+| **Sorceress Supreme (dark hair)** | `sorcerer_supreme_dark` | The same, with the comic's dark auburn hair. |
+
+All three are worn only while her crown is on (without it she is herself, in her own skin). As the Sorceress Supreme her cloak moves by itself: at rest it hangs round her hips and trails behind her; while she flies or uses a power it grows a third longer and fans out, its edges lifting like wings, with a burst of chaos magic as it spreads, and rings of red energy turn at her hands.
 
 ### Vision ([page](Vision))
 

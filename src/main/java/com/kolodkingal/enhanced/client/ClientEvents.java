@@ -124,6 +124,7 @@ public final class ClientEvents {
         TheNoise.tick(mc);
         HeroClients.tick(mc);
         com.kolodkingal.enhanced.client.render.DemiurgeFx.tick(mc.level); // (3.18.1: Billy the Demiurge's two looks)
+        com.kolodkingal.enhanced.client.render.SorcererFx.tick(mc.level); // (the Sorceress Supreme's cloak, at rest and spread)
     }
 
     /** The game's own music waits while a speedster's Walkman song plays, and for its usual pause after the song ends. */
@@ -155,6 +156,7 @@ public final class ClientEvents {
         TheNoise.stop();
         BillyCrownLayer.clear();
         com.kolodkingal.enhanced.client.render.DemiurgeFx.clear(); // (3.18.1)
+        com.kolodkingal.enhanced.client.render.SorcererFx.clear();
         WorldEffectsRenderer.clearHexBolts();
         WorldEffectsRenderer.clearHexes();
         WorldEffectsRenderer.clearShields();
