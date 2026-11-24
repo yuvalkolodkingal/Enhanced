@@ -24,7 +24,7 @@ public final class ModNetwork {
      * hero: one more message and a flag of the power data), and once for 3.19 (the multiverse: the Multiverse screen and
      * its choice).
      */
-    public static final String PROTOCOL_VERSION = "20";
+    public static final String PROTOCOL_VERSION = "22";
     /**
      * 3.5: the version of the world's music messages, which have a channel of their own: optional, so a client without them
      * (an older version of the mod) plays with the server all the same and simply hears the built-in music; the server only
@@ -123,6 +123,8 @@ public final class ModNetwork {
         // 3.19 (the multiverse): protocol 20. The Multiverse screen and its choice.
         registrar.clientbound(UniverseScreenPayload.TYPE, UniverseScreenPayload.STREAM_CODEC, UniverseScreenPayload::handle);
         registrar.serverbound(UniverseChoicePayload.TYPE, UniverseChoicePayload.STREAM_CODEC, UniverseChoicePayload::handle);
+        registrar.serverbound(UniverseNamePayload.TYPE, UniverseNamePayload.STREAM_CODEC, UniverseNamePayload::handle);
+        registrar.clientbound(HydraSkyPayload.TYPE, HydraSkyPayload.STREAM_CODEC, HydraSkyPayload::handle);
         registrar.clientbound(StoneFxPayload.TYPE, StoneFxPayload.STREAM_CODEC, StoneFxPayload::handle);
         registrar.clientbound(StrangeFxPayload.TYPE, StrangeFxPayload.STREAM_CODEC, StrangeFxPayload::handle);
         registrar.serverbound(SlingRingActionPayload.TYPE, SlingRingActionPayload.STREAM_CODEC,

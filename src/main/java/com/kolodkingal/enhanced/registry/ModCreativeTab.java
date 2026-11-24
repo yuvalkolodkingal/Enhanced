@@ -34,6 +34,8 @@ public final class ModCreativeTab {
                         output.accept(ModItems.BOOK_OF_THE_VISHANTI.get());
                         output.accept(ModItems.DARKHOLD.get());
                         output.accept(ModItems.MULTIVERSE_BRIDGE.get());
+        output.accept(ModItems.RED_SKULL_SERUM.get());
+        output.accept(ModItems.KOBIK_SHARD.get());
                         output.accept(ModItems.BOOK_OF_ETHEREAL_WITCHCRAFT.get());
                         output.accept(ModItems.BOOK_OF_ELDRITCH_WITCHCRAFT.get());
                         output.accept(ModItems.BOOK_OF_GREEN_WITCHCRAFT.get());

@@ -375,7 +375,7 @@ public final class SpaceRealms {
 
     /** The first safe floor between the Nether's heights within {@code radius} of {@code around}. */
     @Nullable
-    static Vec3 floorNear(ServerLevel level, Entity traveller, BlockPos around, int radius) {
+    public static Vec3 floorNear(ServerLevel level, Entity traveller, BlockPos around, int radius) {
         for (BlockPos column : spiral(around, radius)) {
             level.getChunk(column.getX() >> 4, column.getZ() >> 4);
             BlockPos.MutableBlockPos feet = new BlockPos.MutableBlockPos(column.getX(), NETHER_MAX_Y, column.getZ());

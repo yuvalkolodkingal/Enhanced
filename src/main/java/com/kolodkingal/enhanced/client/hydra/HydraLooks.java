@@ -34,6 +34,9 @@ public final class HydraLooks {
 
     /** The skin of a soldier. */
     public static ResourceLocation skin(HydraSoldierEntity soldier) {
+        if (soldier instanceof com.kolodkingal.enhanced.hydra.HydraBossEntity boss) {
+            return Enhanced.id("textures/entity/suit/" + (boss.isRedSkull() ? "red_skull" : "captain_hydra") + ".png");
+        }
         String name = soldier.isOfficer() ? "officer_" + Math.floorMod(soldier.variant(), 2)
                 : soldier.rank().id() + "_" + Math.floorMod(soldier.variant(), soldier.rank().skins());
         return Enhanced.id("textures/entity/hydra/" + name + ".png");
@@ -48,6 +51,9 @@ public final class HydraLooks {
     /** The pieces he wears (without the eyes). */
     public static Set<String> pieces(HydraSoldierEntity soldier) {
         List<String> out = new ArrayList<>();
+        if (soldier instanceof com.kolodkingal.enhanced.hydra.HydraBossEntity boss) {
+            return boss.isRedSkull() ? Set.of("belt", "pistol", "pistol_cell") : Set.of("belt", "shield");
+        }
         if (soldier.isOfficer()) {
             out.addAll(HEADSET);
             out.add("belt");

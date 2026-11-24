@@ -19,7 +19,19 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.levelgen.blending.Blender;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +45,9 @@ import java.util.Objects;
  *     <li>in 2149 every village is an abandoned village ({@code enhanced:abandoned_village_*}, the game's zombie
  *     villages alone).</li>
  * </ul>
+ * In the random universes (3.19.1) each cell's {@link UniverseRecipe} turns the biomes into others as they are made
+ * ({@link #createBiomes}), and swaps the stone, the ground and the seas just before the land is decorated
+ * ({@link #applyBiomeDecoration}), so that the trees, ores and structures stand on the new land as they are.
  */
 public class UniverseChunkGenerator extends NoiseBasedChunkGenerator {
     public static final MapCodec<UniverseChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -59,7 +74,7 @@ public class UniverseChunkGenerator extends NoiseBasedChunkGenerator {
         this.universe = universe;
     }
 
-    /** The universe's number (10005, 2149; 0 for What If, whose cells each have their own). */
+    /** The universe's number (10005, 2149, Gamma; 0 for the random universes, whose cells each have their own). */
     public int universe() {
         return universe;
     }
@@ -67,6 +82,75 @@ public class UniverseChunkGenerator extends NoiseBasedChunkGenerator {
     @Override
     protected MapCodec<? extends ChunkGenerator> codec() {
         return CODEC;
+    }
+
+    /** The recipe of the cell a chunk is in, or null outside the random universes. */
+    @Nullable
+    private UniverseRecipe recipe(ChunkAccess chunk) {
+        if (universe != 0) {
+            return null;
+        }
+        int x = chunk.getPos().getMiddleBlockX();
+        int z = chunk.getPos().getMiddleBlockZ();
+        return UniverseRecipe.of(Multiverse.numberOfCell(Multiverse.cellOf((double) x), Multiverse.cellOf((double) z)));
+    }
+
+    @Override
+    public CompletableFuture<ChunkAccess> createBiomes(RandomState randomState, Blender blender, StructureManager structureManager,
+                                                       ChunkAccess chunk) {
+        UniverseRecipe recipe = recipe(chunk);
+        CompletableFuture<ChunkAccess> made = super.createBiomes(randomState, blender, structureManager, chunk);
+        if (recipe == null || !recipe.swapsBiomes()) {
+            return made;
+        }
+        Set<Holder<Biome>> possible = getBiomeSource().possibleBiomes();
+        return made.thenApply(done -> {
+            // (The chunk's own getNoiseBiome refuses before its status says it has biomes: read the sections.)
+            done.fillBiomesFromNoise((qx, qy, qz, sampler) -> recipe.biome(done.getSection(done.getSectionIndex(qy << 2))
+                    .getNoiseBiome(qx & 3, qy & 3, qz & 3), possible), randomState.sampler());
+            return done;
+        });
+    }
+
+    @Override
+    public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager) {
+        UniverseRecipe recipe = recipe(chunk);
+        if (recipe != null && recipe.swapsBlocks()) {
+            swap(chunk, recipe);
+        }
+        super.applyBiomeDecoration(level, chunk, structureManager);
+    }
+
+    /** The cell's stone, ground and seas, in place of the game's, written straight into the chunk's sections. */
+    static void swap(ChunkAccess chunk, UniverseRecipe recipe) {
+        BlockState stone = recipe.stone();
+        BlockState ground = recipe.ground();
+        BlockState sea = recipe.sea();
+        BlockState water = Blocks.WATER.defaultBlockState();
+        for (LevelChunkSection section : chunk.getSections()) {
+            if (section.hasOnlyAir() || !section.maybeHas(state -> stone != null && (state.is(Blocks.STONE) || state.is(Blocks.DEEPSLATE))
+                    || ground != null && state.is(Blocks.GRASS_BLOCK) || sea != null && state == water)) {
+                continue;
+            }
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
+                        BlockState state = section.getBlockState(x, y, z);
+                        BlockState to = null;
+                        if (stone != null && (state.is(Blocks.STONE) || state.is(Blocks.DEEPSLATE))) {
+                            to = stone;
+                        } else if (ground != null && state.is(Blocks.GRASS_BLOCK)) {
+                            to = ground;
+                        } else if (sea != null && state == water) {
+                            to = sea;
+                        }
+                        if (to != null) {
+                            section.setBlockState(x, y, z, to, false);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

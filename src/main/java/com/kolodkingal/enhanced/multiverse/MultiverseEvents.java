@@ -17,15 +17,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.core.Holder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -33,22 +30,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.Heightmap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * The life of the universes (3.19): the dead of 2149 (and of the What If universes where the dead rose), the twists of
- * the What If universes on their players, the stones in the chests, the bridge's ring and energy, and the name of each
- * universe said to whoever comes into it.
+ * The life of the universes (3.19): the dead of 2149, the creatures of the random universes that come as other kinds,
+ * the series' What Ifs (the Gamma Bomb's, Hydra's city, Ultron's dead world), the stones in the chests, the bridge's ring
+ * and energy, and the name of each universe said to whoever comes into it.
  */
 @Subscriber
 public final class MultiverseEvents {
-    /** How many zombies walk round a player in 2149 (about four times a normal night), in a What If universe of the dead, and in the Darkhold's. */
+    /** How many zombies walk round a player in 2149 (about four times a normal night). */
     static final int ZOMBIE_CAP = 28;
-    static final int WHAT_IF_ZOMBIE_CAP = 14;
-    static final int DARKHOLD_ZOMBIE_CAP = 8;
     /** How near a player (blocks) the dead are counted, and where new ones rise (between the two). */
     static final int COUNT_RANGE = 56;
     static final int RISE_MIN = 24;
@@ -67,15 +63,7 @@ public final class MultiverseEvents {
 
     /** How many zombies the place keeps round a player (0: none of its own). */
     static int zombieCap(Level level, BlockPos pos) {
-        int universe = Multiverse.universeAt(level, pos);
-        if (universe == Multiverse.ZOMBIES) {
-            return ZOMBIE_CAP;
-        }
-        if (level.dimension() == Multiverse.WHAT_IF_KEY) {
-            WhatIf twist = WhatIf.of(universe);
-            return twist == WhatIf.ZOMBIES ? WHAT_IF_ZOMBIE_CAP : twist == WhatIf.DARKHOLD ? DARKHOLD_ZOMBIE_CAP : 0;
-        }
-        return 0;
+        return Multiverse.universeAt(level, pos) == Multiverse.ZOMBIES ? ZOMBIE_CAP : 0;
     }
 
     @Subscribe
@@ -102,8 +90,12 @@ public final class MultiverseEvents {
         if (player.tickCount % 100 == 0) {
             UniverseTravel.remember(player);
         }
-        if (level.dimension() == Multiverse.WHAT_IF_KEY) {
-            twist(player, WhatIf.of(universe));
+        if (level.dimension() == Multiverse.GAMMA_KEY) {
+            GammaWorld.tick(player);
+        } else if (level.dimension() == Multiverse.HYDRA_KEY) {
+            HydraCity.tick(player);
+        } else if (level.dimension() == Multiverse.ULTRON_KEY) {
+            UltronWorld.tick(player);
         }
         if (player.tickCount % 40 == 0 && !player.isSpectator()) {
             int cap = zombieCap(level, pos);
@@ -111,32 +103,6 @@ public final class MultiverseEvents {
                 raiseTheDead(level, player, cap);
             }
         }
-    }
-
-    /** The twist of a What If universe on a player in it. */
-    static void twist(ServerPlayer player, WhatIf twist) {
-        switch (twist) {
-            case GRAVITY -> {
-                effect(player, MobEffects.JUMP, 2);
-                effect(player, MobEffects.SLOW_FALLING, 0);
-            }
-            case SPEED -> effect(player, MobEffects.MOVEMENT_SPEED, 2);
-            case GAMMA -> {
-                effect(player, MobEffects.DAMAGE_BOOST, 0);
-                effect(player, MobEffects.DIG_SPEED, 1);
-            }
-            case DARKHOLD -> {
-                if (player.getRandom().nextInt(30) == 0) {
-                    player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 160, 0, true, false, true));
-                }
-            }
-            default -> {
-            }
-        }
-    }
-
-    private static void effect(ServerPlayer player, Holder<MobEffect> effect, int amplifier) {
-        player.addEffect(new MobEffectInstance(effect, 70, amplifier, true, false, true));
     }
 
     /** New zombies rise round the player, by day as by night, until there are as many as the place keeps. */
@@ -192,9 +158,68 @@ public final class MultiverseEvents {
         if (entity instanceof Zombie zombie && zombieCap(level, entity.blockPosition()) > 0) {
             helmet(zombie);
         }
-        if (!event.loadedFromDisk() && entity instanceof Enemy && level.dimension() == Multiverse.WHAT_IF_KEY
-                && WhatIf.of(Multiverse.universeAt(level, entity.blockPosition())) == WhatIf.PEACE) {
+        if (Multiverse.isRandomDimension(level.dimension())) {
+            if (!event.loadedFromDisk() && entity instanceof Mob mob && level instanceof ServerLevel server && swap(server, mob)) {
+                event.setCanceled(true);
+            }
+        } else if (level.dimension() == Multiverse.GAMMA_KEY) {
+            GammaWorld.hulkify(entity);
+        } else if (level.dimension() == Multiverse.HYDRA_KEY) {
+            if (HydraCity.onJoin(entity, event.loadedFromDisk())) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    /** A creature that comes to be in a random universe as another kind ({@link UniverseRecipe#creature}), made next tick. */
+    private record Swap(ServerLevel level, EntityType<?> type, double x, double y, double z, float yaw) {
+    }
+
+    private static final List<Swap> SWAPS = new ArrayList<>();
+    /** The tag of a creature that already came as the kind its universe wanted (it is never swapped again). */
+    static final String SWAPPED = "enhanced_swapped";
+
+    /** Whether the new creature comes as another kind here: it is not added, and the other kind is made in its place. */
+    static boolean swap(ServerLevel level, Mob mob) {
+        if (mob.getTags().contains(SWAPPED) || mob.isPersistenceRequired() || mob.isPassenger() || mob.isVehicle()) {
+            return false;
+        }
+        EntityType<?> to = UniverseRecipe.of(Multiverse.universeAt(level, mob.blockPosition())).creature(mob.getType());
+        if (to == mob.getType() || SWAPS.size() >= 64) {
+            return false;
+        }
+        SWAPS.add(new Swap(level, to, mob.getX(), mob.getY(), mob.getZ(), mob.getYRot()));
+        return true;
+    }
+
+    private static void makeSwaps() {
+        if (SWAPS.isEmpty()) {
+            return;
+        }
+        List<Swap> now = new ArrayList<>(SWAPS);
+        SWAPS.clear();
+        for (Swap swap : now) {
+            BlockPos at = BlockPos.containing(swap.x(), swap.y(), swap.z());
+            if (!swap.level().isLoaded(at)) {
+                continue;
+            }
+            Entity made = swap.type().create(swap.level());
+            if (!(made instanceof Mob mob)) {
+                continue;
+            }
+            mob.moveTo(swap.x(), swap.y(), swap.z(), swap.yaw(), 0.0F);
+            mob.addTag(SWAPPED);
+            mob.finalizeSpawn(swap.level(), swap.level().getCurrentDifficultyAt(at), MobSpawnType.NATURAL, null);
+            swap.level().addFreshEntity(mob);
+        }
+    }
+
+    @Subscribe
+    public static void onInteractEntity(PlayerInteractEvent.EntityInteract event) {
+        if (event.getEntity() instanceof ServerPlayer player && player.level().dimension() == Multiverse.HYDRA_KEY
+                && HydraCity.talk(player, event.getTarget())) {
             event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.SUCCESS);
         }
     }
 
@@ -224,11 +249,16 @@ public final class MultiverseEvents {
     @Subscribe
     public static void onServerTick(ServerTickEvent.Post event) {
         MultiverseBridge.serverTick(event.getServer());
+        makeSwaps();
+        HydraCity.serverTick(event.getServer());
     }
 
     @Subscribe
     public static void onServerStopped(ServerStoppedEvent event) {
         MultiverseBridge.clear();
         TOLD.clear();
+        SWAPS.clear();
+        HydraCity.clear();
+        UltronWorld.clear();
     }
 }

@@ -179,6 +179,10 @@ public final class Variants {
                         0x2A4BA0, 0xE8EEF5),
                 new Variant("stealth", Power.CAPTAIN_AMERICA, Variant.suit("captain_america_stealth"), null, false,
                         0x4A5C80, 0xE8EEF5),
+                // (3.19.1) The two who rule What If... Hydra Won?, earned by beating them: characters of their own.
+                new Variant("red_skull", Power.CAPTAIN_AMERICA, Variant.suit("red_skull"), null, false, 0xB3201A, 0x3FA9FF),
+                new Variant("captain_hydra", Power.CAPTAIN_AMERICA, Variant.suit("captain_hydra"), null, false, 0x22222C,
+                        0xC8102E),
                 own(Power.CAPTAIN_AMERICA));
         // ===== red_hulk (3.8) =====
         // Red Hulk (drawn by the Hulk's renderer, lane L2's seam); Ross's own form is the player's skin with his suit.

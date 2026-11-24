@@ -384,6 +384,13 @@ public final class ModItems {
     public static final ItemEntry<com.kolodkingal.enhanced.mind.SourceCodeItem> SOURCE_CODE = ITEMS.register("source_code",
             () -> new com.kolodkingal.enhanced.mind.SourceCodeItem(new Item.Properties().stacksTo(1).fireResistant()
                     .rarity(Rarity.EPIC)));
+    // ===== what if... hydra won (3.19.1) =====
+    /** Red Skull's drop: Schmidt's serum makes the user Red Skull. */
+    public static final ItemEntry<com.kolodkingal.enhanced.hydra.HydraRulerItem> RED_SKULL_SERUM = ITEMS.register("red_skull_serum",
+            () -> new com.kolodkingal.enhanced.hydra.HydraRulerItem("red_skull", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
+    /** Captain Hydra's drop: a shard of Kobik makes the user Captain Hydra. */
+    public static final ItemEntry<com.kolodkingal.enhanced.hydra.HydraRulerItem> KOBIK_SHARD = ITEMS.register("kobik_shard",
+            () -> new com.kolodkingal.enhanced.hydra.HydraRulerItem("captain_hydra", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
     /** The cinema's popcorn. */
     public static final ItemEntry<Item> POPCORN = ITEMS.register("popcorn", () -> new Item(new Item.Properties()
             .food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(3).saturationModifier(0.3F).fast().build())));

@@ -143,6 +143,8 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
     private Vec3 wanderTo = Vec3.ZERO;
     /** The drone's life, in ticks left (the hero's drones only; the boss's Sentries have none). */
     private int lifetime = -1;
+    /** (3.19.1) A Sentry of the fleets of What If... Ultron Won?: no fight, it hunts any player near it. */
+    private boolean wild;
     /** The creature the master told his drones to attack, or null. */
     @Nullable
     private UUID ordered;
@@ -633,6 +635,10 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
     /** The boss's Sentry: hunt the nearest fighter, shoot it from a distance and punch it close. */
     private void tickHostile() {
         UltronFight fight = fight();
+        if (fight == null && wild) {
+            tickWild();
+            return;
+        }
         if (fight == null) {
             discard(); // its fight is gone: nothing keeps a Sentry of a fight that does not exist
             return;
@@ -662,6 +668,71 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         getLookControl().setLookAt(target, 30.0F, 30.0F);
         double distance = distanceTo(target);
         approach(fight, target, distance);
+        if (shotCooldown > 0) {
+            shotCooldown--;
+        }
+        if (punchCooldown > 0) {
+            punchCooldown--;
+        }
+        if (distance <= PUNCH_RANGE && punchCooldown <= 0) {
+            punchTell = PUNCH_TELL;
+            punchAim = target.position().add(0, target.getBbHeight() * 0.5, 0);
+            beginTell(Act.PUNCH);
+        } else if (distance >= SHOT_MIN && distance <= SHOT_MAX && shotCooldown <= 0 && hasLineOfSight(target)) {
+            shotTell = SHOT_TELL;
+            aim = leadPoint(target, distance);
+            beginTell(Act.SHOT);
+        }
+    }
+
+    /** Whether it is a Sentry of Ultron's fleets (What If... Ultron Won?), which belongs to no fight. */
+    public boolean isWild() {
+        return wild;
+    }
+
+    public void setWild(boolean wild) {
+        this.wild = wild;
+    }
+
+    /** How far a wild Sentry sees a player, and how far from every player it is taken away. */
+    public static final double WILD_SIGHT = 40.0;
+    public static final double WILD_GONE = 112.0;
+
+    /**
+     * A wild Sentry: it hunts the nearest player in sight (not in Creative or Spectator), with the army's shot and punch;
+     * with nobody to hunt it drifts with its fleet. Far from every player it is gone (the fleets come again near them).
+     */
+    private void tickWild() {
+        if (tickCount % 40 == 0 && level().getNearestPlayer(this, WILD_GONE) == null) {
+            discard();
+            return;
+        }
+        if (retarget-- <= 0 || getTarget() == null || !getTarget().isAlive()
+                || getTarget() instanceof Player p && (p.isCreative() || p.isSpectator())) {
+            retarget = 20;
+            Player near = level().getNearestPlayer(getX(), getY(), getZ(), WILD_SIGHT,
+                    e -> e instanceof Player q && !q.isCreative() && !q.isSpectator() && q.isAlive());
+            setTarget(near);
+        }
+        LivingEntity target = getTarget();
+        if (shotTell > 0 || punchTell > 0) {
+            tell(target);
+            return;
+        }
+        if (target == null) {
+            setEyes(Eyes.BLUE);
+            setAct(Act.IDLE);
+            double groundY = UltronMotion.groundBelow(level(), getX(), getY() + 0.1, getZ());
+            Vec3 drift = new Vec3(Math.cos(getId() * 0.7 + tickCount * 0.01), 0, Math.sin(getId() * 0.7 + tickCount * 0.01));
+            Vec3 toward = new Vec3(drift.x, groundY + 12.0 - getY(), drift.z);
+            UltronMotion.steer(this, toward.normalize().scale(speed() * 0.35), 0.05);
+            return;
+        }
+        setEyes(Eyes.RED);
+        setAct(Act.IDLE);
+        getLookControl().setLookAt(target, 30.0F, 30.0F);
+        double distance = distanceTo(target);
+        approach(null, target, distance);
         if (shotCooldown > 0) {
             shotCooldown--;
         }
@@ -804,7 +875,7 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
     }
 
     /** Hovering about the target: a ring of its own angle if others are near it, and the right distance from it. */
-    private void approach(UltronFight fight, LivingEntity target, double distance) {
+    private void approach(@Nullable UltronFight fight, LivingEntity target, double distance) {
         List<UltronSentryEntity> crowd = level().getEntitiesOfClass(UltronSentryEntity.class, target.getBoundingBox().inflate(8.0),
                 s -> s.getOwnerUUID() == null && s.getTarget() == target && !s.isRemoved());
         crowd.sort(Comparator.comparingInt(Entity::getId));
@@ -820,6 +891,10 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         }
         Vec3 toward = new Vec3(spot.x - getX(), y - getY(), spot.z - getZ());
         Vec3 wanted = toward.lengthSqr() < 0.04 ? Vec3.ZERO : toward.normalize().scale(Math.min(speed(), toward.length() * 0.2 + 0.05));
+        if (fight == null) {
+            UltronMotion.steer(this, wanted, 0.06);
+            return;
+        }
         Vec3 centre = fight.arena().center();
         double limit = fight.armyReach(fight.arena().containRadius() - 1.0);
         UltronMotion.steer(this, UltronMotion.keepInDisc(position(), wanted, centre, limit), 0.06);
@@ -844,6 +919,9 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         }
         tag.putInt("Lifetime", lifetime);
         tag.putBoolean("Hacked", isHacked());
+        if (wild) {
+            tag.putBoolean("Wild", true);
+        }
     }
 
     @Override
@@ -852,5 +930,6 @@ public class UltronSentryEntity extends PathfinderMob implements OwnableEntity, 
         setOwner(tag.hasUUID("Owner") ? tag.getUUID("Owner") : null);
         lifetime = tag.contains("Lifetime") ? tag.getInt("Lifetime") : -1;
         entityData.set(DATA_HACKED, tag.getBoolean("Hacked"));
+        wild = tag.getBoolean("Wild");
     }
 }

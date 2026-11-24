@@ -282,6 +282,8 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
         registrar.entityRenderer(ModEntities.HYDRA_OFFICER,
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
+        registrar.entityRenderer(ModEntities.HYDRA_BOSS,
+                com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
         registrar.entityRenderer(ModEntities.HYDRA_BOLT,
                 com.kolodkingal.enhanced.client.hydra.HydraBoltRenderer::new);
         // The renderers of 3.7, one region per lane (the skeleton's stand-ins until the lanes draw their own).

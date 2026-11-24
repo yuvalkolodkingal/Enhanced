@@ -16,13 +16,18 @@ import java.util.List;
 public final class Characters {
     public static final String SOURCE_CODE_VISION = "source_code_vision";
     public static final String NANO_ULTRON = "nano_ultron";
+    /** (3.19.1) Red Skull and Captain Hydra, made from Captain America's powers: what their bosses drop makes them. */
+    public static final String RED_SKULL = "red_skull";
+    public static final String CAPTAIN_HYDRA = "captain_hydra";
 
     private record Made(Power power, String id, List<String> looks) {
     }
 
     private static final List<Made> MADE = List.of(
             new Made(Power.VISION, SOURCE_CODE_VISION, List.of("source_code")),
-            new Made(Power.ULTRON, NANO_ULTRON, List.of("nano", "nano_human")));
+            new Made(Power.ULTRON, NANO_ULTRON, List.of("nano", "nano_human")),
+            new Made(Power.CAPTAIN_AMERICA, RED_SKULL, List.of("red_skull")),
+            new Made(Power.CAPTAIN_AMERICA, CAPTAIN_HYDRA, List.of("captain_hydra")));
 
     private Characters() {
     }

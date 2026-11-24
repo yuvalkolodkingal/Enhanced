@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -24,8 +25,12 @@ import java.util.Locale;
  *     <li><b>2149</b>, the zombie universe ({@code enhanced:universe_2149}): the same land as 616, overrun. Zombies with
  *     helmets walk by day and by night, four times as many as a normal night, and every village is abandoned;</li>
  *     <li><b>What If</b> universes ({@code enhanced:what_if}), as many as you like, as in the infinite dimensions of the
- *     game's April Fools update: one dimension cut into square cells {@link #CELL} blocks wide, each cell a universe of
- *     its own with its own number, its own land and its own twist ({@link WhatIf}). Any number or any words name one.</li>
+ *     game's April Fools update (20w14&infin;): four dimensions of four shapes of land (the Overworld's, amplified,
+ *     floating islands, caves), each cut into square cells {@link #CELL} blocks wide, each cell a universe of its own with
+ *     its own number. The number is a seed ({@link UniverseRecipe}): it picks the shape, the stone, the ground, the seas,
+ *     the biomes, the colour of the sky and the creatures. Any number or any words name one;</li>
+ *     <li>three <b>What If</b> universes of the series, each a world of its own: the Gamma Bomb went off
+ *     ({@link #GAMMA}), Hydra won ({@link #HYDRA}) and Ultron won ({@link #ULTRON}).</li>
  * </ul>
  * Outside 616 there are none of the mod's structures (so no Infinity Stone sites): the stones are found in chests
  * instead, one of each per universe ({@link UniverseStones}), and a stone works only in the universe it came from.
@@ -38,6 +43,19 @@ public final class Multiverse {
     public static final ResourceKey<Level> XMEN_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("universe_10005"));
     public static final ResourceKey<Level> ZOMBIES_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("universe_2149"));
     public static final ResourceKey<Level> WHAT_IF_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if"));
+    public static final ResourceKey<Level> AMPLIFIED_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_amplified"));
+    public static final ResourceKey<Level> ISLANDS_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_islands"));
+    public static final ResourceKey<Level> CAVES_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_caves"));
+    /** The four shapes of land of the random universes, in the order of {@link UniverseRecipe#shape()}. */
+    public static final List<ResourceKey<Level>> SHAPES = List.of(WHAT_IF_KEY, AMPLIFIED_KEY, ISLANDS_KEY, CAVES_KEY);
+
+    /** The three What If universes of the series (numbers no cell ever has). */
+    public static final int GAMMA = 8_000_001;
+    public static final int HYDRA = 8_000_002;
+    public static final int ULTRON = 8_000_003;
+    public static final ResourceKey<Level> GAMMA_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_gamma"));
+    public static final ResourceKey<Level> HYDRA_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_hydra"));
+    public static final ResourceKey<Level> ULTRON_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_ultron"));
 
     /** The width of one What If universe (blocks). */
     public static final int CELL = 100_000;
@@ -56,9 +74,20 @@ public final class Multiverse {
 
     // ---- which universe ----
 
-    /** Whether the dimension is one of the multiverse's own (10005, 2149, What If). */
+    /** Whether the dimension is one of the multiverse's own (10005, 2149, the random ones, the series' three). */
     public static boolean isUniverseDimension(ResourceKey<Level> dimension) {
-        return dimension == XMEN_KEY || dimension == ZOMBIES_KEY || dimension == WHAT_IF_KEY;
+        return dimension == XMEN_KEY || dimension == ZOMBIES_KEY || isRandomDimension(dimension) || dimension == GAMMA_KEY
+                || dimension == HYDRA_KEY || dimension == ULTRON_KEY;
+    }
+
+    /** Whether the dimension is one of the four cut into the random universes' cells. */
+    public static boolean isRandomDimension(ResourceKey<Level> dimension) {
+        return SHAPES.contains(dimension);
+    }
+
+    /** Whether the universe is one of the series' three What Ifs (Gamma, Hydra, Ultron). */
+    public static boolean isThemed(int universe) {
+        return universe == GAMMA || universe == HYDRA || universe == ULTRON;
     }
 
     /** The universe of a place: the cell's number in What If, the dimension's otherwise (616 for every other one). */
@@ -73,7 +102,16 @@ public final class Multiverse {
         if (dimension == ZOMBIES_KEY) {
             return ZOMBIES;
         }
-        if (dimension == WHAT_IF_KEY) {
+        if (dimension == GAMMA_KEY) {
+            return GAMMA;
+        }
+        if (dimension == HYDRA_KEY) {
+            return HYDRA;
+        }
+        if (dimension == ULTRON_KEY) {
+            return ULTRON;
+        }
+        if (isRandomDimension(dimension)) {
             return numberOfCell(cellOf(x), cellOf(z));
         }
         return MAIN;
@@ -108,9 +146,9 @@ public final class Multiverse {
         return new BlockPos(cell[0] * CELL, 64, cell[1] * CELL);
     }
 
-    /** Whether the number is a What If universe (not one of the three with their own worlds). */
+    /** Whether the number is a random universe of the cells (not 616, 10005, 2149 or one of the series' What Ifs). */
     public static boolean isWhatIf(int universe) {
-        return universe != MAIN && universe != XMEN && universe != ZOMBIES;
+        return universe != MAIN && universe != XMEN && universe != ZOMBIES && !isThemed(universe);
     }
 
     /**
@@ -156,16 +194,28 @@ public final class Multiverse {
         if (universe == ZOMBIES) {
             return server.getLevel(ZOMBIES_KEY);
         }
-        return server.getLevel(WHAT_IF_KEY);
+        if (universe == GAMMA) {
+            return server.getLevel(GAMMA_KEY);
+        }
+        if (universe == HYDRA) {
+            return server.getLevel(HYDRA_KEY);
+        }
+        if (universe == ULTRON) {
+            return server.getLevel(ULTRON_KEY);
+        }
+        return server.getLevel(SHAPES.get(UniverseRecipe.of(universe).shape()));
     }
 
-    /** The universe's name for players: "Earth-616 (the main universe)", "Earth-48213: What If... Zombies?!". */
+    /** The universe's name for players: "Earth-616 (the main universe)", "Earth-48213: What If... the World Were Made of Clay?". */
     public static Component name(int universe) {
         return switch (universe) {
             case MAIN -> Component.translatable("universe.enhanced.616");
             case XMEN -> Component.translatable("universe.enhanced.10005");
             case ZOMBIES -> Component.translatable("universe.enhanced.2149");
-            default -> Component.translatable("universe.enhanced.what_if", universe, WhatIf.of(universe).title());
+            case GAMMA -> Component.translatable("universe.enhanced.gamma");
+            case HYDRA -> Component.translatable("universe.enhanced.hydra");
+            case ULTRON -> Component.translatable("universe.enhanced.ultron");
+            default -> Component.translatable("universe.enhanced.what_if", universe, UniverseRecipe.of(universe).title());
         };
     }
 }
