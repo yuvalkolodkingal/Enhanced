@@ -459,6 +459,8 @@ public final class ClientSetup {
     }
 
     static void addLayers(ClientRegistrar.LayerContext layers) {
+        // (3.19.1) The zombies' rot and the Gamma Bomb's Hulk hide, over every creature of those universes.
+        com.kolodkingal.enhanced.client.world.WhatIfLooks.addLayers(layers);
         for (PlayerSkin.Model skin : layers.skins()) {
             if (layers.playerRenderer(skin) instanceof PlayerRenderer renderer) {
                 boolean slim = skin == PlayerSkin.Model.SLIM;

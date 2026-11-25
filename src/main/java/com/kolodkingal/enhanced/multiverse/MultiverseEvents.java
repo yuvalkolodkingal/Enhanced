@@ -97,6 +97,10 @@ public final class MultiverseEvents {
         } else if (level.dimension() == Multiverse.ULTRON_KEY) {
             UltronWorld.tick(player);
         }
+        WhatIfPeople.tick(player);
+        if (level.dimension() == Multiverse.ZOMBIES_KEY && !player.isSpectator()) {
+            ZombieWorld.tick(player);
+        }
         if (player.tickCount % 40 == 0 && !player.isSpectator()) {
             int cap = zombieCap(level, pos);
             if (cap > 0) {
@@ -158,6 +162,14 @@ public final class MultiverseEvents {
         if (entity instanceof Zombie zombie && zombieCap(level, entity.blockPosition()) > 0) {
             helmet(zombie);
         }
+        if (level.dimension() == Multiverse.ZOMBIES_KEY && entity instanceof Mob mob && level instanceof ServerLevel server) {
+            EntityType<?> zombie = ZombieWorld.onJoin(mob);
+            if (zombie != null && SWAPS.size() < 64) {
+                SWAPS.add(new Swap(server, zombie, mob.getX(), mob.getY(), mob.getZ(), mob.getYRot()));
+                event.setCanceled(true);
+                return;
+            }
+        }
         if (Multiverse.isRandomDimension(level.dimension())) {
             if (!event.loadedFromDisk() && entity instanceof Mob mob && level instanceof ServerLevel server && swap(server, mob)) {
                 event.setCanceled(true);
@@ -215,15 +227,6 @@ public final class MultiverseEvents {
     }
 
     @Subscribe
-    public static void onInteractEntity(PlayerInteractEvent.EntityInteract event) {
-        if (event.getEntity() instanceof ServerPlayer player && player.level().dimension() == Multiverse.HYDRA_KEY
-                && HydraCity.talk(player, event.getTarget())) {
-            event.setCanceled(true);
-            event.setCancellationResult(InteractionResult.SUCCESS);
-        }
-    }
-
-    @Subscribe
     public static void onUseBlock(PlayerInteractEvent.RightClickBlock event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
@@ -251,6 +254,7 @@ public final class MultiverseEvents {
         MultiverseBridge.serverTick(event.getServer());
         makeSwaps();
         HydraCity.serverTick(event.getServer());
+        WhatIfPeople.serverTick(event.getServer());
     }
 
     @Subscribe
