@@ -103,6 +103,12 @@ public interface ClientRegistrar {
 
         <T extends Entity, R extends EntityRenderer<T>> R renderer(EntityType<? extends T> type);
 
+        /**
+         * The renderer of any kind, the game's too, or null (3.19.1). {@link #renderer} is cast to the mod's own
+         * renderers from 1.21.4 on, so a vanilla kind's renderer is only reached through this.
+         */
+        Object anyRenderer(EntityType<?> type);
+
         EntityRendererProvider.Context context();
 
         default ModelPart bakeLayer(ModelLayerLocation layer) {
