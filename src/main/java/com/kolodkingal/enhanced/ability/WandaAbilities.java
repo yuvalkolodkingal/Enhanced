@@ -62,6 +62,11 @@ import java.util.function.Predicate;
 public final class WandaAbilities {
     public static final double SHIELD_RADIUS = 1.9;
 
+    /** The radius of this player's Chaos Shield: Ultimate Wanda's is {@link UltimateWanda#SHIELD_SCALE} times as big (3.19). */
+    public static double shieldRadius(Player player) {
+        return UltimateWanda.is(player) ? SHIELD_RADIUS * UltimateWanda.SHIELD_SCALE : SHIELD_RADIUS;
+    }
+
     private static final ResourceLocation CROWN_HEALTH = Enhanced.id("wanda_crown_health");
     private static final ResourceLocation CROWN_ARMOR = Enhanced.id("wanda_crown_armor");
     private static final ResourceLocation CROWN_TOUGHNESS = Enhanced.id("wanda_crown_toughness");
@@ -312,7 +317,7 @@ public final class WandaAbilities {
         if (worn) {
             ServerLevel level = player.serverLevel();
             level.sendParticles(new EnergyParticleOptions(glow(player), 1.2F), player.getX(), player.getY() + player.getBbHeight() * 0.5,
-                    player.getZ(), 24, SHIELD_RADIUS * 0.5, 0.7, SHIELD_RADIUS * 0.5, 0.05);
+                    player.getZ(), 24, shieldRadius(player) * 0.5, 0.7, shieldRadius(player) * 0.5, 0.05);
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.6F, 1.7F);
     }
@@ -331,7 +336,7 @@ public final class WandaAbilities {
         for (int i = 0; i < SHATTER_SHARDS; i++) {
             // Out from a random spot on the sphere, along the way out.
             Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
-            Vec3 at = center.add(out.scale(SHIELD_RADIUS));
+            Vec3 at = center.add(out.scale(shieldRadius(player)));
             level.sendParticles(shard, at.x, at.y, at.z, 0, out.x, out.y, out.z, 0.3);
             if (i % 2 == 0) {
                 level.sendParticles(new EnergyParticleOptions(i % 4 == 0
@@ -373,7 +378,7 @@ public final class WandaAbilities {
             RandomSource random = player.getRandom();
             for (int i = 0; i < 2; i++) {
                 Vec3 out = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
-                Vec3 at = center.add(out.scale(SHIELD_RADIUS * Math.max(0.3, grown)));
+                Vec3 at = center.add(out.scale(shieldRadius(player) * Math.max(0.3, grown)));
                 level.sendParticles(new EnergyParticleOptions(glow(player), 1.0F), at.x, at.y, at.z, 0, -out.x, -out.y, -out.z, 0.1);
             }
             return;
@@ -381,11 +386,11 @@ public final class WandaAbilities {
         if (now == data.shieldFormedAt()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.5F);
         }
-        for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(SHIELD_RADIUS + 4),
+        for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(shieldRadius(player) + 4),
                 p -> p.getOwner() != player && !isHeadingHome(p))) {
             Vec3 velocity = projectile.getDeltaMovement();
             Vec3 toPlayer = center.subtract(projectile.position());
-            double reach = SHIELD_RADIUS + 0.5 + velocity.length();
+            double reach = shieldRadius(player) + 0.5 + velocity.length();
             if (velocity.dot(toPlayer) > 0 && toPlayer.lengthSqr() < reach * reach) {
                 block(player, projectile);
                 if (!data.chaosShieldActive()) {
@@ -524,7 +529,7 @@ public final class WandaAbilities {
         Vec3 away = attacker.position().add(0, attacker.getBbHeight() * 0.5, 0).subtract(center);
         double distance = away.length();
         // The blow struck the sphere (or the attacker, if it is inside it): sparks and a ring of sound there.
-        Vec3 contact = distance < 1.0E-3 ? center : center.add(away.scale(Math.min(distance, SHIELD_RADIUS) / distance));
+        Vec3 contact = distance < 1.0E-3 ? center : center.add(away.scale(Math.min(distance, shieldRadius(player)) / distance));
         level.sendParticles(new EnergyParticleOptions(glow(player), 1.4F), contact.x, contact.y, contact.z, 8, 0.15, 0.15, 0.15, 0.1);
         level.sendParticles(new EnergyParticleOptions(color(player), 1.2F), contact.x, contact.y, contact.z, 10, 0.2, 0.2, 0.2, 0.15);
         level.playSound(null, contact.x, contact.y, contact.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F, 1.9F);
@@ -587,10 +592,10 @@ public final class WandaAbilities {
         Vec3 direction = path.scale(1.0 / length);
         ShieldStop nearest = null;
         double nearestAt = length;
-        AABB reach = new AABB(from, to).inflate(SHIELD_RADIUS + 1.0);
+        AABB reach = new AABB(from, to).inflate(SHIELD_RADIUS * UltimateWanda.SHIELD_SCALE + 1.0);
         for (Player wanda : level.getEntitiesOfClass(Player.class, reach, p -> p != firer && !p.isSpectator() && hasShieldUp(p))) {
             Vec3 fromCenter = from.subtract(wanda.getPosition(partialTick).add(0, wanda.getBbHeight() * 0.5, 0));
-            double outside = fromCenter.lengthSqr() - SHIELD_RADIUS * SHIELD_RADIUS;
+            double outside = fromCenter.lengthSqr() - shieldRadius(wanda) * shieldRadius(wanda);
             if (outside <= 0) {
                 continue;
             }

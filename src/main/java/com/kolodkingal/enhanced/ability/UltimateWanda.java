@@ -97,6 +97,8 @@ public final class UltimateWanda {
     public static final double TAKE_OVER_RANGE = 30.0;
     /** How long after her death her body comes back (a second). */
     public static final int REVIVE_TICKS = 20;
+    /** How many times as big her Chaos Shield is as the Scarlet Witch's (and the one over her body while her mind is away). */
+    public static final float SHIELD_SCALE = 1.9F;
     /** How long a hold of the runes lasts past their last touch (renewed every second while they burn). */
     private static final int DRAIN_TICKS = 60;
 
@@ -548,27 +550,16 @@ public final class UltimateWanda {
         }
     }
 
+    /** Whether this Ultimate Wanda's body wears her Chaos Shield because her mind is in another body (synced, for the client). */
+    public static boolean guarded(PowerData data) {
+        return is(data) && data.is(Live.MIND_LINKED);
+    }
+
     /** Whether her own body is guarded by the shield of red light (her mind is in another body). */
     public static boolean shielded(Player player) {
         return is(player) && MindLink.isLinked(player);
     }
 
-    /** The shield's light round her body (a few motes every four ticks). */
-    private static void shieldMotes(ServerPlayer player) {
-        if (player.tickCount % 4 != 0) {
-            return;
-        }
-        ServerLevel level = player.serverLevel();
-        EnergyParticleOptions mote = new EnergyParticleOptions(RED, 1.1F);
-        double t = player.tickCount * 0.15;
-        for (int i = 0; i < 10; i++) {
-            double a = t + i * Math.PI * 2.0 / 10.0;
-            double y = Math.sin(t * 0.7 + i) * 0.9;
-            double r = Math.sqrt(Math.max(0.0, 1.3 * 1.3 - y * y));
-            level.sendParticles(mote, player.getX() + Math.cos(a) * r, player.getY() + 1.0 + y, player.getZ() + Math.sin(a) * r,
-                    1, 0.0, 0.0, 0.0, 0.0);
-        }
-    }
 
     // ---- every tick ----
 
@@ -599,8 +590,7 @@ public final class UltimateWanda {
         }
         LAST_HEALTH.put(id, player.getHealth());
         if (MindLink.isLinked(player)) {
-            MindLink.tick(player);
-            shieldMotes(player);
+            MindLink.tick(player); // (her body wears her Chaos Shield meanwhile: drawn by the client, guarded())
         }
         if (data.toggle(Toggle.MIND_READING)) {
             MindReading.tick(player, data);

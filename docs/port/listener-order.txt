@@ -729,6 +729,8 @@ event net.neoforged.neoforge.client.event.RenderLevelStageEvent -> com.kolodking
     NORMAL - com.kolodkingal.enhanced.client.ThoughtBubbles#onRenderLevel
     NORMAL - com.kolodkingal.enhanced.client.render.DemiurgeFx#onRenderLevel
     NORMAL - com.kolodkingal.enhanced.client.render.SorcererFx#onRenderLevel
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onRenderLevel
+    NORMAL - com.kolodkingal.enhanced.client.render.UltimateShieldFx#onRenderLevel
 event net.neoforged.neoforge.client.event.RenderNameTagEvent -> com.kolodkingal.enhanced.platform.event.client.RenderNameTagEvent
     NORMAL - com.kolodkingal.enhanced.client.Shapeshifts#onRenderNameTag
 event net.neoforged.neoforge.client.event.RenderPlayerEvent$Post -> com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent$Post

@@ -53,6 +53,12 @@ public final class ShieldStyles {
      */
     @Nullable
     public static ShieldStyle of(Player player, PowerData data) {
+        if (com.kolodkingal.enhanced.ability.UltimateWanda.is(data)) {
+            // (3.19) Ultimate Wanda's Chaos Shield: far bigger, with her runes turning round it (UltimateShieldFx)
+            ShieldStyle base = CHAOS_SHIELD.big(com.kolodkingal.enhanced.ability.UltimateWanda.SHIELD_SCALE);
+            int chosen = AbilityColors.chosen(player, HeroAbility.WANDA_CHAOS_SHIELD);
+            return chosen < 0 ? base : base.tinted(chosen);
+        }
         ShieldStyle style = of(data);
         if (style != null && data.borrowed() != Power.NONE) {
             // (3.18.1) in the Demiurge's blue

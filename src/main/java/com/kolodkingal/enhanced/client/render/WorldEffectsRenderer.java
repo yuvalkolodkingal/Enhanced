@@ -93,7 +93,7 @@ public final class WorldEffectsRenderer {
                 PowerData data = Powers.get(player);
                 ShieldStyle style =
                         ShieldStyles.of(player, data); // (3.4: a custom hero's shield too; 3.5: in its colour)
-                if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
+                if (style != null && (data.chaosShieldActive() || com.kolodkingal.enhanced.ability.UltimateWanda.guarded(data)) && !player.isInvisible()) {
                     RenderType type = lines ? EnhancedRenderTypes.energyField(style.texture()) : EnhancedRenderTypes.ENERGY_VEIL;
                     VertexConsumer vc = buffers.getBuffer(type);
                     drawn.add(type);
@@ -234,7 +234,7 @@ public final class WorldEffectsRenderer {
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
             ShieldStyle style = ShieldStyles.of(player, data); // (3.4: a custom hero's shield too; 3.5: in its colour)
-            if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
+            if (style != null && (data.chaosShieldActive() || com.kolodkingal.enhanced.ability.UltimateWanda.guarded(data)) && !player.isInvisible()) {
                 ShieldStyle.Look look = style.look(data, time);
                 SHIELDS_UP.put(player.getId(), new Shield(style, look.radius(), look.flicker(), time));
                 SHIELDS_GOING.remove(player.getId());

@@ -31,6 +31,11 @@ public record ShieldStyle(int veil, int lines, ResourceLocation texture, float r
                 radius, maxStrength, maxTicks);
     }
 
+    /** 3.19: this style with a sphere {@code scale} times as big (Ultimate Wanda's). */
+    public ShieldStyle big(float scale) {
+        return new ShieldStyle(veil, lines, texture, radius * scale, maxStrength, maxTicks);
+    }
+
     /** What one frame of the shield looks like. */
     public record Look(float radius, float flicker) {
     }
@@ -42,6 +47,10 @@ public record ShieldStyle(int veil, int lines, ResourceLocation texture, float r
      * @param time the game time with the partial tick
      */
     public Look look(PowerData data, float time) {
+        if (!data.chaosShieldActive() && com.kolodkingal.enhanced.ability.UltimateWanda.guarded(data)) {
+            // (3.19) the shield over Ultimate Wanda's own body while her mind is away: whole and steady, for as long as it lasts
+            return new Look(radius, 0.92F + 0.08F * Mth.sin(time * 0.15F));
+        }
         float formed = data.chaosShieldProgress(time);
         float eased = formed * formed * (3F - 2F * formed);
         float size = radius * (0.2F + 0.8F * eased);
