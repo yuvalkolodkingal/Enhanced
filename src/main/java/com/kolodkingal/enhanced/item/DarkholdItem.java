@@ -121,5 +121,6 @@ public class DarkholdItem extends Item implements ItemExt.StopUsing {
         tooltip.add(Component.translatable("item.enhanced.darkhold.beam").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.enhanced.darkhold.retaliation").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.enhanced.darkhold.marks").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.enhanced.book.read", Component.keybind("key.enhanced.read_book")).withStyle(ChatFormatting.DARK_RED));
     }
 }

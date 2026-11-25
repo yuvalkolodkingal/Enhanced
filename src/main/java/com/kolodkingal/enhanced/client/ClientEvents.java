@@ -332,6 +332,13 @@ public final class ClientEvents {
         if (lookClicked && mine && power.hasPowers() && mc.screen == null && !player.isSpectator()) {
             Net.sendToServer(new ChangeLookPayload(player.isShiftKeyDown() ? -1 : 1));
         }
+        boolean readClicked = false;
+        while (KeyBindings.READ_BOOK.consumeClick()) {
+            readClicked = true;
+        }
+        if (readClicked && mc.screen == null && !player.isSpectator()) {
+            com.kolodkingal.enhanced.client.screen.BookPagesScreen.openHeld();
+        }
         boolean visionClicked = false;
         while (KeyBindings.VISION_COMMAND.consumeClick()) {
             visionClicked = true;

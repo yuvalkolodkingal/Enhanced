@@ -26,7 +26,7 @@ import java.util.Map;
  * seconds, all round her out to thirty blocks, great columns of glowing red energy burst up out of the ground and shoot
  * into the high sky, bolts of it fall from far above, streaks of it fly in at her from every side, and a column of light
  * stands on her while rings of it run out over the ground. Drawn as light (camera-facing ribbons, additive, so where
- * they cross they burn brighter), not as particles, so it is huge and seen from far away; big sparks fly along with it.
+ * they cross they burn brighter), not as particles, so it is huge and seen from far away; sparks fly along with it.
  * {@link SorcererFx} ticks and draws it; it starts by itself on every client that sees her change.
  */
 public final class ChaosEruptionFx {
@@ -169,7 +169,7 @@ public final class ChaosEruptionFx {
             }
             for (int i = 0; i < 2; i++) {
                 double y = p.ground + r.nextDouble() * Math.min(p.height, u * 9.0) * 0.5;
-                level.addParticle(new EnergyParticleOptions(i == 0 ? RED : LIGHT, 2.2F + r.nextFloat() * 2.2F),
+                level.addParticle(new EnergyParticleOptions(i == 0 ? RED : LIGHT, 0.7F + r.nextFloat() * 0.6F),
                         p.x + (r.nextDouble() - 0.5) * p.width, y, p.z + (r.nextDouble() - 0.5) * p.width,
                         (r.nextDouble() - 0.5) * 0.2, 0.6 + r.nextDouble() * 0.9, (r.nextDouble() - 0.5) * 0.2);
             }
@@ -177,7 +177,7 @@ public final class ChaosEruptionFx {
                 // (the ground bursts where it comes out)
                 for (int i = 0; i < 10; i++) {
                     double a = r.nextDouble() * Math.PI * 2;
-                    level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? LIGHT : RED, 1.8F + r.nextFloat() * 1.6F), p.x, p.ground + 0.2,
+                    level.addParticle(new EnergyParticleOptions(i % 3 == 0 ? LIGHT : RED, 0.6F + r.nextFloat() * 0.5F), p.x, p.ground + 0.2,
                             p.z, Math.cos(a) * 0.45, 0.2 + r.nextDouble() * 0.4, Math.sin(a) * 0.45);
                 }
             }
@@ -186,7 +186,7 @@ public final class ChaosEruptionFx {
         if (age < 50) {
             for (int i = 0; i < 10; i++) {
                 Vec3 v = new Vec3(r.nextGaussian(), r.nextGaussian() * 0.6 + 0.3, r.nextGaussian()).normalize().scale(0.5 + r.nextDouble() * 0.8);
-                level.addParticle(new EnergyParticleOptions(i % 4 == 0 ? LIGHT : RED, 2.5F + r.nextFloat() * 2.0F), heart.x, heart.y, heart.z,
+                level.addParticle(new EnergyParticleOptions(i % 4 == 0 ? LIGHT : RED, 0.7F + r.nextFloat() * 0.6F), heart.x, heart.y, heart.z,
                         v.x, v.y, v.z);
             }
         }
@@ -200,7 +200,7 @@ public final class ChaosEruptionFx {
                 }
                 for (int k = 0; k < 14; k++) {
                     double a = r.nextDouble() * Math.PI * 2;
-                    level.addParticle(new EnergyParticleOptions(k % 3 == 0 ? LIGHT : RED, 2.0F + r.nextFloat() * 1.5F), at.x, at.y + 0.3, at.z,
+                    level.addParticle(new EnergyParticleOptions(k % 3 == 0 ? LIGHT : RED, 0.6F + r.nextFloat() * 0.5F), at.x, at.y + 0.3, at.z,
                             Math.cos(a) * 0.5, 0.3 + r.nextDouble() * 0.5, Math.sin(a) * 0.5);
                 }
             }

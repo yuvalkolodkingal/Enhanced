@@ -65,6 +65,10 @@ public final class KeyBindings {
     public static final KeyMapping STONE_WHEEL = Keys.newKey("key.enhanced.stone_wheel", KeyBindings.STONES,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
 
+    /** (3.19.2) While the Darkhold or the Book of the Vishanti is held: opens its pages to read (BookPagesScreen). */
+    public static final KeyMapping READ_BOOK = Keys.newKey("key.enhanced.read_book", KeyContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORY);
+
     private static KeyMapping create(int ability, int key) {
         return Keys.newKey("key.enhanced.ability_" + ability, KeyContext.IN_GAME, InputConstants.Type.KEYSYM, key,
                 CATEGORY);
