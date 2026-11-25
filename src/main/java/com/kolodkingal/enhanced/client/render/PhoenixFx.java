@@ -2,6 +2,7 @@ package com.kolodkingal.enhanced.client.render;
 
 import com.kolodkingal.enhanced.Enhanced;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
+import com.kolodkingal.enhanced.ability.PhoenixShield;
 import com.kolodkingal.enhanced.client.EnhancedClientConfig;
 import com.kolodkingal.enhanced.config.PhoenixConfig;
 import com.kolodkingal.enhanced.custom.AbilityColors;
@@ -403,6 +404,7 @@ public final class PhoenixFx {
         }
         List<AbstractClientPlayer> charging = new ArrayList<>();
         List<AbstractClientPlayer> fields = new ArrayList<>();
+        List<AbstractClientPlayer> shields = new ArrayList<>();
         for (AbstractClientPlayer player : level.players()) {
             if (!Powers.get(player).acts(Power.PHOENIX) || player.isInvisible() || player.isSpectator()) {
                 continue;
@@ -413,8 +415,11 @@ public final class PhoenixFx {
             if (DOMES.containsKey(player.getId())) {
                 fields.add(player);
             }
+            if (Powers.get(player).is(Live.PHOENIX_SHIELD)) {
+                shields.add(player);
+            }
         }
-        if (BURSTS.isEmpty() && charging.isEmpty() && fields.isEmpty()) {
+        if (BURSTS.isEmpty() && charging.isEmpty() && fields.isEmpty() && shields.isEmpty()) {
             return;
         }
         float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
@@ -452,6 +457,9 @@ public final class PhoenixFx {
                 dome(pose, dc, camera, player, partialTick, time, lines);
             }
             tint = -1;
+            for (AbstractClientPlayer player : shields) {
+                shieldSphere(pose, dc, camera, player, partialTick, time, lines, mc);
+            }
             buffers.endBatch(domeType);
         }
 
@@ -686,6 +694,27 @@ public final class PhoenixFx {
                     0.40F * alpha, 0.80F * alpha);
         } else {
             EnergyGeometry.veil(pose, vc, centre, radius, segments, segments / 2, c(PhoenixAbilities.PSY_FRINGE), 0.22F * alpha, 0.50F * alpha);
+        }
+    }
+
+    /**
+     * (3.19.2) Her psionic force field: an orange sphere of hexagons round her that breathes. Seen from inside (her own
+     * first-person view) only its faint lines, so it never hides the world.
+     */
+    private static void shieldSphere(Matrix4f pose, VertexConsumer vc, Vec3 camera, AbstractClientPlayer player, float partialTick,
+                                     float time, boolean lines, Minecraft mc) {
+        boolean inside = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
+        if (inside && !lines) {
+            return;
+        }
+        float radius = (float) PhoenixShield.RADIUS + 0.06F * Mth.sin(time * 0.15F);
+        float alpha = inside ? 0.35F : 1.0F;
+        Vec3 centre = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
+        if (lines) {
+            EnergyGeometry.sphere(pose, vc, centre, radius, 32, 16, 8, 4, time * 0.003F, PhoenixAbilities.TK_ORANGE,
+                    0.35F * alpha, 0.75F * alpha);
+        } else {
+            EnergyGeometry.veil(pose, vc, centre, radius, 32, 16, 0xC25A12, 0.12F, 0.38F);
         }
     }
 

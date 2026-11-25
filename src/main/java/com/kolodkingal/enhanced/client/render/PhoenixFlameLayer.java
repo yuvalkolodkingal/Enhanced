@@ -44,6 +44,10 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         PowerData data = Powers.get(player);
+        if (!player.isInvisible() && data.has(HeroAbility.PHOENIX_TELEKINESIS) && data.heldEntityId() != -1
+                && !data.is(Live.PHOENIX_BLAZE)) {
+            telekinesisArms(poseStack, buffer, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+        }
         // (3.4) Phoenix, or a custom hero with her Burst.
         if (!data.has(HeroAbility.PHOENIX_BURST) || !data.is(Live.PHOENIX_BLAZE) || player.isInvisible()) {
             return;
@@ -71,6 +75,29 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
             handOrb(poseStack, orbs, model.rightArm, -1.0F / 16.0F, t, swell, tint);
             handOrb(poseStack, orbs, model.leftArm, 1.0F / 16.0F, t + 20.0F, swell, tint);
         }
+    }
+
+    /**
+     * (3.19.2) Her telekinesis: no lightning, only a soft orange glow that breathes over her arms (her eyes glow too, in
+     * {@code PhoenixView}).
+     */
+    private void telekinesisArms(PoseStack poseStack, MultiBufferSource buffer, AbstractClientPlayer player, float limbSwing,
+                                 float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+        model.prepareMobModel(player, limbSwing, limbSwingAmount, partialTicks);
+        getParentModel().copyPropertiesTo(model);
+        model.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        model.setAllVisible(false);
+        model.rightArm.visible = true;
+        model.leftArm.visible = true;
+        float t = player.tickCount + partialTicks;
+        float pulse = 0.75F + 0.25F * Mth.sin(0.25F * t);
+        int alpha = Math.round(0x70 * pulse);
+        poseStack.pushPose();
+        poseStack.scale(1.06F, 1.0F, 1.06F);
+        PowerAuraLayer.drawSwirl(poseStack, buffer, FULL_BRIGHT, model, PowerAuraLayer.SWIRL, t, 0.6F,
+                alpha << 24 | PhoenixAbilities.TK_ORANGE);
+        poseStack.popPose();
+        model.setAllVisible(true);
     }
 
     /**
@@ -103,7 +130,7 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         model.rightPants.visible = false;
         // Fatter and slower behind, then the main tongues scrolling upward over the body.
         poseStack.pushPose();
-        poseStack.scale(1.1F, 1.0F, 1.1F);
+        poseStack.scale(1.25F, 1.08F, 1.25F); // (3.19.2: taller, fuller flames)
         VertexConsumer glow = buffer.getBuffer(RenderType.energySwirl(texture, (t * 0.004F) % 1.0F, (-t * 0.02F) % 1.0F));
         model.renderToBuffer(poseStack, glow, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, scaleAlpha(glowArgb, strength));
         poseStack.popPose();

@@ -95,6 +95,8 @@ final class PhoenixView {
     /** The two masks of her glowing eyes (the pixels of the eyes in the skin, painted fire and violet). */
     private static final RenderType FIRE_EYES = RenderType.eyes(Enhanced.id("textures/entity/phoenix_eyes.png"));
     private static final RenderType PSYCHIC_EYES = RenderType.eyes(Enhanced.id("textures/entity/phoenix_eyes_psychic.png"));
+    /** (3.19.2) Her eyes while she holds something with her mind: a warm orange, as in the films. */
+    private static final RenderType TELEKINESIS_EYES = RenderType.eyes(Enhanced.id("textures/entity/phoenix_eyes_telekinesis.png"));
 
     /** Gold fire while she charges or burns, else violet while she reads, holds, casts or senses, else none. */
     @Nullable
@@ -102,7 +104,10 @@ final class PhoenixView {
         if (data.is(Live.PHOENIX_CHARGING) || data.is(Live.PHOENIX_BLAZE)) {
             return FIRE_EYES;
         }
-        boolean psychic = data.heldEntityId() != -1 || data.toggle(Toggle.MIND_READING) || data.is(Live.CASTING) || data.is(Live.MIND_SENSING)
+        if (data.heldEntityId() != -1) {
+            return TELEKINESIS_EYES;
+        }
+        boolean psychic = data.toggle(Toggle.MIND_READING) || data.is(Live.CASTING) || data.is(Live.MIND_SENSING)
                 || data.is(Live.PHOENIX_PSIONIC);
         return psychic ? PSYCHIC_EYES : null;
     }

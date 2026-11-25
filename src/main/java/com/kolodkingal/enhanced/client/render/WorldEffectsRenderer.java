@@ -603,6 +603,9 @@ public final class WorldEffectsRenderer {
         // The Phoenix's telekinesis is of the mind: violet, where the others' take their hero's colour.
         // (3.4: a custom hero's in his own colours, the Phoenix's grip in hers.)
         boolean mind = data.has(HeroAbility.PHOENIX_TELEKINESIS);
+        if (mind) {
+            return; // (3.19.2) Jean lifts with her mind and her eyes: no line of energy, no lightning (her arms glow orange)
+        }
         int main = mind ? PhoenixAbilities.PSY_MAIN : CustomActing.tint(player, power.color, false);
         int glow = mind ? PhoenixAbilities.PSY_CORE : CustomActing.tint(player, power.glow, true);
         // 3.5: a hero's grip in the colour its pick chose.

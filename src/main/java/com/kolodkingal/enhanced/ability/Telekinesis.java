@@ -94,8 +94,8 @@ public final class Telekinesis {
         MAGNETO(Power.MAGNETO, HeroAbility.MAGNETO_METAL),
         WANDA(Power.SCARLET_WITCH, HeroAbility.WANDA_TELEKINESIS),
         BILLY(Power.BILLY, HeroAbility.BILLY_TELEKINESIS),
-        /** Jean Grey: Wanda's telekinesis, in the violet of her mind. */
-        JEAN(Power.PHOENIX, PhoenixAbilities.PSY_MAIN, HeroAbility.PHOENIX_TELEKINESIS),
+        /** Jean Grey: Wanda's telekinesis, with her mind and her eyes (3.19.2: orange, no lightning). */
+        JEAN(Power.PHOENIX, PhoenixAbilities.TK_ORANGE, HeroAbility.PHOENIX_TELEKINESIS),
         /** 3.3: a custom hero's Telekinesis ("creatures": anything loose, projectiles in flight, no blocks), in his colour. */
         CUSTOM(Power.CUSTOM, null),
         /** 3.3: a custom hero's Telekinesis "everything": blocks too, as Wanda's. */
@@ -662,7 +662,14 @@ public final class Telekinesis {
                 block.keepHeld();
             }
         }
-        if (grip.ticks % 2 == 0) {
+        if (grip.mode == Mode.JEAN) {
+            // (3.19.2) Hers shows almost nothing: now and then a faint orange shimmer.
+            if (grip.ticks % 10 == 0) {
+                level.sendParticles(new EnergyParticleOptions(grip.mode.colorOf(player), 0.6F),
+                        e.getX(), e.getY() + e.getBbHeight() * 0.5, e.getZ(), 1,
+                        e.getBbWidth() * 0.6, e.getBbHeight() * 0.5, e.getBbWidth() * 0.6, 0.01);
+            }
+        } else if (grip.ticks % 2 == 0) {
             level.sendParticles(new EnergyParticleOptions(grip.mode.colorOf(player), 1.2F),
                     e.getX(), e.getY() + e.getBbHeight() * 0.5, e.getZ(), 3,
                     e.getBbWidth() * 0.6, e.getBbHeight() * 0.5, e.getBbWidth() * 0.6, 0.02);

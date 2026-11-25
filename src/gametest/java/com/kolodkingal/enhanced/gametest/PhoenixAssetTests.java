@@ -125,14 +125,16 @@ public final class PhoenixAssetTests {
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHeroLooksAreRedAndOliveWhereTheFilmsAreRedAndOlive(GameTestHelper helper) throws IOException {
         // A cheap guard against a swapped or redrawn-by-mistake skin: the Apocalypse look is red hair and a blue body,
-        // the Brand New Day look an olive hood and a dark jacket with a mustard centre.
+        // the Brand New Day look (3.19.2) a yellow hood, a green jacket open over a yellow hoodie.
         BufferedImage apocalypse = image("textures/entity/suit/phoenix_apocalypse.png");
         BufferedImage day = image("textures/entity/suit/phoenix_brand_new_day.png");
         check(share(apocalypse, 8, 0, 8, 8, c -> red(c) > 150 && green(c) < 110 && blue(c) < 60) > 0.7, "the Apocalypse crown is red");
         check(share(apocalypse, 20, 20, 8, 12, c -> blue(c) > red(c) + 40) > 0.2, "the Apocalypse body is blue");
         check(share(apocalypse, 20, 20, 8, 12, c -> red(c) > 200 && green(c) > 150 && blue(c) < 80) > 0.04, "with the yellow of the stripes");
-        check(share(day, 40, 0, 8, 8, c -> green(c) > blue(c) + 20 && red(c) > blue(c) + 20 && green(c) >= red(c) - 10) > 0.6,
-                "the Brand New Day hood is olive");
+        check(share(day, 40, 0, 8, 8, c -> red(c) > 180 && green(c) > 120 && blue(c) < 90) > 0.6,
+                "the Brand New Day hood is yellow");
+        check(share(day, 20, 36, 8, 12, c -> green(c) > red(c) + 15 && green(c) > blue(c) + 30) > 0.5,
+                "over it a green jacket");
         check(share(day, 20, 20, 8, 12, c -> red(c) > 150 && green(c) > 110 && blue(c) < 110) > 0.2, "with a mustard strip down the body");
         helper.succeed();
     }

@@ -70,10 +70,10 @@ public final class PhoenixClientTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theFirebirdOfABurstGrowsFliesOutAndDissolves(GameTestHelper helper) {
-        assertNear(PhoenixMath.burstBirdScale(24.0F, 0.0F), 1.0, 1.0E-6, "it starts at scale one");
-        assertNear(PhoenixMath.burstBirdScale(24.0F, 24.0F), 4.0, 1.0E-6, "and ends at a sixth of the radius");
-        check(PhoenixMath.burstBirdScale(24.0F, 12.0F) > 1.0F && PhoenixMath.burstBirdScale(24.0F, 12.0F) < 4.0F, "growing between");
-        assertNear(PhoenixMath.burstBirdScale(3.0F, 24.0F), 1.0, 1.0E-6, "never smaller than scale one, even for a tiny Burst");
+        assertNear(PhoenixMath.burstBirdScale(24.0F, 0.0F), 2.3, 1.0E-6, "it starts at scale 2.3 (3.19.2: bigger)");
+        assertNear(PhoenixMath.burstBirdScale(45.0F, 24.0F), 10.0, 1.0E-4, "and ends at the radius over 4.5");
+        check(PhoenixMath.burstBirdScale(45.0F, 12.0F) > 2.3F && PhoenixMath.burstBirdScale(45.0F, 12.0F) < 10.0F, "growing between");
+        assertNear(PhoenixMath.burstBirdScale(3.0F, 24.0F), 2.3, 1.0E-6, "never smaller than scale 2.3, even for a tiny Burst");
         assertNear(PhoenixMath.burstBirdDistance(24.0F, 0.0F), 0.0, 1.0E-6, "it leaves from her chest");
         assertNear(PhoenixMath.burstBirdDistance(24.0F, 24.0F), 18.0, 1.0E-6, "and ends three quarters of the radius out");
         assertNear(PhoenixMath.burstWingAngle(0.0F), -20.0, 1.0E-6, "flung open and down at the release");
@@ -104,8 +104,8 @@ public final class PhoenixClientTests {
         check(PhoenixMath.percent(0.63F) == 63 && PhoenixMath.percent(1.0F) == 100 && PhoenixMath.percent(0.004F) == 0, "whole percents");
         check(PhoenixMath.BRIGHT_CHARGE == 0.9F, "the HUD turns orange, and the eyes and the screen edge brighten, above nine tenths");
 
-        assertNear(PhoenixMath.chargeBirdScale(0.0F), 0.5, 1.0E-6, "the charging firebird starts at half size");
-        assertNear(PhoenixMath.chargeBirdScale(1.0F), 1.3, 1.0E-6, "and ends at 1.3");
+        assertNear(PhoenixMath.chargeBirdScale(0.0F), 0.8, 1.0E-6, "the charging firebird starts at 0.8");
+        assertNear(PhoenixMath.chargeBirdScale(1.0F), 2.3, 1.0E-6, "and ends at 2.3");
         check(!PhoenixMath.chargeBirdHasWings(0.2F) && PhoenixMath.chargeBirdHasWings(0.21F), "its wings come out once a fifth of the charge is in");
         for (int t = 0; t < 28; t++) {
             float angle = PhoenixMath.chargeWingAngle(t);

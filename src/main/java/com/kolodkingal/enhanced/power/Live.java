@@ -262,6 +262,9 @@ public enum Live {
      * the healing, her powers eight times as strong, her own menu on H ({@code ability.UltimateWanda}). Never saved.
      */
     WANDA_ULTIMATE,
+    // ===== jean grey (3.19.2) =====
+    /** Jean Grey's psionic force field (Sneak + G) is up round her ({@code ability.PhoenixShield}). */
+    PHOENIX_SHIELD,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

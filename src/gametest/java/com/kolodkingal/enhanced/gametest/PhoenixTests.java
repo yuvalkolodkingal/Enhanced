@@ -895,7 +895,7 @@ public final class PhoenixTests {
             helper.assertBlockNotPresent(Blocks.STONE, stone);
             List<TelekineticBlockEntity> blocks = helper.getEntities(ModEntities.TELEKINETIC_BLOCK.get());
             check(blocks.size() == 1 && Telekinesis.isHolding(jean) && data.heldEntityId() == blocks.get(0).getId(), "a block of stone is torn out and held");
-            check(blocks.get(0).getColor() == Telekinesis.Mode.JEAN.color, "in the violet of her mind, not Wanda's red");
+            check(blocks.get(0).getColor() == Telekinesis.Mode.JEAN.color, "in her orange, not Wanda's red");
             Telekinesis.release(jean, false);
             blocks.get(0).discard();
 
@@ -937,7 +937,7 @@ public final class PhoenixTests {
     @EnhancedTest(template = ARENA, batch = QUICK)
     public static void phoenixTelekinesisUsesPsychicColours(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
-        check(Telekinesis.Mode.JEAN.color == PhoenixAbilities.PSY_MAIN, "Jean's telekinesis is violet");
+        check(Telekinesis.Mode.JEAN.color == PhoenixAbilities.TK_ORANGE, "Jean's telekinesis is orange (3.19.2: as in the films)");
         check(Telekinesis.Mode.WANDA.color == Power.SCARLET_WITCH.color && Telekinesis.Mode.BILLY.color == Power.BILLY.color
                 && Telekinesis.Mode.MAGNETO.color == Power.MAGNETO.color, "the others keep the colour of their power");
         ServerPlayer jean = jean(f, 4.5, 10.5);
@@ -945,11 +945,12 @@ public final class PhoenixTests {
         lookAt(jean, pig);
         TestKit.sentPackets(jean);
         press(jean, 3);
-        PowerTicker.tick(jean);
-        PowerTicker.tick(jean);
+        for (int i = 0; i < 10; i++) {
+            PowerTicker.tick(jean); // (3.19.2: her shimmer is faint, a mote every 10 ticks)
+        }
         List<Integer> colours = TestKit.particlesIn(TestKit.sentPackets(jean)).stream().map(ClientboundLevelParticlesPacket::getParticle)
                 .filter(EnergyParticleOptions.class::isInstance).map(p -> ((EnergyParticleOptions) p).color()).toList();
-        check(colours.contains(PhoenixAbilities.PSY_MAIN) && !colours.contains(Power.SCARLET_WITCH.color), "what she holds glows violet: " + colours);
+        check(colours.contains(PhoenixAbilities.TK_ORANGE) && !colours.contains(Power.SCARLET_WITCH.color), "what she holds shimmers orange: " + colours);
         Telekinesis.release(jean, false);
 
         ServerPlayer wanda = f.player(4.5, FLOOR, 16.5, Power.SCARLET_WITCH);
@@ -1457,6 +1458,7 @@ public final class PhoenixTests {
         jean.setHealth(health);
         jean.invulnerableTime = 0;
         f.config(PhoenixConfig.FIRE_IMMUNE, false);
+        PowerTicker.tick(jean); // (3.19.2: her unseen fire resistance goes with the option)
         check(jean.hurt(level.damageSources().inFire(), 4.0F) && jean.getHealth() < health, "with the option off, fire hurts her like anyone");
 
         ServerPlayer other = f.player(4.5, FLOOR, 4.5, Power.MAGNETO);

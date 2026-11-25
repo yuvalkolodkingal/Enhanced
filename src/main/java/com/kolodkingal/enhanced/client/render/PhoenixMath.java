@@ -89,7 +89,7 @@ public final class PhoenixMath {
     /** The firebird of the Burst: from scale 1 to a sixth of the radius over its life. */
     public static float burstBirdScale(float radius, float age) {
         float t = Mth.clamp(age / BIRD_TICKS, 0.0F, 1.0F);
-        return Mth.lerp(t * (2.0F - t), 1.0F, Math.max(1.0F, radius / 6.0F));
+        return Mth.lerp(t * (2.0F - t), 2.3F, Math.max(2.3F, radius / 4.5F)); // (3.19.2: a bigger Phoenix)
     }
 
     /** How far the firebird has flown out along her facing, in blocks: it ends at three quarters of the radius. */
@@ -159,7 +159,7 @@ public final class PhoenixMath {
 
     /** The firebird that forms behind a charging Phoenix: half size at first, a bit over one as the charge fills. */
     public static float chargeBirdScale(float charge) {
-        return 0.5F + 0.8F * Mth.clamp(charge, 0.0F, 1.0F);
+        return 0.8F + 1.5F * Mth.clamp(charge, 0.0F, 1.0F); // (3.19.2: a bigger Phoenix)
     }
 
     /** The wings only come out once a fifth of the charge is in. */
