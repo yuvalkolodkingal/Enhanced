@@ -130,6 +130,12 @@ public final class NeoClientRegistrar implements ClientRegistrar {
             }
 
             @Override
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            public Object anyRenderer(EntityType<?> type) {
+                return event.getRenderer((EntityType) type);
+            }
+
+            @Override
             public EntityRendererProvider.Context context() {
                 return event.getContext();
             }

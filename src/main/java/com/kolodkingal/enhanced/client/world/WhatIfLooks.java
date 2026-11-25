@@ -9,7 +9,6 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -57,9 +56,9 @@ public final class WhatIfLooks {
             if (type == EntityType.PLAYER || type == EntityType.ARMOR_STAND) {
                 continue;
             }
-            EntityRenderer<?> renderer;
+            Object renderer;
             try {
-                renderer = layers.renderer(type);
+                renderer = layers.anyRenderer(type);
             } catch (RuntimeException e) {
                 continue;
             }
