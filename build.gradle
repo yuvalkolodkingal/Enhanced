@@ -84,6 +84,8 @@ neoForge {
             // (./gradlew runGameTestServer -Penhanced.tests=Captain*,FalconTests.redwing*).
             systemProperty 'enhanced.testReport', file('build/gametest').absolutePath
             systemProperty 'enhanced.tests', providers.gradleProperty('enhanced.tests').getOrElse('')
+            // (3.19.2) the whole suite (2,900 tests) needs more than the default quarter of the memory
+            jvmArgument '-Xmx' + providers.gradleProperty('enhanced.testHeap').getOrElse('6G')
             // PERSISTENT_DATA's mode on NeoForge (view by default; -Penhanced.persistentData=attachment for the real
             // attachment, platform/neoforge/NeoPersistentData).
             systemProperty 'enhanced.persistentData', providers.gradleProperty('enhanced.persistentData').getOrElse('view')
