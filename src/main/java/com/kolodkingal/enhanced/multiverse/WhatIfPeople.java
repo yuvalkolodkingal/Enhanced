@@ -30,22 +30,31 @@ import java.util.List;
 /**
  * The people of the What If universes (3.19.1), on the mod's own talk system (the Asgardians' {@link AsgardDialogue}: the
  * talk panel with the speaker's face, his words typed out and up to three answers). They are {@code enhanced:asgardian}
- * of two roles of their own:
+ * of two roles of their own, and each skin of a role is one person, with a name, a face and words of his own
+ * ({@link Role#personaKey}):
  * <ul>
- *   <li>{@link Role#HYDRA_CITIZEN}: the people of Hydra's city. Under Hydra they whisper how they suffer and what
- *   happened, tell where the rulers are (and which of them has fallen), and thank whoever promises to free them with
- *   what little they have; once the city is free they celebrate and give a reward.</li>
- *   <li>{@link Role#SURVIVOR}: the last of the living in the zombies' Earth-2149, the Gamma Bomb's world and Ultron's
- *   dead one. Rare, hiding; each tells his universe's story, gives advice, and shares his supplies once.</li>
+ *   <li>{@link Role#HYDRA_CITIZEN}: eight people of Hydra's city. Under Hydra each whispers his own life under it and
+ *   his own memory of before; all of them tell where the rulers are and thank whoever promises to free them; once the
+ *   city is free each celebrates in his own way, gives a reward and says what he will do now.</li>
+ *   <li>{@link Role#SURVIVOR}: twenty of the last of the living, each with his own story, advice and supplies: eight in
+ *   the zombies' Earth-2149 and eight in the Gamma Bomb's world, found only in the bunkers ({@link Bunkers}), and four
+ *   hiding in Ultron's dead streets.</li>
  * </ul>
- * Lines {@code npc.enhanced.hydra_citizen|survivor.<node>[.n]}, answers {@code npc.enhanced.option.whatif_*}. A person
- * is tagged {@link #PERSON}; far from every player he is gone (no world fills up with them).
+ * Lines {@code npc.enhanced.hydra_citizen|survivor.p<variant>[_<node>][.n]}, answers {@code npc.enhanced.option.whatif_*}.
+ * A person is tagged {@link #PERSON}; far from every player he is gone (no world fills up with them), except the
+ * bunkers' people, who live there.
  */
 public final class WhatIfPeople {
     /** The tag of every person of a What If universe, and of one who already gave what he had. */
     public static final String PERSON = "enhanced_whatif_person";
     static final String GAVE = "enhanced_whatif_gave";
-    /** How many survivors are round a player at most, how far they are counted, and where a new one comes. */
+    /** The survivors of each universe: their skins (persons) are {@code first} to {@code first + count - 1}. */
+    public static final int ZOMBIE_SURVIVORS = 0;
+    public static final int GAMMA_SURVIVORS = 8;
+    public static final int ULTRON_SURVIVORS = 16;
+    public static final int SURVIVORS_EACH = 8;
+    static final int ULTRON_COUNT = 4;
+    /** How many survivors are round a player at most in Ultron's streets, how far they are counted, and where a new one comes. */
     static final int SURVIVORS = 2;
     static final int COUNT_RANGE = 96;
     static final int COME_MIN = 20;
@@ -60,12 +69,19 @@ public final class WhatIfPeople {
 
     // ---- the people ----
 
-    /** A new person of {@code role} at the place, his skin at random, tagged as a What If person (and {@code tag}). */
+    /** A new person of {@code role} at the place, one of its people at random, tagged as a What If person (and {@code tag}). */
     public static AsgardianEntity person(ServerLevel level, Role role, double x, double y, double z, @Nullable String tag) {
+        return person(level, role, level.getRandom().nextInt(role.skins()), x, y, z, tag);
+    }
+
+    /** A new person: the one of {@code role} that is skin {@code variant} (his name over his head, his own words). */
+    public static AsgardianEntity person(ServerLevel level, Role role, int variant, double x, double y, double z, @Nullable String tag) {
         AsgardianEntity npc = ModEntities.ASGARDIAN.get().create(level);
-        npc.setRole(role, level.getRandom().nextInt(role.skins()));
+        npc.setRole(role, variant);
         npc.moveTo(x, y, z, level.getRandom().nextFloat() * 360.0F, 0.0F);
         npc.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(x, y, z)), MobSpawnType.NATURAL, null);
+        npc.setCustomName(net.minecraft.network.chat.Component.translatable(role.personaKey(npc.variant())));
+        npc.setCustomNameVisible(false);
         npc.addTag(PERSON);
         if (tag != null) {
             npc.addTag(tag);
@@ -73,20 +89,23 @@ public final class WhatIfPeople {
         return npc;
     }
 
+    /** The person a speaker is (his skin), 0 for any other speaker. */
+    static int variant(Ctx ctx) {
+        return ctx.speaker() instanceof AsgardianEntity npc ? npc.variant() : 0;
+    }
+
     /** Whether the entity is one of the universes' people (by its role, which the client knows too). */
     public static boolean isPerson(Entity entity) {
         return entity instanceof AsgardianEntity npc && npc.role().whatIf();
     }
 
-    /** Whether survivors hide in this universe (the zombies', the Gamma Bomb's, Ultron's). */
-    static boolean survivorsIn(ResourceKey<Level> dimension) {
-        return dimension == Multiverse.ZOMBIES_KEY || dimension == Multiverse.GAMMA_KEY || dimension == Multiverse.ULTRON_KEY;
-    }
-
-    /** Every five seconds of a player in a universe of survivors: now and then one is found hiding near. */
+    /**
+     * Every five seconds of a player in Ultron's streets: now and then one of its survivors is found hiding near. (In
+     * 2149 and the Gamma Bomb's world the survivors are only in the bunkers: {@link Bunkers}.)
+     */
     static void tick(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
-        if (player.isSpectator() || player.tickCount % 100 != 0 || !survivorsIn(level.dimension())) {
+        if (player.isSpectator() || player.tickCount % 100 != 0 || level.dimension() != Multiverse.ULTRON_KEY) {
             return;
         }
         int near = level.getEntitiesOfClass(AsgardianEntity.class, player.getBoundingBox().inflate(COUNT_RANGE),
@@ -103,11 +122,11 @@ public final class WhatIfPeople {
                 continue;
             }
             int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            BlockPos feet = new BlockPos(x, y, z);
-            if (level.dimension() == Multiverse.ULTRON_KEY ? y != CityChunkGenerator.GROUND + 1 : !SpaceRealms.safe(level, feet)) {
+            if (y != CityChunkGenerator.GROUND + 1) {
                 continue;
             }
-            level.addFreshEntity(person(level, Role.SURVIVOR, x + 0.5, y, z + 0.5, null));
+            int variant = ULTRON_SURVIVORS + player.getRandom().nextInt(ULTRON_COUNT);
+            level.addFreshEntity(person(level, Role.SURVIVOR, variant, x + 0.5, y, z + 0.5, null));
             return;
         }
     }
@@ -124,7 +143,7 @@ public final class WhatIfPeople {
             }
             List<Entity> gone = new ArrayList<>();
             for (Entity entity : level.getAllEntities()) {
-                if (isPerson(entity) && level.getNearestPlayer(entity, GONE_RANGE) == null) {
+                if (isPerson(entity) && !entity.getTags().contains(Bunkers.RESIDENT) && level.getNearestPlayer(entity, GONE_RANGE) == null) {
                     gone.add(entity);
                 }
             }
@@ -133,12 +152,6 @@ public final class WhatIfPeople {
     }
 
     // ---- what they say ----
-
-    /** The universe a survivor's lines are of: "zombies", "gamma" or "ultron". */
-    static String universe(Ctx ctx) {
-        ResourceKey<Level> dimension = ctx.speaker().level().dimension();
-        return dimension == Multiverse.ULTRON_KEY ? "ultron" : dimension == Multiverse.GAMMA_KEY ? "gamma" : "zombies";
-    }
 
     static boolean freed(Ctx ctx) {
         return HydraCity.state(ctx.player().server).freed();
@@ -175,7 +188,8 @@ public final class WhatIfPeople {
 
     private static void citizens() {
         Role role = Role.HYDRA_CITIZEN;
-        Option history = Option.to("whatif_what_happened", "history");
+        Option history = new Option("whatif_your_story", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx, "p" + variant(ctx) + "_history"));
+        Option future = new Option("whatif_future", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx, "p" + variant(ctx) + "_future"));
         Option rulers = new Option("whatif_rulers", AsgardDialogue.ALWAYS, ctx -> {
             HydraCity.State state = HydraCity.state(ctx.player().server);
             boolean skull = state.down(HydraBossEntity.RED_SKULL);
@@ -184,47 +198,77 @@ public final class WhatIfPeople {
         });
         Option promise = Option.to("whatif_free_you", "promise");
         Option bye = Option.close("whatif_bye");
-        AsgardDialogue.node(role, "oppressed").when(ctx -> !freed(ctx)).priority(1).variants(12)
-                .option(history).option(rulers).option(promise).register();
-        AsgardDialogue.node(role, "history").variants(3).option(rulers).option(promise).option(bye).register();
+        Option reward = new Option("whatif_reward", AsgardDialogue.ALWAYS,
+                ctx -> AsgardTalk.show(ctx, give(ctx, List.of(new ItemStack(Items.EMERALD, 2 + ctx.player().getRandom().nextInt(3))))
+                        ? "reward" : "reward_given"));
+        for (int v = 0; v < role.skins(); v++) {
+            int person = v;
+            AsgardDialogue.node(role, "p" + v).when(ctx -> !freed(ctx) && variant(ctx) == person).priority(1).variants(2)
+                    .option(history).option(rulers).option(promise).register();
+            AsgardDialogue.node(role, "p" + v + "_history").option(rulers).option(promise).option(bye).register();
+            AsgardDialogue.node(role, "p" + v + "_free").when(ctx -> freed(ctx) && variant(ctx) == person).priority(5).variants(2)
+                    .option(reward).option(future).option(bye).register();
+            AsgardDialogue.node(role, "p" + v + "_future").option(bye).register();
+        }
         AsgardDialogue.node(role, "rulers").option(promise).option(history).option(bye).register();
         AsgardDialogue.node(role, "rulers_skull_down").option(promise).option(bye).register();
         AsgardDialogue.node(role, "rulers_cap_down").option(promise).option(bye).register();
         AsgardDialogue.node(role, "promise").variants(3).onShow(ctx -> give(ctx, List.of(new ItemStack(Items.BREAD, 2))))
                 .option(rulers).option(bye).register();
-        AsgardDialogue.node(role, "freed").when(WhatIfPeople::freed).priority(5).variants(6)
-                .option(new Option("whatif_reward", AsgardDialogue.ALWAYS,
-                        ctx -> AsgardTalk.show(ctx, give(ctx, List.of(new ItemStack(Items.EMERALD, 2 + ctx.player().getRandom().nextInt(3))))
-                                ? "reward" : "reward_given")))
-                .option(Option.to("whatif_future", "future")).option(bye).register();
-        AsgardDialogue.node(role, "reward").option(Option.to("whatif_future", "future")).option(bye).register();
-        AsgardDialogue.node(role, "reward_given").option(Option.to("whatif_future", "future")).option(bye).register();
-        AsgardDialogue.node(role, "future").variants(3).option(bye).register();
+        AsgardDialogue.node(role, "reward").option(future).option(bye).register();
+        AsgardDialogue.node(role, "reward_given").option(future).option(bye).register();
     }
 
     private static void survivors() {
         Role role = Role.SURVIVOR;
-        Option story = new Option("whatif_what_happened", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx, universe(ctx) + "_story"));
-        Option advice = new Option("whatif_advice", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx, universe(ctx) + "_advice"));
+        Option who = new Option("whatif_who", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx, "p" + variant(ctx) + "_who"));
+        Option story = new Option("whatif_your_story", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx, "p" + variant(ctx) + "_story"));
+        Option advice = new Option("whatif_advice", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx, "p" + variant(ctx) + "_advice"));
         Option supplies = new Option("whatif_supplies", AsgardDialogue.ALWAYS, ctx -> AsgardTalk.show(ctx,
-                give(ctx, supplies(universe(ctx))) ? "supplies" : "supplies_gone"));
+                "p" + variant(ctx) + (give(ctx, supplies(variant(ctx))) ? "_gift" : "_gone")));
         Option bye = Option.close("whatif_bye");
-        for (String universe : List.of("zombies", "gamma", "ultron")) {
-            AsgardDialogue.node(role, universe).when(ctx -> universe(ctx).equals(universe)).priority(1).variants(4)
-                    .option(story).option(advice).option(supplies).register();
-            AsgardDialogue.node(role, universe + "_story").variants(2).option(advice).option(supplies).option(bye).register();
-            AsgardDialogue.node(role, universe + "_advice").variants(3).option(story).option(supplies).option(bye).register();
+        for (int v = 0; v < role.skins(); v++) {
+            int person = v;
+            AsgardDialogue.node(role, "p" + v).when(ctx -> variant(ctx) == person).priority(1).variants(2)
+                    .option(who).option(story).option(supplies).register();
+            AsgardDialogue.node(role, "p" + v + "_who").option(story).option(advice).option(supplies).register();
+            AsgardDialogue.node(role, "p" + v + "_story").option(who).option(advice).option(bye).register();
+            AsgardDialogue.node(role, "p" + v + "_advice").option(supplies).option(story).option(bye).register();
+            AsgardDialogue.node(role, "p" + v + "_gift").option(advice).option(bye).register();
+            AsgardDialogue.node(role, "p" + v + "_gone").option(advice).option(bye).register();
         }
-        AsgardDialogue.node(role, "supplies").option(story).option(bye).register();
-        AsgardDialogue.node(role, "supplies_gone").option(story).option(bye).register();
     }
 
-    /** What a survivor of each universe has to share. */
-    static List<ItemStack> supplies(String universe) {
-        return switch (universe) {
-            case "ultron" -> List.of(new ItemStack(Items.COOKED_BEEF, 3), new ItemStack(Items.REDSTONE, 8), new ItemStack(Items.IRON_INGOT, 3));
-            case "gamma" -> List.of(new ItemStack(Items.GOLDEN_CARROT, 3), new ItemStack(Items.MILK_BUCKET), new ItemStack(Items.SHIELD));
-            default -> List.of(new ItemStack(Items.BREAD, 4), new ItemStack(Items.ARROW, 16), new ItemStack(Items.IRON_SWORD));
-        };
+    /**
+     * What each survivor has to share (by his skin: 2149's, the Gamma Bomb's, Ultron's). Made on first use, not as the class
+     * loads: in 26.3 an item stack cannot be made before the items' components are bound (the mod's loading).
+     */
+    private static final class Supplies {
+        static final List<List<ItemStack>> ALL = List.of(
+            List.of(new ItemStack(Items.GOLDEN_APPLE, 1), new ItemStack(Items.BREAD, 3)),
+            List.of(new ItemStack(Items.COMPASS, 1), new ItemStack(Items.TORCH, 16)),
+            List.of(new ItemStack(Items.WHEAT_SEEDS, 8), new ItemStack(Items.BREAD, 6)),
+            List.of(new ItemStack(Items.IRON_INGOT, 6), new ItemStack(Items.REDSTONE, 8)),
+            List.of(new ItemStack(Items.BOW, 1), new ItemStack(Items.ARROW, 24)),
+            List.of(new ItemStack(Items.GOLDEN_CARROT, 4)),
+            List.of(new ItemStack(Items.CANDLE, 4), new ItemStack(Items.COOKED_BEEF, 3)),
+            List.of(new ItemStack(Items.IRON_SWORD, 1), new ItemStack(Items.SHIELD, 1)),
+            List.of(new ItemStack(Items.MILK_BUCKET, 1), new ItemStack(Items.GOLDEN_CARROT, 2)),
+            List.of(new ItemStack(Items.COOKED_CHICKEN, 4), new ItemStack(Items.LEATHER, 4)),
+            List.of(new ItemStack(Items.COOKED_BEEF, 6), new ItemStack(Items.HAY_BLOCK, 2)),
+            List.of(new ItemStack(Items.IRON_INGOT, 4), new ItemStack(Items.SHIELD, 1)),
+            List.of(new ItemStack(Items.COAL, 12), new ItemStack(Items.COOKED_PORKCHOP, 4)),
+            List.of(new ItemStack(Items.GOLDEN_APPLE, 1), new ItemStack(Items.MILK_BUCKET, 1)),
+            List.of(new ItemStack(Items.BOOK, 3), new ItemStack(Items.BREAD, 4)),
+            List.of(new ItemStack(Items.CROSSBOW, 1), new ItemStack(Items.ARROW, 16)),
+            List.of(new ItemStack(Items.REDSTONE, 12), new ItemStack(Items.IRON_INGOT, 3)),
+            List.of(new ItemStack(Items.REDSTONE_TORCH, 8), new ItemStack(Items.COOKED_BEEF, 3)),
+            List.of(new ItemStack(Items.IRON_INGOT, 5), new ItemStack(Items.COPPER_INGOT, 8)),
+            List.of(new ItemStack(Items.GOLDEN_APPLE, 1), new ItemStack(Items.BREAD, 4))
+        );
+    }
+
+    static List<ItemStack> supplies(int variant) {
+        return Supplies.ALL.get(Math.floorMod(variant, Supplies.ALL.size()));
     }
 }

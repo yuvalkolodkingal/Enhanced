@@ -606,6 +606,9 @@ public final class ClientSetup {
                 new SpeedSurfaceFx.SpeedLines());
         registrar.guiLayer(Enhanced.id("anim_state"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new AnimStateOverlay());
+        // 3.19.1: the passage between universes, a tunnel of light whenever the player comes into another one.
+        registrar.guiLayer(Enhanced.id("universe_transit"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new com.kolodkingal.enhanced.client.world.UniverseTransit());
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
         registrar.guiLayer(Enhanced.id("mind_read"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,

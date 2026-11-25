@@ -227,7 +227,8 @@ public final class AsgardTalk {
     /** An Asgardian says a line to one player (in his chat, with his name in his colour, and his murmur). */
     public static void speak(Entity speaker, ServerPlayer player, String lineKey, List<String> args) {
         Role role = speaker instanceof AsgardianEntity npc ? npc.role() : Role.CITIZEN;
-        player.sendSystemMessage(said(role, lineKey, args));
+        player.sendSystemMessage(speaker instanceof AsgardianEntity npc && role.whatIf()
+                ? said(role, role.personaKey(npc.variant()), lineKey, args) : said(role, lineKey, args));
         if (speaker instanceof AsgardianEntity npc) {
             npc.murmur(0.7F);
         }
@@ -235,7 +236,12 @@ public final class AsgardTalk {
 
     /** "<Name> line": the name in the role's colour. */
     public static Component said(Role role, String lineKey, List<String> args) {
-        MutableComponent name = Component.translatable(role.nameKey()).withStyle(s -> s.withColor(role.color()).withBold(true));
+        return said(role, role.nameKey(), lineKey, args);
+    }
+
+    /** The same, with the speaker's own name ({@code nameKey}: the What If people's names). */
+    public static Component said(Role role, String nameKey, String lineKey, List<String> args) {
+        MutableComponent name = Component.translatable(nameKey).withStyle(s -> s.withColor(role.color()).withBold(true));
         Object[] parts = new Object[args.size()];
         for (int i = 0; i < parts.length; i++) {
             String arg = args.get(i);

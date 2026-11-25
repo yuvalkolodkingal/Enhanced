@@ -48,10 +48,10 @@ import java.util.Set;
  *     origin when a player comes near it, each until he falls.</li>
  *     <li><b>The liberation</b>: when both have fallen, every Hydra soldier is gone and no more come, the citizens are
  *     happy (and say so), and the city turns back into an ordinary one, chunk by chunk round the players: Hydra's red and
- *     black and iron bars become white, glass and grass ({@link CityChunkGenerator#FREED}); chunks made later are made
- *     free.</li>
+ *     black and iron bars become white, glass and green yards ({@link CityChunkGenerator#FREED}), the roads stay
+ *     roads; every chunk in sight of a player turns, and chunks made later are made free.</li>
  * </ul>
- * Everything is capped round each player, and the turning of the city does at most two chunks a second per player.
+ * Everything is capped round each player, and the turning of the city does at most 24 chunks a second per player.
  */
 public final class HydraCity {
     /** The tags of the city's citizens and of its patrols. */
@@ -69,8 +69,8 @@ public final class HydraCity {
     static final int HAPPY_LINES = 8;
     static final int BROADCAST_LINES = 6;
     /** How far round a player (chunks) the free city spreads, and how many chunks a second. */
-    static final int FREE_RADIUS = 4;
-    static final int FREE_PER_SECOND = 2;
+    /** How many chunks are turned round each player a second, out to the server's view distance (the whole world in sight). */
+    static final int FREE_PER_SECOND = 24;
 
     private static boolean started;
 
@@ -96,7 +96,8 @@ public final class HydraCity {
             state.redSkull = tag.getBoolean("RedSkull");
             state.captainHydra = tag.getBoolean("CaptainHydra");
             state.freed = tag.getBoolean("Freed");
-            for (long chunk : tag.getLongArray("Turned")) {
+            // (3.19.1: "Turned" of before the roads were mended is forgotten: every chunk is turned again, its roads made whole)
+            for (long chunk : tag.getLongArray("Freed2")) {
                 state.turned.add(chunk);
             }
             return state;
@@ -107,7 +108,7 @@ public final class HydraCity {
             tag.putBoolean("RedSkull", redSkull);
             tag.putBoolean("CaptainHydra", captainHydra);
             tag.putBoolean("Freed", freed);
-            tag.putLongArray("Turned", turned.stream().mapToLong(Long::longValue).toArray());
+            tag.putLongArray("Freed2", turned.stream().mapToLong(Long::longValue).toArray());
             return tag;
         }
 
@@ -337,12 +338,16 @@ public final class HydraCity {
 
     // ---- the city turns ----
 
-    /** Turns up to {@link #FREE_PER_SECOND} of the chunks round the player into a free city's. */
+    /**
+     * Turns up to {@link #FREE_PER_SECOND} of the chunks round the player into a free city's, the nearest first, out to
+     * the server's view distance: the whole world he can see is free, not only the streets round him.
+     */
     private static void turn(ServerLevel level, ServerPlayer player, State state) {
         int cx = player.getBlockX() >> 4;
         int cz = player.getBlockZ() >> 4;
+        int radius = Math.max(4, player.server.getPlayerList().getViewDistance() + 1);
         int done = 0;
-        for (int r = 0; r <= FREE_RADIUS && done < FREE_PER_SECOND; r++) {
+        for (int r = 0; r <= radius && done < FREE_PER_SECOND; r++) {
             for (int dx = -r; dx <= r && done < FREE_PER_SECOND; dx++) {
                 for (int dz = -r; dz <= r && done < FREE_PER_SECOND; dz++) {
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != r) {
@@ -363,9 +368,10 @@ public final class HydraCity {
         }
     }
 
-    /** Hydra's colours in the chunk become a free city's. */
+    /** Hydra's colours in the chunk become a free city's, and its roads are mended (grass of before 3.19.1's fix). */
     public static void turnChunk(ServerLevel level, LevelChunk chunk) {
         Set<Block> hydra = CityChunkGenerator.FREED.keySet();
+        mendRoads(level, chunk);
         int minY = CityChunkGenerator.GROUND;
         int maxY = CityChunkGenerator.GROUND + CityChunkGenerator.CITADEL_HEIGHT + 2;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
@@ -382,17 +388,32 @@ public final class HydraCity {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
-                        BlockState to = CityChunkGenerator.FREED.get(state.getBlock());
+                        int worldY = baseY + y;
+                        BlockState to = CityChunkGenerator.free(state, worldY);
                         if (to == null) {
                             continue;
-                        }
-                        int worldY = baseY + y;
-                        if (to.is(Blocks.GRASS_BLOCK) && worldY > CityChunkGenerator.GROUND) {
-                            to = Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
                         }
                         pos.set(chunk.getPos().getMinBlockX() + x, worldY, chunk.getPos().getMinBlockZ() + z);
                         level.setBlock(pos, to, 2);
                     }
+                }
+            }
+        }
+    }
+
+    /** The roads of the chunk are roads again where a turning of before 3.19.1 made them grass (or grey). */
+    static void mendRoads(ServerLevel level, LevelChunk chunk) {
+        if (!(level.getChunkSource().getGenerator() instanceof CityChunkGenerator city)) {
+            return;
+        }
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int z = 0; z < 16; z++) {
+            for (int x = 0; x < 16; x++) {
+                pos.set(chunk.getPos().getMinBlockX() + x, CityChunkGenerator.GROUND, chunk.getPos().getMinBlockZ() + z);
+                BlockState road = city.road(pos.getX(), pos.getZ());
+                BlockState now = chunk.getBlockState(pos);
+                if (road != null && (now.is(Blocks.GRASS_BLOCK) || now.is(Blocks.GRAY_CONCRETE))) {
+                    level.setBlock(pos, road, 2);
                 }
             }
         }

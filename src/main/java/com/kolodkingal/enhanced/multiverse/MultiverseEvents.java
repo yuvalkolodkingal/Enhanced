@@ -78,6 +78,7 @@ public final class MultiverseEvents {
         ServerLevel level = player.serverLevel();
         BlockPos pos = player.blockPosition();
         int universe = Multiverse.universeAt(level, pos);
+        physics(player, Multiverse.isRandomDimension(level.dimension()) ? UniverseRecipe.of(universe) : null);
         UniverseStones.check(player);
         Integer told = TOLD.get(player.getUUID());
         if (told == null) {
@@ -98,6 +99,7 @@ public final class MultiverseEvents {
             UltronWorld.tick(player);
         }
         WhatIfPeople.tick(player);
+        Bunkers.tick(player);
         if (level.dimension() == Multiverse.ZOMBIES_KEY && !player.isSpectator()) {
             ZombieWorld.tick(player);
         }
@@ -173,6 +175,10 @@ public final class MultiverseEvents {
         if (Multiverse.isRandomDimension(level.dimension())) {
             if (!event.loadedFromDisk() && entity instanceof Mob mob && level instanceof ServerLevel server && swap(server, mob)) {
                 event.setCanceled(true);
+                return;
+            }
+            if (entity instanceof Mob mob) {
+                physics(mob, UniverseRecipe.of(Multiverse.universeAt(level, mob.blockPosition())));
             }
         } else if (level.dimension() == Multiverse.GAMMA_KEY) {
             GammaWorld.hulkify(entity);
@@ -180,6 +186,48 @@ public final class MultiverseEvents {
             if (HydraCity.onJoin(entity, event.loadedFromDisk())) {
                 event.setCanceled(true);
             }
+        }
+    }
+
+    /** The modifiers of a random universe's gravity (on everyone) and of its creatures' size (not on the players). */
+    static final net.minecraft.resources.ResourceLocation GRAVITY = com.kolodkingal.enhanced.Enhanced.id("universe_gravity");
+    static final net.minecraft.resources.ResourceLocation SIZE = com.kolodkingal.enhanced.Enhanced.id("universe_size");
+
+    /**
+     * The gravity of the universe the entity is in (3.19.1: light as the moon, or heavy), and for a creature its size
+     * (giants, or tiny). {@code recipe} null: out of the random universes, as at home.
+     */
+    static void physics(net.minecraft.world.entity.LivingEntity entity, @org.jetbrains.annotations.Nullable UniverseRecipe recipe) {
+        float gravity = recipe == null ? 0.0F : recipe.gravity();
+        modifier(entity, net.minecraft.world.entity.ai.attributes.Attributes.GRAVITY, GRAVITY, gravity);
+        modifier(entity, net.minecraft.world.entity.ai.attributes.Attributes.SAFE_FALL_DISTANCE, GRAVITY, gravity < 0.0F ? 6.0 : 0.0);
+        if (!(entity instanceof ServerPlayer)) {
+            float scale = recipe == null ? 1.0F : recipe.scale();
+            modifier(entity, net.minecraft.world.entity.ai.attributes.Attributes.SCALE, SIZE, scale - 1.0F);
+        }
+    }
+
+    private static void modifier(net.minecraft.world.entity.LivingEntity entity,
+                                 net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute,
+                                 net.minecraft.resources.ResourceLocation id, double amount) {
+        net.minecraft.world.entity.ai.attributes.AttributeInstance instance = entity.getAttribute(attribute);
+        if (instance == null) {
+            return;
+        }
+        net.minecraft.world.entity.ai.attributes.AttributeModifier existing = instance.getModifier(id);
+        if (amount == 0.0) {
+            if (existing != null) {
+                instance.removeModifier(id);
+            }
+            return;
+        }
+        // SAFE_FALL_DISTANCE adds; the gravity and the size multiply.
+        net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation operation = attribute == net.minecraft.world.entity.ai.attributes.Attributes.SAFE_FALL_DISTANCE
+                ? net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE
+                : net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
+        if (existing == null || existing.amount() != amount) {
+            instance.removeModifier(id);
+            instance.addPermanentModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(id, amount, operation));
         }
     }
 
