@@ -32,6 +32,8 @@ public final class ChargedBeamFx {
 
     static final Colors MIND = new Colors(0xF5D77A, 0xFFF6D5, 0xF2C66A);
     static final Colors FIRE = new Colors(0xFF6A14, 0xFFF4C0, 0xFFA830);
+    /** (3.19) Ultimate Wanda's giant chaos beam. */
+    static final Colors CHAOS = new Colors(0xFF2040, 0xFFE3E6, 0xFF6A80);
     private static final Vec3 UP = new Vec3(0, 1, 0);
 
     /** When each player's charge began (game time), and the charge it had when it last was seen. */
@@ -46,6 +48,9 @@ public final class ChargedBeamFx {
     }
 
     private static int chargeTicks(Power power) {
+        if (power == Power.SCARLET_WITCH) {
+            return com.kolodkingal.enhanced.ability.ChaosCannon.CHARGE_TICKS; // (3.19: Ultimate Wanda's giant beam)
+        }
         return EnhancedConfig.SPEC.isLoaded() ? ChargedBeamConfig.CHARGE_TICKS.get() : 50;
     }
 
@@ -149,6 +154,50 @@ public final class ChargedBeamFx {
         }
         float t = Mth.clamp((time - seen[2]) / 8.0F, 0.0F, 1.0F);
         fired(player, data.power(), pose, vc, camera, a, origin, look, colors, seen[1], t, time, partialTick);
+    }
+
+    /**
+     * (3.19) Ultimate Wanda's giant chaos beam ({@code ability.ChaosCannon}): while it charges, her red light gathers at her
+     * hands, swelling far bigger than a Charged Beam's; fired, a beam as wide as the tunnel it cuts, straight along her look
+     * through everything, fading over its ticks.
+     */
+    static void renderGiant(Minecraft mc, AbstractClientPlayer player, PowerData data, Vec3 origin, Matrix4f pose, VertexConsumer vc,
+                            Vec3 camera, float partialTick, float time) {
+        float charge = charge(player, data, time);
+        Vec3 look = player.getViewVector(partialTick);
+        Vec3 a = origin.subtract(camera);
+        if (data.is(Live.BEAM_CHARGING)) {
+            gatherAround(pose, vc, a, look, CHAOS, charge, time, 1.0F + 2.0F * charge);
+            if (player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson()) {
+                Vec3 ahead = player.getEyePosition(partialTick).add(look.scale(3.0)).subtract(camera);
+                flare(pose, vc, ahead, 0.05F + 0.35F * charge, CHAOS);
+            }
+            SEEN.get(player.getId())[2] = -1;
+            return;
+        }
+        float[] seen = SEEN.get(player.getId());
+        if (!data.is(Live.BEAM_FIRING)) {
+            if (seen != null) {
+                seen[2] = -1;
+            }
+            return;
+        }
+        if (seen == null) {
+            seen = new float[]{-1, 1.0F, -1, 0};
+            SEEN.put(player.getId(), seen);
+        }
+        if (seen[2] < 0) {
+            seen[2] = time;
+        }
+        float t = Mth.clamp((time - seen[2]) / (float) com.kolodkingal.enhanced.ability.ChaosCannon.FIRING_TICKS, 0.0F, 1.0F);
+        float c = seen[1];
+        Vec3 end = player.getEyePosition(partialTick).add(look.scale(com.kolodkingal.enhanced.ability.ChaosCannon.range(c)));
+        float strength = 1.0F - t * t;
+        float w = com.kolodkingal.enhanced.ability.ChaosCannon.radius(c) * 1.5F * strength;
+        Vec3 b = end.subtract(camera);
+        beam(pose, vc, a, b, CHAOS, w, strength, time, player.getId() * 7349L);
+        flare(pose, vc, a, (0.6F + 1.2F * c) * strength + 0.05F, CHAOS);
+        flare(pose, vc, b, (1.0F + 2.0F * c) * strength + 0.05F, CHAOS);
     }
 
     private static void gather(Minecraft mc, AbstractClientPlayer player, Matrix4f pose, VertexConsumer vc, Vec3 camera, Vec3 a,

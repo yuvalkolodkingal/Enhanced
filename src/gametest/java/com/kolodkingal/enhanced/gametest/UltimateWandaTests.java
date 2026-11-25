@@ -195,4 +195,50 @@ public final class UltimateWandaTests {
         check(!MindLink.isLinked(player) && !MindLink.isHost(husk), "V again: she is back");
         helper.succeed();
     }
+
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 120)
+    public static void sneakRChargesAGiantChaosBeamThroughEverything(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = ultimate(f, 3.5, 10.5);
+        PowerData data = Powers.get(player);
+        if (UltimateWanda.ultimateMenu(data)) {
+            UltimateWanda.onLookKey(player, data, 1);
+        }
+        check(!UltimateWanda.ultimateMenu(data), "the Scarlet Witch's menu");
+        net.minecraft.core.BlockPos wall = new net.minecraft.core.BlockPos(7, (int) FLOOR + 1, 10);
+        helper.setBlock(wall, net.minecraft.world.level.block.Blocks.STONE);
+        helper.setBlock(wall.above(), net.minecraft.world.level.block.Blocks.STONE);
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(12.5, FLOOR, 10.5));
+        TestKit.lookAt(player, helper.absoluteVec(new Vec3(12.5, FLOOR + 1.62, 10.5)));
+        AbilityHandler.onKey(player, 1, true, true);
+        check(com.kolodkingal.enhanced.ability.ChaosCannon.charging(player) && data.is(Live.BEAM_CHARGING), "Sneak + R: the charge gathers");
+        helper.runAfterDelay(com.kolodkingal.enhanced.ability.ChaosCannon.CHARGE_TICKS + 2, () -> {
+            AbilityHandler.onKey(player, 1, false, true);
+            check(data.is(Live.BEAM_FIRING), "released: the giant beam fires");
+            check(helper.getBlockState(wall).isAir() && helper.getBlockState(wall.above()).isAir(), "it erases the wall in its path");
+            check(!husk.isAlive(), "and destroys what is behind it");
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void herOwnEyeOfAgamottoRevealsBindsAndBanishes(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = ultimate(f, 3.5, 10.5);
+        ultimateMenu(player);
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(8.5, FLOOR, 10.5));
+        husk.addEffect(new MobEffectInstance(net.minecraft.world.effect.MobEffects.INVISIBILITY, 600));
+        TestKit.lookAt(player, husk);
+        float health = husk.getHealth();
+        press(player, 5, false);
+        check(!husk.hasEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY), "N, the Light of Agamotto: nothing stays hidden");
+        check(husk.hasEffect(ModEffects.SPELLBOUND), "her foe is held in its light");
+        check(!husk.isAlive() || husk.getHealth() < health, "and the dead burn in it");
+        husk.removeEffect(net.minecraft.world.effect.MobEffects.GLOWING);
+        if (husk.isAlive()) {
+            press(player, 5, true);
+            check(husk.hasEffect(net.minecraft.world.effect.MobEffects.GLOWING), "Sneak + N, the All-Seeing Eye: she sees them all");
+        }
+        helper.succeed();
+    }
 }

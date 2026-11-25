@@ -191,6 +191,11 @@ public final class UltimateWanda {
             return true;
         }
         if (!ultimateMenu(data)) {
+            // (in the Scarlet Witch's menu her Sneak + R is the giant charged chaos beam; R alone is the Scarlet Witch's beam)
+            if (ability == 1 && (alt || ChaosCannon.charging(player))) {
+                ChaosCannon.onKey(player, data, down);
+                return true;
+            }
             return false;
         }
         switch (ability) {
@@ -220,6 +225,17 @@ public final class UltimateWanda {
                 }
                 if (down) {
                     toggleRunes(player);
+                }
+                return true;
+            }
+            case 5 -> {
+                // (her own Eye of Agamotto: its light, or with Sneak its sight)
+                if (down) {
+                    if (alt) {
+                        UltimateEye.sight(player);
+                    } else {
+                        UltimateEye.light(player);
+                    }
                 }
                 return true;
             }
@@ -629,6 +645,7 @@ public final class UltimateWanda {
 
     /** Every player, every tick (server): their client is told when the universe they stand in turns red, or clears. */
     public static void everyPlayerTick(ServerPlayer player) {
+        ChaosCannon.tick(player);
         if (TAKEN.isEmpty() && !TOLD.containsKey(player.getUUID())) {
             return;
         }
@@ -751,6 +768,7 @@ public final class UltimateWanda {
         UUID id = player.getUUID();
         releaseAll(player.server, id, false);
         STOLEN.remove(id);
+        ChaosCannon.forget(id);
         REVIVE_AT.remove(id);
         LAST_HEALTH.remove(id);
         TOLD.remove(id);

@@ -190,6 +190,11 @@ public final class WorldEffectsRenderer {
             ChargedBeamFx.render(mc, player, data, source ? jewelPosition(mc, player, partialTick) : foreheadPosition(mc, player, partialTick),
                     source ? ChargedBeamFx.FIRE : ChargedBeamFx.MIND, pose, beams, camera, partialTick, time);
         }
+        // (3.19) Ultimate Wanda's giant chaos beam (Sneak + R): the charge at her hands and the shot
+        if (com.kolodkingal.enhanced.ability.UltimateWanda.is(data) && (data.is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING)
+                || data.is(com.kolodkingal.enhanced.power.Live.BEAM_FIRING))) {
+            ChargedBeamFx.renderGiant(mc, player, data, handPosition(mc, player, partialTick), pose, beams, camera, partialTick, time);
+        }
         // (3.17) Jim Hammond: his Fire Beam (continuous, in fire), his fireballs and the Nova Flame
         if (data.power() == com.kolodkingal.enhanced.power.Power.JIM_HAMMOND) {
             if (data.is(com.kolodkingal.enhanced.power.Live.BEAM_FIRING)) {
