@@ -674,8 +674,8 @@ public final class GestureRoutes {
             case BILLY_DEMIURGE -> "drawn, not acted: the Demiurge's two looks (SuitSkins, DemiurgeFx), his cloth cloak (DemiurgeCloakLayer) and crown (BillyCrownLayer)";
             // (3.19) Ultimate Wanda
             case WANDA_ULTIMATE -> "drawn, not acted: the Sorceress Supreme's look (SuitSkins), her red sky (UniverseTakeoverClient)";
-            case WANDA_EYE_OPEN -> "drawn, not acted: her red Eye of Agamotto open on her chest (EyeAmuletLayer)";
-            case PHOENIX_SHIELD -> "drawn, not acted: her orange psionic force field (PhoenixFx.shieldSphere)";
+            case WANDA_EYE_OPEN -> "neither drawn nor acted: the red Eye on her chest is her skin's own (SuitSkins); the bit marks only that she uses it";
+            case PHOENIX_SHIELD -> "drawn, not acted: her force field of burning orange fire (PhoenixFx.shieldSphere)";
         };
     }
 
