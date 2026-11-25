@@ -5624,5 +5624,14 @@
   "ultron.enhanced.voice.2": "Everything you loved is dust.",
   "ultron.enhanced.voice.3": "Why do you still run? There is nowhere left.",
   "ultron.enhanced.voice.4": "Every heartbeat on this planet was a mistake. I corrected them.",
-  "ultron.enhanced.voice.5": "You are the last noise in a silent world."
+  "ultron.enhanced.voice.5": "You are the last noise in a silent world.",
+  "item.enhanced.hydra_shield": "Hydra Shield",
+  "captain.enhanced.hail_hydra": "Hail Hydra!",
+  "ability.enhanced.captain_america.hydra.4": "Hail Hydra (Sneak: Inspire)",
+  "ability.enhanced.captain_america.red_skull.1": "Tesseract Blast (Sneak: Luger)",
+  "ability.enhanced.captain_america.red_skull.2": "Dust of Death (Sneak: Super-Soldier Leap)",
+  "ability.enhanced.captain_america.red_skull.3": "Tesseract Jump (Sneak: Shield Bash)",
+  "hud.enhanced.captain.hail": "Hail Hydra: %ss",
+  "screen.enhanced.hero_creator.character.red_skull": "Johann Schmidt, the first super-soldier: the Tesseract's blasts and jumps, the Dust of Death, his Luger, and Hydra at his call.",
+  "screen.enhanced.hero_creator.character.captain_hydra": "Steve Rogers, rewritten by the Cosmic Cube to serve Hydra: Cap's face and powers, Hydra's suit and shield."
 }

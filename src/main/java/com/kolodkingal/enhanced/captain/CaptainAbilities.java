@@ -137,6 +137,10 @@ public final class CaptainAbilities {
         if (!down || player.isSpectator() || !player.isAlive() || HealingFactor.isDown(player)) {
             return;
         }
+        // (3.19) Red Skull's own powers on R, G and V: the Tesseract, the Dust of Death, his Luger
+        if (RedSkull.onKey(player, data, ability, alt)) {
+            return;
+        }
         switch (ability) {
             case 1 -> ShieldThrow.start(player, data, alt);
             case 2 -> {

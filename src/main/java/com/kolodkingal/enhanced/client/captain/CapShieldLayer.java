@@ -54,7 +54,8 @@ public class CapShieldLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         // Its face out behind him (the model's face is -z), the star upright.
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
         poseStack.scale(SCALE, SCALE, SCALE);
-        ShieldItemRenderer.get().model().renderOnBack(poseStack, buffer.getBuffer(ShieldModel.renderType()),
+        ShieldItemRenderer.get().model().renderOnBack(poseStack, buffer.getBuffer(ShieldModel.renderType(
+                com.kolodkingal.enhanced.power.Characters.hydra(com.kolodkingal.enhanced.power.Powers.get(player)))),
                 packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }

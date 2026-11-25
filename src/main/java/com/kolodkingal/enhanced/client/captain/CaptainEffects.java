@@ -28,6 +28,9 @@ public final class CaptainEffects {
     private static final int BLUE = 0x6FA0FF;
     private static final int RED = CaptainAbilities.RED;
     private static final int GOLD = 0xFFD86A;
+    /** (3.19) Hail Hydra's colours. */
+    private static final int HYDRA_RED = 0xD0102E;
+    private static final int HYDRA_BLACK = 0x2A2A30;
 
     /** Registers a drawer for every kind (the client setup calls it once). */
     public static void register() {
@@ -106,22 +109,27 @@ public final class CaptainEffects {
                 }
             }
             case CaptainFxPayload.ASSEMBLE -> {
+                // (3.19) Hail Hydra: Hydra's red and black, not Cap's blue and silver
+                boolean hydra = who instanceof net.minecraft.world.entity.player.Player hero
+                        && com.kolodkingal.enhanced.power.Characters.hydra(com.kolodkingal.enhanced.power.Powers.get(hero));
+                int first = hydra ? HYDRA_RED : BLUE;
+                int second = hydra ? HYDRA_BLACK : SILVER;
                 if (who != null) {
                     Vec3 feet = who.position();
                     for (int i = 0; i < 48; i++) {
                         double a = Mth.TWO_PI * i / 48.0;
                         double cos = Math.cos(a);
                         double sin = Math.sin(a);
-                        level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? BLUE : SILVER, 0.9F),
+                        level.addParticle(new EnergyParticleOptions(i % 2 == 0 ? first : second, 0.9F),
                                 feet.x + cos * 0.6, feet.y + 0.15, feet.z + sin * 0.6, cos * 0.45, 0.01, sin * 0.45);
                     }
                     Vec3 top = feet.add(0, who.getBbHeight() + 0.6, 0);
-                    burst(level, top, BLUE, 10, 0.2, r);
+                    burst(level, top, first, 10, 0.2, r);
                 }
                 for (int i = who != null ? 1 : 0; i < p.points().size(); i++) {
                     Vec3 ally = p.points().get(i);
                     for (int k = 0; k < 6; k++) {
-                        level.addParticle(new EnergyParticleOptions(k % 2 == 0 ? BLUE : RED, 0.6F),
+                        level.addParticle(new EnergyParticleOptions(k % 2 == 0 ? first : (hydra ? second : RED), 0.6F),
                                 ally.x + r.nextGaussian() * 0.3, ally.y + 1.8 + r.nextDouble() * 0.4,
                                 ally.z + r.nextGaussian() * 0.3, 0, 0.03, 0);
                     }

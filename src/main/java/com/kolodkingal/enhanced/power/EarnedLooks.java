@@ -12,12 +12,12 @@ import java.util.Set;
 /**
  * Looks that are earned, not chosen (3.12): Vision's Source Code (from the Human Torch, in Vision's mind) and Ultron's
  * nanotech body (from the Horton manor's storage). The Change Look key skips them until the player has earned them;
- * once earned they stay, with the player's own data (it survives death).
+ * once earned they stay, with the player's own data (it survives death). (3.19: Red Skull and Captain Hydra are no longer
+ * earned: they are heroes of their own, {@code Characters.playable}.)
  */
 public final class EarnedLooks {
     private static final String TAG = "enhanced_earned_looks";
-    private static final Set<String> EARNED = Set.of("vision:source_code", "ultron:nano", "ultron:nano_human",
-            "captain_america:red_skull", "captain_america:captain_hydra");
+    private static final Set<String> EARNED = Set.of("vision:source_code", "ultron:nano", "ultron:nano_human");
 
     private EarnedLooks() {
     }

@@ -5624,5 +5624,14 @@
   "ultron.enhanced.voice.2": "כל מה שאהבתם הוא אבק.",
   "ultron.enhanced.voice.3": "למה אתם עדיין בורחים? לא נשאר לאן.",
   "ultron.enhanced.voice.4": "כל פעימת לב על הכוכב הזה הייתה טעות. תיקנתי אותן.",
-  "ultron.enhanced.voice.5": "אתם הרעש האחרון בעולם שקט."
+  "ultron.enhanced.voice.5": "אתם הרעש האחרון בעולם שקט.",
+  "item.enhanced.hydra_shield": "מגן הידרה",
+  "captain.enhanced.hail_hydra": "הייל הידרה!",
+  "ability.enhanced.captain_america.hydra.4": "הייל הידרה (התגנבות: השראה)",
+  "ability.enhanced.captain_america.red_skull.1": "פיצוץ טסרקט (התגנבות: לוגר)",
+  "ability.enhanced.captain_america.red_skull.2": "אבקת המוות (התגנבות: קפיצת על-חייל)",
+  "ability.enhanced.captain_america.red_skull.3": "קפיצת טסרקט (התגנבות: מכת מגן)",
+  "hud.enhanced.captain.hail": "הייל הידרה: %ss",
+  "screen.enhanced.hero_creator.character.red_skull": "יוהאן שמידט, העל-חייל הראשון: פיצוצים וקפיצות של הטסרקט, אבקת המוות, הלוגר שלו, והידרה לפקודתו.",
+  "screen.enhanced.hero_creator.character.captain_hydra": "סטיב רוג'רס, שהקובייה הקוסמית שכתבה מחדש כך שישרת את הידרה: הפנים והכוחות של קפטן, החליפה והמגן של הידרה."
 }

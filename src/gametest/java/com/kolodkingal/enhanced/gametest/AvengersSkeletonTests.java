@@ -179,7 +179,7 @@ public final class AvengersSkeletonTests {
         TestKit.assertNear(Power.LOVE.flightSpeed(), 0.10, 1.0E-6, "Love's 0.10");
         check(Variants.of(Power.CAPTAIN_AMERICA).stream().map(Variant::id).toList()
                 .equals(List.of("classic", "stealth", "red_skull", "captain_hydra", "own")),
-                "Cap's three looks, and (3.19.1) Red Skull's and Captain Hydra's, earned in Hydra's city");
+                "Cap's three looks, and (3.19.1) Red Skull's and Captain Hydra's (3.19: heroes of their own)");
         check(Variants.of(Power.RED_HULK).stream().map(Variant::id).toList().equals(List.of("red_hulk", "own")),
                 "Red Hulk's two");
         check(Variants.of(Power.IRON_MAN).stream().map(Variant::id).toList()

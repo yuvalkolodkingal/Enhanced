@@ -130,7 +130,8 @@ public final class HydraGoals {
         near.sort(Comparator.comparingDouble(e -> e.distanceToSqr(soldier)));
         for (LivingEntity e : near) {
             if (e instanceof Player player) {
-                if (HydraSenses.sees(soldier, player)) {
+                // (3.19: never Red Skull or Captain Hydra)
+                if (!HydraLoyalty.sameSide(soldier, player) && HydraSenses.sees(soldier, player)) {
                     return player;
                 }
             } else if (HydraLoyalty.isHydra(e) && HydraLoyalty.isTraitor(e)

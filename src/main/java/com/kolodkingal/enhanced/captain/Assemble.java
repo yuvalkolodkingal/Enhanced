@@ -25,6 +25,9 @@ import java.util.List;
  * rallyRadius}: they (and he) get Strength I and Speed I for {@code rallyTicks}; Inspire heals them {@code inspireHeal}
  * and lifts Weakness, Slowness and Mining Fatigue. His allies are the players of his team (with no team, every player
  * while PvP is off: nobody is a foe then), tamed pets, iron golems and villagers; never a monster.
+ *
+ * <p>(3.19) For Red Skull and Captain Hydra it is <i>Hail Hydra</i>: the shout is heard in chat, and his allies are Hydra's
+ * soldiers and officers (not golems and villagers).
  */
 public final class Assemble {
     /** Assemble: the rally. Returns how many allies (him included) were rallied, or -1 when it could not be used. */
@@ -47,9 +50,30 @@ public final class Assemble {
             count++;
         }
         ServerLevel level = player.serverLevel();
-        CaptainAbilities.sound(level, player.position(), ModSounds.CAP_ASSEMBLE.get(), 1.4F, 1.0F);
+        if (com.kolodkingal.enhanced.power.Characters.hydra(data)) {
+            // (3.19) Red Skull and Captain Hydra: not "Assemble" but "Hail Hydra!", shouted for all near to hear; a deeper horn
+            hailHydra(level, player);
+            CaptainAbilities.sound(level, player.position(), ModSounds.CAP_ASSEMBLE.get(), 1.4F, 0.7F);
+        } else {
+            CaptainAbilities.sound(level, player.position(), ModSounds.CAP_ASSEMBLE.get(), 1.4F, 1.0F);
+        }
         CaptainAbilities.send(level, player, CaptainFxPayload.ASSEMBLE, points, count);
         return count;
+    }
+
+    /** How far "Hail Hydra!" is heard (blocks). */
+    public static final double HAIL_RANGE = 48.0;
+
+    /** (3.19) The shout, in chat, to everyone within {@link #HAIL_RANGE}. */
+    static void hailHydra(ServerLevel level, ServerPlayer player) {
+        net.minecraft.network.chat.Component line = net.minecraft.network.chat.Component.translatable("hydra.enhanced.says",
+                player.getDisplayName(), net.minecraft.network.chat.Component.translatable("captain.enhanced.hail_hydra"))
+                .withStyle(net.minecraft.ChatFormatting.DARK_RED, net.minecraft.ChatFormatting.BOLD);
+        for (ServerPlayer other : level.players()) {
+            if (other.distanceToSqr(player) <= HAIL_RANGE * HAIL_RANGE) {
+                other.sendSystemMessage(line);
+            }
+        }
     }
 
     /** Inspire: the heal. Returns how many were healed (him included), or -1 when it could not be used. */
@@ -106,6 +130,10 @@ public final class Assemble {
         }
         if (e instanceof TamableAnimal pet) {
             return pet.isTame();
+        }
+        // (3.19) Hydra's own answer Red Skull and Captain Hydra; golems and villagers do not
+        if (com.kolodkingal.enhanced.power.Characters.hydra(com.kolodkingal.enhanced.power.Powers.get(player))) {
+            return com.kolodkingal.enhanced.hydra.HydraLoyalty.isHydra(e) && !com.kolodkingal.enhanced.hydra.HydraLoyalty.isTraitor(e);
         }
         return e instanceof IronGolem || e instanceof AbstractVillager;
     }

@@ -328,6 +328,15 @@ public class PowerHud implements LayeredDraw.Layer {
         if ((ability == 1 || ability == 5) && com.kolodkingal.enhanced.power.VisionQuest.solar(data)) {
             return "ability.enhanced.vision.solar." + ability;
         }
+        // (3.19) Red Skull's own R, G and V; his and Captain Hydra's "Hail Hydra" on B
+        if (power == Power.CAPTAIN_AMERICA && com.kolodkingal.enhanced.power.Characters.hydra(data)) {
+            if (com.kolodkingal.enhanced.captain.RedSkull.is(data) && ability >= 1 && ability <= 3) {
+                return "ability.enhanced.captain_america.red_skull." + ability;
+            }
+            if (ability == 4) {
+                return "ability.enhanced.captain_america.hydra.4";
+            }
+        }
         // (3.18) Cosmic Spider-Man's own R, G (webs, not swings: he flies), B and N
         if ((ability == 1 || ability == 2 || ability == 4 || ability == 5) && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data)) {
             return "ability.enhanced.spider_man.cosmic." + ability;
