@@ -258,6 +258,62 @@ public final class MindTour {
             whatIf(com.kolodkingal.enhanced.multiverse.Multiverse.HYDRA_KEY, "w05_hydra", com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN);
             return;
         }
+        if ("jean".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            // (3.19.2) -Denhanced.mindtour.mode=jean: Jean Grey's Brand New Day look, her telekinesis (orange, no lightning),
+            // her psionic force field and her bigger Phoenix
+            server(p -> {
+                p.setGameMode(GameType.SURVIVAL);
+                Powers.awaken(p, Power.PHOENIX, "brand_new_day", false);
+                p.teleportTo(p.getX(), p.level().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                        (int) p.getX(), (int) p.getZ()), p.getZ());
+                p.setYRot(0.0F);
+                p.setXRot(0.0F);
+            }, 40);
+            camera(CameraType.THIRD_PERSON_FRONT);
+            shot("j01_look_front", 30);
+            camera(CameraType.THIRD_PERSON_BACK);
+            shot("j02_look_back", 20);
+            server(p -> {
+                net.minecraft.world.entity.Mob pig = net.minecraft.world.entity.EntityType.PIG.create(p.level());
+                if (pig != null) {
+                    pig.moveTo(p.getX(), p.getY(), p.getZ() + 4.0, 180.0F, 0.0F);
+                    pig.setNoAi(true);
+                    p.level().addFreshEntity(pig);
+                }
+            }, 10);
+            server(p -> p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
+                    p.position().add(0, 0.5, 4.0)), 10);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, true, false), 10);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, false), 30);
+            shot("j03_tk_back", 10);
+            camera(CameraType.THIRD_PERSON_FRONT);
+            shot("j04_tk_front", 15);
+            camera(CameraType.FIRST_PERSON);
+            shot("j05_tk_first", 15);
+            server(p -> com.kolodkingal.enhanced.ability.Telekinesis.release(p, true), 10);
+            server(p -> {
+                com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 2, true, true);
+                com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 2, false, true);
+            }, 10);
+            camera(CameraType.THIRD_PERSON_FRONT);
+            shot("j06_shield_front", 20);
+            camera(CameraType.FIRST_PERSON);
+            shot("j07_shield_first", 15);
+            server(p -> {
+                com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 2, true, true);
+                com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 2, false, true);
+                p.getFoodData().setFoodLevel(20);
+                p.setYRot(180.0F);
+            }, 10);
+            camera(CameraType.THIRD_PERSON_BACK);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 5, true, false), 10);
+            shot("j08_charge", 45);
+            server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 5, false, false), 2);
+            shot("j09_burst", 8);
+            shot("j10_burst_late", 12);
+            camera(CameraType.FIRST_PERSON);
+            return;
+        }
         if ("tk".equals(System.getProperty("enhanced.mindtour.mode"))) {
             // (3.16.1) -Denhanced.mindtour.mode=tk: the Scarlet Witch's telekinesis on a pig, then (Sneak) on a block
             server(p -> {
