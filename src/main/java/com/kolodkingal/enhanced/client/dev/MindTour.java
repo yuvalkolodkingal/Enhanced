@@ -147,6 +147,73 @@ public final class MindTour {
         server(p -> MindTalk.choose(p, option), delay);
     }
 
+    private static final java.util.List<net.minecraft.world.entity.Entity> TOUR = new java.util.ArrayList<>();
+
+    /** (3.19.1) A row of creatures and one of the universe's people in front of the player there; a picture; his talk. */
+    private static void whatIf(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> key, String name,
+                               com.kolodkingal.enhanced.asgard.npc.Role role) {
+        server(p -> {
+            TOUR.forEach(net.minecraft.world.entity.Entity::discard);
+            TOUR.clear();
+            net.minecraft.server.level.ServerLevel level = p.getServer().getLevel(key);
+            int x = key == com.kolodkingal.enhanced.multiverse.Multiverse.HYDRA_KEY ? 99 : 8;
+            int z = key == com.kolodkingal.enhanced.multiverse.Multiverse.HYDRA_KEY ? 3 : 8;
+            level.getChunk(x >> 4, z >> 4);
+            int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+            level.setDayTime(6000);
+            p.teleportTo(level, x + 0.5, y + 2.5, z - 7.5, 0.0F, 15.0F);
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+        }, 60);
+        server(p -> {
+            net.minecraft.server.level.ServerLevel level = p.serverLevel();
+            java.util.List<net.minecraft.world.entity.EntityType<?>> kinds = java.util.List.of(net.minecraft.world.entity.EntityType.COW,
+                    net.minecraft.world.entity.EntityType.PIG, net.minecraft.world.entity.EntityType.SHEEP, net.minecraft.world.entity.EntityType.CHICKEN,
+                    net.minecraft.world.entity.EntityType.WOLF, net.minecraft.world.entity.EntityType.CREEPER, net.minecraft.world.entity.EntityType.VILLAGER);
+            double x0 = p.getX() - 6.0;
+            int floor = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(p.getX()), (int) Math.floor(p.getZ()) + 6);
+            for (int dx = -8; dx <= 8; dx++) {
+                for (int dz = 2; dz <= 10; dz++) {
+                    BlockPos at = BlockPos.containing(p.getX() + dx, floor - 1, p.getZ() + dz);
+                    level.setBlockAndUpdate(at, net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                    for (int up = 0; up < 6; up++) {
+                        level.setBlockAndUpdate(at.above(1 + up), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    }
+                }
+            }
+            for (int i = 0; i < kinds.size(); i++) {
+                net.minecraft.world.entity.Entity e = kinds.get(i).create(level);
+                if (e instanceof net.minecraft.world.entity.Mob mob) {
+                    double x = x0 + i * 2.0;
+                    mob.moveTo(x, floor, p.getZ() + 6.0, 180.0F, 0.0F);
+                    mob.setYHeadRot(180.0F);
+                    mob.setNoAi(true);
+                    level.addFreshEntity(mob);
+                    TOUR.add(mob);
+                }
+            }
+            com.kolodkingal.enhanced.asgard.npc.AsgardianEntity person = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(level, role,
+                    p.getX() + 7.0, floor, p.getZ() + 3.5, null);
+            person.setYRot(180.0F);
+            level.addFreshEntity(person);
+            TOUR.add(person);
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("What If tour: {} creatures in {}", TOUR.size(), level.dimension().location());
+        }, 80);
+        shot(name, 10);
+        server(p -> {
+            for (net.minecraft.world.entity.Entity e : TOUR) {
+                if (e instanceof com.kolodkingal.enhanced.asgard.npc.AsgardianEntity npc) {
+                    p.teleportTo(p.serverLevel(), npc.getX(), npc.getY(), npc.getZ() - 2.5, 0.0F, 10.0F);
+                    boolean opened = com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(p, npc);
+                    com.kolodkingal.enhanced.Enhanced.LOGGER.info("What If tour: talk opened {} at {}", opened,
+                            com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(p));
+                }
+            }
+        }, 60);
+        shot(name.replace("1_", "2_").replace("3_", "4_").replace("5_", "6_") + "_talk", 10);
+        STEPS.add(new Step(10, () -> Minecraft.getInstance().setScreen(null)));
+    }
+
     private static void script() {
         if ("config".equals(System.getProperty("enhanced.mindtour.mode"))) {
             // (3.16.1) the settings screen and its client section, in a world (a player's report: an empty screen)
@@ -182,6 +249,13 @@ public final class MindTour {
             }));
             shot("c03_values", 10);
             STEPS.add(new Step(20, () -> Minecraft.getInstance().setScreen(null)));
+            return;
+        }
+        if ("whatif".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            // (3.19.1) -Denhanced.mindtour.mode=whatif: the zombies' and the Gamma Bomb's creatures, and their people's talk
+            whatIf(com.kolodkingal.enhanced.multiverse.Multiverse.ZOMBIES_KEY, "w01_zombies", com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR);
+            whatIf(com.kolodkingal.enhanced.multiverse.Multiverse.GAMMA_KEY, "w03_gamma", com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR);
+            whatIf(com.kolodkingal.enhanced.multiverse.Multiverse.HYDRA_KEY, "w05_hydra", com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN);
             return;
         }
         if ("tk".equals(System.getProperty("enhanced.mindtour.mode"))) {

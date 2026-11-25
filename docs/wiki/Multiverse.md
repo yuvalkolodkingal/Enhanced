@@ -10,7 +10,7 @@ Hebrew: [עברית](Multiverse-HE)
 |---|---|
 | **Earth-616**, the main universe | Where a new world starts (the Overworld; the Nether, the End and the mod's realms belong to it). Every structure of the game and of the mod is here, **except the Mutant School**. |
 | **Earth-10005**, the X-Men's universe | A normal world of large biomes with the game's own structures and the **Mutant School**, the only universe that has it now (with its lab: Wolverine, Deadpool, Cerebro). |
-| **Earth-2149**, the zombie universe | The same land as 616, overrun. **Zombies with helmets** walk by day and by night (the sun does not burn them), **four times as many** as a normal night, and **every village is an abandoned village**. Every other structure of the game is there. |
+| **Earth-2149**, the zombie universe | The same land as 616, overrun. **Zombies with helmets** walk by day and by night (the sun does not burn them), **four times as many** as a normal night, and **every village is an abandoned village**. **Every creature is a zombie of its kind**: villagers come as zombie villagers, piglins as zombified piglins, hoglins as zoglins, horses as zombie horses, and every other kind rots where it stands (grey-green dead hide, raw flesh, bone), groans, is tougher, drops rotten flesh and **attacks you on sight**, a cow or a chicken too. Every other structure of the game is there. |
 | **What If... the Gamma Bomb Went Off?** | Every creature is a Hulk of its kind (below). |
 | **What If... Hydra Won?** | Hydra's grey city, its people, and its two rulers (below). |
 | **What If... Ultron Won?** | A dead world of ruins, bones and Ultron's Sentries (below). |
@@ -50,7 +50,7 @@ Its title on the screen says what it is best known for: "What If... the World We
 
 ## What If... the Gamma Bomb Went Off?
 
-Bruce Banner's gamma bomb went off over the whole world. **Every creature came out of the green light a Hulk of its kind**: half again to more than twice its size, four times as tough, two and a half times as strong, faster, thick-skinned and hard to knock back. They glow with green gamma sparks, and the air itself is green. Players stay as they are.
+Bruce Banner's gamma bomb went off over the whole world. **Every creature came out of the green light a Hulk of its kind**: half again to more than twice its size, four times as tough, two and a half times as strong, faster, thick-skinned and hard to knock back. Their hide is swollen past their own shape, green and veined, and **the veins glow**, pulsing with their heartbeat; green gamma sparks rise round them, and the air itself is green. **Annoy one and it turns on you**: hit any creature, a cow, a sheep, a chicken, and it charges and mauls you, and its kind round it join in. Players stay as they are.
 
 ## What If... Hydra Won?
 
@@ -67,6 +67,13 @@ Hydra rules a grey industrial city: blocks of flats with Hydra's red stripes, fa
 ## What If... Ultron Won?
 
 As in the series: Ultron took the six Infinity Stones and ended all life. The cities lie in ruins, broken towers with holes blown through their walls, cracked streets with rubble and craters, cobwebs, and **the bones of the people** where they fell. Nothing lives here; no creature comes to be. **Fleets of Ultron's Sentries** fly over the ruins and hunt whoever is left, and now and then you hear Ultron's voice.
+
+## The people of the What If universes
+
+They talk on the mod's own talk panel, as the Asgardians do (use one: their face, their words, and up to three answers):
+
+* **Hydra's citizens** walk the city. Under Hydra they whisper how they suffer, tell **what happened** (Kobik, the Secret Empire), **where the rulers are** (and which of them has fallen, and how to beat the other), and give what little they have to whoever **promises to free them**. Once the city is free they celebrate, give a **reward** and tell what they will do now.
+* **Survivors** hide in Earth-2149, the Gamma Bomb's world and Ultron's: rare, one or two round you at most. Each tells **his universe's story**, gives **advice**, and **shares his supplies** once.
 
 ## Reed Richards' Multiverse Bridge
 

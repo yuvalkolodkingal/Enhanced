@@ -22,7 +22,9 @@ import java.util.List;
  * creature in it came out of the green light a Hulk of its kind: bigger (half again to more than twice its size), four
  * times as tough, two and a half times as strong, faster, harder to knock back and thick-skinned, each a little
  * different from the next. They glow with gamma (green sparks round them near a player), and the air is green
- * (the client's fog). Players stay as they are.
+ * (the client's fog). Their hide swells green and veined (the client's {@code WhatIfLooks}), and every one of them, a cow
+ * or a chicken too, turns on whoever hurts it, and its kind round it join in ({@link WhatIfGoals#temper}). Players and
+ * the survivors stay as they are.
  */
 public final class GammaWorld {
     static final ResourceLocation SCALE = Enhanced.id("gamma_scale");
@@ -48,7 +50,15 @@ public final class GammaWorld {
 
     /** Makes a creature that comes into the Gamma world a Hulk of its kind (once: the changes are saved with it). */
     public static void hulkify(Entity entity) {
-        if (!(entity instanceof LivingEntity living) || entity instanceof Player || entity instanceof ArmorStand || isHulk(living)) {
+        if (!(entity instanceof LivingEntity living) || entity instanceof Player || entity instanceof ArmorStand
+                || WhatIfPeople.isPerson(entity)) {
+            return;
+        }
+        // Its temper, every time it comes (goals are not saved): it turns on whoever hurts it.
+        if (entity instanceof net.minecraft.world.entity.Mob mob) {
+            WhatIfGoals.temper(mob);
+        }
+        if (isHulk(living)) {
             return;
         }
         int h = entity.getUUID().hashCode();

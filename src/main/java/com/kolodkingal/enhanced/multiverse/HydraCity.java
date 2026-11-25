@@ -22,6 +22,8 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.Villager;
+import com.kolodkingal.enhanced.asgard.npc.AsgardianEntity;
+import com.kolodkingal.enhanced.asgard.npc.Role;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -165,7 +167,7 @@ public final class HydraCity {
         if (state.freed) {
             turn(level, player, state);
             if (player.getRandom().nextInt(4) == 0) {
-                for (Villager citizen : citizens(level, player)) {
+                for (AsgardianEntity citizen : citizens(level, player)) {
                     level.sendParticles(ParticleTypes.HAPPY_VILLAGER, citizen.getX(), citizen.getY() + 2.1, citizen.getZ(), 2, 0.3, 0.2, 0.3, 0.0);
                 }
             }
@@ -181,8 +183,8 @@ public final class HydraCity {
         }
     }
 
-    private static List<Villager> citizens(ServerLevel level, ServerPlayer player) {
-        return level.getEntitiesOfClass(Villager.class, player.getBoundingBox().inflate(COUNT_RANGE),
+    private static List<AsgardianEntity> citizens(ServerLevel level, ServerPlayer player) {
+        return level.getEntitiesOfClass(AsgardianEntity.class, player.getBoundingBox().inflate(COUNT_RANGE),
                 v -> v.getTags().contains(CITIZEN));
     }
 
@@ -190,7 +192,7 @@ public final class HydraCity {
     private static void people(ServerLevel level, ServerPlayer player, boolean freed) {
         int citizens = citizens(level, player).size();
         if (citizens < CITIZENS) {
-            come(level, player, EntityType.VILLAGER, CITIZEN);
+            come(level, player, null, CITIZEN);
         }
         if (!freed) {
             int soldiers = level.getEntitiesOfClass(HydraSoldierEntity.class, player.getBoundingBox().inflate(COUNT_RANGE),
@@ -201,7 +203,8 @@ public final class HydraCity {
         }
     }
 
-    private static void come(ServerLevel level, ServerPlayer player, EntityType<? extends net.minecraft.world.entity.Mob> type, String tag) {
+    /** A citizen ({@code type} null: one of the city's people, {@link WhatIfPeople}) or a soldier comes round the player. */
+    private static void come(ServerLevel level, ServerPlayer player, @org.jetbrains.annotations.Nullable EntityType<? extends net.minecraft.world.entity.Mob> type, String tag) {
         for (int attempt = 0; attempt < 4; attempt++) {
             double angle = player.getRandom().nextDouble() * Mth.TWO_PI;
             double distance = COME_MIN + player.getRandom().nextDouble() * (COME_MAX - COME_MIN);
@@ -218,6 +221,10 @@ public final class HydraCity {
             BlockPos feet = new BlockPos(x, y, z);
             if (level.getNearestPlayer(x, y, z, COME_MIN - 4, false) != null) {
                 continue;
+            }
+            if (type == null) {
+                level.addFreshEntity(WhatIfPeople.person(level, Role.HYDRA_CITIZEN, x + 0.5, y, z + 0.5, tag));
+                return;
             }
             net.minecraft.world.entity.Mob mob = type.create(level);
             if (mob == null) {
@@ -258,23 +265,6 @@ public final class HydraCity {
     private static boolean out(ServerLevel level, int kind) {
         AABB round = new AABB(CityChunkGenerator.CITADEL_DOOR).inflate(160.0, 128.0, 160.0);
         return !level.getEntitiesOfClass(HydraBossEntity.class, round, b -> b.isAlive() && b.kind() == kind).isEmpty();
-    }
-
-    // ---- the people speak ----
-
-    /** A player speaks to a citizen: he says how he lives. Returns whether it was a citizen. */
-    static boolean talk(ServerPlayer player, Entity target) {
-        if (!(target instanceof Villager citizen) || !citizen.getTags().contains(CITIZEN)) {
-            return false;
-        }
-        boolean freed = state(player.server).freed;
-        String key = freed ? "hydra.enhanced.citizen.happy." + player.getRandom().nextInt(HAPPY_LINES)
-                : "hydra.enhanced.citizen.suffer." + player.getRandom().nextInt(SUFFER_LINES);
-        player.sendSystemMessage(Component.translatable("hydra.enhanced.citizen.says", Component.translatable(key))
-                .withStyle(freed ? ChatFormatting.GREEN : ChatFormatting.GRAY));
-        citizen.getLookControl().setLookAt(player);
-        citizen.playSound(freed ? SoundEvents.VILLAGER_CELEBRATE : SoundEvents.VILLAGER_NO, 1.0F, 1.0F);
-        return true;
     }
 
     // ---- the rulers fall ----
@@ -332,6 +322,9 @@ public final class HydraCity {
 
     /** A Hydra soldier that comes into a free city is not let in; nor a second ruler, nor one who has fallen. */
     static boolean onJoin(Entity entity, boolean loadedFromDisk) {
+        if (entity instanceof Villager && entity.getTags().contains(CITIZEN)) {
+            return true; // a citizen of before 3.19.1's talk: the people are the mod's own now
+        }
         if (!(entity instanceof HydraSoldierEntity) || entity.level().getServer() == null) {
             return false;
         }

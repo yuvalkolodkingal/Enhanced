@@ -596,4 +596,4 @@ new net\.minecraft\.client\.input\.MouseButtonInfo\(([^,()]+), 0\) => new net.mi
 @in(/UniverseChunkGenerator\.java) \(qx, qy, qz, sampler\) -> => (qx, qy, qz) ->
 @in(/UniverseChunkGenerator\.java) , randomState\.sampler\(\)\); => );
 # (3.19.1, 26.3: an entity's own tags are entityTags())
-@in(/(HydraCity|MultiverseEvents)\.java) \.getTags\(\)\.contains\( => .entityTags().contains(
+@in(/(HydraCity|MultiverseEvents|WhatIfPeople|ZombieWorld)\.java) \.getTags\(\)\.contains\( => .entityTags().contains(

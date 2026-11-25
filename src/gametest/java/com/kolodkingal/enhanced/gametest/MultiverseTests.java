@@ -294,7 +294,7 @@ public final class MultiverseTests {
                 || city.getBlockState(new BlockPos(3, ground, 100)).is(net.minecraft.world.level.block.Blocks.YELLOW_CONCRETE), "a street");
         // The test world is kept between runs: a Citadel an earlier run already freed is grey, and then only the fall is tested.
         net.minecraft.world.level.block.state.BlockState roof = city.getBlockState(new BlockPos(27, ground + com.kolodkingal.enhanced.multiverse.CityChunkGenerator.CITADEL_HEIGHT, 27));
-        boolean turnedBefore = roof.is(net.minecraft.world.level.block.Blocks.GRAY_CONCRETE);
+        boolean turnedBefore = roof.is(net.minecraft.world.level.block.Blocks.GRAY_CONCRETE) || roof.is(net.minecraft.world.level.block.Blocks.LIGHT_GRAY_CONCRETE);
         check(turnedBefore || roof.is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE), "the Citadel's black roof, high over the city");
         boolean red = turnedBefore;
         for (int y = ground + 1; y < ground + 40 && !red; y++) {
@@ -339,6 +339,75 @@ public final class MultiverseTests {
         check(cow.getMaxHealth() >= health * 3.9F && cow.getHealth() == cow.getMaxHealth(), "four times as tough, and well");
         com.kolodkingal.enhanced.multiverse.GammaWorld.hulkify(cow);
         check(Math.abs(cow.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) - scale) < 1.0E-6, "only once");
+        helper.succeed();
+    }
+
+    /** Whether a creature has a goal of that class (by its simple name: the goals' classes are the universes' own). */
+    static boolean hasGoal(net.minecraft.world.entity.Mob mob, boolean target, String name) {
+        return (target ? mob.targetSelector : mob.goalSelector).getAvailableGoals().stream()
+                .anyMatch(g -> g.getGoal().getClass().getSimpleName().equals(name));
+    }
+
+    /** (3.19.1) Earth-2149: the game's own zombie of a kind where it has one, and every other creature zombified, hunting. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theZombiesUniverseHasAZombieOfEveryKind(GameTestHelper helper) {
+        check(com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.VILLAGER) == net.minecraft.world.entity.EntityType.ZOMBIE_VILLAGER
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.PIGLIN) == net.minecraft.world.entity.EntityType.ZOMBIFIED_PIGLIN
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.HOGLIN) == net.minecraft.world.entity.EntityType.ZOGLIN
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.HORSE) == net.minecraft.world.entity.EntityType.ZOMBIE_HORSE
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.COW) == null, "the game's own zombies");
+        net.minecraft.world.entity.animal.Cow cow = helper.spawn(net.minecraft.world.entity.EntityType.COW, new BlockPos(4, (int) TestKit.FLOOR, 4));
+        float health = cow.getMaxHealth();
+        com.kolodkingal.enhanced.multiverse.ZombieWorld.zombify(cow);
+        check(com.kolodkingal.enhanced.multiverse.ZombieWorld.isZombified(cow) && cow.getMaxHealth() >= health * 1.45F, "a zombie cow, tougher");
+        check(cow.getMainHandItem().is(net.minecraft.world.item.Items.ROTTEN_FLESH), "it carries its rotten flesh");
+        check(hasGoal(cow, false, "Maul") && hasGoal(cow, true, "NearestAttackableTargetGoal"), "it hunts the living on sight");
+        helper.succeed();
+    }
+
+    /** (3.19.1) The Gamma Bomb: a Hulk cow turns on whoever hurts it. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aGammaCowTurnsOnWhoeverHurtsIt(GameTestHelper helper) {
+        net.minecraft.world.entity.animal.Cow cow = helper.spawn(net.minecraft.world.entity.EntityType.COW, new BlockPos(4, (int) TestKit.FLOOR, 4));
+        com.kolodkingal.enhanced.multiverse.GammaWorld.hulkify(cow);
+        check(hasGoal(cow, false, "Maul") && hasGoal(cow, true, "HurtByTargetGoal") && !hasGoal(cow, true, "NearestAttackableTargetGoal"),
+                "angry when annoyed, not before");
+        helper.succeed();
+    }
+
+    /** (3.19.1) The people of the What If universes talk on the mod's own talk panel. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void thePeopleOfTheWhatIfUniversesTalk(GameTestHelper helper) {
+        com.kolodkingal.enhanced.multiverse.WhatIfPeople.register();
+        TestKit.Fixture f = TestKit.fixture(helper);
+        net.minecraft.server.level.ServerPlayer player = f.player(6.5, TestKit.FLOOR, 6.5, com.kolodkingal.enhanced.power.Power.NONE);
+        net.minecraft.world.phys.Vec3 at = helper.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, TestKit.FLOOR, 7.5));
+        com.kolodkingal.enhanced.asgard.npc.AsgardianEntity survivor = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
+                com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR, at.x, at.y, at.z, null);
+        check(f.level().addFreshEntity(survivor), "a survivor");
+        f.onClose(survivor::discard);
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, survivor)
+                && "zombies".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "he greets on the talk panel");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.offered(player).contains("whatif_supplies"), "he offers his supplies");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_supplies")
+                && "supplies".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
+                && player.getInventory().countItem(net.minecraft.world.item.Items.BREAD) >= 4, "he shares them");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, survivor);
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_supplies");
+        check("supplies_gone".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "once");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        com.kolodkingal.enhanced.multiverse.HydraCity.state(f.level().getServer()).reset();
+        com.kolodkingal.enhanced.asgard.npc.AsgardianEntity citizen = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
+                com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN, at.x - 2, at.y, at.z, null);
+        check(f.level().addFreshEntity(citizen), "a citizen");
+        f.onClose(citizen::discard);
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, citizen)
+                && "oppressed".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
+                && com.kolodkingal.enhanced.asgard.npc.AsgardTalk.offered(player).contains("whatif_rulers"), "a citizen of Hydra whispers");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, citizen.getId(), "whatif_rulers")
+                && "rulers".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "and tells where the rulers are");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
         helper.succeed();
     }
 
