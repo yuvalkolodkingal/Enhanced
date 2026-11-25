@@ -262,6 +262,8 @@ public enum Live {
      * the healing, her powers eight times as strong, her own menu on H ({@code ability.UltimateWanda}). Never saved.
      */
     WANDA_ULTIMATE,
+    /** Ultimate Wanda's own Eye of Agamotto is open (red) for a moment after she uses it ({@code ability.UltimateEye}). */
+    WANDA_EYE_OPEN,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

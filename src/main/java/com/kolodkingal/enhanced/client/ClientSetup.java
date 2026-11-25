@@ -353,6 +353,9 @@ public final class ClientSetup {
         // ===== eternity (3.8) =====
         registrar.dimensionEffects(Enhanced.id("eternity"),
                 new com.kolodkingal.enhanced.client.eternity.EternitySkyEffects());
+        // ===== the nexus (3.19.2) =====
+        registrar.dimensionEffects(Enhanced.id("nexus"),
+                new com.kolodkingal.enhanced.client.nexus.NexusSkyEffects());
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */

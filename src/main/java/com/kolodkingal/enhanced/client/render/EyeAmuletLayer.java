@@ -31,6 +31,8 @@ import net.minecraft.world.entity.EquipmentSlot;
  */
 public class EyeAmuletLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     public static final ResourceLocation TEXTURE = Enhanced.id("textures/entity/strange_eye_amulet.png");
+    /** (3.19) Ultimate Wanda's own Eye: the same amulet, its gem and its light red. */
+    public static final ResourceLocation WANDA_TEXTURE = Enhanced.id("textures/entity/wanda_eye_amulet.png");
     /** The amulet's half-size (pixels), and how far before the chest it hangs. */
     private static final float HALF = 1.9F;
     private static final float FRONT = -2.35F;
@@ -45,6 +47,7 @@ public class EyeAmuletLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             return false;
         }
         return data.power() == Power.DOCTOR_STRANGE
+                || com.kolodkingal.enhanced.ability.UltimateWanda.is(data)
                 || data.power() == Power.CUSTOM && data.has(HeroAbility.STRANGE_EYE) && EyeTime.hasEye(player);
     }
 
@@ -56,21 +59,28 @@ public class EyeAmuletLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         if (!wears(player, data)) {
             return;
         }
-        boolean open = data.toggle(Toggle.TIME_SLOW);
+        boolean wanda = com.kolodkingal.enhanced.ability.UltimateWanda.is(data);
+        boolean open = wanda ? data.is(com.kolodkingal.enhanced.power.Live.WANDA_EYE_OPEN) : data.toggle(Toggle.TIME_SLOW);
         boolean high = data.power() == Power.DOCTOR_STRANGE && "multiverse".equals(Variants.drawn(data).id());
         draw(poseStack, buffers, light, LivingEntityRenderer.getOverlayCoords(player, 0.0F), getParentModel().body, open,
-                high, ageInTicks);
+                high, ageInTicks, wanda ? WANDA_TEXTURE : TEXTURE);
     }
 
     /** Draws the Eye on {@code body} (the pose stack at the model's root). */
     public static void draw(PoseStack poseStack, MultiBufferSource buffers, int light, int overlay, ModelPart body,
                             boolean open, boolean high, float age) {
+        draw(poseStack, buffers, light, overlay, body, open, high, age, TEXTURE);
+    }
+
+    /** As above, with {@code texture} (Doctor Strange's green Eye, or Ultimate Wanda's red one). */
+    public static void draw(PoseStack poseStack, MultiBufferSource buffers, int light, int overlay, ModelPart body,
+                            boolean open, boolean high, float age, ResourceLocation texture) {
         poseStack.pushPose();
         body.translateAndRotate(poseStack);
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         PoseStack.Pose pose = poseStack.last();
         float cy = high ? 2.4F : 3.6F;
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE));
+        VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(texture));
         float u0 = open ? 0.5F : 0.0F;
         quad(vc, pose, 0.0F, cy, FRONT, HALF, u0, u0 + 0.5F, 0.0F, 0.5F, light, overlay, 0xFFFFFFFF);
         // The chain: two short gold links up to the collar, taken from the amulet's rim.
@@ -81,7 +91,7 @@ public class EyeAmuletLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         }
         if (open) {
             float pulse = 0.75F + 0.25F * Mth.sin(age * 0.25F);
-            VertexConsumer glow = buffers.getBuffer(RenderType.eyes(TEXTURE));
+            VertexConsumer glow = buffers.getBuffer(RenderType.eyes(texture));
             int a = (int) (255 * pulse);
             quad(glow, pose, 0.0F, cy, FRONT - 0.05F, HALF * 1.6F, 0.0F, 0.5F, 0.5F, 1.0F,
                     LightTexture.FULL_BRIGHT, overlay, (a << 24) | 0xFFFFFF);

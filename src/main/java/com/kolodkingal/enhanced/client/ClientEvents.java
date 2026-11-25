@@ -362,6 +362,11 @@ public final class ClientEvents {
                     com.kolodkingal.enhanced.client.screen.DemiurgeGiftScreen.open();
                     continue;
                 }
+                // (3.19.2) Ultimate Wanda's V in her Multiverse menu: the screen of her red portals
+                if (i == 3 && !sneak && com.kolodkingal.enhanced.ability.UltimateWanda.multiverseMenu(Powers.get(player))) {
+                    com.kolodkingal.enhanced.client.strange.SlingRingScreen.openWanda();
+                    continue;
+                }
                 // (3.18) Cosmic Spider-Man's B: the screen of his portals (the places he saved, the worlds)
                 if (i == 4 && !sneak && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(Powers.get(player))) {
                     com.kolodkingal.enhanced.client.strange.SlingRingScreen.openCosmic();

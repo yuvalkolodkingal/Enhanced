@@ -80,6 +80,7 @@ public final class EnhancedConfig {
     public static final ConfigSpec.IntValue HEX_DEFAULT_RADIUS;
     public static final ConfigSpec.IntValue HEX_MIN_RADIUS;
     public static final ConfigSpec.IntValue HEX_MAX_RADIUS;
+    public static final ConfigSpec.IntValue ULTIMATE_HEX_MAX_RADIUS;
     public static final ConfigSpec.DoubleValue HEX_DEATH_CHANCE;
     public static final ConfigSpec.DoubleValue HEX_HOLD_DAMAGE;
     public static final ConfigSpec.DoubleValue HEX_HOLD_DAMAGE_MAX;
@@ -301,6 +302,8 @@ public final class EnhancedConfig {
                 .defineInRange("hexDefaultRadius", 32, 4, 256);
         HEX_MIN_RADIUS = BUILDER.defineInRange("hexMinRadius", 8, 4, 256);
         HEX_MAX_RADIUS = BUILDER.defineInRange("hexMaxRadius", 96, 4, 256);
+        ULTIMATE_HEX_MAX_RADIUS = BUILDER.comment("Largest Hex Ultimate Wanda can stretch (0 = no limit: as far as the world border).")
+                .defineInRange("ultimateHexMaxRadius", 0, 0, 30000000);
         HEX_DEATH_CHANCE = BUILDER.comment("Chance that an unauthorised creature without powers dies when crossing the Hex wall.")
                 .defineInRange("hexDeathChance", 0.95, 0.0, 1.0);
         HEX_HOLD_DAMAGE = BUILDER.comment("Damage Vision takes the first time he is thrown back at the wall of a Hex he is inside (2 = one heart).",

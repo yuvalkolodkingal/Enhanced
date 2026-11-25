@@ -29,6 +29,8 @@ public record EternityFxPayload(int kind, int entityId, BlockPos pos, int arg) i
     public static final int THUNDER_STRIKE = 6;
     public static final int EYES_ON = 7;
     public static final int EYES_OFF = 8;
+    /** (3.19.2) A flash of colour over the local player's screen, {@code arg} its RGB (Ultimate Wanda's banishment: red). */
+    public static final int FLASH = 9;
 
     public static final Type<EternityFxPayload> TYPE = new Type<>(Enhanced.id("eternity_fx"));
 

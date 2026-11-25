@@ -322,7 +322,11 @@ public class PowerHud implements LayeredDraw.Layer {
             if (ability == 2) {
                 return "ability.enhanced.scarlet_witch.ultimate.2";
             }
-            if (ability == 1 && !com.kolodkingal.enhanced.ability.UltimateWanda.ultimateMenu(data)) {
+            if (com.kolodkingal.enhanced.ability.UltimateWanda.multiverseMenu(data) && (ability == 1 || ability == 3)) {
+                return "ability.enhanced.scarlet_witch.multiverse." + ability;
+            }
+            if (ability == 1 && !com.kolodkingal.enhanced.ability.UltimateWanda.ultimateMenu(data)
+                    && !com.kolodkingal.enhanced.ability.UltimateWanda.multiverseMenu(data)) {
                 return "ability.enhanced.scarlet_witch.ultimate_beam.1";
             }
         } else if (power == Power.SCARLET_WITCH && ability == 2 && com.kolodkingal.enhanced.ability.UltimateWanda.allowedHolder(player)) {

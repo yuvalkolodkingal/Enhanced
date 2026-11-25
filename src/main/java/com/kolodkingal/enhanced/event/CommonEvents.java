@@ -272,6 +272,16 @@ public final class CommonEvents {
         if (player instanceof ServerPlayer billy && BillyBarrier.isUp(billy) && !unstoppable && BillyBarrier.absorb(billy, event)) {
             return;
         }
+        if (player instanceof ServerPlayer ultimate && !unstoppable
+                && com.kolodkingal.enhanced.ability.UltimateShield.stops(ultimate, source)) {
+            // (3.19) Ultimate Wanda's shield lets nothing of anyone else's in: a blow throws its striker out
+            if (WandaAbilities.isMeleeHit(source) && source.getDirectEntity() instanceof LivingEntity attacker && attacker != player
+                    && WandaAbilities.hasShieldUp(player)) {
+                WandaAbilities.blockMelee(ultimate, attacker, event.getAmount());
+            }
+            event.setCanceled(true);
+            return;
+        }
         if (player instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(player) && !unstoppable) {
             // What the shield stops wears it down (and when nothing is left it shatters).
             if (source.is(DamageTypeTags.IS_PROJECTILE) && source.getDirectEntity() != null && source.getEntity() != player) {

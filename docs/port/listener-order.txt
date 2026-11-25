@@ -54,6 +54,7 @@ event net.neoforged.neoforge.event.entity.EntityTeleportEvent$EnderPearl -> com.
 event net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent -> com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent
     HIGHEST - com.kolodkingal.enhanced.asgard.AsgardGate#onTravel
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onTravel
+    HIGHEST - com.kolodkingal.enhanced.nexus.NexusEvents#onTravel
     HIGH - com.kolodkingal.enhanced.boss.BossArenaEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onTravel
@@ -334,6 +335,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent 
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.boss.BossEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onRespawn
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onRespawn
     LOW - com.kolodkingal.enhanced.protect.ShelterEvents#onRespawn
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$StartTracking -> com.kolodkingal.enhanced.platform.event.PlayerEvent$StartTracking
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onStartTracking
@@ -523,6 +525,7 @@ event net.neoforged.neoforge.event.tick.PlayerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onPlayerTick
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onPlayerTick
 event net.neoforged.neoforge.event.tick.PlayerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.PlayerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.wolverine.WolverineEvents#onPlayerTick
@@ -818,6 +821,7 @@ event net.neoforged.neoforge.event.entity.EntityTeleportEvent$EnderPearl -> com.
 event net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent -> com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent
     HIGHEST - com.kolodkingal.enhanced.asgard.AsgardGate#onTravel
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onTravel
+    HIGHEST - com.kolodkingal.enhanced.nexus.NexusEvents#onTravel
     HIGH - com.kolodkingal.enhanced.boss.BossArenaEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onTravel
@@ -1096,6 +1100,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent 
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.boss.BossEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onRespawn
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onRespawn
     LOW - com.kolodkingal.enhanced.protect.ShelterEvents#onRespawn
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$StartTracking -> com.kolodkingal.enhanced.platform.event.PlayerEvent$StartTracking
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onStartTracking
@@ -1284,6 +1289,7 @@ event net.neoforged.neoforge.event.tick.PlayerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.client.SpeedsterMotion#onPlayerTickPost
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onPlayerTick
 event net.neoforged.neoforge.event.tick.PlayerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.PlayerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.wolverine.WolverineEvents#onPlayerTick
