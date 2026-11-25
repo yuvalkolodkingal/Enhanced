@@ -36,6 +36,7 @@ import java.util.Map;
  * tells the cloak whether she stands on something: there its train glides out over the ground instead of into it.
  * {@link #runes} is the light of the runes of her gloves: they are chaos energy, not paint, and show only while she uses
  * her magic (they come quicker than the cloak spreads, and fade when she stops); {@link SorcererGlowLayer} draws them.
+ * (3.19.2) Becoming Ultimate Wanda erupts in chaos energy all round her ({@link ChaosEruptionFx}), ticked and drawn here.
  */
 @Subscriber(side = Side.CLIENT)
 public final class SorcererFx {
@@ -107,6 +108,7 @@ public final class SorcererFx {
 
     public static void clear() {
         LOOKS.clear();
+        ChaosEruptionFx.clear();
     }
 
     /** Every client tick: each Sorceress Supreme's cloak follows what she does; the change has its burst and chime. */
@@ -115,6 +117,7 @@ public final class SorcererFx {
         if (mc.isPaused() || mc.player == null) {
             return;
         }
+        ChaosEruptionFx.tick(level); // (3.19.2: the eruption of chaos energy when she becomes the Sorceress Supreme)
         LOOKS.keySet().removeIf(id -> !(level.getEntity(id) instanceof Player p) || !worn(p));
         for (Player player : level.players()) {
             if (!worn(player)) {
@@ -162,7 +165,7 @@ public final class SorcererFx {
 
     @Subscribe
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || LOOKS.isEmpty()) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || LOOKS.isEmpty() && !ChaosEruptionFx.active()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -176,6 +179,10 @@ public final class SorcererFx {
         Matrix4f pose = new Matrix4f();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         VertexConsumer vc = null;
+        if (ChaosEruptionFx.active()) {
+            vc = buffers.getBuffer(EnhancedRenderTypes.ENERGY_BEAM);
+            ChaosEruptionFx.render(level, pose, vc, camera, partial, mc.options.getCameraType().isFirstPerson(), mc.getCameraEntity());
+        }
         for (Player p : level.players()) {
             if (!LOOKS.containsKey(p.getId()) || !(p instanceof AbstractClientPlayer player) || player.isInvisible()
                     || player.isSpectator() || player.distanceToSqr(camera) > 96 * 96) {

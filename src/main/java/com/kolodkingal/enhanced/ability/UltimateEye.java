@@ -30,8 +30,8 @@ import java.util.List;
  * her Ultimate menu. What the Eye is in the comics (not the films' Time Stone): an amulet of the Vishanti whose light reveals
  * every truth (it sees through illusion and invisibility), weakens and drives back demons and the dead, binds whom it shines
  * on, and through which its bearer sees far and into others.
- * Hers is red, not green: its gem and its light are her chaos magic's colour, and it opens on her chest while she uses it
- * ({@link Live#WANDA_EYE_OPEN}).
+ * Hers is red, not green: its gem and its light are her chaos magic's colour. It is the Eye drawn in her Sorceress Supreme
+ * skin itself (3.19.2: no amulet drawn over it); {@link Live#WANDA_EYE_OPEN} only marks that she is using it.
  * <ul>
  *   <li>N, the Light of Agamotto: within {@link #LIGHT_RANGE} blocks all round her the invisible are seen (and glow), her
  *   foes are held fast and the undead and demons (the Nether's creatures, endermen, vexes) burn;</li>
