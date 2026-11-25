@@ -38,6 +38,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -457,10 +458,24 @@ public final class PhoenixFx {
                 dome(pose, dc, camera, player, partialTick, time, lines);
             }
             tint = -1;
-            for (AbstractClientPlayer player : shields) {
-                shieldSphere(pose, dc, camera, player, partialTick, time, lines, mc);
-            }
             buffers.endBatch(domeType);
+            // (3.19.3) her force field is burning fire: a shell of the Phoenix's own flame lattice, not hexagons
+            RenderType fireType = lines ? EnhancedRenderTypes.energyField(FLAME_TEXTURE) : EnhancedRenderTypes.ENERGY_VEIL;
+            VertexConsumer fc = buffers.getBuffer(fireType);
+            for (AbstractClientPlayer player : shields) {
+                shieldSphere(pose, fc, camera, player, partialTick, time, lines, mc);
+            }
+            buffers.endBatch(fireType);
+        }
+        if (!shields.isEmpty()) {
+            // (3.19.3) and real flames licking up all over it (Jim Hammond's fire sheets), seen from outside
+            for (int pass = FireSheet.DECAL; pass <= FireSheet.GLOW; pass++) {
+                VertexConsumer vc = buffers.getBuffer(FireSheet.type(pass));
+                for (AbstractClientPlayer player : shields) {
+                    shieldFlames(pass, pose, vc, camera, player, partialTick, time, mc);
+                }
+                buffers.endBatch();
+            }
         }
 
         // The ribbons in two batches, one render type after the other (asking the buffer source for the second ends the
@@ -711,11 +726,51 @@ public final class PhoenixFx {
         float alpha = inside ? 0.35F : 1.0F;
         Vec3 centre = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
         if (lines) {
-            EnergyGeometry.sphere(pose, vc, centre, radius, 32, 16, 8, 4, time * 0.003F, PhoenixAbilities.TK_ORANGE,
-                    0.35F * alpha, 0.75F * alpha);
+            // two shells of flame, scrolling against each other, so the fire never stands still
+            EnergyGeometry.sphere(pose, vc, centre, radius, 32, 16, 6, 3, time * 0.006F, PhoenixAbilities.FIRE_MAIN,
+                    0.55F * alpha, 0.9F * alpha);
+            EnergyGeometry.sphere(pose, vc, centre, radius * 0.97F, 32, 16, 4, 2, -time * 0.004F, PhoenixAbilities.FIRE_GOLD,
+                    0.30F * alpha, 0.5F * alpha);
         } else {
-            EnergyGeometry.veil(pose, vc, centre, radius, 32, 16, 0xC25A12, 0.12F, 0.38F);
+            EnergyGeometry.veil(pose, vc, centre, radius, 32, 16, PhoenixAbilities.FIRE_EMBER, 0.18F * alpha, 0.5F * alpha);
         }
+    }
+
+    /** (3.19.3) The flames of her force field: two rings of fire sheets rising up its sides, and a crown on top. */
+    private static void shieldFlames(int pass, Matrix4f pose, VertexConsumer vc, Vec3 camera, AbstractClientPlayer player,
+                                     float partialTick, float time, Minecraft mc) {
+        boolean inside = player == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson();
+        if (inside) {
+            return; // (her own view stays clear: she sees the shell's faint fire only)
+        }
+        float radius = (float) PhoenixShield.RADIUS;
+        Vec3 c = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0).subtract(camera);
+        Matrix4f inverse = new Matrix4f(pose).invert();
+        Vector3f base = new Vector3f();
+        Vector3f right = new Vector3f();
+        Vector3f up = new Vector3f();
+        float seed0 = player.getId() * 0.53F;
+        int n = 10;
+        for (int i = 0; i < n; i++) {
+            float a = Mth.TWO_PI * i / n + time * 0.01F;
+            // the low ring: from under the sphere up its sides
+            Vector3f foot = new Vector3f((float) c.x + Mth.cos(a) * radius * 0.8F, (float) c.y - radius * 0.75F,
+                    (float) c.z + Mth.sin(a) * radius * 0.8F);
+            FireSheet.frame(inverse, foot, new Vector3f(Mth.cos(a) * 0.25F, 1.0F, Mth.sin(a) * 0.25F).normalize(radius * 1.25F),
+                    0.55F, base, right, up);
+            FireSheet.draw(pass, pose, vc, base, right, up, time, seed0 + i * 1.7F, 0.045F, 0.95F);
+            // the high ring, between the others: from the middle up over the shoulders
+            float b = a + Mth.PI / n;
+            Vector3f mid = new Vector3f((float) c.x + Mth.cos(b) * radius, (float) c.y - radius * 0.1F,
+                    (float) c.z + Mth.sin(b) * radius);
+            FireSheet.frame(inverse, mid, new Vector3f(-Mth.cos(b) * 0.35F, 1.0F, -Mth.sin(b) * 0.35F).normalize(radius * 1.05F),
+                    0.5F, base, right, up);
+            FireSheet.draw(pass, pose, vc, base, right, up, time, seed0 + i * 2.3F + 0.6F, 0.06F, 0.8F);
+        }
+        // the crown: flames rising off the top
+        Vector3f top = new Vector3f((float) c.x, (float) c.y + radius * 0.75F, (float) c.z);
+        FireSheet.frame(inverse, top, new Vector3f(0, radius * 0.9F, 0), 0.8F, base, right, up);
+        FireSheet.draw(pass, pose, vc, base, right, up, time, seed0 + 9.1F, 0.05F, 0.9F);
     }
 
     private PhoenixFx() {

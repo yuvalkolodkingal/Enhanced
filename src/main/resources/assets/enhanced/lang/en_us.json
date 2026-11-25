@@ -488,6 +488,7 @@
   "message.enhanced.mind_control.pinned": "Mjolnir holds it down: you cannot take it",
   "message.enhanced.mind_control.host": "You take over %s",
   "message.enhanced.psionic_field.nothing": "Nobody in your field",
+  "message.enhanced.phoenix_body.immune": "That mind is closed to her (the Scarlet Witch, Billy and Spider-Man are immune)",
   "message.enhanced.phoenix_shield.on": "Psionic force field up",
   "message.enhanced.phoenix_shield.off": "Psionic force field down",
   "message.enhanced.phoenix_matter.nothing": "Nothing there to reshape",

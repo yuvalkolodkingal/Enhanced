@@ -48,11 +48,11 @@ public final class MindReadingOverlay implements LayeredDraw.Layer {
     private static final int CELL = 12;
     private static final int WORN_SLOTS = 7;
     private static final int PACK_COLUMNS = 9;
-    private static final int FRAME = 0xA01A1030;
+    private static final int FRAME = 0xA0301206; // (3.19.3: dark ember, not violet)
     private static final int SLOT_BACK = 0x66000000;
-    private static final int SLOT_EDGE = 0x55B79CFF;
+    private static final int SLOT_EDGE = 0x55FF9A3C;
     private static final int GREY = 0xFFAAAAAA;
-    private static final int CALM = 0xFFB79CFF;
+    private static final int CALM = 0xFFFF9A3C;
     private static final int ALERT = 0xFFFFD65A;
     private static final int HOSTILE = 0xFFFF5C8A;
     private static final int AFRAID = 0xFF9ED8FF;

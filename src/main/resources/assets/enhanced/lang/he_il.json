@@ -488,6 +488,7 @@
   "message.enhanced.mind_control.pinned": "מיולניר מצמיד אותו לקרקע: אי אפשר להשתלט עליו",
   "message.enhanced.mind_control.host": "השתלטתם על %s",
   "message.enhanced.psionic_field.nothing": "אין אף אחד בשדה שלכם",
+  "message.enhanced.phoenix_body.immune": "המוח הזה סגור בפניה (וונדה, בילי וספיידרמן חסינים)",
   "message.enhanced.phoenix_shield.on": "שדה כוח פסיוני פעיל",
   "message.enhanced.phoenix_shield.off": "שדה הכוח הפסיוני כבה",
   "message.enhanced.phoenix_matter.nothing": "אין שם מה לעצב",

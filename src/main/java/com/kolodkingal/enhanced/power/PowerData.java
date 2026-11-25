@@ -247,6 +247,10 @@ public final class PowerData {
                 && com.kolodkingal.enhanced.ability.UltimateWanda.is(this)) {
             return true;
         }
+        // (3.19.3: Jean Grey takes over bodies too, on Sneak + V)
+        if (a == HeroAbility.XAVIER_TAKE_OVER && power == Power.PHOENIX) {
+            return true;
+        }
         return power == a.hero || power == Power.CUSTOM && kit != null && kit.has(a)
                 && (a == HeroAbility.HULK_TRANSFORM || a == HeroAbility.RED_HULK_TRANSFORM
                 || !toggle(Toggle.HUMAN_FORM));
@@ -273,8 +277,8 @@ public final class PowerData {
      * ability on two keys (its main on one, its variant row on another) waits on the key that was used.
      */
     public int slot(HeroAbility a) {
-        if (a == HeroAbility.XAVIER_TAKE_OVER && com.kolodkingal.enhanced.ability.UltimateWanda.is(this)) {
-            return 3; // (3.19: her V takes a body and brings her back)
+        if (a == HeroAbility.XAVIER_TAKE_OVER && (com.kolodkingal.enhanced.ability.UltimateWanda.is(this) || power == Power.PHOENIX)) {
+            return 3; // (3.19: her V takes a body and brings her back; 3.19.3: Jean's Sneak + V)
         }
         if (power == a.hero || a.hero != Power.NONE && borrowed() == a.hero) {
             return a.home >= 1 && a.home <= ABILITIES ? a.home : 0;

@@ -1,5 +1,6 @@
 package com.kolodkingal.enhanced.gametest;
 
+import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.client.render.Firebird;
 import com.kolodkingal.enhanced.client.render.HeroAnimState;
 import com.kolodkingal.enhanced.client.render.HeroClient;
@@ -349,7 +350,7 @@ public final class PhoenixClientTests {
         BufferedImage fire = texture("phoenix_eyes");
         BufferedImage psychic = texture("phoenix_eyes_psychic");
         check(fire.getWidth() == 64 && fire.getHeight() == 64 && psychic.getWidth() == 64 && psychic.getHeight() == 64, "both masks are the size of a skin");
-        int[][] expected = {{0xFF8A1F, 0xFFF4C2}, {0x7C5CE0, 0xF4EEFF}};
+        int[][] expected = {{0xFF8A1F, 0xFFF4C2}, {PhoenixAbilities.PSY_BODY, PhoenixAbilities.PSY_CORE}}; // (3.19.3: her mind's eyes orange too)
         BufferedImage[] masks = {fire, psychic};
         for (int m = 0; m < 2; m++) {
             int painted = 0;

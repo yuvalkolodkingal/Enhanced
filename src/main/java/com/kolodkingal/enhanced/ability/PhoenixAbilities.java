@@ -80,10 +80,11 @@ public final class PhoenixAbilities {
     public static final int FIRE_EMBER = 0xE2531A;
     public static final int FIRE_DEEP = 0x8C2410;
     // ---- the mind: telepathy, Mind Control, the Psionic Field, telekinesis ----
-    public static final int PSY_CORE = 0xF4EEFF;
-    public static final int PSY_MAIN = 0xB79CFF;
-    public static final int PSY_BODY = 0x7C5CE0;
-    public static final int PSY_FRINGE = 0x3F2B96;
+    // (3.19.3) No violet any more: all of her energy, the mind's too, is orange like fire.
+    public static final int PSY_CORE = 0xFFF0D2;
+    public static final int PSY_MAIN = 0xFF9A3C;
+    public static final int PSY_BODY = 0xE8641C;
+    public static final int PSY_FRINGE = 0x9A3410;
     /**
      * (3.19.2) Her telekinesis, as in the films: no lightning and no violet, only a soft orange glow on her arms and in her
      * eyes (and a faint shimmer round what she holds).
@@ -161,8 +162,33 @@ public final class PhoenixAbilities {
         return e instanceof LivingEntity living && MagnetoAbilities.wearsHelmet(living);
     }
 
-    /** (3.19.2) She heals a heart's half every this many ticks while she is hurt: five times a player's natural healing (80). */
-    public static final int REGEN_PERIOD = 16;
+    /** (3.19.3) She heals a heart's half every this many ticks while she is hurt: sixteen times a player's natural healing (80). */
+    public static final int REGEN_PERIOD = 5;
+    /** (3.19.3) Her body is as well protected as one in a full set of diamond armour (20 armour, 8 toughness). */
+    public static final double BODY_ARMOR = 20.0;
+    public static final double BODY_TOUGHNESS = 8.0;
+    private static final ResourceLocation ARMOR_ID = Enhanced.id("phoenix_body_armor");
+    private static final ResourceLocation TOUGHNESS_ID = Enhanced.id("phoenix_body_toughness");
+
+    /** (3.19.3) Her diamond-like protection, on while she has her body's powers, off otherwise (never saved with the player). */
+    public static void bodyArmor(ServerPlayer player, boolean on) {
+        armorModifier(player, Attributes.ARMOR, ARMOR_ID, BODY_ARMOR, on);
+        armorModifier(player, Attributes.ARMOR_TOUGHNESS, TOUGHNESS_ID, BODY_TOUGHNESS, on);
+    }
+
+    private static void armorModifier(ServerPlayer player, net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute,
+            ResourceLocation id, double amount, boolean on) {
+        net.minecraft.world.entity.ai.attributes.AttributeInstance instance = player.getAttribute(attribute);
+        if (instance == null) {
+            return;
+        }
+        boolean has = instance.getModifier(id) != null;
+        if (on && !has) {
+            instance.addTransientModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
+        } else if (!on && has) {
+            instance.removeModifier(id);
+        }
+    }
 
     /** (3.19.2) Her own healing, five times a player's: half a heart every {@link #REGEN_PERIOD} ticks while she is hurt. */
     private static void regenerate(ServerPlayer player, long now) {
@@ -286,7 +312,15 @@ public final class PhoenixAbilities {
                     PowerTicker.toggleFlight(player);
                 }
             }
-            case 3 -> Telekinesis.press(player, Telekinesis.Mode.JEAN);
+            case 3 -> {
+                if (MindLink.isLinked(player) || alt && !Telekinesis.isHolding(player) && PhoenixBody.aimed(player) != null) {
+                    // (3.19.3) Sneak + V at a creature or player: her mind into that body, for as long as she likes (V
+                    // brings her back); Sneak + V at a block still lifts it, and with something held still sets it down
+                    PhoenixBody.press(player);
+                } else {
+                    Telekinesis.press(player, Telekinesis.Mode.JEAN);
+                }
+            }
             case 4 -> {
                 if (alt) {
                     psionicField(player, data);
@@ -322,7 +356,11 @@ public final class PhoenixAbilities {
         if (data.has(HeroAbility.PHOENIX_BODY)) {
             regenerate(player, now);
         }
+        bodyArmor(player, data.has(HeroAbility.PHOENIX_BODY));
         PhoenixShield.tick(player, data);
+        if (MindLink.isLinked(player)) {
+            MindLink.tick(player); // (3.19.3) her mind in another body
+        }
         // The poses and effects that last a moment.
         data.set(Live.MIND_SENSING, now < state.sensingUntil);
         if (state.castingUntil != 0L) {
@@ -392,6 +430,10 @@ public final class PhoenixAbilities {
         MindReading.stop(player);
         PhoenixShield.stop(player, data);
         dropHiddenFireResistance(player);
+        bodyArmor(player, false);
+        if (MindLink.isLinked(player)) {
+            MindLink.end(player.server, player.getUUID(), MindLink.End.POWER_LOST);
+        }
         freeAll(player.server, player.getUUID(), false);
         data.setToggle(Toggle.MIND_READING, false);
         data.set(Live.PHOENIX_CHARGING, false);

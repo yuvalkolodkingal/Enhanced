@@ -476,6 +476,7 @@
   "message.enhanced.mind_control.pinned": "Mjolnir lo mantiene sujeto: no puedes tomarlo",
   "message.enhanced.mind_control.host": "Tomas el control de %s",
   "message.enhanced.psionic_field.nothing": "No hay nadie en tu campo",
+  "message.enhanced.phoenix_body.immune": "Esa mente está cerrada para ella (la Bruja Escarlata, Billy y Spider-Man son inmunes)",
   "message.enhanced.phoenix_shield.on": "Campo de fuerza psiónico activado",
   "message.enhanced.phoenix_shield.off": "Campo de fuerza psiónico desactivado",
   "message.enhanced.phoenix_matter.nothing": "No hay nada que transformar",

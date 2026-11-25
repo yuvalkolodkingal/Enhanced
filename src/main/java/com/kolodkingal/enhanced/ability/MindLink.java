@@ -197,7 +197,11 @@ public final class MindLink {
         }
         // (3.19) Ultimate Wanda takes any telepath's body (no rank keeps her out, none throws her out), for as long as she
         // likes; only Magneto's helmet (or a boss's vast mind) shuts a mind to her
-        boolean supreme = UltimateWanda.is(xavier);
+        // (3.19.3) Jean Grey too, except for the three minds closed to her (the Scarlet Witch's, Billy's, Spider-Man's)
+        boolean supreme = boundless(xavier);
+        if (PhoenixBody.is(xavier) && PhoenixBody.immune(target)) {
+            return "message.enhanced.phoenix_body.immune";
+        }
         Telepathy.Verdict verdict = Telepathy.reach(xavier, target);
         if (supreme && verdict != Telepathy.Verdict.SHIELDED) {
             verdict = Telepathy.Verdict.OPEN;
@@ -248,7 +252,7 @@ public final class MindLink {
             xavier.displayClientMessage(Component.translatable(refusal), true);
             return false;
         }
-        boolean supreme = UltimateWanda.is(xavier);
+        boolean supreme = boundless(xavier);
         if (!supreme && Telepathy.reach(xavier, target) == Telepathy.Verdict.THROWS_OUT) {
             backlash(xavier, target);
             return false;
@@ -346,7 +350,7 @@ public final class MindLink {
         if (xavier != null) {
             PowerData data = Powers.get(xavier);
             data.set(Live.MIND_LINKED, false);
-            if (data.has(HeroAbility.XAVIER_TAKE_OVER)) {
+            if (data.has(HeroAbility.XAVIER_TAKE_OVER) && !PhoenixBody.is(data)) { // (3.19.3: Jean's V is her telekinesis too)
                 data.startCooldown(HeroAbility.XAVIER_TAKE_OVER, xavier.serverLevel().getGameTime(), XavierConfig.LINK_COOLDOWN.get());
             }
             Powers.syncIfDirty(xavier);
@@ -388,6 +392,14 @@ public final class MindLink {
         for (UUID xavier : new ArrayList<>(BY_XAVIER.keySet())) {
             end(server, xavier, End.SERVER);
         }
+    }
+
+    /**
+     * Whether this mind's links have no end of their own and no telepath keeps it out (only a helmet does): Ultimate
+     * Wanda's (3.19) and Jean Grey's (3.19.3).
+     */
+    public static boolean boundless(ServerPlayer xavier) {
+        return UltimateWanda.is(xavier) || PhoenixBody.is(xavier);
     }
 
     /** Forget every link (the server stopped). */
@@ -467,8 +479,11 @@ public final class MindLink {
         if (host.level() != xavier.level() || !host.level().dimension().equals(link.dimension)) {
             return End.DISTANCE;
         }
-        boolean supreme = UltimateWanda.is(xavier);
+        boolean supreme = boundless(xavier);
         double max = XavierConfig.LINK_MAX_DISTANCE.get();
+        if (PhoenixBody.is(xavier) && PhoenixBody.immune(host)) {
+            return End.CLOSED; // (a body that became one of the three while she held it)
+        }
         if (!supreme && host.distanceToSqr(xavier) > max * max) {
             return End.DISTANCE; // (3.19: Ultimate Wanda holds a body however far it goes in her world)
         }

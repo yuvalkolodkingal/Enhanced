@@ -45,7 +45,9 @@ public final class AbilityColors {
             // (3.19) Ultimate Wanda: what she borrows of Professor X and Jean Grey (taking a body, reading a mind) is her red
             return com.kolodkingal.enhanced.ability.Demiurge.is(data) ? com.kolodkingal.enhanced.ability.Demiurge.BLUE
                     : com.kolodkingal.enhanced.ability.UltimateWanda.is(data) && (row == HeroAbility.XAVIER_TAKE_OVER || row == HeroAbility.PHOENIX_MIND)
-                    ? com.kolodkingal.enhanced.ability.UltimateWanda.RED : -1;
+                    ? com.kolodkingal.enhanced.ability.UltimateWanda.RED
+                    : data.power() == Power.PHOENIX && row == HeroAbility.XAVIER_TAKE_OVER
+                    ? com.kolodkingal.enhanced.ability.PhoenixAbilities.TK_ORANGE : -1; // (3.19.3: Jean's take-over in her orange)
         }
         return chosen(CustomHeroes.hero(player), row);
     }

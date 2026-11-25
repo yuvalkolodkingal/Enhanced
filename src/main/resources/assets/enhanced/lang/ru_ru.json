@@ -476,6 +476,7 @@
   "message.enhanced.mind_control.pinned": "Мьёльнир удерживает его: ты не можешь его захватить",
   "message.enhanced.mind_control.host": "Ты захватываешь: %s",
   "message.enhanced.psionic_field.nothing": "В твоём поле никого нет",
+  "message.enhanced.phoenix_body.immune": "Этот разум для неё закрыт (Алая Ведьма, Билли и Человек-паук невосприимчивы)",
   "message.enhanced.phoenix_shield.on": "Псионическое силовое поле включено",
   "message.enhanced.phoenix_shield.off": "Псионическое силовое поле выключено",
   "message.enhanced.phoenix_matter.nothing": "Тут нечего преобразовать",

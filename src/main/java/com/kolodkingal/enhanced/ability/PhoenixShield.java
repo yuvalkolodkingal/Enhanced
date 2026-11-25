@@ -48,6 +48,11 @@ public final class PhoenixShield {
         return e instanceof ServerPlayer && UP.contains(e.getUUID());
     }
 
+    /** (3.19.3) Whether blows to her are cut: the field is up, or her mind is in another body (her own is guarded meanwhile). */
+    public static boolean guarded(Entity e) {
+        return isUp(e) || e instanceof ServerPlayer p && PhoenixBody.is(p) && MindLink.isLinked(p);
+    }
+
     /** Sneak + G: the field goes up, or down. */
     public static void toggle(ServerPlayer player, PowerData data) {
         boolean on = UP.add(player.getUUID());
@@ -62,7 +67,7 @@ public final class PhoenixShield {
 
     /** Her tick: the field holds (projectiles back, hostiles out) and costs its hunger. */
     public static void tick(ServerPlayer player, PowerData data) {
-        boolean up = UP.contains(player.getUUID());
+        boolean up = UP.contains(player.getUUID()) || MindLink.isLinked(player) && PhoenixBody.is(data);
         data.set(Live.PHOENIX_SHIELD, up);
         if (!up) {
             return;
@@ -115,7 +120,7 @@ public final class PhoenixShield {
     /** What of a blow gets through the field (the whole blow if it is down or the blow cannot be stopped). */
     public static float filter(LivingEntity target, DamageSource source, float amount) {
         // (a fall, drowning, hunger, a wall she is stuck in, or what nothing stops: those are not blows from outside)
-        if (!isUp(target) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) || source.is(DamageTypeTags.IS_FALL)
+        if (!guarded(target) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) || source.is(DamageTypeTags.IS_FALL)
                 || source.is(DamageTypeTags.IS_DROWNING) || source.is(DamageTypes.STARVE) || source.is(DamageTypes.IN_WALL)) {
             return amount;
         }

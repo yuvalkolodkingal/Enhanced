@@ -476,6 +476,7 @@
   "message.enhanced.mind_control.pinned": "Mjolnir le maintient au sol : tu ne peux pas le prendre",
   "message.enhanced.mind_control.host": "Tu prends possession de %s",
   "message.enhanced.psionic_field.nothing": "Personne dans ton champ",
+  "message.enhanced.phoenix_body.immune": "Cet esprit lui est fermé (la Sorcière Rouge, Billy et Spider-Man sont immunisés)",
   "message.enhanced.phoenix_shield.on": "Champ de force psionique activé",
   "message.enhanced.phoenix_shield.off": "Champ de force psionique désactivé",
   "message.enhanced.phoenix_matter.nothing": "Rien à transformer",

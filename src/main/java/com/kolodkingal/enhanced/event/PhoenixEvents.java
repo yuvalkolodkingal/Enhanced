@@ -52,7 +52,7 @@ public final class PhoenixEvents {
     /** A blow that reaches Jean through her psionic force field is cut to a third. */
     @Subscribe(priority = Priority.HIGH)
     public static void onPsionicShield(LivingIncomingDamageEvent event) {
-        if (PhoenixShield.isUp(event.getEntity())) {
+        if (PhoenixShield.guarded(event.getEntity())) {
             event.setAmount(PhoenixShield.filter(event.getEntity(), event.getSource(), event.getAmount()));
         }
     }

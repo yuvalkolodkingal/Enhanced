@@ -476,6 +476,7 @@
   "message.enhanced.mind_control.pinned": "O Mjolnir o segura no chão: você não pode tomá-lo",
   "message.enhanced.mind_control.host": "Você assume o controle de %s",
   "message.enhanced.psionic_field.nothing": "Ninguém no seu campo",
+  "message.enhanced.phoenix_body.immune": "Essa mente está fechada para ela (a Feiticeira Escarlate, Billy e o Homem-Aranha são imunes)",
   "message.enhanced.phoenix_shield.on": "Campo de força psiônico ativado",
   "message.enhanced.phoenix_shield.off": "Campo de força psiônico desativado",
   "message.enhanced.phoenix_matter.nothing": "Nada para transformar",
