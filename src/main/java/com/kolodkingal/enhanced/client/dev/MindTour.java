@@ -371,6 +371,8 @@ public final class MindTour {
             }, 10);
             camera(CameraType.THIRD_PERSON_FRONT);
             shot("j06_shield_front", 20);
+            camera(CameraType.THIRD_PERSON_BACK);
+            shot("j06b_shield_back", 15);
             camera(CameraType.FIRST_PERSON);
             shot("j07_shield_first", 15);
             server(p -> {
