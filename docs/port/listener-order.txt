@@ -178,6 +178,7 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     HIGH - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onIncoming
     HIGH - com.kolodkingal.enhanced.ironman.IronEvents#onFallDamage
     HIGH - com.kolodkingal.enhanced.event.PhoenixEvents#onFire
+    HIGH - com.kolodkingal.enhanced.event.PhoenixEvents#onPsionicShield
     HIGH - com.kolodkingal.enhanced.hulk.HulkEvents#onFall
     HIGH - com.kolodkingal.enhanced.wolverine.WolverineEvents#onFall
     HIGH - com.kolodkingal.enhanced.captain.CaptainEvents#onIncomingGuard

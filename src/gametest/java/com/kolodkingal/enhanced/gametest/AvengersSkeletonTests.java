@@ -206,7 +206,7 @@ public final class AvengersSkeletonTests {
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTwelve(GameTestHelper helper) {
         check(ModNetwork.PROTOCOL_VERSION.equals("22"), "protocol 22 (3.19: Ultimate Wanda's red sky; 3.19.1: a universe's name, Hydra's sky)");
-        check(Live.values().length == 88 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 5 (3.17 Jim) + 1 (3.18 Cosmic Spider-Man) + 1 (3.18.1 Billy the Demiurge) + 1 (3.19 Ultimate Wanda) = 88: "
+        check(Live.values().length == 89 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 5 (3.17 Jim) + 1 (3.18 Cosmic Spider-Man) + 1 (3.18.1 Billy the Demiurge) + 1 (3.19 Ultimate Wanda) + 1 (3.19.2 Jean's force field) = 89: "
                 + Live.values().length);
         check(Toggle.values().length == 26 && Toggle.values().length <= 32, "Toggle: 22 + 2 + 1 (3.18 Cosmic Spider-Man's look) + 1 (3.19 Ultimate Wanda's hair) = 26: "
                 + Toggle.values().length);

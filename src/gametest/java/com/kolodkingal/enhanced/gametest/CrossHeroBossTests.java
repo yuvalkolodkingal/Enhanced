@@ -222,6 +222,10 @@ public final class CrossHeroBossTests {
         f.config(PhoenixConfig.BURST_FIRE_SECONDS, 0);
         f.config(PhoenixConfig.BURST_KNOCKBACK, 0.0);
         f.config(PhoenixConfig.BURST_COOLDOWN, 0);
+        // (3.19.2: the defaults are stronger now; these tests measure against the old numbers)
+        f.config(PhoenixConfig.BURST_MIN_DAMAGE, 8.0);
+        f.config(PhoenixConfig.BURST_MAX_DAMAGE, 30.0);
+        f.config(PhoenixConfig.BURST_WAVE_SPEED, 1.0);
     }
 
     // ============================================================================================================
