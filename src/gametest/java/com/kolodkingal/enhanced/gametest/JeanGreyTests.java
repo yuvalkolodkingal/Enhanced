@@ -133,10 +133,13 @@ public final class JeanGreyTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = PhoenixTests.jean(f, 3.5, 10.5);
         f.onClose(() -> MindLink.end(jean.server, jean.getUUID(), MindLink.End.LET_GO));
-        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(14.5, FLOOR, 10.5));
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(9.5, FLOOR, 10.5));
         TestKit.lookAt(jean, husk);
-        PhoenixTests.sneakPress(jean, 3);
-        check(MindLink.isHost(husk) && MindLink.isLinked(jean), "Sneak + V: her mind is in the husk, eleven blocks away");
+        PhoenixTests.press(jean, 4);
+        check(PhoenixAbilities.isHost(husk) && !MindLink.isLinked(jean), "B: the husk is her host, as before");
+        TestKit.lookAt(jean, husk);
+        PhoenixTests.press(jean, 4);
+        check(MindLink.isHost(husk) && MindLink.isLinked(jean), "B at her host: her mind is in its body");
         for (int i = 0; i < 5; i++) {
             PowerTicker.tick(jean);
         }
@@ -145,8 +148,8 @@ public final class JeanGreyTests {
         jean.hurt(helper.getLevel().damageSources().generic(), 10.0F);
         check(MindLink.isLinked(jean), "a blow to her body does not bring her back, and there is no time limit");
         check(jean.getHealth() >= health - 3.5F, "the field took most of the blow: " + (health - jean.getHealth()));
-        PhoenixTests.press(jean, 3);
-        check(!MindLink.isLinked(jean) && !MindLink.isHost(husk), "V: she is back");
+        PhoenixTests.press(jean, 4);
+        check(!MindLink.isLinked(jean) && !MindLink.isHost(husk), "B again: she is back");
         helper.succeed();
     }
 
@@ -155,13 +158,14 @@ public final class JeanGreyTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = PhoenixTests.jean(f, 3.5, 10.5);
         f.onClose(() -> MindLink.end(jean.server, jean.getUUID(), MindLink.End.LET_GO));
+        f.pvp(true);
         Power[] immune = {Power.SCARLET_WITCH, Power.BILLY, Power.SPIDER_MAN};
         for (int i = 0; i < immune.length; i++) {
             Power power = immune[i];
             ServerPlayer other = f.player(8.5, FLOOR, 6.5 + 4.0 * i, power);
             TestKit.lookAt(jean, other);
             PhoenixTests.actionBarKeys(jean);
-            PhoenixTests.sneakPress(jean, 3);
+            PhoenixTests.press(jean, 4);
             check(!MindLink.isLinked(jean) && !MindLink.isHost(other), power + "'s mind is closed to her");
             check(PhoenixTests.actionBarKeys(jean).contains("message.enhanced.phoenix_body.immune"), "and she is told why (" + power + ")");
         }

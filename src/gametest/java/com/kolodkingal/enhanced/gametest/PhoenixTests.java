@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.ability.HeroLifecycle;
 import com.kolodkingal.enhanced.ability.HeroServers;
 import com.kolodkingal.enhanced.ability.MindReading;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
+import com.kolodkingal.enhanced.ability.MindLink;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
 import com.kolodkingal.enhanced.ability.PhoenixServer;
@@ -1206,22 +1207,25 @@ public final class PhoenixTests {
         check(data.isReady(4, helper.getLevel().getGameTime()), "and it costs nothing");
 
         f.pvp(true);
+        f.onClose(() -> MindLink.end(jean.server, jean.getUUID(), MindLink.End.LET_GO));
         press(jean, 4);
-        check(other.hasEffect(ModEffects.SPELLBOUND) && other.getEffect(ModEffects.SPELLBOUND).getDuration() == 60, "PvP on: they are held for 3 seconds");
-        check(!other.hasEffect(ModEffects.POSSESSED) && PhoenixAbilities.hostsOf(jean).isEmpty(), "(a player is held, not driven)");
-        check(!data.isReady(4, helper.getLevel().getGameTime()), "and she must rest");
+        // (3.19.3) she goes into their body and steers it for as long as she likes
+        check(MindLink.isLinked(jean) && MindLink.isHost(other), "PvP on: her mind is in their body");
+        check(!other.hasEffect(ModEffects.POSSESSED) && PhoenixAbilities.hostsOf(jean).isEmpty(), "(a player is steered as Professor X does, not made a host)");
+        press(jean, 4);
+        check(!MindLink.isLinked(jean) && !MindLink.isHost(other), "B again: she is back");
 
         rested(jean, 4);
         lookAt(jean, creative);
         press(jean, 4);
-        check(!creative.hasEffect(ModEffects.SPELLBOUND), "a Creative player is unaffected");
+        check(!creative.hasEffect(ModEffects.SPELLBOUND) && !MindLink.isHost(creative), "a Creative player is unaffected");
 
         other.removeEffect(ModEffects.SPELLBOUND);
         rested(jean, 4);
         f.config(PhoenixConfig.MIND_CONTROL_PLAYER_TICKS, 0);
         lookAt(jean, other);
         press(jean, 4);
-        check(!other.hasEffect(ModEffects.SPELLBOUND), "with the time set to 0, players are out of reach for good");
+        check(!other.hasEffect(ModEffects.SPELLBOUND) && !MindLink.isHost(other), "with the time set to 0, players are out of reach for good");
         helper.succeed();
     }
 
@@ -1340,6 +1344,7 @@ public final class PhoenixTests {
         assertNear(jean.getFoodData().getExhaustionLevel() - exhaustion, 8.0, 1.0E-4, "at 8.0 of exhaustion");
         check(touched.contains(warden) && touched.contains(held) && touched.contains(stranger) && !touched.contains(jean) && !touched.contains(creative),
                 "the listeners hear of every mind the field reached, held or not");
+        jean.setXRot(-90.0F); // (3.19.3: at the sky, not at her host: B at her host puts her mind in it)
         press(jean, 4);
         check(!PhoenixAbilities.hostsOf(jean).isEmpty() && data.cooldownUntil(4) == now + 1200, "Mind Control shares the slot: it is still resting");
 

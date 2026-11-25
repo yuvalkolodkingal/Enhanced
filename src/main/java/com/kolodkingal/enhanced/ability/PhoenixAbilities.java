@@ -312,15 +312,7 @@ public final class PhoenixAbilities {
                     PowerTicker.toggleFlight(player);
                 }
             }
-            case 3 -> {
-                if (MindLink.isLinked(player) || alt && !Telekinesis.isHolding(player) && PhoenixBody.aimed(player) != null) {
-                    // (3.19.3) Sneak + V at a creature or player: her mind into that body, for as long as she likes (V
-                    // brings her back); Sneak + V at a block still lifts it, and with something held still sets it down
-                    PhoenixBody.press(player);
-                } else {
-                    Telekinesis.press(player, Telekinesis.Mode.JEAN);
-                }
-            }
+            case 3 -> Telekinesis.press(player, Telekinesis.Mode.JEAN);
             case 4 -> {
                 if (alt) {
                     psionicField(player, data);
@@ -529,6 +521,11 @@ public final class PhoenixAbilities {
     private static void mindControl(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
+        // (3.19.3) B while her mind is in another body brings her back; B at a creature she already holds puts her mind in it
+        if (PhoenixBody.is(player) && (MindLink.isLinked(player) || PhoenixBody.aimed(player) instanceof Mob own && isHers(player, own))) {
+            PhoenixBody.press(player);
+            return;
+        }
         if (!data.isReady(HeroAbility.PHOENIX_CONTROL, now)) {
             return;
         }
@@ -552,7 +549,12 @@ public final class PhoenixAbilities {
             player.displayClientMessage(Component.translatable(refusal), true);
             return;
         }
-        if (target instanceof ServerPlayer other) {
+        if (target instanceof ServerPlayer other && PhoenixBody.is(player)) {
+            // (3.19.3) Jean Grey goes into a player's body and steers it for as long as she likes (B brings her back);
+            // the Scarlet Witch, Billy and Spider-Man are immune
+            MindLink.take(player, other);
+            return;
+        } else if (target instanceof ServerPlayer other) {
             // Their controls are theirs: all she can do is hold them still while their mind goes blank.
             if (!other.addEffect(new MobEffectInstance(ModEffects.SPELLBOUND, PhoenixConfig.MIND_CONTROL_PLAYER_TICKS.get(), 0, false, false, true), player)) {
                 player.displayClientMessage(Component.translatable("message.enhanced.mind_control.cannot"), true);
@@ -656,7 +658,7 @@ public final class PhoenixAbilities {
     }
 
     /** Lets a host go: its effect ends, and (when she took another in its place) it wakes confused for a moment. */
-    private static void release(Mob mob, boolean confuse) {
+    static void release(Mob mob, boolean confuse) {
         mob.removeEffect(ModEffects.POSSESSED);
         if (confuse && mob.isAlive()) {
             mob.addEffect(new MobEffectInstance(ModEffects.CONFUSED, FREED_CONFUSED_TICKS, 0, false, false, true));

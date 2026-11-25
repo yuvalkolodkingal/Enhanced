@@ -12,16 +12,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
 
 /**
- * (3.19.3) Jean Grey takes over a body, on Sneak + V aimed at it (at a block Sneak + V still lifts the block): her mind goes into the creature or player she looks at (within
- * {@link #RANGE} blocks) and she steers it as Professor X does, for as long as she likes (Sneak + V, or V, brings her
- * back). No time limit and no distance limit in her world, and no telepath keeps her out, except three minds that are
- * closed to her: the Scarlet Witch's, Billy's and Spider-Man's (his spider-sense). Magneto's helmet still shuts a mind.
- * Her own body, left behind, is guarded by her force field meanwhile ({@link PhoenixShield#filter}), and a blow to it
- * does not break the link.
+ * (3.19.3) Jean Grey takes over bodies, for as long as she likes, on B (Mind Control): B at a player puts her mind in
+ * their body; B at a creature takes it as her host as before, and B at a host of hers puts her mind in it. She steers
+ * the body as Professor X does ({@link MindLink}), with no time limit and no distance limit in her world, and no telepath
+ * keeps her out, except three minds that are closed to her: the Scarlet Witch's, Billy's and Spider-Man's. Magneto's
+ * helmet still shuts a mind. B again brings her back. Her own body, left behind, is guarded by her force field meanwhile
+ * ({@link PhoenixShield#guarded}), and a blow to it does not break the link.
  */
 public final class PhoenixBody {
     /** How far she reaches for a body. */
     public static final double RANGE = 30.0;
+    /** Her key for it: B (Mind Control). */
+    public static final int KEY = 4;
 
     private PhoenixBody() {
     }
@@ -44,7 +46,7 @@ public final class PhoenixBody {
         return power == Power.SCARLET_WITCH || power == Power.BILLY || power == Power.SPIDER_MAN;
     }
 
-    /** Sneak + V (or V while she is in a body): in, or back. */
+    /** B while she is in a body, or at a creature she already holds: back, or in. */
     static void press(ServerPlayer player) {
         if (MindLink.isLinked(player)) {
             MindLink.end(player.server, player.getUUID(), MindLink.End.LET_GO);
@@ -54,6 +56,9 @@ public final class PhoenixBody {
         if (target == null) {
             player.displayClientMessage(Component.translatable("message.enhanced.xavier.nothing"), true);
             return;
+        }
+        if (target instanceof net.minecraft.world.entity.Mob mob && PhoenixAbilities.isHostOf(player, mob)) {
+            PhoenixAbilities.release(mob, false); // her host stops being one: her mind goes in instead
         }
         MindLink.take(player, target);
     }

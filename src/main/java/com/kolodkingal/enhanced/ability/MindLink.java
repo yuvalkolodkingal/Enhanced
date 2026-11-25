@@ -466,7 +466,7 @@ public final class MindLink {
     /** Why the link must end now, or null. */
     @Nullable
     private static End check(ServerPlayer xavier, Link link) {
-        if (!Powers.get(xavier).has(HeroAbility.XAVIER_TAKE_OVER)) {
+        if (!Powers.get(xavier).has(HeroAbility.XAVIER_TAKE_OVER) && !PhoenixBody.is(xavier)) {
             return End.POWER_LOST; // (3.4: or a custom hero who no longer has the ability)
         }
         if (xavier.serverLevel().getGameTime() >= link.until) {
@@ -649,8 +649,8 @@ public final class MindLink {
             return false;
         }
         PowerData own = Powers.get(xavier);
-        if (ability == own.slot(HeroAbility.XAVIER_TAKE_OVER)) {
-            return false;
+        if (ability == (PhoenixBody.is(own) ? PhoenixBody.KEY : own.slot(HeroAbility.XAVIER_TAKE_OVER))) {
+            return false; // (3.19.3: Jean's B brings her back)
         }
         if (!(find(xavier.server, link.host) instanceof ServerPlayer host) || !host.isAlive()) {
             return false;
