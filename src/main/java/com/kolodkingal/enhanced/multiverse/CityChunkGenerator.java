@@ -260,15 +260,36 @@ public class CityChunkGenerator extends ChunkGenerator {
         }
         BlockState state = ruined() ? ruin(c, y) : hydra(c, y);
         if (state != null && !ruined() && hydraFreed) {
-            BlockState free = FREED.get(state.getBlock());
+            BlockState free = free(state, y);
             if (free != null) {
-                state = y > GROUND && free.is(Blocks.GRASS_BLOCK) ? Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState() : free;
+                state = free;
                 if (state.isAir()) {
                     return null;
                 }
             }
         }
         return state;
+    }
+
+    /**
+     * What a block of Hydra's city becomes in the free city, or null if it stays as it is (3.19.1). Turning twice gives
+     * the same: the roads (black, with yellow lines) stay roads, and the grey that a black wall turns into stays grey.
+     * Only the yards on the ground turn green.
+     */
+    @Nullable
+    public static BlockState free(BlockState state, int y) {
+        if (y == GROUND ? state.is(Blocks.BLACK_CONCRETE) : state.is(Blocks.GRAY_CONCRETE) || state.is(Blocks.COAL_BLOCK)) {
+            return null;
+        }
+        BlockState free = FREED.get(state.getBlock());
+        return free != null && y > GROUND && free.is(Blocks.GRASS_BLOCK) ? Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState() : free;
+    }
+
+    /** The road's own block at the ground of a column (black, or a yellow line), or null where there is no road. */
+    @Nullable
+    BlockState road(int x, int z) {
+        Column c = column(x, z);
+        return c.kind() == Kind.ROAD && !ruined() ? hydra(c, GROUND) : null;
     }
 
     @Nullable

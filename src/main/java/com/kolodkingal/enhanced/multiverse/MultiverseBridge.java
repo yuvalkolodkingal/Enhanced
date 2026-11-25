@@ -220,22 +220,80 @@ public final class MultiverseBridge {
         }
     }
 
-    /** The ring fills with blue light as it gathers its energy. */
+    /**
+     * The opening of the bridge (3.19.1, in full), as it gathers its energy ({@code progress} 0 to 1):
+     * <ol>
+     *     <li>the ring wakes: sparks run round its rim, faster and faster;</li>
+     *     <li>arms of light spiral in from the rim to the middle;</li>
+     *     <li>the middle fills: a turning disc of light grows out to the rim, the way through;</li>
+     * </ol>
+     * and its hum rises with it. When it sends, the disc bursts ({@link #burst}).
+     */
     static void glow(ServerLevel level, BlockPos core, Direction facing, float progress) {
         Vec3 c = centre(core);
         Direction side = side(facing);
-        int n = 6 + (int) (progress * 18);
-        for (int i = 0; i < n; i++) {
-            double angle = level.random.nextDouble() * Mth.TWO_PI;
-            double r = RADIUS - 0.6 - level.random.nextDouble() * (RADIUS - 0.6) * progress;
-            double a = Math.cos(angle) * r;
-            double b = Math.sin(angle) * r;
-            level.sendParticles(new EnergyParticleOptions(i % 3 == 0 ? 0xFFFFFF : UniverseTravel.BRIDGE_BLUE, 1.2F),
-                    c.x + side.getStepX() * a, c.y + b, c.z + side.getStepZ() * a, 1, 0.0, 0.0, 0.0, 0.0);
+        double time = level.getGameTime() * 0.25;
+        // 1. The rim: sparks running round, faster as it wakes.
+        int rim = 6 + (int) (progress * 10);
+        double run = time * (1.0 + progress * 4.0);
+        for (int i = 0; i < rim; i++) {
+            double angle = run + i * Mth.TWO_PI / rim;
+            point(level, c, side, Math.cos(angle) * (RADIUS - 0.5), Math.sin(angle) * (RADIUS - 0.5), i % 2 == 0 ? 0xFFFFFF : UniverseTravel.BRIDGE_BLUE, 1.0F);
+        }
+        // 2. The arms: spiralling in from the rim.
+        if (progress > 0.25F) {
+            float arms = Math.min(1.0F, (progress - 0.25F) / 0.35F);
+            for (int arm = 0; arm < 4; arm++) {
+                for (int k = 0; k < 5; k++) {
+                    double t = ((time * 0.35 + k / 5.0) % 1.0);
+                    double r = (RADIUS - 0.6) * (1.0 - t * arms);
+                    double angle = arm * Mth.HALF_PI + t * 4.0 - time * 0.6;
+                    point(level, c, side, Math.cos(angle) * r, Math.sin(angle) * r, UniverseTravel.BRIDGE_BLUE, 1.3F);
+                }
+            }
+        }
+        // 3. The disc: the way through, growing from the middle to the rim, turning.
+        if (progress > 0.55F) {
+            float disc = Math.min(1.0F, (progress - 0.55F) / 0.4F);
+            int n = 8 + (int) (disc * 26);
+            for (int i = 0; i < n; i++) {
+                double r = Math.sqrt(level.random.nextDouble()) * (RADIUS - 0.6) * disc;
+                double angle = level.random.nextDouble() * Mth.TWO_PI + time;
+                point(level, c, side, Math.cos(angle) * r, Math.sin(angle) * r, i % 4 == 0 ? 0xFFFFFF : 0x7FD0FF, 1.6F);
+            }
+            if (level.getGameTime() % 4 == 0) {
+                level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL, c.x, c.y, c.z, 12,
+                        Math.abs(side.getStepX()) * RADIUS * 0.5 * disc, RADIUS * 0.5 * disc, Math.abs(side.getStepZ()) * RADIUS * 0.5 * disc, 0.4);
+            }
         }
         if (level.getGameTime() % 10 == 0) {
             level.playSound(null, core, SoundEvents.BEACON_AMBIENT, SoundSource.BLOCKS, 1.2F, 0.6F + progress);
         }
+        if (progress > 0.55F && level.getGameTime() % 20 == 0) {
+            level.playSound(null, core, SoundEvents.PORTAL_AMBIENT, SoundSource.BLOCKS, 0.8F, 0.7F + progress * 0.6F);
+        }
+    }
+
+    /** A spark of the bridge's light at ({@code a}, {@code b}) on the ring's face (sideways, up from its middle). */
+    private static void point(ServerLevel level, Vec3 c, Direction side, double a, double b, int color, float size) {
+        level.sendParticles(new EnergyParticleOptions(color, size), c.x + side.getStepX() * a, c.y + b, c.z + side.getStepZ() * a,
+                1, 0.0, 0.0, 0.0, 0.0);
+    }
+
+    /** The bridge sends: its disc of light bursts out of the ring, a flash and a wave of it. */
+    static void burst(ServerLevel level, BlockPos core, Direction facing) {
+        Vec3 c = centre(core);
+        Direction side = side(facing);
+        for (int i = 0; i < 48; i++) {
+            double angle = i * Mth.TWO_PI / 48;
+            for (double r = 0.5; r < RADIUS; r += 1.5) {
+                point(level, c, side, Math.cos(angle) * r, Math.sin(angle) * r, i % 3 == 0 ? 0xFFFFFF : UniverseTravel.BRIDGE_BLUE, 2.0F);
+            }
+        }
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, c.x, c.y, c.z, 60, 0.4, 0.4, 0.4, 0.35);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 80,
+                Math.abs(side.getStepX()) * RADIUS * 0.5, RADIUS * 0.5, Math.abs(side.getStepZ()) * RADIUS * 0.5, 0.6);
+        level.playSound(null, core, SoundEvents.END_PORTAL_SPAWN, SoundSource.BLOCKS, 0.7F, 1.4F);
     }
 
     /** The energy is gathered: everyone standing in the ring goes, and the way stays open. */
@@ -270,6 +328,7 @@ public final class MultiverseBridge {
         if (!UniverseTravel.send(starter, spool.universe(), arrival, UniverseTravel.BRIDGE_BLUE)) {
             return;
         }
+        burst(level, core, facing);
         for (ServerPlayer p : going) {
             UniverseTravel.send(p, spool.universe(), new SpaceRealms.Arrival(arrival.level(), arrival.spot(), arrival.yaw()),
                     UniverseTravel.BRIDGE_BLUE);

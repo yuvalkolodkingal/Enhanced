@@ -51,8 +51,9 @@ public final class GammaWorld {
     /** Makes a creature that comes into the Gamma world a Hulk of its kind (once: the changes are saved with it). */
     public static void hulkify(Entity entity) {
         if (!(entity instanceof LivingEntity living) || entity instanceof Player || entity instanceof ArmorStand
-                || WhatIfPeople.isPerson(entity)) {
-            return;
+                || WhatIfPeople.isPerson(entity)
+                || com.kolodkingal.enhanced.Enhanced.MODID.equals(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getNamespace())) {
+            return; // (3.19.1) the mod's own bodies, as Wanda's Hex Vision, are not the Gamma Bomb's
         }
         // Its temper, every time it comes (goals are not saved): it turns on whoever hurts it.
         if (entity instanceof net.minecraft.world.entity.Mob mob) {

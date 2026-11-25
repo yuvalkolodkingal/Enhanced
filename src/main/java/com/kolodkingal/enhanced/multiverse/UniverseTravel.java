@@ -205,17 +205,48 @@ public final class UniverseTravel {
         }
         // Over an ocean there is no ground: find land first from the generator's noise alone (no chunk is made for
         // it), then make only the chunks round that one spot.
-        if (level.dimension() == Multiverse.CAVES_KEY) {
-            // One great cave: the floor under its roof, not the roof.
-            Vec3 floor = SpaceRealms.floorNear(level, player, around, 24);
+        if (level.dimension() == Multiverse.CAVES_KEY || level.dimension() == Multiverse.HOLLOW_KEY) {
+            // One great cave, or a hollow world: the floor under its roof, not the roof.
+            Vec3 floor = SpaceRealms.floorNear(level, player, around, level.dimension() == Multiverse.HOLLOW_KEY ? 12 : 24);
+            if (floor == null && level.dimension() == Multiverse.HOLLOW_KEY) {
+                floor = landing(level, around.atY(72));
+            }
             return floor == null ? null : new SpaceRealms.Arrival(level, floor, player.getYRot());
         }
         BlockPos land = land(level, around);
-        Vec3 spot = SpaceRealms.surfaceNear(level, player, land, land.equals(around) ? 24 : 8);
-        if (spot == null && !land.equals(around)) {
+        boolean islands = level.dimension() == Multiverse.VOID_KEY;
+        Vec3 spot = SpaceRealms.surfaceNear(level, player, land, land.equals(around) && !islands ? 24 : 8);
+        if (spot == null && !land.equals(around) && !islands) {
             spot = SpaceRealms.surfaceNear(level, player, around, 8);
         }
+        if (spot == null && Multiverse.isRandomDimension(level.dimension())) {
+            // Islands over the void with none near, or a hollow world without a floor: a landing of the land's own stone.
+            spot = landing(level, around.atY(islands ? 70 : Math.max(level.getSeaLevel() + 8, 72)));
+        }
         return spot == null ? null : new SpaceRealms.Arrival(level, spot, player.getYRot());
+    }
+
+    /**
+     * (3.19.1) A landing where a random universe has no ground to arrive on: a round floor of its stone, five blocks
+     * across, with room above it. Returns where to stand.
+     */
+    static Vec3 landing(ServerLevel level, BlockPos at) {
+        net.minecraft.world.level.block.state.BlockState stone = UniverseRecipe.of(Multiverse.universeAt(level, at)).stone();
+        if (stone == null || !stone.isCollisionShapeFullBlock(level, at)) {
+            stone = net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState();
+        }
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                if (dx * dx + dz * dz > 5) {
+                    continue;
+                }
+                level.setBlock(at.offset(dx, -1, dz), stone, 3);
+                for (int dy = 0; dy < 3; dy++) {
+                    level.setBlock(at.offset(dx, dy, dz), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+                }
+            }
+        }
+        return Vec3.atBottomCenterOf(at);
     }
 
     /** How far (blocks) the search for land goes out, and how far apart the columns it looks at are. */

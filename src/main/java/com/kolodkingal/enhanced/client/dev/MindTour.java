@@ -214,6 +214,75 @@ public final class MindTour {
         STEPS.add(new Step(10, () -> Minecraft.getInstance().setScreen(null)));
     }
 
+    private static final BlockPos[] BUNKER = new BlockPos[1];
+
+    /** (3.19.1) A bunker of a universe, as the land built it: the transit, the bunker from the air, its hall, a resident's talk. */
+    private static void bunker(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> key, int universe, String name) {
+        server(p -> {
+            TOUR.forEach(net.minecraft.world.entity.Entity::discard);
+            TOUR.clear();
+            BUNKER[0] = null;
+            net.minecraft.server.level.ServerLevel level = p.getServer().getLevel(key);
+            for (int cell = 0; cell < 6 && BUNKER[0] == null; cell++) {
+                int cx = cell % 3 - 1;
+                int cz = cell / 3;
+                BlockPos site = com.kolodkingal.enhanced.multiverse.Bunkers.site(level.getSeed(), universe, cx, cz);
+                for (int x = -2; x <= 2; x++) {
+                    for (int z = -2; z <= 2; z++) {
+                        level.getChunk((site.getX() >> 4) + x, (site.getZ() >> 4) + z);
+                    }
+                }
+                BlockPos lodestone = com.kolodkingal.enhanced.multiverse.Bunkers.find(level, site.offset(0, 0, -8));
+                com.kolodkingal.enhanced.Enhanced.LOGGER.info("Bunker tour: cell {},{} site {} lodestone {}", cx, cz, site, lodestone);
+                if (lodestone != null) {
+                    BUNKER[0] = lodestone;
+                    if (!level.getBlockState(lodestone.below()).is(net.minecraft.world.level.block.Blocks.CHISELED_STONE_BRICKS)) {
+                        TOUR.addAll(com.kolodkingal.enhanced.multiverse.Bunkers.populate(level, lodestone, universe,
+                                com.kolodkingal.enhanced.multiverse.Bunkers.siteSeed(level.getSeed(), universe, cx, cz)));
+                    }
+                }
+            }
+            BlockPos at = BUNKER[0] == null ? p.blockPosition() : BUNKER[0];
+            level.setDayTime(5000);
+            p.getAbilities().flying = true;
+            p.onUpdateAbilities();
+            p.teleportTo(level, at.getX() + 0.5, at.getY() + 26.0, at.getZ() + 8 + 48.0, 180.0F, 28.0F);
+        }, 60);
+        shot(name, 200);
+        STEPS.add(new Step(2, () -> com.kolodkingal.enhanced.client.world.UniverseTransit.play(universe)));
+        shot(name + "_transit", 4);
+        shot(name + "_transit2", 12);
+        shot(name + "_transit3", 14);
+        server(p -> {
+            if (BUNKER[0] != null) {
+                BlockPos l = BUNKER[0];
+                p.teleportTo(p.serverLevel(), l.getX() + 0.5, l.getY() + 31.0, l.getZ() + 8 + 4.0, 180.0F, 70.0F);
+            }
+        }, 40);
+        shot(name + "_top", 40);
+        server(p -> {
+            if (BUNKER[0] != null) {
+                BlockPos l = BUNKER[0];
+                p.teleportTo(p.serverLevel(), l.getX() + 0.5, l.getY() + 1.0, l.getZ() + 4.5, 180.0F, 5.0F);
+            }
+        }, 40);
+        shot(name + "_hall", 40);
+        server(p -> {
+            for (net.minecraft.world.entity.Entity e : p.serverLevel().getEntitiesOfClass(com.kolodkingal.enhanced.asgard.npc.AsgardianEntity.class,
+                    p.getBoundingBox().inflate(24.0))) {
+                if (e instanceof com.kolodkingal.enhanced.asgard.npc.AsgardianEntity npc) {
+                    p.teleportTo(p.serverLevel(), npc.getX(), npc.getY(), npc.getZ() + 2.5, 180.0F, 10.0F);
+                    boolean opened = com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(p, npc);
+                    com.kolodkingal.enhanced.Enhanced.LOGGER.info("Bunker tour: talk opened {} at {}", opened,
+                            com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(p));
+                    break;
+                }
+            }
+        }, 40);
+        shot(name + "_talk", 10);
+        STEPS.add(new Step(10, () -> Minecraft.getInstance().setScreen(null)));
+    }
+
     private static void script() {
         if ("config".equals(System.getProperty("enhanced.mindtour.mode"))) {
             // (3.16.1) the settings screen and its client section, in a world (a player's report: an empty screen)
@@ -249,6 +318,11 @@ public final class MindTour {
             }));
             shot("c03_values", 10);
             STEPS.add(new Step(20, () -> Minecraft.getInstance().setScreen(null)));
+            return;
+        }
+        if ("bunker".equals(System.getProperty("enhanced.mindtour.mode"))) {
+            bunker(com.kolodkingal.enhanced.multiverse.Multiverse.GAMMA_KEY, com.kolodkingal.enhanced.multiverse.Multiverse.GAMMA, "b01_gamma");
+            bunker(com.kolodkingal.enhanced.multiverse.Multiverse.ZOMBIES_KEY, com.kolodkingal.enhanced.multiverse.Multiverse.ZOMBIES, "b02_zombies");
             return;
         }
         if ("whatif".equals(System.getProperty("enhanced.mindtour.mode"))) {

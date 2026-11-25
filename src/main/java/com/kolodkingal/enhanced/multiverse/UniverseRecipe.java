@@ -22,17 +22,22 @@ import java.util.concurrent.ConcurrentHashMap;
  * What a random universe is made of (3.19.1), as the game's April Fools update 20w14&infin; made a dimension of the words
  * in a book: the universe's number is the seed, and the seed picks everything, always the same for the same number:
  * <ul>
- *     <li>the <b>shape</b> of the land ({@link #shape()}): the Overworld's, amplified mountains, floating islands, or one
- *     great cave (each shape is one dimension of {@link Multiverse#SHAPES});</li>
+ *     <li>the <b>shape</b> of the land ({@link #shape()}): the Overworld's, amplified mountains, floating islands, one
+ *     great cave, a hollow world under a roof (the Nether's shape), islands over the void (the End's) or huge biomes
+ *     (each shape is one dimension of {@link Multiverse#SHAPES});</li>
  *     <li>the <b>stone</b> the land is made of, the <b>ground</b> on top of it and what fills the <b>seas</b>
  *     ({@link #stone()}, {@link #ground()}, {@link #sea()}; null keeps the game's own), swapped when the land is made
  *     ({@link UniverseChunkGenerator});</li>
  *     <li>the <b>biomes</b> ({@link #biome}): the game's own, all one biome, or every biome turned into another;</li>
  *     <li>the colour of the <b>sky and fog</b> ({@link #fog()}, -1: the game's own), drawn by the client;</li>
- *     <li>the <b>creatures</b> ({@link #creature}): each kind that comes to be may come as another kind
- *     ({@code MultiverseEvents}).</li>
+ *     <li>the <b>ores</b> ({@link #ore()}): every ore may be another block;</li>
+ *     <li>the <b>creatures</b> ({@link #creature}): none change, about half of the kinds come as others, all of them
+ *     do, or every creature is one kind; and they may all be giants or tiny ({@link #scale()}) ({@code MultiverseEvents});</li>
+ *     <li>the <b>gravity</b> ({@link #gravity()}): light as the moon, or heavy, for the players and every creature.</li>
  * </ul>
- * Everything here is arithmetic on the number, so the client works out the same colours as the server.
+ * Everything here is arithmetic on the number, so the client works out the same colours as the server. 3.19.1, second
+ * round: the number is mixed first (neighbouring numbers no longer give alike universes), and each part is drawn on its
+ * own, so names give clearly different worlds.
  */
 public final class UniverseRecipe {
     /** What the land may be made of instead of stone. */
@@ -63,6 +68,17 @@ public final class UniverseRecipe {
             EntityType.SILVERFISH, EntityType.ENDERMITE, EntityType.MOOSHROOM, EntityType.CAMEL, EntityType.SNIFFER,
             EntityType.CAVE_SPIDER, EntityType.HORSE, EntityType.DONKEY, EntityType.CAT, EntityType.OCELOT,
             EntityType.IRON_GOLEM, EntityType.SNOW_GOLEM, EntityType.VINDICATOR, EntityType.PILLAGER, EntityType.GHAST);
+    /** What the ores may be instead. */
+    private static final List<Block> ORES = List.of(Blocks.DIAMOND_BLOCK, Blocks.EMERALD_BLOCK, Blocks.GOLD_BLOCK,
+            Blocks.IRON_BLOCK, Blocks.LAPIS_BLOCK, Blocks.REDSTONE_BLOCK, Blocks.COAL_BLOCK, Blocks.GLOWSTONE,
+            Blocks.SEA_LANTERN, Blocks.AMETHYST_BLOCK, Blocks.RAW_GOLD_BLOCK, Blocks.RAW_COPPER_BLOCK, Blocks.MELON,
+            Blocks.PUMPKIN, Blocks.TNT, Blocks.HONEY_BLOCK, Blocks.SLIME_BLOCK, Blocks.CAKE, Blocks.BOOKSHELF,
+            Blocks.ANCIENT_DEBRIS, Blocks.CRYING_OBSIDIAN, Blocks.SHROOMLIGHT, Blocks.PEARLESCENT_FROGLIGHT, Blocks.MAGMA_BLOCK);
+    /** How the creatures are: as they are, about half of the kinds as others, every kind as another, all one kind. */
+    private static final int CREATURES_KEEP = 0;
+    private static final int CREATURES_HALF = 1;
+    private static final int CREATURES_ALL = 2;
+    private static final int CREATURES_ONE = 3;
     /** How the biomes are: the game's own, one for all, or each turned into another. */
     private static final int BIOMES_KEEP = 0;
     private static final int BIOMES_ONE = 1;
@@ -81,27 +97,47 @@ public final class UniverseRecipe {
     private final int biomes;
     private final long biomeSeed;
     private final int fog;
-    private final boolean creatures;
+    private final int creatures;
     private final long creatureSeed;
+    @Nullable
+    private final BlockState ore;
+    private final float scale;
+    private final float gravity;
+    /** Which of its parts the universe is named for (its title). */
+    private final int titled;
     /** The biome map, made the first time the land asks (it needs the dimension's biomes). */
     private volatile Map<Holder<Biome>, Holder<Biome>> biomeMap;
 
     private UniverseRecipe(int number) {
         this.number = number;
-        Random random = new Random(number * 0x5DEECE66DL + 0x2545F4914F6CDD1DL);
+        Random random = new Random(mix(number));
         float s = random.nextFloat();
-        this.shape = s < 0.5F ? 0 : s < 0.7F ? 1 : s < 0.85F ? 2 : 3;
-        this.stone = random.nextFloat() < 0.75F ? pick(STONES, random).defaultBlockState() : skip(random);
+        this.shape = s < 0.25F ? 0 : s < 0.38F ? 1 : s < 0.5F ? 2 : s < 0.62F ? 3 : s < 0.75F ? 4 : s < 0.87F ? 5 : 6;
+        this.stone = random.nextFloat() < 0.7F ? pick(STONES, random).defaultBlockState() : skip(random);
         this.ground = random.nextFloat() < 0.6F ? pick(GROUNDS, random).defaultBlockState() : skip(random);
-        float w = random.nextFloat();
-        this.sea = w < 0.55F ? pick(SEAS, random).defaultBlockState() : skip(random);
+        this.sea = random.nextFloat() < 0.5F ? pick(SEAS, random).defaultBlockState() : skip(random);
         float b = random.nextFloat();
         this.biomes = b < 0.25F ? BIOMES_KEEP : b < 0.5F ? BIOMES_ONE : BIOMES_SHUFFLED;
         this.biomeSeed = random.nextLong();
-        this.fog = random.nextFloat() < 0.7F ? hsv(random.nextFloat(), 0.45F + random.nextFloat() * 0.5F,
-                0.55F + random.nextFloat() * 0.45F) : -1;
-        this.creatures = random.nextFloat() < 0.65F;
+        this.fog = random.nextFloat() < 0.75F ? hsv(random.nextFloat(), 0.35F + random.nextFloat() * 0.65F,
+                0.45F + random.nextFloat() * 0.55F) : -1;
+        float c = random.nextFloat();
+        this.creatures = c < 0.25F ? CREATURES_KEEP : c < 0.55F ? CREATURES_HALF : c < 0.8F ? CREATURES_ALL : CREATURES_ONE;
         this.creatureSeed = random.nextLong();
+        this.ore = random.nextFloat() < 0.4F ? pick(ORES, random).defaultBlockState() : skip(random);
+        float z = random.nextFloat();
+        this.scale = z < 0.15F ? 2.0F : z < 0.3F ? 0.5F : 1.0F;
+        float g = random.nextFloat();
+        this.gravity = g < 0.18F ? -0.65F : g < 0.3F ? 0.6F : 0.0F;
+        this.titled = random.nextInt(1 << 16);
+    }
+
+    /** The number well mixed (splitmix64): neighbouring numbers give unrelated draws. */
+    static long mix(long number) {
+        long z = number * 0x9E3779B97F4A7C15L + 0x2545F4914F6CDD1DL;
+        z = (z ^ (z >>> 30)) * 0xBF58476D1CE4E5B9L;
+        z = (z ^ (z >>> 27)) * 0x94D049BB133111EBL;
+        return z ^ (z >>> 31);
     }
 
     /** A pick that was not taken still draws, so that the picks after it stay the same. */
@@ -132,7 +168,10 @@ public final class UniverseRecipe {
         return number;
     }
 
-    /** 0 the Overworld's land, 1 amplified, 2 floating islands, 3 caves: the index into {@link Multiverse#SHAPES}. */
+    /**
+     * 0 the Overworld's land, 1 amplified, 2 floating islands, 3 caves, 4 a hollow world under a roof, 5 islands over the
+     * void, 6 huge biomes: the index into {@link Multiverse#SHAPES}.
+     */
     public int shape() {
         return shape;
     }
@@ -160,9 +199,25 @@ public final class UniverseRecipe {
         return fog;
     }
 
+    /** What every ore is instead, or null for the ores. */
+    @Nullable
+    public BlockState ore() {
+        return ore;
+    }
+
+    /** How big every creature is (1, 2 giants, 0.5 tiny). */
+    public float scale() {
+        return scale;
+    }
+
+    /** How much lighter or heavier everything falls (0 as at home, -0.65 the moon's, 0.6 heavy): of the gravity. */
+    public float gravity() {
+        return gravity;
+    }
+
     /** Whether the land swaps anything when it is made. */
     public boolean swapsBlocks() {
-        return stone != null || ground != null || sea != null;
+        return stone != null || ground != null || sea != null || ore != null;
     }
 
     /** Whether the biomes are not the game's own. */
@@ -203,42 +258,68 @@ public final class UniverseRecipe {
 
     /** The kind a creature of kind {@code type} comes as here (itself if it does not change). */
     public EntityType<?> creature(EntityType<?> type) {
-        if (!creatures) {
+        if (creatures == CREATURES_KEEP) {
             return type;
         }
         int index = CREATURES.indexOf(type);
         if (index < 0) {
             return type;
         }
+        if (creatures == CREATURES_ONE) {
+            return CREATURES.get((int) Math.floorMod(creatureSeed, (long) CREATURES.size()));
+        }
         long h = creatureSeed + index * 0x9E3779B97F4A7C15L;
         h ^= h >>> 31;
         h *= 0xBF58476D1CE4E5B9L;
         h ^= h >>> 29;
-        // About half the kinds change: the others stay as they are.
-        if ((h & 1L) == 0L) {
+        // About half the kinds change (all of them in a universe of changed creatures): the others stay as they are.
+        if (creatures == CREATURES_HALF && (h & 1L) == 0L) {
             return type;
         }
         return CREATURES.get((int) Math.floorMod(h >>> 1, (long) CREATURES.size()));
     }
 
-    /** "What If... the World Were Made of Clay?": the thing a universe is best known by. */
+    /**
+     * "What If... the World Were Made of Clay?": the thing a universe is best known by, one of the things that make it
+     * itself, drawn from the number (so that not every universe is named for its stone).
+     */
     public Component title() {
+        List<Component> names = new ArrayList<>();
         if (stone != null) {
-            return Component.translatable("what_if.enhanced.made_of", stone.getBlock().getName());
+            names.add(Component.translatable("what_if.enhanced.made_of", stone.getBlock().getName()));
         }
         if (sea != null) {
-            return Component.translatable("what_if.enhanced.seas_of", sea.getBlock().getName());
+            names.add(Component.translatable("what_if.enhanced.seas_of", sea.getBlock().getName()));
         }
         if (ground != null) {
-            return Component.translatable("what_if.enhanced.ground_of", ground.getBlock().getName());
+            names.add(Component.translatable("what_if.enhanced.ground_of", ground.getBlock().getName()));
         }
-        return switch (shape) {
-            case 1 -> Component.translatable("what_if.enhanced.mountains");
-            case 2 -> Component.translatable("what_if.enhanced.islands");
-            case 3 -> Component.translatable("what_if.enhanced.caves");
-            default -> biomes != BIOMES_KEEP ? Component.translatable("what_if.enhanced.biomes")
-                    : Component.translatable("what_if.enhanced.nothing");
-        };
+        if (ore != null) {
+            names.add(Component.translatable("what_if.enhanced.ores_of", ore.getBlock().getName()));
+        }
+        if (shape != 0) {
+            names.add(Component.translatable("what_if.enhanced." + switch (shape) {
+                case 1 -> "mountains";
+                case 2 -> "islands";
+                case 3 -> "caves";
+                case 4 -> "hollow";
+                case 5 -> "void";
+                default -> "huge";
+            }));
+        }
+        if (gravity != 0.0F) {
+            names.add(Component.translatable(gravity < 0.0F ? "what_if.enhanced.light" : "what_if.enhanced.heavy"));
+        }
+        if (scale != 1.0F) {
+            names.add(Component.translatable(scale > 1.0F ? "what_if.enhanced.giants" : "what_if.enhanced.tiny"));
+        }
+        if (creatures == CREATURES_ONE) {
+            names.add(Component.translatable("what_if.enhanced.only", CREATURES.get((int) Math.floorMod(creatureSeed, (long) CREATURES.size())).getDescription()));
+        }
+        if (biomes != BIOMES_KEEP) {
+            names.add(Component.translatable("what_if.enhanced.biomes"));
+        }
+        return names.isEmpty() ? Component.translatable("what_if.enhanced.nothing") : names.get(titled % names.size());
     }
 
     private static int hsv(float hue, float saturation, float value) {

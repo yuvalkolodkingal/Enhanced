@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:overworld",
+  "generator": {
+    "type": "enhanced:universe",
+    "universe": 0,
+    "biome_source": {
+      "type": "minecraft:multi_noise",
+      "preset": "minecraft:overworld"
+    },
+    "settings": "minecraft:large_biomes"
+  }
+}

@@ -46,8 +46,13 @@ public final class Multiverse {
     public static final ResourceKey<Level> AMPLIFIED_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_amplified"));
     public static final ResourceKey<Level> ISLANDS_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_islands"));
     public static final ResourceKey<Level> CAVES_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_caves"));
-    /** The four shapes of land of the random universes, in the order of {@link UniverseRecipe#shape()}. */
-    public static final List<ResourceKey<Level>> SHAPES = List.of(WHAT_IF_KEY, AMPLIFIED_KEY, ISLANDS_KEY, CAVES_KEY);
+    /** (3.19.1, second round) A hollow world under a roof (the Nether's shape), islands over the void (the End's), huge biomes. */
+    public static final ResourceKey<Level> HOLLOW_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_hollow"));
+    public static final ResourceKey<Level> VOID_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_void"));
+    public static final ResourceKey<Level> HUGE_KEY = ResourceKey.create(Registries.DIMENSION, Enhanced.id("what_if_huge"));
+    /** The seven shapes of land of the random universes, in the order of {@link UniverseRecipe#shape()}. */
+    public static final List<ResourceKey<Level>> SHAPES = List.of(WHAT_IF_KEY, AMPLIFIED_KEY, ISLANDS_KEY, CAVES_KEY,
+            HOLLOW_KEY, VOID_KEY, HUGE_KEY);
 
     /** The three What If universes of the series (numbers no cell ever has). */
     public static final int GAMMA = 8_000_001;
@@ -80,7 +85,7 @@ public final class Multiverse {
                 || dimension == HYDRA_KEY || dimension == ULTRON_KEY;
     }
 
-    /** Whether the dimension is one of the four cut into the random universes' cells. */
+    /** Whether the dimension is one of the seven cut into the random universes' cells. */
     public static boolean isRandomDimension(ResourceKey<Level> dimension) {
         return SHAPES.contains(dimension);
     }

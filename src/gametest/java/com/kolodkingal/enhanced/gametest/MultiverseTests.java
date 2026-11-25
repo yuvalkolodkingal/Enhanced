@@ -133,7 +133,7 @@ public final class MultiverseTests {
             check(Multiverse.levelOf(helper.getLevel().getServer(), n) == helper.getLevel().getServer().getLevel(Multiverse.SHAPES.get(recipe.shape())),
                     "a random universe is in the world of its shape");
         }
-        check(shapes.size() == 4, "every shape of land is somewhere: " + shapes);
+        check(shapes.size() == Multiverse.SHAPES.size(), "every shape of land is somewhere: " + shapes);
         check(stones.size() >= 15 && kept > 20, "many stones, and some worlds of plain stone: " + stones.size() + ", " + kept);
         check(fogs > 150 && fogs < 400, "most skies have a colour of their own: " + fogs);
         int carter = Multiverse.named("Captain Carter");
@@ -203,6 +203,7 @@ public final class MultiverseTests {
         Object[][] universes = {{Multiverse.XMEN_KEY, "universe_10005"}, {Multiverse.ZOMBIES_KEY, "universe_2149"},
                 {Multiverse.WHAT_IF_KEY, "what_if"}, {Multiverse.AMPLIFIED_KEY, "what_if_amplified"},
                 {Multiverse.ISLANDS_KEY, "what_if_islands"}, {Multiverse.CAVES_KEY, "what_if_caves"},
+                {Multiverse.HOLLOW_KEY, "what_if_hollow"}, {Multiverse.VOID_KEY, "what_if_void"}, {Multiverse.HUGE_KEY, "what_if_huge"},
                 {Multiverse.GAMMA_KEY, "what_if_gamma"}, {Multiverse.HYDRA_KEY, "what_if_hydra"}, {Multiverse.ULTRON_KEY, "what_if_ultron"}};
         for (Object[] u : universes) {
             @SuppressWarnings("unchecked")
@@ -225,7 +226,8 @@ public final class MultiverseTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         net.minecraft.server.level.ServerPlayer player = f.player(5.5, TestKit.FLOOR, 5.5, com.kolodkingal.enhanced.power.Power.NONE);
         for (int universe : new int[]{Multiverse.XMEN, Multiverse.ZOMBIES, 48213, Multiverse.named("Captain Carter"), 777,
-                Multiverse.GAMMA, Multiverse.HYDRA, Multiverse.ULTRON, firstOfShape(1), firstOfShape(2), firstOfShape(3)}) {
+                Multiverse.GAMMA, Multiverse.HYDRA, Multiverse.ULTRON, firstOfShape(1), firstOfShape(2), firstOfShape(3),
+                firstOfShape(4), firstOfShape(5), firstOfShape(6)}) {
             long start = System.nanoTime();
             com.kolodkingal.enhanced.stones.SpaceRealms.Arrival arrival = com.kolodkingal.enhanced.multiverse.UniverseTravel.arrival(player, universe);
             long ms = (System.nanoTime() - start) / 1_000_000L;
@@ -323,6 +325,15 @@ public final class MultiverseTests {
             }
         }
         check(!stillRed, "no Hydra red is left in a turned chunk");
+        // The roads stay roads, also where a turning of before made them grass, and a second turning changes nothing.
+        BlockPos street = new BlockPos(3, ground, 100);
+        net.minecraft.world.level.chunk.LevelChunk streetChunk = city.getChunkAt(street);
+        city.setBlock(street, net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        com.kolodkingal.enhanced.multiverse.HydraCity.turnChunk(city, streetChunk);
+        com.kolodkingal.enhanced.multiverse.HydraCity.turnChunk(city, streetChunk);
+        net.minecraft.world.level.block.state.BlockState road = city.getBlockState(street);
+        check(road.is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE) || road.is(net.minecraft.world.level.block.Blocks.YELLOW_CONCRETE),
+                "the road is a road in the free city, not " + road);
         state.reset();
         helper.succeed();
     }
@@ -382,32 +393,115 @@ public final class MultiverseTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         net.minecraft.server.level.ServerPlayer player = f.player(6.5, TestKit.FLOOR, 6.5, com.kolodkingal.enhanced.power.Power.NONE);
         net.minecraft.world.phys.Vec3 at = helper.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, TestKit.FLOOR, 7.5));
+        // Each survivor is a person of his own: Marcus (0) greets, tells who he is, and shares his own supplies, once.
         com.kolodkingal.enhanced.asgard.npc.AsgardianEntity survivor = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
-                com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR, at.x, at.y, at.z, null);
+                com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR, 0, at.x, at.y, at.z, null);
         check(f.level().addFreshEntity(survivor), "a survivor");
         f.onClose(survivor::discard);
+        check(survivor.getCustomName() != null && survivor.getCustomName().getString().equals(
+                net.minecraft.network.chat.Component.translatable("entity.enhanced.asgardian.survivor.0").getString()), "he has his own name");
         check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, survivor)
-                && "zombies".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "he greets on the talk panel");
+                && "p0".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "he greets on the talk panel, in his own words");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_who")
+                && "p0_who".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "he tells who he is");
         check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.offered(player).contains("whatif_supplies"), "he offers his supplies");
         check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_supplies")
-                && "supplies".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
-                && player.getInventory().countItem(net.minecraft.world.item.Items.BREAD) >= 4, "he shares them");
+                && "p0_gift".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
+                && player.getInventory().countItem(net.minecraft.world.item.Items.GOLDEN_APPLE) >= 1, "he shares his own");
         com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
         com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, survivor);
         com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_supplies");
-        check("supplies_gone".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "once");
+        check("p0_gone".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "once");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        // Another survivor says other things.
+        com.kolodkingal.enhanced.asgard.npc.AsgardianEntity other = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
+                com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR, 13, at.x + 1, at.y, at.z, null);
+        check(f.level().addFreshEntity(other), "another survivor");
+        f.onClose(other::discard);
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, other)
+                && "p13".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "and greets in hers");
         com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
         com.kolodkingal.enhanced.multiverse.HydraCity.state(f.level().getServer()).reset();
         com.kolodkingal.enhanced.asgard.npc.AsgardianEntity citizen = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
-                com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN, at.x - 2, at.y, at.z, null);
+                com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN, 3, at.x - 2, at.y, at.z, null);
         check(f.level().addFreshEntity(citizen), "a citizen");
         f.onClose(citizen::discard);
         check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, citizen)
-                && "oppressed".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
-                && com.kolodkingal.enhanced.asgard.npc.AsgardTalk.offered(player).contains("whatif_rulers"), "a citizen of Hydra whispers");
+                && "p3".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
+                && com.kolodkingal.enhanced.asgard.npc.AsgardTalk.offered(player).contains("whatif_rulers"), "a citizen of Hydra whispers her own life");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, citizen.getId(), "whatif_your_story")
+                && "p3_history".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "and her own memory");
         check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, citizen.getId(), "whatif_rulers")
                 && "rulers".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "and tells where the rulers are");
         com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        helper.succeed();
+    }
+
+    /** (3.19.1) The survivors' bunker: walls, towers, the blast door and its buttons, the hall; and its people. */
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    public static void aBunkerSheltersItsSurvivors(GameTestHelper helper) {
+        // The plan, at a few telling places.
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 1, 21, false).getBlock() instanceof net.minecraft.world.level.block.DoorBlock, "an iron door in the blast door");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 2, 22, false).getBlock() instanceof net.minecraft.world.level.block.ButtonBlock
+                && com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 2, 20, false).getBlock() instanceof net.minecraft.world.level.block.ButtonBlock, "a button beside it on each side");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(3, 4, 21, true).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK), "the round iron blast door");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(-21, 17, -21, true).is(net.minecraft.world.level.block.Blocks.CAMPFIRE), "a signal fire on each tower");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 0, -8, true).is(net.minecraft.world.level.block.Blocks.LODESTONE), "the hall's marker");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(-10, 5, 21, false).is(net.minecraft.world.level.block.Blocks.STONE_BRICKS)
+                || com.kolodkingal.enhanced.multiverse.Bunkers.plan(-10, 5, 21, false).is(net.minecraft.world.level.block.Blocks.CRACKED_STONE_BRICKS), "the walls");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(28, 3, 0, false) == null, "nothing past its reach");
+        // Built (the hall's middle) in the test's place, and its people come: three or four of 2149's own, each once.
+        ServerLevel level = helper.getLevel();
+        BlockPos mark = helper.absolutePos(new BlockPos(8, 1, 8));
+        for (int dx = -9; dx <= 9; dx++) {
+            for (int dz = -6; dz <= 6; dz++) {
+                for (int dy = 0; dy <= 6; dy++) {
+                    net.minecraft.world.level.block.state.BlockState state = com.kolodkingal.enhanced.multiverse.Bunkers.plan(dx, dy, dz - 8, false);
+                    if (state != null) {
+                        level.setBlock(mark.offset(dx, dy, dz), state, 2);
+                    }
+                }
+            }
+        }
+        java.util.List<com.kolodkingal.enhanced.asgard.npc.AsgardianEntity> people = com.kolodkingal.enhanced.multiverse.Bunkers.populate(level, mark, Multiverse.ZOMBIES, 42L);
+        try {
+            check(people.size() >= 3 && people.size() <= 4, "three or four live there: " + people.size());
+            check(people.stream().map(com.kolodkingal.enhanced.asgard.npc.AsgardianEntity::variant).distinct().count() == people.size()
+                    && people.stream().allMatch(p -> p.variant() < com.kolodkingal.enhanced.multiverse.WhatIfPeople.SURVIVORS_EACH
+                    && p.getTags().contains(com.kolodkingal.enhanced.multiverse.Bunkers.RESIDENT)), "each a different survivor of 2149");
+            check(level.getBlockState(mark.below()).is(net.minecraft.world.level.block.Blocks.CHISELED_STONE_BRICKS), "the bunker is marked as having its people");
+            check(level.getBlockEntity(mark.offset(-7, 1, 0)) instanceof net.minecraft.world.Container c && !c.isEmpty(), "its chests are filled");
+        } finally {
+            people.forEach(net.minecraft.world.entity.Entity::discard);
+        }
+        helper.succeed();
+    }
+
+    /** (3.19.1) The random universes differ: every shape, gravity, giants and tiny creatures, other ores, and many names. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theRandomUniversesAreVaried(GameTestHelper helper) {
+        java.util.Set<Integer> shapes = new java.util.HashSet<>();
+        java.util.Set<String> titles = new java.util.HashSet<>();
+        int light = 0;
+        int giants = 0;
+        int ores = 0;
+        for (int i = 0; i < 400; i++) {
+            com.kolodkingal.enhanced.multiverse.UniverseRecipe recipe = com.kolodkingal.enhanced.multiverse.UniverseRecipe.of(Multiverse.named("world " + i));
+            shapes.add(recipe.shape());
+            titles.add(((net.minecraft.network.chat.contents.TranslatableContents) recipe.title().getContents()).getKey());
+            light += recipe.gravity() < 0 ? 1 : 0;
+            giants += recipe.scale() > 1 ? 1 : 0;
+            ores += recipe.ore() != null ? 1 : 0;
+        }
+        check(shapes.size() == Multiverse.SHAPES.size(), "every shape of land comes: " + shapes);
+        check(titles.size() >= 12, "the universes are known by many things: " + titles);
+        check(light > 20 && giants > 20 && ores > 60, "light gravity " + light + ", giants " + giants + ", other ores " + ores);
+        // Neighbouring numbers are not alike.
+        int same = 0;
+        for (int n = 1000; n < 1100; n++) {
+            same += com.kolodkingal.enhanced.multiverse.UniverseRecipe.of(n).shape() == com.kolodkingal.enhanced.multiverse.UniverseRecipe.of(n + 1).shape() ? 1 : 0;
+        }
+        check(same < 45, "neighbouring numbers give other shapes: " + same + " of 100 alike");
         helper.succeed();
     }
 

@@ -22,6 +22,7 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -46,8 +47,9 @@ import java.util.Objects;
  *     villages alone).</li>
  * </ul>
  * In the random universes (3.19.1) each cell's {@link UniverseRecipe} turns the biomes into others as they are made
- * ({@link #createBiomes}), and swaps the stone, the ground and the seas just before the land is decorated
- * ({@link #applyBiomeDecoration}), so that the trees, ores and structures stand on the new land as they are.
+ * ({@link #createBiomes}), swaps the ground and the seas just before the land is decorated, so that the trees and
+ * structures stand on the new land as they are, and the stone and the ores just after ({@link #applyBiomeDecoration}).
+ * In 2149 and the Gamma Bomb's world the survivors' bunkers are built as the land is ({@link Bunkers}).
  */
 public class UniverseChunkGenerator extends NoiseBasedChunkGenerator {
     public static final MapCodec<UniverseChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -115,20 +117,43 @@ public class UniverseChunkGenerator extends NoiseBasedChunkGenerator {
     @Override
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager) {
         UniverseRecipe recipe = recipe(chunk);
-        if (recipe != null && recipe.swapsBlocks()) {
-            swap(chunk, recipe);
+        if (recipe != null && (recipe.ground() != null || recipe.sea() != null)) {
+            swap(chunk, recipe, false);
         }
         super.applyBiomeDecoration(level, chunk, structureManager);
+        // The stone and the ores after the land is decorated: the ores are in the stone first, then both turn.
+        if (recipe != null && (recipe.stone() != null || recipe.ore() != null)) {
+            swap(chunk, recipe, true);
+        }
+        if (universe == Multiverse.ZOMBIES || universe == Multiverse.GAMMA) {
+            Bunkers.build(this, level, chunk, universe);
+        }
     }
 
-    /** The cell's stone, ground and seas, in place of the game's, written straight into the chunk's sections. */
-    static void swap(ChunkAccess chunk, UniverseRecipe recipe) {
-        BlockState stone = recipe.stone();
-        BlockState ground = recipe.ground();
-        BlockState sea = recipe.sea();
+    /** The game's ores, every one of which a universe of other ores turns. */
+    static final Set<Block> ORES = Set.of(Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE, Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE,
+            Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.REDSTONE_ORE,
+            Blocks.DEEPSLATE_REDSTONE_ORE, Blocks.EMERALD_ORE, Blocks.DEEPSLATE_EMERALD_ORE, Blocks.LAPIS_ORE,
+            Blocks.DEEPSLATE_LAPIS_ORE, Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.NETHER_GOLD_ORE,
+            Blocks.NETHER_QUARTZ_ORE);
+
+    /** Whether the block is what the land is made of (the stone of each shape: stone, deepslate, netherrack, end stone). */
+    static boolean isStone(BlockState state) {
+        return state.is(Blocks.STONE) || state.is(Blocks.DEEPSLATE) || state.is(Blocks.NETHERRACK) || state.is(Blocks.END_STONE);
+    }
+
+    /**
+     * The cell's blocks in place of the game's, written straight into the chunk's sections: the ground and the seas
+     * ({@code late} false: before the land is decorated), or the stone and the ores ({@code late}: after).
+     */
+    static void swap(ChunkAccess chunk, UniverseRecipe recipe, boolean late) {
+        BlockState stone = late ? recipe.stone() : null;
+        BlockState ore = late ? recipe.ore() : null;
+        BlockState ground = late ? null : recipe.ground();
+        BlockState sea = late ? null : recipe.sea();
         BlockState water = Blocks.WATER.defaultBlockState();
         for (LevelChunkSection section : chunk.getSections()) {
-            if (section.hasOnlyAir() || !section.maybeHas(state -> stone != null && (state.is(Blocks.STONE) || state.is(Blocks.DEEPSLATE))
+            if (section.hasOnlyAir() || !section.maybeHas(state -> stone != null && isStone(state) || ore != null && ORES.contains(state.getBlock())
                     || ground != null && state.is(Blocks.GRASS_BLOCK) || sea != null && state == water)) {
                 continue;
             }
@@ -137,8 +162,10 @@ public class UniverseChunkGenerator extends NoiseBasedChunkGenerator {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
                         BlockState to = null;
-                        if (stone != null && (state.is(Blocks.STONE) || state.is(Blocks.DEEPSLATE))) {
+                        if (stone != null && isStone(state)) {
                             to = stone;
+                        } else if (ore != null && ORES.contains(state.getBlock())) {
+                            to = ore;
                         } else if (ground != null && state.is(Blocks.GRASS_BLOCK)) {
                             to = ground;
                         } else if (sea != null && state == water) {
