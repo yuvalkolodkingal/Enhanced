@@ -12,13 +12,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Blaze;
-import net.minecraft.world.entity.monster.EnderMan;
-import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.entity.monster.MagmaCube;
-import net.minecraft.world.entity.monster.Vex;
-import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -51,8 +46,9 @@ public final class UltimateEye {
 
     /** Whether the creature is undead or demonic, what the Eye's light burns. */
     public static boolean evil(LivingEntity e) {
-        return e.getType().is(EntityTypeTags.UNDEAD) || e instanceof Blaze || e instanceof Ghast || e instanceof MagmaCube
-                || e instanceof AbstractPiglin || e instanceof EnderMan || e instanceof Vex;
+        EntityType<?> type = e.getType();
+        return type.is(EntityTypeTags.UNDEAD) || type == EntityType.BLAZE || type == EntityType.GHAST || type == EntityType.MAGMA_CUBE
+                || type == EntityType.PIGLIN || type == EntityType.PIGLIN_BRUTE || type == EntityType.ENDERMAN || type == EntityType.VEX;
     }
 
     /** N: the Light of Agamotto. Returns how many it bound or burned. */
