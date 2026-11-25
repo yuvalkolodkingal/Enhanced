@@ -145,6 +145,9 @@ public class VishantiScreen extends Screen {
         addRenderableWidget(saveBase);
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> onClose())
                 .bounds(left, height - 26, WIDTH, 20).build());
+        // (3.19.2) its pages, to read
+        addRenderableWidget(Button.builder(Component.translatable("screen.enhanced.book.read"),
+                b -> Minecraft.getInstance().setScreen(new BookPagesScreen(BookPagesScreen.Kind.VISHANTI))).bounds(width - 74, 4, 70, 20).build());
     }
 
     private Component baseTooltip(BifrostData data) {

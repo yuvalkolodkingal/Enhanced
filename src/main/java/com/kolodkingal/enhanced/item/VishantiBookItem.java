@@ -36,5 +36,6 @@ public class VishantiBookItem extends Item {
         tooltip.add(Component.translatable("item.enhanced.book_of_the_vishanti.places").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.enhanced.book_of_the_vishanti.ward").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.enhanced.book_of_the_vishanti.use").withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.enhanced.book.read", Component.keybind("key.enhanced.read_book")).withStyle(ChatFormatting.BLUE));
     }
 }

@@ -43,6 +43,8 @@ public class DarkholdHud implements LayeredDraw.Layer {
                         Component.translatable("hud.enhanced.darkhold.retaliation").withStyle(ChatFormatting.DARK_PURPLE))
                 : List.of(Component.translatable("item.enhanced.darkhold").withStyle(s -> s.withBold(true).withColor(PURPLE)),
                         Component.translatable("hud.enhanced.darkhold.locked").withStyle(ChatFormatting.GRAY));
+        lines = new java.util.ArrayList<>(lines);
+        lines.add(Component.translatable("item.enhanced.book.read", KeyBindings.READ_BOOK.getTranslatedKeyMessage()).withStyle(ChatFormatting.RED));
         int width = 0;
         for (Component line : lines) {
             width = Math.max(width, font.width(line));

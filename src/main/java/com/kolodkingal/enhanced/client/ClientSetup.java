@@ -191,6 +191,7 @@ public final class ClientSetup {
         }
         // 3.6: the Stone Wheel (J).
         registrar.keyMapping(KeyBindings.STONE_WHEEL);
+        registrar.keyMapping(KeyBindings.READ_BOOK);
         // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).
         for (KeyMapping key : BuildKeys.ALL) {
             registrar.keyMapping(key);
