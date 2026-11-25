@@ -226,6 +226,9 @@ public final class BossFights {
         if (fightOf(entity) != null || (entity instanceof OwnableEntity pet && pet.getOwnerUUID() != null)) {
             return false;
         }
+        if (entity instanceof com.kolodkingal.enhanced.ultron.UltronSentryEntity sentry && sentry.isWild()) {
+            return false; // (3.19.1) a Sentry of Ultron's fleets in What If... Ultron Won?, which belongs to no fight
+        }
         if (entity instanceof Projectile projectile && projectile.getOwner() instanceof Player) {
             return false; // a hero's own bolt, lance or boulder (a boss's are marked by its fight)
         }

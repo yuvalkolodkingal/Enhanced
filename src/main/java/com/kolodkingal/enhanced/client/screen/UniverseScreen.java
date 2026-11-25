@@ -1,7 +1,8 @@
 package com.kolodkingal.enhanced.client.screen;
 
 import com.kolodkingal.enhanced.multiverse.Multiverse;
-import com.kolodkingal.enhanced.multiverse.WhatIf;
+import com.kolodkingal.enhanced.multiverse.UniverseRecipe;
+import com.kolodkingal.enhanced.network.UniverseNamePayload;
 import com.kolodkingal.enhanced.network.UniverseChoicePayload;
 import com.kolodkingal.enhanced.network.UniverseScreenPayload;
 import com.kolodkingal.enhanced.platform.net.Net;
@@ -9,6 +10,7 @@ import com.kolodkingal.enhanced.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -19,12 +21,15 @@ import org.lwjgl.glfw.GLFW;
 import java.util.List;
 
 /**
- * The Multiverse screen (3.19): four universes to choose from (616, 10005, 2149 and a What If universe), drawn as windows
- * on a starfield as the Space Stone's Realm Picker draws its realms, each a little picture made in code: the green hills of
- * 616, the X-Men's school under a blue sky in 10005, a red sky over the dead in 2149, and the Watcher's great eye over the
- * What If universe. A universe the server does not allow now is dimmed, with the reason on it. Choosing one (a click, or
- * the keys 1-4) sends {@link UniverseChoicePayload}; the server checks again. The title says how one travels (the
- * Darkhold's Dream Walking, the Sling Ring, Reed Richards' bridge).
+ * The Multiverse screen (3.19): seven universes to choose from (616, 10005, 2149, the series' three What Ifs and a random
+ * universe), drawn as windows on a starfield as the Space Stone's Realm Picker draws its realms, each a little picture
+ * made in code: the green hills of 616, the X-Men's school under a blue sky in 10005, a red sky over the dead in 2149, a
+ * giant in green gamma light, Hydra's grey city with its smoking chimneys, Ultron's ruins under red eyes, and the
+ * Watcher's great eye over the random universe, in the colour of its sky. A universe the server does not allow now is
+ * dimmed, with the reason on it. Choosing one (a click, or the keys 1-7) sends {@link UniverseChoicePayload}; typing a
+ * name in the box under the windows and pressing Enter (3.19.1) sends {@link UniverseNamePayload}, the universe those
+ * words make. The server checks again. The title says how one travels (the Darkhold's Dream Walking, the Sling Ring,
+ * Reed Richards' bridge).
  */
 public class UniverseScreen extends Screen {
     /** The multiverse's blue, for the frames. */
@@ -33,6 +38,8 @@ public class UniverseScreen extends Screen {
 
     private final List<UniverseScreenPayload.UniverseOption> realms;
     private int hovered = -1;
+    private EditBox nameBox;
+    private String typed = "";
 
     private UniverseScreen(int mode, List<UniverseScreenPayload.UniverseOption> realms) {
         super(Component.translatable("screen.enhanced.multiverse.title." + (mode == 0 ? "dream" : mode == 1 ? "ring" : "bridge")));
@@ -56,19 +63,21 @@ public class UniverseScreen extends Screen {
     // ---- layout ----
 
     private int count() {
-        return Math.min(4, realms.size());
+        return Math.min(UniverseScreenPayload.MAX, realms.size());
     }
 
-    /** Room above the windows for the title, under each window for its name, between the rows, and for the hint. */
+    /** Room above the windows for the title, under each window for its name, between the rows, for the name box and the hint. */
     private static final int TITLE_SPACE = 24;
     private static final int LABEL_SPACE = 16;
     private static final int ROW_GAP = 6;
-    private static final int HINT_SPACE = 16;
+    private static final int HINT_SPACE = 44;
+    private static final int COLUMNS = 4;
+    private static final int GAP = 12;
 
-    /** The windows' width: as wide as the screen allows, but low enough that both rows, names and hint fit. */
+    /** The windows' width: as wide as the screen allows, but low enough that both rows, names, box and hint fit. */
     private int windowWidth() {
         int byHeight = (height - TITLE_SPACE - HINT_SPACE - 2 * LABEL_SPACE - ROW_GAP - 8) / 2 * 5 / 3;
-        return Mth.clamp(Math.min((width - 48) / 2, byHeight), 60, 150);
+        return Mth.clamp(Math.min((width - 24 - GAP * (COLUMNS - 1)) / COLUMNS, byHeight), 50, 130);
     }
 
     private int windowHeight() {
@@ -77,14 +86,27 @@ public class UniverseScreen extends Screen {
 
     private int left(int index) {
         int w = windowWidth();
-        int gap = 16;
-        return (width - (2 * w + gap)) / 2 + (index % 2) * (w + gap);
+        int inRow = Math.min(COLUMNS, count() - (index / COLUMNS) * COLUMNS);
+        return (width - (inRow * w + (inRow - 1) * GAP)) / 2 + (index % COLUMNS) * (w + GAP);
     }
 
     private int top(int index) {
         int row = windowHeight() + LABEL_SPACE + ROW_GAP;
         int block = TITLE_SPACE + 2 * row - ROW_GAP + HINT_SPACE;
-        return Math.max(0, (height - block) / 2) + TITLE_SPACE + (index / 2) * row;
+        return Math.max(0, (height - block) / 2) + TITLE_SPACE + (index / COLUMNS) * row;
+    }
+
+    @Override
+    protected void init() {
+        int boxWidth = Math.min(220, width - 40);
+        int boxTop = top(COLUMNS) + windowHeight() + LABEL_SPACE + 2;
+        nameBox = new EditBox(font, (width - boxWidth) / 2, Math.min(height - 34, boxTop), boxWidth, 18,
+                Component.translatable("screen.enhanced.multiverse.name"));
+        nameBox.setMaxLength(UniverseNamePayload.MAX);
+        nameBox.setHint(Component.translatable("screen.enhanced.multiverse.name_hint").withStyle(ChatFormatting.DARK_GRAY));
+        nameBox.setValue(typed);
+        nameBox.setResponder(value -> typed = value);
+        addRenderableWidget(nameBox);
     }
 
     private int at(double mouseX, double mouseY) {
@@ -138,10 +160,16 @@ public class UniverseScreen extends Screen {
             } else if (hover) {
                 g.fill(x, y, x + w, y + h, 0x2050B0FF);
             }
-            Component name = Component.literal((i + 1) + ". ").append(Component.translatable("screen.enhanced.multiverse.earth", realm.universe()));
+            Component label = switch (realm.universe()) {
+                case Multiverse.GAMMA -> Component.translatable("screen.enhanced.multiverse.gamma");
+                case Multiverse.HYDRA -> Component.translatable("screen.enhanced.multiverse.hydra");
+                case Multiverse.ULTRON -> Component.translatable("screen.enhanced.multiverse.ultron");
+                default -> Component.translatable("screen.enhanced.multiverse.earth", realm.universe());
+            };
+            Component name = Component.literal((i + 1) + ". ").append(label);
             g.drawCenteredString(font, name, x + w / 2, y + h + 4, realm.allowed() ? 0xFFFFFF : 0x8890A0);
             if (Multiverse.isWhatIf(realm.universe())) {
-                List<FormattedCharSequence> what = font.split(WhatIf.of(realm.universe()).title(), w + 10);
+                List<FormattedCharSequence> what = font.split(UniverseRecipe.of(realm.universe()).title(), w + 10);
                 if (!what.isEmpty()) {
                     g.drawCenteredString(font, what.get(0), x + w / 2, y + 3, 0xFFF2C0);
                 }
@@ -154,7 +182,7 @@ public class UniverseScreen extends Screen {
             }
         }
         g.drawCenteredString(font, Component.translatable("screen.enhanced.multiverse.hint"), width / 2,
-                Math.min(height - 10, top(2) + windowHeight() + LABEL_SPACE + 2), 0x8AA0C0);
+                Math.min(height - 12, nameBox.getY() + 24), 0x8AA0C0);
     }
 
     /** The universe's picture, in its window. */
@@ -214,9 +242,76 @@ public class UniverseScreen extends Screen {
                     g.fill(zx - s / 2 + sway, top + s * 2, zx + s / 2 + sway, y + h, 0xFF2E5A7A);
                 }
             }
+            case Multiverse.GAMMA -> {
+                // Green gamma light, and a giant of it stepping over the hills.
+                g.fillGradient(x, y, x + w, y + h, 0xFF0E3A10, 0xFF6BE04A);
+                float pulse = 0.5F + 0.5F * Mth.sin(time * 0.08F);
+                disc(g, x + w * 3 / 4, y + h / 4, h / 7, argb(0xD8FF9A, 0.6F + 0.4F * pulse));
+                hills(g, x, y, w, h, 0.78F, 0.08F, 1.4F, 0xFF2E6A1E, 0.3F);
+                int gx = x + w / 3;
+                int base = y + h * 82 / 100;
+                int s = Math.max(4, h / 7);
+                g.fill(gx - s, base - s * 4, gx + s, base - s * 2, 0xFF3F9A2E);        // the body
+                g.fill(gx - s / 2, base - s * 5, gx + s / 2, base - s * 4, 0xFF4FB43A); // the head
+                g.fill(gx - s * 2, base - s * 4, gx - s, base - s * 2 - s / 2, 0xFF3F9A2E); // the arms
+                g.fill(gx + s, base - s * 4, gx + s * 2, base - s * 2 - s / 2, 0xFF3F9A2E);
+                g.fill(gx - s, base - s * 2, gx - s / 4, base, 0xFF4A2E7A);            // purple trousers
+                g.fill(gx + s / 4, base - s * 2, gx + s, base, 0xFF4A2E7A);
+                for (int i = 0; i < 10; i++) {
+                    int sx = x + (int) (hash(i + 40) * w);
+                    int sy = y + (int) ((hash(i + 60) * h + time * 0.3F * (1 + i % 3)) % h);
+                    g.fill(sx, sy, sx + 1, sy + 1, 0xFFC8FF9A);
+                }
+            }
+            case Multiverse.HYDRA -> {
+                // A grey city under smog: blocks of flats with red stripes, chimneys smoking, the black Citadel.
+                g.fillGradient(x, y, x + w, y + h, 0xFF4A4642, 0xFF8A8278);
+                int base = y + h * 86 / 100;
+                for (int b = 0; b < 7; b++) {
+                    int bx = x + b * w / 7;
+                    int bh = (int) (h * (0.25F + hash(b + 120) * 0.35F));
+                    g.fill(bx + 1, base - bh, bx + w / 7 - 1, base, 0xFF6E6C6A);
+                    g.fill(bx + w / 14 - 1, base - bh, bx + w / 14 + 1, base, 0xFFB02020);
+                }
+                int cx = x + w / 2;
+                g.fill(cx - w / 12, y + h / 8, cx + w / 12, base, 0xFF141416);
+                g.fill(cx - 1, y + h / 8, cx + 1, base, 0xFFC0141E);
+                for (int c = 0; c < 2; c++) {
+                    int sx = x + w * (15 + c * 65) / 100;
+                    g.fill(sx, base - h / 2, sx + 3, base, 0xFF7A3A2A);
+                    for (int puff = 0; puff < 4; puff++) {
+                        float t = (time * 0.04F + puff * 0.25F + c * 0.5F) % 1.0F;
+                        ellipse(g, sx + 1 + (int) (t * 8), base - h / 2 - (int) (t * h / 3), 2 + (int) (t * 4), 1 + (int) (t * 2),
+                                argb(0x3A3836, 0.7F * (1.0F - t)));
+                    }
+                }
+                g.fill(x, base, x + w, y + h, 0xFF202022);
+            }
+            case Multiverse.ULTRON -> {
+                // A dead city under a red sky, and Ultron's eyes in the dark.
+                g.fillGradient(x, y, x + w, y + h, 0xFF1A0606, 0xFF5A1A12);
+                int base = y + h * 86 / 100;
+                for (int b = 0; b < 8; b++) {
+                    int bx = x + b * w / 8;
+                    int bh = (int) (h * (0.15F + hash(b + 220) * 0.4F));
+                    for (int col = bx + 1; col < bx + w / 8 - 1; col++) {
+                        int jag = (int) (hash(col * 7 + b) * h * 0.08F);
+                        g.fill(col, base - bh + jag, col + 1, base, 0xFF2A2626);
+                    }
+                }
+                for (int e = 0; e < 4; e++) {
+                    int ex = x + (int) ((hash(e + 300) * w + time * 0.2F * (e + 1)) % w);
+                    int ey = y + h / 6 + (int) (hash(e + 310) * h / 3) + (int) (Mth.sin(time * 0.1F + e) * 2);
+                    float glow = 0.6F + 0.4F * Mth.sin(time * 0.2F + e);
+                    g.fill(ex, ey, ex + 2, ey + 1, argb(0xFF2A1A, glow));
+                    g.fill(ex + 3, ey, ex + 5, ey + 1, argb(0xFF2A1A, glow));
+                }
+                g.fill(x, base, x + w, y + h, 0xFF141010);
+            }
             default -> {
-                // The Watcher's eye over the infinite multiverse.
-                g.fillGradient(x, y, x + w, y + h, 0xFF0A0420, 0xFF2A1050);
+                // The Watcher's eye over the infinite multiverse, in the colour of the universe's sky.
+                int sky = UniverseRecipe.of(universe).fog();
+                g.fillGradient(x, y, x + w, y + h, 0xFF0A0420, sky < 0 ? 0xFF2A1050 : 0xFF000000 | darker(sky));
                 for (int i = 0; i < 40; i++) {
                     int sx = x + (int) (hash(i + universe % 1000 + 700) * w);
                     int sy = y + (int) (hash(i + universe % 1000 + 800) * h);
@@ -267,6 +362,9 @@ public class UniverseScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (nameBox != null && nameBox.isMouseOver(mouseX, mouseY)) {
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
         int index = at(mouseX, mouseY);
         if (button == 0 && index >= 0 && realms.get(index).allowed()) {
             choose(index);
@@ -277,13 +375,28 @@ public class UniverseScreen extends Screen {
 
     @Override
     public boolean keyPressed(int key, int scan, int modifiers) {
-        // 1-4 choose a universe from the keyboard.
+        if (nameBox != null && nameBox.isFocused()) {
+            if ((key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) && !typed.isBlank()) {
+                travelTo(typed.trim());
+                return true;
+            }
+            return super.keyPressed(key, scan, modifiers);
+        }
+        // 1-7 choose a universe from the keyboard.
         int index = key - GLFW.GLFW_KEY_1;
         if (index >= 0 && index < count() && realms.get(index).allowed()) {
             choose(index);
             return true;
         }
         return super.keyPressed(key, scan, modifiers);
+    }
+
+    /** The typed name: the universe those words make. */
+    private void travelTo(String words) {
+        Minecraft mc = Minecraft.getInstance();
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SPACE_STONE.get(), 0.8F, 0.5F));
+        Net.sendToServer(new UniverseNamePayload(words));
+        onClose();
     }
 
     private void choose(int index) {
@@ -307,6 +420,10 @@ public class UniverseScreen extends Screen {
         h *= 0x165667B1;
         h ^= h >>> 13;
         return (h & 0xFFFFFF) / (float) 0x1000000;
+    }
+
+    private static int darker(int rgb) {
+        return (((rgb >> 16) & 0xFF) * 3 / 5 << 16) | (((rgb >> 8) & 0xFF) * 3 / 5 << 8) | ((rgb & 0xFF) * 3 / 5);
     }
 
     private static int argb(int rgb, float alpha) {

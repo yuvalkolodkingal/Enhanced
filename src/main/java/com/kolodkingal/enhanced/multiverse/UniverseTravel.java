@@ -32,10 +32,11 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * The ways between the universes (3.19), each opening the Multiverse screen ({@link UniverseScreenPayload}) with four
- * universes: 616, 10005, 2149 and a What If universe. The What If universe is a new one each time, unless the player
- * holds an item renamed (at an anvil) with a number or any words: then it is the universe those words name, as the books
- * of the game's April Fools update named their dimensions ({@link Multiverse#named}).
+ * The ways between the universes (3.19), each opening the Multiverse screen ({@link UniverseScreenPayload}) with seven
+ * universes: 616, 10005, 2149, the series' three What Ifs (the Gamma Bomb, Hydra, Ultron) and a random universe. The
+ * random universe is a new one each time, unless the player holds an item renamed (at an anvil) with a number or any
+ * words, or types a name on the screen (3.19.1): then it is the universe those words name, a world made from them as the
+ * books of the game's April Fools update made their dimensions ({@link Multiverse#named}, {@link UniverseRecipe}).
  * <ul>
  *     <li>{@link #DREAM}, the Darkhold's Dream Walking (Sneak + use, looking straight down): the reader sleeps here and wakes there;</li>
  *     <li>{@link #RING}, the Sling Ring of a cosmic hero of the Ultimate versions (Billy the Demiurge, Cosmic Spider-Man;
@@ -44,7 +45,8 @@ import java.util.UUID;
  *     it and stays open for a while.</li>
  * </ul>
  * One lands on safe ground: in 616, 10005 and 2149 at the same place as where one left (they are the same Earth),
- * coming from elsewhere where one last was there (else the spawn); in a What If universe in the middle of its land.
+ * coming from elsewhere where one last was there (else the spawn, or a street near the Citadel in the two cities); in a
+ * random universe in the middle of its land.
  */
 public final class UniverseTravel {
     public static final int DREAM = 0;
@@ -90,7 +92,8 @@ public final class UniverseTravel {
                 whatIf = Multiverse.fold(player.getRandom().nextInt(Multiverse.CELLS) + 1L);
             } while (whatIf == here);
         }
-        List<Integer> universes = List.of(Multiverse.MAIN, Multiverse.XMEN, Multiverse.ZOMBIES, whatIf);
+        List<Integer> universes = List.of(Multiverse.MAIN, Multiverse.XMEN, Multiverse.ZOMBIES, Multiverse.GAMMA,
+                Multiverse.HYDRA, Multiverse.ULTRON, whatIf);
         List<UniverseScreenPayload.UniverseOption> options = new ArrayList<>();
         for (int universe : universes) {
             String reason = reasonAgainst(player, universe);
@@ -132,7 +135,22 @@ public final class UniverseTravel {
                 || index >= pending.universes().size() || player.isSpectator()) {
             return;
         }
-        int universe = pending.universes().get(index);
+        go(player, pending, pending.universes().get(index));
+    }
+
+    /**
+     * (3.19.1) The player typed a name on the screen: the universe those words name ({@link Multiverse#named}), a world
+     * made from them as 20w14&infin; made one from the words of a book.
+     */
+    public static void chooseNamed(ServerPlayer player, String words) {
+        Pending pending = PENDING.remove(player.getUUID());
+        if (pending == null || player.level().getGameTime() > pending.until() || words.isBlank() || player.isSpectator()) {
+            return;
+        }
+        go(player, pending, Multiverse.named(words));
+    }
+
+    private static void go(ServerPlayer player, Pending pending, int universe) {
         String reason = reasonAgainst(player, universe);
         if (reason != null) {
             player.displayClientMessage(Component.translatable(reason), true);
@@ -161,7 +179,9 @@ public final class UniverseTravel {
             return null;
         }
         int here = Multiverse.universeAt(player.level(), player.blockPosition());
-        boolean sameEarth = !Multiverse.isWhatIf(here) && player.level().dimension() != Level.NETHER
+        boolean sameEarth = (here == Multiverse.MAIN || here == Multiverse.XMEN || here == Multiverse.ZOMBIES)
+                && (universe == Multiverse.MAIN || universe == Multiverse.XMEN || universe == Multiverse.ZOMBIES)
+                && player.level().dimension() != Level.NETHER
                 && player.level().dimension() != Level.END
                 && (player.level().dimension() == Level.OVERWORLD || Multiverse.isUniverseDimension(player.level().dimension()));
         BlockPos around;
@@ -174,6 +194,8 @@ public final class UniverseTravel {
             BlockPos last = LAST.getOrDefault(player.getUUID(), Map.of()).get(universe);
             if (last != null) {
                 around = last;
+            } else if (universe == Multiverse.HYDRA || universe == Multiverse.ULTRON) {
+                around = CityChunkGenerator.ARRIVAL;
             } else if (universe == Multiverse.MAIN) {
                 return SpaceRealms.overworld(player);
             } else {
@@ -183,6 +205,11 @@ public final class UniverseTravel {
         }
         // Over an ocean there is no ground: find land first from the generator's noise alone (no chunk is made for
         // it), then make only the chunks round that one spot.
+        if (level.dimension() == Multiverse.CAVES_KEY) {
+            // One great cave: the floor under its roof, not the roof.
+            Vec3 floor = SpaceRealms.floorNear(level, player, around, 24);
+            return floor == null ? null : new SpaceRealms.Arrival(level, floor, player.getYRot());
+        }
         BlockPos land = land(level, around);
         Vec3 spot = SpaceRealms.surfaceNear(level, player, land, land.equals(around) ? 24 : 8);
         if (spot == null && !land.equals(around)) {

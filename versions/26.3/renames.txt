@@ -525,9 +525,9 @@ public void knockback\(double (\w+), double (\w+), double (\w+)\) \{ => public v
 \bsuper\.knockback\((\w+), (\w+), (\w+)\); => super.knockback($1, $2, $3, knockbackSource, knockbackDamage);
 \b(?:net\.minecraft\.client\.renderer\.)?LevelRenderer\.getLightColor\( => net.minecraft.util.LightCoordsUtil.getLightCoords(
 protected int getLightColor\(float (\w+)\) => protected int getLightCoords(float $1)
-@in(/AsgardChunkGenerator\.java) public CompletableFuture<ChunkAccess> fillFromNoise\(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunk\) => public CompletableFuture<ChunkAccess> buildTerrain(ChunkAccess chunk, Blender blender, RandomState randomState, StructureManager structureManager, net.minecraft.world.level.biome.BiomeManager biomeManager, net.minecraft.server.level.WorldGenRegion carverBiomeRegion, java.util.Set<net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>> possibleBiomes)
-@in(/AsgardChunkGenerator\.java) @Override\s+public void (buildSurface|applyCarvers)\([^)]*\) \{\s*\} => // (26.3: the surface and the carvers are part of buildTerrain)
-@in(/AsgardChunkGenerator\.java) public void addDebugScreenInfo\(List<String> info, RandomState random, BlockPos pos\) => public void addDebugScreenInfo(List<String> info, RandomState random, BlockPos pos, net.minecraft.world.level.levelgen.densityfunction.SamplerContext samplerContext)
+@in(/(AsgardChunkGenerator|CityChunkGenerator)\.java) public CompletableFuture<ChunkAccess> fillFromNoise\(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunk\) => public CompletableFuture<ChunkAccess> buildTerrain(ChunkAccess chunk, Blender blender, RandomState randomState, StructureManager structureManager, net.minecraft.world.level.biome.BiomeManager biomeManager, net.minecraft.server.level.WorldGenRegion carverBiomeRegion, java.util.Set<net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>> possibleBiomes)
+@in(/(AsgardChunkGenerator|CityChunkGenerator)\.java) @Override\s+public void (buildSurface|applyCarvers)\([^)]*\) \{\s*\} => // (26.3: the surface and the carvers are part of buildTerrain)
+@in(/(AsgardChunkGenerator|CityChunkGenerator)\.java) public void addDebugScreenInfo\(List<String> info, RandomState random, BlockPos pos\) => public void addDebugScreenInfo(List<String> info, RandomState random, BlockPos pos, net.minecraft.world.level.levelgen.densityfunction.SamplerContext samplerContext)
 @in(/SiteAmbience\.java) \bModSounds\.(\w+); => ModSounds.$1.holder();
 @in(/SiteAmbience\.java) getStructureWithPieceAt\(player\.blockPosition\(\), structure\) => getStructureWithPieceAt(player.blockPosition().getX(), player.blockPosition().getY(), player.blockPosition().getZ(), structure)
 \bgetStartForStructure\(SectionPos\.bottomOf\((\w+)\),\s* => getStartForStructure(
@@ -592,3 +592,8 @@ new net\.minecraft\.client\.input\.MouseButtonInfo\(([^,()]+), 0\) => new net.mi
 @in(/VibraniumShieldItem\.java) \bjava\.util\.Optional\.of\(net\.minecraft\.tags\.DamageTypeTags\.BYPASSES_SHIELD\) => java.util.Optional.of(context.getOrThrow(net.minecraft.tags.DamageTypeTags.BYPASSES_SHIELD))
 @in(/ModItems\.java) \.component\(DataComponents\.BLOCKS_ATTACKS, ([\w.]+VibraniumShieldItem)\.blocking\(\)\) => .delayedComponent(DataComponents.BLOCKS_ATTACKS, $1::blocking)
 @in(/UniverseChunkGenerator\.java) createForFlat\(randomState, seed, getBiomeSource\(\), => createForFlat(randomState, seed, this.getOrigin(randomState), getBiomeSource(),
+# (3.19.1, 26.3: a biome resolver no longer takes the climate sampler, nor does a chunk's fill)
+@in(/UniverseChunkGenerator\.java) \(qx, qy, qz, sampler\) -> => (qx, qy, qz) ->
+@in(/UniverseChunkGenerator\.java) , randomState\.sampler\(\)\); => );
+# (3.19.1, 26.3: an entity's own tags are entityTags())
+@in(/(HydraCity|MultiverseEvents)\.java) \.getTags\(\)\.contains\( => .entityTags().contains(

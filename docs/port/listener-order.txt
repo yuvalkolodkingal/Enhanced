@@ -348,6 +348,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$EntityInter
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onInteractEntity
     NORMAL - com.kolodkingal.enhanced.stones.StoneEvents#onUseOnEntity
     NORMAL - com.kolodkingal.enhanced.thanos.ThanosEvents#onEntityInteract
+    NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onInteractEntity
 event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$EntityInteractSpecific -> com.kolodkingal.enhanced.platform.event.PlayerInteractEvent$EntityInteractSpecific
     HIGH - com.kolodkingal.enhanced.healing.HealingEvents#onInteractEntitySpecific
 event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$LeftClickBlock -> com.kolodkingal.enhanced.platform.event.PlayerInteractEvent$LeftClickBlock
@@ -766,11 +767,13 @@ event net.neoforged.neoforge.client.event.ViewportEvent$ComputeFogColor -> com.k
     NORMAL - com.kolodkingal.enhanced.client.ThanosAtmosphere#onFogColor
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFogColour
     NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onFogColour
+    NORMAL - com.kolodkingal.enhanced.client.world.WhatIfSky#onFogColor
 event net.neoforged.neoforge.client.event.ViewportEvent$RenderFog -> com.kolodkingal.enhanced.platform.event.client.ViewportEvent$RenderFog
     NORMAL - com.kolodkingal.enhanced.client.render.ArenaFx#onFog
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFog
     NORMAL - com.kolodkingal.enhanced.client.custom.LavaSight#onFog
     NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onFog
+    NORMAL - com.kolodkingal.enhanced.client.world.WhatIfSky#onFog
 event net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent -> -
     NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterClientExtensions
 event net.neoforged.neoforge.event.ItemAttributeModifierEvent -> com.kolodkingal.enhanced.platform.event.ItemAttributeModifierEvent

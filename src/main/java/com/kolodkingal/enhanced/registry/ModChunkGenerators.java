@@ -22,6 +22,9 @@ public final class ModChunkGenerators {
     public static final RegEntry<MapCodec<? extends ChunkGenerator>, MapCodec<UniverseChunkGenerator>> UNIVERSE =
             CHUNK_GENERATORS.register("universe", () -> UniverseChunkGenerator.CODEC);
 
+    public static final RegEntry<MapCodec<? extends ChunkGenerator>, MapCodec<com.kolodkingal.enhanced.multiverse.CityChunkGenerator>> CITY =
+            CHUNK_GENERATORS.register("city", () -> com.kolodkingal.enhanced.multiverse.CityChunkGenerator.CODEC);
+
     private ModChunkGenerators() {
     }
 }

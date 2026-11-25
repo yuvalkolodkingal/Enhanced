@@ -420,6 +420,15 @@ public final class ModEntities {
                     .sized(0.6F, 1.95F)
                     .clientTrackingRange(10)
                     .build("hydra_officer"));
+    /** Red Skull or Captain Hydra, the bosses of What If... Hydra Won? (3.19.1). A monster; saved. */
+    public static final RegEntry<EntityType<?>,
+            EntityType<com.kolodkingal.enhanced.hydra.HydraBossEntity>> HYDRA_BOSS =
+            ENTITIES.register("hydra_boss",
+                    () -> EntityType.Builder.<com.kolodkingal.enhanced.hydra.HydraBossEntity>of(
+                            com.kolodkingal.enhanced.hydra.HydraBossEntity::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(10)
+                    .build("hydra_boss"));
     /** A Hydra energy bolt (lane L8). */
     public static final RegEntry<EntityType<?>,
             EntityType<com.kolodkingal.enhanced.hydra.HydraBoltEntity>> HYDRA_BOLT =
@@ -622,6 +631,7 @@ public final class ModEntities {
         attributes(STONEKEEPER, () -> com.kolodkingal.enhanced.vormir.StonekeeperEntity.createAttributes().build());
         attributes(HYDRA_SOLDIER, () -> com.kolodkingal.enhanced.hydra.HydraSoldierEntity.createAttributes().build());
         attributes(HYDRA_OFFICER, () -> com.kolodkingal.enhanced.hydra.HydraOfficerEntity.createAttributes().build());
+        attributes(HYDRA_BOSS, () -> com.kolodkingal.enhanced.hydra.HydraOfficerEntity.createAttributes().build());
         // 3.7
         attributes(DOGPOOL, () -> com.kolodkingal.enhanced.deadpool.DogpoolEntity.createAttributes().build());
         attributes(COTTAGE_RESIDENT, () -> AsgardianEntity.createAttributes().build());
