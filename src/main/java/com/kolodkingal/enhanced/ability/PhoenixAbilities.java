@@ -88,8 +88,8 @@ public final class PhoenixAbilities {
      * (3.19.2) Her telekinesis, as in the films: no lightning and no violet, only a soft orange glow on her arms and in her
      * eyes (and a faint shimmer round what she holds).
      */
-    public static final int TK_ORANGE = 0xFF9A2E;
-    public static final int TK_GLOW = 0xFFC06A;
+    public static final int TK_ORANGE = 0xFF7418;
+    public static final int TK_GLOW = 0xFFA040;
 
     /** How long the casting pose of Mind Control lasts. */
     public static final int MIND_CAST_TICKS = 16;

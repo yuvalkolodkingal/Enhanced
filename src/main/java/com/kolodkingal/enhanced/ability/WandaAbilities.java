@@ -664,6 +664,9 @@ public final class WandaAbilities {
         if (BillyBarrier.owns(data)) {
             return BillyBarrier.wear(player, data, amount, cause); // 3.3: the wall it stopped at was his Hex Barrier
         }
+        if (UltimateWanda.is(data)) {
+            return amount; // (3.19: Ultimate Wanda's shield is never worn down)
+        }
         if (data.has(HeroAbility.WANDA_CHAOS_SHIELD) && shieldUnlimited() && (EnhancedConfig.WANDA_SHIELD_UNLIMITED_VS_BOSSES.get() || !fromBoss(cause))) {
             return amount; // 3.2: an unlimited shield stops it all and is never worn down
         }

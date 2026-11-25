@@ -276,13 +276,13 @@ public final class MindTour {
             server(p -> {
                 net.minecraft.world.entity.Mob pig = net.minecraft.world.entity.EntityType.PIG.create(p.level());
                 if (pig != null) {
-                    pig.moveTo(p.getX(), p.getY(), p.getZ() + 4.0, 180.0F, 0.0F);
+                    pig.moveTo(p.getX() + 3.0, p.getY(), p.getZ() + 3.0, 180.0F, 0.0F);
                     pig.setNoAi(true);
                     p.level().addFreshEntity(pig);
                 }
             }, 10);
             server(p -> p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
-                    p.position().add(0, 0.5, 4.0)), 10);
+                    p.position().add(3.0, 0.5, 3.0)), 10);
             server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, true, false), 10);
             server(p -> com.kolodkingal.enhanced.ability.AbilityHandler.onKey(p, 3, false, false), 30);
             shot("j03_tk_back", 10);

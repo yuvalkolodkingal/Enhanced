@@ -78,7 +78,9 @@ public final class UniverseTravel {
 
     /** Whether the player is a cosmic hero of the Ultimate versions, whose Sling Ring reaches other universes. */
     public static boolean cosmic(Player player) {
-        return Demiurge.is(player) || com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(player);
+        // (3.19: Ultimate Wanda too)
+        return Demiurge.is(player) || com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(player)
+                || com.kolodkingal.enhanced.ability.UltimateWanda.is(player);
     }
 
     // ---- the screen ----

@@ -105,6 +105,11 @@ public final class UltimateWanda {
     /** Her menus (in {@link PowerData#ironCharge}, which the Scarlet Witch has no other use for). */
     public static final int MENU_WITCH = 0;
     public static final int MENU_ULTIMATE = 1;
+    /** (3.19.2) Her Multiverse menu: the Banishment, the Nexus, her red portals ({@code nexus.WandaPortals}). */
+    public static final int MENU_MULTIVERSE = 2;
+    /** How far her whisper of Banishment reaches, and how often she may whisper (ticks). */
+    public static final int BANISH_COOLDOWN = 20;
+    private static final Map<UUID, Long> BANISH_READY = new HashMap<>();
 
     private static final ResourceLocation HEALTH = Enhanced.id("ultimate_wanda_health");
     private static final ResourceLocation ARMOR_ID = Enhanced.id("ultimate_wanda_armor");
@@ -150,6 +155,11 @@ public final class UltimateWanda {
         return entity instanceof Player player && is(Powers.get(player));
     }
 
+    /** (3.19.2) Whether her keys are the Multiverse menu's now. */
+    public static boolean multiverseMenu(PowerData data) {
+        return is(data) && data.ironCharge() == MENU_MULTIVERSE;
+    }
+
     /** Whether her keys are the Ultimate menu's now. */
     public static boolean ultimateMenu(PowerData data) {
         return is(data) && data.ironCharge() == MENU_ULTIMATE;
@@ -189,6 +199,9 @@ public final class UltimateWanda {
                 }
             }
             return true;
+        }
+        if (multiverseMenu(data)) {
+            return multiverseKey(player, ability, down, alt);
         }
         if (!ultimateMenu(data)) {
             // (in the Scarlet Witch's menu her Sneak + R is the giant charged chaos beam; R alone is the Scarlet Witch's beam)
@@ -243,6 +256,57 @@ public final class UltimateWanda {
                 return false;
             }
         }
+    }
+
+    /**
+     * (3.19.2) Her Multiverse menu: R the Banishment (whom she looks at, to the Nexus between the universes), Sneak + R a red
+     * portal into the Nexus; V the screen of her red portals (the client opens it), Sneak + V saves where she stands. G, B and
+     * N stay the Scarlet Witch's (flight, the Chaos Shield, the Hex).
+     */
+    static boolean multiverseKey(ServerPlayer player, int ability, boolean down, boolean alt) {
+        switch (ability) {
+            case 1 -> {
+                if (down) {
+                    if (alt) {
+                        com.kolodkingal.enhanced.nexus.WandaPortals.toNexus(player);
+                    } else {
+                        banish(player);
+                    }
+                }
+                return true;
+            }
+            case 3 -> {
+                if (down) {
+                    if (alt) {
+                        com.kolodkingal.enhanced.strange.SlingRingActions.save(player, "");
+                    } else {
+                        // (the client opens her screen of portals; a key that reaches here came from elsewhere)
+                        player.displayClientMessage(Component.translatable("message.enhanced.nexus.screen"), true);
+                    }
+                }
+                return true;
+            }
+            default -> {
+                return false;
+            }
+        }
+    }
+
+    /** R in her Multiverse menu: she whispers to whom she looks at, and a flash of red light takes him to the Nexus. */
+    public static boolean banish(ServerPlayer player) {
+        long now = player.level().getGameTime();
+        if (now < BANISH_READY.getOrDefault(player.getUUID(), Long.MIN_VALUE)) {
+            return false;
+        }
+        net.minecraft.world.phys.EntityHitResult hit = Raycasts.entity(player, com.kolodkingal.enhanced.nexus.Nexus.BANISH_RANGE, 0.6,
+                e -> e instanceof net.minecraft.world.entity.LivingEntity living && living.isAlive() && !e.isSpectator()
+                        && AreaTargets.mayHurt(player, living, true), 1.0F);
+        if (hit == null || !(hit.getEntity() instanceof net.minecraft.world.entity.LivingEntity target)) {
+            player.displayClientMessage(Component.translatable("message.enhanced.nexus.no_target"), true);
+            return false;
+        }
+        BANISH_READY.put(player.getUUID(), now + BANISH_COOLDOWN);
+        return com.kolodkingal.enhanced.nexus.Nexus.banish(player, target);
     }
 
     /** Sneak + G: the Ultimate, or the Scarlet Witch again. */
@@ -330,7 +394,8 @@ public final class UltimateWanda {
             revert(player, data, "message.enhanced.ultimate_wanda.lost");
             return true;
         }
-        int menu = data.ironCharge() == MENU_ULTIMATE ? MENU_WITCH : MENU_ULTIMATE;
+        // (3.19.2) the Scarlet Witch, the Ultimate, the Multiverse, round again
+        int menu = data.ironCharge() == MENU_WITCH ? MENU_ULTIMATE : data.ironCharge() == MENU_ULTIMATE ? MENU_MULTIVERSE : MENU_WITCH;
         if (data.toggle(Toggle.MIND_READING)) {
             data.setToggle(Toggle.MIND_READING, false);
             MindReading.stop(player);
@@ -350,7 +415,7 @@ public final class UltimateWanda {
     /** The name of a menu ("The Scarlet Witch", "Ultimate"). */
     public static Component menuName(int menu) {
         return Component.translatable(menu == MENU_ULTIMATE ? "hud.enhanced.ultimate_wanda.menu.ultimate"
-                : "hud.enhanced.ultimate_wanda.menu.witch");
+                : menu == MENU_MULTIVERSE ? "hud.enhanced.ultimate_wanda.menu.multiverse" : "hud.enhanced.ultimate_wanda.menu.witch");
     }
 
     // ---- R: taking over a universe ----
@@ -646,6 +711,8 @@ public final class UltimateWanda {
     /** Every player, every tick (server): their client is told when the universe they stand in turns red, or clears. */
     public static void everyPlayerTick(ServerPlayer player) {
         ChaosCannon.tick(player);
+        UltimateShield.tick(player);
+        UltimateEye.tick(player);
         if (TAKEN.isEmpty() && !TOLD.containsKey(player.getUUID())) {
             return;
         }
@@ -769,6 +836,9 @@ public final class UltimateWanda {
         releaseAll(player.server, id, false);
         STOLEN.remove(id);
         ChaosCannon.forget(id);
+        UltimateEye.forget(id);
+        BANISH_READY.remove(id);
+        com.kolodkingal.enhanced.nexus.WandaPortals.forget(id);
         REVIVE_AT.remove(id);
         LAST_HEALTH.remove(id);
         TOLD.remove(id);

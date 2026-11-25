@@ -57,7 +57,8 @@ public class HexScreen extends Screen {
         PowerData data = Powers.get(player);
         boolean hexKey;
         if (data.power() == Power.SCARLET_WITCH) {
-            hexKey = column == HeroAbility.WANDA_HEX.home && !sneak;
+            // (3.19: in Ultimate Wanda's Ultimate menu N is her Eye of Agamotto)
+            hexKey = column == HeroAbility.WANDA_HEX.home && !sneak && !com.kolodkingal.enhanced.ability.UltimateWanda.ultimateMenu(data);
         } else {
             HeroKit kit = data.power() == Power.CUSTOM ? data.kit() : null;
             HeroKit.Binding binding = kit == null ? null : kit.binding(column, sneak);
@@ -104,6 +105,11 @@ public class HexScreen extends Screen {
         return Math.max(1, (height - 150 - 2 * ROW) / ROW);
     }
 
+    /** 3.19: steps of 8 up to 128, then a quarter of the radius, so an Ultimate Hex can reach any size in a few clicks. */
+    static int step(int radius) {
+        return radius < 128 ? 8 : Math.max(8, radius / 4);
+    }
+
     @Override
     protected void init() {
         Optional<Hex> found = hex();
@@ -115,9 +121,9 @@ public class HexScreen extends Screen {
         int left = width / 2 - WIDTH / 2;
         int y = 36;
 
-        addRenderableWidget(Button.builder(Component.literal("-"), b -> send(HexAction.SET_RADIUS, null, hex.radius() - 8))
+        addRenderableWidget(Button.builder(Component.literal("-"), b -> send(HexAction.SET_RADIUS, null, hex.radius() - step(hex.radius())))
                 .bounds(left, y, 20, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("+"), b -> send(HexAction.SET_RADIUS, null, hex.radius() + 8))
+        addRenderableWidget(Button.builder(Component.literal("+"), b -> send(HexAction.SET_RADIUS, null, hex.radius() + step(hex.radius())))
                 .bounds(left + WIDTH - 20, y, 20, 20).build());
         y += ROW;
 

@@ -368,11 +368,24 @@ public final class SlingPortals {
         Vec3 arrive = to.center().add(offset);
         Vec3 feet = new Vec3(arrive.x, arrive.y - e.getBbHeight() * 0.5, arrive.z);
         feet = fit(toLevel, e, feet);
-        if (feet == null || !HexManager.onTeleport(toLevel, e, feet)) {
+        Pair pair = from.pair == null ? null : PAIRS.get(from.pair);
+        if (feet == null || !HexManager.onTeleport(toLevel, e, feet)
+                // (3.19.2) out of the Nexus, a banished player passes only Ultimate Wanda's portals
+                || !com.kolodkingal.enhanced.nexus.Nexus.leaveThrough(e, pair == null ? null : pair.owner(), toLevel)) {
             e.setDeltaMovement(e.getDeltaMovement().scale(-0.3));
             e.hurtMarked = true;
             return null;
         }
+        try {
+            return passNow(e, from, to, toLevel, feet, turnBy);
+        } finally {
+            com.kolodkingal.enhanced.nexus.Nexus.crossed(e);
+        }
+    }
+
+    @Nullable
+    private static Entity passNow(Entity e, SlingPortalEntity from, SlingPortalEntity to, ServerLevel toLevel, Vec3 feet,
+                                  float turnBy) {
         Vec3 velocity = turn(e.getDeltaMovement(), turnBy);
         float yaw = e.getYRot() + turnBy;
         // (3.18.1) a journey of over 100 blocks, or to another world: the Eldritch sorcerer's practice
@@ -412,7 +425,7 @@ public final class SlingPortals {
 
     /** {@code feet}, or a little above it if the body does not fit there (the far ground may be uneven); null if none. */
     @Nullable
-    static Vec3 fit(ServerLevel level, Entity e, Vec3 feet) {
+    public static Vec3 fit(ServerLevel level, Entity e, Vec3 feet) {
         level.getChunkAt(BlockPos.containing(feet));
         for (double up = 0.0; up <= 1.5; up += 0.5) {
             Vec3 at = feet.add(0, up, 0);

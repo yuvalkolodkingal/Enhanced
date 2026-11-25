@@ -91,7 +91,7 @@ public class PhoenixFlameLayer extends RenderLayer<AbstractClientPlayer, PlayerM
         model.leftArm.visible = true;
         float t = player.tickCount + partialTicks;
         float pulse = 0.75F + 0.25F * Mth.sin(0.25F * t);
-        int alpha = Math.round(0x70 * pulse);
+        int alpha = Math.round(0x90 * pulse);
         poseStack.pushPose();
         poseStack.scale(1.06F, 1.0F, 1.06F);
         PowerAuraLayer.drawSwirl(poseStack, buffer, FULL_BRIGHT, model, PowerAuraLayer.SWIRL, t, 0.6F,

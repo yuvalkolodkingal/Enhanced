@@ -96,9 +96,11 @@ public final class UltimateWandaTests {
         PowerData data = Powers.get(player);
         check(UltimateWanda.ultimateMenu(data), "she starts in her own menu");
         UltimateWanda.onLookKey(player, data, 1);
-        check(!UltimateWanda.ultimateMenu(data), "H: the Scarlet Witch's");
+        check(UltimateWanda.multiverseMenu(data), "H: her Multiverse menu");
         UltimateWanda.onLookKey(player, data, 1);
-        check(UltimateWanda.ultimateMenu(data), "H again: her own");
+        check(!UltimateWanda.ultimateMenu(data) && !UltimateWanda.multiverseMenu(data), "H again: the Scarlet Witch's");
+        UltimateWanda.onLookKey(player, data, 1);
+        check(UltimateWanda.ultimateMenu(data), "and again: her own");
         check(!UltimateWanda.comicsHair(data), "her hair is the films' ginger");
         UltimateWanda.onLookKey(player, data, -1);
         check(UltimateWanda.comicsHair(data) && data.toggle(Toggle.WANDA_COMICS_HAIR), "Sneak + H: the comics' dark hair");
@@ -201,10 +203,10 @@ public final class UltimateWandaTests {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer player = ultimate(f, 3.5, 10.5);
         PowerData data = Powers.get(player);
-        if (UltimateWanda.ultimateMenu(data)) {
+        for (int i = 0; i < 3 && (UltimateWanda.ultimateMenu(data) || UltimateWanda.multiverseMenu(data)); i++) {
             UltimateWanda.onLookKey(player, data, 1);
         }
-        check(!UltimateWanda.ultimateMenu(data), "the Scarlet Witch's menu");
+        check(!UltimateWanda.ultimateMenu(data) && !UltimateWanda.multiverseMenu(data), "the Scarlet Witch's menu");
         net.minecraft.core.BlockPos wall = new net.minecraft.core.BlockPos(7, (int) FLOOR + 1, 10);
         helper.setBlock(wall, net.minecraft.world.level.block.Blocks.STONE);
         helper.setBlock(wall.above(), net.minecraft.world.level.block.Blocks.STONE);
@@ -228,9 +230,13 @@ public final class UltimateWandaTests {
         ultimateMenu(player);
         Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(8.5, FLOOR, 10.5));
         husk.addEffect(new MobEffectInstance(net.minecraft.world.effect.MobEffects.INVISIBILITY, 600));
-        TestKit.lookAt(player, husk);
+        // (3.19.2) all round her, 50 blocks out: even behind her
+        TestKit.lookAt(player, player.position().add(-5, 1.6, 0));
         float health = husk.getHealth();
         press(player, 5, false);
+        check(com.kolodkingal.enhanced.ability.UltimateEye.LIGHT_RANGE == 50.0 && com.kolodkingal.enhanced.ability.UltimateEye.SIGHT_RANGE == 50.0,
+                "its range is 50 blocks");
+        check(Powers.get(player).is(Live.WANDA_EYE_OPEN), "the red Eye opens on her chest");
         check(!husk.hasEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY), "N, the Light of Agamotto: nothing stays hidden");
         check(husk.hasEffect(ModEffects.SPELLBOUND), "her foe is held in its light");
         check(!husk.isAlive() || husk.getHealth() < health, "and the dead burn in it");
@@ -240,5 +246,132 @@ public final class UltimateWandaTests {
             check(husk.hasEffect(net.minecraft.world.effect.MobEffects.GLOWING), "Sneak + N, the All-Seeing Eye: she sees them all");
         }
         helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 80)
+    public static void herShieldLetsNothingIn(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = ultimate(f, 10.5, 10.5);
+        ultimateMenu(player);
+        AbilityHandler.onKey(player, 4, true, true); // (held: the shield stays while B is down)
+        helper.runAfterDelay(WandaAbilitiesAccess.windUp() + 3, () -> {
+            check(com.kolodkingal.enhanced.ability.UltimateShield.up(player), "Sneak + B: her shield is up");
+            Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(11.5, FLOOR, 10.5));
+            com.kolodkingal.enhanced.ability.UltimateShield.tick(player);
+            check(husk.distanceTo(player) > com.kolodkingal.enhanced.ability.WandaAbilities.SHIELD_RADIUS * UltimateWanda.SHIELD_SCALE,
+                    "nobody stays inside it: " + husk.distanceTo(player));
+            float health = player.getHealth();
+            player.hurt(player.damageSources().mobAttack(husk), 10.0F);
+            player.hurt(player.damageSources().indirectMagic(husk, husk), 10.0F);
+            assertNear(player.getHealth(), health, 1.0E-4, "no blow and no power gets in");
+            player.addEffect(new MobEffectInstance(net.minecraft.world.effect.MobEffects.POISON, 200));
+            com.kolodkingal.enhanced.ability.UltimateShield.tick(player);
+            check(!player.hasEffect(net.minecraft.world.effect.MobEffects.POISON), "no poison holds on her");
+            check(Powers.get(player).chaosShieldActive(), "and it never breaks");
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void herHexHasNoSizeLimitUnlessTheServerSetsOne(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = ultimate(f, 10.5, 10.5);
+        f.onClose(() -> com.kolodkingal.enhanced.hex.HexManager.dissolveAllOwnedBy(player.server, player.getUUID()));
+        com.kolodkingal.enhanced.hex.HexManager.create(player);
+        java.util.function.Supplier<Integer> radius = () -> com.kolodkingal.enhanced.hex.HexManager
+                .ownedBy(helper.getLevel(), player.getUUID()).orElseThrow().radius();
+        com.kolodkingal.enhanced.hex.HexManager.handleAction(player, com.kolodkingal.enhanced.hex.HexAction.SET_RADIUS,
+                java.util.Optional.empty(), 5000);
+        check(radius.get() == 5000, "the Ultimate's Hex grows past the Scarlet Witch's 96: " + radius.get());
+        com.kolodkingal.enhanced.hex.HexManager.handleAction(player, com.kolodkingal.enhanced.hex.HexAction.SET_RADIUS,
+                java.util.Optional.empty(), Integer.MAX_VALUE);
+        check(radius.get() == com.kolodkingal.enhanced.hex.HexManager.WORLD_LIMIT, "as far as the world border: " + radius.get());
+        f.config(com.kolodkingal.enhanced.EnhancedConfig.ULTIMATE_HEX_MAX_RADIUS, 300);
+        com.kolodkingal.enhanced.hex.HexManager.handleAction(player, com.kolodkingal.enhanced.hex.HexAction.SET_RADIUS,
+                java.util.Optional.empty(), 5000);
+        check(radius.get() == 300, "unless the server sets a limit: " + radius.get());
+        // (dissolved before the level ticks: a Hex this wide would hold the tests beside it)
+        com.kolodkingal.enhanced.hex.HexManager.dissolveAllOwnedBy(player.server, player.getUUID());
+        helper.succeed();
+    }
+
+    private static void multiverseMenu(ServerPlayer player) {
+        PowerData data = Powers.get(player);
+        for (int i = 0; i < 3 && !UltimateWanda.multiverseMenu(data); i++) {
+            UltimateWanda.onLookKey(player, data, 1);
+        }
+        check(UltimateWanda.multiverseMenu(data), "H turns to her Multiverse menu");
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 100)
+    public static void sheBanishesToTheNexusAndOnlyHerPortalLeadsOut(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        f.pvp(true);
+        ServerPlayer player = ultimate(f, 3.5, 10.5);
+        multiverseMenu(player);
+        ServerPlayer victim = f.player(9.5, FLOOR, 10.5, Power.NONE);
+        f.onClose(() -> com.kolodkingal.enhanced.nexus.Nexus.setBanished(victim, false));
+        if (com.kolodkingal.enhanced.nexus.Nexus.level(player.server) == null) {
+            AsgardTestSupport.makeLevel(player.server, com.kolodkingal.enhanced.nexus.Nexus.KEY, "/data/enhanced/dimension/nexus.json");
+        }
+        check(com.kolodkingal.enhanced.nexus.Nexus.level(player.server) != null, "the world has its Nexus");
+        TestKit.lookAt(player, victim);
+        check(UltimateWanda.banish(player), "R, her whisper, reaches whom she looks at");
+        check(com.kolodkingal.enhanced.nexus.Nexus.in(victim), "R, her whisper: a flash of red and he is in the Nexus");
+        check(com.kolodkingal.enhanced.nexus.Nexus.banished(victim), "banished");
+        check(victim.getY() >= com.kolodkingal.enhanced.nexus.Nexus.GROUND, "standing on its island: " + victim.position());
+        net.minecraft.server.level.ServerLevel nexus = (net.minecraft.server.level.ServerLevel) victim.level();
+        check(!nexus.getBlockState(net.minecraft.core.BlockPos.containing(0, com.kolodkingal.enhanced.nexus.Nexus.GROUND, 0)).isAir(),
+                "the island of the Nexus is built");
+        net.minecraft.server.level.ServerLevel home = helper.getLevel();
+        Vec3 aside = helper.absoluteVec(new Vec3(14.5, FLOOR, 16.5));
+        victim.teleportTo(home, aside.x, aside.y, aside.z, 0.0F, 0.0F);
+        check(com.kolodkingal.enhanced.nexus.Nexus.in(victim), "no power takes him out");
+        check(!com.kolodkingal.enhanced.nexus.Nexus.leaveThrough(victim, victim.getUUID(), home), "nor anyone's portal");
+        // dead, or out some other way: he is taken straight back
+        com.kolodkingal.enhanced.nexus.Nexus.setBanished(victim, false);
+        victim.teleportTo(home, aside.x, aside.y, aside.z, 0.0F, 0.0F);
+        com.kolodkingal.enhanced.nexus.Nexus.setBanished(victim, true);
+        victim.tickCount = 0;
+        com.kolodkingal.enhanced.nexus.Nexus.tick(victim);
+        check(com.kolodkingal.enhanced.nexus.Nexus.in(victim), "found outside, he is brought back to the Nexus");
+        // the void gives him back
+        victim.teleportTo(nexus, 0.5, 2.0, 0.5, 0.0F, 0.0F);
+        com.kolodkingal.enhanced.nexus.Nexus.tick(victim);
+        check(victim.getY() > com.kolodkingal.enhanced.nexus.Nexus.GROUND, "falling off the island brings him back onto it");
+        check(com.kolodkingal.enhanced.nexus.Nexus.leaveThrough(victim, player.getUUID(), home), "her red portal leads him out");
+        com.kolodkingal.enhanced.nexus.Nexus.crossed(victim);
+        check(!com.kolodkingal.enhanced.nexus.Nexus.banished(victim), "and he is free");
+        victim.teleportTo(home, aside.x, aside.y, aside.z, 0.0F, 0.0F);
+        check(!com.kolodkingal.enhanced.nexus.Nexus.in(victim), "free, he may go");
+        // a creature too
+        net.minecraft.world.entity.monster.Pillager pillager = TestKit.spawnWithNoFreeWill(helper, EntityType.PILLAGER,
+                new Vec3(3.5, FLOOR, 4.5));
+        TestKit.lookAt(player, pillager);
+        helper.runAfterDelay(UltimateWanda.BANISH_COOLDOWN + 1, () -> {
+            press(player, 1, false);
+            check(helper.getLevel().getEntity(pillager.getUUID()) == null, "a creature is banished too");
+            // Sneak + R: a red portal into the Nexus
+            press(player, 1, true);
+            com.kolodkingal.enhanced.strange.SlingPortals.Pair pair = com.kolodkingal.enhanced.strange.SlingPortals.of(player.getUUID());
+            check(pair != null && pair.farDimension() == com.kolodkingal.enhanced.nexus.Nexus.KEY, "Sneak + R opens her portal into the Nexus");
+            com.kolodkingal.enhanced.strange.SlingPortals.closeOwnedBy(player.server, player.getUUID());
+            helper.succeed();
+        });
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void asTheUltimateHerSlingRingReachesOtherUniverses(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = ultimate(f, 10.5, 10.5);
+        check(com.kolodkingal.enhanced.multiverse.UniverseTravel.cosmic(player), "Ultimate Wanda's Sling Ring opens ways to other universes");
+        check(!com.kolodkingal.enhanced.multiverse.UniverseTravel.cosmic(wanda(f, 3.5, 3.5, false)), "the Scarlet Witch's does not");
+        helper.succeed();
+    }
+
+    private static final class WandaAbilitiesAccess {
+        static int windUp() {
+            return com.kolodkingal.enhanced.ability.WandaAbilities.windUpTicks();
+        }
     }
 }

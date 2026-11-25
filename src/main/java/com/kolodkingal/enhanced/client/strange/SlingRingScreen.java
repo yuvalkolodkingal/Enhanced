@@ -47,14 +47,18 @@ public class SlingRingScreen extends Screen {
     private EditBox nameBox;
     /** (3.18) Cosmic Spider-Man's portal screen: the same places, no ring, a row of worlds, in white and blue. */
     private final boolean cosmic;
+    /** (3.19.2) Ultimate Wanda's red portals: the same places, two rows of universes and the Nexus, in red. */
+    private final boolean wanda;
 
     public SlingRingScreen() {
-        this(false);
+        this(false, false);
     }
 
-    private SlingRingScreen(boolean cosmic) {
-        super(Component.translatable(cosmic ? "screen.enhanced.cosmic_portals.title" : "screen.enhanced.sling_ring.title"));
+    private SlingRingScreen(boolean cosmic, boolean wanda) {
+        super(Component.translatable(wanda ? "screen.enhanced.wanda_portals.title"
+                : cosmic ? "screen.enhanced.cosmic_portals.title" : "screen.enhanced.sling_ring.title"));
         this.cosmic = cosmic;
+        this.wanda = wanda;
     }
 
     public static void open() {
@@ -63,16 +67,22 @@ public class SlingRingScreen extends Screen {
 
     /** (3.18) Cosmic Spider-Man's B. */
     public static void openCosmic() {
-        Minecraft.getInstance().setScreen(new SlingRingScreen(true));
+        Minecraft.getInstance().setScreen(new SlingRingScreen(true, false));
+    }
+
+    /** (3.19.2) Ultimate Wanda's V in her Multiverse menu. */
+    public static void openWanda() {
+        Minecraft.getInstance().setScreen(new SlingRingScreen(false, true));
     }
 
     /** The space under the list: the cosmic screen has its row of worlds there too. */
     private int bottom() {
-        return cosmic ? BOTTOM + 24 : BOTTOM;
+        return wanda ? BOTTOM + 48 : cosmic ? BOTTOM + 24 : BOTTOM;
     }
 
     private int accent() {
-        return cosmic ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA : StrangeAbilities.ORANGE;
+        return wanda ? com.kolodkingal.enhanced.nexus.WandaPortals.TINT
+                : cosmic ? com.kolodkingal.enhanced.ability.CosmicSpider.AURA : StrangeAbilities.ORANGE;
     }
 
     private static BifrostData data() {
@@ -82,7 +92,7 @@ public class SlingRingScreen extends Screen {
 
     private boolean ready() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return player != null && (cosmic || PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING) == 0);
+        return player != null && (cosmic || wanda || PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING) == 0);
     }
 
     private int perPage() {
@@ -149,6 +159,39 @@ public class SlingRingScreen extends Screen {
                 addRenderableWidget(button);
             }
         }
+        if (wanda) {
+            // (3.19.2) the universes, a new What If and the Nexus, in two rows of four
+            LocalPlayer player = Minecraft.getInstance().player;
+            int perRow = 4;
+            int w = (WIDTH - 4 * (perRow - 1)) / perRow;
+            int here = player == null ? 0 : com.kolodkingal.enhanced.multiverse.Multiverse.universeAt(player.level(), player.blockPosition());
+            boolean inNexus = player != null && player.level().dimension() == com.kolodkingal.enhanced.nexus.Nexus.KEY;
+            for (int i = 0; i < com.kolodkingal.enhanced.nexus.WandaPortals.BUTTONS; i++) {
+                int index = i;
+                Component name;
+                boolean active;
+                if (i < com.kolodkingal.enhanced.nexus.WandaPortals.UNIVERSES.size()) {
+                    int universe = com.kolodkingal.enhanced.nexus.WandaPortals.UNIVERSES.get(i);
+                    name = com.kolodkingal.enhanced.multiverse.Multiverse.name(universe);
+                    active = inNexus || universe != here;
+                } else if (i == com.kolodkingal.enhanced.nexus.WandaPortals.WHAT_IF) {
+                    name = Component.translatable("screen.enhanced.wanda_portals.what_if");
+                    active = true;
+                } else {
+                    name = Component.translatable("dimension.enhanced.nexus");
+                    active = !inNexus;
+                }
+                Button button = Button.builder(name.copy().withStyle(s -> s.withColor(accent())), b -> {
+                            send(SlingRingActionPayload.WORLD, index, "");
+                            onClose();
+                        })
+                        .bounds(left + (i % perRow) * (w + 4), height - 122 + (i / perRow) * 24, w, 20)
+                        .tooltip(Tooltip.create(Component.translatable("screen.enhanced.wanda_portals.world", name)))
+                        .build();
+                button.active = active;
+                addRenderableWidget(button);
+            }
+        }
         nameBox = new EditBox(font, left, height - 74, WIDTH, 20, Component.translatable("screen.enhanced.sling_ring.name"));
         nameBox.setMaxLength(BifrostData.MAX_NAME_LENGTH);
         nameBox.setHint(Component.translatable("screen.enhanced.sling_ring.name_hint").withStyle(ChatFormatting.DARK_GRAY));
@@ -206,7 +249,8 @@ public class SlingRingScreen extends Screen {
     @Override
     public void tick() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || !player.isAlive() || (cosmic ? !com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(
+        if (player == null || !player.isAlive() || (wanda ? !com.kolodkingal.enhanced.ability.UltimateWanda.is(player)
+                : cosmic ? !com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(
                 com.kolodkingal.enhanced.power.Powers.get(player)) : !SlingRingActions.carries(player))) {
             onClose();
             return;
@@ -235,7 +279,7 @@ public class SlingRingScreen extends Screen {
             int x = cx + Math.round(Mth.cos(a) * r * wobble);
             int y = cy + Math.round(Mth.sin(a) * r * wobble);
             int alpha = 0x60 + (int) (0x60 * (0.5F + 0.5F * Mth.sin(time * 0.3F + i)));
-            int color = (alpha << 24) | (cosmic ? (i % 4 == 0 ? 0xFFFFFF : com.kolodkingal.enhanced.ability.CosmicSpider.AURA)
+            int color = (alpha << 24) | (wanda ? (i % 4 == 0 ? 0xFFC8D0 : com.kolodkingal.enhanced.nexus.WandaPortals.TINT) : cosmic ? (i % 4 == 0 ? 0xFFFFFF : com.kolodkingal.enhanced.ability.CosmicSpider.AURA)
                     : i % 4 == 0 ? StrangeAbilities.GOLD : StrangeAbilities.ORANGE);
             graphics.fill(x - 1, y - 1, x + 1, y + 1, color);
         }
@@ -248,7 +292,7 @@ public class SlingRingScreen extends Screen {
                 width / 2, 10, 0xFFFFFF);
         LocalPlayer player = Minecraft.getInstance().player;
         long wait = player == null ? 0 : PlaceBook.cooldown(player, PlaceBook.Kind.SLING_RING);
-        Component hint = cosmic ? Component.translatable("screen.enhanced.cosmic_portals.hint",
+        Component hint = wanda ? Component.translatable("screen.enhanced.wanda_portals.hint").withStyle(ChatFormatting.GRAY) : cosmic ? Component.translatable("screen.enhanced.cosmic_portals.hint",
                 Math.round(com.kolodkingal.enhanced.ability.CosmicSpider.portalCost()),
                 Math.round(com.kolodkingal.enhanced.ability.CosmicSpider.worldPortalCost())).withStyle(ChatFormatting.GRAY)
                 : wait > 0

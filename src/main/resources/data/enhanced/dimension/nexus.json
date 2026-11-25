@@ -1,0 +1,18 @@
+{
+  "type": "enhanced:nexus",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "enhanced:nexus",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:air",
+          "height": 1
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

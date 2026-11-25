@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.hex;
 import com.kolodkingal.enhanced.EnhancedConfig;
 import com.kolodkingal.enhanced.ability.MjolnirPin;
 import com.kolodkingal.enhanced.ability.Telekinesis;
+import com.kolodkingal.enhanced.ability.UltimateWanda;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.boss.BossFights;
 import com.kolodkingal.enhanced.custom.AbilityColors;
@@ -32,6 +33,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -148,6 +150,23 @@ public final class HexManager {
         create(wanda);
     }
 
+    /** No Hex grows past the world border (30 million blocks out). */
+    public static final int WORLD_LIMIT = 30_000_000;
+    /** Past this radius a Hex finds the creatures in it from the level's own list instead of a box search. */
+    private static final int BOX_SEARCH_LIMIT = 512;
+
+    /**
+     * 3.19: how far this Wanda may stretch her Hex. Ultimate Wanda's has no limit unless the server sets one
+     * ({@code ultimateHexMaxRadius}, 0 = none); everyone else keeps {@code hexMaxRadius}.
+     */
+    public static int maxRadius(Player wanda) {
+        if (UltimateWanda.is(Powers.get(wanda))) {
+            int set = EnhancedConfig.ULTIMATE_HEX_MAX_RADIUS.get();
+            return set <= 0 ? WORLD_LIMIT : Math.max(set, EnhancedConfig.HEX_MIN_RADIUS.get());
+        }
+        return EnhancedConfig.HEX_MAX_RADIUS.get();
+    }
+
     public static Hex create(ServerPlayer wanda) {
         ServerLevel level = wanda.serverLevel();
         int radius = Mth.clamp(EnhancedConfig.HEX_DEFAULT_RADIUS.get(), EnhancedConfig.HEX_MIN_RADIUS.get(), EnhancedConfig.HEX_MAX_RADIUS.get());
@@ -193,7 +212,7 @@ public final class HexManager {
             });
             case SET_CREATURES -> save(level, data(level).update(hex.id(), h -> h.withAllowCreatures(value != 0)));
             case SET_RADIUS -> {
-                int radius = Mth.clamp(value, EnhancedConfig.HEX_MIN_RADIUS.get(), EnhancedConfig.HEX_MAX_RADIUS.get());
+                int radius = Mth.clamp(value, EnhancedConfig.HEX_MIN_RADIUS.get(), maxRadius(wanda));
                 save(level, data(level).update(hex.id(), h -> h.withRadius(radius)));
                 // Resizing moves the wall; nobody should "cross" just because the wall moved over them.
                 SIDES.remove(hex.id());
@@ -278,7 +297,19 @@ public final class HexManager {
         for (Hex hex : data.hexes()) {
             Map<UUID, Boolean> sides = SIDES.computeIfAbsent(hex.id(), k -> new HashMap<>());
             Set<UUID> seen = new HashSet<>();
-            List<LivingEntity> near = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, hex.bounds(6.0), LivingEntity::isAlive));
+            List<LivingEntity> near = new ArrayList<>();
+            if (hex.radius() > BOX_SEARCH_LIMIT) {
+                // 3.19: an Ultimate Hex can be as wide as the world; a box search that size walks millions of empty
+                // columns, so the loaded creatures are checked one by one instead.
+                AABB box = hex.bounds(6.0);
+                for (Entity each : level.getAllEntities()) {
+                    if (each instanceof LivingEntity living && living.isAlive() && box.intersects(living.getBoundingBox())) {
+                        near.add(living);
+                    }
+                }
+            } else {
+                near.addAll(level.getEntitiesOfClass(LivingEntity.class, hex.bounds(6.0), LivingEntity::isAlive));
+            }
             // 3.3: every player of the level is watched wherever they are, so that however fast they fly (Quicksilver, Thor,
             // a lag spike, the Phoenix) the side they were on is known, and a jump clear past the edge of the box is still a
             // crossing (a Vision inside is brought back the same way).

@@ -81,6 +81,7 @@ Section `[scarlet_witch]`. The hero's page is [Scarlet Witch](Scarlet-Witch).
 | `scarlet_witch.hexDefaultRadius` | `32` | 4 to 256 | Radius, in blocks, of a newly created Hex. |
 | `scarlet_witch.hexMinRadius` | `8` | 4 to 256 | Smallest radius Wanda can shrink her Hex to in Hex Control. |
 | `scarlet_witch.hexMaxRadius` | `96` | 4 to 256 | Largest radius Wanda can grow her Hex to in Hex Control. |
+| `scarlet_witch.ultimateHexMaxRadius` | `0` | 0 to 30000000 | Largest radius Ultimate Wanda can grow her Hex to. `0` means no limit (as far as the world border). |
 | `scarlet_witch.hexDeathChance` | `0.95` | 0.0 to 1.0 | Chance that a creature without powers dies when it crosses the Hex wall without Wanda's permission (0.95 = 95%). The rest survive. |
 | `scarlet_witch.hexHoldDamage` | `2.0` | 0.0 to 20.0 | Damage Vision takes the first time he is thrown back at the wall of a Hex he is inside (2 = one heart). He can't leave a standing Hex, and comes apart a little at its edge; it never kills him. |
 | `scarlet_witch.hexHoldDamageMax` | `8.0` | 0.0 to 40.0 | The most one throw back at the wall can do to Vision. Each time he pushes again within three seconds it grows by `hexHoldDamage`, up to this; it never takes his last half heart. |
