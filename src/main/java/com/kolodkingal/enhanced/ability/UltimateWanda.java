@@ -228,6 +228,17 @@ public final class UltimateWanda {
                 }
                 return true;
             }
+            case 5 -> {
+                // (her own Eye of Agamotto: its light, or with Sneak its sight)
+                if (down) {
+                    if (alt) {
+                        UltimateEye.sight(player);
+                    } else {
+                        UltimateEye.light(player);
+                    }
+                }
+                return true;
+            }
             default -> {
                 return false;
             }

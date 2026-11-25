@@ -220,4 +220,25 @@ public final class UltimateWandaTests {
             helper.succeed();
         });
     }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void herOwnEyeOfAgamottoRevealsBindsAndBanishes(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = ultimate(f, 3.5, 10.5);
+        ultimateMenu(player);
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(8.5, FLOOR, 10.5));
+        husk.addEffect(new MobEffectInstance(net.minecraft.world.effect.MobEffects.INVISIBILITY, 600));
+        TestKit.lookAt(player, husk);
+        float health = husk.getHealth();
+        press(player, 5, false);
+        check(!husk.hasEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY), "N, the Light of Agamotto: nothing stays hidden");
+        check(husk.hasEffect(ModEffects.SPELLBOUND), "her foe is held in its light");
+        check(!husk.isAlive() || husk.getHealth() < health, "and the dead burn in it");
+        husk.removeEffect(net.minecraft.world.effect.MobEffects.GLOWING);
+        if (husk.isAlive()) {
+            press(player, 5, true);
+            check(husk.hasEffect(net.minecraft.world.effect.MobEffects.GLOWING), "Sneak + N, the All-Seeing Eye: she sees them all");
+        }
+        helper.succeed();
+    }
 }

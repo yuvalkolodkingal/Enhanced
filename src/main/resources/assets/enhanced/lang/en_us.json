@@ -5684,5 +5684,8 @@
   "npc.enhanced.survivor.ultron_advice.3": "Find another universe. I mean it. There's nothing left for anyone here.",
   "npc.enhanced.survivor.supplies": "Take these. I've got a little hidden away, and you'll need it more out there.",
   "npc.enhanced.survivor.supplies_gone": "I gave you what I could spare. The rest keeps me alive.",
-  "ability.enhanced.scarlet_witch.ultimate_beam.1": "Chaos Energy Beam (Sneak, hold: Giant Chaos Beam)"
+  "ability.enhanced.scarlet_witch.ultimate_beam.1": "Chaos Energy Beam (Sneak, hold: Giant Chaos Beam)",
+  "ability.enhanced.scarlet_witch.ultimate.5": "Light of Agamotto (Sneak: All-Seeing Eye)",
+  "message.enhanced.ultimate_wanda.eye.sees": "The Eye of Agamotto sees %s creatures, %s of them players:",
+  "message.enhanced.ultimate_wanda.eye.player": "  %s: %s blocks away, %s/%s health"
 }

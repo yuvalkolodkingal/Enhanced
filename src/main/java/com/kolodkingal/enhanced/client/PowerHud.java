@@ -316,7 +316,7 @@ public class PowerHud implements LayeredDraw.Layer {
         // (3.19) Ultimate Wanda: her own R, V and B in her Ultimate menu; G says how to leave the Ultimate, a plain Scarlet Witch
         // with Ultimate how to become her
         if (com.kolodkingal.enhanced.ability.UltimateWanda.is(data)) {
-            if (com.kolodkingal.enhanced.ability.UltimateWanda.ultimateMenu(data) && (ability == 1 || ability == 3 || ability == 4)) {
+            if (com.kolodkingal.enhanced.ability.UltimateWanda.ultimateMenu(data) && (ability == 1 || ability == 3 || ability == 4 || ability == 5)) {
                 return "ability.enhanced.scarlet_witch.ultimate." + ability;
             }
             if (ability == 2) {
