@@ -4,6 +4,7 @@
     "enhanced:chaos_beam",
     "enhanced:hex_wall",
     "enhanced:hex_bolt",
-    "enhanced:hex_beam"
+    "enhanced:hex_beam",
+    "enhanced:chaos_eruption"
   ]
 }

@@ -295,6 +295,26 @@ public final class UltimateWandaTests {
         helper.succeed();
     }
 
+    /** (3.19.4) B in her Multiverse menu: the Chaos Energy Eruption hurts everyone in reach at least ten hearts, through armour. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void herChaosEruptionHitsForAtLeastTenHearts(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = ultimate(f, 10.5, 10.5);
+        multiverseMenu(player);
+        Husk husk = TestKit.spawnWithNoFreeWill(helper, EntityType.HUSK, new Vec3(16.5, FLOOR, 10.5));
+        husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000.0);
+        husk.setHealth(1000.0F);
+        husk.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.NETHERITE_CHESTPLATE));
+        husk.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.NETHERITE_HELMET));
+        check(UltimateWanda.ERUPTION_DAMAGE >= 20.0F, "at least ten hearts before she is any stronger");
+        press(player, 4, false);
+        float lost = 1000.0F - husk.getHealth();
+        check(lost >= 20.0F, "B: the eruption takes at least ten hearts through netherite: " + lost);
+        check(Powers.get(player).chaosShieldActive() == false, "and B alone is not her Chaos Shield");
+        check(UltimateWanda.eruption(player) == -1, "then it has a short recharge");
+        helper.succeed();
+    }
+
     private static void multiverseMenu(ServerPlayer player) {
         PowerData data = Powers.get(player);
         for (int i = 0; i < 3 && !UltimateWanda.multiverseMenu(data); i++) {

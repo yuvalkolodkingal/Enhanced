@@ -523,4 +523,25 @@ public final class MultiverseTests {
         check("captain_hydra".equals(com.kolodkingal.enhanced.power.Powers.get(player).variant()), "the shard of Kobik makes him Captain Hydra");
         helper.succeed();
     }
+    /** (3.19.4) The people of the What If universes never speak of Asgard when they are hit; and a body's owner hears who took it. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void whatIfPeopleSpeakNoAsgardWhenHit(GameTestHelper helper) throws java.io.IOException {
+        com.google.gson.JsonObject en = TestKit.lang("en_us");
+        com.google.gson.JsonObject he = TestKit.lang("he_il");
+        net.minecraft.util.RandomSource random = net.minecraft.util.RandomSource.create(7L);
+        for (com.kolodkingal.enhanced.asgard.npc.Role role : List.of(com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR,
+                com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN)) {
+            for (int i = 0; i < 40; i++) {
+                String key = com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.mannersLine(role, random);
+                check(key.startsWith("npc.enhanced.whatif.manners."), role + " says a line of its own: " + key);
+                check(en.has(key) && he.has(key), "in English and Hebrew: " + key);
+                check(!en.get(key).getAsString().contains("Asgard"), "and never of Asgard: " + key);
+            }
+        }
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.mannersLine(com.kolodkingal.enhanced.asgard.npc.Role.CITIZEN, random)
+                .startsWith("npc.enhanced.common.manners"), "Asgard's citizens keep theirs");
+        check(en.has("message.enhanced.mind_link.controlled") && he.has("message.enhanced.mind_link.controlled")
+                && !en.get("hud.enhanced.xavier.controlled").getAsString().contains("Professor"), "taking a body names who took it");
+        helper.succeed();
+    }
 }

@@ -190,6 +190,10 @@ public final class ModDamageTypes {
     /** Cosmic Spider-Man's blasts, from his hand and from his eyes (energy_damage, no damage cooldown). */
     public static final ResourceKey<DamageType> COSMIC_BLAST = key("cosmic_blast");
 
+    // ===== ultimate wanda (3.19.2) =====
+    /** Her Chaos Eruption: chaos energy out of the ground and the sky all round her (bypasses armour and shields). */
+    public static final ResourceKey<DamageType> CHAOS_ERUPTION = key("chaos_eruption");
+
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Enhanced.id(name));
     }

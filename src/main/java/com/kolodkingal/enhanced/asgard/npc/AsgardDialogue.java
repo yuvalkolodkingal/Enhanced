@@ -276,9 +276,15 @@ public final class AsgardDialogue {
         return n <= 1 ? base : base + "." + (1 + random.nextInt(n));
     }
 
-    /** A "mind your manners" line of a role (the named ones have their own, the others share four). */
+    /**
+     * A "mind your manners" line of a role (the named ones have their own, Asgard's guards and citizens share four, and
+     * (3.19.4) the people of the What If universes share four of their own: they have never seen Asgard).
+     */
     public static String mannersLine(Role role, RandomSource random) {
-        return role.named() ? lineKey(role, "manners") : variant("npc.enhanced.common.manners", random);
+        if (role.named()) {
+            return lineKey(role, "manners");
+        }
+        return variant(role.whatIf() ? "npc.enhanced.whatif.manners" : "npc.enhanced.common.manners", random);
     }
 
     /** The arguments of a node's line in this talk. */
