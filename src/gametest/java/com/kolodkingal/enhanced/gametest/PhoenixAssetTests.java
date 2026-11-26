@@ -125,8 +125,8 @@ public final class PhoenixAssetTests {
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theHeroLooksAreRedAndOliveWhereTheFilmsAreRedAndOlive(GameTestHelper helper) throws IOException {
         // A cheap guard against a swapped or redrawn-by-mistake skin: the Apocalypse look is red hair and a blue body,
-        // the Brand New Day look (3.19.3, Yuval's option A) an olive field jacket and its hood the same olive, open over a
-        // yellow hoodie.
+        // the Brand New Day look (3.19.3, Yuval's option A) an olive hood, a darker green field jacket (3.19.4), open over
+        // a hoodie of the hood's olive, brighter.
         BufferedImage apocalypse = image("textures/entity/suit/phoenix_apocalypse.png");
         BufferedImage day = image("textures/entity/suit/phoenix_brand_new_day.png");
         check(share(apocalypse, 8, 0, 8, 8, c -> red(c) > 150 && green(c) < 110 && blue(c) < 60) > 0.7, "the Apocalypse crown is red");
@@ -134,8 +134,10 @@ public final class PhoenixAssetTests {
         check(share(apocalypse, 20, 20, 8, 12, c -> red(c) > 200 && green(c) > 150 && blue(c) < 80) > 0.04, "with the yellow of the stripes");
         java.util.function.IntPredicate olive = c -> Math.abs(red(c) - green(c)) < 20 && green(c) > blue(c) + 25 && red(c) < 140;
         check(share(day, 40, 0, 8, 8, olive) > 0.6, "the Brand New Day hood is olive");
-        check(share(day, 20, 36, 8, 12, olive) > 0.5, "and so is the jacket over it");
-        check(share(day, 20, 20, 8, 12, c -> red(c) > 150 && green(c) > 110 && blue(c) < 110) > 0.2, "with a mustard strip down the body");
+        check(share(day, 20, 36, 8, 12, c -> green(c) > red(c) && green(c) > blue(c) + 20 && green(c) < 110) > 0.3,
+                "and the jacket over it a darker green (3.19.4)");
+        check(share(day, 20, 20, 8, 12, c -> red(c) > 100 && Math.abs(red(c) - green(c)) < 20 && green(c) > blue(c) + 25) > 0.2,
+                "with the hoodie's brighter olive down the body (3.19.4: not yellow)");
         helper.succeed();
     }
 

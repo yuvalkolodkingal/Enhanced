@@ -12,12 +12,16 @@ PATH = 'src/main/resources/assets/enhanced/textures/entity/suit/phoenix_brand_ne
 
 YELLOW = [(0xF2, 0xC2, 0x3A), (0xE3, 0xAE, 0x2A), (0xC9, 0x93, 0x1E), (0xA8, 0x76, 0x16)]
 # (3.19.3) Yuval chose option A: the olive field jacket of the set photos, and the hood the same olive
-GREEN = [(0x6B, 0x6A, 0x3A), (0x5C, 0x5B, 0x31), (0x4C, 0x4B, 0x28), (0x3A, 0x3A, 0x1F)]
+HOOD = [(0x6B, 0x6A, 0x3A), (0x5C, 0x5B, 0x31), (0x4C, 0x4B, 0x28), (0x3A, 0x3A, 0x1F)]
+# (3.19.4) Yuval: the hoodie under it is the hood's olive, a little brighter (it was yellow)
+HOODIE = [(0x8C, 0x8B, 0x4E), (0x7D, 0x7C, 0x45), (0x6E, 0x6D, 0x3C), (0x5E, 0x5D, 0x33)]
+# (3.19.4) Yuval: the hood keeps that olive, the rest of the jacket a darker green
+GREEN = [(0x45, 0x4C, 0x2A), (0x3A, 0x41, 0x23), (0x2F, 0x35, 0x1C), (0x23, 0x28, 0x15)]
 CAMO = [(0x7A, 0x74, 0x4E), (0x5B, 0x5A, 0x38), (0x8E, 0x7C, 0x55), (0x3F, 0x42, 0x2C)]
 BOOT = [(0x26, 0x24, 0x22), (0x1A, 0x19, 0x18), (0x36, 0x33, 0x2F)]
 SKIN = (0xF0, 0xC3, 0xA6)
 CORD = (0xF7, 0xEE, 0xD8)
-ZIP = (0x2E, 0x2E, 0x18)
+ZIP = (0x1E, 0x22, 0x10)
 
 rnd = random.Random(19)
 
@@ -79,12 +83,12 @@ def leg(im, ox, oy):
 
 def body_base(im):
     """The yellow hoodie under the jacket."""
-    fill(im, (20, 16, 36, 20), YELLOW)
+    fill(im, (20, 16, 36, 20), HOODIE)
     for i, (a, b) in enumerate([(16, 20), (20, 28), (28, 32), (32, 40)]):
-        fill(im, (a, 20, b, 32), YELLOW)
+        fill(im, (a, 20, b, 32), HOODIE)
     # the hoodie's pocket and drawstrings on the front (20..28)
     for x in range(21, 27):
-        im.putpixel((x, 27), YELLOW[2] + (255,))
+        im.putpixel((x, 27), HOODIE[2] + (255,))
     im.putpixel((22, 21), CORD + (255,))
     im.putpixel((22, 22), CORD + (255,))
     im.putpixel((25, 21), CORD + (255,))
@@ -96,10 +100,10 @@ def body_base(im):
 
 def arm_base(im, ox, oy):
     """A slim arm of the base layer: hoodie yellow, the hand bare."""
-    fill(im, (ox + 4, oy, ox + 10, oy + 4), YELLOW)
+    fill(im, (ox + 4, oy, ox + 10, oy + 4), HOODIE)
     faces = [(ox, ox + 4), (ox + 4, ox + 7), (ox + 7, ox + 11), (ox + 11, ox + 14)]
     for a, b in faces:
-        fill(im, (a, oy + 4, b, oy + 16), YELLOW)
+        fill(im, (a, oy + 4, b, oy + 16), HOODIE)
         fill(im, (a, oy + 14, b, oy + 16), [SKIN, SKIN], noise=False)
     fill(im, (ox + 7, oy, ox + 10, oy + 4), [SKIN, SKIN], noise=False)  # the bottom face: the hand
 
@@ -128,10 +132,10 @@ def jacket(im):
         im.putpixel((x, oy + 7), GREEN[3] + (255,))
     for x in (ox + 10, ox + 11):
         im.putpixel((x, oy + 7), GREEN[3] + (255,))
-    # the hood hanging down the back, the jacket's olive (3.19.3), over the jacket's back (16+16..16+24)
+    # the hood hanging down the back, the hood's olive (3.19.3), over the jacket's back (16+16..16+24)
     for y in range(oy + 4, oy + 8):
         for x in range(ox + 18, ox + 22):
-            im.putpixel((x, y), GREEN[1 if y < oy + 7 else 2] + (255,))
+            im.putpixel((x, y), HOOD[1 if y < oy + 7 else 2] + (255,))
 
 
 def sleeve(im, ox, oy):
@@ -153,21 +157,21 @@ def hood(im):
                 continue
             if (r, g, b) in YELLOW:
                 # the 3.19.2 yellow hood: each of its shades to the olive of the same depth
-                im.putpixel((x, y), GREEN[YELLOW.index((r, g, b))] + (255,))
+                im.putpixel((x, y), HOOD[YELLOW.index((r, g, b))] + (255,))
                 continue
             lum = (r * 3 + g * 6 + b) / 10.0
             if r > 200 and g > 150 and b < 120 and lum > 150:
                 # the old gold trim round the face: the hood's light inner edge
-                im.putpixel((x, y), GREEN[0] + (255,))
+                im.putpixel((x, y), HOOD[0] + (255,))
                 continue
             if lum > 120:
-                c = GREEN[0]
+                c = HOOD[0]
             elif lum > 95:
-                c = GREEN[1]
+                c = HOOD[1]
             elif lum > 70:
-                c = GREEN[2]
+                c = HOOD[2]
             else:
-                c = GREEN[3]
+                c = HOOD[3]
             im.putpixel((x, y), c + (255,))
 
 
@@ -176,10 +180,10 @@ def hood_shade(im):
     r = random.Random(7)
     for y in range(0, 16):
         for x in range(32, 64):
-            if im.getpixel((x, y))[:3] != GREEN[0] or im.getpixel((x, y))[3] == 0:
+            if im.getpixel((x, y))[:3] != HOOD[0] or im.getpixel((x, y))[3] == 0:
                 continue
             face_row = y % 8
-            c = GREEN[2] if face_row == 7 else GREEN[1] if r.random() < 0.3 else GREEN[0]
+            c = HOOD[2] if face_row == 7 else HOOD[1] if r.random() < 0.3 else HOOD[0]
             im.putpixel((x, y), c + (255,))
 
 
