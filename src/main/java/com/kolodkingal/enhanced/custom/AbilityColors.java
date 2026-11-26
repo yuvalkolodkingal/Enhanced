@@ -46,8 +46,9 @@ public final class AbilityColors {
             return com.kolodkingal.enhanced.ability.Demiurge.is(data) ? com.kolodkingal.enhanced.ability.Demiurge.BLUE
                     : com.kolodkingal.enhanced.ability.UltimateWanda.is(data) && (row == HeroAbility.XAVIER_TAKE_OVER || row == HeroAbility.PHOENIX_MIND)
                     ? com.kolodkingal.enhanced.ability.UltimateWanda.RED
-                    : data.power() == Power.PHOENIX && row == HeroAbility.XAVIER_TAKE_OVER
-                    ? com.kolodkingal.enhanced.ability.PhoenixAbilities.TK_ORANGE : -1; // (3.19.3: Jean's take-over in her orange)
+                    : data.power() == Power.PHOENIX && (row == HeroAbility.XAVIER_TAKE_OVER || row == HeroAbility.WANDA_BUILD_MAGIC
+                    || row == HeroAbility.BILLY_BUILD_MAGIC)
+                    ? com.kolodkingal.enhanced.ability.PhoenixAbilities.TK_ORANGE : -1; // (3.19.3: Jean's take-over and Matter Manipulation in her orange)
         }
         return chosen(CustomHeroes.hero(player), row);
     }

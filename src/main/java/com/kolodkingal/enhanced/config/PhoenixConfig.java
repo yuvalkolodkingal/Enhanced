@@ -22,6 +22,8 @@ public final class PhoenixConfig {
      */
     public static ConfigSpec.DoubleValue FLIGHT_SPEED;
     public static ConfigSpec.BooleanValue FIRE_IMMUNE;
+    /** (3.19.3) Matter Manipulation (her Build Magic) has no limit, as the Scarlet Witch's; off: Billy's rules at her rank. */
+    public static ConfigSpec.BooleanValue MATTER_UNLIMITED;
 
     // ---- Mind Reading (R) and Mind Sense (Sneak + R) ----
     public static ConfigSpec.IntValue MIND_READ_RANGE;
@@ -74,6 +76,8 @@ public final class PhoenixConfig {
                 .defineInRange("flightSpeed", 0.09, 0.01, 0.5);
         FIRE_IMMUNE = builder.comment("Fire, lava and burning cannot hurt the Phoenix.")
                 .define("fireImmunity", true); // (3.19.2: a new key, so an old file's "false" no longer switches it off)
+        MATTER_UNLIMITED = builder.comment("Matter Manipulation (Sneak + N or the Build Magic key: the Scarlet Witch's Build Magic, in orange) has no limit. If false, Billy's rules apply at her rank: the meter and his caps.")
+                .define("matterUnlimited", true);
 
         MIND_READ_RANGE = builder.comment("How far (blocks) Mind Reading reaches (line of sight needed).")
                 .defineInRange("mindReadRange", 24, 4, 64);

@@ -374,6 +374,11 @@ public final class ClientEvents {
                     com.kolodkingal.enhanced.client.strange.SlingRingScreen.openWanda();
                     continue;
                 }
+                // (3.19.3) Jean Grey's Sneak + N: Matter Manipulation, her Build Magic, on or off
+                if (i == 5 && sneak && com.kolodkingal.enhanced.ability.PhoenixMatter.builds(Powers.get(player))) {
+                    com.kolodkingal.enhanced.client.build.BuildClient.toggle();
+                    continue;
+                }
                 // (3.18) Cosmic Spider-Man's B: the screen of his portals (the places he saved, the worlds)
                 if (i == 4 && !sneak && com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(Powers.get(player))) {
                     com.kolodkingal.enhanced.client.strange.SlingRingScreen.openCosmic();

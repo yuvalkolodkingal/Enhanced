@@ -11,13 +11,13 @@ from PIL import Image
 PATH = 'src/main/resources/assets/enhanced/textures/entity/suit/phoenix_brand_new_day.png'
 
 YELLOW = [(0xF2, 0xC2, 0x3A), (0xE3, 0xAE, 0x2A), (0xC9, 0x93, 0x1E), (0xA8, 0x76, 0x16)]
-# (3.19.3) the jacket is dark purple, not green (Eilon)
-GREEN = [(0x4A, 0x2A, 0x5E), (0x3E, 0x22, 0x50), (0x31, 0x1A, 0x40), (0x23, 0x12, 0x2E)]
+# (3.19.3) Yuval chose option A: the olive field jacket of the set photos, and the hood the same olive
+GREEN = [(0x6B, 0x6A, 0x3A), (0x5C, 0x5B, 0x31), (0x4C, 0x4B, 0x28), (0x3A, 0x3A, 0x1F)]
 CAMO = [(0x7A, 0x74, 0x4E), (0x5B, 0x5A, 0x38), (0x8E, 0x7C, 0x55), (0x3F, 0x42, 0x2C)]
 BOOT = [(0x26, 0x24, 0x22), (0x1A, 0x19, 0x18), (0x36, 0x33, 0x2F)]
 SKIN = (0xF0, 0xC3, 0xA6)
 CORD = (0xF7, 0xEE, 0xD8)
-ZIP = (0x1C, 0x10, 0x26)
+ZIP = (0x2E, 0x2E, 0x18)
 
 rnd = random.Random(19)
 
@@ -128,10 +128,10 @@ def jacket(im):
         im.putpixel((x, oy + 7), GREEN[3] + (255,))
     for x in (ox + 10, ox + 11):
         im.putpixel((x, oy + 7), GREEN[3] + (255,))
-    # the hood hanging down the back, yellow, over the jacket's back (16+16..16+24)
+    # the hood hanging down the back, the jacket's olive (3.19.3), over the jacket's back (16+16..16+24)
     for y in range(oy + 4, oy + 8):
         for x in range(ox + 18, ox + 22):
-            im.putpixel((x, y), YELLOW[1 if y < oy + 7 else 2] + (255,))
+            im.putpixel((x, y), GREEN[1 if y < oy + 7 else 2] + (255,))
 
 
 def sleeve(im, ox, oy):
@@ -145,31 +145,48 @@ def sleeve(im, ox, oy):
 
 
 def hood(im):
-    """The hat layer: the yellow hood, pulled up round her face (the old hood's shape, its olive turned yellow)."""
+    """The hat layer: the hood, pulled up round her face, in the jacket's olive (3.19.3: it was yellow in 3.19.2)."""
     for y in range(0, 16):
         for x in range(32, 64):
             r, g, b, a = im.getpixel((x, y))
             if a == 0:
                 continue
+            if (r, g, b) in YELLOW:
+                # the 3.19.2 yellow hood: each of its shades to the olive of the same depth
+                im.putpixel((x, y), GREEN[YELLOW.index((r, g, b))] + (255,))
+                continue
             lum = (r * 3 + g * 6 + b) / 10.0
             if r > 200 and g > 150 and b < 120 and lum > 150:
                 # the old gold trim round the face: the hood's light inner edge
-                im.putpixel((x, y), YELLOW[0] + (255,))
+                im.putpixel((x, y), GREEN[0] + (255,))
                 continue
             if lum > 120:
-                c = YELLOW[0]
+                c = GREEN[0]
             elif lum > 95:
-                c = YELLOW[1]
+                c = GREEN[1]
             elif lum > 70:
-                c = YELLOW[2]
+                c = GREEN[2]
             else:
-                c = YELLOW[3]
+                c = GREEN[3]
+            im.putpixel((x, y), c + (255,))
+
+
+def hood_shade(im):
+    """(3.19.3) Depth in the olive hood: its folds a shade darker, its lowest rows (the back of the neck) darker still."""
+    r = random.Random(7)
+    for y in range(0, 16):
+        for x in range(32, 64):
+            if im.getpixel((x, y))[:3] != GREEN[0] or im.getpixel((x, y))[3] == 0:
+                continue
+            face_row = y % 8
+            c = GREEN[2] if face_row == 7 else GREEN[1] if r.random() < 0.3 else GREEN[0]
             im.putpixel((x, y), c + (255,))
 
 
 def main():
     im = Image.open(PATH).convert('RGBA')
     hood(im)
+    hood_shade(im)
     # base layers
     clear(im, (0, 16, 56, 32))
     leg(im, 0, 16)
@@ -185,7 +202,19 @@ def main():
     jacket(im)
     sleeve(im, 40, 32)
     sleeve(im, 48, 48)
+    gloves(im)
     im.save(PATH)
+
+
+def gloves(im):
+    """(3.19.3) Black fingerless gloves over the hands: the fingertips show."""
+    black = [(0x1E, 0x1C, 0x1B), (0x16, 0x15, 0x14)]
+    for ox, oy in ((40, 16), (32, 48)):
+        for a, b in [(ox, ox + 4), (ox + 4, ox + 7), (ox + 7, ox + 11), (ox + 11, ox + 14)]:
+            fill(im, (a, oy + 14, b, oy + 16), black, noise=False)
+            for x in range(a, b, 2):
+                im.putpixel((x, oy + 15), SKIN + (255,))
+        fill(im, (ox + 7, oy, ox + 10, oy + 4), black, noise=False)
 
 
 if __name__ == '__main__':

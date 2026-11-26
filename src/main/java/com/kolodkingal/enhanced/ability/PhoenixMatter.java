@@ -54,6 +54,14 @@ public final class PhoenixMatter {
     }
 
     /** Sneak + N went down. */
+    /**
+     * (3.19.3) Whether this hero builds with Matter Manipulation: Jean Grey, whose Sneak + N (and the Build Magic key) is the
+     * Scarlet Witch's Build Magic in her orange ({@code Limits.of}, {@code BuildClient.hero}).
+     */
+    public static boolean builds(com.kolodkingal.enhanced.power.PowerData data) {
+        return data.power() == com.kolodkingal.enhanced.power.Power.PHOENIX;
+    }
+
     public static void use(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();

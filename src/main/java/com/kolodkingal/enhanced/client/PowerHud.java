@@ -431,7 +431,11 @@ public class PowerHud implements LayeredDraw.Layer {
     private static Component buildLine(LocalPlayer player, Power power, long now) {
         MutableComponent line = Component.literal("[").append(BuildKeys.MAGIC.getTranslatedKeyMessage()).append("] ")
                 .withStyle(ChatFormatting.YELLOW)
-                .append(Component.translatable("hud.enhanced.build").withStyle(ChatFormatting.WHITE))
+                // (3.19.3: Jean Grey's is Matter Manipulation, in her orange)
+                .append(com.kolodkingal.enhanced.ability.PhoenixMatter.builds(com.kolodkingal.enhanced.power.Powers.get(player))
+                        ? Component.translatable("hud.enhanced.phoenix.matter").withStyle(s -> s.withColor(
+                        com.kolodkingal.enhanced.ability.PhoenixAbilities.FIRE_GOLD))
+                        : Component.translatable("hud.enhanced.build").withStyle(ChatFormatting.WHITE))
                 .append(Component.literal("  ")).append(onOff(BuildClient.buildMode()));
         if (power == Power.BILLY) {
             BuildData build = ModAttachments.BUILD_DATA.getExisting(player).orElse(BuildData.EMPTY);

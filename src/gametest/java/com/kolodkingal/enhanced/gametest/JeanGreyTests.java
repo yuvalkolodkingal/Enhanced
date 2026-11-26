@@ -115,6 +115,25 @@ public final class JeanGreyTests {
     }
 
     @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void matterManipulationIsWandasBuildMagicInOrangeWithNoLimit(GameTestHelper helper) {
+        // (3.19.3) Her Matter Manipulation is the Scarlet Witch's Build Magic: her numbers, no meter, in Jean's orange.
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer jean = PhoenixTests.jean(f, 10.5, 10.5);
+        com.kolodkingal.enhanced.build.Limits limits = com.kolodkingal.enhanced.build.Limits.of(jean);
+        check(limits != null && limits.hero() == Power.SCARLET_WITCH, "she has the Scarlet Witch's Build Magic");
+        check(!limits.limited(), "with no limit: no meter, no rank caps");
+        check(limits.reach() == com.kolodkingal.enhanced.build.Limits.wanda(limits.world()).reach(), "the Scarlet Witch's reach");
+        check(com.kolodkingal.enhanced.custom.AbilityColors.color(jean,
+                com.kolodkingal.enhanced.custom.HeroAbility.WANDA_BUILD_MAGIC, 0) == PhoenixAbilities.TK_ORANGE, "in her orange");
+        check(PhoenixMatter.builds(Powers.get(jean)), "Sneak + N switches it");
+        com.kolodkingal.enhanced.build.BuildMagic.setMode(jean, true);
+        check(com.kolodkingal.enhanced.build.BuildSession.of(jean.getUUID()).mode(), "build mode turns on for her");
+        com.kolodkingal.enhanced.build.BuildMagic.setMode(jean, false);
+        check(!com.kolodkingal.enhanced.build.BuildSession.of(jean.getUUID()).mode(), "and off");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
     public static void herBodyIsArmouredLikeDiamondAndHealsFaster(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
         ServerPlayer jean = PhoenixTests.jean(f, 10.5, 10.5);
