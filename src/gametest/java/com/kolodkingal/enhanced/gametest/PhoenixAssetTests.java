@@ -133,7 +133,8 @@ public final class PhoenixAssetTests {
         check(share(apocalypse, 20, 20, 8, 12, c -> blue(c) > red(c) + 40) > 0.2, "the Apocalypse body is blue");
         check(share(apocalypse, 20, 20, 8, 12, c -> red(c) > 200 && green(c) > 150 && blue(c) < 80) > 0.04, "with the yellow of the stripes");
         java.util.function.IntPredicate olive = c -> Math.abs(red(c) - green(c)) < 20 && green(c) > blue(c) + 25 && red(c) < 140;
-        check(share(day, 40, 0, 8, 8, olive) > 0.6, "the Brand New Day hood is olive");
+        check(share(day, 40, 0, 8, 8, c -> red(c) > 100 && Math.abs(red(c) - green(c)) < 20 && green(c) > blue(c) + 25) > 0.6,
+                "the Brand New Day hood is the hoodie's yellowish olive (3.19.4d)");
         check(share(day, 20, 36, 8, 12, c -> green(c) > red(c) && green(c) > blue(c) + 5 && green(c) < 110) > 0.3,
                 "and the jacket over it a near-black green (3.19.4)");
         check(share(day, 20, 20, 8, 12, c -> red(c) > 100 && Math.abs(red(c) - green(c)) < 20 && green(c) > blue(c) + 25) > 0.2,
