@@ -22,6 +22,8 @@ BOOT = [(0x26, 0x24, 0x22), (0x1A, 0x19, 0x18), (0x36, 0x33, 0x2F)]
 SKIN = (0xF0, 0xC3, 0xA6)
 CORD = (0xF7, 0xEE, 0xD8)
 ZIP = (0x12, 0x15, 0x0A)
+# (3.19.4) the leather's sheen: a highlight lighter than the jacket's lightest green
+SHEEN = (0x4E, 0x57, 0x31)
 
 rnd = random.Random(19)
 
@@ -207,7 +209,37 @@ def main():
     sleeve(im, 40, 32)
     sleeve(im, 48, 48)
     gloves(im)
+    leather(im)
     im.save(PATH)
+
+
+def leather(im):
+    """
+    (3.19.4) The outer jacket feels like leather, not cloth (Yuval): the blotches of the noise are smoothed into one tone,
+    lit from above at the shoulders with a pixel of sheen, a crease across the middle (the elbows on the sleeves), and a
+    shadow at the hem. The seams (the darkest green) are kept.
+    """
+    regions = [(16, 32, 40, 48), (40, 32, 56, 48), (48, 48, 64, 64)]
+    for x0, y0, x1, y1 in regions:
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                r, g, b, a = im.getpixel((x, y))
+                if a == 0 or (r, g, b) not in GREEN[:3]:
+                    continue
+                rr = (y - y0) - 4
+                if rr < 0:
+                    c = GREEN[0]
+                elif rr <= 2:
+                    c = SHEEN if rr == 1 and x % 5 == 2 else GREEN[0]
+                elif rr <= 9:
+                    c = GREEN[1]
+                    if rr == 6 and x % 4 in (0, 1):
+                        c = GREEN[2]
+                    elif rr in (4, 5) and x % 7 == 3:
+                        c = GREEN[0]
+                else:
+                    c = GREEN[2]
+                im.putpixel((x, y), c + (255,))
 
 
 def gloves(im):
