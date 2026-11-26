@@ -123,7 +123,7 @@ public final class MutantSkeletonTests {
     static final Map<Defeat, Set<String>> KILLERS = Map.of(
             Defeat.STONES, Set.of("stone_power", "stone_blast", "stone_soul", "mind_stone", "mind_stone_beam",
                     "power_stone_beam", "power_stone_explosion", "snap_dust"),
-            Defeat.CHAOS, Set.of("chaos_beam", "hex_wall", "hex_bolt", "hex_beam"),
+            Defeat.CHAOS, Set.of("chaos_beam", "hex_wall", "hex_bolt", "hex_beam", "chaos_eruption"),
             Defeat.ODIN, Set.of("odinforce", "gungnir"),
             Defeat.PHOENIX, Set.of("phoenix_burst"),
             Defeat.DARKHOLD, Set.of("darkhold_beam", "agatha_drain", "agatha_runes"));
