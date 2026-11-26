@@ -42,7 +42,13 @@ public final class AbilityColors {
         if (data.power() != Power.CUSTOM) {
             // (3.18.1) Billy the Demiurge: every effect of his magic, and of the magic type he took on, in his brighter blue
             // (the client lays small stars in it: DemiurgeStars)
-            return com.kolodkingal.enhanced.ability.Demiurge.is(data) ? com.kolodkingal.enhanced.ability.Demiurge.BLUE : -1;
+            // (3.19) Ultimate Wanda: what she borrows of Professor X and Jean Grey (taking a body, reading a mind) is her red
+            return com.kolodkingal.enhanced.ability.Demiurge.is(data) ? com.kolodkingal.enhanced.ability.Demiurge.BLUE
+                    : com.kolodkingal.enhanced.ability.UltimateWanda.is(data) && (row == HeroAbility.XAVIER_TAKE_OVER || row == HeroAbility.PHOENIX_MIND)
+                    ? com.kolodkingal.enhanced.ability.UltimateWanda.RED
+                    : data.power() == Power.PHOENIX && (row == HeroAbility.XAVIER_TAKE_OVER || row == HeroAbility.WANDA_BUILD_MAGIC
+                    || row == HeroAbility.BILLY_BUILD_MAGIC)
+                    ? com.kolodkingal.enhanced.ability.PhoenixAbilities.TK_ORANGE : -1; // (3.19.3: Jean's take-over and Matter Manipulation in her orange)
         }
         return chosen(CustomHeroes.hero(player), row);
     }

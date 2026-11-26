@@ -86,7 +86,9 @@ public final class EnhancedCommand {
                                         .then(Commands.argument("power", StringArgumentType.word())
                                                 .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(java.util.stream.Stream.concat(
                                                         Arrays.stream(Power.values()).map(Power::getSerializedName),
-                                                        com.kolodkingal.enhanced.spellbook.Spellbook.heroIds().stream()), builder))
+                                                        java.util.stream.Stream.concat(com.kolodkingal.enhanced.spellbook.Spellbook.heroIds().stream(),
+                                                                com.kolodkingal.enhanced.power.Characters.playable().stream()
+                                                                        .map(com.kolodkingal.enhanced.power.Characters.Playable::id))), builder))
                                                 .executes(ctx -> set(ctx, ""))
                                                 .then(Commands.argument("look", StringArgumentType.word())
                                                         .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(lookIds(
@@ -104,6 +106,8 @@ public final class EnhancedCommand {
                 .then(com.kolodkingal.enhanced.ultimate.UltimateCommand.node())
                 // 3.18.1: Billy the Demiurge, and his gift of magic, by an operator
                 .then(com.kolodkingal.enhanced.ultimate.DemiurgeCommand.node())
+                // 3.19: the multiverse (where am I; an operator's journey; the other universes' stones)
+                .then(com.kolodkingal.enhanced.multiverse.MultiverseCommand.node())
                 // (3.17) the player's own skin on his hero (any hero, built-in or custom), or the suit again
                 .then(Commands.literal("skin")
                         .then(Commands.argument("players", EntityArgument.players())
@@ -177,6 +181,23 @@ public final class EnhancedCommand {
                 }
             }
             ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.power.set", players.size(), witch.title()), true);
+            return players.size();
+        }
+        // (3.19) Red Skull and Captain Hydra, heroes of their own: Captain America's powers in their one look
+        com.kolodkingal.enhanced.power.Characters.Playable character = com.kolodkingal.enhanced.power.Characters.playable(name);
+        if (character != null) {
+            if (!look.isEmpty()) {
+                throw UNKNOWN_LOOK.create(look);
+            }
+            Collection<ServerPlayer> players = EntityArgument.getPlayers(ctx, "players");
+            for (ServerPlayer player : players) {
+                if (Powers.power(player) == character.power()) {
+                    Powers.setVariant(player, Variants.get(character.power(), character.look()));
+                } else {
+                    Powers.awaken(player, character.power(), character.look(), false);
+                }
+            }
+            ctx.getSource().sendSuccess(() -> Component.translatable("commands.enhanced.power.set", players.size(), character.name()), true);
             return players.size();
         }
         Power power = Power.byName(name);

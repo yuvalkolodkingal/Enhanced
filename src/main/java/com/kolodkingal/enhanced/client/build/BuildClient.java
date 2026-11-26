@@ -217,6 +217,9 @@ public final class BuildClient {
         if (data.power() == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(data)) {
             return Power.BILLY; // (3.18: Cosmic Spider-Man's Matter Restructuring is Billy's Build Magic, weaker)
         }
+        if (com.kolodkingal.enhanced.ability.PhoenixMatter.builds(data)) {
+            return Power.SCARLET_WITCH; // (3.19.3: Jean Grey's Matter Manipulation is the Scarlet Witch's Build Magic, in orange)
+        }
         if (data.power() == Power.CUSTOM && data.has(HeroAbility.WANDA_BUILD_MAGIC)) {
             return Power.SCARLET_WITCH; // (3.5: the Scarlet Witch's Build Magic, her looks and her Instant)
         }
@@ -251,8 +254,8 @@ public final class BuildClient {
     // ------------------------------------------------------------------------------------------------------------
     // Build mode
 
-    /** A tap of Y: build mode on or off. */
-    static void toggle() {
+    /** A tap of Y (or, 3.19.3, Jean Grey's Sneak + N): build mode on or off. */
+    public static void toggle() {
         setMode(!mode);
     }
 

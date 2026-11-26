@@ -28,6 +28,7 @@ event net.neoforged.neoforge.event.entity.EntityJoinLevelEvent -> com.kolodkinga
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onJoin
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onEntityJoin
     NORMAL - com.kolodkingal.enhanced.ability.TelekinesisEvents#onEntityJoin
+    NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onJoin
 event net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent -> com.kolodkingal.enhanced.platform.event.EntityLeaveLevelEvent
     NORMAL - com.kolodkingal.enhanced.stones.StoneTouch#onLeave
 event net.neoforged.neoforge.event.entity.EntityMobGriefingEvent -> com.kolodkingal.enhanced.platform.event.EntityMobGriefingEvent
@@ -53,6 +54,7 @@ event net.neoforged.neoforge.event.entity.EntityTeleportEvent$EnderPearl -> com.
 event net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent -> com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent
     HIGHEST - com.kolodkingal.enhanced.asgard.AsgardGate#onTravel
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onTravel
+    HIGHEST - com.kolodkingal.enhanced.nexus.NexusEvents#onTravel
     HIGH - com.kolodkingal.enhanced.boss.BossArenaEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onTravel
@@ -109,6 +111,7 @@ event net.neoforged.neoforge.event.entity.living.LivingDamageEvent$Pre -> com.ko
 event net.neoforged.neoforge.event.entity.living.LivingDeathEvent -> com.kolodkingal.enhanced.platform.event.LivingDeathEvent
     HIGHEST - com.kolodkingal.enhanced.healing.HealingEvents#onDeath
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onDeath
+    HIGHEST - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onDeath
     HIGH - com.kolodkingal.enhanced.ultron.UltronEvents#onSecondLife
     NORMAL - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onDeath
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onDeath
@@ -170,11 +173,13 @@ event net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent -> co
     HIGHEST - com.kolodkingal.enhanced.heimdall.HeimdallEvents#onShadowHurt
     HIGHEST - com.kolodkingal.enhanced.ultron.SokoviaEvents#onIncomingDamage
     HIGHEST - com.kolodkingal.enhanced.eternity.EternityEvents#onDamage
+    HIGHEST - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onIncomingDamage
     HIGH - com.kolodkingal.enhanced.asgard.AsgardRules#onVoidDamage
     HIGH - com.kolodkingal.enhanced.strange.StrangeEvents#onIncomingDamage
     HIGH - com.kolodkingal.enhanced.ironman.nano.NanoEvents#onIncoming
     HIGH - com.kolodkingal.enhanced.ironman.IronEvents#onFallDamage
     HIGH - com.kolodkingal.enhanced.event.PhoenixEvents#onFire
+    HIGH - com.kolodkingal.enhanced.event.PhoenixEvents#onPsionicShield
     HIGH - com.kolodkingal.enhanced.hulk.HulkEvents#onFall
     HIGH - com.kolodkingal.enhanced.wolverine.WolverineEvents#onFall
     HIGH - com.kolodkingal.enhanced.captain.CaptainEvents#onIncomingGuard
@@ -221,6 +226,7 @@ event net.neoforged.neoforge.event.entity.living.MobEffectEvent$Applicable -> co
     HIGH - com.kolodkingal.enhanced.event.SpiderEvents#onEffectApplicable
     HIGH - com.kolodkingal.enhanced.thanos.ThanosEvents#onEffectApplicable
     HIGH - com.kolodkingal.enhanced.ultron.UltronEvents#onEffectApplicable
+    HIGH - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onEffectApplicable
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onEffectApplicable
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onEffectApplicable
     NORMAL - com.kolodkingal.enhanced.event.PhoenixEvents#onEffectApplicable
@@ -320,6 +326,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerLoggedOutEven
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.nano.NanoEvents#onLogout
     NORMAL - com.kolodkingal.enhanced.ability.SolarJewel#onLogout
+    NORMAL - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onLogout
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent -> com.kolodkingal.enhanced.platform.event.PlayerEvent$PlayerRespawnEvent
     HIGH - com.kolodkingal.enhanced.death.DeathMeeting#onRespawn
     NORMAL - com.kolodkingal.enhanced.vormir.VormirEvents#onRespawn
@@ -329,6 +336,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent 
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.boss.BossEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onRespawn
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onRespawn
     LOW - com.kolodkingal.enhanced.protect.ShelterEvents#onRespawn
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$StartTracking -> com.kolodkingal.enhanced.platform.event.PlayerEvent$StartTracking
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onStartTracking
@@ -368,6 +376,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickB
     NORMAL - com.kolodkingal.enhanced.road.copy.StructureCopyEvents#onRightClickBlock
     NORMAL - com.kolodkingal.enhanced.thanos.ThanosEvents#onRightClickBlock
     NORMAL - com.kolodkingal.enhanced.spellbook.SpellbookEvents#onUseBlock
+    NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onUseBlock
 event net.neoforged.neoforge.event.entity.player.PlayerInteractEvent$RightClickItem -> com.kolodkingal.enhanced.platform.event.PlayerInteractEvent$RightClickItem
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onRightClickItem
     HIGH - com.kolodkingal.enhanced.asgard.AsgardRules#onUseItem
@@ -394,6 +403,7 @@ event net.neoforged.neoforge.event.level.BlockEvent$BreakEvent -> com.kolodkinga
     HIGH - com.kolodkingal.enhanced.boss.BossArenaEvents#onBreak
     NORMAL - com.kolodkingal.enhanced.strange.StrangeEvents#onBreak
     NORMAL - com.kolodkingal.enhanced.hydra.HydraEvents#onBreak
+    NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onBreak
     LOWEST - com.kolodkingal.enhanced.road.copy.StructureCopyEvents#onBreak
 event net.neoforged.neoforge.event.level.BlockEvent$EntityPlaceEvent -> com.kolodkingal.enhanced.platform.event.BlockEvent$EntityPlaceEvent
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onPlace
@@ -468,6 +478,8 @@ event net.neoforged.neoforge.event.server.ServerStoppedEvent -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.serum.SerumEvents#onServerStopped
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onStopped
     NORMAL - com.kolodkingal.enhanced.balance.BalanceEvents#onServerStopped
+    NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onServerStopped
+    NORMAL - com.kolodkingal.enhanced.ability.UltimateWandaEvents#onServerStopped
     LOWEST - com.kolodkingal.enhanced.config.neoforge.ConfigNeoForge#lambda
 event net.neoforged.neoforge.event.server.ServerStoppingEvent -> com.kolodkingal.enhanced.platform.event.ServerStoppingEvent
     HIGHEST - com.kolodkingal.enhanced.boss.BossEvents#onServerStopping
@@ -513,6 +525,8 @@ event net.neoforged.neoforge.event.tick.PlayerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.tower.TowerEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onPlayerTick
+    NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onPlayerTick
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onPlayerTick
 event net.neoforged.neoforge.event.tick.PlayerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.PlayerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.wolverine.WolverineEvents#onPlayerTick
@@ -525,6 +539,7 @@ event net.neoforged.neoforge.event.tick.ServerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onServerTickDone
     NORMAL - com.kolodkingal.enhanced.finders.FindersEvents#onServerTick
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onServerTick
+    NORMAL - com.kolodkingal.enhanced.multiverse.MultiverseEvents#onServerTick
 event net.neoforged.neoforge.event.tick.ServerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.ServerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onServerTick
 event net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent -> -
@@ -561,6 +576,7 @@ event net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent$LoggingOut ->
     NORMAL - com.kolodkingal.enhanced.client.world.SiteAmbienceClient$Events#onLogout
     NORMAL - com.kolodkingal.enhanced.client.render.HeimdallSightView#onLoggingOut
     NORMAL - com.kolodkingal.enhanced.client.WardFx#onLogout
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onLoggingOut
     NORMAL - com.kolodkingal.enhanced.client.custom.CustomFx#onLogout
     NORMAL - com.kolodkingal.enhanced.client.deadpool.LineBubbles#onLoggingOut
     NORMAL - com.kolodkingal.enhanced.client.music.ServerMusicClient#onLogout
@@ -715,6 +731,9 @@ event net.neoforged.neoforge.client.event.RenderLevelStageEvent -> com.kolodking
     NORMAL - com.kolodkingal.enhanced.client.CerebroView#onRenderLevel
     NORMAL - com.kolodkingal.enhanced.client.ThoughtBubbles#onRenderLevel
     NORMAL - com.kolodkingal.enhanced.client.render.DemiurgeFx#onRenderLevel
+    NORMAL - com.kolodkingal.enhanced.client.render.SorcererFx#onRenderLevel
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onRenderLevel
+    NORMAL - com.kolodkingal.enhanced.client.render.UltimateShieldFx#onRenderLevel
 event net.neoforged.neoforge.client.event.RenderNameTagEvent -> com.kolodkingal.enhanced.platform.event.client.RenderNameTagEvent
     NORMAL - com.kolodkingal.enhanced.client.Shapeshifts#onRenderNameTag
 event net.neoforged.neoforge.client.event.RenderPlayerEvent$Post -> com.kolodkingal.enhanced.platform.event.client.RenderPlayerEvent$Post
@@ -752,10 +771,14 @@ event net.neoforged.neoforge.client.event.ViewportEvent$ComputeFogColor -> com.k
     NORMAL - com.kolodkingal.enhanced.client.render.ArenaFx#onFogColor
     NORMAL - com.kolodkingal.enhanced.client.ThanosAtmosphere#onFogColor
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFogColour
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onFogColour
+    NORMAL - com.kolodkingal.enhanced.client.world.WhatIfSky#onFogColor
 event net.neoforged.neoforge.client.event.ViewportEvent$RenderFog -> com.kolodkingal.enhanced.platform.event.client.ViewportEvent$RenderFog
     NORMAL - com.kolodkingal.enhanced.client.render.ArenaFx#onFog
     NORMAL - com.kolodkingal.enhanced.client.eternity.EternityClient#onFog
     NORMAL - com.kolodkingal.enhanced.client.custom.LavaSight#onFog
+    NORMAL - com.kolodkingal.enhanced.client.UniverseTakeoverClient#onFog
+    NORMAL - com.kolodkingal.enhanced.client.world.WhatIfSky#onFog
 event net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent -> -
     NORMAL - com.kolodkingal.enhanced.client.ClientSetup#onRegisterClientExtensions
 event net.neoforged.neoforge.event.ItemAttributeModifierEvent -> com.kolodkingal.enhanced.platform.event.ItemAttributeModifierEvent
@@ -799,6 +822,7 @@ event net.neoforged.neoforge.event.entity.EntityTeleportEvent$EnderPearl -> com.
 event net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent -> com.kolodkingal.enhanced.platform.event.EntityTravelToDimensionEvent
     HIGHEST - com.kolodkingal.enhanced.asgard.AsgardGate#onTravel
     HIGHEST - com.kolodkingal.enhanced.road.RoadRules#onTravel
+    HIGHEST - com.kolodkingal.enhanced.nexus.NexusEvents#onTravel
     HIGH - com.kolodkingal.enhanced.boss.BossArenaEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.asgard.npc.AsgardNpcEvents#onTravel
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onTravel
@@ -1077,6 +1101,7 @@ event net.neoforged.neoforge.event.entity.player.PlayerEvent$PlayerRespawnEvent 
     NORMAL - com.kolodkingal.enhanced.build.BuildEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.boss.BossEvents#onRespawn
     NORMAL - com.kolodkingal.enhanced.vishanti.WardEvents#onRespawn
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onRespawn
     LOW - com.kolodkingal.enhanced.protect.ShelterEvents#onRespawn
 event net.neoforged.neoforge.event.entity.player.PlayerEvent$StartTracking -> com.kolodkingal.enhanced.platform.event.PlayerEvent$StartTracking
     NORMAL - com.kolodkingal.enhanced.event.CommonEvents#onStartTracking
@@ -1265,6 +1290,7 @@ event net.neoforged.neoforge.event.tick.PlayerTickEvent$Post -> com.kolodkingal.
     NORMAL - com.kolodkingal.enhanced.eternity.EternityEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.mind.MindEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.client.SpeedsterMotion#onPlayerTickPost
+    NORMAL - com.kolodkingal.enhanced.nexus.NexusEvents#onPlayerTick
 event net.neoforged.neoforge.event.tick.PlayerTickEvent$Pre -> com.kolodkingal.enhanced.platform.event.PlayerTickEvent$Pre
     NORMAL - com.kolodkingal.enhanced.protect.ShelterEvents#onPlayerTick
     NORMAL - com.kolodkingal.enhanced.wolverine.WolverineEvents#onPlayerTick

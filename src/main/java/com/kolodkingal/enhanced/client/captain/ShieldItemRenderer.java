@@ -54,7 +54,7 @@ public final class ShieldItemRenderer extends BlockEntityWithoutLevelRenderer {
         poseStack.pushPose();
         // (Vanilla's shield's frame: its display transforms are made for it.)
         poseStack.scale(1.0F, -1.0F, -1.0F);
-        VertexConsumer vc = ItemRenderer.getFoilBufferDirect(buffer, ShieldModel.renderType(), true,
+        VertexConsumer vc = ItemRenderer.getFoilBufferDirect(buffer, ShieldModel.renderType(com.kolodkingal.enhanced.captain.HydraShield.is(stack)), true,
                 stack.hasFoil());
         model().renderAll(poseStack, vc, light, overlay);
         poseStack.popPose();

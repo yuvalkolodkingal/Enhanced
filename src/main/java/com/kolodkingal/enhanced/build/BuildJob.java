@@ -2234,7 +2234,7 @@ public final class BuildJob {
         if (sparks.isEmpty()) {
             return;
         }
-        int colour = hero == Power.BILLY ? Power.BILLY.color : Power.SCARLET_WITCH.color;
+        int colour = colour();
         for (int i = 0; i < sparks.size() && tick.spark(); i++) {
             BlockPos pos = BlockPos.of(sparks.getLong(i));
             level.sendParticles(new EnergyParticleOptions(colour, 1.0F), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.02);
@@ -3038,9 +3038,17 @@ public final class BuildJob {
         BuildMagic.billy(level.getServer(), caster, back, changed, -1);
     }
 
+    /** The colour of the spell's sparks: the hero's, or (3.19.3) the caster's own (Jean Grey's orange, a custom hero's choice). */
+    private int colour() {
+        int builtIn = hero == Power.BILLY ? Power.BILLY.color : Power.SCARLET_WITCH.color;
+        return com.kolodkingal.enhanced.custom.AbilityColors.color(online(), hero == Power.BILLY
+                ? com.kolodkingal.enhanced.custom.HeroAbility.BILLY_BUILD_MAGIC
+                : com.kolodkingal.enhanced.custom.HeroAbility.WANDA_BUILD_MAGIC, builtIn);
+    }
+
     /** D-B 7.2: 40 sparks at the top middle of a spell that is done. */
     private void burst(Vec3 at) {
-        int colour = hero == Power.BILLY ? Power.BILLY.color : Power.SCARLET_WITCH.color;
+        int colour = colour();
         level.sendParticles(new EnergyParticleOptions(colour, 1.0F), at.x, at.y, at.z, 40, 0.8, 0.4, 0.8, 0.05);
     }
 
@@ -3049,7 +3057,7 @@ public final class BuildJob {
         Vec3 from = Vec3.atCenterOf(box.getCenter());
         Vec3 to = (online() != null ? online().getEyePosition() : eyes);
         Vec3 way = to.subtract(from).normalize().scale(0.3);
-        int colour = hero == Power.BILLY ? Power.BILLY.color : Power.SCARLET_WITCH.color;
+        int colour = colour();
         for (int i = 0; i < 20; i++) {
             level.sendParticles(new EnergyParticleOptions(colour, 1.0F), from.x, from.y, from.z, 0, way.x, way.y, way.z, 1.0);
         }

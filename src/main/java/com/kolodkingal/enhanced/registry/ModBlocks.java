@@ -252,6 +252,29 @@ public final class ModBlocks {
                     .noOcclusion()
                     .lightLevel(state -> 4));
 
+    // ===== multiverse (3.19) =====
+    /** The core of Reed Richards' Multiverse Bridge: set down, it raises its ring; it drops itself. */
+    public static final BlockEntry<com.kolodkingal.enhanced.block.MultiverseBridgeBlock> MULTIVERSE_BRIDGE = BLOCKS.registerBlock(
+            "multiverse_bridge", com.kolodkingal.enhanced.block.MultiverseBridgeBlock::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(30.0F, 1200.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK)
+                    .lightLevel(state -> 10)
+                    .pushReaction(PushReaction.BLOCK));
+
+    /** A block of the bridge's ring, raised by its core: it drops nothing (the core is the bridge). */
+    public static final BlockEntry<Block> MULTIVERSE_BRIDGE_FRAME = BLOCKS.registerBlock(
+            "multiverse_bridge_frame", Block::new, BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(30.0F, 1200.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.NETHERITE_BLOCK)
+                    .lightLevel(state -> 7)
+                    .noLootTable()
+                    .pushReaction(PushReaction.BLOCK)
+                    .isValidSpawn(Blocks::never));
+
     // ===== healing (3.7) =====
     // ===== wolverine (3.7) =====
     // ===== deadpool (3.7) =====

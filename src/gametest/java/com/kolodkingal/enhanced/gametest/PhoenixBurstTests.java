@@ -87,6 +87,10 @@ public final class PhoenixBurstTests {
         f.config(PhoenixConfig.BURST_MAX_RADIUS, 9);
         f.config(PhoenixConfig.BURST_FIRE_SECONDS, 0);
         f.config(PhoenixConfig.BURST_KNOCKBACK, 0.0);
+        // (3.19.2: the defaults are stronger now; these tests measure against the old numbers)
+        f.config(PhoenixConfig.BURST_MIN_DAMAGE, 8.0);
+        f.config(PhoenixConfig.BURST_MAX_DAMAGE, 30.0);
+        f.config(PhoenixConfig.BURST_WAVE_SPEED, 1.0);
     }
 
     /** A zombie with 200 health that stands still, so that what the Burst does to it can be measured. */

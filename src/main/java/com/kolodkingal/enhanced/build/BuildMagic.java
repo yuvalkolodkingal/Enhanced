@@ -992,7 +992,7 @@ public final class BuildMagic {
      * at work finishes and the waiting ones are dropped; the history, the pocket and the meter are kept (D-B 11.9).
      */
     public static void onPowerChanged(ServerPlayer player, Power from, Power to) {
-        if (from != Power.SCARLET_WITCH && from != Power.BILLY) {
+        if (from != Power.SCARLET_WITCH && from != Power.BILLY && from != Power.PHOENIX) { // (3.19.3: and Jean Grey's Matter Manipulation)
             return;
         }
         leaveMode(player, false);

@@ -103,6 +103,8 @@ final class AsgardLines {
 
     private static void common() {
         AsgardDialogue.variants("npc.enhanced.common.manners", 4);
+        AsgardDialogue.variants("npc.enhanced.whatif.manners", 4);
+        AsgardDialogue.lines("npc.enhanced.whatif.manners");
         AsgardDialogue.lines("npc.enhanced.common.manners", "npc.enhanced.common.busy", "npc.enhanced.common.down",
                 "npc.enhanced.sif.duel_score", "npc.enhanced.sif.duel_won", "npc.enhanced.sif.duel_lost", "npc.enhanced.sif.duel_draw",
                 "npc.enhanced.frigga.odin_asleep", "npc.enhanced.valkyrie.horse",

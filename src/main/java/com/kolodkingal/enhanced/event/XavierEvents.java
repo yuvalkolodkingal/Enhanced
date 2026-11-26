@@ -1,6 +1,7 @@
 package com.kolodkingal.enhanced.event;
 
 import com.kolodkingal.enhanced.ability.MindLink;
+import com.kolodkingal.enhanced.ability.PhoenixBody;
 import com.kolodkingal.enhanced.config.XavierConfig;
 import com.kolodkingal.enhanced.platform.event.AttackEntityEvent;
 import com.kolodkingal.enhanced.platform.event.Cancellable;
@@ -90,7 +91,7 @@ public final class XavierEvents {
     @Subscribe
     public static void onDamage(LivingDamageEvent.Post event) {
         if (event.getNewDamage() > 0.0F && event.getEntity() instanceof ServerPlayer player && MindLink.isLinked(player)
-                && XavierConfig.LINK_BREAKS_ON_HURT.get()) {
+                && XavierConfig.LINK_BREAKS_ON_HURT.get() && !PhoenixBody.is(player)) { // (3.19.3: Jean's body is guarded, she stays)
             MindLink.end(player.server, player.getUUID(), MindLink.End.HURT);
         }
     }

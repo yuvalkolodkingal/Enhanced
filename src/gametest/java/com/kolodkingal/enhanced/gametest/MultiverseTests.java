@@ -1,0 +1,547 @@
+package com.kolodkingal.enhanced.gametest;
+
+import com.kolodkingal.enhanced.multiverse.Multiverse;
+import com.kolodkingal.enhanced.multiverse.MultiverseBridge;
+import com.kolodkingal.enhanced.multiverse.UniverseChunkGenerator;
+import com.kolodkingal.enhanced.multiverse.UniverseLedger;
+import com.kolodkingal.enhanced.multiverse.UniverseStones;
+import com.kolodkingal.enhanced.multiverse.UniverseRecipe;
+import com.kolodkingal.enhanced.platform.test.EnhancedTest;
+import com.kolodkingal.enhanced.thanos.StoneKind;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.kolodkingal.enhanced.gametest.TestKit.ARENA;
+import static com.kolodkingal.enhanced.gametest.TestKit.check;
+
+/**
+ * The multiverse (3.19, {@code Multiverse}): the universes' worlds are there with their own land, the What If numbers
+ * and cells are one to one, words always name the same universe, a stone of another universe carries its universe and
+ * works only there, and the bridge's ring is a whole circle with the core at its foot.
+ */
+public final class MultiverseTests {
+    private static final String BATCH = "multiverse";
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theUniversesAreThereWithTheirOwnLand(GameTestHelper helper) {
+        ServerLevel any = helper.getLevel();
+        // The GameTest server's world is built from the flat preset, with the game's three dimensions alone: the
+        // universes' worlds are checked where they are loaded, as on a real server, and their files are read below.
+        if (any.getServer().getLevel(Multiverse.XMEN_KEY) != null) {
+            for (int universe : new int[]{Multiverse.MAIN, Multiverse.XMEN, Multiverse.ZOMBIES, 12345}) {
+                check(Multiverse.levelOf(any.getServer(), universe) != null, "universe " + universe + " has a world");
+            }
+            ServerLevel xmen = any.getServer().getLevel(Multiverse.XMEN_KEY);
+            ServerLevel zombies = any.getServer().getLevel(Multiverse.ZOMBIES_KEY);
+            check(xmen.getChunkSource().getGenerator() instanceof UniverseChunkGenerator g && g.universe() == Multiverse.XMEN,
+                    "10005's land is the universe generator's, numbered 10005");
+            check(zombies.getChunkSource().getGenerator() instanceof UniverseChunkGenerator g && g.universe() == Multiverse.ZOMBIES,
+                    "2149's too");
+        }
+        check(Multiverse.levelOf(any.getServer(), Multiverse.MAIN) == any.getServer().overworld(), "616 is the Overworld");
+        // The universes' dimension files are read as the game reads them for a real world.
+        Object[][] files = {{Multiverse.XMEN, "universe_10005"}, {Multiverse.ZOMBIES, "universe_2149"}, {0, "what_if"},
+                {0, "what_if_amplified"}, {0, "what_if_islands"}, {0, "what_if_caves"}, {Multiverse.GAMMA, "what_if_gamma"},
+                {-1, "what_if_hydra"}, {-2, "what_if_ultron"}};
+        for (Object[] entry : files) {
+            int universe = (Integer) entry[0];
+            String file = (String) entry[1];
+            net.minecraft.server.packs.resources.Resource resource = any.getServer().getResourceManager()
+                    .getResource(com.kolodkingal.enhanced.Enhanced.id("dimension/" + file + ".json")).orElse(null);
+            check(resource != null, "the dimension " + file + " is in the mod's data");
+            com.google.gson.JsonElement json;
+            try (java.io.Reader reader = resource.openAsReader()) {
+                json = com.google.gson.JsonParser.parseReader(reader);
+            } catch (java.io.IOException e) {
+                throw new IllegalStateException(e);
+            }
+            net.minecraft.world.level.dimension.LevelStem stem = net.minecraft.world.level.dimension.LevelStem.CODEC
+                    .parse(net.minecraft.resources.RegistryOps.create(com.mojang.serialization.JsonOps.INSTANCE, any.getServer().registryAccess()), json)
+                    .getOrThrow();
+            if (universe < 0) {
+                String city = universe == -1 ? "hydra" : "ultron";
+                check(stem.generator() instanceof com.kolodkingal.enhanced.multiverse.CityChunkGenerator g && g.city().equals(city),
+                        "the dimension " + file + " reads as the city generator of " + city);
+                continue;
+            }
+            check(stem.generator() instanceof UniverseChunkGenerator g && g.universe() == universe,
+                    "the dimension " + file + " reads as the universe generator numbered " + universe);
+        }
+        check(Multiverse.universeAt(Level.OVERWORLD, 0, 0) == Multiverse.MAIN && Multiverse.universeAt(Level.NETHER, 5, 5) == Multiverse.MAIN,
+                "the Overworld and the Nether are 616");
+        check(Multiverse.universeAt(Multiverse.XMEN_KEY, 0, 0) == Multiverse.XMEN, "10005 is 10005");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void whatIfNumbersAndCellsAreOneToOne(GameTestHelper helper) {
+        Set<Long> cells = new HashSet<>();
+        for (int n : new int[]{1, 2, 3, 615, 617, 999, 4242, 48213, 99999, 123456, Multiverse.CELLS - 1, Multiverse.CELLS}) {
+            int[] cell = Multiverse.cellOf(n);
+            check(Math.abs(cell[0]) <= Multiverse.HALF && Math.abs(cell[1]) <= Multiverse.HALF, "cell of " + n + " inside the border");
+            check(Multiverse.numberOfCell(cell[0], cell[1]) == n, "the cell of " + n + " is numbered " + n);
+            BlockPos centre = Multiverse.centreOf(n);
+            check(Multiverse.universeAt(Multiverse.WHAT_IF_KEY, centre.getX() + 0.5, centre.getZ() + 0.5) == n,
+                    "standing in the middle of " + n + " is being in " + n);
+            check(Multiverse.universeAt(Multiverse.WHAT_IF_KEY, centre.getX() + Multiverse.CELL / 2.0 - 10, centre.getZ()) == n,
+                    "and near its edge too");
+            check(cells.add(((long) cell[0] << 32) ^ (cell[1] & 0xFFFFFFFFL)), "every number has a cell of its own");
+        }
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void wordsAlwaysNameTheSameUniverse(GameTestHelper helper) {
+        check(Multiverse.named("616") == Multiverse.MAIN && Multiverse.named("Earth-10005") == Multiverse.XMEN
+                && Multiverse.named(" 2149 ") == Multiverse.ZOMBIES, "616, 10005 and 2149 name themselves");
+        check(Multiverse.named("48213") == 48213, "a number names its What If universe");
+        int carter = Multiverse.named("Captain Carter");
+        check(carter == Multiverse.named("captain carter") && Multiverse.isWhatIf(carter), "words name one What If universe, whatever their case");
+        check(Multiverse.named("Captain Carter") != Multiverse.named("Party Thor"), "other words, another universe");
+        for (long n : new long[]{616, 10005, 2149, Multiverse.CELLS + 616L, -5, Long.MAX_VALUE}) {
+            int folded = Multiverse.fold(n);
+            check(Multiverse.isWhatIf(folded) && folded >= 1 && folded <= Multiverse.CELLS + 1, "fold " + n + " is a What If universe");
+        }
+        helper.succeed();
+    }
+
+    /** (3.19.1) A random universe's number is its seed: the same number, the same world; many numbers, many worlds. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aUniversesNumberIsTheSeedOfItsWorld(GameTestHelper helper) {
+        Set<Integer> shapes = new HashSet<>();
+        Set<String> stones = new HashSet<>();
+        int fogs = 0;
+        int kept = 0;
+        for (int n = 1; n <= 400; n++) {
+            UniverseRecipe recipe = UniverseRecipe.of(n);
+            shapes.add(recipe.shape());
+            if (recipe.stone() != null) {
+                stones.add(recipe.stone().getBlock().getDescriptionId());
+            } else {
+                kept++;
+            }
+            fogs += recipe.fog() >= 0 ? 1 : 0;
+            check(recipe.title() != null, "every universe has a title");
+            check(Multiverse.levelOf(helper.getLevel().getServer(), n) == helper.getLevel().getServer().getLevel(Multiverse.SHAPES.get(recipe.shape())),
+                    "a random universe is in the world of its shape");
+        }
+        check(shapes.size() == Multiverse.SHAPES.size(), "every shape of land is somewhere: " + shapes);
+        check(stones.size() >= 15 && kept > 20, "many stones, and some worlds of plain stone: " + stones.size() + ", " + kept);
+        check(fogs > 150 && fogs < 400, "most skies have a colour of their own: " + fogs);
+        int carter = Multiverse.named("Captain Carter");
+        UniverseRecipe first = UniverseRecipe.of(carter);
+        check(first.shape() == UniverseRecipe.of(Multiverse.named("captain carter")).shape()
+                && first.stone() == UniverseRecipe.of(Multiverse.named("CAPTAIN CARTER")).stone()
+                && first.fog() == UniverseRecipe.of(carter).fog(), "the same words make the same world");
+        check(UniverseRecipe.of(616).creature(net.minecraft.world.entity.EntityType.ARMOR_STAND) == net.minecraft.world.entity.EntityType.ARMOR_STAND,
+                "a kind the recipes do not know stays itself");
+        int swapped = 0;
+        for (int n = 1; n <= 100; n++) {
+            swapped += UniverseRecipe.of(n).creature(net.minecraft.world.entity.EntityType.COW) != net.minecraft.world.entity.EntityType.COW ? 1 : 0;
+        }
+        check(swapped > 10 && swapped < 90, "in some universes the cows come as something else: " + swapped);
+        check(Multiverse.isThemed(Multiverse.HYDRA) && !Multiverse.isWhatIf(Multiverse.ULTRON) && !Multiverse.isWhatIf(Multiverse.GAMMA),
+                "the series' three are not random universes");
+        check(Multiverse.universeAt(Multiverse.HYDRA_KEY, 5, 5) == Multiverse.HYDRA && Multiverse.universeAt(Multiverse.GAMMA_KEY, 0, 0) == Multiverse.GAMMA
+                && Multiverse.universeAt(Multiverse.ULTRON_KEY, 0, 0) == Multiverse.ULTRON, "each of them is its own world");
+        check(Multiverse.universeAt(Multiverse.CAVES_KEY, 0.5, 0.5) == Multiverse.universeAt(Multiverse.WHAT_IF_KEY, 0.5, 0.5),
+                "the four shapes share their cells' numbers");
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aStoneOfAnotherUniverseIsOneAndWorksOnlyThere(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        UniverseLedger ledger = UniverseLedger.get(helper.getLevel().getServer());
+        ledger.reset();
+        ItemStack first = UniverseStones.make(StoneKind.POWER, Multiverse.ZOMBIES);
+        ItemStack second = UniverseStones.make(StoneKind.POWER, Multiverse.ZOMBIES);
+        check(UniverseStones.origin(first) == Multiverse.ZOMBIES, "the stone says it is from 2149");
+        check(UniverseStones.origin(new ItemStack(first.getItem())) == Multiverse.MAIN, "a stone that says nothing is from 616");
+        net.minecraft.server.level.ServerPlayer player = f.player(5.5, TestKit.FLOOR, 5.5, com.kolodkingal.enhanced.power.Power.NONE);
+        player.getInventory().setItem(0, first);
+        UniverseStones.check(player);
+        check(ledger.finder(Multiverse.ZOMBIES, StoneKind.POWER) != null, "the first copy taken is the stone");
+        player.getInventory().setItem(1, second);
+        UniverseStones.check(player);
+        check(player.getInventory().getItem(1).isEmpty() && !player.getInventory().getItem(0).isEmpty(),
+                "a second copy fades away, the first stays");
+        check(UniverseStones.refusal(player, StoneKind.POWER, Multiverse.ZOMBIES) != null, "2149's stone does nothing here");
+        check(UniverseStones.refusal(player, StoneKind.POWER, Multiverse.MAIN) == null, "616's stone works here");
+        ledger.reset();
+        helper.succeed();
+    }
+
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theBridgesRingIsAWholeCircle(GameTestHelper helper) {
+        BlockPos core = new BlockPos(100, 70, 100);
+        for (Direction facing : new Direction[]{Direction.NORTH, Direction.EAST}) {
+            List<BlockPos> ring = MultiverseBridge.ring(core, facing);
+            check(ring.get(0).equals(core), "the core is the ring's foot");
+            check(ring.contains(core.above(2 * MultiverseBridge.RADIUS)), "the ring reaches up to its top");
+            check(new HashSet<>(ring).size() == ring.size() && ring.size() >= 28, "a whole ring of blocks: " + ring.size());
+            for (BlockPos pos : ring) {
+                check(facing.getAxis() == Direction.Axis.Z ? pos.getZ() == core.getZ() : pos.getX() == core.getX(),
+                        "the ring stands across the way it faces");
+            }
+        }
+        helper.succeed();
+    }
+
+    /** The universes' land is made as a real world makes it: chunks round the middle generate in each, in good time. */
+    @EnhancedTest(template = ARENA, batch = "multiverse_land", timeoutTicks = 2400)
+    public static void theUniversesLandGeneratesInGoodTime(GameTestHelper helper) {
+        net.minecraft.server.MinecraftServer server = helper.getLevel().getServer();
+        Object[][] universes = {{Multiverse.XMEN_KEY, "universe_10005"}, {Multiverse.ZOMBIES_KEY, "universe_2149"},
+                {Multiverse.WHAT_IF_KEY, "what_if"}, {Multiverse.AMPLIFIED_KEY, "what_if_amplified"},
+                {Multiverse.ISLANDS_KEY, "what_if_islands"}, {Multiverse.CAVES_KEY, "what_if_caves"},
+                {Multiverse.HOLLOW_KEY, "what_if_hollow"}, {Multiverse.VOID_KEY, "what_if_void"}, {Multiverse.HUGE_KEY, "what_if_huge"},
+                {Multiverse.GAMMA_KEY, "what_if_gamma"}, {Multiverse.HYDRA_KEY, "what_if_hydra"}, {Multiverse.ULTRON_KEY, "what_if_ultron"}};
+        for (Object[] u : universes) {
+            @SuppressWarnings("unchecked")
+            net.minecraft.resources.ResourceKey<Level> key = (net.minecraft.resources.ResourceKey<Level>) u[0];
+            ServerLevel level = server.getLevel(key);
+            if (level == null) {
+                level = AsgardTestSupport.makeLevel(server, key, "/data/enhanced/dimension/" + u[1] + ".json");
+            }
+            long start = System.nanoTime();
+            for (int dx = -4; dx <= 4; dx++) {
+                for (int dz = -4; dz <= 4; dz++) {
+                    level.getChunk(dx, dz);
+                }
+            }
+            long ms = (System.nanoTime() - start) / 1_000_000L;
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Multiverse land: 81 chunks of {} in {} ms", u[1], ms);
+            check(ms < 60_000, "81 chunks of " + u[1] + " generate within a minute: " + ms + " ms");
+        }
+        // Arriving finds ground without making a great many chunks (the noise says where the land is).
+        TestKit.Fixture f = TestKit.fixture(helper);
+        net.minecraft.server.level.ServerPlayer player = f.player(5.5, TestKit.FLOOR, 5.5, com.kolodkingal.enhanced.power.Power.NONE);
+        for (int universe : new int[]{Multiverse.XMEN, Multiverse.ZOMBIES, 48213, Multiverse.named("Captain Carter"), 777,
+                Multiverse.GAMMA, Multiverse.HYDRA, Multiverse.ULTRON, firstOfShape(1), firstOfShape(2), firstOfShape(3),
+                firstOfShape(4), firstOfShape(5), firstOfShape(6)}) {
+            long start = System.nanoTime();
+            com.kolodkingal.enhanced.stones.SpaceRealms.Arrival arrival = com.kolodkingal.enhanced.multiverse.UniverseTravel.arrival(player, universe);
+            long ms = (System.nanoTime() - start) / 1_000_000L;
+            com.kolodkingal.enhanced.Enhanced.LOGGER.info("Multiverse arrival in {}: {} ms at {}", universe, ms, arrival == null ? null : arrival.spot());
+            check(arrival != null, "there is ground to arrive on in " + universe);
+            check(Multiverse.universeAt(arrival.level(), BlockPos.containing(arrival.spot())) == universe, "and it is in " + universe);
+        }
+        helper.succeed();
+    }
+
+    /** The first random universe whose land has the shape (0 the Overworld's ... 3 caves). */
+    static int firstOfShape(int shape) {
+        for (int n = 1; ; n++) {
+            if (UniverseRecipe.of(n).shape() == shape && Multiverse.isWhatIf(n)) {
+                return n;
+            }
+        }
+    }
+
+    /** (3.19.1) A random universe's land is made of its own stone, ground and seas, and none of the game's stone is left. */
+    @EnhancedTest(template = ARENA, batch = "multiverse_land", timeoutTicks = 2400)
+    public static void aRandomUniversesLandIsMadeOfItsOwnStone(GameTestHelper helper) {
+        net.minecraft.server.MinecraftServer server = helper.getLevel().getServer();
+        ServerLevel level = server.getLevel(Multiverse.WHAT_IF_KEY);
+        if (level == null) {
+            level = AsgardTestSupport.makeLevel(server, Multiverse.WHAT_IF_KEY, "/data/enhanced/dimension/what_if.json");
+        }
+        int n = 1;
+        while (UniverseRecipe.of(n).shape() != 0 || UniverseRecipe.of(n).stone() == null || !Multiverse.isWhatIf(n)) {
+            n++;
+        }
+        UniverseRecipe recipe = UniverseRecipe.of(n);
+        BlockPos centre = Multiverse.centreOf(n);
+        net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunk(centre.getX() >> 4, centre.getZ() >> 4);
+        int stone = 0;
+        int theirs = 0;
+        for (net.minecraft.world.level.chunk.LevelChunkSection section : chunk.getSections()) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
+                        net.minecraft.world.level.block.state.BlockState state = section.getBlockState(x, y, z);
+                        stone += state.is(net.minecraft.world.level.block.Blocks.STONE) ? 1 : 0;
+                        theirs += state == recipe.stone() ? 1 : 0;
+                    }
+                }
+            }
+        }
+        check(stone == 0, "no stone is left in universe " + n + ": " + stone);
+        check(theirs > 1000, "its land is made of " + recipe.stone() + ": " + theirs);
+        helper.succeed();
+    }
+
+    /** (3.19.1) Hydra's city: streets, the Citadel at the origin, and the free city once both rulers have fallen. */
+    @EnhancedTest(template = ARENA, batch = "multiverse_land", timeoutTicks = 2400)
+    public static void hydrasCityFallsWithItsRulers(GameTestHelper helper) {
+        net.minecraft.server.MinecraftServer server = helper.getLevel().getServer();
+        ServerLevel city = server.getLevel(Multiverse.HYDRA_KEY);
+        if (city == null) {
+            city = AsgardTestSupport.makeLevel(server, Multiverse.HYDRA_KEY, "/data/enhanced/dimension/what_if_hydra.json");
+        }
+        com.kolodkingal.enhanced.multiverse.HydraCity.State state = com.kolodkingal.enhanced.multiverse.HydraCity.state(server);
+        state.reset();
+        int ground = com.kolodkingal.enhanced.multiverse.CityChunkGenerator.GROUND;
+        net.minecraft.world.level.chunk.LevelChunk citadel = city.getChunk(1, 1);
+        check(city.getBlockState(new BlockPos(3, ground, 100)).is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE)
+                || city.getBlockState(new BlockPos(3, ground, 100)).is(net.minecraft.world.level.block.Blocks.YELLOW_CONCRETE), "a street");
+        // The test world is kept between runs: a Citadel an earlier run already freed is grey, and then only the fall is tested.
+        net.minecraft.world.level.block.state.BlockState roof = city.getBlockState(new BlockPos(27, ground + com.kolodkingal.enhanced.multiverse.CityChunkGenerator.CITADEL_HEIGHT, 27));
+        boolean turnedBefore = roof.is(net.minecraft.world.level.block.Blocks.GRAY_CONCRETE) || roof.is(net.minecraft.world.level.block.Blocks.LIGHT_GRAY_CONCRETE);
+        check(turnedBefore || roof.is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE), "the Citadel's black roof, high over the city");
+        boolean red = turnedBefore;
+        for (int y = ground + 1; y < ground + 40 && !red; y++) {
+            for (int x = 16; x < 32 && !red; x++) {
+                red = city.getBlockState(new BlockPos(x, y, 11)).is(net.minecraft.world.level.block.Blocks.RED_CONCRETE);
+            }
+        }
+        check(red, "Hydra's red stripes down the Citadel");
+        check(city.getBlockState(com.kolodkingal.enhanced.multiverse.CityChunkGenerator.CITADEL_DOOR.above()).isAir(), "the way in is open");
+        // Both rulers fall: the city is free, its soldiers are not let in, and Hydra's colours turn.
+        for (int kind : new int[]{com.kolodkingal.enhanced.hydra.HydraBossEntity.RED_SKULL, com.kolodkingal.enhanced.hydra.HydraBossEntity.CAPTAIN_HYDRA}) {
+            com.kolodkingal.enhanced.hydra.HydraBossEntity boss = com.kolodkingal.enhanced.hydra.HydraBossEntity.make(city, kind);
+            check(boss.getMaxHealth() >= 300.0F, "a ruler is a boss: " + boss.getMaxHealth());
+            boss.moveTo(27.5, ground + 1, 9.5, 0.0F, 0.0F);
+            com.kolodkingal.enhanced.multiverse.HydraCity.bossDown(city, boss);
+            check(state.down(kind), "the fall is written down");
+        }
+        check(state.freed() && com.kolodkingal.enhanced.multiverse.CityChunkGenerator.hydraFreed, "the city is free");
+        com.kolodkingal.enhanced.multiverse.HydraCity.turnChunk(city, citadel);
+        boolean stillRed = false;
+        for (int y = ground; y < ground + 100; y++) {
+            for (int x = 16; x < 32; x++) {
+                for (int z = 16; z < 32; z++) {
+                    stillRed |= citadel.getBlockState(new BlockPos(x, y, z)).is(net.minecraft.world.level.block.Blocks.RED_CONCRETE);
+                }
+            }
+        }
+        check(!stillRed, "no Hydra red is left in a turned chunk");
+        // The roads stay roads, also where a turning of before made them grass, and a second turning changes nothing.
+        BlockPos street = new BlockPos(3, ground, 100);
+        net.minecraft.world.level.chunk.LevelChunk streetChunk = city.getChunkAt(street);
+        city.setBlock(street, net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        com.kolodkingal.enhanced.multiverse.HydraCity.turnChunk(city, streetChunk);
+        com.kolodkingal.enhanced.multiverse.HydraCity.turnChunk(city, streetChunk);
+        net.minecraft.world.level.block.state.BlockState road = city.getBlockState(street);
+        check(road.is(net.minecraft.world.level.block.Blocks.BLACK_CONCRETE) || road.is(net.minecraft.world.level.block.Blocks.YELLOW_CONCRETE),
+                "the road is a road in the free city, not " + road);
+        state.reset();
+        helper.succeed();
+    }
+
+    /** (3.19.1) The Gamma Bomb's world: every creature a Hulk of its kind, once. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theGammaBombMakesHulksOfEveryone(GameTestHelper helper) {
+        net.minecraft.world.entity.animal.Cow cow = helper.spawn(net.minecraft.world.entity.EntityType.COW, new BlockPos(4, (int) TestKit.FLOOR, 4));
+        float health = cow.getMaxHealth();
+        com.kolodkingal.enhanced.multiverse.GammaWorld.hulkify(cow);
+        check(com.kolodkingal.enhanced.multiverse.GammaWorld.isHulk(cow), "the cow is a Hulk");
+        double scale = cow.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE);
+        check(scale >= 1.45 && scale <= 2.25, "bigger: " + scale);
+        check(cow.getMaxHealth() >= health * 3.9F && cow.getHealth() == cow.getMaxHealth(), "four times as tough, and well");
+        com.kolodkingal.enhanced.multiverse.GammaWorld.hulkify(cow);
+        check(Math.abs(cow.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.SCALE) - scale) < 1.0E-6, "only once");
+        helper.succeed();
+    }
+
+    /** Whether a creature has a goal of that class (by its simple name: the goals' classes are the universes' own). */
+    static boolean hasGoal(net.minecraft.world.entity.Mob mob, boolean target, String name) {
+        return (target ? mob.targetSelector : mob.goalSelector).getAvailableGoals().stream()
+                .anyMatch(g -> g.getGoal().getClass().getSimpleName().equals(name));
+    }
+
+    /** (3.19.1) Earth-2149: the game's own zombie of a kind where it has one, and every other creature zombified, hunting. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theZombiesUniverseHasAZombieOfEveryKind(GameTestHelper helper) {
+        check(com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.VILLAGER) == net.minecraft.world.entity.EntityType.ZOMBIE_VILLAGER
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.PIGLIN) == net.minecraft.world.entity.EntityType.ZOMBIFIED_PIGLIN
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.HOGLIN) == net.minecraft.world.entity.EntityType.ZOGLIN
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.HORSE) == net.minecraft.world.entity.EntityType.ZOMBIE_HORSE
+                && com.kolodkingal.enhanced.multiverse.ZombieWorld.zombieOf(net.minecraft.world.entity.EntityType.COW) == null, "the game's own zombies");
+        net.minecraft.world.entity.animal.Cow cow = helper.spawn(net.minecraft.world.entity.EntityType.COW, new BlockPos(4, (int) TestKit.FLOOR, 4));
+        float health = cow.getMaxHealth();
+        com.kolodkingal.enhanced.multiverse.ZombieWorld.zombify(cow);
+        check(com.kolodkingal.enhanced.multiverse.ZombieWorld.isZombified(cow) && cow.getMaxHealth() >= health * 1.45F, "a zombie cow, tougher");
+        check(cow.getMainHandItem().is(net.minecraft.world.item.Items.ROTTEN_FLESH), "it carries its rotten flesh");
+        check(hasGoal(cow, false, "Maul") && hasGoal(cow, true, "NearestAttackableTargetGoal"), "it hunts the living on sight");
+        helper.succeed();
+    }
+
+    /** (3.19.1) The Gamma Bomb: a Hulk cow turns on whoever hurts it. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void aGammaCowTurnsOnWhoeverHurtsIt(GameTestHelper helper) {
+        net.minecraft.world.entity.animal.Cow cow = helper.spawn(net.minecraft.world.entity.EntityType.COW, new BlockPos(4, (int) TestKit.FLOOR, 4));
+        com.kolodkingal.enhanced.multiverse.GammaWorld.hulkify(cow);
+        check(hasGoal(cow, false, "Maul") && hasGoal(cow, true, "HurtByTargetGoal") && !hasGoal(cow, true, "NearestAttackableTargetGoal"),
+                "angry when annoyed, not before");
+        helper.succeed();
+    }
+
+    /** (3.19.1) The people of the What If universes talk on the mod's own talk panel. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void thePeopleOfTheWhatIfUniversesTalk(GameTestHelper helper) {
+        com.kolodkingal.enhanced.multiverse.WhatIfPeople.register();
+        TestKit.Fixture f = TestKit.fixture(helper);
+        net.minecraft.server.level.ServerPlayer player = f.player(6.5, TestKit.FLOOR, 6.5, com.kolodkingal.enhanced.power.Power.NONE);
+        net.minecraft.world.phys.Vec3 at = helper.absoluteVec(new net.minecraft.world.phys.Vec3(7.5, TestKit.FLOOR, 7.5));
+        // Each survivor is a person of his own: Marcus (0) greets, tells who he is, and shares his own supplies, once.
+        com.kolodkingal.enhanced.asgard.npc.AsgardianEntity survivor = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
+                com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR, 0, at.x, at.y, at.z, null);
+        check(f.level().addFreshEntity(survivor), "a survivor");
+        f.onClose(survivor::discard);
+        check(survivor.getCustomName() != null && survivor.getCustomName().getString().equals(
+                net.minecraft.network.chat.Component.translatable("entity.enhanced.asgardian.survivor.0").getString()), "he has his own name");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, survivor)
+                && "p0".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "he greets on the talk panel, in his own words");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_who")
+                && "p0_who".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "he tells who he is");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.offered(player).contains("whatif_supplies"), "he offers his supplies");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_supplies")
+                && "p0_gift".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
+                && player.getInventory().countItem(net.minecraft.world.item.Items.GOLDEN_APPLE) >= 1, "he shares his own");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, survivor);
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, survivor.getId(), "whatif_supplies");
+        check("p0_gone".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "once");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        // Another survivor says other things.
+        com.kolodkingal.enhanced.asgard.npc.AsgardianEntity other = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
+                com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR, 13, at.x + 1, at.y, at.z, null);
+        check(f.level().addFreshEntity(other), "another survivor");
+        f.onClose(other::discard);
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, other)
+                && "p13".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "and greets in hers");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        com.kolodkingal.enhanced.multiverse.HydraCity.state(f.level().getServer()).reset();
+        com.kolodkingal.enhanced.asgard.npc.AsgardianEntity citizen = com.kolodkingal.enhanced.multiverse.WhatIfPeople.person(f.level(),
+                com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN, 3, at.x - 2, at.y, at.z, null);
+        check(f.level().addFreshEntity(citizen), "a citizen");
+        f.onClose(citizen::discard);
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.begin(player, citizen)
+                && "p3".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player))
+                && com.kolodkingal.enhanced.asgard.npc.AsgardTalk.offered(player).contains("whatif_rulers"), "a citizen of Hydra whispers her own life");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, citizen.getId(), "whatif_your_story")
+                && "p3_history".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "and her own memory");
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.tryChoose(player, citizen.getId(), "whatif_rulers")
+                && "rulers".equals(com.kolodkingal.enhanced.asgard.npc.AsgardTalk.currentNode(player)), "and tells where the rulers are");
+        com.kolodkingal.enhanced.asgard.npc.AsgardTalk.end(player);
+        helper.succeed();
+    }
+
+    /** (3.19.1) The survivors' bunker: walls, towers, the blast door and its buttons, the hall; and its people. */
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 400)
+    public static void aBunkerSheltersItsSurvivors(GameTestHelper helper) {
+        // The plan, at a few telling places.
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 1, 21, false).getBlock() instanceof net.minecraft.world.level.block.DoorBlock, "an iron door in the blast door");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 2, 22, false).getBlock() instanceof net.minecraft.world.level.block.ButtonBlock
+                && com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 2, 20, false).getBlock() instanceof net.minecraft.world.level.block.ButtonBlock, "a button beside it on each side");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(3, 4, 21, true).is(net.minecraft.world.level.block.Blocks.IRON_BLOCK), "the round iron blast door");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(-21, 17, -21, true).is(net.minecraft.world.level.block.Blocks.CAMPFIRE), "a signal fire on each tower");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(0, 0, -8, true).is(net.minecraft.world.level.block.Blocks.LODESTONE), "the hall's marker");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(-10, 5, 21, false).is(net.minecraft.world.level.block.Blocks.STONE_BRICKS)
+                || com.kolodkingal.enhanced.multiverse.Bunkers.plan(-10, 5, 21, false).is(net.minecraft.world.level.block.Blocks.CRACKED_STONE_BRICKS), "the walls");
+        check(com.kolodkingal.enhanced.multiverse.Bunkers.plan(28, 3, 0, false) == null, "nothing past its reach");
+        // Built (the hall's middle) in the test's place, and its people come: three or four of 2149's own, each once.
+        ServerLevel level = helper.getLevel();
+        BlockPos mark = helper.absolutePos(new BlockPos(8, 1, 8));
+        for (int dx = -9; dx <= 9; dx++) {
+            for (int dz = -6; dz <= 6; dz++) {
+                for (int dy = 0; dy <= 6; dy++) {
+                    net.minecraft.world.level.block.state.BlockState state = com.kolodkingal.enhanced.multiverse.Bunkers.plan(dx, dy, dz - 8, false);
+                    if (state != null) {
+                        level.setBlock(mark.offset(dx, dy, dz), state, 2);
+                    }
+                }
+            }
+        }
+        java.util.List<com.kolodkingal.enhanced.asgard.npc.AsgardianEntity> people = com.kolodkingal.enhanced.multiverse.Bunkers.populate(level, mark, Multiverse.ZOMBIES, 42L);
+        try {
+            check(people.size() >= 3 && people.size() <= 4, "three or four live there: " + people.size());
+            check(people.stream().map(com.kolodkingal.enhanced.asgard.npc.AsgardianEntity::variant).distinct().count() == people.size()
+                    && people.stream().allMatch(p -> p.variant() < com.kolodkingal.enhanced.multiverse.WhatIfPeople.SURVIVORS_EACH
+                    && p.getTags().contains(com.kolodkingal.enhanced.multiverse.Bunkers.RESIDENT)), "each a different survivor of 2149");
+            check(level.getBlockState(mark.below()).is(net.minecraft.world.level.block.Blocks.CHISELED_STONE_BRICKS), "the bunker is marked as having its people");
+            check(level.getBlockEntity(mark.offset(-7, 1, 0)) instanceof net.minecraft.world.Container c && !c.isEmpty(), "its chests are filled");
+        } finally {
+            people.forEach(net.minecraft.world.entity.Entity::discard);
+        }
+        helper.succeed();
+    }
+
+    /** (3.19.1) The random universes differ: every shape, gravity, giants and tiny creatures, other ores, and many names. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theRandomUniversesAreVaried(GameTestHelper helper) {
+        java.util.Set<Integer> shapes = new java.util.HashSet<>();
+        java.util.Set<String> titles = new java.util.HashSet<>();
+        int light = 0;
+        int giants = 0;
+        int ores = 0;
+        for (int i = 0; i < 400; i++) {
+            com.kolodkingal.enhanced.multiverse.UniverseRecipe recipe = com.kolodkingal.enhanced.multiverse.UniverseRecipe.of(Multiverse.named("world " + i));
+            shapes.add(recipe.shape());
+            titles.add(((net.minecraft.network.chat.contents.TranslatableContents) recipe.title().getContents()).getKey());
+            light += recipe.gravity() < 0 ? 1 : 0;
+            giants += recipe.scale() > 1 ? 1 : 0;
+            ores += recipe.ore() != null ? 1 : 0;
+        }
+        check(shapes.size() == Multiverse.SHAPES.size(), "every shape of land comes: " + shapes);
+        check(titles.size() >= 12, "the universes are known by many things: " + titles);
+        check(light > 20 && giants > 20 && ores > 60, "light gravity " + light + ", giants " + giants + ", other ores " + ores);
+        // Neighbouring numbers are not alike.
+        int same = 0;
+        for (int n = 1000; n < 1100; n++) {
+            same += com.kolodkingal.enhanced.multiverse.UniverseRecipe.of(n).shape() == com.kolodkingal.enhanced.multiverse.UniverseRecipe.of(n + 1).shape() ? 1 : 0;
+        }
+        check(same < 45, "neighbouring numbers give other shapes: " + same + " of 100 alike");
+        helper.succeed();
+    }
+
+    /** (3.19.1) What Red Skull and Captain Hydra drop makes their user them: characters of their own. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void theRulersDropsMakeTheirUserThem(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        net.minecraft.server.level.ServerPlayer player = f.player(6.5, TestKit.FLOOR, 6.5, com.kolodkingal.enhanced.power.Power.NONE);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.kolodkingal.enhanced.registry.ModItems.RED_SKULL_SERUM.get()));
+        com.kolodkingal.enhanced.registry.ModItems.RED_SKULL_SERUM.get().use(player.level(), player, net.minecraft.world.InteractionHand.MAIN_HAND);
+        check(com.kolodkingal.enhanced.power.Powers.is(player, com.kolodkingal.enhanced.power.Power.CAPTAIN_AMERICA)
+                && "red_skull".equals(com.kolodkingal.enhanced.power.Powers.get(player).variant()), "the serum makes him Red Skull");
+        check(com.kolodkingal.enhanced.power.Characters.is(com.kolodkingal.enhanced.power.Powers.get(player),
+                com.kolodkingal.enhanced.power.Characters.RED_SKULL), "a character of his own");
+        com.kolodkingal.enhanced.power.Powers.cycleVariant(player, 1);
+        check("red_skull".equals(com.kolodkingal.enhanced.power.Powers.get(player).variant()), "Change Look keeps him Red Skull");
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.kolodkingal.enhanced.registry.ModItems.KOBIK_SHARD.get()));
+        com.kolodkingal.enhanced.registry.ModItems.KOBIK_SHARD.get().use(player.level(), player, net.minecraft.world.InteractionHand.MAIN_HAND);
+        check("captain_hydra".equals(com.kolodkingal.enhanced.power.Powers.get(player).variant()), "the shard of Kobik makes him Captain Hydra");
+        helper.succeed();
+    }
+    /** (3.19.4) The people of the What If universes never speak of Asgard when they are hit; and a body's owner hears who took it. */
+    @EnhancedTest(template = ARENA, batch = BATCH)
+    public static void whatIfPeopleSpeakNoAsgardWhenHit(GameTestHelper helper) throws java.io.IOException {
+        com.google.gson.JsonObject en = TestKit.lang("en_us");
+        com.google.gson.JsonObject he = TestKit.lang("he_il");
+        net.minecraft.util.RandomSource random = net.minecraft.util.RandomSource.create(7L);
+        for (com.kolodkingal.enhanced.asgard.npc.Role role : List.of(com.kolodkingal.enhanced.asgard.npc.Role.SURVIVOR,
+                com.kolodkingal.enhanced.asgard.npc.Role.HYDRA_CITIZEN)) {
+            for (int i = 0; i < 40; i++) {
+                String key = com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.mannersLine(role, random);
+                check(key.startsWith("npc.enhanced.whatif.manners."), role + " says a line of its own: " + key);
+                check(en.has(key) && he.has(key), "in English and Hebrew: " + key);
+                check(!en.get(key).getAsString().contains("Asgard"), "and never of Asgard: " + key);
+            }
+        }
+        check(com.kolodkingal.enhanced.asgard.npc.AsgardDialogue.mannersLine(com.kolodkingal.enhanced.asgard.npc.Role.CITIZEN, random)
+                .startsWith("npc.enhanced.common.manners"), "Asgard's citizens keep theirs");
+        check(en.has("message.enhanced.mind_link.controlled") && he.has("message.enhanced.mind_link.controlled")
+                && !en.get("hud.enhanced.xavier.controlled").getAsString().contains("Professor"), "taking a body names who took it");
+        helper.succeed();
+    }
+}

@@ -71,7 +71,8 @@ public final class CaptainHud implements LayeredDraw.Layer {
                 MobEffectInstance rally = player.getEffect(MobEffects.DAMAGE_BOOST);
                 Component cd = PowerHud.cooldown(data, ability, now);
                 if (rally != null && cd != null) {
-                    return Component.translatable("hud.enhanced.captain.rally", (rally.getDuration() + 19) / 20)
+                    return Component.translatable(com.kolodkingal.enhanced.power.Characters.hydra(data) ? "hud.enhanced.captain.hail"
+                                    : "hud.enhanced.captain.rally", (rally.getDuration() + 19) / 20)
                             .withStyle(ChatFormatting.AQUA).append(" ").append(cd);
                 }
             }

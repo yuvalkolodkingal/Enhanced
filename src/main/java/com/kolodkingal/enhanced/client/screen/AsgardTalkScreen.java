@@ -43,7 +43,7 @@ public class AsgardTalkScreen extends Screen {
     private int waiting = -1;
 
     AsgardTalkScreen(AsgardTalkPayload.Open talk) {
-        super(Component.translatable(roleOf(talk).nameKey()));
+        super(nameOf(talk));
         this.talk = talk;
         this.role = roleOf(talk);
         Object[] args = new Object[talk.args().size()];
@@ -53,6 +53,16 @@ public class AsgardTalkScreen extends Screen {
         }
         this.line = Component.translatable(talk.node(), args);
         this.text = line.getString();
+    }
+
+    /** The speaker's name: his role's, or (3.19.1) the What If people's own names, each of them a person of his own. */
+    private static Component nameOf(AsgardTalkPayload.Open talk) {
+        Role role = roleOf(talk);
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        if (role.whatIf() && mc.level != null && mc.level.getEntity(talk.entityId()) instanceof AsgardianEntity npc && npc.role() == role) {
+            return Component.translatable(role.personaKey(npc.variant()));
+        }
+        return Component.translatable(role.nameKey());
     }
 
     private static Role roleOf(AsgardTalkPayload.Open talk) {

@@ -84,6 +84,18 @@ public final class SlingRingActions {
         // (3.18) Cosmic Spider-Man's portal screen keeps the same places, and needs no ring: the Enigma Force opens his portals.
         com.kolodkingal.enhanced.power.PowerData data = com.kolodkingal.enhanced.power.Powers.get(player);
         boolean cosmic = com.kolodkingal.enhanced.ability.CosmicSpider.cosmicKeys(data);
+        // (3.19.2) Ultimate Wanda's red portals: the same places, and a row of universes and the Nexus; no ring needed
+        if (!cosmic && com.kolodkingal.enhanced.ability.UltimateWanda.is(data)) {
+            switch (action) {
+                case SlingRingActionPayload.TRAVEL -> com.kolodkingal.enhanced.nexus.WandaPortals.place(player, index, name);
+                case SlingRingActionPayload.SAVE -> save(player, name);
+                case SlingRingActionPayload.FORGET -> forget(player, index, name);
+                case SlingRingActionPayload.WORLD -> com.kolodkingal.enhanced.nexus.WandaPortals.world(player, index);
+                default -> {
+                }
+            }
+            return;
+        }
         if (!cosmic && !carries(player)) {
             StrangeAbilities.say(player, "message.enhanced.sling_ring.needs_ring");
             return;

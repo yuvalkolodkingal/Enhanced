@@ -131,6 +131,11 @@ public final class StoneUse {
         boolean variant = alt && !(source == Source.VESSEL && kind == StoneKind.MIND);
         Cast cast = new Cast(player, data, kind, source, variant, column);
         Component refusal = refusal(player, kind, source);
+        if (refusal == null && source != Source.VESSEL) {
+            // 3.19: a stone works only in the universe it came from.
+            refusal = com.kolodkingal.enhanced.multiverse.UniverseStones.refusal(player, kind,
+                    com.kolodkingal.enhanced.multiverse.UniverseStones.originOf(player, kind, source == Source.GAUNTLET));
+        }
         if (refusal != null) {
             player.displayClientMessage(refusal.copy().withStyle(ChatFormatting.GRAY), true);
             return true;

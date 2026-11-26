@@ -84,7 +84,11 @@ public final class HydraEvents {
     public static final class Setup {
         @Subscribe
         public static void onCommonSetup(FMLCommonSetupEvent event) {
-            event.enqueueWork(() -> AreaTargets.addAllyRule(HydraLoyalty::allies));
+            event.enqueueWork(() -> {
+                AreaTargets.addAllyRule(HydraLoyalty::allies);
+                // 3.19.1: what the people of the What If universes say (the Asgardians' talk table).
+                com.kolodkingal.enhanced.multiverse.WhatIfPeople.register();
+            });
         }
 
         private Setup() {

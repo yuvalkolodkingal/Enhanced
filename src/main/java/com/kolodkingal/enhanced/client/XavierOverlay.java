@@ -60,13 +60,18 @@ public class XavierOverlay implements LayeredDraw.Layer {
         if (cerebro > 0.01F) {
             shade(graphics, AbilityColors.color(mc.player, HeroAbility.XAVIER_CEREBRO, CEREBRO_BLUE), 0.35F * cerebro);
         }
+        boolean jean = com.kolodkingal.enhanced.ability.PhoenixBody.is(mc.player);
         if (link > 0.01F) {
             shade(graphics, AbilityColors.color(mc.player, HeroAbility.XAVIER_TAKE_OVER, LINK_BLUE), 0.4F * link);
             Entity host = XavierControl.host();
             if (host != null && XavierControl.inBody()) {
                 Component line = Component.translatable("hud.enhanced.xavier.in_body", host.getDisplayName(),
-                        String.format(Locale.ROOT, "%.0f", XavierControl.ticksLeft() / 20.0), KeyBindings.ability(3).getTranslatedKeyMessage());
-                graphics.drawCenteredString(font, line.copy().withStyle(s -> s.withColor(Power.PROFESSOR_X.glow)), w / 2, h - 96, 0xFFFFFF);
+                        // (3.19: Ultimate Wanda's link never runs out)
+                        XavierControl.ticksLeft() > 1_000_000L ? "\u221E" : String.format(Locale.ROOT, "%.0f", XavierControl.ticksLeft() / 20.0),
+                        // (3.19.3: Jean Grey's B brings her back, and her words are in her fire)
+                        KeyBindings.ability(jean ? com.kolodkingal.enhanced.ability.PhoenixBody.KEY : 3).getTranslatedKeyMessage());
+                int words = jean ? com.kolodkingal.enhanced.ability.PhoenixAbilities.FIRE_GOLD : Power.PROFESSOR_X.glow;
+                graphics.drawCenteredString(font, line.copy().withStyle(s -> s.withColor(words)), w / 2, h - 96, 0xFFFFFF);
                 if (host instanceof LivingEntity living) {
                     Component hp = Component.translatable("hud.enhanced.xavier.body_health",
                             String.format(Locale.ROOT, "%.0f", living.getHealth()), String.format(Locale.ROOT, "%.0f", living.getMaxHealth()));
@@ -75,10 +80,13 @@ public class XavierOverlay implements LayeredDraw.Layer {
             }
         }
         if (control > 0.01F) {
-            shade(graphics, CONTROL_VIOLET, 0.45F * control);
+            // (3.19.3) taken by Jean Grey: her orange fire, not the violet of Professor X's grip
+            boolean byJean = takenByJean(mc);
+            shade(graphics, byJean ? com.kolodkingal.enhanced.ability.PhoenixAbilities.PSY_BODY : CONTROL_VIOLET, 0.45F * control);
             if (XavierControl.controlled()) {
+                int text = byJean ? com.kolodkingal.enhanced.ability.PhoenixAbilities.PSY_MAIN : 0xD9B8FF;
                 graphics.drawCenteredString(font, Component.translatable("hud.enhanced.xavier.controlled")
-                        .withStyle(s -> s.withColor(0xD9B8FF).withBold(true)), w / 2, h / 2 + 24, 0xFFFFFF);
+                        .withStyle(s -> s.withColor(text).withBold(true)), w / 2, h / 2 + 24, 0xFFFFFF);
             }
         }
         float pt = deltaTracker.getGameTimeDeltaPartialTick(false);
@@ -140,5 +148,19 @@ public class XavierOverlay implements LayeredDraw.Layer {
         graphics.fillGradient(0, 0, w, h / 3, edge, mid);
         graphics.fill(0, h / 3, w, h - h / 3, mid);
         graphics.fillGradient(0, h - h / 3, w, h, mid, edge);
+    }
+
+    /** (3.19.3) Whether the mind that holds this player is a Jean Grey's: a Phoenix in the world whose mind is in a body. */
+    static boolean takenByJean(Minecraft mc) {
+        if (mc.level == null) {
+            return false;
+        }
+        for (var other : mc.level.players()) {
+            if (other != mc.player && com.kolodkingal.enhanced.ability.PhoenixBody.is(other)
+                    && com.kolodkingal.enhanced.power.Powers.get(other).is(com.kolodkingal.enhanced.power.Live.MIND_LINKED)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

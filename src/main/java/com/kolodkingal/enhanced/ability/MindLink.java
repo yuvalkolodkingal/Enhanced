@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.network.XavierPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -195,7 +196,17 @@ public final class MindLink {
         if (isHost(target) || PhoenixAbilities.isHost(target)) {
             return "message.enhanced.xavier.link.taken";
         }
+        // (3.19) Ultimate Wanda takes any telepath's body (no rank keeps her out, none throws her out), for as long as she
+        // likes; only Magneto's helmet (or a boss's vast mind) shuts a mind to her
+        // (3.19.3) Jean Grey too, except for the three minds closed to her (the Scarlet Witch's, Billy's, Spider-Man's)
+        boolean supreme = boundless(xavier);
+        if (PhoenixBody.is(xavier) && PhoenixBody.immune(target)) {
+            return "message.enhanced.phoenix_body.immune";
+        }
         Telepathy.Verdict verdict = Telepathy.reach(xavier, target);
+        if (supreme && verdict != Telepathy.Verdict.SHIELDED) {
+            verdict = Telepathy.Verdict.OPEN;
+        }
         if (verdict == Telepathy.Verdict.SHIELDED) {
             return "message.enhanced.xavier.shielded";
         }
@@ -215,7 +226,7 @@ public final class MindLink {
             if (!xavier.server.isPvpAllowed() || !xavier.canHarmPlayer(other)) {
                 return "message.enhanced.xavier.no_pvp";
             }
-            return XavierConfig.LINK_PLAYER_TICKS.get() > 0 ? null : "message.enhanced.xavier.link.players_off";
+            return supreme || XavierConfig.LINK_PLAYER_TICKS.get() > 0 ? null : "message.enhanced.xavier.link.players_off";
         }
         if (!(target instanceof Mob)) {
             return "message.enhanced.xavier.link.cannot";
@@ -242,15 +253,18 @@ public final class MindLink {
             xavier.displayClientMessage(Component.translatable(refusal), true);
             return false;
         }
-        if (Telepathy.reach(xavier, target) == Telepathy.Verdict.THROWS_OUT) {
+        boolean supreme = boundless(xavier);
+        if (!supreme && Telepathy.reach(xavier, target) == Telepathy.Verdict.THROWS_OUT) {
             backlash(xavier, target);
             return false;
         }
         ServerLevel level = xavier.serverLevel();
         long now = level.getGameTime();
         boolean player = target instanceof Player;
-        int ticks = player ? XavierConfig.LINK_PLAYER_TICKS.get() : XavierConfig.LINK_CREATURE_TICKS.get();
-        Link link = new Link(xavier.getUUID(), target.getUUID(), player, level.dimension(), now + ticks, xavier.getYRot(), xavier.getXRot());
+        // (3.19: Ultimate Wanda's link has no end of its own)
+        int ticks = supreme ? Integer.MAX_VALUE : player ? XavierConfig.LINK_PLAYER_TICKS.get() : XavierConfig.LINK_CREATURE_TICKS.get();
+        Link link = new Link(xavier.getUUID(), target.getUUID(), player, level.dimension(), supreme ? Long.MAX_VALUE : now + ticks,
+                xavier.getYRot(), xavier.getXRot());
         BY_XAVIER.put(link.xavier, link);
         BY_HOST.put(link.host, link);
         Powers.get(xavier).set(Live.MIND_LINKED, true);
@@ -258,7 +272,8 @@ public final class MindLink {
             host.stopUsingItem();
             Powers.get(host).set(Live.MIND_CONTROLLED, true);
             Powers.syncIfDirty(host);
-            host.displayClientMessage(Component.translatable("message.enhanced.xavier.controlled", xavier.getDisplayName()), true);
+            host.displayClientMessage(Component.translatable("message.enhanced.mind_link.controlled", controllerTitle(xavier),
+                    xavier.getDisplayName()), true);
         } else if (target instanceof Mob mob) {
             mob.setTarget(null);
             mob.getNavigation().stop();
@@ -337,7 +352,7 @@ public final class MindLink {
         if (xavier != null) {
             PowerData data = Powers.get(xavier);
             data.set(Live.MIND_LINKED, false);
-            if (data.has(HeroAbility.XAVIER_TAKE_OVER)) {
+            if (data.has(HeroAbility.XAVIER_TAKE_OVER) && !PhoenixBody.is(data)) { // (3.19.3: Jean's V is her telekinesis too)
                 data.startCooldown(HeroAbility.XAVIER_TAKE_OVER, xavier.serverLevel().getGameTime(), XavierConfig.LINK_COOLDOWN.get());
             }
             Powers.syncIfDirty(xavier);
@@ -379,6 +394,26 @@ public final class MindLink {
         for (UUID xavier : new ArrayList<>(BY_XAVIER.keySet())) {
             end(server, xavier, End.SERVER);
         }
+    }
+
+    /**
+     * Whether this mind's links have no end of their own and no telepath keeps it out (only a helmet does): Ultimate
+     * Wanda's (3.19) and Jean Grey's (3.19.3).
+     */
+    public static boolean boundless(ServerPlayer xavier) {
+        return UltimateWanda.is(xavier) || PhoenixBody.is(xavier);
+    }
+
+    /**
+     * (3.19.4) Who the one who took a body over is, as the one taken is told: Ultimate Wanda, or the hero's own name
+     * (Professor X, Jean Grey, the Scarlet Witch...).
+     */
+    public static Component controllerTitle(ServerPlayer mind) {
+        if (UltimateWanda.is(mind)) {
+            return Component.translatable("hud.enhanced.ultimate_wanda.title");
+        }
+        Power power = Powers.get(mind).power();
+        return (power == Power.NONE ? Power.PROFESSOR_X : power).displayName();
     }
 
     /** Forget every link (the server stopped). */
@@ -445,7 +480,7 @@ public final class MindLink {
     /** Why the link must end now, or null. */
     @Nullable
     private static End check(ServerPlayer xavier, Link link) {
-        if (!Powers.get(xavier).has(HeroAbility.XAVIER_TAKE_OVER)) {
+        if (!Powers.get(xavier).has(HeroAbility.XAVIER_TAKE_OVER) && !PhoenixBody.is(xavier)) {
             return End.POWER_LOST; // (3.4: or a custom hero who no longer has the ability)
         }
         if (xavier.serverLevel().getGameTime() >= link.until) {
@@ -458,11 +493,16 @@ public final class MindLink {
         if (host.level() != xavier.level() || !host.level().dimension().equals(link.dimension)) {
             return End.DISTANCE;
         }
+        boolean supreme = boundless(xavier);
         double max = XavierConfig.LINK_MAX_DISTANCE.get();
-        if (host.distanceToSqr(xavier) > max * max) {
-            return End.DISTANCE;
+        if (PhoenixBody.is(xavier) && PhoenixBody.immune(host)) {
+            return End.CLOSED; // (a body that became one of the three while she held it)
         }
-        if (Telepathy.reach(xavier, host) != Telepathy.Verdict.OPEN) {
+        if (!supreme && host.distanceToSqr(xavier) > max * max) {
+            return End.DISTANCE; // (3.19: Ultimate Wanda holds a body however far it goes in her world)
+        }
+        Telepathy.Verdict verdict = Telepathy.reach(xavier, host);
+        if (supreme ? verdict == Telepathy.Verdict.SHIELDED : verdict != Telepathy.Verdict.OPEN) {
             return End.CLOSED;
         }
         if (host instanceof Player player) {
@@ -623,8 +663,8 @@ public final class MindLink {
             return false;
         }
         PowerData own = Powers.get(xavier);
-        if (ability == own.slot(HeroAbility.XAVIER_TAKE_OVER)) {
-            return false;
+        if (ability == (PhoenixBody.is(own) ? PhoenixBody.KEY : own.slot(HeroAbility.XAVIER_TAKE_OVER))) {
+            return false; // (3.19.3: Jean's B brings her back)
         }
         if (!(find(xavier.server, link.host) instanceof ServerPlayer host) || !host.isAlive()) {
             return false;

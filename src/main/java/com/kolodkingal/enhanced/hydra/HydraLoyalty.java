@@ -56,8 +56,14 @@ public final class HydraLoyalty {
         return EnhancedConfig.SPEC.isLoaded() ? HydraConfig.SCEPTER_TURN_TICKS.get() : 1200;
     }
 
-    /** Whether this is Hydra (a soldier or an officer, or anything in {@code #enhanced:hydra}). */
+    /**
+     * Whether this is Hydra (a soldier or an officer, or anything in {@code #enhanced:hydra}; 3.19: and a player who is Red
+     * Skull or Captain Hydra, whom Hydra salute and never shoot).
+     */
     public static boolean isHydra(Entity e) {
+        if (e instanceof Player player) {
+            return com.kolodkingal.enhanced.power.Characters.hydra(com.kolodkingal.enhanced.power.Powers.get(player));
+        }
         return e instanceof HydraSoldierEntity || e.getType().is(ModTags.HYDRA);
     }
 

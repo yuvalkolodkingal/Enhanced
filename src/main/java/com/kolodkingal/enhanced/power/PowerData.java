@@ -242,6 +242,11 @@ public final class PowerData {
         if (borrowed != Power.NONE) {
             return a.hero == borrowed;
         }
+        // (3.19: Ultimate Wanda takes over bodies as Professor X does and reads minds as the Phoenix does)
+        if ((a == HeroAbility.XAVIER_TAKE_OVER || a == HeroAbility.PHOENIX_MIND)
+                && com.kolodkingal.enhanced.ability.UltimateWanda.is(this)) {
+            return true;
+        }
         return power == a.hero || power == Power.CUSTOM && kit != null && kit.has(a)
                 && (a == HeroAbility.HULK_TRANSFORM || a == HeroAbility.RED_HULK_TRANSFORM
                 || !toggle(Toggle.HUMAN_FORM));
@@ -268,6 +273,9 @@ public final class PowerData {
      * ability on two keys (its main on one, its variant row on another) waits on the key that was used.
      */
     public int slot(HeroAbility a) {
+        if (a == HeroAbility.XAVIER_TAKE_OVER && com.kolodkingal.enhanced.ability.UltimateWanda.is(this)) {
+            return 3; // (3.19: her V takes a body and brings her back)
+        }
         if (power == a.hero || a.hero != Power.NONE && borrowed() == a.hero) {
             return a.home >= 1 && a.home <= ABILITIES ? a.home : 0;
         }
@@ -648,11 +656,12 @@ public final class PowerData {
     }
 
     public boolean isReady(int ability, long gameTime) {
-        return gameTime >= cooldownUntil(ability);
+        // (3.19: Ultimate Wanda's chaos magic is endless: nothing of hers waits for a recharge)
+        return gameTime >= cooldownUntil(ability) || com.kolodkingal.enhanced.ability.UltimateWanda.is(this);
     }
 
     public void startCooldown(int ability, long gameTime, int ticks) {
-        if (ability < 1 || ability > ABILITIES) {
+        if (ability < 1 || ability > ABILITIES || com.kolodkingal.enhanced.ability.UltimateWanda.is(this)) { // (3.19: no recharge)
             return;
         }
         cooldownUntil[ability] = gameTime + ticks;

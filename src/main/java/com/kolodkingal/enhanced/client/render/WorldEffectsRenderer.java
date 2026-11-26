@@ -93,7 +93,7 @@ public final class WorldEffectsRenderer {
                 PowerData data = Powers.get(player);
                 ShieldStyle style =
                         ShieldStyles.of(player, data); // (3.4: a custom hero's shield too; 3.5: in its colour)
-                if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
+                if (style != null && (data.chaosShieldActive() || com.kolodkingal.enhanced.ability.UltimateWanda.guarded(data)) && !player.isInvisible()) {
                     RenderType type = lines ? EnhancedRenderTypes.energyField(style.texture()) : EnhancedRenderTypes.ENERGY_VEIL;
                     VertexConsumer vc = buffers.getBuffer(type);
                     drawn.add(type);
@@ -190,6 +190,11 @@ public final class WorldEffectsRenderer {
             ChargedBeamFx.render(mc, player, data, source ? jewelPosition(mc, player, partialTick) : foreheadPosition(mc, player, partialTick),
                     source ? ChargedBeamFx.FIRE : ChargedBeamFx.MIND, pose, beams, camera, partialTick, time);
         }
+        // (3.19) Ultimate Wanda's giant chaos beam (Sneak + R): the charge at her hands and the shot
+        if (com.kolodkingal.enhanced.ability.UltimateWanda.is(data) && (data.is(com.kolodkingal.enhanced.power.Live.BEAM_CHARGING)
+                || data.is(com.kolodkingal.enhanced.power.Live.BEAM_FIRING))) {
+            ChargedBeamFx.renderGiant(mc, player, data, handPosition(mc, player, partialTick), pose, beams, camera, partialTick, time);
+        }
         // (3.17) Jim Hammond: his Fire Beam (continuous, in fire), his fireballs and the Nova Flame
         if (data.power() == com.kolodkingal.enhanced.power.Power.JIM_HAMMOND) {
             if (data.is(com.kolodkingal.enhanced.power.Live.BEAM_FIRING)) {
@@ -234,7 +239,7 @@ public final class WorldEffectsRenderer {
         for (AbstractClientPlayer player : level.players()) {
             PowerData data = Powers.get(player);
             ShieldStyle style = ShieldStyles.of(player, data); // (3.4: a custom hero's shield too; 3.5: in its colour)
-            if (style != null && data.chaosShieldActive() && !player.isInvisible()) {
+            if (style != null && (data.chaosShieldActive() || com.kolodkingal.enhanced.ability.UltimateWanda.guarded(data)) && !player.isInvisible()) {
                 ShieldStyle.Look look = style.look(data, time);
                 SHIELDS_UP.put(player.getId(), new Shield(style, look.radius(), look.flicker(), time));
                 SHIELDS_GOING.remove(player.getId());
@@ -603,6 +608,9 @@ public final class WorldEffectsRenderer {
         // The Phoenix's telekinesis is of the mind: violet, where the others' take their hero's colour.
         // (3.4: a custom hero's in his own colours, the Phoenix's grip in hers.)
         boolean mind = data.has(HeroAbility.PHOENIX_TELEKINESIS);
+        if (mind) {
+            return; // (3.19.2) Jean lifts with her mind and her eyes: no line of energy, no lightning (her arms glow orange)
+        }
         int main = mind ? PhoenixAbilities.PSY_MAIN : CustomActing.tint(player, power.color, false);
         int glow = mind ? PhoenixAbilities.PSY_CORE : CustomActing.tint(player, power.glow, true);
         // 3.5: a hero's grip in the colour its pick chose.

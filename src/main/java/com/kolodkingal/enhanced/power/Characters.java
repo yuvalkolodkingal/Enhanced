@@ -16,15 +16,64 @@ import java.util.List;
 public final class Characters {
     public static final String SOURCE_CODE_VISION = "source_code_vision";
     public static final String NANO_ULTRON = "nano_ultron";
+    /** (3.19.1) Red Skull and Captain Hydra, made from Captain America's powers: what their bosses drop makes them. */
+    public static final String RED_SKULL = "red_skull";
+    public static final String CAPTAIN_HYDRA = "captain_hydra";
 
     private record Made(Power power, String id, List<String> looks) {
     }
 
     private static final List<Made> MADE = List.of(
             new Made(Power.VISION, SOURCE_CODE_VISION, List.of("source_code")),
-            new Made(Power.ULTRON, NANO_ULTRON, List.of("nano", "nano_human")));
+            new Made(Power.ULTRON, NANO_ULTRON, List.of("nano", "nano_human")),
+            new Made(Power.CAPTAIN_AMERICA, RED_SKULL, List.of("red_skull")),
+            new Made(Power.CAPTAIN_AMERICA, CAPTAIN_HYDRA, List.of("captain_hydra")));
+
+    /**
+     * (3.19) The characters that are heroes of their own, chosen like any other hero (Choose a Hero, {@code /enhanced power
+     * set}): Red Skull and Captain Hydra. The others are still only earned.
+     */
+    public record Playable(String id, Power power, String look, int color) {
+        public Component name() {
+            return Component.translatable("character.enhanced." + id);
+        }
+    }
+
+    private static final List<Playable> PLAYABLE = List.of(
+            new Playable(RED_SKULL, Power.CAPTAIN_AMERICA, "red_skull", 0xD02A1E),
+            new Playable(CAPTAIN_HYDRA, Power.CAPTAIN_AMERICA, "captain_hydra", 0xC8102E));
 
     private Characters() {
+    }
+
+    public static List<Playable> playable() {
+        return PLAYABLE;
+    }
+
+    @Nullable
+    public static Playable playable(String id) {
+        for (Playable p : PLAYABLE) {
+            if (p.id.equals(id)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    /** Whether this look of the hero belongs to one of its characters (so not to the hero itself). */
+    public static boolean characterLook(Power power, String look) {
+        for (Made made : MADE) {
+            if (made.power == power && made.looks.contains(look)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** (3.19) Whether this is Red Skull or Captain Hydra: Hydra's, who shout "Hail Hydra!" and carry its shield. */
+    public static boolean hydra(PowerData data) {
+        String id = of(data);
+        return RED_SKULL.equals(id) || CAPTAIN_HYDRA.equals(id);
     }
 
     /** The character this hero is, or null for the hero itself. */

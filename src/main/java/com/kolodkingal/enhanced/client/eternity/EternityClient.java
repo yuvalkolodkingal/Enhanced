@@ -56,6 +56,8 @@ public final class EternityClient {
     static final float FLASH_TICKS = 24.0F;
 
     private static long flashAt = Long.MIN_VALUE;
+    /** The flash's colour (white for Eternity's journeys). */
+    private static int flashColour = 0xFFFFFF;
     private static AmbientLoop ambient;
     /** Altars humming (by position) and their loops. */
     private static final Map<BlockPos, AmbientLoop> HUMS = new HashMap<>();
@@ -65,6 +67,13 @@ public final class EternityClient {
         EternityFx.screen(WishScreen::open);
         BeamRenderer.registerDrawer(AvengersBeams.LOVE_EYES, LoveEyeBeamFx.DRAWER);
         EternityFx.register(EternityFxPayload.ALTAR_CHARGE, EternityClient::charge);
+        EternityFx.register(EternityFxPayload.FLASH, p -> flash(p.arg()));
+        EternityFx.register(EternityFxPayload.ERUPTION, p -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            if (mc.level != null && mc.level.getEntity(p.entityId()) instanceof net.minecraft.world.entity.player.Player wanda) {
+                com.kolodkingal.enhanced.client.render.ChaosEruptionFx.start(mc.level, wanda);
+            }
+        });
         EternityFx.register(EternityFxPayload.ALTAR_GO, p -> flash());
         EternityFx.register(EternityFxPayload.ARRIVE, p -> flash());
         EternityFx.register(EternityFxPayload.LEAVE, p -> flash());
@@ -95,9 +104,15 @@ public final class EternityClient {
 
     /** A white flash on the local player's screen (the journey to and from the realm). */
     private static void flash() {
+        flash(0xFFFFFF);
+    }
+
+    /** A flash of {@code rgb} on the local player's screen. */
+    private static void flash(int rgb) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null) {
             flashAt = mc.level.getGameTime();
+            flashColour = rgb & 0xFFFFFF;
         }
     }
 
@@ -136,7 +151,7 @@ public final class EternityClient {
             }
             float k = t < 4 ? t / 4 : 1.0F - (t - 4) / (FLASH_TICKS - 4);
             int alpha = (int) (Mth.clamp(k, 0, 1) * (EnhancedClientConfig.reducedMotion() ? 120 : 235));
-            graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), alpha << 24 | 0xFFFFFF);
+            graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), alpha << 24 | flashColour);
         }
     }
 

@@ -22,6 +22,8 @@ public final class PhoenixConfig {
      */
     public static ConfigSpec.DoubleValue FLIGHT_SPEED;
     public static ConfigSpec.BooleanValue FIRE_IMMUNE;
+    /** (3.19.3) Matter Manipulation (her Build Magic) has no limit, as the Scarlet Witch's; off: Billy's rules at her rank. */
+    public static ConfigSpec.BooleanValue MATTER_UNLIMITED;
 
     // ---- Mind Reading (R) and Mind Sense (Sneak + R) ----
     public static ConfigSpec.IntValue MIND_READ_RANGE;
@@ -73,7 +75,9 @@ public final class PhoenixConfig {
         FLIGHT_SPEED = builder.comment("The Phoenix's flying speed (Creative flight is 0.05).")
                 .defineInRange("flightSpeed", 0.09, 0.01, 0.5);
         FIRE_IMMUNE = builder.comment("Fire, lava and burning cannot hurt the Phoenix.")
-                .define("fireImmune", true);
+                .define("fireImmunity", true); // (3.19.2: a new key, so an old file's "false" no longer switches it off)
+        MATTER_UNLIMITED = builder.comment("Matter Manipulation (Sneak + N or the Build Magic key: the Scarlet Witch's Build Magic, in orange) has no limit. If false, Billy's rules apply at her rank: the meter and his caps.")
+                .define("matterUnlimited", true);
 
         MIND_READ_RANGE = builder.comment("How far (blocks) Mind Reading reaches (line of sight needed).")
                 .defineInRange("mindReadRange", 24, 4, 64);
@@ -120,28 +124,28 @@ public final class PhoenixConfig {
         BURST_MIN_CHARGE_TICKS = builder.comment("A shorter charge is cancelled.")
                 .defineInRange("burstMinChargeTicks", 12, 0, 100);
         BURST_MIN_RADIUS = builder.comment("Radius (blocks) of a barely charged Burst.")
-                .defineInRange("burstMinRadius", 8, 2, 64);
+                .defineInRange("burstMinRadiusBlocks", 12, 2, 64); // (3.19.2: stronger and bigger, new keys)
         BURST_MAX_RADIUS = builder.comment("Radius (blocks) of a fully charged Burst.")
-                .defineInRange("burstMaxRadius", 24, 4, 96);
+                .defineInRange("burstMaxRadiusBlocks", 40, 4, 96);
         BURST_MIN_DAMAGE = builder.comment("Damage of a barely charged Burst.")
-                .defineInRange("burstMinDamage", 8.0, 0.0, 200.0);
+                .defineInRange("burstMinDamageHearts", 16.0, 0.0, 200.0);
         BURST_MAX_DAMAGE = builder.comment("Damage of a fully charged Burst (it fades to 60% at the edge).")
-                .defineInRange("burstMaxDamage", 30.0, 0.0, 200.0);
+                .defineInRange("burstMaxDamageHearts", 60.0, 0.0, 200.0);
         BURST_PLAYER_FACTOR = builder.comment("What a player takes of the Burst's damage (only with PvP on).")
                 .defineInRange("burstPlayerFactor", 0.5, 0.0, 1.0);
         BURST_WAVE_SPEED = builder.comment("How fast the wave spreads (blocks per tick).")
-                .defineInRange("burstWaveSpeed", 1.0, 0.2, 4.0);
+                .defineInRange("burstWaveSpeedBlocks", 1.6, 0.2, 4.0);
         BURST_FIRE_SECONDS = builder.comment("Seconds a creature burns after a full Burst (a weaker one burns 40% as long).")
-                .defineInRange("burstFireSeconds", 10, 0, 60);
+                .defineInRange("burstFireSecondsLong", 15, 0, 60);
         BURST_KNOCKBACK = builder.comment("Knockback of the wave.")
-                .defineInRange("burstKnockback", 1.2, 0.0, 5.0);
+                .defineInRange("burstKnockbackStrong", 2.0, 0.0, 5.0);
         BURST_SETS_FIRE = builder.comment("Whether the wave sets flammable blocks on fire (it also needs mobGriefing).")
                 .define("burstSetsFire", true);
         BURST_HURTS_PASSIVES = builder.comment("If true the wave also hurts villagers, golems, animals and other players' pets; "
                         + "by default it hurts only hostile creatures, creatures after her, and players (with PvP on).")
                 .define("burstHurtsPassives", false);
         BURST_MAX_FIRE_BLOCKS = builder.comment("At most this many fires per Burst.")
-                .defineInRange("burstMaxFireBlocks", 40, 0, 400);
+                .defineInRange("burstMaxFires", 80, 0, 400);
         BURST_FOOD_COST = builder.comment("Food points a full Burst costs (and the least hunger needed to start charging).")
                 .defineInRange("burstFoodCost", 6, 0, 20);
         BURST_COOLDOWN = builder.comment("Cooldown of the Burst, in ticks (1800 = 90 s).")
@@ -165,7 +169,7 @@ public final class PhoenixConfig {
 
     /** How fast the Burst's wave spreads, in blocks a tick. */
     public static double waveSpeed() {
-        return EnhancedConfig.SPEC.isLoaded() ? BURST_WAVE_SPEED.get() : 1.0;
+        return EnhancedConfig.SPEC.isLoaded() ? BURST_WAVE_SPEED.get() : 1.6;
     }
 
     /** The radius of the Psionic Field, in blocks. */

@@ -41,6 +41,7 @@ public final class PowerTicker {
         VishantiBook.everyPlayerTick(player);
         DarkholdBook.everyPlayerTick(player);
         HeroServers.everyPlayerTick(player, data);
+        UltimateWanda.everyPlayerTick(player); // (3.19: the client told when its universe's sky turns red)
         applyPassives(player, data);
         heroTick(data.power(), player, data);
         Telekinesis.tickHolder(player, data);
@@ -73,6 +74,7 @@ public final class PowerTicker {
                 : power == Power.IRON_MAN ? com.kolodkingal.enhanced.ironman.IronSuits.flightSpeed(player)
                 : power == Power.FALCON ? com.kolodkingal.enhanced.falcon.FalconWings.flightSpeed(player)
                 : Demiurge.is(data) ? Math.max(Demiurge.flightSpeed(), power.flightSpeed()) // (3.18.1)
+                : UltimateWanda.is(data) ? UltimateWanda.flightSpeed(power) // (3.19)
                 : power.flightSpeed() * lookFlight(data);
         if (survivalLike && canFly) {
             // (3.18.1) in another's slowed time a hero flies as slowly as everything round him (Slowness never slows flight)
@@ -104,6 +106,7 @@ public final class PowerTicker {
         ThorAbilities.applyBody(player, data);
         HeroServers.applyBody(player, data);
         Demiurge.applyBody(player, data); // (3.18.1: Billy the Demiurge's body, and gone from whoever is not)
+        UltimateWanda.applyBody(player, data); // (3.19: Ultimate Wanda's)
     }
 
     /**
@@ -113,7 +116,12 @@ public final class PowerTicker {
     public static void heroTick(Power hero, ServerPlayer player, PowerData data) {
         switch (hero) {
             case MAGNETO -> MagnetoAbilities.tick(player, data);
-            case SCARLET_WITCH -> WandaAbilities.tick(player, data);
+            case SCARLET_WITCH -> {
+                WandaAbilities.tick(player, data);
+                if (data.power() == Power.SCARLET_WITCH) {
+                    UltimateWanda.tick(player, data); // (3.19: Ultimate checked, her upkeep)
+                }
+            }
             case QUICKSILVER -> QuicksilverAbilities.tick(player, data);
             case VISION -> VisionAbilities.tick(player, data);
             case BILLY -> {

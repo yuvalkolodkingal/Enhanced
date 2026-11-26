@@ -80,10 +80,17 @@ public final class PhoenixAbilities {
     public static final int FIRE_EMBER = 0xE2531A;
     public static final int FIRE_DEEP = 0x8C2410;
     // ---- the mind: telepathy, Mind Control, the Psionic Field, telekinesis ----
-    public static final int PSY_CORE = 0xF4EEFF;
-    public static final int PSY_MAIN = 0xB79CFF;
-    public static final int PSY_BODY = 0x7C5CE0;
-    public static final int PSY_FRINGE = 0x3F2B96;
+    // (3.19.3) No violet any more: all of her energy, the mind's too, is orange like fire.
+    public static final int PSY_CORE = 0xFFF0D2;
+    public static final int PSY_MAIN = 0xFF9A3C;
+    public static final int PSY_BODY = 0xE8641C;
+    public static final int PSY_FRINGE = 0x9A3410;
+    /**
+     * (3.19.2) Her telekinesis, as in the films: no lightning and no violet, only a soft orange glow on her arms and in her
+     * eyes (and a faint shimmer round what she holds).
+     */
+    public static final int TK_ORANGE = 0xFF7418;
+    public static final int TK_GLOW = 0xFFA040;
 
     /** How long the casting pose of Mind Control lasts. */
     public static final int MIND_CAST_TICKS = 16;
@@ -153,6 +160,50 @@ public final class PhoenixAbilities {
     /** Whether Magneto's helmet shields this creature's mind from every telepathy (not from telekinesis or fire). */
     public static boolean isShielded(Entity e) {
         return e instanceof LivingEntity living && MagnetoAbilities.wearsHelmet(living);
+    }
+
+    /** (3.19.3) She heals a heart's half every this many ticks while she is hurt: sixteen times a player's natural healing (80). */
+    public static final int REGEN_PERIOD = 5;
+    /** (3.19.3) Her body is as well protected as one in a full set of diamond armour (20 armour, 8 toughness). */
+    public static final double BODY_ARMOR = 20.0;
+    public static final double BODY_TOUGHNESS = 8.0;
+    private static final ResourceLocation ARMOR_ID = Enhanced.id("phoenix_body_armor");
+    private static final ResourceLocation TOUGHNESS_ID = Enhanced.id("phoenix_body_toughness");
+
+    /** (3.19.3) Her diamond-like protection, on while she has her body's powers, off otherwise (never saved with the player). */
+    public static void bodyArmor(ServerPlayer player, boolean on) {
+        armorModifier(player, Attributes.ARMOR, ARMOR_ID, BODY_ARMOR, on);
+        armorModifier(player, Attributes.ARMOR_TOUGHNESS, TOUGHNESS_ID, BODY_TOUGHNESS, on);
+    }
+
+    private static void armorModifier(ServerPlayer player, net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute,
+            ResourceLocation id, double amount, boolean on) {
+        net.minecraft.world.entity.ai.attributes.AttributeInstance instance = player.getAttribute(attribute);
+        if (instance == null) {
+            return;
+        }
+        boolean has = instance.getModifier(id) != null;
+        if (on && !has) {
+            instance.addTransientModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
+        } else if (!on && has) {
+            instance.removeModifier(id);
+        }
+    }
+
+    /** (3.19.2) Her own healing, five times a player's: half a heart every {@link #REGEN_PERIOD} ticks while she is hurt. */
+    private static void regenerate(ServerPlayer player, long now) {
+        if (now % REGEN_PERIOD == 0 && player.isAlive() && player.getHealth() < player.getMaxHealth()
+                && player.getFoodData().getFoodLevel() > 0) {
+            player.heal(1.0F);
+        }
+    }
+
+    /** (3.19.2) Takes back the unseen fire resistance her body gave (it is not hers any more, or the option is off). */
+    public static void dropHiddenFireResistance(ServerPlayer player) {
+        MobEffectInstance resistance = player.getEffect(MobEffects.FIRE_RESISTANCE);
+        if (resistance != null && resistance.isAmbient() && !resistance.isVisible() && resistance.getDuration() <= 100) {
+            player.removeEffect(MobEffects.FIRE_RESISTANCE);
+        }
     }
 
     /** Whether the player is a Phoenix who may not be burned (the server option is on). */
@@ -227,6 +278,13 @@ public final class PhoenixAbilities {
      * is its key for her, {@code alt} whether it is the Sneak variant.
      */
     public static void onKey(ServerPlayer player, PowerData data, int ability, boolean down, boolean alt) {
+        if (ability == 5 && alt && down && !isCharging(player)) {
+            // (3.19.2) Sneak + N: basic matter manipulation, the block she looks at reshaped by her mind.
+            if (!player.isSpectator()) {
+                PhoenixMatter.use(player);
+            }
+            return;
+        }
         if (ability == 5) {
             // N is held: both edges count (a release always goes through, so a charge never sticks).
             if (down) {
@@ -247,7 +305,13 @@ public final class PhoenixAbilities {
                     toggleMindReading(player, data);
                 }
             }
-            case 2 -> PowerTicker.toggleFlight(player);
+            case 2 -> {
+                if (alt) {
+                    PhoenixShield.toggle(player, data); // (3.19.2) the psionic force field
+                } else {
+                    PowerTicker.toggleFlight(player);
+                }
+            }
             case 3 -> Telekinesis.press(player, Telekinesis.Mode.JEAN);
             case 4 -> {
                 if (alt) {
@@ -269,8 +333,25 @@ public final class PhoenixAbilities {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
         State state = state(player);
-        if (player.getRemainingFireTicks() > 0 && isFireImmune(player)) {
-            player.clearFire();
+        if (isFireImmune(player)) {
+            if (player.getRemainingFireTicks() > 0) {
+                player.clearFire();
+            }
+            // (3.19.2) Lava and fire never touch her: the game's own fire resistance too, unseen (no swirls, no icon).
+            MobEffectInstance resistance = player.getEffect(MobEffects.FIRE_RESISTANCE);
+            if (resistance == null || resistance.getDuration() < 40) {
+                player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0, true, false, false));
+            }
+        } else {
+            dropHiddenFireResistance(player);
+        }
+        if (data.has(HeroAbility.PHOENIX_BODY)) {
+            regenerate(player, now);
+        }
+        bodyArmor(player, data.has(HeroAbility.PHOENIX_BODY));
+        PhoenixShield.tick(player, data);
+        if (MindLink.isLinked(player)) {
+            MindLink.tick(player); // (3.19.3) her mind in another body
         }
         // The poses and effects that last a moment.
         data.set(Live.MIND_SENSING, now < state.sensingUntil);
@@ -339,6 +420,12 @@ public final class PhoenixAbilities {
         }
         STATES.remove(player.getUUID());
         MindReading.stop(player);
+        PhoenixShield.stop(player, data);
+        dropHiddenFireResistance(player);
+        bodyArmor(player, false);
+        if (MindLink.isLinked(player)) {
+            MindLink.end(player.server, player.getUUID(), MindLink.End.POWER_LOST);
+        }
         freeAll(player.server, player.getUUID(), false);
         data.setToggle(Toggle.MIND_READING, false);
         data.set(Live.PHOENIX_CHARGING, false);
@@ -361,6 +448,7 @@ public final class PhoenixAbilities {
             endCharge(player, Powers.get(player), state);
         }
         freeAll(player.server, player.getUUID(), false);
+        PhoenixShield.stop(player, Powers.get(player));
         if (forgetAll) {
             STATES.remove(player.getUUID());
             MindReading.stop(player);
@@ -375,6 +463,8 @@ public final class PhoenixAbilities {
         steering = false;
         MindReading.clear();
         PhoenixBurst.clear();
+        PhoenixShield.clear();
+        PhoenixMatter.clear();
     }
 
     // ------------------------------------------------------------------------------------------------------------
@@ -431,6 +521,11 @@ public final class PhoenixAbilities {
     private static void mindControl(ServerPlayer player, PowerData data) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
+        // (3.19.3) B while her mind is in another body brings her back; B at a creature she already holds puts her mind in it
+        if (PhoenixBody.is(player) && (MindLink.isLinked(player) || PhoenixBody.aimed(player) instanceof Mob own && isHers(player, own))) {
+            PhoenixBody.press(player);
+            return;
+        }
         if (!data.isReady(HeroAbility.PHOENIX_CONTROL, now)) {
             return;
         }
@@ -454,7 +549,12 @@ public final class PhoenixAbilities {
             player.displayClientMessage(Component.translatable(refusal), true);
             return;
         }
-        if (target instanceof ServerPlayer other) {
+        if (target instanceof ServerPlayer other && PhoenixBody.is(player)) {
+            // (3.19.3) Jean Grey goes into a player's body and steers it for as long as she likes (B brings her back);
+            // the Scarlet Witch, Billy and Spider-Man are immune
+            MindLink.take(player, other);
+            return;
+        } else if (target instanceof ServerPlayer other) {
             // Their controls are theirs: all she can do is hold them still while their mind goes blank.
             if (!other.addEffect(new MobEffectInstance(ModEffects.SPELLBOUND, PhoenixConfig.MIND_CONTROL_PLAYER_TICKS.get(), 0, false, false, true), player)) {
                 player.displayClientMessage(Component.translatable("message.enhanced.mind_control.cannot"), true);
@@ -558,7 +658,7 @@ public final class PhoenixAbilities {
     }
 
     /** Lets a host go: its effect ends, and (when she took another in its place) it wakes confused for a moment. */
-    private static void release(Mob mob, boolean confuse) {
+    static void release(Mob mob, boolean confuse) {
         mob.removeEffect(ModEffects.POSSESSED);
         if (confuse && mob.isAlive()) {
             mob.addEffect(new MobEffectInstance(ModEffects.CONFUSED, FREED_CONFUSED_TICKS, 0, false, false, true));

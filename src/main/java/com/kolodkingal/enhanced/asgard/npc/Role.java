@@ -30,7 +30,12 @@ public enum Role {
     // the roles above keep their ordinals.
     AGATHA(30, 2, 2, 1.0F, 0x9A3FE0, Voice.HIGH, false, true, 1, true),
     NICKY(20, 0, 1, 0.75F, 0x7FD8B8, Voice.HIGH, false, false, 1, false),
-    RIO(30, 2, 2, 1.0F, 0x4FA35A, Voice.MID, false, true, 1, true);
+    RIO(30, 2, 2, 1.0F, 0x4FA35A, Voice.MID, false, true, 1, true),
+    // 3.19.1: the people of the What If universes (WhatIfPeople): Hydra's citizens, and the last survivors of the
+    // zombies, the Gamma Bomb and Ultron. Appended. Each skin is a person of his own (a name, a face, his own words):
+    // 8 citizens; survivors 0-7 of 2149, 8-15 of the Gamma Bomb's world, 16-19 of Ultron's.
+    HYDRA_CITIZEN(20, 0, 1, 1.0F, 0xB8B0A4, Voice.MID, false, false, 8, false),
+    SURVIVOR(24, 1, 2, 1.0F, 0xD9A65A, Voice.MID, false, false, 20, false);
 
     /** The pitch of a role's murmur ({@code npc_talk_low|mid|high}). */
     public enum Voice { LOW, MID, HIGH }
@@ -62,12 +67,20 @@ public enum Role {
 
     /** Whether there is exactly one of this role in the city (the eight named ones). */
     public boolean named() {
-        return this != EINHERJAR && this != CITIZEN;
+        return this != EINHERJAR && this != CITIZEN && !whatIf();
     }
 
     /** The id in lang keys and slots: {@code heimdall}, {@code einherjar}... */
     public String id() {
         return name().toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * The lang key of a What If person's own name (3.19.1): {@code entity.enhanced.asgardian.<role>.<variant>}; each
+     * skin of those roles is one person.
+     */
+    public String personaKey(int variant) {
+        return nameKey() + "." + Math.floorMod(variant, skins);
     }
 
     /** The lang key of the role's name: {@code entity.enhanced.asgardian.<role>}. */
@@ -103,7 +116,7 @@ public enum Role {
 
     /** The voice of a skin variant: the citizens who are women (odd variants) hum high. */
     public Voice voice(int variant) {
-        return this == CITIZEN && variant % 2 == 1 ? Voice.HIGH : voice;
+        return (this == CITIZEN || whatIf()) && variant % 2 == 1 ? Voice.HIGH : voice;
     }
 
     /**
@@ -156,6 +169,11 @@ public enum Role {
     /** Whether the role lives in Agatha's Cottage (3.7: Agatha, Nicky, Rio), not in Asgard. */
     public boolean cottage() {
         return this == AGATHA || this == NICKY || this == RIO;
+    }
+
+    /** Whether the role lives in a What If universe (3.19.1: Hydra's citizens, the survivors), not in Asgard. */
+    public boolean whatIf() {
+        return this == HYDRA_CITIZEN || this == SURVIVOR;
     }
 
     /** The Warriors Three. */

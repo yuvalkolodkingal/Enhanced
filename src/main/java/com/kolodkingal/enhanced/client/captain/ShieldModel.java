@@ -27,6 +27,8 @@ import net.minecraft.util.Mth;
 public final class ShieldModel {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Enhanced.id("vibranium_shield"), "main");
     public static final ResourceLocation TEXTURE = Enhanced.id("textures/entity/captain/shield.png");
+    /** (3.19) The Hydra Shield's: black, Hydra's skull and tentacles in red (same layout). */
+    public static final ResourceLocation HYDRA_TEXTURE = Enhanced.id("textures/entity/captain/hydra_shield.png");
     /** The disc's radius, and how far its centre stands out (pixels). */
     public static final float RADIUS = 7.0F;
     public static final float DOME = 1.1F;
@@ -58,6 +60,10 @@ public final class ShieldModel {
         root.addOrReplaceChild("grip", CubeListBuilder.create()
                 .texOffs(24, 80).addBox(-0.75F, -2.5F, -0.7F, 1.5F, 5.0F, 4.7F), PartPose.ZERO);
         return LayerDefinition.create(mesh, 128, 128);
+    }
+
+    public static RenderType renderType(boolean hydra) {
+        return RenderType.entityCutoutNoCull(hydra ? HYDRA_TEXTURE : TEXTURE);
     }
 
     public static RenderType renderType() {

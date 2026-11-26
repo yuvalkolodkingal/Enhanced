@@ -69,7 +69,7 @@ public class AsgardianRenderer extends LivingEntityRenderer<AsgardianEntity, Pla
         return switch (role) {
             case HEIMDALL -> Enhanced.id("textures/entity/suit/heimdall_guardian.png");
             case ODIN -> Enhanced.id("textures/entity/suit/odin_allfather.png");
-            case EINHERJAR, CITIZEN -> Enhanced.id("textures/entity/asgardian/" + role.id() + "_" + Math.floorMod(variant, role.skins()) + ".png");
+            case EINHERJAR, CITIZEN, HYDRA_CITIZEN, SURVIVOR -> Enhanced.id("textures/entity/asgardian/" + role.id() + "_" + Math.floorMod(variant, role.skins()) + ".png");
             default -> Enhanced.id("textures/entity/asgardian/" + role.id() + ".png");
         };
     }

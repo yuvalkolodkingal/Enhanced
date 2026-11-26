@@ -287,9 +287,14 @@ public final class CustomHeroDataTests {
                 }
             }
         }
-        for (Power power : List.of(Power.MAGNETO, Power.SCARLET_WITCH, Power.QUICKSILVER)) {
+        for (Power power : List.of(Power.MAGNETO, Power.QUICKSILVER)) {
             check(HeroLooks.of(power).size() == 1 && HeroLooks.of(power).get(0).id().equals(HeroLooks.SUIT), power + "'s single suit");
         }
+        // (3.19: the Scarlet Witch has her suit first, then the Sorceress Supreme's two looks)
+        check(!HeroLooks.of(Power.SCARLET_WITCH).isEmpty() && HeroLooks.of(Power.SCARLET_WITCH).get(0).id().equals(HeroLooks.SUIT),
+                "the Scarlet Witch's suit first");
+        check(HeroLooks.byRef("scarlet_witch/sorcerer_supreme") != null && HeroLooks.byRef("scarlet_witch/sorcerer_supreme_dark") != null,
+                "and the Sorceress Supreme's looks");
         helper.succeed();
     }
 

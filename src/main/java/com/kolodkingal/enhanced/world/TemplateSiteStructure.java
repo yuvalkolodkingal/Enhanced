@@ -81,6 +81,12 @@ public class TemplateSiteStructure extends Structure {
         if (!SiteSwitch.enabled(enabledBy)) {
             return Optional.empty();
         }
+        // 3.19: the Mutant School is built only in its own universe, 10005 (no longer in the main one).
+        if (template.getPath().startsWith("mutant_school/")
+                && !(context.chunkGenerator() instanceof com.kolodkingal.enhanced.multiverse.UniverseChunkGenerator universe
+                && universe.universe() == com.kolodkingal.enhanced.multiverse.Multiverse.XMEN)) {
+            return Optional.empty();
+        }
         StructureTemplate built = context.structureTemplateManager().getOrCreate(template);
         Vec3i size = built.getSize();
         if (size.getX() == 0 || size.getZ() == 0) {

@@ -55,6 +55,15 @@ public final class SuitSkins {
     private static final PlayerSkin BILLY_DEMIURGE_POWERED = new PlayerSkin(
             Enhanced.id("textures/entity/suit/billy_demiurge_powered.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
+    /**
+     * (3.19) Ultimate Wanda wears the Sorceress Supreme look (her looks {@code sorcerer_supreme} and its dark-haired twin):
+     * the films' ginger hair, or (Sneak + H) the dark. Her waist cloak, tiara and runes are drawn by the Sorcerer layers.
+     */
+    private static final PlayerSkin WANDA_ULTIMATE = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/scarlet_witch_sorcerer_supreme.png"), null, null, null, PlayerSkin.Model.SLIM, true);
+    private static final PlayerSkin WANDA_ULTIMATE_COMICS = new PlayerSkin(
+            Enhanced.id("textures/entity/suit/scarlet_witch_sorcerer_supreme_dark.png"), null, null, null, PlayerSkin.Model.SLIM, true);
+
     private static final PlayerSkin JIM_HUMAN = new PlayerSkin(
             Enhanced.id("textures/entity/suit/jim_human.png"), null, null, null, PlayerSkin.Model.WIDE, true);
 
@@ -92,6 +101,10 @@ public final class SuitSkins {
             // (3.18) the Enigma Force turns his suit black and white, whatever his look or his own skin
             return com.kolodkingal.enhanced.ability.CosmicSpider.universe(Powers.get(player)) ? COSMIC_UNIVERSE : COSMIC_SPIDER;
         }
+        if (power == Power.SCARLET_WITCH && com.kolodkingal.enhanced.ability.UltimateWanda.is(Powers.get(player))) {
+            // (3.19) Ultimate Wanda looks the Sorceress Supreme, whatever her look or her own skin
+            return com.kolodkingal.enhanced.ability.UltimateWanda.comicsHair(Powers.get(player)) ? WANDA_ULTIMATE_COMICS : WANDA_ULTIMATE;
+        }
         if (power == Power.BILLY && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
             // (3.18.1) the Demiurge looks the Demiurge, whatever his look, his own skin or the magic type on his keys
             return com.kolodkingal.enhanced.client.render.DemiurgeFx.poweredSkin(player) ? BILLY_DEMIURGE_POWERED : BILLY_DEMIURGE;
@@ -103,8 +116,14 @@ public final class SuitSkins {
         if (power == Power.MAGNETO && MagnetoAbilities.wearsHelmet(player)) {
             return MAGNETO;
         }
-        if (power == Power.SCARLET_WITCH && WandaAbilities.wearsCrown(player)) {
-            return SCARLET_WITCH;
+        if (power == Power.SCARLET_WITCH) {
+            // Her crown puts the suit on: the look she chose (her own suit, or the Sorceress Supreme's). Without it she is
+            // herself, in her own skin.
+            if (!WandaAbilities.wearsCrown(player)) {
+                return null;
+            }
+            Variant chosen = Powers.variant(player);
+            return chosen.skin() == null || "suit".equals(chosen.id()) ? SCARLET_WITCH : skinOf(chosen);
         }
         if (power == Power.QUICKSILVER && QuicksilverAbilities.wearsGoggles(player)) {
             return QUICKSILVER;

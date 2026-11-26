@@ -256,6 +256,17 @@ public enum Live {
      * witches and sorcerers on H ({@code ability.Demiurge}). Never saved: he logs back in as plain Billy.
      */
     BILLY_DEMIURGE,
+    // ===== ultimate wanda (3.19) =====
+    /**
+     * The Scarlet Witch is Ultimate Wanda (Sneak + G, only with Ultimate): twenty hearts, a netherite set's protection, twice
+     * the healing, her powers eight times as strong, her own menu on H ({@code ability.UltimateWanda}). Never saved.
+     */
+    WANDA_ULTIMATE,
+    /** Ultimate Wanda's own Eye of Agamotto is open (red) for a moment after she uses it ({@code ability.UltimateEye}). */
+    WANDA_EYE_OPEN,
+    // ===== jean grey (3.19.2) =====
+    /** Jean Grey's psionic force field (Sneak + G) is up round her ({@code ability.PhoenixShield}). */
+    PHOENIX_SHIELD,
     ;
 
     /** The states that fit in one word of {@link PowerData}: the first word holds ordinals 0-63, the second 64-127. */

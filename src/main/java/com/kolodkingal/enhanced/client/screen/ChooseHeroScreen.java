@@ -4,6 +4,7 @@ import com.kolodkingal.enhanced.client.custom.CreatorUi;
 import com.kolodkingal.enhanced.custom.HeroLooks;
 import com.kolodkingal.enhanced.network.HeroCreatorPayload;
 import com.kolodkingal.enhanced.platform.net.Net;
+import com.kolodkingal.enhanced.power.Characters;
 import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Variant;
 import com.kolodkingal.enhanced.power.Variants;
@@ -40,6 +41,10 @@ public class ChooseHeroScreen extends Screen {
     private final List<Power> heroes = HeroLooks.heroes();
     /** 3.18.1: the witches, after the heroes. */
     private final List<Spellbook> witches = List.of(Spellbook.values());
+    /** 3.19: Red Skull and Captain Hydra, heroes of their own, after the witches. */
+    private final List<Characters.Playable> characters = Characters.playable();
+    @Nullable
+    private Characters.Playable chosenCharacter;
     @Nullable
     private Power chosen;
     @Nullable
@@ -61,7 +66,7 @@ public class ChooseHeroScreen extends Screen {
     }
 
     private int rows() {
-        return (heroes.size() + witches.size() + columns() - 1) / columns();
+        return (heroes.size() + witches.size() + characters.size() + columns() - 1) / columns();
     }
 
     @Override
@@ -92,6 +97,18 @@ public class ChooseHeroScreen extends Screen {
             addRenderableWidget(new CreatorUi.BigButton(x, y, CARD_W, CARD_H, book.title(), null, book.color, () -> pickWitch(book))
                     .icon(bookStack(book)).selected(book == chosenWitch));
         }
+        for (int j = 0; j < characters.size(); j++) {
+            int i = heroes.size() + witches.size() + j;
+            int row = i / cols - scroll;
+            if (row < 0 || row >= visibleRows()) {
+                continue;
+            }
+            Characters.Playable hero = characters.get(j);
+            int x = left + (i % cols) * (CARD_W + GAP);
+            int y = TOP + row * (CARD_H + GAP);
+            addRenderableWidget(new CreatorUi.BigButton(x, y, CARD_W, CARD_H, hero.name(), null, characterColor(hero), () -> pickCharacter(hero))
+                    .face(face(hero.power(), hero.look())).selected(hero == chosenCharacter));
+        }
         int bottom = height - BOTTOM + 4;
         addRenderableWidget(Button.builder(Component.translatable("gui.back"), b -> Minecraft.getInstance().setScreen(parent))
                 .bounds(6, 4, 50, 18).build());
@@ -105,10 +122,22 @@ public class ChooseHeroScreen extends Screen {
                     }).icon(bookStack(book)));
             return;
         }
+        if (chosenCharacter != null) {
+            Characters.Playable hero = chosenCharacter;
+            int becomeW = 96;
+            addRenderableWidget(new CreatorUi.BigButton(width - 8 - becomeW, bottom, becomeW, 36,
+                    Component.translatable("screen.enhanced.hero_creator.become"), null, characterColor(hero), () -> {
+                        Net.sendToServer(HeroCreatorPayload.choose(hero.power(), hero.look()));
+                        onClose();
+                    }).face(face(hero.power(), hero.look())));
+            return;
+        }
         if (chosen == null) {
             return;
         }
-        List<Variant> looks = Variants.of(chosen);
+        // (3.19: a character's looks are on its own card, not its hero's)
+        Power from = chosen;
+        List<Variant> looks = Variants.of(chosen).stream().filter(v -> !Characters.characterLook(from, v.id())).toList();
         int lookW = 76;
         int becomeW = 96;
         int room = width - 16 - becomeW - 6;
@@ -134,6 +163,7 @@ public class ChooseHeroScreen extends Screen {
     private void pick(Power power) {
         chosen = power;
         chosenWitch = null;
+        chosenCharacter = null;
         look = "";
         rebuild();
     }
@@ -142,8 +172,22 @@ public class ChooseHeroScreen extends Screen {
     private void pickWitch(Spellbook book) {
         chosen = null;
         chosenWitch = book;
+        chosenCharacter = null;
         look = "";
         rebuild();
+    }
+
+    /** 3.19: Red Skull or Captain Hydra chosen (one look: his own). */
+    private void pickCharacter(Characters.Playable hero) {
+        chosen = null;
+        chosenWitch = null;
+        chosenCharacter = hero;
+        look = "";
+        rebuild();
+    }
+
+    private static int characterColor(Characters.Playable hero) {
+        return hero.color();
     }
 
     /** 3.18.1: a witch's card shows her book. */
@@ -199,6 +243,14 @@ public class ChooseHeroScreen extends Screen {
             g.drawString(font, chosenWitch.title().copy().withStyle(s -> s.withColor(chosenWitch.color).withBold(true)), 8, ty, 0xFFFFFF);
             for (net.minecraft.util.FormattedCharSequence line : font.split(Component.translatable("screen.enhanced.hero_creator.witch.desc",
                     chosenWitch.bookName()).withStyle(ChatFormatting.GRAY), textW)) {
+                ty += 10;
+                g.drawString(font, line, 8, ty, 0xFFFFFF);
+            }
+        } else if (chosenCharacter != null) {
+            int ty = height - BOTTOM + 6;
+            g.drawString(font, chosenCharacter.name().copy().withStyle(s -> s.withColor(characterColor(chosenCharacter)).withBold(true)), 8, ty, 0xFFFFFF);
+            for (net.minecraft.util.FormattedCharSequence line : font.split(Component.translatable("screen.enhanced.hero_creator.character."
+                    + chosenCharacter.id()).withStyle(ChatFormatting.GRAY), width - 16 - 96 - 12)) {
                 ty += 10;
                 g.drawString(font, line, 8, ty, 0xFFFFFF);
             }

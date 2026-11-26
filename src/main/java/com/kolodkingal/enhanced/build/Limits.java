@@ -96,6 +96,12 @@ public final class Limits implements RecipeLimits {
             }
             return wanda(world);
         }
+        if (com.kolodkingal.enhanced.ability.PhoenixMatter.builds(Powers.get(player))) {
+            // (3.19.3) Jean Grey's Matter Manipulation: the Scarlet Witch's Build Magic, with no limit for now
+            // (phoenix.matterUnlimited off: Billy's rules at her rank, the meter and his caps)
+            boolean unlimited = !loaded() || com.kolodkingal.enhanced.config.PhoenixConfig.MATTER_UNLIMITED.get();
+            return unlimited ? wanda(world) : billy(BillyRanks.rank(ModAttachments.BUILD_DATA.get(player)), world);
+        }
         if (power == Power.SPIDER_MAN && com.kolodkingal.enhanced.ability.CosmicSpider.isCosmic(Powers.get(player))) {
             // (3.18) Cosmic Spider-Man's Matter Restructuring: Billy's Build Magic, weaker (Billy's rules at his own rank)
             int rank = BillyRanks.rank(ModAttachments.BUILD_DATA.get(player));

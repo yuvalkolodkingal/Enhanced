@@ -123,7 +123,7 @@ public final class MutantSkeletonTests {
     static final Map<Defeat, Set<String>> KILLERS = Map.of(
             Defeat.STONES, Set.of("stone_power", "stone_blast", "stone_soul", "mind_stone", "mind_stone_beam",
                     "power_stone_beam", "power_stone_explosion", "snap_dust"),
-            Defeat.CHAOS, Set.of("chaos_beam", "hex_wall", "hex_bolt", "hex_beam"),
+            Defeat.CHAOS, Set.of("chaos_beam", "hex_wall", "hex_bolt", "hex_beam", "chaos_eruption"),
             Defeat.ODIN, Set.of("odinforce", "gungnir"),
             Defeat.PHOENIX, Set.of("phoenix_burst"),
             Defeat.DARKHOLD, Set.of("darkhold_beam", "agatha_drain", "agatha_runes"));
@@ -439,7 +439,7 @@ public final class MutantSkeletonTests {
         for (int i = 0; i < asgard.size(); i++) {
             check(all[i] == asgard.get(i) && !all[i].cottage(), asgard.get(i) + " kept its ordinal " + i);
         }
-        check(all.length == 13 && all[10] == Role.AGATHA && all[11] == Role.NICKY && all[12] == Role.RIO,
+        check(all.length == 15 && all[13] == Role.HYDRA_CITIZEN && all[14] == Role.SURVIVOR && all[10] == Role.AGATHA && all[11] == Role.NICKY && all[12] == Role.RIO,
                 "AGATHA, NICKY, RIO appended");
         check(Role.AGATHA.cottage() && Role.NICKY.cottage() && Role.RIO.cottage(), "the cottage's three");
         check(Role.AGATHA.hero() == Power.AGATHA && Role.AGATHA.yieldsToHero(), "one Agatha: she yields to a player");

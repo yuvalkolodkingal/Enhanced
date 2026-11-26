@@ -121,7 +121,8 @@ public final class HealingEvents {
     @Subscribe(priority = Priority.HIGHEST)
     public static void onDeath(LivingDeathEvent event) {
         if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player) || RoadTrials.isInside(player)
-                || !HealingFactor.has(player)) {
+                || !HealingFactor.has(player)
+                || com.kolodkingal.enhanced.ability.UltimateWanda.is(player)) { // (3.19: she comes back in red energy, never downed)
             return;
         }
         HealingFactor.Defeat defeat = HealingFactor.defeat(event.getSource(), player);

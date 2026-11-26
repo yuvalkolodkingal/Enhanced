@@ -46,7 +46,8 @@ public class ThrownShieldRenderer extends EntityRenderer<ThrownShieldEntity> {
         poseStack.mulPose(Axis.ZP.rotationDegrees(spin));
         if (com.kolodkingal.enhanced.captain.ShieldRules.isVibranium(shield.shield())) {
             ShieldModel model = ShieldItemRenderer.get().model();
-            model.renderAll(poseStack, buffer.getBuffer(ShieldModel.renderType()), light, OverlayTexture.NO_OVERLAY);
+            model.renderAll(poseStack, buffer.getBuffer(ShieldModel.renderType(
+                    com.kolodkingal.enhanced.captain.HydraShield.is(shield.shield()))), light, OverlayTexture.NO_OVERLAY);
         } else {
             poseStack.scale(1.0F, 1.0F, 1.0F);
             Minecraft.getInstance().getItemRenderer().renderStatic(shield.shield(),
@@ -59,6 +60,6 @@ public class ThrownShieldRenderer extends EntityRenderer<ThrownShieldEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(ThrownShieldEntity shield) {
-        return ShieldModel.TEXTURE;
+        return com.kolodkingal.enhanced.captain.HydraShield.is(shield.shield()) ? ShieldModel.HYDRA_TEXTURE : ShieldModel.TEXTURE;
     }
 }

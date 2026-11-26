@@ -34,6 +34,10 @@ public record ChangeLookPayload(int step) implements CustomPacketPayload {
                 com.kolodkingal.enhanced.ability.CosmicSpider.switchLook(player, Powers.get(player));
                 return;
             }
+            // (3.19) Ultimate Wanda: H switches her menu, Sneak + H her hair
+            if (com.kolodkingal.enhanced.ability.UltimateWanda.onLookKey(player, Powers.get(player), payload.step() < 0 ? -1 : 1)) {
+                return;
+            }
             // (3.18.1) Billy the Demiurge: H and Sneak + H step through the magic types
             if (com.kolodkingal.enhanced.ability.Demiurge.cycle(player, Powers.get(player), payload.step() < 0 ? -1 : 1)) {
                 return;

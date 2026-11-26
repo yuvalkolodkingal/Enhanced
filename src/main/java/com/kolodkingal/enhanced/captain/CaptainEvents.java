@@ -165,6 +165,10 @@ public final class CaptainEvents {
     /** An axe never leaves Captain America's Vibranium Shield disabled (unless {@code axeDisables} says so). */
     @Subscribe
     public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (event.getEntity() instanceof ServerPlayer hero) {
+            // (3.19) Red Skull's and Captain Hydra's shields are Hydra's; Cap's own are his
+            HydraShield.tick(hero);
+        }
         if (!(event.getEntity() instanceof ServerPlayer player) || CaptainAbilities.cfg(CaptainConfig.AXE_DISABLES,
                 false) || !player.getCooldowns().isOnCooldown(ModItems.VIBRANIUM_SHIELD.get())
                 || !ShieldRules.isCap(player)) {

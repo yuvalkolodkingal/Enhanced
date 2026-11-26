@@ -6,8 +6,8 @@ import java.util.Map;
 
 /**
  * Every hero's looks, in the order the Change Look key cycles through them. The first one is the default. Heroes
- * without a list (Magneto, the Scarlet Witch, Quicksilver) keep their single suit, which they put on with their
- * helmet, crown or goggles.
+ * without a list (Magneto, Quicksilver) keep their single suit, which they put on with their helmet or goggles. The
+ * Scarlet Witch puts hers on with her crown too, and chooses which: her own suit or the Sorceress Supreme's.
  */
 public final class Variants {
     private static final Map<Power, List<Variant>> BY_POWER = new EnumMap<>(Power.class);
@@ -21,6 +21,17 @@ public final class Variants {
                 // (3.16: his powers burn in fire's colours)
                 new Variant("source_code", Power.VISION, Variant.suit("vision_visionquest"), Variant.suit("vision_cape"), false, 0xFF5A14, 0xFFB43C));
                 // (3.16.1: the VisionQuest look is gone: its suit is the Source Code's alone, earned in Vision's mind)
+
+        // ===== scarlet_witch =====
+        // Her own suit (its id is the one a hero without looks has: HeroLooks.SUIT, so saved heroes still find it), and the
+        // Sorceress Supreme (Russell Dauterman's design for Sorcerer Supreme, 2025; our own drawing, tools/gen_sorcerer_supreme.py)
+        // with her ginger hair or the comic's dark hair. The Sorceress Supreme has no cape of the game's: the Cloak of
+        // Levitation at her waist is a cloth of its own (render.SorcererCloakLayer), and her tiara is light
+        // (render.SorcererGlowLayer). All of them are worn only with her crown on (SuitSkins).
+        add(Power.SCARLET_WITCH,
+                new Variant("suit", Power.SCARLET_WITCH, Variant.suit("scarlet_witch"), Variant.suit("scarlet_witch_cape"), true, Power.SCARLET_WITCH.color, Power.SCARLET_WITCH.glow),
+                new Variant("sorcerer_supreme", Power.SCARLET_WITCH, Variant.suit("scarlet_witch_sorcerer_supreme"), null, true, Power.SCARLET_WITCH.color, Power.SCARLET_WITCH.glow),
+                new Variant("sorcerer_supreme_dark", Power.SCARLET_WITCH, Variant.suit("scarlet_witch_sorcerer_supreme_dark"), null, true, Power.SCARLET_WITCH.color, Power.SCARLET_WITCH.glow));
 
         add(Power.BILLY,
                 new Variant("wiccan", Power.BILLY, Variant.suit("billy_wiccan"), Variant.suit("billy_wiccan_cape"), false, Power.BILLY.color, Power.BILLY.glow),
@@ -179,6 +190,10 @@ public final class Variants {
                         0x2A4BA0, 0xE8EEF5),
                 new Variant("stealth", Power.CAPTAIN_AMERICA, Variant.suit("captain_america_stealth"), null, false,
                         0x4A5C80, 0xE8EEF5),
+                // (3.19.1) The two who rule What If... Hydra Won?, earned by beating them: characters of their own.
+                new Variant("red_skull", Power.CAPTAIN_AMERICA, Variant.suit("red_skull"), null, false, 0xB3201A, 0x3FA9FF),
+                new Variant("captain_hydra", Power.CAPTAIN_AMERICA, Variant.suit("captain_hydra"), null, false, 0x22222C,
+                        0xC8102E),
                 own(Power.CAPTAIN_AMERICA));
         // ===== red_hulk (3.8) =====
         // Red Hulk (drawn by the Hulk's renderer, lane L2's seam); Ross's own form is the player's skin with his suit.

@@ -178,7 +178,8 @@ public final class AvengersSkeletonTests {
         TestKit.assertNear(Power.FALCON.flightSpeed(), 0.10, 1.0E-6, "Falcon's 0.10");
         TestKit.assertNear(Power.LOVE.flightSpeed(), 0.10, 1.0E-6, "Love's 0.10");
         check(Variants.of(Power.CAPTAIN_AMERICA).stream().map(Variant::id).toList()
-                .equals(List.of("classic", "stealth", "own")), "Cap's three looks");
+                .equals(List.of("classic", "stealth", "red_skull", "captain_hydra", "own")),
+                "Cap's three looks, and (3.19.1) Red Skull's and Captain Hydra's (3.19: heroes of their own)");
         check(Variants.of(Power.RED_HULK).stream().map(Variant::id).toList().equals(List.of("red_hulk", "own")),
                 "Red Hulk's two");
         check(Variants.of(Power.IRON_MAN).stream().map(Variant::id).toList()
@@ -204,10 +205,10 @@ public final class AvengersSkeletonTests {
 
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void theBitsFitAndTheProtocolIsTwelve(GameTestHelper helper) {
-        check(ModNetwork.PROTOCOL_VERSION.equals("19"), "protocol 19 (3.18.3: Professor X's use button in a body he steers)");
-        check(Live.values().length == 87 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 5 (3.17 Jim) + 1 (3.18 Cosmic Spider-Man) + 1 (3.18.1 Billy the Demiurge) = 87: "
+        check(ModNetwork.PROTOCOL_VERSION.equals("22"), "protocol 22 (3.19: Ultimate Wanda's red sky; 3.19.1: a universe's name, Hydra's sky)");
+        check(Live.values().length == 90 && Live.values().length <= 127, "Live: 58 + 2 + 6 + 6 + 3 + 3 (3.16 Solar Jewel) + 2 (3.17 charged beam) + 5 (3.17 Jim) + 1 (3.18 Cosmic Spider-Man) + 1 (3.18.1 Billy the Demiurge) + 1 (3.19 Ultimate Wanda) + 1 (3.19.2 Ultimate Wanda's Eye) + 1 (3.19.2 Jean's force field) = 90: "
                 + Live.values().length);
-        check(Toggle.values().length == 25 && Toggle.values().length <= 32, "Toggle: 22 + 2 + 1 (3.18 Cosmic Spider-Man's look) = 25: "
+        check(Toggle.values().length == 26 && Toggle.values().length <= 32, "Toggle: 22 + 2 + 1 (3.18 Cosmic Spider-Man's look) + 1 (3.19 Ultimate Wanda's hair) = 26: "
                 + Toggle.values().length);
         check(Live.CAP_CHARGING.ordinal() == 58 && Live.RED_HULK_TRANSFORMING.ordinal() == 60
                 && Live.IRON_SUITING.ordinal() == 66 && Live.FALCON_GLIDING.ordinal() == 74,

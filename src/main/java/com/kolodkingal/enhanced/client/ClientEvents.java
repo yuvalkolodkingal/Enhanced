@@ -124,6 +124,7 @@ public final class ClientEvents {
         TheNoise.tick(mc);
         HeroClients.tick(mc);
         com.kolodkingal.enhanced.client.render.DemiurgeFx.tick(mc.level); // (3.18.1: Billy the Demiurge's two looks)
+        com.kolodkingal.enhanced.client.render.SorcererFx.tick(mc.level); // (the Sorceress Supreme's cloak, at rest and spread)
     }
 
     /** The game's own music waits while a speedster's Walkman song plays, and for its usual pause after the song ends. */
@@ -155,6 +156,7 @@ public final class ClientEvents {
         TheNoise.stop();
         BillyCrownLayer.clear();
         com.kolodkingal.enhanced.client.render.DemiurgeFx.clear(); // (3.18.1)
+        com.kolodkingal.enhanced.client.render.SorcererFx.clear();
         WorldEffectsRenderer.clearHexBolts();
         WorldEffectsRenderer.clearHexes();
         WorldEffectsRenderer.clearShields();
@@ -330,6 +332,13 @@ public final class ClientEvents {
         if (lookClicked && mine && power.hasPowers() && mc.screen == null && !player.isSpectator()) {
             Net.sendToServer(new ChangeLookPayload(player.isShiftKeyDown() ? -1 : 1));
         }
+        boolean readClicked = false;
+        while (KeyBindings.READ_BOOK.consumeClick()) {
+            readClicked = true;
+        }
+        if (readClicked && mc.screen == null && !player.isSpectator()) {
+            com.kolodkingal.enhanced.client.screen.BookPagesScreen.openHeld();
+        }
         boolean visionClicked = false;
         while (KeyBindings.VISION_COMMAND.consumeClick()) {
             visionClicked = true;
@@ -358,6 +367,16 @@ public final class ClientEvents {
                 // (3.18.1) Billy the Demiurge's Sneak + G: the screen of his gift of magic
                 if (i == 2 && sneak && com.kolodkingal.enhanced.ability.Demiurge.is(Powers.get(player))) {
                     com.kolodkingal.enhanced.client.screen.DemiurgeGiftScreen.open();
+                    continue;
+                }
+                // (3.19.2) Ultimate Wanda's V in her Multiverse menu: the screen of her red portals
+                if (i == 3 && !sneak && com.kolodkingal.enhanced.ability.UltimateWanda.multiverseMenu(Powers.get(player))) {
+                    com.kolodkingal.enhanced.client.strange.SlingRingScreen.openWanda();
+                    continue;
+                }
+                // (3.19.3) Jean Grey's Sneak + N: Matter Manipulation, her Build Magic, on or off
+                if (i == 5 && sneak && com.kolodkingal.enhanced.ability.PhoenixMatter.builds(Powers.get(player))) {
+                    com.kolodkingal.enhanced.client.build.BuildClient.toggle();
                     continue;
                 }
                 // (3.18) Cosmic Spider-Man's B: the screen of his portals (the places he saved, the worlds)

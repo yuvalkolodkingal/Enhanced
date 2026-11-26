@@ -269,6 +269,10 @@ public final class BillyBarrier {
             }
             return;
         }
+        if (Demiurge.is(player)) {
+            keepOut(player, level);
+            return;
+        }
         // Projectiles that cross the plate's plane within its outline.
         double halfWidth = width() * 0.5 + 0.3;
         double halfHeight = height() * 0.5 + 0.3;
@@ -291,6 +295,65 @@ public final class BillyBarrier {
                     return; // broken: the rest get through
                 }
             }
+        }
+    }
+
+    /** (3.19.4) The radius of the Demiurge's shell round his body (as the client draws it, {@code BarrierRenderer}). */
+    public static double shellRadius(Entity billy) {
+        return billy.getBbHeight() * 0.64;
+    }
+
+    /**
+     * (3.19.4) Every tick of the Demiurge's formed barrier, as Ultimate Wanda's shield ({@link UltimateShield#tick}): no
+     * creature or player of anyone else's stays inside the shell (it is put back out), no projectile of anyone else's comes
+     * near him, and no harmful spell or poison holds on him.
+     */
+    static void keepOut(ServerPlayer player, ServerLevel level) {
+        double radius = shellRadius(player);
+        Vec3 center = body(player);
+        int blue = color(player, BillyAbilities.MAIN);
+        for (Entity e : level.getEntities(player, new net.minecraft.world.phys.AABB(center, center).inflate(radius + 3.0),
+                e -> e.isAlive() && !e.isSpectator() && !(e instanceof net.minecraft.world.entity.item.ItemEntity)
+                        && e != player.getVehicle() && !player.hasPassenger(e))) {
+            if (e instanceof Projectile projectile) {
+                if (projectile.getOwner() != player && !WandaAbilities.isHeadingHome(projectile)
+                        && e.getBoundingBox().getCenter().distanceToSqr(center) < (radius + 1.5) * (radius + 1.5)) {
+                    WandaAbilities.neutralize(level, projectile, blue);
+                }
+                continue;
+            }
+            if (e instanceof Player p && p.isCreative()) {
+                continue;
+            }
+            Vec3 at = e.getBoundingBox().getCenter();
+            Vec3 away = at.subtract(center);
+            double distance = away.length();
+            double reach = radius + e.getBbWidth() / 2.0;
+            if (distance >= reach) {
+                continue;
+            }
+            double flat = Math.hypot(away.x, away.z);
+            Vec3 out = flat < 1.0E-3 ? Vec3.directionFromRotation(0, player.getYRot()) : new Vec3(away.x / flat, 0, away.z / flat);
+            Vec3 to = new Vec3(center.x, e.getY(), center.z).add(out.scale(reach + 0.4));
+            if (e instanceof ServerPlayer other) {
+                other.connection.teleport(to.x, to.y, to.z, other.getYRot(), other.getXRot());
+            } else {
+                e.teleportTo(to.x, to.y, to.z);
+            }
+            e.setDeltaMovement(out.x * 0.6, 0.2, out.z * 0.6);
+            e.hurtMarked = true;
+            Vec3 spark = center.add(out.scale(radius));
+            level.sendParticles(new EnergyParticleOptions(blue, 1.3F), spark.x, at.y, spark.z, 8, 0.2, 0.3, 0.2, 0.08);
+            level.playSound(null, spark.x, at.y, spark.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.7F, 1.9F);
+        }
+        java.util.List<net.minecraft.world.effect.MobEffectInstance> harmful = new java.util.ArrayList<>();
+        for (net.minecraft.world.effect.MobEffectInstance effect : player.getActiveEffects()) {
+            if (effect.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL) {
+                harmful.add(effect);
+            }
+        }
+        for (net.minecraft.world.effect.MobEffectInstance effect : harmful) {
+            player.removeEffect(effect.getEffect());
         }
     }
 
@@ -319,6 +382,17 @@ public final class BillyBarrier {
             return false; // his own
         }
         Vec3 from = origin(source);
+        if (Demiurge.is(billy) && attacker != billy) {
+            // (3.19.4) the Demiurge's barrier is as Ultimate Wanda's shield: no harm of anyone else's, from anywhere, gets in
+            PowerData data = Powers.get(billy);
+            if (WandaAbilities.isMeleeHit(source) && direct instanceof LivingEntity blow && blow != billy) {
+                blockMelee(billy, data, blow, event.getAmount(), source);
+            } else if (from != null) {
+                sparks(billy, from);
+            }
+            event.setCanceled(true);
+            return true;
+        }
         if (from == null || !covers(billy, from)) {
             return false;
         }
@@ -439,6 +513,9 @@ public final class BillyBarrier {
     private static float wear(ServerPlayer billy, PowerData data, float amount, @Nullable Entity cause, @Nullable DamageSource source) {
         if (!data.chaosShieldActive()) {
             return 0.0F;
+        }
+        if (Demiurge.is(billy)) {
+            return amount; // (3.19.4) the Demiurge's barrier, like Ultimate Wanda's shield, is never worn down nor shattered
         }
         boolean chaos = isChaos(cause) || (source != null && (source.is(ModDamageTypes.CHAOS_BEAM) || isChaos(source.getEntity())));
         if (!chaos && !isDark(cause, source)) {

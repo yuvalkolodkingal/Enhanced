@@ -302,7 +302,7 @@ public final class SpaceRealms {
 
     /** The Overworld: his respawn point there (bed or anchor), else the world's spawn; safe ground near it. */
     @Nullable
-    static Arrival overworld(ServerPlayer player) {
+    public static Arrival overworld(ServerPlayer player) {
         ServerLevel overworld = player.server.overworld();
         DimensionTransition spawn = player.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING);
         BlockPos around = spawn.newLevel() == overworld ? BlockPos.containing(spawn.pos())
@@ -358,7 +358,7 @@ public final class SpaceRealms {
 
     /** The first safe spot on the surface (the highest ground of a column) within {@code radius} of {@code around}. */
     @Nullable
-    static Vec3 surfaceNear(ServerLevel level, Entity traveller, BlockPos around, int radius) {
+    public static Vec3 surfaceNear(ServerLevel level, Entity traveller, BlockPos around, int radius) {
         for (BlockPos column : spiral(around, radius)) {
             level.getChunk(column.getX() >> 4, column.getZ() >> 4);
             int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, column.getX(), column.getZ());
@@ -375,7 +375,7 @@ public final class SpaceRealms {
 
     /** The first safe floor between the Nether's heights within {@code radius} of {@code around}. */
     @Nullable
-    static Vec3 floorNear(ServerLevel level, Entity traveller, BlockPos around, int radius) {
+    public static Vec3 floorNear(ServerLevel level, Entity traveller, BlockPos around, int radius) {
         for (BlockPos column : spiral(around, radius)) {
             level.getChunk(column.getX() >> 4, column.getZ() >> 4);
             BlockPos.MutableBlockPos feet = new BlockPos.MutableBlockPos(column.getX(), NETHER_MAX_Y, column.getZ());

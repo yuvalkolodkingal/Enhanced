@@ -32,6 +32,7 @@
 \bnet\.minecraft\.world\.entity\.boss\.EnderDragonPart\b => net.minecraft.world.entity.boss.enderdragon.EnderDragonPart
 \bnet\.minecraft\.world\.entity\.vehicle\.MinecartCommandBlock\b => net.minecraft.world.entity.vehicle.minecart.MinecartCommandBlock
 \bnet\.minecraft\.world\.entity\.monster\.ZombieVillager\b => net.minecraft.world.entity.monster.zombie.ZombieVillager
+\bnet\.minecraft\.world\.entity\.monster\.Zombie\b => net.minecraft.world.entity.monster.zombie.Zombie
 
 # ---- classes renamed ----
 \bResourceLocation\b => Identifier

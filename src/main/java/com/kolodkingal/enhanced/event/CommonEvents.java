@@ -247,6 +247,8 @@ public final class CommonEvents {
         if (!event.getEntity().level().isClientSide()) {
             // (3.18.1) Billy the Demiurge's powers hit much harder, whoever they hit
             event.setAmount(com.kolodkingal.enhanced.ability.Demiurge.outgoing(event.getEntity(), event.getSource(), event.getAmount()));
+            // (3.19) and Ultimate Wanda's (and a body she steers)
+            event.setAmount(com.kolodkingal.enhanced.ability.UltimateWanda.outgoing(event.getEntity(), event.getSource(), event.getAmount()));
         }
         if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
             return;
@@ -268,6 +270,16 @@ public final class CommonEvents {
             return;
         }
         if (player instanceof ServerPlayer billy && BillyBarrier.isUp(billy) && !unstoppable && BillyBarrier.absorb(billy, event)) {
+            return;
+        }
+        if (player instanceof ServerPlayer ultimate && !unstoppable
+                && com.kolodkingal.enhanced.ability.UltimateShield.stops(ultimate, source)) {
+            // (3.19) Ultimate Wanda's shield lets nothing of anyone else's in: a blow throws its striker out
+            if (WandaAbilities.isMeleeHit(source) && source.getDirectEntity() instanceof LivingEntity attacker && attacker != player
+                    && WandaAbilities.hasShieldUp(player)) {
+                WandaAbilities.blockMelee(ultimate, attacker, event.getAmount());
+            }
+            event.setCanceled(true);
             return;
         }
         if (player instanceof ServerPlayer wanda && WandaAbilities.hasShieldUp(player) && !unstoppable) {

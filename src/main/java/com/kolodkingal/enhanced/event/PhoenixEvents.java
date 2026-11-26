@@ -3,6 +3,7 @@ package com.kolodkingal.enhanced.event;
 import com.kolodkingal.enhanced.ability.PhoenixAbilities;
 import com.kolodkingal.enhanced.ability.PhoenixBurst;
 import com.kolodkingal.enhanced.ability.PhoenixPower;
+import com.kolodkingal.enhanced.ability.PhoenixShield;
 import com.kolodkingal.enhanced.ability.WandaAbilities;
 import com.kolodkingal.enhanced.custom.HeroAbility;
 import com.kolodkingal.enhanced.platform.event.LevelTickEvent;
@@ -43,6 +44,16 @@ public final class PhoenixEvents {
         if (source.is(DamageTypeTags.IS_FIRE) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)
                 && PhoenixAbilities.isFireImmune(event.getEntity())) {
             event.setCanceled(true);
+        }
+    }
+
+    // ---- (3.19.2) her psionic force field ----
+
+    /** A blow that reaches Jean through her psionic force field is cut to a third. */
+    @Subscribe(priority = Priority.HIGH)
+    public static void onPsionicShield(LivingIncomingDamageEvent event) {
+        if (PhoenixShield.guarded(event.getEntity())) {
+            event.setAmount(PhoenixShield.filter(event.getEntity(), event.getSource(), event.getAmount()));
         }
     }
 

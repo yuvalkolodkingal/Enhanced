@@ -191,6 +191,7 @@ public final class ClientSetup {
         }
         // 3.6: the Stone Wheel (J).
         registrar.keyMapping(KeyBindings.STONE_WHEEL);
+        registrar.keyMapping(KeyBindings.READ_BOOK);
         // 3.1: Build Magic's ten (Y, and the shortcuts of build mode and of a witch's undo and redo).
         for (KeyMapping key : BuildKeys.ALL) {
             registrar.keyMapping(key);
@@ -282,6 +283,8 @@ public final class ClientSetup {
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
         registrar.entityRenderer(ModEntities.HYDRA_OFFICER,
                 com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
+        registrar.entityRenderer(ModEntities.HYDRA_BOSS,
+                com.kolodkingal.enhanced.client.hydra.HydraSoldierRenderer::new);
         registrar.entityRenderer(ModEntities.HYDRA_BOLT,
                 com.kolodkingal.enhanced.client.hydra.HydraBoltRenderer::new);
         // The renderers of 3.7, one region per lane (the skeleton's stand-ins until the lanes draw their own).
@@ -351,6 +354,9 @@ public final class ClientSetup {
         // ===== eternity (3.8) =====
         registrar.dimensionEffects(Enhanced.id("eternity"),
                 new com.kolodkingal.enhanced.client.eternity.EternitySkyEffects());
+        // ===== the nexus (3.19.2) =====
+        registrar.dimensionEffects(Enhanced.id("nexus"),
+                new com.kolodkingal.enhanced.client.nexus.NexusSkyEffects());
     }
 
     /** Frost Giant skins are painted from the current textures, so new resource packs mean painting them again. */
@@ -457,6 +463,8 @@ public final class ClientSetup {
     }
 
     static void addLayers(ClientRegistrar.LayerContext layers) {
+        // (3.19.1) The zombies' rot and the Gamma Bomb's Hulk hide, over every creature of those universes.
+        com.kolodkingal.enhanced.client.world.WhatIfLooks.addLayers(layers);
         for (PlayerSkin.Model skin : layers.skins()) {
             if (layers.playerRenderer(skin) instanceof PlayerRenderer renderer) {
                 boolean slim = skin == PlayerSkin.Model.SLIM;
@@ -506,6 +514,9 @@ public final class ClientSetup {
                 // (3.18.1) Billy the Demiurge's red cloak, scarf and hood: cloth, drawn for him only
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.DemiurgeCloakLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.DemiurgeGlowLayer(renderer));
+                // The Scarlet Witch as the Sorceress Supreme: the Cloak of Levitation at her waist, her tiara and sigils of light
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.SorcererCloakLayer(renderer));
+                renderer.addLayer(new com.kolodkingal.enhanced.client.render.SorcererGlowLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.EyeAmuletLayer(renderer));
                 renderer.addLayer(new com.kolodkingal.enhanced.client.render.AstralLayer(renderer));
                 // ===== hulk (3.6) =====
@@ -596,6 +607,9 @@ public final class ClientSetup {
                 new SpeedSurfaceFx.SpeedLines());
         registrar.guiLayer(Enhanced.id("anim_state"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,
                 new AnimStateOverlay());
+        // 3.19.1: the passage between universes, a tunnel of light whenever the player comes into another one.
+        registrar.guiLayer(Enhanced.id("universe_transit"), HudAnchor.ABOVE, VanillaHud.CAMERA_OVERLAYS,
+                new com.kolodkingal.enhanced.client.world.UniverseTransit());
         // The screens of 3.0, one region per hero (the // ===== lines).
         // ===== phoenix =====
         registrar.guiLayer(Enhanced.id("mind_read"), HudAnchor.BELOW, VanillaHud.DEBUG_OVERLAY,

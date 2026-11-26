@@ -488,9 +488,14 @@ public final class BuildFx {
                         hand.z, (random.nextDouble() - 0.5) * 0.03, 0.01 + random.nextDouble() * 0.02, (random.nextDouble() - 0.5) * 0.03);
             } else {
                 // Two wisps, curling up as they rise.
+                // (3.19.3: in the colour of her Build Magic: Jean Grey's orange, or a custom hero's choice)
+                int core = com.kolodkingal.enhanced.custom.AbilityColors.color(player,
+                        com.kolodkingal.enhanced.custom.HeroAbility.WANDA_BUILD_MAGIC, Power.SCARLET_WITCH.color);
+                int glow = core == Power.SCARLET_WITCH.color ? Power.SCARLET_WITCH.glow
+                        : com.kolodkingal.enhanced.custom.AbilityColors.glowOf(core);
                 for (int i = 0; i < 2; i++) {
                     double turn = (now + i * 9) * 0.5;
-                    level.addParticle(new EnergyParticleOptions(i == 0 ? Power.SCARLET_WITCH.glow : Power.SCARLET_WITCH.color, 0.9F), hand.x, hand.y,
+                    level.addParticle(new EnergyParticleOptions(i == 0 ? glow : core, 0.9F), hand.x, hand.y,
                             hand.z, Math.sin(turn) * 0.012, 0.03 + random.nextDouble() * 0.015, Math.cos(turn) * 0.012);
                 }
             }

@@ -661,7 +661,7 @@ public final class MindPowers {
                 Shots.Aim aim = Shots.aim(p, c.v(ModuleStats.STOP_RANGE));
                 LivingEntity target = aim.target();
                 if (target == null || !AreaTargets.mayHurt(p, target, true) || target.getType().is(ModTags.BOSSES)
-                        || com.kolodkingal.enhanced.ability.Demiurge.is(target)) { // (3.18.1: time does not stop for the Demiurge)
+                        || com.kolodkingal.enhanced.ability.Demiurge.is(target) || com.kolodkingal.enhanced.ability.UltimateWanda.is(target)) { // (3.18.1: time does not stop for the Demiurge)
                     c.refuse("message.enhanced.custom.no_target");
                     return;
                 }

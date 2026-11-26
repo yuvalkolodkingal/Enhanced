@@ -37,11 +37,11 @@ import java.util.Set;
  */
 public final class MindSense {
     /** The glow of a player's mind. */
-    public static final int PLAYER_GLOW = 0xE9E0FF;
+    public static final int PLAYER_GLOW = 0xFFF0DC; // (3.19.3: her mind's glows are orange, never violet)
     /** The glow of a mind that means harm (a hostile creature). */
     public static final int HOSTILE_GLOW = 0xFF5C8A;
     /** The glow of every other mind. */
-    public static final int MIND_GLOW = 0xA98BFF;
+    public static final int MIND_GLOW = 0xFFA857;
 
     /** Where a Phoenix stood when her ping began (the middle of her body) and the game time. */
     private record Ping(Vec3 origin, long start) {
