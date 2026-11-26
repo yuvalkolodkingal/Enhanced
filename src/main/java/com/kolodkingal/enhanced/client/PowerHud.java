@@ -322,7 +322,7 @@ public class PowerHud implements LayeredDraw.Layer {
             if (ability == 2) {
                 return "ability.enhanced.scarlet_witch.ultimate.2";
             }
-            if (com.kolodkingal.enhanced.ability.UltimateWanda.multiverseMenu(data) && (ability == 1 || ability == 3)) {
+            if (com.kolodkingal.enhanced.ability.UltimateWanda.multiverseMenu(data) && (ability == 1 || ability == 3 || ability == 4)) {
                 return "ability.enhanced.scarlet_witch.multiverse." + ability;
             }
             if (ability == 1 && !com.kolodkingal.enhanced.ability.UltimateWanda.ultimateMenu(data)

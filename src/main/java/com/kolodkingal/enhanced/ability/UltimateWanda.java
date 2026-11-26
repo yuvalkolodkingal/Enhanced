@@ -110,6 +110,12 @@ public final class UltimateWanda {
     /** How far her whisper of Banishment reaches, and how often she may whisper (ticks). */
     public static final int BANISH_COOLDOWN = 20;
     private static final Map<UUID, Long> BANISH_READY = new HashMap<>();
+    /** (3.19.4) Her Chaos Energy Eruption (B in her Multiverse menu): how far it reaches, how hard it hits each one in reach
+     *  (before her {@link #damageFactor}, and never under ten hearts), and how often she may call it (ticks). */
+    public static final double ERUPTION_REACH = 30.0;
+    public static final float ERUPTION_DAMAGE = 24.0F;
+    public static final int ERUPTION_COOLDOWN = 80;
+    private static final Map<UUID, Long> ERUPTION_READY = new HashMap<>();
 
     private static final ResourceLocation HEALTH = Enhanced.id("ultimate_wanda_health");
     private static final ResourceLocation ARMOR_ID = Enhanced.id("ultimate_wanda_armor");
@@ -260,8 +266,9 @@ public final class UltimateWanda {
 
     /**
      * (3.19.2) Her Multiverse menu: R the Banishment (whom she looks at, to the Nexus between the universes), Sneak + R a red
-     * portal into the Nexus; V the screen of her red portals (the client opens it), Sneak + V saves where she stands. G, B and
-     * N stay the Scarlet Witch's (flight, the Chaos Shield, the Hex).
+     * portal into the Nexus; V the screen of her red portals (the client opens it), Sneak + V saves where she stands; (3.19.4)
+     * B the Chaos Energy Eruption ({@link #eruption}). G, Sneak + B and N stay the Scarlet Witch's (flight, the Chaos Shield,
+     * the Hex).
      */
     static boolean multiverseKey(ServerPlayer player, int ability, boolean down, boolean alt) {
         switch (ability) {
@@ -286,6 +293,15 @@ public final class UltimateWanda {
                 }
                 return true;
             }
+            case 4 -> {
+                if (alt || com.kolodkingal.enhanced.power.Powers.get(player).chaosShieldActive()) {
+                    return false; // (Sneak + B: her Chaos Shield, and its release, are the Scarlet Witch's own)
+                }
+                if (down) {
+                    eruption(player);
+                }
+                return true;
+            }
             default -> {
                 return false;
             }
@@ -307,6 +323,40 @@ public final class UltimateWanda {
         }
         BANISH_READY.put(player.getUUID(), now + BANISH_COOLDOWN);
         return com.kolodkingal.enhanced.nexus.Nexus.banish(player, target);
+    }
+
+    /**
+     * (3.19.4) B in her Multiverse menu: the Chaos Energy Eruption. Chaos breaks out of the sky and the ground all around her
+     * (the client draws it: {@code ChaosEruptionFx}), and everything she may hurt within {@link #ERUPTION_REACH} blocks takes
+     * {@link #ERUPTION_DAMAGE} (times her {@link #damageFactor}), through armour and shields. Returns how many it struck,
+     * or -1 while it is not ready.
+     */
+    public static int eruption(ServerPlayer player) {
+        long now = player.level().getGameTime();
+        if (now < ERUPTION_READY.getOrDefault(player.getUUID(), Long.MIN_VALUE)) {
+            return -1;
+        }
+        ERUPTION_READY.put(player.getUUID(), now + ERUPTION_COOLDOWN);
+        ServerLevel level = player.serverLevel();
+        Net.sendToPlayersTrackingEntityAndSelf(player, new com.kolodkingal.enhanced.network.EternityFxPayload(
+                com.kolodkingal.enhanced.network.EternityFxPayload.ERUPTION, player.getId(), player.blockPosition(), 0));
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.TRIDENT_THUNDER, SoundSource.PLAYERS, 1.6F, 0.6F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.4F, 0.5F);
+        burst(level, player, 120);
+        DamageSource source = com.kolodkingal.enhanced.registry.ModDamageTypes.source(level,
+                com.kolodkingal.enhanced.registry.ModDamageTypes.CHAOS_ERUPTION, player, player);
+        int struck = 0;
+        double r2 = ERUPTION_REACH * ERUPTION_REACH;
+        for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(ERUPTION_REACH),
+                e -> e.isAlive() && !e.isSpectator() && e.distanceToSqr(player) <= r2 && AreaTargets.mayHurt(player, e, false))) {
+            target.invulnerableTime = 0;
+            if (target.hurt(source, ERUPTION_DAMAGE)) {
+                struck++;
+                level.sendParticles(new EnergyParticleOptions(RED, 1.2F), target.getX(), target.getY() + target.getBbHeight() / 2,
+                        target.getZ(), 24, 0.3, 0.6, 0.3, 0.2);
+            }
+        }
+        return struck;
     }
 
     /** Sneak + G: the Ultimate, or the Scarlet Witch again. */
@@ -838,6 +888,7 @@ public final class UltimateWanda {
         ChaosCannon.forget(id);
         UltimateEye.forget(id);
         BANISH_READY.remove(id);
+        ERUPTION_READY.remove(id);
         com.kolodkingal.enhanced.nexus.WandaPortals.forget(id);
         REVIVE_AT.remove(id);
         LAST_HEALTH.remove(id);

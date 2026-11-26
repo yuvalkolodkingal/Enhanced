@@ -68,6 +68,12 @@ public final class EternityClient {
         BeamRenderer.registerDrawer(AvengersBeams.LOVE_EYES, LoveEyeBeamFx.DRAWER);
         EternityFx.register(EternityFxPayload.ALTAR_CHARGE, EternityClient::charge);
         EternityFx.register(EternityFxPayload.FLASH, p -> flash(p.arg()));
+        EternityFx.register(EternityFxPayload.ERUPTION, p -> {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            if (mc.level != null && mc.level.getEntity(p.entityId()) instanceof net.minecraft.world.entity.player.Player wanda) {
+                com.kolodkingal.enhanced.client.render.ChaosEruptionFx.start(mc.level, wanda);
+            }
+        });
         EternityFx.register(EternityFxPayload.ALTAR_GO, p -> flash());
         EternityFx.register(EternityFxPayload.ARRIVE, p -> flash());
         EternityFx.register(EternityFxPayload.LEAVE, p -> flash());

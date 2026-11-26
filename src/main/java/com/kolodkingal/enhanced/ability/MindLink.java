@@ -10,6 +10,7 @@ import com.kolodkingal.enhanced.network.XavierPayload;
 import com.kolodkingal.enhanced.particle.EnergyParticleOptions;
 import com.kolodkingal.enhanced.power.Live;
 import com.kolodkingal.enhanced.power.PowerData;
+import com.kolodkingal.enhanced.power.Power;
 import com.kolodkingal.enhanced.power.Powers;
 import com.kolodkingal.enhanced.registry.ModDamageTypes;
 import com.kolodkingal.enhanced.registry.ModEffects;
@@ -271,7 +272,8 @@ public final class MindLink {
             host.stopUsingItem();
             Powers.get(host).set(Live.MIND_CONTROLLED, true);
             Powers.syncIfDirty(host);
-            host.displayClientMessage(Component.translatable("message.enhanced.xavier.controlled", xavier.getDisplayName()), true);
+            host.displayClientMessage(Component.translatable("message.enhanced.mind_link.controlled", controllerTitle(xavier),
+                    xavier.getDisplayName()), true);
         } else if (target instanceof Mob mob) {
             mob.setTarget(null);
             mob.getNavigation().stop();
@@ -400,6 +402,18 @@ public final class MindLink {
      */
     public static boolean boundless(ServerPlayer xavier) {
         return UltimateWanda.is(xavier) || PhoenixBody.is(xavier);
+    }
+
+    /**
+     * (3.19.4) Who the one who took a body over is, as the one taken is told: Ultimate Wanda, or the hero's own name
+     * (Professor X, Jean Grey, the Scarlet Witch...).
+     */
+    public static Component controllerTitle(ServerPlayer mind) {
+        if (UltimateWanda.is(mind)) {
+            return Component.translatable("hud.enhanced.ultimate_wanda.title");
+        }
+        Power power = Powers.get(mind).power();
+        return (power == Power.NONE ? Power.PROFESSOR_X : power).displayName();
     }
 
     /** Forget every link (the server stopped). */

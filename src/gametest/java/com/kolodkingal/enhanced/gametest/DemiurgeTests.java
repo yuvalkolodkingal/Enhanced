@@ -176,6 +176,35 @@ public final class DemiurgeTests {
         helper.succeed();
     }
 
+    /** (3.19.4) The Demiurge's barrier is as Ultimate Wanda's shield: unbreakable, and nothing of anyone else's gets in. */
+    @EnhancedTest(template = ARENA, batch = BATCH, timeoutTicks = 60)
+    public static void hisBarrierIsUnbreakableAndLetsNothingIn(GameTestHelper helper) {
+        TestKit.Fixture f = TestKit.fixture(helper);
+        ServerPlayer player = demiurge(f);
+        ServerPlayer wanda = f.player(14.5, FLOOR, 10.5, Power.SCARLET_WITCH);
+        f.pvp(true);
+        AbilityHandler.onKey(player, 4, true, true); // (held: it stays while B is down)
+        helper.runAfterDelay(com.kolodkingal.enhanced.EnhancedConfig.BILLY_BARRIER_WIND_UP.get() + 2, () -> {
+            check(BillyBarrier.isUp(player), "Sneak + B: his barrier is up");
+            float strength = data(player).shieldStrength();
+            float health = player.getHealth();
+            player.hurt(com.kolodkingal.enhanced.registry.ModDamageTypes.source(player.level(),
+                    com.kolodkingal.enhanced.registry.ModDamageTypes.CHAOS_BEAM, wanda, wanda), 5000.0F);
+            Zombie zombie = TestKit.spawnWithNoFreeWill(helper, EntityType.ZOMBIE, new Vec3(10.5, FLOOR, 7.5));
+            player.hurt(player.damageSources().mobAttack(zombie), 10.0F);
+            player.hurt(player.damageSources().magic(), 10.0F);
+            assertNear(player.getHealth(), health, 1.0E-4, "no chaos, no blow and no spell gets in");
+            check(BillyBarrier.isUp(player), "chaos magic does not break it");
+            assertNear(data(player).shieldStrength(), strength, 1.0E-4, "nor wear it down at all");
+            zombie.teleportTo(player.getX() + 0.4, player.getY(), player.getZ());
+            player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.POISON, 200));
+            PowerTicker.tick(player);
+            check(zombie.distanceTo(player) > BillyBarrier.shellRadius(player), "nobody stays inside it: " + zombie.distanceTo(player));
+            check(!player.hasEffect(net.minecraft.world.effect.MobEffects.POISON), "no poison holds on him");
+            helper.succeed();
+        });
+    }
+
     @EnhancedTest(template = ARENA, batch = BATCH)
     public static void magicTypesStepThroughTheSorcerersAndTheKeysAreTheirs(GameTestHelper helper) {
         TestKit.Fixture f = TestKit.fixture(helper);
